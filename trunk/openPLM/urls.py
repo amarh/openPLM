@@ -12,7 +12,6 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-     (r'^admin/(?P<app_label>\w+)/(?P<model_name>\w+)/order/(?P<ol_id>\d+)/$', 'openPLM.utils.admin_views.order'),
     # Uncomment the next line to enable the admin:
      (r'^admin/', include(admin.site.urls)),
 
