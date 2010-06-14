@@ -1,0 +1,32 @@
+{% extends "MiddleDisplayObject.htm" %}
+
+<!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
+
+{% block content %}
+	<h3>RELATED DOCUMENTS AND CAD :</h3>
+	<input type="submit" value="ADD"><input type="submit" value="DISCONNECT"><br>
+	<br>
+	<table class="Content">
+	{% for ObjectDocCadItem, ObjectDocCadItemURL in ObjectDocCad %}
+		<tr class="Content">
+			{% if not forloop.first %}
+				<td class="Content"><input type="checkbox" name="ToBeDisconnected"/></td>
+				{% for ObjectDocCadItemIndividual in ObjectDocCadItem %}
+					{% ifequal forloop.counter 2 %}
+						<td class="Content"><a href={{ObjectDocCadItemURL}}>{{ObjectDocCadItemIndividual}}</a></td>
+					{% else %}
+						<td class="Content">{{ObjectDocCadItemIndividual}}</td>
+					{% endifequal %}
+				{% endfor %}
+			{% else %}
+				<td class="Content"></td>
+				{% for ObjectDocCadItemIndividual in ObjectDocCadItem %}
+					<th class="Content">{{ObjectDocCadItemIndividual}}</th>
+				{% endfor %}
+			{% endif %}
+		</tr>	
+	{% endfor %}
+	</table>
+{% endblock %}
+
+
