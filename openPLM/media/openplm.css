@@ -1,0 +1,109 @@
+/* Definir le style de la page entière */
+body 	{
+		background-color: #dddddd;
+		/* background-image: url(/media/img/fond-page.gif); */
+		/*	background-repeat: repeat-y; */
+		font-family: Comic Sans MS, Verdana, Arial, sans-serif;
+		text-align: center;
+		}
+	
+/* Definir le style de la Page limitee a 700px */
+div#Page	{
+			width: 800px;
+			background-color: #99ccff;		
+			-moz-border-radius: 3em;
+			-webkit-box-shadow: 3px 3px 6px #666;
+			-moz-box-shadow: 3px 3px 6px #666;
+			box-shadow: 3px 3px 6px #666;
+			min-height: 350px;
+			}
+/* Definir le style de la Banniere en haut de page */
+div#PageBanner	{
+				width: 670px;
+				float: left;
+				border-left: 3px solid #AAAAAA;
+				border-bottom: 3px solid #AAAAAA;
+				margin-bottom: 0px;
+				padding-top: 5px;
+				padding-left: 5px;
+				text-align: left;
+				}
+/* Definir le style de la partie Gauche de la page */
+div#PageLeft	{
+			/* background-color: #99ccff; */
+			width: 120px;
+			float: left;
+			min-height: 350px;
+			}
+
+/* Definir le style de la partie Centrale de la page */
+div#PageCenter	{
+			width: 670px;
+			float: left;
+			border-left: 3px solid #AAAAAA;
+			margin-left: 0px;
+			padding-top: 5px;
+			padding-left: 5px;
+			text-align: left;
+			vertical-align: center;
+			filter: alpha(opacity=80);
+			opacity: 0.80; 
+			}
+
+.clear {
+		clear: both;
+		}
+
+a {text-decoration: none;
+	color: blue;}
+
+table.MenuTable 	{
+				width: 100%;
+				border-width: 3px;
+				border-style: none;
+				border-color: #777777;
+				border-spacing: 0;
+				}
+
+.MenuTable tr:hover {background-color: #E6E6FF;}
+
+.MenuTable td 	{
+						padding: 5px;
+						border-width: 1px;
+						border-style: none;
+						border-color: #777777;
+						text-align: right;
+						}
+
+.MenuTable a {text-decoration: none;
+	color: black;}
+
+/* .MenuTable a:link, a:visited {
+						color: green;
+						
+						} */
+	
+/* .MenuTable a:hover, a:active, a:focus {
+						color: blue;
+						background-color: #FFFFFF;
+						} */
+
+
+table.Content 	{
+				width: 100%;
+				border-width: 3px;
+				border-style: none;
+				border-color: #777777;
+				border-spacing: 0;
+				}
+
+tr.Content	{
+			background-color: #E6E6FF;
+			}
+
+td.Content, th.Content 	{
+						padding: 3px;
+						border-width: 1px;
+						border-style: solid;
+						border-color: #777777;
+						}

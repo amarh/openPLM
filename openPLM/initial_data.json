@@ -1,0 +1,72 @@
+[
+    {
+        "pk": "draft", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "official", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "deprecated", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "draft->official->deprecated", 
+        "model": "plmapp.lifecycle", 
+        "fields": {}
+    }, 
+    {
+        "pk": "draft->official", 
+        "model": "plmapp.lifecycle", 
+        "fields": {}
+    }, 
+    {
+        "pk": 1, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "draft", 
+            "lifecycle": "draft->official->deprecated", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "official", 
+            "lifecycle": "draft->official->deprecated", 
+            "rank": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "deprecated", 
+            "lifecycle": "draft->official->deprecated", 
+            "rank": 2
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "draft", 
+            "lifecycle": "draft->official", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "official", 
+            "lifecycle": "draft->official", 
+            "rank": 1
+        }
+    }
+]

@@ -1,0 +1,39 @@
+{% extends "BaseDisplayObject.htm" %}
+
+<!-- Middle page between the BaseDisplayObject.htm and the pages which correspond to each menu -->
+
+<!-- Manage the text displayed between title tags -->
+{% block title %}
+	{{ObjectType}} | {{ObjectReference}} | {{ObjectRevision}}
+{% endblock %}
+
+<!-- Manage the text displayed in the "banner" -->
+{% block description %}
+	{{ObjectType}} | {{ObjectReference}} | {{ObjectRevision}}
+{% endblock %}
+
+<!-- Display the current date in the "banner" -->
+{% block date %}
+	{{current_date|date:"l j F Y, G:i"}}
+{% endblock %}
+
+<!-- Manage the Menu -->
+{% block menu %}
+	<p>&nbsp</p>
+	<table class="MenuTable">
+		{% for MenuItem in ObjectMenu %}
+			<tr>
+				<td>
+				<a href="/object/{{ObjectType}}/{{ObjectReference}}/{{ObjectRevision}}/{{MenuItem}}/">{{ MenuItem|upper }}</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<p>&nbsp</p>
+{% endblock %}
+
+<!-- Manage the footer -->
+{% block footer %}
+	Fin de la page
+{% endblock%}
+
