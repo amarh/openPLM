@@ -254,11 +254,3 @@ def ModifyObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionV
     VariablesDictionnary.update({'ModificationForm': ModificationFormInstance, 'NonModifyableAttributes': NonModifyableAttributesList })
     return render_to_response('DisplayObject4modification.htm', VariablesDictionnary)
 
-
-
-
-
-
-
-
-
