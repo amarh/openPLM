@@ -10,16 +10,19 @@ from django.http import HttpResponseRedirect
 from openPLM.plmapp.forms import *
 
 
-# Replace all whitespace characteres by %20 in order to be compatible with an URL
+
 def ReplaceWhitespaces(Chain):
+    """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
     return Chain.replace(" ","%20")
 
-# Build a list for the html page menu
+
 def BuildMenu():
+    """ Build a list for the html page menu"""
     return ["attributes", "lifecycle", "revisions", "history", "BOM-child", "parents", "doc-cad"]
 
-# Get Type, Reference and Revision and return an object
+
 def get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Get Type, Reference and Revision and return an object """
     obj = get_object_or_404(models.PLMObject, type=ObjectTypeValue,
                             reference=ObjectReferenceValue,
                             revision=ObjectRevisionValue)
@@ -37,8 +40,8 @@ def get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
     controller_cls = get_controller(ObjectTypeValue)
     return controller_cls(obj, user)
 
-# Initiate VariablesDictionnary we used after to transfer parameters to html pages
 def InitVariablesDictionnary(InitTypeValue, InitReferenceValue, InitRevisionValue):
+    """ Initiate VariablesDictionnary we used after to transfer parameters to html pages"""
     now = datetime.datetime.now()
     return {
         'current_date': now,
@@ -51,8 +54,8 @@ def InitVariablesDictionnary(InitTypeValue, InitReferenceValue, InitRevisionValu
 # All functions which manage the different html pages related to a part #
 #########################################################################
 
-# Manage html page for attributes
 def DisplayObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for attributes """
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
     ObjectAttributesList = []
@@ -62,9 +65,9 @@ def DisplayObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevision
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectAttributes': ObjectAttributesList})
     return render_to_response('DisplayObject.htm', VariablesDictionnary)
-
-# Manage html page for Lifecycle    
+    
 def DisplayObjectLifecycle(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for Lifecycle """
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     if request.method == 'POST':
@@ -82,8 +85,9 @@ def DisplayObjectLifecycle(request, ObjectTypeValue, ObjectReferenceValue, Objec
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectLifecycle': ObjectLifecycleList})
     return render_to_response('DisplayObjectLifecycle.htm', VariablesDictionnary)
 
-# Manage html page for revisions
+
 def DisplayObjectRevisions(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """Manage html page for revisions"""
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
@@ -96,8 +100,8 @@ def DisplayObjectRevisions(request, ObjectTypeValue, ObjectReferenceValue, Objec
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectRevisions': ObjectRevisionsList})
     return render_to_response('DisplayObjectRevisions.htm', VariablesDictionnary)
 
-# Manage html page for history
 def DisplayObjectHistory(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """Manage html page for history"""
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
@@ -109,8 +113,8 @@ def DisplayObjectHistory(request, ObjectTypeValue, ObjectReferenceValue, ObjectR
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectHistory': ObjectHistoryList})
     return render_to_response('DisplayObjectHistory.htm', VariablesDictionnary)
 
-# Manage html page for BOM and children of the part
 def DisplayObjectChild(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for BOM and children of the part """
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
@@ -124,9 +128,9 @@ def DisplayObjectChild(request, ObjectTypeValue, ObjectReferenceValue, ObjectRev
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectChild': ObjectChildList})
     return render_to_response('DisplayObjectChild.htm', VariablesDictionnary)
-
-# Manage html page for "where is used / parents" of the part 
+ 
 def DisplayObjectParents(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for "where is used / parents" of the part """
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
@@ -141,8 +145,8 @@ def DisplayObjectParents(request, ObjectTypeValue, ObjectReferenceValue, ObjectR
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectParent': ObjectParentList})
     return render_to_response('DisplayObjectParents.htm', VariablesDictionnary)
 
-# Manage html page for related documents and CAD of the part
 def DisplayObjectDocCad(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for related documents and CAD of the part"""
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
@@ -156,10 +160,8 @@ def DisplayObjectDocCad(request, ObjectTypeValue, ObjectReferenceValue, ObjectRe
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectDocCad': ObjectDocCadList})
     return render_to_response('DisplayObjectDocCad.htm', VariablesDictionnary)
 
-#########################
-# Manage html Home Page #
-#########################
 def DisplayHomePage(request):
+    """ Manage html Home Page """
     now = datetime.datetime.now()
     LoggedPerson="pjoulaud"
     VariablesDictionnary = {'LoggedPerson' : LoggedPerson}
@@ -189,8 +191,8 @@ def DisplayHomePage(request):
 # Manage html pages for part creation / modification #
 ######################################################
 
-# Create a list of an object's attributes we can't modify' and set them a value
 def CreateNonModifyableAttributesList(Classe=models.PLMObject):
+    """ Create a list of an object's attributes we can't modify' and set them a value """
     NonModifyableFieldsList = Classe.excluded_creation_fields()
     NonModifyableAttributesList=[]
     NonModifyableAttributesList.append((NonModifyableFieldsList[0], 'Person'))
@@ -199,8 +201,8 @@ def CreateNonModifyableAttributesList(Classe=models.PLMObject):
     NonModifyableAttributesList.append((NonModifyableFieldsList[3], 'Date'))
     return NonModifyableAttributesList
 
-# Manage html page for the part creation
 def CreateObject(request):
+    """ Manage html page for the part creation """
     now = datetime.datetime.now()
     LoggedPerson="pjoulaud"
     VariablesDictionnary = {'CurrentDate': now, 'LoggedPerson' : LoggedPerson}
@@ -229,8 +231,8 @@ def CreateObject(request):
     VariablesDictionnary.update({'CreationForm': CreationFormInstance, 'ObjectType': TypeChoiceFormInstance.cleaned_data["type"], 'NonModifyableAttributes': NonModifyableAttributesList })
     return render_to_response('DisplayObject4creation.htm', VariablesDictionnary)
 
-# Manage html page for part modification
 def ModifyObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for part modification """
     now = datetime.datetime.now()
     LoggedPerson="pjoulaud"
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
