@@ -95,15 +95,90 @@ table.Content 	{
 				border-style: none;
 				border-color: #777777;
 				border-spacing: 0;
+				margin: 5px;
 				}
 
 tr.Content	{
-			background-color: #E6E6FF;
+
 			}
 
-td.Content, th.Content 	{
-						padding: 3px;
-						border-width: 1px;
-						border-style: solid;
-						border-color: #777777;
-						}
+td.Content	{
+			background-color: #E6E6FF;
+			padding: 3px;
+			border-width: 1px;
+			border-style: solid;
+			border-color: #777777;
+			}
+						
+th.Content	{
+			/*background-color: #E6E6FF;*/
+			padding: 3px;
+			border-width: 1px;
+			border-style: solid;
+			border-color: #777777;
+			}
+
+div#HomePage	{
+			background-color: #ffffff;	
+			width: 1000px;
+			min-height: 550px;
+			-moz-border-radius: 1em;
+					-webkit-box-shadow: 3px 3px 6px #666;
+					-moz-box-shadow: 3px 3px 6px #666;
+					box-shadow: 3px 3px 6px #666;
+			}
+
+div#SearchArea	{
+			float: left;
+			width: 32%;
+			min-height: 550px;
+			border-style: none;
+			}
+			
+div#NavigateArea	{
+			float: left;
+			width: 68%;
+			min-height: 550px;
+			border-style: none;
+			}
+
+div#LoggedPersonBox	{
+					float: top;
+					margin: 5px;
+					background-color: #99ccff;		
+					-moz-border-radius: 1em;
+					-webkit-box-shadow: 3px 3px 6px #666;
+					-moz-box-shadow: 3px 3px 6px #666;
+					box-shadow: 3px 3px 6px #666;
+					min-height: 10px;
+					padding: 10px;
+					}
+
+div#SearchBox	{
+					float: top;
+					margin: 5px;
+					background-color: #99ccff;		
+					-moz-border-radius: 1em;
+					-webkit-box-shadow: 3px 3px 6px #666;
+					-moz-box-shadow: 3px 3px 6px #666;
+					box-shadow: 3px 3px 6px #666;
+					min-height: 200px;
+					padding: 5px;
+					}
+
+div#NavigateBox	{
+					float: top;
+					margin: 5px;
+					background-color: #99ccff;		
+					-moz-border-radius: 1em;
+					-webkit-box-shadow: 3px 3px 6px #666;
+					-moz-box-shadow: 3px 3px 6px #666;
+					box-shadow: 3px 3px 6px #666;
+					min-height: 400px;
+					padding: 5px;
+					}
+
+
+
+
+

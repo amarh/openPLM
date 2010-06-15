@@ -6,6 +6,7 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
     ("pcosquer", "pierre.cosquer@insa-rennes.fr"),
+    ("pjoulaud", "ninoo.fr@gmail.com"),
 )
 
 MANAGERS = ADMINS
@@ -22,11 +23,11 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'France/Paris'
+TIME_ZONE = 'Europe/Paris'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'fr-fr'
+LANGUAGE_CODE = 'en-en'
 
 SITE_ID = 1
 
