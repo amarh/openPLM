@@ -15,6 +15,7 @@ Contents:
     models
     controllers
     forms
+    views
 
 
 Indices and tables
