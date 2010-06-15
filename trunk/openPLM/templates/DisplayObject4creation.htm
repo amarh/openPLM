@@ -1,0 +1,41 @@
+{% extends "MiddleDisplayObject4modification.htm" %}
+
+<!-- Manage html display in the Content div which correspond to the "attributes" menu -->
+
+{% block content %}
+	<h3>OBJECT CREATION:</h3>
+		<table class="Content">
+			<tr class="Content">
+				<th>Type</th><td>{{ ObjectType }}</td>
+			</tr>
+			{% for Field, TypeOfAttribute in NonModifyableAttributes %}
+				<tr class="Content">
+					<th>{{Field}}</th>
+					{% ifequal TypeOfAttribute 'Person' %}
+					<td>{{LoggedPerson}}</td>
+					{% endifequal %}
+					{% ifequal TypeOfAttribute 'Date' %}
+					<td>{{ CurrentDate|date:"l j F Y, G:i" }}</td>
+					{% endifequal %}
+				</tr>
+			{% endfor%}
+			<form method="post" action="." >	
+			<tr class="Content">
+				<th><label for="id_type">&nbsp</label></th>
+				<td><input id="id_type" type="hidden" name="type" value="{{ObjectType}}" /></td>
+			</tr>
+			{% for Attribute in CreationForm %}
+				<tr class="Content">
+					<th>{{Attribute.label_tag}}</th><td>{{Attribute}}</td><td>{{ Attribute.errors }}</td>
+				</tr>
+			{% endfor %}
+			<tr class="Content">
+				<td>&nbsp</td><td><input type="submit" value="CREATE" /></td>
+			</tr>
+			</form>
+		</table>
+					
+	
+{% endblock %}
+
+
