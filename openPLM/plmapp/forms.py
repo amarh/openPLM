@@ -4,7 +4,7 @@ from django.forms.models import modelform_factory
 import openPLM.plmapp.models as m
 
 
-def get_creation_form(cls=m.PLMObject, initial=None):
+def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
     Returns a creation form suitable to creates an object
     of type *cls*.
@@ -16,19 +16,20 @@ def get_creation_form(cls=m.PLMObject, initial=None):
 
     If *initial* is provided, it will be used to fill the form.
     """
+    print "classe : "
+    print cls
     fields = cls.get_creation_fields()
-    Form = modelform_factory(cls, fields=fields, exclude=('type',)) 
-    if initial:
-        return Form(initial)
+    Form = modelform_factory(cls, fields=fields, exclude=('type', 'state')) 
+    if data:
+        return Form(data=data, empty_permitted=empty_allowed)
     else:
         return Form()
-
-
-def get_modification_form(cls=m.PLMObject, initial=None, instance=None):
+        
+def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     fields = cls.get_modification_fields()
     Form = modelform_factory(cls, fields=fields)
-    if initial:
-        return Form(initial)
+    if data:
+        return Form(data)
     elif instance:
         return Form(instance=instance)
     else:
@@ -37,6 +38,12 @@ def get_modification_form(cls=m.PLMObject, initial=None, instance=None):
 class TypeChoiceForm(forms.Form):
     DICT = m.get_all_plmobjects()
     TYPES = [(v, v) for v in DICT]
-    
-    type = forms.TypedChoiceField(choices=TYPES, coerce=DICT.get)
+    type = forms.TypedChoiceField(choices=TYPES)
+
+class ChoiceForm(forms.Form):
+    DICT = m.get_all_plmobjects()
+    TYPES = [(v, v) for v in DICT]
+    type = forms.TypedChoiceField(choices=TYPES, required=False)
+    reference = forms.CharField(widget=forms.TextInput(), required=False)
+    revision = forms.CharField(widget=forms.TextInput(), required=False)
 
