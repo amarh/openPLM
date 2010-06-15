@@ -16,8 +16,7 @@ def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
 
     If *initial* is provided, it will be used to fill the form.
     """
-    print "classe : "
-    print cls
+
     fields = cls.get_creation_fields()
     Form = modelform_factory(cls, fields=fields, exclude=('type', 'state')) 
     if data:

@@ -60,7 +60,7 @@ class PLMObjectController(object):
         self.__histo = ""
 
     @classmethod
-    def create(cls, reference, type, revision, user):
+    def create(cls, reference, type, revision, user, data={}):
         u"""
         This methods build a new :class:`~openPLM.plmapp.models.PLMObject` of type *class_*
         and return a :class:`PLMObjectController` associated to the created object.
@@ -80,6 +80,10 @@ class PLMObjectController(object):
         obj.revision = revision
         obj.owner = user
         obj.creator = user
+        if data:
+            for key, value in data.iteritems():
+                if key not in ["reference", "type", "revision"]:
+                    setattr(obj, key, value)
         obj.save()
         # record creation in the historic
         histo = models.History()
@@ -87,6 +91,7 @@ class PLMObjectController(object):
         histo.action = "Create"
         histo.user = user
         infos = {"type" : type, "reference" : reference, "revision" : revision}
+        infos.update(data)
         histo.details = ",".join("%s : %s" % (k,v) for k, v in infos.items())
         histo.save()
         return cls(obj, user)
@@ -107,8 +112,8 @@ class PLMObjectController(object):
             ref = form.cleaned_data["reference"]
             type = form.Meta.model.__name__
             rev = form.cleaned_data["revision"]
-            obj = cls.create(ref, type, rev, user)
-            obj.update_from_form(form)
+            obj = cls.create(ref, type, rev, user, form.cleaned_data)
+            #obj.update_from_form(form)
             return obj
         else:
             raise ValueError("form is invalid")
@@ -191,10 +196,10 @@ class PLMObjectController(object):
     def __getattr__(self, attr):
         obj = object.__getattribute__(self, "object")
         if hasattr(self, "object") and hasattr(obj, attr) and \
-           not hasattr(self, attr):
+           not attr in self.__dict__:
             return getattr(obj, attr)
         else:
-            super(PLMObjectController, self).__getattr__(attr)
+            return object.__getattribute__(self, attr)
 
     def save(self):
         u"""

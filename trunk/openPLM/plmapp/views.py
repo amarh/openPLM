@@ -208,7 +208,7 @@ def CreateObject(request):
 			TypeChoiceFormInstance = TypeChoiceForm(request.GET)
 			if TypeChoiceFormInstance.is_valid():
 				cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
-				CreationFormInstance = get_creation_form(cls, {'revision':'a', 'lifecycle': models.get_default_lifecycle(), }, True)
+				CreationFormInstance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
 				NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
 	elif request.method == 'POST':
 		if request.POST:

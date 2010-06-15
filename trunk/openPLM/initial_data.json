@@ -15,12 +15,12 @@
         "fields": {}
     }, 
     {
-        "pk": "draft->official->deprecated", 
+        "pk": "draft_official_deprecated", 
         "model": "plmapp.lifecycle", 
         "fields": {}
     }, 
     {
-        "pk": "draft->official", 
+        "pk": "draft_official", 
         "model": "plmapp.lifecycle", 
         "fields": {}
     }, 
@@ -29,7 +29,7 @@
         "model": "plmapp.lifecyclestates", 
         "fields": {
             "state": "draft", 
-            "lifecycle": "draft->official->deprecated", 
+            "lifecycle": "draft_official_deprecated", 
             "rank": 0
         }
     }, 
@@ -38,7 +38,7 @@
         "model": "plmapp.lifecyclestates", 
         "fields": {
             "state": "official", 
-            "lifecycle": "draft->official->deprecated", 
+            "lifecycle": "draft_official_deprecated", 
             "rank": 1
         }
     }, 
@@ -47,7 +47,7 @@
         "model": "plmapp.lifecyclestates", 
         "fields": {
             "state": "deprecated", 
-            "lifecycle": "draft->official->deprecated", 
+            "lifecycle": "draft_official_deprecated", 
             "rank": 2
         }
     }, 
@@ -56,7 +56,7 @@
         "model": "plmapp.lifecyclestates", 
         "fields": {
             "state": "draft", 
-            "lifecycle": "draft->official", 
+            "lifecycle": "draft_official", 
             "rank": 0
         }
     }, 
@@ -65,7 +65,7 @@
         "model": "plmapp.lifecyclestates", 
         "fields": {
             "state": "official", 
-            "lifecycle": "draft->official", 
+            "lifecycle": "draft_official", 
             "rank": 1
         }
     }
