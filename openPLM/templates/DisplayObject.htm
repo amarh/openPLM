@@ -4,15 +4,17 @@
 
 {% block content %}
 	<h3>ATTRIBUTES :</h3>
-	<input type="submit" value="EDIT"><br>
+	<form method="POST" action="/object/{{ObjectType}}/{{ObjectReference}}/{{ObjectRevision}}/modify/">
+		<input type="submit" value="EDIT"><br>
 	<br>
 	<table class="Content">
 	{% for Description,Attribute in ObjectAttributes %}
 		<tr class="Content">
-			<td class="Content">{{Description|capfirst}}</td><td class="Content">{{Attribute}}</td>
+			<td class="Content">{{Description}}</td><td class="Content">{{Attribute}}</td>
 		</tr>
 	{% endfor %}
 	</table>
+	</form>
 {% endblock %}
 
 
