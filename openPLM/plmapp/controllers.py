@@ -1,5 +1,8 @@
 import re
-import openPLM.plmapp.models as models
+try:
+    import openPLM.plmapp.models as models
+except AttributeError, e:
+    import plmapp.models as models
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 

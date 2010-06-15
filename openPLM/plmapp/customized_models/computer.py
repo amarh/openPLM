@@ -4,7 +4,7 @@ from django.contrib import admin
 try:
     from openPLM.plmapp.models import Part
     from openPLM.plmapp.controllers import PartController
-except ImportError, e:
+except ImportError:
     from plmapp.models import Part
     from plmapp.controllers import PartController
 
@@ -28,6 +28,11 @@ class SinglePart(Part):
         attrs = list(super(SinglePart, self).attributes)
         attrs.extend(["supplier", "tech_details"])
         return attrs
+
+class SinglePartController(PartController):
+    def __init__(self, *args):
+        print "passage dans SinglePartController"
+        PartController.__init__(self, *args)
 
 register(SinglePart)
 
