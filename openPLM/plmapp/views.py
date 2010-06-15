@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 import datetime
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController
+from openPLM.plmapp.controllers import PLMObjectController, get_controller
 
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -34,7 +34,8 @@ def get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
                 obj = getattr(obj, c.__name__.lower())
                 find = True
     user = models.User.objects.all()[0]
-    return PLMObjectController(obj, user)
+    controller_cls = get_controller(ObjectTypeValue)
+    return controller_cls(obj, user)
 
 # Initiate VariablesDictionnary we used after to transfer parameters to html pages
 def InitVariablesDictionnary(InitTypeValue, InitReferenceValue, InitRevisionValue):
@@ -159,30 +160,30 @@ def DisplayObjectDocCad(request, ObjectTypeValue, ObjectReferenceValue, ObjectRe
 # Manage html Home Page #
 #########################
 def DisplayHomePage(request):
-	now = datetime.datetime.now()
-	LoggedPerson="pjoulaud"
-	VariablesDictionnary = {'LoggedPerson' : LoggedPerson}
+    now = datetime.datetime.now()
+    LoggedPerson="pjoulaud"
+    VariablesDictionnary = {'LoggedPerson' : LoggedPerson}
 
-	if request.GET:
-		TypeChoiceFormInstance = TypeChoiceForm(request.GET)
-		ChoiceFormInstance = ChoiceForm(request.GET)
-	else:
-		TypeChoiceFormInstance = TypeChoiceForm()
-		ChoiceFormInstance = ChoiceForm()
-	QueryType = ""
-	QueryReference = ""
-	QueryRevision = ""
-	if ChoiceFormInstance.is_valid():
-		QueryType = ChoiceFormInstance.cleaned_data["type"]
-		QueryReference = ChoiceFormInstance.cleaned_data["reference"]
-		QueryRevision = ChoiceFormInstance.cleaned_data["revision"]
-	if QueryType or QueryReference or QueryRevision:
-		results = models.PLMObject.objects.filter(type__icontains=QueryType, reference__icontains=QueryReference, revision__icontains=QueryRevision)
-	else:
-		results = []
-	
-	VariablesDictionnary.update({'results': results, 'QueryType': QueryType, 'QueryReference': QueryReference, 'QueryRevision': QueryRevision, 'TypeChoiceForm': TypeChoiceFormInstance, 'ChoiceForm': ChoiceFormInstance})
-	return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
+    if request.GET:
+        TypeChoiceFormInstance = TypeChoiceForm(request.GET)
+        ChoiceFormInstance = ChoiceForm(request.GET)
+    else:
+        TypeChoiceFormInstance = TypeChoiceForm()
+        ChoiceFormInstance = ChoiceForm()
+    QueryType = ""
+    QueryReference = ""
+    QueryRevision = ""
+    if ChoiceFormInstance.is_valid():
+        QueryType = ChoiceFormInstance.cleaned_data["type"]
+        QueryReference = ChoiceFormInstance.cleaned_data["reference"]
+        QueryRevision = ChoiceFormInstance.cleaned_data["revision"]
+    if QueryType or QueryReference or QueryRevision:
+        results = models.PLMObject.objects.filter(type__icontains=QueryType, reference__icontains=QueryReference, revision__icontains=QueryRevision)
+    else:
+        results = []
+    
+    VariablesDictionnary.update({'results': results, 'QueryType': QueryType, 'QueryReference': QueryReference, 'QueryRevision': QueryRevision, 'TypeChoiceForm': TypeChoiceFormInstance, 'ChoiceForm': ChoiceFormInstance})
+    return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
 
 ######################################################
 # Manage html pages for part creation / modification #
@@ -190,66 +191,68 @@ def DisplayHomePage(request):
 
 # Create a list of an object's attributes we can't modify' and set them a value
 def CreateNonModifyableAttributesList(Classe=models.PLMObject):
-	NonModifyableFieldsList = Classe.excluded_creation_fields()
-	NonModifyableAttributesList=[]
-	NonModifyableAttributesList.append((NonModifyableFieldsList[0], 'Person'))
-	NonModifyableAttributesList.append((NonModifyableFieldsList[1], 'Person'))
-	NonModifyableAttributesList.append((NonModifyableFieldsList[2], 'Date'))
-	NonModifyableAttributesList.append((NonModifyableFieldsList[3], 'Date'))
-	return NonModifyableAttributesList
+    NonModifyableFieldsList = Classe.excluded_creation_fields()
+    NonModifyableAttributesList=[]
+    NonModifyableAttributesList.append((NonModifyableFieldsList[0], 'Person'))
+    NonModifyableAttributesList.append((NonModifyableFieldsList[1], 'Person'))
+    NonModifyableAttributesList.append((NonModifyableFieldsList[2], 'Date'))
+    NonModifyableAttributesList.append((NonModifyableFieldsList[3], 'Date'))
+    return NonModifyableAttributesList
 
 # Manage html page for the part creation
 def CreateObject(request):
-	now = datetime.datetime.now()
-	LoggedPerson="pjoulaud"
-	VariablesDictionnary = {'CurrentDate': now, 'LoggedPerson' : LoggedPerson}
-	if request.method == 'GET':
-		if request.GET:
-			TypeChoiceFormInstance = TypeChoiceForm(request.GET)
-			if TypeChoiceFormInstance.is_valid():
-				cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
-				CreationFormInstance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
-				NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
-	elif request.method == 'POST':
-		if request.POST:
-			TypeChoiceFormInstance = TypeChoiceForm(request.POST)
-			if TypeChoiceFormInstance.is_valid():
-				cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
-				NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
-				CreationFormInstance = get_creation_form(cls, request.POST)
-				if CreationFormInstance.is_valid():
-					user = models.User.objects.get(username=LoggedPerson)
-					controller = PLMObjectController.create_from_form(CreationFormInstance, user)
-					return HttpResponseRedirect("/object/%s/%s/%s/" % (controller.type, controller.reference, controller.revision) )
-			else:
-				return HttpResponseRedirect("/home/")
-	VariablesDictionnary.update({'CreationForm': CreationFormInstance, 'ObjectType': TypeChoiceFormInstance.cleaned_data["type"], 'NonModifyableAttributes': NonModifyableAttributesList })
-	return render_to_response('DisplayObject4creation.htm', VariablesDictionnary)
+    now = datetime.datetime.now()
+    LoggedPerson="pjoulaud"
+    VariablesDictionnary = {'CurrentDate': now, 'LoggedPerson' : LoggedPerson}
+    if request.method == 'GET':
+        if request.GET:
+            TypeChoiceFormInstance = TypeChoiceForm(request.GET)
+            if TypeChoiceFormInstance.is_valid():
+                cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
+                CreationFormInstance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
+                NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
+    elif request.method == 'POST':
+        if request.POST:
+            TypeChoiceFormInstance = TypeChoiceForm(request.POST)
+            if TypeChoiceFormInstance.is_valid():
+                type_name = TypeChoiceFormInstance.cleaned_data["type"]
+                cls = models.get_all_plmobjects()[type_name]
+                NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
+                CreationFormInstance = get_creation_form(cls, request.POST)
+                if CreationFormInstance.is_valid():
+                    user = models.User.objects.get(username=LoggedPerson)
+                    controller_cls = get_controller(type_name)
+                    controller = PLMObjectController.create_from_form(CreationFormInstance, user)
+                    return HttpResponseRedirect("/object/%s/%s/%s/" % (controller.type, controller.reference, controller.revision) )
+            else:
+                return HttpResponseRedirect("/home/")
+    VariablesDictionnary.update({'CreationForm': CreationFormInstance, 'ObjectType': TypeChoiceFormInstance.cleaned_data["type"], 'NonModifyableAttributes': NonModifyableAttributesList })
+    return render_to_response('DisplayObject4creation.htm', VariablesDictionnary)
 
 # Manage html page for part modification
 def ModifyObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
-	now = datetime.datetime.now()
-	LoggedPerson="pjoulaud"
-	VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-	VariablesDictionnary.update({'CurrentDate': now, 'LoggedPerson' : LoggedPerson})
-	cls = models.get_all_plmobjects()[ObjectTypeValue]
-	NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
-	CurrentObject = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-	if request.method == 'POST':
-		if request.POST:
-			ModificationFormInstance = get_modification_form(cls, request.POST)
-			if ModificationFormInstance.is_valid():
-				user = models.User.objects.get(username=LoggedPerson)
-				CurrentObject.update_from_form(ModificationFormInstance)
-				return HttpResponseRedirect("/object/%s/%s/%s/" % (CurrentObject.type, CurrentObject.reference, CurrentObject.revision) )
-			else:
-				pass
-		else:
-			ModificationFormInstance = get_modification_form(cls, instance = CurrentObject.object)
-	else:
-		pass
-	VariablesDictionnary.update({'ModificationForm': ModificationFormInstance, 'NonModifyableAttributes': NonModifyableAttributesList })
-	return render_to_response('DisplayObject4modification.htm', VariablesDictionnary)
+    now = datetime.datetime.now()
+    LoggedPerson="pjoulaud"
+    VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
+    VariablesDictionnary.update({'CurrentDate': now, 'LoggedPerson' : LoggedPerson})
+    cls = models.get_all_plmobjects()[ObjectTypeValue]
+    NonModifyableAttributesList = CreateNonModifyableAttributesList(cls)
+    CurrentObject = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
+    if request.method == 'POST':
+        if request.POST:
+            ModificationFormInstance = get_modification_form(cls, request.POST)
+            if ModificationFormInstance.is_valid():
+                user = models.User.objects.get(username=LoggedPerson)
+                CurrentObject.update_from_form(ModificationFormInstance)
+                return HttpResponseRedirect("/object/%s/%s/%s/" % (CurrentObject.type, CurrentObject.reference, CurrentObject.revision) )
+            else:
+                pass
+        else:
+            ModificationFormInstance = get_modification_form(cls, instance = CurrentObject.object)
+    else:
+        pass
+    VariablesDictionnary.update({'ModificationForm': ModificationFormInstance, 'NonModifyableAttributes': NonModifyableAttributesList })
+    return render_to_response('DisplayObject4modification.htm', VariablesDictionnary)
 
 
 

@@ -29,7 +29,7 @@ class MetaController(type):
                 # just a security to prevent an infinite recursion
                 return PLMObjectController
             else:
-                model = models.get_all_plmobjects[type_name]
+                model = models.get_all_plmobjects()[type_name]
                 parents = [p for p in model.__bases__ 
                                 if issubclass(p, models.PLMObject)]
                 return cls.get_controller(parents[0].__name__)
