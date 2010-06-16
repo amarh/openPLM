@@ -34,6 +34,21 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     else:
         return Form()
 
+def get_search_form(cls=m.PLMObject, data=None):
+    fields = cls.get_creation_fields()
+    fields_dict = {}
+    for field in fields:
+        model_field = cls._meta.get_field(field)
+        form_field = model_field.formfield()
+        form_field.required = False
+        fields_dict[field] = form_field
+    Form = type("Search%sForm" % cls.__name__,
+                (forms.BaseForm,), {"base_fields" : fields_dict}) 
+    if data is not None:
+        return Form(data=data, empty_permitted=True)
+    else:
+        return Form(empty_permitted=True)
+    
 class TypeChoiceForm(forms.Form):
     DICT = m.get_all_plmobjects()
     TYPES = [(v, v) for v in DICT]
