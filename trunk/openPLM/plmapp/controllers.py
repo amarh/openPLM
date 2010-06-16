@@ -1,7 +1,7 @@
 import re
 try:
     import openPLM.plmapp.models as models
-except AttributeError, e:
+except AttributeError:
     import plmapp.models as models
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
@@ -59,7 +59,7 @@ class PLMObjectController(object):
 
     def __init__(self, obj, user):
         self.object = obj
-        self.__user = user
+        self._user = user
         self.__histo = ""
 
     @classmethod
@@ -88,17 +88,14 @@ class PLMObjectController(object):
                 if key not in ["reference", "type", "revision"]:
                     setattr(obj, key, value)
         obj.save()
-        # record creation in the historic
-        histo = models.History()
-        histo.plmobject = obj
-        histo.action = "Create"
-        histo.user = user
+        res = cls(obj, user)
+        # record ceation in history
         infos = {"type" : type, "reference" : reference, "revision" : revision}
         infos.update(data)
-        histo.details = ",".join("%s : %s" % (k,v) for k, v in infos.items())
-        histo.save()
-        return cls(obj, user)
-    
+        details = ",".join("%s : %s" % (k,v) for k, v in infos.items())
+        res._save_histo("Create", details)
+        return res
+        
     @classmethod
     def create_from_form(cls, form, user):
         u"""
@@ -116,7 +113,6 @@ class PLMObjectController(object):
             type = form.Meta.model.__name__
             rev = form.cleaned_data["revision"]
             obj = cls.create(ref, type, rev, user, form.cleaned_data)
-            #obj.update_from_form(form)
             return obj
         else:
             raise ValueError("form is invalid")
@@ -150,13 +146,9 @@ class PLMObjectController(object):
                 new_state = lcl.next_state(state.name)
                 self.object.state = models.State.objects.get_or_create(name=new_state)[0]
                 self.object.save()
-                histo = models.History()
-                histo.plmobject = self.object
-                histo.action = "Promote"
-                histo.details = "change state from %(first)s to %(second)s" % \
-                             {"first" :state.name, "second" : new_state}
-                histo.user = self.__user
-                histo.save()
+                self._save_histo("Promote",
+                                 "change state from %(first)s to %(second)s" % \
+                                     {"first" :state.name, "second" : new_state})
 
             except IndexError:
                 # FIXME raises it ?
@@ -173,13 +165,8 @@ class PLMObjectController(object):
             new_state = lcl.previous_state(state.name)
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
-            histo = models.History()
-            histo.plmobject = self.object
-            histo.action = "Demote"
-            histo.details = "change state from %(first)s to %(second)s" % \
-                    {"first" :state.name, "second" : new_state}
-            histo.user = self.__user
-            histo.save()
+            self._save_histo("Demote", "change state from %(first)s to %(second)s" % \
+                    {"first" :state.name, "second" : new_state})
         except IndexError:
             # FIXME raises it ?
             pass
@@ -210,16 +197,63 @@ class PLMObjectController(object):
         """
         self.object.save()
         if self.__histo:
-            histo = models.History()
-            histo.plmobject = self.object
-            histo.action = "Modify"
-            histo.details = self.__histo 
-            histo.user = self.__user
-            histo.save()
+            self._save_histo("Modify", self.__histo) 
             self.__histo = ""
 
+    def _save_histo(self, action, details):
+        histo = models.History()
+        histo.plmobject = self.object
+        histo.action = action
+        histo.details = details 
+        histo.user = self._user
+        histo.save()
+         
+
 class PartController(PLMObjectController):
-    pass
+    
+    def add_child(self, child, quantity, order):
+        if isinstance(child, PLMObjectController):
+            child = child.object
+        # check if child is not a parent
+        if child == self.object:
+            raise ValueError("Can not add child : child is current object")
+        parents = (p[1] for p in self.get_parents(-1))
+        if child in parents:
+            raise ValueError("Can not add child %s to %s, it is a parent" %
+                                (child, self.object))
+        # create the link
+        link = models.ParentChildLink()
+        link.parent = self.object
+        link.child = child
+        link.quantity = quantity
+        link.order = order
+        link.save()
+        # records creation in history
+        self._save_histo(link.ACTION_NAME,
+                         "parent : %s\nchild : %s" % (self.object, child))
+
+    def get_children(self, max_level=1, current_level=1):
+        if max_level != -1 and current_level > max_level:
+            return []
+        links = models.ParentChildLink.objects.filter(object1=self.object)
+        res = []
+        for link in links:
+            res.append((current_level, link.child, link.quantity, link.order))
+            pc = PartController(link.child, self._user)
+            res.extend(pc.get_children(max_level, current_level + 1))
+        return res
+            
+    
+    def get_parents(self, max_level=1, current_level=1):
+        if max_level != -1 and current_level > max_level:
+            return []
+        links = models.ParentChildLink.objects.filter(object2=self.object)
+        res = []
+        for link in links:
+            res.append((current_level, link.parent, link.quantity, link.order))
+            pc = PartController(link.parent, self._user)
+            res.extend(pc.get_parents(max_level, current_level + 1))
+        return res
 
 class DocumentController(PLMObjectController):
     pass
