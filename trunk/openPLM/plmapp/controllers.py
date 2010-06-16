@@ -7,7 +7,9 @@ except AttributeError:
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
 class MetaController(type):
+    #: dict<type_name(str) : Controller(like :class:`PLMObjectController`)>
     controllers_dict = {}
+
     def __new__(mcs, name, bases, attrs):
         cls = type.__new__(mcs, name, bases, attrs)
         if "MANAGED_TYPE" in attrs:
@@ -24,6 +26,10 @@ class MetaController(type):
 
     @classmethod
     def get_controller(cls, type_name):
+        """
+        Returns the a controller (subclass of :class:`PLMObjectController`) 
+        associated to *type_name* (a string).
+        """
         if type_name in cls.controllers_dict:
             return cls.controllers_dict[type_name]
         else:
@@ -37,6 +43,7 @@ class MetaController(type):
                                 if issubclass(p, models.PLMObject)]
                 return cls.get_controller(parents[0].__name__)
 
+#: shortcut for :meth:`MetaController.get_controller`
 get_controller = MetaController.get_controller
 
 class PLMObjectController(object):
@@ -65,13 +72,14 @@ class PLMObjectController(object):
     @classmethod
     def create(cls, reference, type, revision, user, data={}):
         u"""
-        This methods build a new :class:`~openPLM.plmapp.models.PLMObject` of type *class_*
+        This method builds a new :class:`~openPLM.plmapp.models.PLMObject` of type *class_*
         and return a :class:`PLMObjectController` associated to the created object.
 
         :param reference: reference of the objet
         :param type: type of the object
         :param revision: revision of the object
         :param user: user who creates/owns the object
+        :param data: a dict<key, value> with informations to add to the plmobject
         :rtype: :class:`PLMObjectController`
         """
 
@@ -194,7 +202,7 @@ class PLMObjectController(object):
 
     def save(self):
         u"""
-        Saves :attr:`object` and write the history in the database
+        Saves :attr:`object` and records its history in the database
         """
         self.object.save()
         if self.__histo:
@@ -242,6 +250,22 @@ class PartController(PLMObjectController):
         link = models.ParentChildLink.objects.get(object1=self.object, object2=child)
         link.delete()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
+
+    def modify_child(self, child, new_quantity, new_order):
+        if isinstance(child, PLMObjectController):
+            child = child.object
+        link = models.ParentChildLink.objects.get(object1=self.object, object2=child)
+        details = ""
+        if link.quantity != new_quantity:
+            details += "quantity changes from %d to %d\n" % (link.quantity, new_quantity)
+            link.quantity = new_quantity
+        if link.order != new_order:
+            details += "order changes from %d to %d" % (link.order, new_order)
+            link.order = new_order
+        if details:
+            # do not make an update if it is useless
+            link.save(force_update=True)
+            self._save_histo("Modify - %s" % link.ACTION_NAME, details)
 
     def get_children(self, max_level=1, current_level=1):
         if max_level != -1 and current_level > max_level:
