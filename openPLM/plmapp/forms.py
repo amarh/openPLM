@@ -46,3 +46,8 @@ class ChoiceForm(forms.Form):
     reference = forms.CharField(widget=forms.TextInput(), required=False)
     revision = forms.CharField(widget=forms.TextInput(), required=False)
 
+class AddChildForm(forms.Form):
+    child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   empty_label=None)
+    quantity = forms.IntegerField(initial=1)
+    order = forms.IntegerField(initial=1)
