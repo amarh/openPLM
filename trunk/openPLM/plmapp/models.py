@@ -108,8 +108,7 @@ class Lifecycle(models.Model):
         :return: a :class:`Lifecycle`
         """
         
-        name = cycle.name
-        lifecycle = cls(name=name)
+        lifecycle = cls(name=cycle.name)
         lifecycle.save()
         for i, state_name in enumerate(cycle):
             state = State.objects.get_or_create(name=state_name)[0]
@@ -142,12 +141,15 @@ def get_default_lifecycle():
     """
     return Lifecycle.objects.all()[0]
 
-def get_default_state():
+def get_default_state(lifecycle=None):
     u"""
     Returns the default :class:`State` used when instanciate a :class:`PLMObject`.
     It's the first state of the default lifecycle.
     """
-    return State.objects.get(name=list(get_default_lifecycle())[0])
+
+    if not lifecycle:
+        lifecycle = get_default_lifecycle()
+    return State.objects.get(name=list(lifecycle)[0])
 
 
 # PLMobjects

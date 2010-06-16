@@ -87,6 +87,7 @@ class PLMObjectController(object):
             for key, value in data.iteritems():
                 if key not in ["reference", "type", "revision"]:
                     setattr(obj, key, value)
+        obj.state = models.get_default_state(obj.lifecycle)
         obj.save()
         res = cls(obj, user)
         # record ceation in history
@@ -221,6 +222,9 @@ class PartController(PLMObjectController):
         if child in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
+        # check if child is not already a direct child
+        if child in self.get_children(1):
+            raise ValueError("%s is already a child of %s" % (child, self.object))
         # create the link
         link = models.ParentChildLink()
         link.parent = self.object
@@ -232,6 +236,13 @@ class PartController(PLMObjectController):
         self._save_histo(link.ACTION_NAME,
                          "parent : %s\nchild : %s" % (self.object, child))
 
+    def delete_child(self, child):
+        if isinstance(child, PLMObjectController):
+            child = child.object
+        link = models.ParentChildLink.objects.get(object1=self.object, object2=child)
+        link.delete()
+        self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
+
     def get_children(self, max_level=1, current_level=1):
         if max_level != -1 and current_level > max_level:
             return []
@@ -242,7 +253,6 @@ class PartController(PLMObjectController):
             pc = PartController(link.child, self._user)
             res.extend(pc.get_children(max_level, current_level + 1))
         return res
-            
     
     def get_parents(self, max_level=1, current_level=1):
         if max_level != -1 and current_level > max_level:
@@ -254,6 +264,8 @@ class PartController(PLMObjectController):
             pc = PartController(link.parent, self._user)
             res.extend(pc.get_parents(max_level, current_level + 1))
         return res
+
+
 
 class DocumentController(PLMObjectController):
     pass
