@@ -42,6 +42,7 @@ def get_search_form(cls=m.PLMObject, data=None):
     for field in fields:
         model_field = cls._meta.get_field(field)
         form_field = model_field.formfield()
+        form_field.help_text = ""
         if isinstance(form_field.widget, forms.Textarea):
             form_field.widget = forms.TextInput()
         form_field.required = False
