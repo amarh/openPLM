@@ -35,15 +35,35 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
         return Form()
 
 def get_search_form(cls=m.PLMObject, data=None):
-    fields = cls.get_creation_fields()
+    fields = set(cls.get_creation_fields())
+    fields.update(set(cls.get_modification_fields()))
+    fields.difference_update(("revision", "type", "reference"))
     fields_dict = {}
     for field in fields:
         model_field = cls._meta.get_field(field)
         form_field = model_field.formfield()
+        if isinstance(form_field.widget, forms.Textarea):
+            form_field.widget = forms.TextInput()
         form_field.required = False
         fields_dict[field] = form_field
+    
+    def search(self, query_set=None):
+        if self.is_valid():
+            query = {}
+            for field in self.changed_data:
+                if isinstance(cls._meta.get_field(field),
+                              (m.models.CharField, m.models.TextField)):
+                    query[field + "__icontains"] = self.cleaned_data[field]
+                else:
+                    query[field] = self.cleaned_data[field]
+            if query_set:
+                return query_set.filter(**query)
+            else:
+                return cls.objects.filter(**query)
+    
     Form = type("Search%sForm" % cls.__name__,
-                (forms.BaseForm,), {"base_fields" : fields_dict}) 
+                (forms.BaseForm,),
+                {"base_fields" : fields_dict, "search" : search}) 
     if data is not None:
         return Form(data=data, empty_permitted=True)
     else:
