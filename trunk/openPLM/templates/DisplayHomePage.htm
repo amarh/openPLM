@@ -11,6 +11,7 @@
 	<form method="get" action="." enctype="text/plain">
 		<table class="Content">
 			{{ChoiceForm.as_table}}
+			{{AttributesForm.as_table}}
 		</table>
 		<input type="submit" value="SEARCH !">
 	</form>
@@ -19,18 +20,20 @@
 {% block ResultBlock %}
 	<table class="Content">
 		<tr class="Content">
-			<th class="Content">Type</th><th class="Content">Reference</th><th class="Content">Rev.</th>
+			<th class="Content">Type</th>
+			<th class="Content">Reference</th>
+			<th class="Content">Rev.</th>
+			<th class="Content">Name</th>
 		</tr>
-		{% if QueryType or QueryReference or QueryRevision %}
-			{% if results %}
-				{% for Object in results %}
-					<tr class="Content">
-						<td class="Content">{{Object.type|escape}}</td>
-						<td class="Content"><a href="/object/{{Object.type}}/{{Object.reference}}/{{Object.revision}}/" target="_blank">{{Object.reference|escape}}</a></td>
-						<td class="Content">{{Object.revision|escape}}</td>
-					</tr>
-				{% endfor %}
-			{% endif %}
+		{% if results %}
+			{% for Object in results %}
+				<tr class="Content">
+					<td class="Content">{{Object.type|escape}}</td>
+					<td class="Content"><a href="/object/{{Object.type}}/{{Object.reference}}/{{Object.revision}}/" target="_blank">{{Object.reference|escape}}</a></td>
+					<td class="Content">{{Object.revision|escape}}</td>
+					<td class="Content">{{Object.name|escape}}</td>
+				</tr>
+			{% endfor %}
 		{% endif %}
 	</table>
 {% endblock %}

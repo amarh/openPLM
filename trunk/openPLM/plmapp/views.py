@@ -5,7 +5,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller
 
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, QueryDict
 
 from openPLM.plmapp.forms import *
 
@@ -169,22 +169,36 @@ def DisplayHomePage(request):
     if request.GET:
         TypeChoiceFormInstance = TypeChoiceForm(request.GET)
         ChoiceFormInstance = ChoiceForm(request.GET)
+        if TypeChoiceFormInstance.is_valid():
+            print(TypeChoiceFormInstance.cleaned_data["type"])
+            cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
+            AttributesFormInstance = get_search_form(cls)
+        else:
+            print "Donnees non valides"
     else:
         TypeChoiceFormInstance = TypeChoiceForm()
         ChoiceFormInstance = ChoiceForm()
-    QueryType = ""
-    QueryReference = ""
-    QueryRevision = ""
+        AttributesFormInstance = get_search_form()
+    QueryDict = {}
     if ChoiceFormInstance.is_valid():
-        QueryType = ChoiceFormInstance.cleaned_data["type"]
-        QueryReference = ChoiceFormInstance.cleaned_data["reference"]
-        QueryRevision = ChoiceFormInstance.cleaned_data["revision"]
-    if QueryType or QueryReference or QueryRevision:
-        results = models.PLMObject.objects.filter(type__icontains=QueryType, reference__icontains=QueryReference, revision__icontains=QueryRevision)
+        for field, value in ChoiceFormInstance.cleaned_data.items():
+            if value:
+                QueryDict[field]=value
+        if AttributesFormInstance.is_valid():
+            for field, value in AttributesFormInstance.cleaned_data.items():
+                print "voici la liste"
+                print field
+                QueryDict[field]=value
+    print "QueryDict : "
+    print QueryDict    
+    if QueryDict :
+        results = models.PLMObject.objects.filter(**QueryDict)
+        print "results"
+        print results
     else:
         results = []
     
-    VariablesDictionnary.update({'results': results, 'QueryType': QueryType, 'QueryReference': QueryReference, 'QueryRevision': QueryRevision, 'TypeChoiceForm': TypeChoiceFormInstance, 'ChoiceForm': ChoiceFormInstance})
+    VariablesDictionnary.update({'results': results, 'TypeChoiceForm': TypeChoiceFormInstance, 'ChoiceForm': ChoiceFormInstance, 'AttributesForm': AttributesFormInstance})
     return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
 
 ######################################################

@@ -37,7 +37,7 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
 def get_search_form(cls=m.PLMObject, data=None):
     fields = set(cls.get_creation_fields())
     fields.update(set(cls.get_modification_fields()))
-    fields.difference_update(("revision", "type", "reference"))
+    fields.difference_update(("revision", "type", "reference", "lifecycle"))
     fields_dict = {}
     for field in fields:
         model_field = cls._meta.get_field(field)
@@ -75,12 +75,27 @@ class TypeChoiceForm(forms.Form):
     TYPES = [(v, v) for v in DICT]
     type = forms.TypedChoiceField(choices=TYPES)
 
-class ChoiceForm(forms.Form):
-    DICT = m.get_all_plmobjects()
-    TYPES = [(v, v) for v in DICT]
-    type = forms.TypedChoiceField(choices=TYPES, required=False)
+class ChoiceForm(TypeChoiceForm):
     reference = forms.CharField(widget=forms.TextInput(), required=False)
     revision = forms.CharField(widget=forms.TextInput(), required=False)
+    
+def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
+    fields = cls.get_modification_fields()
+    Form = modelform_factory(cls, fields=fields)
+    if data:
+        return Form(data)
+    elif instance:
+        return Form(instance=instance)
+    else:
+        return Form()
+        
+        
+        
+        
+        
+        
+        
+        
 
 class AddChildForm(forms.Form):
     child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
