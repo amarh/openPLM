@@ -89,16 +89,15 @@ def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
     else:
         return Form()
         
-        
-        
-        
-        
-        
-        
-        
-
 class AddChildForm(forms.Form):
     child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
                                    empty_label=None)
     quantity = forms.IntegerField(initial=1)
     order = forms.IntegerField(initial=1)
+
+class DisplayChildrenForm(forms.Form):
+    LEVELS = (("all", "All levels",),
+              ("first", "First level",),
+              ("last", "Last level"),)
+    level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
+    date = forms.DateTimeField(required=False)

@@ -1,4 +1,34 @@
+"""
+Introduction
+=============
+
+aim
+
+How to use this module
+======================
+
+explain how to use this module :
+    
+    * get_controller
+    * PLMObjectController
+        * create
+        * create_from_form
+        * update_from_form
+
+How to add a controller
+=======================
+
+speak about class name and managed_type
+
+Classes and functions
+=====================
+
+"""
+
 import re
+from datetime import datetime
+from collections import namedtuple
+
 try:
     import openPLM.plmapp.models as models
 except AttributeError:
@@ -216,24 +246,48 @@ class PLMObjectController(object):
         histo.details = details 
         histo.user = self._user
         histo.save()
-         
+
+Child = namedtuple("Child", "level link")
+Parent = namedtuple("Parent", "level link")
 
 class PartController(PLMObjectController):
-    
+    u"""
+    Controller for :class:`~openPLM.plmapp.models.Part`.
+
+    This controller adds methods to manage Parent-Child links between two
+    Parts.
+    """
+
     def add_child(self, child, quantity, order):
+        """
+        Adds *child* to *self*.
+
+        :param child: child added
+        :type child: :class:`~openPLM.plmapp.models.Part`
+        :param quantity: amount of *child* added
+        :type quantity: positive float
+        :param order: order
+        :type order: positive int
+        
+        Raises :exc:`ValueError` if *child* is already a child or a parent.
+        Raises :exc:`ValueError` if *quantity* or *order* are negative.
+        """
+
         if isinstance(child, PLMObjectController):
             child = child.object
         # check if child is not a parent
         if child == self.object:
             raise ValueError("Can not add child : child is current object")
-        parents = (p[1] for p in self.get_parents(-1))
+        parents = (p.link.parent for p in self.get_parents(-1))
         if child in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
         # check if child is not already a direct child
-        if child in self.get_children(1):
+        if child in (c.link.child for c in self.get_children(1)):
             raise ValueError("%s is already a child of %s" % (child, self.object))
-        # create the link
+        if order < 0 or quantity < 0:
+            raise ValueError("Quantity or order is negative")
+        # data are valid : create the link
         link = models.ParentChildLink()
         link.parent = self.object
         link.child = child
@@ -247,46 +301,65 @@ class PartController(PLMObjectController):
     def delete_child(self, child):
         if isinstance(child, PLMObjectController):
             child = child.object
-        link = models.ParentChildLink.objects.get(object1=self.object, object2=child)
-        link.delete()
+        link = models.ParentChildLink.objects.get(parent=self.object, 
+                                                  child=child, end_time=None)
+        link.end_time = datetime.today()
+        link.save()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
     def modify_child(self, child, new_quantity, new_order):
         if isinstance(child, PLMObjectController):
             child = child.object
-        link = models.ParentChildLink.objects.get(object1=self.object, object2=child)
+        if new_order < 0 or new_quantity < 0:
+            raise ValueError("Quantity or order is negative")
+        link = models.ParentChildLink.objects.get(parent=self.object,
+                                                  child=child, end_time=None)
+        if link.quantity == new_quantity and link.order == new_order:
+            # do not make an update if it is useless
+            return
+        link.end_time = datetime.today()
+        link.save()
+        # make a new link
+        link2 = models.ParentChildLink(parent=self.object, child=child,
+                                       quantity=new_quantity, order=new_order)
         details = ""
         if link.quantity != new_quantity:
             details += "quantity changes from %d to %d\n" % (link.quantity, new_quantity)
-            link.quantity = new_quantity
         if link.order != new_order:
             details += "order changes from %d to %d" % (link.order, new_order)
-            link.order = new_order
-        if details:
-            # do not make an update if it is useless
-            link.save(force_update=True)
-            self._save_histo("Modify - %s" % link.ACTION_NAME, details)
+        self._save_histo("Modify - %s" % link.ACTION_NAME, details)
+        link2.save(force_insert=True)
 
-    def get_children(self, max_level=1, current_level=1):
+    def get_children(self, max_level=1, current_level=1, date=None):
         if max_level != -1 and current_level > max_level:
             return []
-        links = models.ParentChildLink.objects.filter(object1=self.object)
+        if not date:
+            links = models.ParentChildLink.objects.filter(parent=self.object,
+                        end_time__exact=None)
+        else:
+            links = models.ParentChildLink.objects.filter(parent=self.object,
+                         ctime__lt=date).exclude(end_time__lt=date)
         res = []
-        for link in links:
-            res.append((current_level, link.child, link.quantity, link.order))
+        for link in links.order_by("order", "child__reference"):
+            res.append(Child(current_level, link))
             pc = PartController(link.child, self._user)
-            res.extend(pc.get_children(max_level, current_level + 1))
+            res.extend(pc.get_children(max_level, current_level + 1, date))
         return res
     
-    def get_parents(self, max_level=1, current_level=1):
+    def get_parents(self, max_level=1, current_level=1, date=None):
         if max_level != -1 and current_level > max_level:
             return []
-        links = models.ParentChildLink.objects.filter(object2=self.object)
+        if not date:
+            links = models.ParentChildLink.objects.filter(child=self.object,
+                        end_time__exact=None)
+        else:
+            links = models.ParentChildLink.objects.filter(child=self.object,
+                         ctime__lt=date).exclude(end_time__lt=date)
         res = []
         for link in links:
-            res.append((current_level, link.parent, link.quantity, link.order))
+            res.append(Parent(current_level, link))
             pc = PartController(link.parent, self._user)
-            res.extend(pc.get_parents(max_level, current_level + 1))
+            res.extend(pc.get_parents(max_level, current_level + 1, date))
         return res
 
 

@@ -405,54 +405,32 @@ class Link(models.Model):
 
 
     ACTION_NAME = "Link"
-    OBJECT1_TYPE = PLMObject
-    OBJECT2_TYPE = PLMObject
-    object1 = models.ForeignKey(PLMObject, related_name="%(class)s_object1")
-    object2 = models.ForeignKey(PLMObject, related_name="%(class)s_object2")
-    #: type is automatically set, it should not be modified
-    type = models.CharField(max_length=60, editable=False)
-
-    def __init__(self, *args, **kwargs):
-        kwargs["type"] = self.__class__.__name__
-        super(Link, self).__init__(*args, **kwargs)
-    
-    def save(self, force_insert=False, force_update=False):
-        if self.type != type(self).__name__:
-            raise ValueError("Bad value for type, should be %s", type(self).__name__)
-               
-        super(Link, self).save(force_insert, force_update)
-
     class Meta:
-        unique_together = ("object1", "object2", "type")
-
+        abstract = True
 
 class RevisionLink(Link):
     
     ACTION_NAME = "Link : revision"
-    
-    new = Link.object1
-    old = Link.object2
+    # TODO    
 
 class ParentChildLink(Link):
 
     ACTION_NAME = "Link : parent-child"
-    OBJECT1_TYPE = Part
-    OBJECT2_TYPE = Part
 
-    quantity = models.PositiveIntegerField(default=lambda: 1)
-    order = models.PositiveIntegerField(default=lambda: 1)
+    parent = models.ForeignKey(Part, related_name="%(class)s_parent")    
+    child = models.ForeignKey(Part, related_name="%(class)s_child")    
+    quantity = models.FloatField(default=lambda: 1)
+    order = models.PositiveSmallIntegerField(default=lambda: 1)
+    ctime = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     
-    def get_parent(self):
-        return self.OBJECT1_TYPE.objects.get(id=self.object1.pk)
-    def set_parent(self, parent):
-        self.object1 = parent
-    parent = property(get_parent, set_parent)
+    class Meta:
+        unique_together = ("parent", "child", "end_time")
 
-    def get_child(self):
-        return self.OBJECT2_TYPE.objects.get(id=self.object2.pk)
-    def set_child(self, child):
-        self.object2 = child
-    child = property(get_child, set_child)
+    def __unicode__(self):
+        return u"ParentChildLink<%s, %s, %f, %d>" % (self.parent, self.child,
+                                                     self.quantity, self.order)
+
 
 # import_models should be the last function
 

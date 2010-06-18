@@ -4,30 +4,35 @@
 
 {% block content %}
 	<h3>WHERE USED :</h3>
-	Display : 
-		<input type="radio" name="DisplayLevel" value="FirstLevel"/>First Level
-		<input type="radio" name="DisplayLevel" value="LastLevel"/>Last Level
-		<input type="radio" name="DisplayLevel" value="AllLevel" checked="checked"/>All Levels
-		<input type="submit" value="GO !"><br>
-	<br>
+    <form method="GET" action="">
+        Display :
+        {{ display_form.as_p }}
+        <input type="submit" value="GO !"><br/>
+    </form>
+	<br/>
 	<table class="Content">
-	{% for ObjectParentItem, ObjectParentItemURL in ObjectParent %}
-		<tr class="Content">
-		{% if not forloop.first %}
-			{% for ObjectParentItemIndividual in ObjectParentItem %}
-				{% ifequal forloop.counter 2 %}
-					<td class="Content"><a href={{ObjectParentItemURL}}>{{ObjectParentItemIndividual}}</a></td>
-				{% else %}
-					<td class="Content">{{ObjectParentItemIndividual}}</td>
-				{% endifequal %}
-			{% endfor %}
-		{% else %}
-			{% for ObjectParentItemIndividual in ObjectParentItem %}
-				<th class="Content">{{ObjectParentItemIndividual}}</th>
-			{% endfor %}
-		{% endif %}
-		</tr>	
-	{% endfor %}
+        <tr>
+            <th class="Content"> </th>
+            <th class="Content"> {{ obj.reference }} </th>
+            <th class="Content"> {{ obj.revision }} </th>
+            <th class="Content"> {{ obj.type }} </th>
+            <th class="Content"> {{ obj.name }} </th>
+            <th class="Content"> {{ obj.state.name }} </th>
+        </tr>
+        {% for level, link in parents %}
+        <tr class="Content"> 
+            <td class="Content">-{{ level}}</td>
+            <td class="Content"> 
+                <a href="/object/{{link.parent.type}}/{{link.parent.reference}}/{{link.parent.revision}}/">
+                    {{ link.parent.reference }}
+                </a>
+            </td>
+            <td class="Content"> {{ link.parent.revision }} </td>
+            <td class="Content"> {{ link.parent.type }} </td>
+            <td class="Content"> {{ link.parent.name }} </td>
+            <td class="Content"> {{ link.parent.state.name }} </td>
+        </tr>
+        {% endfor %}
 	</table>
 {% endblock %}
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render_to_response, get_object_or_404
 import datetime
+from operator import attrgetter
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller
@@ -127,15 +128,29 @@ def DisplayObjectChild(request, ObjectTypeValue, ObjectReferenceValue, ObjectRev
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
-    ObjectChildList = [
-        (["", 1, 1, ObjectReferenceValue, ObjectRevisionValue, ObjectTypeValue, "Assemble superieur de velo", "official"], ""),
-        ([range(1), 10, 1, "part011", "a", "assembly", "pedalier", "obsolete"], ReplaceWhitespaces("/object/assembly/part011/a/")),
-        ([range(2), 10, 1, "part012", "a", "part", "couronne", "officiel"], ReplaceWhitespaces("/object/part/part012/a/")),
-        ([range(2), 20, 1, "part013", "a", "part", "pedale", "officiel"], ReplaceWhitespaces("/object/part/part013/a/")),
-        ([range(1), 20, 2, "part077", "b", "assembly", "roue", "officiel"], ReplaceWhitespaces("/object/assembly/part077/a/")),
-        ]
+    if not hasattr(obj, "get_children"):
+        # TODO
+        raise TypeError()
+    date = None
+    level = "first"
+    if request.GET:
+        display_form = DisplayChildrenForm(request.GET)
+        if display_form.is_valid():
+            date = display_form.cleaned_data["date"]
+            level = display_form.cleaned_data["level"]
+    else:
+        display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
+                                                    "level" : "first"})
+    max_level = 1 if level == "first" else -1
+    children = obj.get_children(max_level, date=date)
+    if level == "last" and children:
+        maximum = max(children, key=attrgetter("level")).level
+        children = (c for c in children if c.level == maximum)
+    # convert level to html space
+    children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-    VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectChild': ObjectChildList})
+    VariablesDictionnary.update({'ObjectMenu': MenuList, 'obj' : obj,
+                                 'children': children, "display_form" : display_form })
     return render_to_response('DisplayObjectChild.htm', VariablesDictionnary)
  
 def DisplayObjectParents(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
@@ -143,15 +158,28 @@ def DisplayObjectParents(request, ObjectTypeValue, ObjectReferenceValue, ObjectR
     now = datetime.datetime.now()
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
-    ObjectParentList = [
-        (["", ObjectReferenceValue, ObjectRevisionValue, ObjectTypeValue, "Assemble superieur de velo", "official"], ""),
-        ([-1, "part011", "a", "assembly", "pedalier", "obsolete"], ReplaceWhitespaces("/object/assembly/part011/a/")),
-        ([-2, "part012", "a", "part", "couronne", "officiel"], ReplaceWhitespaces("/object/part/part012/a/")),
-        ([-2, "part013", "a", "part", "pedale", "officiel"], ReplaceWhitespaces("/object/part/part013/a/")),
-        ([-1, "part077", "b", "assembly", "roue", "officiel"], ReplaceWhitespaces("/object/assembly/part077/a/")),
-        ]
+    if not hasattr(obj, "get_parents"):
+        # TODO
+        raise TypeError()
+    date = None
+    level = "first"
+    if request.GET:
+        display_form = DisplayChildrenForm(request.GET)
+        if display_form.is_valid():
+            date = display_form.cleaned_data["date"]
+            level = display_form.cleaned_data["level"]
+    else:
+        display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
+                                                    "level" : "first"})
+    max_level = 1 if level == "first" else -1
+    parents = obj.get_parents(max_level, date=date)
+    if level == "last" and parents:
+        maximum = max(parents, key=attrgetter("level")).level
+        parents = (c for c in parents if c.level == maximum)
+
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-    VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectParent': ObjectParentList})
+    VariablesDictionnary.update({'ObjectMenu': MenuList, 'parents' :  parents,
+                                 'display_form' : display_form, 'obj': obj})
     return render_to_response('DisplayObjectParents.htm', VariablesDictionnary)
 
 def DisplayObjectDocCad(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
