@@ -57,10 +57,10 @@ def get_search_form(cls=m.PLMObject, data=None):
                     query[field + "__icontains"] = self.cleaned_data[field]
                 else:
                     query[field] = self.cleaned_data[field]
-            if query_set:
+            if query_set is not None:
                 return query_set.filter(**query)
             else:
-                return cls.objects.filter(**query)
+                return []
     
     Form = type("Search%sForm" % cls.__name__,
                 (forms.BaseForm,),
