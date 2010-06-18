@@ -4,43 +4,42 @@
 
 {% block content %}
 	<h3>BOM - CHILDREN :</h3>
-	<input type="submit" value="ADD"><input type="submit" value="EDIT"><br>
-	Display : 
-		<input type="radio" name="DisplayLevel" value="FirstLevel"/>First Level
-		<input type="radio" name="DisplayLevel" value="LastLevel"/>Last Level
-		<input type="radio" name="DisplayLevel" value="AllLevel" checked="checked"/>All Levels
-		<input type="submit" value="GO !"><br>
-	Display : 
-		<input type="radio" name="DisplayRevision" value="OfficialRevisions"/>Official Revisions
-		<input type="radio" name="DisplayRevision" value="LastRevisions" checked="checked"/>Last Revisions
-		as of : 
-		<input type="text" name="ConsideredDate" value="{{current_date|date:"d/m/Y"}}" size="10" maxlength="10"/>
-		<input type="submit" value="GO !"><br>
-	<br>
-	<table class="Content">
-	{% for ObjectChildItem, ObjectChildItemURL in ObjectChild %}
-		<tr class="Content">
-		{% if not forloop.first %}
-			{% for ObjectChildItemIndividual in ObjectChildItem %}
-				{% if forloop.first %}
-					<td class="Content">
-					{% for i in ObjectChildItemIndividual %}&nbsp &nbsp{% endfor %}
-					↳</td>
-				{% else %}
-					{% ifequal forloop.counter 4 %}
-						<td class="Content"><a href={{ObjectChildItemURL}}>{{ObjectChildItemIndividual}}</td>
-					{% else %}
-						<td class="Content">{{ObjectChildItemIndividual}}</td>
-					{% endifequal %}
-				{% endif%}
-			{% endfor %}
-		{% else %}
-			{% for ObjectChildItemIndividual in ObjectChildItem %}
-				<th class="Content">{{ObjectChildItemIndividual}}</th>
-			{% endfor %}
-		{% endif %}
-		</tr>	
-	{% endfor %}
+	<input type="submit" value="ADD"><input type="submit" value="EDIT"><br/>
+    <form method="GET" action="">
+        Display :
+        {{ display_form.as_p }}
+        <input type="submit" value="GO !"><br/>
+    </form>
+	<br/>
+    <table class="Content">
+        <tr>
+            <th class="Content"> </th>
+            <th class="Content"> Order </th>
+            <th class="Content"> Quantity </th>
+            <th class="Content"> {{ obj.reference }} </th>
+            <th class="Content"> {{ obj.revision }} </th>
+            <th class="Content"> {{ obj.type }} </th>
+            <th class="Content"> {{ obj.name }} </th>
+            <th class="Content"> {{ obj.state.name }} </th>
+        </tr>
+        {% for level, link in children %}
+        <tr class="Content"> 
+            <td class="Content">{{ level|safe}} ↳</td>
+            <td class="Content"> {{ link.order }} </td>
+            <td class="Content"> {{ link.quantity }} </td>
+            <td class="Content"> 
+                <a href="/object/{{link.child.type}}/{{link.child.reference}}/{{link.child.revision}}/">
+                    {{ link.child.reference }}
+                </a>
+            </td>
+            <td class="Content"> {{ link.child.revision }} </td>
+            <td class="Content"> {{ link.child.type }} </td>
+            <td class="Content"> {{ link.child.name }} </td>
+            <td class="Content"> {{ link.child.state.name }} </td>
+        </tr>
+
+        {% endfor %}
+ 
 	</table>
 {% endblock %}
 
