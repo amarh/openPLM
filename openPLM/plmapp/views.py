@@ -56,6 +56,7 @@ def InitVariablesDictionnary(InitTypeValue, InitReferenceValue, InitRevisionValu
 
 def DisplayObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
     """ Manage html page for attributes """
+    RequestDict = request
     obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     MenuList = obj.menu_items
     ObjectAttributesList = []
@@ -64,8 +65,16 @@ def DisplayObject(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevision
         ObjectAttributesList.append((item, getattr(obj, attr)))
     VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectAttributes': ObjectAttributesList})
+    VariablesDictionnary.update(DisplayGlobalPage(RequestDict))
+    print "VariablesDictionnary"
+    print VariablesDictionnary
     return render_to_response('DisplayObject.htm', VariablesDictionnary)
-    
+
+def DisplayHomePage(request):
+    VariablesDictionnary={}
+    VariablesDictionnary.update(DisplayGlobalPage(request))
+    return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
+
 def DisplayObjectLifecycle(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
     """ Manage html page for Lifecycle """
     now = datetime.datetime.now()
@@ -160,46 +169,49 @@ def DisplayObjectDocCad(request, ObjectTypeValue, ObjectReferenceValue, ObjectRe
     VariablesDictionnary.update({'ObjectMenu': MenuList, 'ObjectDocCad': ObjectDocCadList})
     return render_to_response('DisplayObjectDocCad.htm', VariablesDictionnary)
 
-def DisplayHomePage(request):
+###################################
+# Manage html pages for Home Page #
+###################################
+
+def DisplayGlobalPage(RequestDict):
     """ Manage html Home Page """
     now = datetime.datetime.now()
     LoggedPerson="pjoulaud"
     VariablesDictionnary = {'LoggedPerson' : LoggedPerson}
-
-    if request.GET:
-        TypeChoiceFormInstance = TypeChoiceForm(request.GET)
-        ChoiceFormInstance = ChoiceForm(request.GET)
-        if TypeChoiceFormInstance.is_valid():
-            print(TypeChoiceFormInstance.cleaned_data["type"])
-            cls = models.get_all_plmobjects()[TypeChoiceFormInstance.cleaned_data["type"]]
-            AttributesFormInstance = get_search_form(cls)
+    QueryDict = {}
+    if RequestDict.GET:
+        TypeChoiceFormInstance = TypeChoiceForm(RequestDict.GET)
+        ChoiceFormInstance = ChoiceForm(RequestDict.GET)
+        if ChoiceFormInstance.is_valid():
+            cls = models.get_all_plmobjects()[ChoiceFormInstance.cleaned_data["type"]]
+            AttributesFormInstance = get_search_form(cls, RequestDict.GET)
+            for field, value in ChoiceFormInstance.cleaned_data.items():
+                if value:
+                    QueryDict["%s__icontains"%field]=value
+            results = cls.objects.filter(**QueryDict)
+            print "results : "
+            print results   
+            QueryDict = {}
+            if AttributesFormInstance.is_valid():
+                for field, value in AttributesFormInstance.cleaned_data.items():
+                    if value:
+                        QueryDict[field]=value
+                print "QueryDict"
+                print QueryDict
+                results = AttributesFormInstance.search(results)
+                print "results2 : "
+                print results
         else:
             print "Donnees non valides"
     else:
         TypeChoiceFormInstance = TypeChoiceForm()
         ChoiceFormInstance = ChoiceForm()
         AttributesFormInstance = get_search_form()
-    QueryDict = {}
-    if ChoiceFormInstance.is_valid():
-        for field, value in ChoiceFormInstance.cleaned_data.items():
-            if value:
-                QueryDict[field]=value
-        if AttributesFormInstance.is_valid():
-            for field, value in AttributesFormInstance.cleaned_data.items():
-                print "voici la liste"
-                print field
-                QueryDict[field]=value
-    print "QueryDict : "
-    print QueryDict    
-    if QueryDict :
-        results = models.PLMObject.objects.filter(**QueryDict)
-        print "results"
-        print results
-    else:
-        results = []
-    
+        results = AttributesFormInstance.search()
+        
     VariablesDictionnary.update({'results': results, 'TypeChoiceForm': TypeChoiceFormInstance, 'ChoiceForm': ChoiceFormInstance, 'AttributesForm': AttributesFormInstance})
-    return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
+    return VariablesDictionnary
+#    return render_to_response('DisplayHomePage.htm', VariablesDictionnary)
 
 ######################################################
 # Manage html pages for part creation / modification #
