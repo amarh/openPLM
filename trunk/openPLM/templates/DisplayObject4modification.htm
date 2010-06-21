@@ -6,16 +6,16 @@
 	<h3>OBJECT MODIFICATION:</h3>
 		<table class="Content">
 			<tr class="Content">
-				<th>Type</th><td>{{ ObjectType }}</td>
+				<th>Type</th><td>{{ object_type }}</td>
 			</tr>
-			{% for Field, TypeOfAttribute in NonModifyableAttributes %}
+			{% for field, type_of_attribute in non_modifyable_attributes %}
 				<tr class="Content">
-					<th>{{Field}}</th>
-					{% ifequal TypeOfAttribute 'Person' %}
-					<td>{{LoggedPerson}}</td>
+					<th>{{field}}</th>
+					{% ifequal type_of_attribute 'Person' %}
+					<td>{{log_in_person}}</td>
 					{% endifequal %}
-					{% ifequal TypeOfAttribute 'Date' %}
-					<td>{{ CurrentDate|date:"l j F Y, G:i" }}</td>
+					{% ifequal type_of_attribute 'Date' %}
+					<td>{{ current_date|date:"l j F Y, G:i" }}</td>
 					{% endifequal %}
 				</tr>
 			{% endfor%}
@@ -24,9 +24,9 @@
 				<th><label for="id_type">&nbsp</label></th>
 				<td><input id="id_type" type="hidden" name="type" value="{{ObjectType}}" /></td>
 			</tr>
-			{% for Attribute in ModificationForm %}
+			{% for attribute in modification_form %}
 				<tr class="Content">
-					<th>{{Attribute.label_tag}}</th><td>{{Attribute}}</td><td>{{ Attribute.errors }}</td>
+					<th>{{attribute.label_tag}}</th><td>{{attribute}}</td><td>{{ attribute.errors }}</td>
 				</tr>
 			{% endfor %}
 			<tr class="Content">

@@ -6,9 +6,9 @@
 	<h3>HISTORY :</h3><br>
 	<br>
 	<table class="Content">
-	{% for Date, Action, Details in ObjectHistory %}
+	{% for date, action, details in object_history %}
 		<tr class="Content">
-			<td class="Content">{{Date}}</td><td class="Content">{{Action}}</td><td class="Content">{{Details}}</td>
+			<td class="Content">{{date}}</td><td class="Content">{{action}}</td><td class="Content">{{details}}</td>
 		</tr>
 	{% endfor %}
 	</table>

@@ -70,12 +70,12 @@ def get_search_form(cls=m.PLMObject, data=None):
     else:
         return Form(empty_permitted=True)
     
-class TypeChoiceForm(forms.Form):
+class type_form(forms.Form):
     DICT = m.get_all_plmobjects()
     TYPES = [(v, v) for v in DICT]
     type = forms.TypedChoiceField(choices=TYPES)
 
-class ChoiceForm(TypeChoiceForm):
+class attributes_form(type_form):
     reference = forms.CharField(widget=forms.TextInput(), required=False)
     revision = forms.CharField(widget=forms.TextInput(), required=False)
     
@@ -89,7 +89,7 @@ def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
     else:
         return Form()
         
-class AddChildForm(forms.Form):
+class add_child_form(forms.Form):
     child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
                                    empty_label=None)
     quantity = forms.FloatField(initial=1)

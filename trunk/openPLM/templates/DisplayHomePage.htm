@@ -3,15 +3,15 @@
 <!-- Manage html display of the home page -->
 
 {% block LoggedPersonBlock %}
-{{LoggedPerson}}
+    {{log_in_person}} | {{current_date|date:"l j F Y, G:i"}}
 {% endblock %}
 
 {% block SearchBlock %}
 	Search for :
 	<form method="get" action="." enctype="text/plain">
 		<table class="Content">
-			{{ChoiceForm.as_table}}
-			{{AttributesForm.as_table}}
+			{{attributes_form.as_table}}
+			{{extra_attributes_form.as_table}}
 		</table>
 		<input type="submit" value="SEARCH !">
 	</form>
@@ -29,7 +29,7 @@
 			{% for Object in results %}
 				<tr class="Content">
 					<td class="Content">{{Object.type|escape}}</td>
-					<td class="Content"><a href="/object/{{Object.type}}/{{Object.reference}}/{{Object.revision}}/" target="_blank">{{Object.reference|escape}}</a></td>
+					<td class="Content"><a href="/object/{{Object.type}}/{{Object.reference}}/{{Object.revision}}/">{{Object.reference|escape}}</a></td>
 					<td class="Content">{{Object.revision|escape}}</td>
 					<td class="Content">{{Object.name|escape}}</td>
 				</tr>
@@ -42,9 +42,9 @@
 	<form method="get" action="/object/create/" enctype="text/plain">
 		<table class="Content">
 			<tr>
-				{% for Attribute in TypeChoiceForm %}
-					<th>{{Attribute.label_tag}}</th>
-					<td>{{ Attribute }}</td>
+				{% for attribute in type_form %}
+					<th>{{attribute.label_tag}}</th>
+					<td>{{attribute}}</td>
 				{% endfor %}
 				<td><input type="submit" value="CREATE !"></td>
 			</tr>
@@ -52,6 +52,6 @@
 	</form>
 {% endblock %}
 
-{% block NavigateBlock %}
-<p>NavigateBlock</p>
-{% endblock %}
+
+
+

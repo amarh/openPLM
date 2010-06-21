@@ -5,26 +5,17 @@
 <head>
 	<meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
 	<link rel="stylesheet" type="text/css" href="/media/openplm.css" />
-	<title>{{LoggedPerson}} HOME PAGE</title>
+	<title>{{title}}{{endblock}}</title>
 	<meta name="Author" content="philippe.joulaud" />
 	<meta name="Classification" content="" />
 	<meta name="Description" content="" />
 	<meta name="keywords" content="" />
-
-	<script>
-	function pop() {
-	window.open('popup.html','height=100px,width=100px,top=100px,left=100px,resible=no');
-	}
-	</script> 
-
 </head>
+
 <body>
 <center>
 	<div id="HomePage" >
 		<div id="SearchArea">
-			<div id="LoggedPersonBox">
-				{% block LoggedPersonBlock %}{% endblock %}
-			</div>
 			<div id="SearchBox">
 				{% block SearchBlock %}{% endblock %}
 			</div>
@@ -34,13 +25,16 @@
 		</div>
 		<div id="NavigateArea">
 			<div id="LoggedPersonBox">
+				{% block LoggedPersonBlock %}{% endblock %}
+			</div>
+			<div id="LoggedPersonBox">
 				{% block CreationBlock %}{% endblock %}
 			</div>
 			<div id="NavigateBox">
-				{% block NavigateBlock %}{% endblock %}
+				{% block ObjectBlock %}{% endblock %}
 			</div>
 		</div>
-			<br class="clear" />
+		<br class="clear" />
 	</div>
 
 </center>
