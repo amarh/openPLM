@@ -4,13 +4,13 @@
 
 {% block content %}
 	<h3>ATTRIBUTES :</h3>
-	<form method="POST" action="/object/{{ObjectType}}/{{ObjectReference}}/{{ObjectRevision}}/modify/">
+	<form method="POST" action="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
 		<input type="submit" value="EDIT"><br>
 	<br>
 	<table class="Content">
-	{% for Description,Attribute in ObjectAttributes %}
+	{% for description,attribute in object_attributes %}
 		<tr class="Content">
-			<td class="Content">{{Description}}</td><td class="Content">{{Attribute}}</td>
+			<td class="Content">{{description}}</td><td class="Content">{{attribute}}</td>
 		</tr>
 	{% endfor %}
 	</table>

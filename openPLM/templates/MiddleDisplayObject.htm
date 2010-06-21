@@ -1,41 +1,36 @@
-{% extends "BaseDisplayObject.htm" %}
+{% extends "DisplayHomePage.htm" %}
 
 <!-- Middle page between the BaseDisplayObject.htm and the pages which correspond to each menu -->
 
 <!-- Manage the text displayed between title tags -->
 {% block title %}
-	{{ObjectType}} | {{ObjectReference}} | {{ObjectRevision}}
+	{{object_type}} | {{object_reference}} | {{object_revision}}
 {% endblock %}
 
-<!-- Manage the text displayed in the "banner" -->
-{% block description %}
-	{{ObjectType}} | {{ObjectReference}} | {{ObjectRevision}}
+<!-- Manage the Navigate block which have an object menu, a banner and a content -->
+{% block ObjectBlock %}
+    <div id="PageLeft">
+        <br />
+        <br />
+        <br />
+    	<table class="MenuTable">
+    		{% for menu_item in object_menu %}
+    			<tr>
+    				<td>
+    				<a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">{{ menu_item|upper }}</a>
+    				</td>
+    			</tr>
+    		{% endfor %}
+    	</table>
+    	<p>&nbsp</p>
+    </div>
+	<div id="PageBanner">
+		<h2>{{object_type}} | {{object_reference}} | {{object_revision}}</h2>
+	</div>
+	<div id="PageCenter">
+		{% block content %}{% endblock %}
+		<p>&nbsp</p>
+		<p>&nbsp</p>
+	</div>
+	<br class="clear" />
 {% endblock %}
-
-<!-- Display the current date in the "banner" -->
-{% block date %}
-	{{current_date|date:"l j F Y, G:i"}}
-{% endblock %}
-
-<!-- Manage the Menu -->
-{% block menu %}
-	<p>&nbsp</p>
-	<a href="/home/"><img src="/media/img/home.gif" height=60px width=60px alt="home"></a>
-	<p>&nbsp</p>
-	<table class="MenuTable">
-		{% for MenuItem in ObjectMenu %}
-			<tr>
-				<td>
-				<a href="/object/{{ObjectType}}/{{ObjectReference}}/{{ObjectRevision}}/{{MenuItem}}/">{{ MenuItem|upper }}</a>
-				</td>
-			</tr>
-		{% endfor %}
-	</table>
-	<p>&nbsp</p>
-{% endblock %}
-
-<!-- Manage the footer -->
-{% block footer %}
-	Fin de la page
-{% endblock%}
-

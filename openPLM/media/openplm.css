@@ -5,11 +5,13 @@ body 	{
 		/*	background-repeat: repeat-y; */
 		font-family: Comic Sans MS, Verdana, Arial, sans-serif;
 		text-align: center;
+		padding: 0px;
+		margin: 5px;
 		}
 	
 /* Definir le style de la Page limitee a 700px */
 div#Page	{
-			width: 800px;
+			width: 1200px;
 			background-color: #99ccff;		
 			-moz-border-radius: 3em;
 			-webkit-box-shadow: 3px 3px 6px #666;
@@ -19,10 +21,11 @@ div#Page	{
 			}
 /* Definir le style de la Banniere en haut de page */
 div#PageBanner	{
-				width: 670px;
+				width: 77%;
 				float: left;
 				border-left: 3px solid #AAAAAA;
 				border-bottom: 3px solid #AAAAAA;
+				/*border: solid;*/
 				margin-bottom: 0px;
 				padding-top: 5px;
 				padding-left: 5px;
@@ -31,14 +34,16 @@ div#PageBanner	{
 /* Definir le style de la partie Gauche de la page */
 div#PageLeft	{
 			/* background-color: #99ccff; */
-			width: 120px;
+			width: 17%;
 			float: left;
 			min-height: 350px;
+			/*border: solid;*/
 			}
 
 /* Definir le style de la partie Centrale de la page */
 div#PageCenter	{
-			width: 670px;
+			width: 77%;
+			height: 100%;
 			float: left;
 			border-left: 3px solid #AAAAAA;
 			margin-left: 0px;
@@ -68,11 +73,12 @@ table.MenuTable 	{
 .MenuTable tr:hover {background-color: #E6E6FF;}
 
 .MenuTable td 	{
-						padding: 5px;
+						padding: 2px 5px 5px 0px;
 						border-width: 1px;
 						border-style: none;
 						border-color: #777777;
 						text-align: right;
+						font-size: 100%;
 						}
 
 .MenuTable a {text-decoration: none;
@@ -90,7 +96,7 @@ table.MenuTable 	{
 
 
 table.Content 	{
-				width: 100%;
+				min-width: 90%;
 				border-width: 3px;
 				border-style: none;
 				border-color: #777777;
@@ -122,6 +128,8 @@ div#HomePage	{
 			background-color: #ffffff;	
 			width: 1000px;
 			min-height: 550px;
+			padding: 0%;
+			margin: 0px;
 			-moz-border-radius: 1em;
 					-webkit-box-shadow: 3px 3px 6px #666;
 					-moz-box-shadow: 3px 3px 6px #666;
@@ -130,33 +138,38 @@ div#HomePage	{
 
 div#SearchArea	{
 			float: left;
-			width: 32%;
+			width: 35%;
 			min-height: 550px;
 			border-style: none;
+			margin: 0px;
+			padding: 0px;
 			}
 			
 div#NavigateArea	{
 			float: left;
-			width: 68%;
+			width: 65%;
 			min-height: 550px;
 			border-style: none;
+			margin: 0px;
+			padding: 0px;
 			}
 
 div#LoggedPersonBox	{
-					float: top;
-					margin: 5px;
+					float: left;
+					width: 44%;
+					margin: 1%;
 					background-color: #99ccff;		
 					-moz-border-radius: 1em;
 					-webkit-box-shadow: 3px 3px 6px #666;
 					-moz-box-shadow: 3px 3px 6px #666;
 					box-shadow: 3px 3px 6px #666;
-					min-height: 10px;
+					height: 30px;
 					padding: 10px;
 					}
 
 div#SearchBox	{
 					float: top;
-					margin: 5px;
+					margin: 1%;
 					background-color: #99ccff;		
 					-moz-border-radius: 1em;
 					-webkit-box-shadow: 3px 3px 6px #666;
@@ -167,13 +180,14 @@ div#SearchBox	{
 					}
 
 div#NavigateBox	{
-					float: top;
-					margin: 5px;
+					float: left;
+					margin: 1%;
 					background-color: #99ccff;		
 					-moz-border-radius: 1em;
 					-webkit-box-shadow: 3px 3px 6px #666;
 					-moz-box-shadow: 3px 3px 6px #666;
 					box-shadow: 3px 3px 6px #666;
+					width: 96%;
 					min-height: 400px;
 					padding: 5px;
 					}

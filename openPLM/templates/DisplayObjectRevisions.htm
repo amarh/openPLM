@@ -7,12 +7,12 @@
 	<input type="submit" value="DELETE"><input type="submit" value="NEW"><br>
 	<br>
 	<table class="Content">
-	{% for Type, Reference, Revision, Status in ObjectRevisions %}
+	{% for type, reference, revision, status in object_revisions %}
 		<tr class="Content">
-			<td class="Content"><a href="/object/{{Type}}/{{Reference}}/{{Revision}}/">{{Reference}}</a></td>
-				<td class="Content">{{Revision}}</td>
-					<td class="Content">{{Type}}</td>
-						<td class="Content">{{Status}}</td>
+			<td class="Content"><a href="/object/{{Type}}/{{Reference}}/{{Revision}}/">{{reference}}</a></td>
+				<td class="Content">{{revision}}</td>
+					<td class="Content">{{type}}</td>
+						<td class="Content">{{status}}</td>
 		</tr>	
 	{% endfor %}
 	</table>

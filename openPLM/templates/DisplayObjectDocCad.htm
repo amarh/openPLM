@@ -7,21 +7,21 @@
 	<input type="submit" value="ADD"><input type="submit" value="DISCONNECT"><br>
 	<br>
 	<table class="Content">
-	{% for ObjectDocCadItem, ObjectDocCadItemURL in ObjectDocCad %}
+	{% for object_doc_cad_item, object_doc_cad_itemURL in object_doc_cad %}
 		<tr class="Content">
 			{% if not forloop.first %}
 				<td class="Content"><input type="checkbox" name="ToBeDisconnected"/></td>
-				{% for ObjectDocCadItemIndividual in ObjectDocCadItem %}
+				{% for object_doc_cad_item_individual in object_doc_cad_item %}
 					{% ifequal forloop.counter 2 %}
-						<td class="Content"><a href={{ObjectDocCadItemURL}}>{{ObjectDocCadItemIndividual}}</a></td>
+						<td class="Content"><a href={{object_doc_cad_itemURL}}>{{object_doc_cad_item_individual}}</a></td>
 					{% else %}
-						<td class="Content">{{ObjectDocCadItemIndividual}}</td>
+						<td class="Content">{{object_doc_cad_item_individual}}</td>
 					{% endifequal %}
 				{% endfor %}
 			{% else %}
 				<td class="Content"></td>
-				{% for ObjectDocCadItemIndividual in ObjectDocCadItem %}
-					<th class="Content">{{ObjectDocCadItemIndividual}}</th>
+				{% for object_doc_cad_item_individual in object_doc_cad_item %}
+					<th class="Content">{{object_doc_cad_item_individual}}</th>
 				{% endfor %}
 			{% endif %}
 		</tr>	
