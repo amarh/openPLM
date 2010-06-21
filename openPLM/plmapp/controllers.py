@@ -278,12 +278,12 @@ class PartController(PLMObjectController):
         # check if child is not a parent
         if child == self.object:
             raise ValueError("Can not add child : child is current object")
-        parents = (p.link.parent for p in self.get_parents(-1))
-        if child in parents:
+        parents = (p.link.parent.pk for p in self.get_parents(-1))
+        if child.pk in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
         # check if child is not already a direct child
-        if child in (c.link.child for c in self.get_children(1)):
+        if child.pk in (c.link.child.pk for c in self.get_children(1)):
             raise ValueError("%s is already a child of %s" % (child, self.object))
         if order < 0 or quantity < 0:
             raise ValueError("Quantity or order is negative")
@@ -362,7 +362,20 @@ class PartController(PLMObjectController):
             res.extend(pc.get_parents(max_level, current_level + 1, date))
         return res
 
-
+    def update_children(self, formset):
+        if formset.is_valid():
+            for form in formset.forms:
+                parent = form.cleaned_data["parent"]
+                if parent.pk != self.object.pk:
+                    raise ValueError("Bad parent %s (%s expected)" % (parent, self.object))
+                delete = form.cleaned_data["delete"]
+                child = form.cleaned_data["child"]
+                if delete:
+                    self.delete_child(child)
+                else:
+                    quantity = form.cleaned_data["quantity"]
+                    order = form.cleaned_data["order"]
+                    self.modify_child(child, quantity, order)
 
 class DocumentController(PLMObjectController):
     pass

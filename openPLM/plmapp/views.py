@@ -153,6 +153,28 @@ def DisplayObjectChild(request, ObjectTypeValue, ObjectReferenceValue, ObjectRev
                                  'children': children, "display_form" : display_form })
     return render_to_response('DisplayObjectChild.htm', VariablesDictionnary)
  
+def edit_children(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for BOM and children of the part : edition"""
+    now = datetime.datetime.now()
+    obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
+    MenuList = obj.menu_items
+    if not hasattr(obj, "get_children"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        if request.POST.get("action", "Undo") == "Undo":
+            return HttpResponseRedirect("..")
+        formset = get_children_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_children(formset)
+            return HttpResponseRedirect("..")
+    else:
+        formset = get_children_formset(obj)
+    VariablesDictionnary = InitVariablesDictionnary(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
+    VariablesDictionnary.update({'ObjectMenu': MenuList, 'obj' : obj,
+                                 'children_formset': formset, })
+    return render_to_response('DisplayObjectChildEdit.htm', VariablesDictionnary)
+
 def DisplayObjectParents(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
     """ Manage html page for "where is used / parents" of the part """
     now = datetime.datetime.now()

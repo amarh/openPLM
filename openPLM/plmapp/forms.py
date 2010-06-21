@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.models import modelform_factory
+from django.forms.models import modelform_factory, modelformset_factory
 
 import openPLM.plmapp.models as m
 
@@ -92,7 +92,7 @@ def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
 class AddChildForm(forms.Form):
     child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
                                    empty_label=None)
-    quantity = forms.IntegerField(initial=1)
+    quantity = forms.FloatField(initial=1)
     order = forms.IntegerField(initial=1)
 
 class DisplayChildrenForm(forms.Form):
@@ -101,3 +101,24 @@ class DisplayChildrenForm(forms.Form):
               ("last", "Last level"),)
     level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
     date = forms.DateTimeField(required=False)
+
+class ModifyChildForm(forms.ModelForm):
+    delete = forms.BooleanField(required=False, initial=False)
+    parent = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   widget=forms.HiddenInput())
+    child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   widget=forms.HiddenInput())
+
+    class Meta:
+        model = m.ParentChildLink
+        fields = ["order", "quantity", "child", "parent"]
+
+def get_children_formset(controller, data=None):
+    Formset = modelformset_factory(m.ParentChildLink, form=ModifyChildForm, extra=0)
+    if data is None:
+        queryset = m.ParentChildLink.objects.filter(parent=controller,
+                                                    end_time__exact=None)
+        formset = Formset(queryset=queryset)
+    else:
+        formset = Formset(data=data)
+    return formset
