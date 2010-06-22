@@ -27,7 +27,10 @@ settings.configure()
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.inheritance_diagram']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx', 'sphinx.ext.todo',
+              'sphinx.ext.coverage', 'sphinx.ext.pngmath',
+              'sphinx.ext.autosummary', 'sphinx.ext.inheritance_diagram']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -204,3 +207,5 @@ intersphinx_mapping = {'http://docs.python.org/': None,
                        'http://docs.djangoproject.com/en/dev': 'http://docs.djangoproject.com/en/dev/_objects',}
 
 autodoc_member_order = 'groupwise'
+
+autosummary_genererate = ["models.rst", "controllers.rst"]
