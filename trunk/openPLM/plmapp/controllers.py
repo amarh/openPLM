@@ -2,26 +2,119 @@
 Introduction
 =============
 
-aim
+This module contains utilities to manage a :class:`~openPLM.plmapp.models.PLMObject`.
+It provides a new class, :class:`PLMObjectController`, which can be used to
+modify its attributes, promote/demote/revise it...
+
+All modifications are recorded in an history.
 
 How to use this module
 ======================
 
-explain how to use this module :
+The controller for a ``PLMObject`` is :class:`PLMObjectController`.
+All subclasses of ``PLMObject`` may have their own controller to add functionalities
+or redefined default behaviors.
+
+To get a suitable controller for a ``PLMObject`` instances use :func:`get_controller`.
+For example, `get_controller('Part')` returns :class:`PartController`.
+
+If you have a ``PLMObject`` and an User, you can instanciate a controller.
+For example::
+
+    >>> # obj is a PLMObject and user an User
+    >>> controller_cls = get_controller(obj.type)
+    >>> controller = controller_cls(obj, user)
+
+Then you can modify/access the attributes of the PLMObject and save the modifications:
+
+    >>> controller.name = "New Name"
+    >>> "type" in controller.attributes
+    True
+    >>> controller.owner = user
+    >>> # as with django models, you should call *save* to register modifications
+    >>> controller.save()
+
+You can also promote/demote the ``PLMObject``:
+
+    >>> controller.state.name
+    'draft'
+    >>> controller.promote()
+    >>> controller.state.name
+    'official'
+    >>> controller.demote()
+    >>> controller.state.name
+    'draft'
+
+There are also two classmethods which can help to create a new ``PLMobject``:
+
+    * :meth:`~PLMObjectController.create`
+    * :meth:`~PLMObjectController.create_from_form`
+
+This two methods return an instance of :class:`PLMObjectController` (or one of
+its subclasses).
+
+Moreover, the method :meth:`~PLMObjectController.create_from_form` can be used
+to update informations from a form created with 
+:func:`plmapp.forms.get_modification_form`.
     
-    * get_controller
-    * PLMObjectController
-        * create
-        * create_from_form
-        * update_from_form
 
 How to add a controller
 =======================
 
-speak about class name and managed_type
+If you add a new model which inherits from :class:`~openPLM.plmapp.models.PLMObject`
+or one of its subclasses, you may want to add your own controller.
+
+You just have to declare a class which inherits (directly or not) from 
+:class:`PLMObjectController`. To associate this class with your models, there
+are two possibilities:
+
+    * if your class has an attribute *MANAGED_TYPE*, its value (a class)
+      will be used.
+      For example::
+
+          class MyController(PLMObjectController):
+              MANAGED_TYPE = MyPart
+              ...
+              
+      *MyController* will be associated to *MyPart* and 
+      ``get_controller("MyPart")`` will return *MyController*. 
+    * if *MANAGED_TYPE* is not defined, the name class will be used: for
+      example, *MyPartController* will be associated to *MyPart*. The rule
+      is simple, it is just the name of the model followed by "Controller".
+      The model may not be defined when the controller is written.
+
+If a controller exploits none of theses possibilities, it will still
+work but it will not be associated to a type.
+
+.. note::
+
+    This association is possible without any registration because 
+    :class:`PLMObjectController` metaclass is :class:`MetaController`.
 
 Classes and functions
 =====================
+
+This module defines several classes, here is a summary:
+
+    * exceptions:
+        - :exc:`RevisionError`
+    * metaclasses:
+        - :class:`MetaController`
+    * :class:`~collections.namedtuple` :
+        - :class:`Child`
+        - :class:`Parent`
+    * controllers:
+
+        ========================================= ============================
+                          Type                             Controller
+        ========================================= ============================
+        :class:`~openPLM.plmapp.models.PLMObject` :class:`PLMObjectController`
+        :class:`~openPLM.plmapp.models.Part`      :class:`PartController`
+        :class:`~openPLM.plmapp.models.Document`  :class:`DocumentController`
+        ========================================= ============================
+    
+    * functions:
+        :func:`get_controller`
 
 """
 
@@ -464,8 +557,9 @@ class PartController(PLMObjectController):
     def update_children(self, formset):
         u"""
         Updates children informations with data from *formset*
-
-        :rtype formset: a modelfactory_formset of 
+        
+        :param formset:
+        :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyChildForm`
         """
         if formset.is_valid():
