@@ -221,11 +221,11 @@ def display_object_child(request, object_type_value, object_reference_value, obj
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectChild.htm', context_dict)
 
-def edit_children(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+def edit_children(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : edition"""
     now = datetime.datetime.now()
-    obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-    MenuList = obj.menu_items
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    menu_list = obj.menu_items
     if not hasattr(obj, "get_children"):
         # TODO
         raise TypeError()
@@ -238,9 +238,12 @@ def edit_children(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevision
             return HttpResponseRedirect("..")
     else:
         formset = get_children_formset(obj)
-    context_dict = init_context_dict(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-    context_dict.update({'ObjectMenu': MenuList, 'obj' : obj,
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    context_dict.update({'object_menu': menu_list, 'obj' : obj,
                                  'children_formset': formset, })
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
     return render_to_response('DisplayObjectChildEdit.htm', context_dict)
     
 def display_object_parents(request, object_type_value, object_reference_value, object_revision_value):
