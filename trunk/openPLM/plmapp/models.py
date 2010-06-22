@@ -403,6 +403,7 @@ class Link(models.Model):
     This class represents a link between two :class:`PLMObject`
     """
 
+    ctime = models.DateTimeField(auto_now_add=True)
 
     ACTION_NAME = "Link"
     class Meta:
@@ -411,7 +412,15 @@ class Link(models.Model):
 class RevisionLink(Link):
     
     ACTION_NAME = "Link : revision"
-    # TODO    
+    old = models.ForeignKey(PLMObject, related_name="%(class)s_old")    
+    new = models.ForeignKey(PLMObject, related_name="%(class)s_new")
+    
+    class Meta:
+        unique_together = ("old", "new")
+
+    def __unicode__(self):
+        return u"RevisionLink<%s, %s>" % (self.old, self.new)
+    
 
 class ParentChildLink(Link):
 
@@ -421,7 +430,6 @@ class ParentChildLink(Link):
     child = models.ForeignKey(Part, related_name="%(class)s_child")    
     quantity = models.FloatField(default=lambda: 1)
     order = models.PositiveSmallIntegerField(default=lambda: 1)
-    ctime = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     
     class Meta:

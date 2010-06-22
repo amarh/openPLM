@@ -29,12 +29,21 @@ import re
 from datetime import datetime
 from collections import namedtuple
 
+from django.core.exceptions import ObjectDoesNotExist
+
 try:
     import openPLM.plmapp.models as models
 except AttributeError:
     import plmapp.models as models
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
+
+class RevisionError(StandardError):
+    """
+    Exception raised when :meth:`~PLMObjectController.revise` is called but
+    making a revision is not allowed.
+    """
+    pass
 
 class MetaController(type):
     #: dict<type_name(str) : Controller(like :class:`PLMObjectController`)>
@@ -247,6 +256,66 @@ class PLMObjectController(object):
         histo.user = self._user
         histo.save()
 
+    def revise(self, new_revision):
+        u"""
+        Makes a new revision : duplicates :attr:`object`. The duplicated 
+        object's revision is *new_revision*.
+
+        Returns a controller of the new object.
+        """
+
+        if models.RevisionLink.objects.filter(old=self.object.pk):
+            raise RevisionError("a revision already exists for %s" % self.object)
+        data = {}
+        fields = self.get_modification_fields() + self.get_creation_fields()
+        for attr in fields:
+            if attr not in ("reference", "type", "revision"):
+                data[attr] = getattr(self.object, attr)
+        data["state"] = models.get_default_state(self.lifecycle)
+        new_controller = self.create(self.reference, self.type, new_revision, self._user,
+                                     data)
+        details = "old : %s, new : %s" % (self.object, new_controller.object)
+        self._save_histo(models.RevisionLink.ACTION_NAME, details) 
+        models.RevisionLink.objects.create(old=self.object, new=new_controller.object)
+        return new_controller
+
+    def is_revisable(self):
+        """
+        Returns True if :attr:`object` is revisable : if we can call :meth:`revise`
+        """
+        # objects.get fails if a link does not exist
+        # we can revise if any links exist
+        try:
+            link = models.RevisionLink.objects.get(old=self.object.pk)
+            return False
+        except ObjectDoesNotExist:
+            return True 
+    
+    def get_previous_revisions(self):
+        try:
+            link = models.RevisionLink.objects.get(new=self.object.pk)
+            controller = type(self)(link.old, self._user)
+            return controller.get_previous_revisions() + [link.old]
+        except ObjectDoesNotExist:
+            return []
+
+    def get_next_revisions(self):
+        try:
+            link = models.RevisionLink.objects.get(old=self.object.pk)
+            controller = type(self)(link.new, self._user)
+            return [link.new] + controller.get_next_revisions()
+        except ObjectDoesNotExist:
+            return []
+
+    def get_all_revisions(self):
+        """
+        Returns a list of all revisions, ordered from less recent to most recent
+        
+        :rtype: list of :class:`~openPLM.plmapp.models.PLMObject`
+        """
+        return self.get_previous_revisions() + [self.object] +\
+               self.get_next_revisions()
+
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
 
@@ -299,6 +368,14 @@ class PartController(PLMObjectController):
                          "parent : %s\nchild : %s" % (self.object, child))
 
     def delete_child(self, child):
+        u"""
+        Deletes *child* from current children and records this action in the
+        history.
+
+        .. note::
+            The link is not destroyed: its end_time is set to now.
+        """
+
         if isinstance(child, PLMObjectController):
             child = child.object
         link = models.ParentChildLink.objects.get(parent=self.object, 
@@ -308,6 +385,16 @@ class PartController(PLMObjectController):
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
     def modify_child(self, child, new_quantity, new_order):
+        """
+        Modifies information about *child*.
+
+        :param child: child added
+        :type child: :class:`~openPLM.plmapp.models.Part`
+        :param new_quantity: amount of *child* added
+        :type new_quantity: positive float
+        :param new_order: order
+        :type new_order: positive int
+        """
         if isinstance(child, PLMObjectController):
             child = child.object
         if new_order < 0 or new_quantity < 0:
@@ -331,6 +418,12 @@ class PartController(PLMObjectController):
         link2.save(force_insert=True)
 
     def get_children(self, max_level=1, current_level=1, date=None):
+        """
+        Returns a list of all children at time *date*.
+        
+        :rtype: list of :class:`Child`
+        """
+
         if max_level != -1 and current_level > max_level:
             return []
         if not date:
@@ -347,6 +440,12 @@ class PartController(PLMObjectController):
         return res
     
     def get_parents(self, max_level=1, current_level=1, date=None):
+        """
+        Returns a list of all parents at time *date*.
+        
+        :rtype: list of :class:`Parent`
+        """
+
         if max_level != -1 and current_level > max_level:
             return []
         if not date:
@@ -363,6 +462,12 @@ class PartController(PLMObjectController):
         return res
 
     def update_children(self, formset):
+        u"""
+        Updates children informations with data from *formset*
+
+        :rtype formset: a modelfactory_formset of 
+                        :class:`~plmapp.forms.ModifyChildForm`
+        """
         if formset.is_valid():
             for form in formset.forms:
                 parent = form.cleaned_data["parent"]
@@ -377,13 +482,14 @@ class PartController(PLMObjectController):
                     order = form.cleaned_data["order"]
                     self.modify_child(child, quantity, order)
 
+    def revise(self, new_revision):
+        # same as PLMOBjectController + add children
+        new_controller = super(PartController, self).revise(new_revision)
+        for level, link in self.get_children(1):
+            new_controller.add_child(link.child, link.quantity, link.order)
+        return new_controller
+
 class DocumentController(PLMObjectController):
-    pass
-
-class PlasticPartController(PartController):
-    pass
-
-class RedPlasticPartController(PlasticPartController):
     pass
 
 
