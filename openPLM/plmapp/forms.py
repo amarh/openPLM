@@ -122,3 +122,6 @@ def get_children_formset(controller, data=None):
     else:
         formset = Formset(data=data)
     return formset
+
+class AddRevisionForm(forms.Form):
+    revision = forms.CharField()

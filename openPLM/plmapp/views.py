@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, QueryDict
 
 from openPLM.plmapp.forms import *
+from openPLM.plmapp.utils import get_next_revision
 
 def replace_white_spaces(Chain):
     """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
@@ -159,13 +160,19 @@ def display_object_revisions(request, object_type_value, object_reference_value,
     now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
-    object_revisions_list = [
-        [object_type_value, object_reference_value, 'a', "obsolete"],
-        [object_type_value, object_reference_value, 'b', "official"],
-        [object_type_value, object_reference_value, 'c', "draft"],
-        ]
+    if obj.is_revisable():
+        if request.method == "POST" and request.POST:
+            add_form = AddRevisionForm(request.POST)
+            if add_form.is_valid():
+                obj.revise(add_form.cleaned_data["revision"])
+        else:
+            add_form = AddRevisionForm({"revision" : get_next_revision(object_revision_value)})
+    else:
+        add_form = None
+    revisions = obj.get_all_revisions()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'object_menu': menu_list, 'object_revisions': object_revisions_list})
+    context_dict.update({'object_menu': menu_list, 'revisions': revisions,
+                         'add_revision_form' : add_form})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
