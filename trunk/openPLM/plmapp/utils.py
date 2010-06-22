@@ -5,11 +5,19 @@ This module contains some functions which may be useful.
 import re
 import string
 
-def next(liste, value):
+def next_in_seq(seq, value):
     """
-    Returns item after *value* in the sequence *liste*
+    Returns item next to *value* in the sequence *seq*
+    
+    Example::
+
+        >>> next_in_seq("abcd", "b")
+        'c'
+        >>> next_in_seq(range(5), 2)
+        3
+    
     """
-    return liste[liste.index(value) + 1]
+    return seq[seq.index(value) + 1]
 
 def get_next_revision(revision):
     """
@@ -60,12 +68,12 @@ def get_next_revision(revision):
             if revision == "z":
                 return "aa"
             else:
-                return next(string.ascii_lowercase, revision)
+                return next_in_seq(string.ascii_lowercase, revision)
         if revision in string.ascii_uppercase:
             if revision == "Z":
                 return "AA"
             else:
-                return next(string.ascii_uppercase, revision)
+                return next_in_seq(string.ascii_uppercase, revision)
     if revision.isdigit():
         zeros = re.search(r"^(0*).+", revision).group(1)
         return zeros + "%d" % (int(revision) + 1)
