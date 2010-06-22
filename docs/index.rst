@@ -16,7 +16,7 @@ Contents:
     controllers
     forms
     views
-
+    utils
 
 Indices and tables
 ==================

@@ -1,7 +1,14 @@
+"""
+This module contains some functions which may be useful.
+"""
+
 import re
 import string
 
 def next(liste, value):
+    """
+    Returns item after *value* in the sequence *liste*
+    """
     return liste[liste.index(value) + 1]
 
 def get_next_revision(revision):
@@ -12,6 +19,7 @@ def get_next_revision(revision):
     If it can not find a new revision, it returns ""
 
     Example::
+
         >>> get_next_revision("a")
         'b'
         >>> get_next_revision("r")
