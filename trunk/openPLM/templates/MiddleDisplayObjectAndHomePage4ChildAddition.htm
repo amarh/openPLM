@@ -1,0 +1,132 @@
+{% extends "BaseDisplayHomePage.htm" %}
+
+<!-- Manage html display of the global page when we add new child to a part -->
+
+{% block title %}
+	{{object_type}} | {{object_reference}} | {{object_revision}}
+{% endblock %}
+
+{% block LoggedPersonBlock %}
+    {{log_in_person}} | {{current_date|date:"l j F Y, G:i"}}
+{% endblock %}
+
+{% block SearchBlock %}
+	Search for :
+	<form method="get" action="." enctype="text/plain">
+		<table class="Content">
+			{{attributes_form.as_table}}
+			{{extra_attributes_form.as_table}}
+		</table>
+		<input type="submit" value="SEARCH !">
+	</form>
+{% endblock %}
+
+{% block ResultBlock %}
+	Results for children addition :
+	<table class="Content">
+		<tr class="Content">
+			<th class="Content">Type</th>
+			<th class="Content">Reference</th>
+			<th class="Content">Rev.</th>
+
+		</tr>
+		{% if results %}
+			{% for object in results %}
+				<form method="post" action="." enctype="multipart/form-data">
+				{% if forloop.counter|divisibleby:"2" %}
+				    <tr class="Content">
+					    <td class="Content4ChildAddition2">
+					        {{object.type|escape}}
+					        <input type="hidden" name="type" value="{{object.type|escape}}">
+				        </td>
+					    <td class="Content4ChildAddition2">
+					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
+			                    {{object.reference|escape}}
+		                    </a>
+		                    <input type="hidden" name="reference" value="{{object.reference|escape}}">
+				        </td>
+					    <td class="Content4ChildAddition2">
+					        {{object.revision|escape}}
+					        <input type="hidden" name="revision" value="{{object.revision|escape}}">
+				        </td>
+				    </tr>
+				    <tr>
+					    <td class="Content4ChildAddition2" colspan="2" align="right">
+					        {{object.name|escape}}
+				        </td>
+					    <td class="Content4ChildAddition2">
+					        <input type="submit" value="ADD">
+				        </td>
+				    </tr>
+			    {% else %}
+			        <tr class="Content4ChildAddition">
+					    <td class="Content4ChildAddition">
+					        {{object.type|escape}}
+					        <input type="hidden" name="type" value={{object.type|escape}}>
+				        </td>
+					    <td class="Content4ChildAddition">
+					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
+			                    {{object.reference|escape}}
+		                    </a>
+		                    <input type="hidden" name="reference" value={{object.reference|escape}}>
+				        </td>
+					    <td class="Content4ChildAddition">
+					        {{object.revision|escape}}
+					        <input type="hidden" name="revision" value={{object.revision|escape}}>
+				        </td>
+				    </tr>
+				    <tr>
+					    <td class="Content4ChildAddition" colspan="2" align="right">
+					        {{object.name|escape}}
+				        </td>
+					    <td class="Content4ChildAddition">
+					        <input type="submit" value="ADD">
+				        </td>
+				    </tr>
+			    {% endif %}
+			    <input type="hidden" name="quantity" value="1">
+			    </form>
+			{% endfor %}
+		{% endif %}
+	</table>
+{% endblock %}
+
+{% block CreationBlock %}
+	<form method="get" action="/object/create/" enctype="text/plain">
+		<table class="Content">
+			<tr>
+				{% for attribute in type_form %}
+					<th>{{attribute.label_tag}}</th>
+					<td>{{attribute}}</td>
+				{% endfor %}
+				<td><input type="submit" value="CREATE !"></td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}
+
+{% block ObjectBlock %}
+    <div id="PageBanner">
+		<h2>{{object_type}} | {{object_reference}} | {{object_revision}}</h2>
+	</div>
+    <div id="PageLeft">
+    	<table class="MenuTable">
+	        <tr>
+		        {% for menu_item in object_menu %}
+    				<td>
+    				<a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">{{ menu_item|upper }}</a>
+    				</td>
+    		    {% endfor %}
+			</tr>
+    	</table>
+    </div>
+	
+	<div id="PageCenter">
+		{% block content %}{% endblock %}
+		<p>&nbsp</p>
+		<p>&nbsp</p>
+	</div>
+	<br class="clear" />
+{% endblock %}
+
+
