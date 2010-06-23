@@ -90,10 +90,11 @@ def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
         return Form()
         
 class add_child_form(forms.Form):
-    child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
-                                   empty_label=None)
-    quantity = forms.FloatField(initial=1)
-    order = forms.IntegerField(initial=1)
+    type = forms.CharField()
+    reference = forms.CharField()
+    revision = forms.CharField()
+    quantity = forms.FloatField()
+    order = forms.IntegerField()
 
 class DisplayChildrenForm(forms.Form):
     LEVELS = (("all", "All levels",),
@@ -108,7 +109,8 @@ class ModifyChildForm(forms.ModelForm):
                                    widget=forms.HiddenInput())
     child = forms.ModelChoiceField(queryset=m.Part.objects.all(),
                                    widget=forms.HiddenInput())
-
+    quantity = forms.FloatField(widget=forms.TextInput(attrs={'size':'4'}))
+    order = forms.IntegerField(widget=forms.TextInput(attrs={'size':'2'}))
     class Meta:
         model = m.ParentChildLink
         fields = ["order", "quantity", "child", "parent"]

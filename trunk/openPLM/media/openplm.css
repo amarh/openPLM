@@ -24,7 +24,7 @@ div#PageBanner	{
 				width: 100%;
 				float: top;
 				/*border-left: 3px solid #AAAAAA;*/
-				border-bottom: 7px solid #AAAAAA;
+				border-bottom: 7px solid #CCCCCC;
 				/*border: solid;*/
 				margin: 0px;
 				padding-top: 5px;
@@ -70,7 +70,7 @@ table.MenuTable 	{
 				}
 
 .MenuTable td 	{
-						background-color: #AAAAAA;
+						background-color: #CCCCCC;
 						padding: 0px 0px 0px 0px;
 						border-width: 1px;
 						border-style: none;
@@ -119,6 +119,22 @@ td.Content	{
 
 td.Content2	{
             background-color: #AAAAAA;
+			padding: 3px;
+			border-width: 1px;
+			border-style: dotted;
+			border-color: #777777;
+			}
+			
+td.Content4ChildAddition	{
+            background-color: #fec3c3;
+			padding: 3px;
+			border-width: 1px;
+			border-style: dotted;
+			border-color: #777777;
+			}
+			
+td.Content4ChildAddition2	{
+            background-color: #ffd9da;
 			padding: 3px;
 			border-width: 1px;
 			border-style: dotted;
