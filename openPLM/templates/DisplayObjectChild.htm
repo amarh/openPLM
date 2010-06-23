@@ -4,11 +4,26 @@
 
 {% block content %}
 	<h3>BOM - CHILDREN :</h3>
-    <input type="submit" value="ADD">
-    <a href="edit/">Edit</a>
+    <table>
+        <tr>
+            <td>
+                <form action="./add">
+                    <input type="submit" value="ADD">
+                </form>
+            </td>
+            <td>
+                <form action="./edit">
+                    <input type="submit" value="EDIT" >
+                </form>
+            </td>
+        </tr>
+    </table>
     <form method="GET" action="">
         Display :
-        {{ display_form.as_p }}
+        {% for level, name in display_form.LEVELS %}
+            <input type="radio" value={{level}} name="level" /> {{name}}
+        {% endfor %}
+        {{ display_form.date }}
         <input type="submit" value="GO !"><br/>
     </form>
 	<br/>

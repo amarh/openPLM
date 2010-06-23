@@ -23,16 +23,29 @@
 			<th class="Content">Type</th>
 			<th class="Content">Reference</th>
 			<th class="Content">Rev.</th>
-			<th class="Content">Name</th>
+
 		</tr>
 		{% if results %}
-			{% for Object in results %}
-				<tr class="Content">
-					<td class="Content">{{Object.type|escape}}</td>
-					<td class="Content"><a href="/object/{{Object.type}}/{{Object.reference}}/{{Object.revision}}/">{{Object.reference|escape}}</a></td>
-					<td class="Content">{{Object.revision|escape}}</td>
-					<td class="Content">{{Object.name|escape}}</td>
-				</tr>
+			{% for object in results %}
+				{% if forloop.counter|divisibleby:"2" %}
+				    <tr class="Content">
+					    <td class="Content2">{{object.type|escape}}</td>
+					    <td class="Content2"><a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference|escape}}</a></td>
+					    <td class="Content2">{{object.revision|escape}}</td>
+				    </tr>
+				    <tr>
+					    <td class="Content2" colspan="3" align="right">{{object.name|escape}}</td>
+				    </tr>
+			    {% else %}
+			        <tr class="Content">
+					    <td class="Content">{{object.type|escape}}</td>
+					    <td class="Content"><a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference|escape}}</a></td>
+					    <td class="Content">{{object.revision|escape}}</td>
+				    </tr>
+				    <tr>
+					    <td class="Content" colspan="3" align="right">{{object.name|escape}}</td>
+				    </tr>
+			    {% endif %}
 			{% endfor %}
 		{% endif %}
 	</table>

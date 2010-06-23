@@ -50,7 +50,6 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 
 def display_global_page(request_dict):
     """ Get a request and return a dictionnary with elements common to all pages """
-    now = datetime.datetime.now()
     log_in_person="pjoulaud"
     context_dict = {'log_in_person' : log_in_person}
     query_dict = {}
@@ -113,7 +112,9 @@ def display_global_page(request_dict):
 #########################################################################
 
 def display_home_page(request):
+    now = datetime.datetime.now()
     context_dict, SessionDictionnary= display_global_page(request)
+    context_dict.update({'current_date': now,})
     request.session.update(SessionDictionnary)
     return render_to_response('DisplayHomePage.htm', context_dict)
 
@@ -134,7 +135,6 @@ def display_object(request, object_type_value, object_reference_value, object_re
 
 def display_object_lifecycle(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for Lifecycle """
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     if request.method == 'POST':
         if request.POST["action"] == "DEMOTE":
@@ -157,7 +157,6 @@ def display_object_lifecycle(request, object_type_value, object_reference_value,
 
 def display_object_revisions(request, object_type_value, object_reference_value, object_revision_value):
     """Manage html page for revisions"""
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     if obj.is_revisable():
@@ -180,7 +179,6 @@ def display_object_revisions(request, object_type_value, object_reference_value,
 
 def display_object_history(request, object_type_value, object_reference_value, object_revision_value):
     """Manage html page for history"""
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     histos = models.History.objects.filter(plmobject=obj.object).order_by('date')
@@ -196,7 +194,6 @@ def display_object_history(request, object_type_value, object_reference_value, o
 
 def display_object_child(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part """
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     if not hasattr(obj, "get_children"):
@@ -230,7 +227,6 @@ def display_object_child(request, object_type_value, object_reference_value, obj
 
 def edit_children(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : edition"""
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     if not hasattr(obj, "get_children"):
@@ -253,9 +249,20 @@ def edit_children(request, object_type_value, object_reference_value, object_rev
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectChildEdit.htm', context_dict)
     
+def add_children(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+    """ Manage html page for BOM and children of the part : add new link"""
+    obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
+    MenuList = obj.menu_items
+    
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    context_dict.update({'ObjectMenu': MenuList, 'obj' : obj,
+                                 'children_formset': formset, })
+    return render_to_response('DisplayObjectChildAdd.htm', context_dict)
+    
 def display_object_parents(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for "where is used / parents" of the part """
-    now = datetime.datetime.now()
     obj = get_obj( object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     if not hasattr(obj, "get_parents"):
@@ -288,7 +295,6 @@ def display_object_parents(request, object_type_value, object_reference_value, o
 
 def display_object_doc_cad(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for related documents and CAD of the part"""
-    now = datetime.datetime.now()
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     menu_list = obj.menu_items
     object_doc_cad_list = [
@@ -321,7 +327,6 @@ def create_non_modifyable_attributes_list(Classe=models.PLMObject):
 
 def create_object(request):
     """ Manage html page for the part creation """
-    now = datetime.datetime.now()
     log_in_person="pjoulaud"
     context_dict = {'CurrentDate': now, 'log_in_person' : log_in_person}
     if request.method == 'GET':
@@ -351,7 +356,6 @@ def create_object(request):
 
 def modify_object(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for part modification """
-    now = datetime.datetime.now()
     log_in_person="pjoulaud"
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     context_dict.update({'CurrentDate': now, 'log_in_person' : log_in_person})
