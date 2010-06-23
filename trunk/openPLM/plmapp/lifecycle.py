@@ -39,6 +39,22 @@ class LifecycleList(list):
 
         Raises :exc:`ValueError` if *state* is not in the list and :exc:`IndexError`
         if *state* is the last state.
+        
+        Example::
+
+            >>> cycle = LifecycleList("MyCycle", "a", "b", "c", "d")
+            >>> cycle.next_state("b")
+            'c'
+            >>> cycle.next_state("d")
+            Traceback (most recent call last):
+                ...
+            IndexError: list index out of range
+
+            >>> cycle.next_state("z")
+            Traceback (most recent call last):
+                ...
+            ValueError: list.index(x): x not in list
+
         """
         index = self.index(state)
         return self[index + 1]
@@ -49,6 +65,23 @@ class LifecycleList(list):
 
         Raises :exc:`ValueError` if *state* is not in the list and :exc:`IndexError`
         if *state* is the first state.
+
+        Example::
+
+            >>> cycle = LifecycleList("MyCycle", "a", "b", "c", "d")
+            >>> cycle.previous_state("b")
+            'a'
+            >>> cycle.previous_state("a")
+            Traceback (most recent call last):
+                ...
+            IndexError
+
+            >>> cycle.previous_state("z")
+            Traceback (most recent call last):
+                ...
+            ValueError: list.index(x): x not in list
+
+
         """
         index = self.index(state)
         if index - 1 < 0:
@@ -87,3 +120,6 @@ for cycles in _lifecycles_list:
     name = "->".join(cycles) 
     lifecycles[name] = LifecycleList(name, *cycles)
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
