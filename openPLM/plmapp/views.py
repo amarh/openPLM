@@ -249,17 +249,36 @@ def edit_children(request, object_type_value, object_reference_value, object_rev
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectChildEdit.htm', context_dict)
     
-def add_children(request, ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue):
+def add_children(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : add new link"""
-    obj = get_obj(ObjectTypeValue, ObjectReferenceValue, ObjectRevisionValue)
-    MenuList = obj.menu_items
-    
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    menu_list = obj.menu_items
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
-    context_dict.update({'ObjectMenu': MenuList, 'obj' : obj,
-                                 'children_formset': formset, })
-    return render_to_response('DisplayObjectChildAdd.htm', context_dict)
+    if request.POST:
+        add_child_form_instance = add_child_form(request.POST)
+        if add_child_form_instance.is_valid():
+            child_obj = get_obj(add_child_form_instance.cleaned_data["type"], \
+                        add_child_form_instance.cleaned_data["reference"], \
+                        add_child_form_instance.cleaned_data["revision"])
+            obj.add_child(child_obj, \
+                            add_child_form_instance.cleaned_data["quantity"], \
+                            add_child_form_instance.cleaned_data["order"])
+            context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+            return HttpResponseRedirect("/object/%s/%s/%s/BOM-child/" \
+                                        % (object_type_value, object_reference_value, object_revision_value) )
+        else:
+            print request.POST.items()
+            add_child_form_instance = add_child_form(request.POST)
+            context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+            return render_to_response('DisplayObjectChildAdd.htm', context_dict)
+    else:
+        add_child_form_instance = add_child_form()
+        context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+        return render_to_response('DisplayObjectChildAdd.htm', context_dict)
+    
     
 def display_object_parents(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for "where is used / parents" of the part """
@@ -377,4 +396,17 @@ def modify_object(request, object_type_value, object_reference_value, object_rev
         pass
     context_dict.update({'modification_form': modification_form_instance, 'non_modifyable_attributes': non_modifyable_attributes_list })
     return render_to_response('DisplayObject4modification.htm', context_dict)
-
+    
+    
+def display_bollox(request):
+    context_dict={}
+    return render_to_response('bollox.htm', context_dict)
+    
+    
+    
+    
+    
+    
+    
+    
+    
