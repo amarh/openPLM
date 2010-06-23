@@ -85,3 +85,6 @@ def get_next_revision(revision):
         return m.group(1) + m.group(2) + last
     return ""
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

@@ -12,8 +12,8 @@ How to use this module
 ======================
 
 The controller for a ``PLMObject`` is :class:`PLMObjectController`.
-All subclasses of ``PLMObject`` may have their own controller to add functionalities
-or redefined default behaviors.
+All subclasses of ``PLMObject`` may have their own controller to add
+functionalities or redefined default behaviors.
 
 To get a suitable controller for a ``PLMObject`` instances use :func:`get_controller`.
 For example, `get_controller('Part')` returns :class:`PartController`.
@@ -25,7 +25,8 @@ For example::
     >>> controller_cls = get_controller(obj.type)
     >>> controller = controller_cls(obj, user)
 
-Then you can modify/access the attributes of the PLMObject and save the modifications:
+Then you can modify/access the attributes of the PLMObject and save the
+modifications:
 
     >>> controller.name = "New Name"
     >>> "type" in controller.attributes
@@ -126,7 +127,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 try:
     import openPLM.plmapp.models as models
-except AttributeError:
+except (ImportError, AttributeError):
     import plmapp.models as models
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
@@ -186,7 +187,7 @@ class PLMObjectController(object):
     :attributes:
         .. attribute:: object
 
-            The :class:`~openPLM.plmapp.models.PLMObject` managed by the controllers
+            The :class:`~openPLM.plmapp.models.PLMObject` managed by the controller
 
     :param obj: managed object
     :type obj: a subinstance of :class:`~openPLM.plmapp.models.PLMObject`
@@ -204,8 +205,9 @@ class PLMObjectController(object):
     @classmethod
     def create(cls, reference, type, revision, user, data={}):
         u"""
-        This method builds a new :class:`~openPLM.plmapp.models.PLMObject` of type *class_*
-        and return a :class:`PLMObjectController` associated to the created object.
+        This method builds a new :class:`~openPLM.plmapp.models.PLMObject` of
+        type *class_* and return a :class:`PLMObjectController` associated to
+        the created object.
 
         :param reference: reference of the objet
         :param type: type of the object
@@ -233,7 +235,7 @@ class PLMObjectController(object):
         # record ceation in history
         infos = {"type" : type, "reference" : reference, "revision" : revision}
         infos.update(data)
-        details = ",".join("%s : %s" % (k,v) for k, v in infos.items())
+        details = ",".join("%s : %s" % (k, v) for k, v in infos.items())
         res._save_histo("Create", details)
         return res
         
@@ -277,7 +279,8 @@ class PLMObjectController(object):
 
     def promote(self):
         u"""
-        Promotes :attr:`object` in his lifecycle and writes his promotion in the history
+        Promotes :attr:`object` in his lifecycle and writes his promotion in
+        the history
         """
         if self.object.is_promotable():
             state = self.object.state
@@ -297,7 +300,8 @@ class PLMObjectController(object):
 
     def demote(self):
         u"""
-        Demotes :attr:`object` in his lifecycle and writes his demotion in the history
+        Demotes :attr:`object` in his lifecycle and writes his demotion in the
+        history
         """
         state = self.object.state
         lifecycle = self.object.lifecycle
@@ -374,12 +378,13 @@ class PLMObjectController(object):
 
     def is_revisable(self):
         """
-        Returns True if :attr:`object` is revisable : if we can call :meth:`revise`
+        Returns True if :attr:`object` is revisable : if :meth:`revise` can be
+        called safely
         """
         # objects.get fails if a link does not exist
         # we can revise if any links exist
         try:
-            link = models.RevisionLink.objects.get(old=self.object.pk)
+            models.RevisionLink.objects.get(old=self.object.pk)
             return False
         except ObjectDoesNotExist:
             return True 
@@ -424,9 +429,9 @@ class PartController(PLMObjectController):
         """
         Adds *child* to *self*.
 
-        :param child: child added
+        :param child: added child
         :type child: :class:`~openPLM.plmapp.models.Part`
-        :param quantity: amount of *child* added
+        :param quantity: amount of *child*
         :type quantity: positive float
         :param order: order
         :type order: positive int
@@ -481,9 +486,9 @@ class PartController(PLMObjectController):
         """
         Modifies information about *child*.
 
-        :param child: child added
+        :param child: added child
         :type child: :class:`~openPLM.plmapp.models.Part`
-        :param new_quantity: amount of *child* added
+        :param new_quantity: amount of *child*
         :type new_quantity: positive float
         :param new_order: order
         :type new_order: positive int
