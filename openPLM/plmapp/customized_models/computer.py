@@ -31,7 +31,7 @@ class SinglePart(Part):
 
 class SinglePartController(PartController):
     def __init__(self, *args):
-        print "passage dans SinglePartController"
+        #print "passage dans SinglePartController"
         PartController.__init__(self, *args)
 
 register(SinglePart)

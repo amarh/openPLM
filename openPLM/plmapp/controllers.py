@@ -209,6 +209,9 @@ class PLMObjectController(object):
         type *class_* and return a :class:`PLMObjectController` associated to
         the created object.
 
+        Raises :exc:`ValueError` if *reference*, *type* or *revision* are
+        empty. Raises :exc:`ValueError` if *type* is not valid.
+
         :param reference: reference of the objet
         :param type: type of the object
         :param revision: revision of the object
@@ -216,8 +219,13 @@ class PLMObjectController(object):
         :param data: a dict<key, value> with informations to add to the plmobject
         :rtype: :class:`PLMObjectController`
         """
-
-        class_ = models.get_all_plmobjects().get(type) 
+        
+        if not reference or not type or not revision:
+            raise ValueError("Empty value not permitted for reference/type/revision")
+        try:
+            class_ = models.get_all_plmobjects()[type]
+        except KeyError:
+            raise ValueError("Incorrect type")
         # create an object
         obj = class_()
         obj.reference = reference
