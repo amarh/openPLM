@@ -14,6 +14,32 @@ from openPLM.plmapp.models import *
 from openPLM.plmapp.customized_models.computer import *
 
 
+class LifecycleTest(TestCase):
+    def test_get_default(self):
+        lifecycle = get_default_lifecycle()
+    
+    def test_to_list(self):
+        lifecycle = get_default_lifecycle()
+        lc_list = lifecycle.to_states_list()
+        self.assertEqual(lc_list.name, lifecycle.name)
+        lcs = LifecycleStates.objects.filter(lifecycle=lifecycle).order_by("rank")
+        self.assertEqual(len(lcs), len(lc_list))
+
+    def test_from_list(self):
+        cycle = LifecycleList("cycle_name", "a", "b", "c")
+        lifecycle = Lifecycle.from_lifecyclelist(cycle)
+        self.assertEqual(cycle.name, lifecycle.name)
+
+    def test_iteration(self):
+        cycle = LifecycleList("cycle_name", "a", "b", "c")
+        lifecycle = Lifecycle.from_lifecyclelist(cycle)
+        for i, state in enumerate(lifecycle):
+            self.assertEqual(state, cycle[i])
+
+    def test_get_default_state(self):
+        state = get_default_state()
+        self.assertEqual(state.name, "draft")
+        
 class ControllerTest(TestCase):
     CONTROLLER = PLMObjectController
     TYPE = "Part"
@@ -307,6 +333,7 @@ class SearchViewTest(CommonViewTest):
         eaf = response.context["extra_attributes_form"]
     
     def test_session_forms(self):
+        "Tests if form field are kept between two search"
         response = self.client.get("/home/", {"revision" : "c", "name" : "a name"})
         self.assertEqual(response.status_code, 200)
         response = self.client.get("/home/")
@@ -317,6 +344,7 @@ class SearchViewTest(CommonViewTest):
         self.assertEqual(af.data["name"], "a name")
 
     def test_empty(self):
+        "Test a search with an empty database"
         # clear all plmobject so results is empty
         for obj in PLMObject.objects.all():
             obj.delete()
@@ -324,6 +352,7 @@ class SearchViewTest(CommonViewTest):
         self.assertEqual(results, [])
 
     def test_one_result(self):
+        "Test a search with one object in the database"
         results = self.search({"type" : self.TYPE}) 
         self.assertEqual(results, [self.controller.object])
 

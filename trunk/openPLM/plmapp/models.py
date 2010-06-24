@@ -88,11 +88,8 @@ class Lifecycle(models.Model):
         Converts a Lifecycle to a :class:`LifecycleList` (a list of strings)
         """
         
-        temp = []
-        for lcs in LifecycleStates.objects.filter(lifecycle=self):
-            temp.append((lcs.rank, lcs.state.name))
-        temp.sort()
-        return LifecycleList(self.name, *[state for rank, state in temp])
+        lcs = LifecycleStates.objects.filter(lifecycle=self).order_by("rank")
+        return LifecycleList(self.name, *(l.state.name for l in lcs))
 
     def __iter__(self):
         return iter(self.to_states_list())
