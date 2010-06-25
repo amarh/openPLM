@@ -133,7 +133,8 @@ class ControllerTest(TestCase):
         def fail():
             controller.revise("b2")
         self.assertRaises(RevisionError, fail)
-
+        for attr in controller.get_modification_fields():
+            self.assertEqual(getattr(controller, attr), getattr(rev, attr))
 
 class PartControllerTest(ControllerTest):
     TYPE = "Part"
@@ -163,25 +164,44 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(link.quantity, 10)
         self.assertEqual(link.order, 15)
 
-    def test_add_child_errors(self):
-        def f1():
+    def test_add_child_error1(self):
+        def fail():
             # bad quantity
             self.controller.add_child(self.controller2, -10, 15)
-        def f2():
+        self.assertRaises(ValueError, fail)
+
+    def test_add_child_error2(self):
+        def fail():
             # bad order
             self.controller.add_child(self.controller2, 10, -15)
-        def f3():
+        self.assertRaises(ValueError, fail)
+    
+    def test_add_child_error3(self):
+        def fail():
             # bad child : parent
             self.controller2.add_child(self.controller, 10, 15)
             self.controller.add_child(self.controller2, 10, 15)
-        def f4():
+        self.assertRaises(ValueError, fail)
+    
+    def test_add_child_error4(self):
+        def fail():
             # bad child : already a child
             self.controller.add_child(self.controller2, 10, 15)
             self.controller.add_child(self.controller2, 10, 15)
-        self.assertRaises(ValueError, f1)
-        self.assertRaises(ValueError, f2)
-        self.assertRaises(ValueError, f3)
-        self.assertRaises(ValueError, f4)
+        self.assertRaises(ValueError, fail)
+    
+    def test_add_child_error5(self):
+        def fail():
+            # bad child type
+            doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
+            self.controller.add_child(doc, 10, 15)
+        self.assertRaises(ValueError, fail)
+
+    def test_add_child_error6(self):
+        def fail():
+            # bad child : add self
+            self.controller.add_child(self.controller, 10, 15)
+        self.assertRaises(ValueError, fail)
 
     def test_modify_child(self):
         self.controller.add_child(self.controller2, 10, 15)

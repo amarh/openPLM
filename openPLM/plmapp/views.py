@@ -347,7 +347,7 @@ def create_non_modifyable_attributes_list(Classe=models.PLMObject):
 def create_object(request):
     """ Manage html page for the part creation """
     log_in_person="pjoulaud"
-    context_dict = {'CurrentDate': now, 'log_in_person' : log_in_person}
+    context_dict = {'log_in_person' : log_in_person}
     if request.method == 'GET':
         if request.GET:
             type_form_instance = type_form(request.GET)
@@ -377,7 +377,7 @@ def modify_object(request, object_type_value, object_reference_value, object_rev
     """ Manage html page for part modification """
     log_in_person="pjoulaud"
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'CurrentDate': now, 'log_in_person' : log_in_person})
+    context_dict.update({'log_in_person' : log_in_person})
     cls = models.get_all_plmobjects()[object_type_value]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
     current_object = get_obj(object_type_value, object_reference_value, object_revision_value)
