@@ -77,8 +77,6 @@ def display_global_page(request_dict):
                         query_dict[field]=value
                 results = extra_attributes_form_instance.search(results)
                 request_dict.session["results"] = results
-        else:
-            print "Donnees non valides"
     elif request_dict.session:
         type_form_instance = type_form(request_dict.session)
         attributes_form_instance = attributes_form(request_dict.session)
@@ -96,10 +94,6 @@ def display_global_page(request_dict):
                     if value:
                         query_dict[field]=value
                 results = extra_attributes_form_instance.search(results)
-        else:
-            print "Donnees non valides"
-    else:
-        print "Pas de donnees dans .GET ni dans .session"
       
     context_dict.update({'results': results, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'extra_attributes_form': extra_attributes_form_instance})
 
@@ -270,7 +264,6 @@ def add_children(request, object_type_value, object_reference_value, object_revi
             return HttpResponseRedirect("/object/%s/%s/%s/BOM-child/" \
                                         % (object_type_value, object_reference_value, object_revision_value) )
         else:
-            print request.POST.items()
             add_child_form_instance = add_child_form(request.POST)
             context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
             return render_to_response('DisplayObjectChildAdd.htm', context_dict)
