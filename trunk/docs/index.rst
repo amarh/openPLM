@@ -11,12 +11,13 @@ Contents:
 .. toctree::
     :maxdepth: 2
     
+    controllers
+    exceptions
+    forms
     lifecycle
     models
-    controllers
-    forms
-    views
     utils
+    views
 
 Indices and tables
 ==================

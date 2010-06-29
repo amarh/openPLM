@@ -40,10 +40,15 @@ Classes and functions
 """
 
 import os
+import string
+import random
+import hashlib
 import fnmatch
 import datetime
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 
 from openPLM.plmapp.lifecycle import LifecycleList
 
@@ -320,12 +325,65 @@ def get_all_parts():
     return res
 
 # document stuff
+class DocumentStorage(FileSystemStorage):
+
+    def get_available_name(self, name):
+       
+        def rand():
+            r = ""
+            for i in xrange(3):
+                r += random.choice(string.ascii_lowercase + string.digits)
+            return r
+        basename = os.path.basename(name)
+        base, ext = os.path.splitext(basename)
+        ext2 = ext.lstrip(".") or "no_ext"
+        md5 = hashlib.md5()
+        md5.update(basename)
+        md5_value = md5.hexdigest() + "-%s" + ext
+        path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
+        while os.path.exists(path):
+            path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
+        return path
+
+docfs = DocumentStorage(location=settings.DOCUMENTS_DIR)
+
+class DocumentFile(models.Model):
+    
+    filename = models.CharField(max_length=200)
+    file = models.FileField(upload_to="docs", storage=docfs)
+    size = models.PositiveIntegerField()
+
 
 class Document(PLMObject):
+
+    # locking stuff
+    locked = models.BooleanField(default=lambda: False)
+    # null if unlocked
+    locker = models.ForeignKey(User, null=True, blank=True,
+                               related_name="%(class)s_locker",
+                               default=lambda: None)
+
+    files = models.ManyToManyField(DocumentFile, related_name="%(class)s_files")
 
     def is_promotable(self):
         # TODO check file
         return True
+
+    @property
+    def attributes(self):
+        attrs = list(super(Document, self).attributes)
+        attrs.extend(["locked", "locker"])
+        return attrs
+    
+    @classmethod
+    def excluded_creation_fields(cls):
+        return super(Document, cls).excluded_creation_fields() + \
+                ["locked", "locker"]
+    
+    @classmethod
+    def excluded_modification_fields(cls):
+        return super(Document, cls).excluded_modification_fields() + \
+                ["locked", "locker"]
 
 
 def get_all_documents():
@@ -436,6 +494,18 @@ class ParentChildLink(Link):
         return u"ParentChildLink<%s, %s, %f, %d>" % (self.parent, self.child,
                                                      self.quantity, self.order)
 
+class DocumentPartLink(Link):
+
+    ACTION_NAME = "Link : document-part"
+
+    document = models.ForeignKey(Document, related_name="%(class)s_document")    
+    part = models.ForeignKey(Part, related_name="%(class)s_part")    
+
+    class Meta:
+        unique_together = ("document", "part")
+
+    def __unicode__(self):
+        return u"DocumentPartLink<%s, %s" % (self.document, self.part)
 
 # import_models should be the last function
 

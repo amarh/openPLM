@@ -2,17 +2,20 @@
 This module contains some tests for openPLM.
 """
 
+import os
 import datetime
+from django.conf import settings
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.core.files.base import ContentFile
 
-from utils import *
-from controllers import *
-from lifecycle import *
+
+from openPLM.plmapp.utils import *
+from openPLM.plmapp.controllers import *
+from openPLM.plmapp.lifecycle import *
 from openPLM.plmapp.models import *
 from openPLM.plmapp.customized_models.computer import *
-
 
 class LifecycleTest(TestCase):
     def test_get_default(self):
@@ -57,27 +60,40 @@ class ControllerTest(TestCase):
         self.assertEqual(controller.type, self.TYPE)
         self.assertEqual(type(controller.object), get_all_plmobjects()[self.TYPE])
 
-    def test_create_errors(self):
+    def test_create_error1(self):
         # empty reference
-        def fail1():
+        def fail():
             controller = self.CONTROLLER.create("", self.TYPE, "a",
                                             self.user, self.DATA)
-        self.assertRaises(ValueError, fail1)
+        self.assertRaises(ValueError, fail)
+
+    def test_create_error2(self):
         # empty revision
-        def fail2():
+        def fail():
             controller = self.CONTROLLER.create("paer", self.TYPE, "",
                                             self.user, self.DATA)
-        self.assertRaises(ValueError, fail2)
+        self.assertRaises(ValueError, fail)
+
+    def test_create_error3(self):
         # empty reference
-        def fail3():
+        def fail():
             controller = self.CONTROLLER.create("zeez", "", "a",
                                             self.user, self.DATA)
-        self.assertRaises(ValueError, fail3)
+        self.assertRaises(ValueError, fail)
+
+    def test_create_error4(self):
         # bad type
-        def fail4():
+        def fail():
             controller = self.CONTROLLER.create("zee", "__", "a",
                                             self.user, self.DATA)
-        self.assertRaises(ValueError, fail4)
+        self.assertRaises(ValueError, fail)
+    
+    def test_create_error(self):
+        # bad type : PLMObject
+        def fail():
+            controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
+                                            self.user, self.DATA)
+        self.assertRaises(ValueError, fail)
 
     def test_keys(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
@@ -253,12 +269,154 @@ class PartControllerTest(ControllerTest):
         parents = [(lvl, lk.parent.pk) for lvl, lk in self.controller3.get_parents(date=date)]
         self.assertEqual(parents, [])
 
-
 class HardDiskControllerTest(PartControllerTest):
     TYPE = "HardDisk"
     CONTROLLER = SinglePartController
     DATA = {"capacity_in_go" : 500}
 
+class DocumentControllerTest(ControllerTest):
+    TYPE = "Document"
+    CONTROLLER = DocumentController
+    DATA = {}
+
+    def setUp(self):
+        super(DocumentControllerTest, self).setUp()
+        self.controller = self.CONTROLLER.create("adoc", self.TYPE, "a",
+                                                 self.user, self.DATA)
+        self.part = PartController.create("mpart", "Part", "a", self.user)
+
+    def test_initial_lock(self):
+        self.assertEqual(self.controller.locked, False)
+        self.assertEqual(self.controller.locker, None)
+
+    def test_lock(self):
+        self.controller.lock()
+        self.assertEqual(self.controller.locked, True)
+        self.assertEqual(self.controller.locker, self.user)
+
+    def test_lock_error1(self):
+        "Error : already locked"
+        self.controller.lock()
+        self.assertRaises(LockError, self.controller.lock)
+    
+    def test_unlock(self):
+        self.controller.lock()
+        self.controller.unlock()
+        self.assertEqual(self.controller.locked, False)
+        self.assertEqual(self.controller.locker, None)
+    
+    def test_unlock_error1(self):
+        self.assertRaises(UnlockError, self.controller.unlock)
+
+    def test_unlock_error2(self):
+        user = User(username="baduser")
+        user.set_password("password")
+        user.save()
+        controller = self.CONTROLLER(self.controller.object, user)
+        self.assertRaises(UnlockError, controller.unlock)
+    
+    def get_file(self, name="temp.txt", data="data"):
+        f = ContentFile(data)
+        f.name = name
+        return f
+
+    def test_add_file(self):
+        f = self.get_file()
+        self.controller.add_file(f)
+        files = self.controller.files.all()
+        self.assertEqual(len(files), 1)
+        f2 = files[0]
+        self.assertEqual(f2.filename, f.name)
+        self.assertEqual(f2.size, f.size)
+        self.assertEqual(f2.file.read(), "data")
+        self.assertEqual(file(f2.file.name).read(), "data")
+        self.assertEqual(os.path.splitext(f2.file.name)[1], ".txt")
+        self.failIf("temp" in f2.file.path)
+        self.failUnless(f2.file.name.startswith(os.path.join(
+            settings.DOCUMENTS_DIR, "txt")))
+        self.failUnless(os.access(f2.file.path, os.F_OK))
+        self.failUnless(os.access(f2.file.path, os.R_OK))
+        self.failUnless(not os.access(f2.file.path, os.W_OK))
+        self.failUnless(not os.access(f2.file.path, os.X_OK))
+        # clean up
+        os.chmod(f2.file.path, 0700)
+        os.remove(f2.file.path)
+
+    def test_add_several_files(self):
+        nb = 5
+        for i in xrange(nb):
+            f = self.get_file("temp%d.txt" % i, "data%d" % i)
+            self.controller.add_file(f)
+        files = self.controller.files.all().order_by('filename')
+        self.assertEqual(len(files), nb)
+        for i, f2 in enumerate(files):
+            self.assertEqual(f2.filename, "temp%d.txt" % i)
+            self.assertEqual(f2.file.read(), "data%d" % i)
+            os.chmod(f2.file.path, 0700)
+            os.remove(f2.file.path)
+
+    def test_add_file_error(self):
+        self.controller.lock()
+        self.assertRaises(AddFileError, self.controller.add_file,
+                          self.get_file())
+
+    def test_delete_file(self):
+        self.controller.add_file(self.get_file())
+        f2 = self.controller.files.all()[0]
+        path = f2.file.path
+        self.controller.delete_file(f2)
+        self.assertEqual([], list(self.controller.files.all()))
+        self.failIf(os.path.exists(path))
+
+    def test_delete_file_error(self):
+        self.controller.add_file(self.get_file())
+        f2 = self.controller.files.all()[0]
+        self.controller.lock()
+        self.assertRaises(DeleteFileError, self.controller.delete_file, f2)
+
+    def test_attach_to_part(self):
+        self.controller.attach_to_part(self.part)
+    
+    def test_attach_to_part_error1(self):
+        self.assertRaises(ValueError, self.controller.attach_to_part, None)
+    
+    def test_attach_to_part_error2(self):
+        self.assertRaises(ValueError, self.controller.attach_to_part, self)
+
+    def test_attach_to_part_error3(self):
+        obj = PLMObject.objects.create(reference="obj", type="PLMObject",
+                           revision="a", creator=self.user, owner=self.user)
+        self.assertRaises(ValueError, self.controller.attach_to_part, obj)
+    
+    def test_attach_to_part_error4(self):
+        obj = self.CONTROLLER.create("ob", self.TYPE, "a", self.user, self.DATA)
+        self.assertRaises(ValueError, self.controller.attach_to_part, obj)
+    
+    def test_get_attached_parts(self):
+        self.controller.attach_to_part(self.part)
+        links = list(self.controller.get_attached_parts())
+        self.assertEqual([l.part for l in links], [self.part.object])
+        
+    def test_get_attached_parts_empty(self):
+        links = list(self.controller.get_attached_parts())
+        self.assertEqual(links, [])
+
+    def test_revise2(self):
+        self.controller.attach_to_part(self.part)
+        self.controller.add_file(self.get_file())
+        f1 = self.controller.files.all()[0]
+        rev = self.controller.revise("new_name")
+        links = list(rev.get_attached_parts())
+        self.assertEqual(links, [])
+        self.assertEqual(len(rev.files.all()), 1)
+        self.assertEqual(len(self.controller.files.all()), 1)
+        f2 = rev.files.all()[0]
+        self.assertEqual(f1.filename, f2.filename)
+        self.assertEqual(f1.size, f2.size)
+        self.assertEqual(f1.file.read(), f2.file.read())
+        self.failIf(f1.file.path == f2.file.path)
+        
+        
 class CommonViewTest(TestCase):
     TYPE = "Part"
     CONTROLLER = PartController
