@@ -367,7 +367,9 @@ class PLMObjectController(object):
 
         Returns a controller of the new object.
         """
-
+        
+        if not new_revision or new_revision == self.revision:
+            raise RevisionError("Bad value for new_revision")
         if models.RevisionLink.objects.filter(old=self.object.pk):
             raise RevisionError("a revision already exists for %s" % self.object)
         data = {}
