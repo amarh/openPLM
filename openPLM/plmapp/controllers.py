@@ -97,8 +97,6 @@ Classes and functions
 
 This module defines several classes, here is a summary:
 
-    * exceptions:
-        - :exc:`RevisionError`
     * metaclasses:
         - :class:`MetaController`
     * :class:`~collections.namedtuple` :
@@ -119,25 +117,25 @@ This module defines several classes, here is a summary:
 
 """
 
+import os
 import re
+import shutil
 from datetime import datetime
 from collections import namedtuple
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 try:
     import openPLM.plmapp.models as models
+    from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
+        AddFileError, DeleteFileError
 except (ImportError, AttributeError):
     import plmapp.models as models
+    from plmapp.exceptions import RevisionError, LockError, UnlockError, \
+        AddFileError, DeleteFileError
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
-
-class RevisionError(StandardError):
-    """
-    Exception raised when :meth:`~PLMObjectController.revise` is called but
-    making a revision is not allowed.
-    """
-    pass
 
 class MetaController(type):
     #: dict<type_name(str) : Controller(like :class:`PLMObjectController`)>
@@ -344,12 +342,13 @@ class PLMObjectController(object):
         else:
             return object.__getattribute__(self, attr)
 
-    def save(self):
+    def save(self, with_history=True):
         u"""
-        Saves :attr:`object` and records its history in the database
+        Saves :attr:`object` and records its history in the database.
+        If *with_history* is False, the history is not recorded.
         """
         self.object.save()
-        if self.__histo:
+        if self.__histo and with_history:
             self._save_histo("Modify", self.__histo) 
             self.__histo = ""
 
@@ -597,6 +596,78 @@ class PartController(PLMObjectController):
         return new_controller
 
 class DocumentController(PLMObjectController):
-    pass
+    
+    def lock(self):
+        if not self.object.locked:
+            self.object.locked = True
+            self.object.locker = self._user
+            self.save(with_history=False)
+            self._save_histo("Locked", "locked by %s" % self._user)
+        else:
+            raise LockError("Document already locked")
 
+    def unlock(self):
+        if not self.object.locked:
+            raise UnlockError("Document already unlocked")
+        if self.object.locker != self._user:
+            raise UnlockError("Bad user")
+
+        self.object.locked = False
+        self.object.locker = None
+        self.save(with_history=False)
+        self._save_histo("Unlocked", "Unlocked by %s" % self._user)
+
+    def add_file(self, f):
+        if not self.object.locked:
+            doc_file = models.DocumentFile()
+            doc_file.filename = f.name
+            doc_file.size = f.size
+            doc_file.file = models.docfs.save(f.name, f)
+            doc_file.save()
+            self.object.files.add(doc_file)
+            self.save(False)
+            # set read only file
+            os.chmod(doc_file.file.path, 0400)
+            self._save_histo("File added", "file : %s" % f.name)
+            self.handle_add_file(doc_file)
+        else:
+            raise AddFileError("Document is locked")
+
+    def delete_file(self, doc_file):
+        if self.object.locked:
+            raise DeleteFileError("Document is locked")
+        path = os.path.realpath(doc_file.file.path)
+        if not path.startswith(settings.DOCUMENTS_DIR):
+            raise DeleteFileError("Bad path : %s" % path)
+        os.chmod(path, 0700)
+        os.remove(path)
+        self._save_histo("File deleted", "file : %s" % doc_file.filename)
+        self.files.remove(doc_file)
+        doc_file.delete()
+
+    def handle_add_file(self, doc_file):
+        pass
+
+    def attach_to_part(self, part):
+        if isinstance(part, PLMObjectController):
+            part = part.object
+        models.DocumentPartLink.objects.create(document=self.object, part=part)
+        self._save_histo(models.DocumentPartLink.ACTION_NAME,
+                         "Part : %s - Document : %s" % (part, self.object))
+
+    def get_attached_parts(self):
+        return models.DocumentPartLink.objects.filter(document=self.object)
+
+    def revise(self, new_revision):
+        rev = super(DocumentController, self).revise(new_revision)
+        rev.locked = False
+        rev.locker = None
+        for doc_file in self.object.files.all():
+            filename = doc_file.filename
+            path = models.docfs.get_available_name(filename)
+            shutil.copy(doc_file.file.path, path)
+            new_doc = models.DocumentFile.objects.create(file=path,
+                filename=filename, size=doc_file.size)
+            rev.files.add(new_doc)
+        return rev
 

@@ -83,3 +83,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'openPLM.plmapp',
 )
+
+######################
+# openPLM's settings #
+######################
+
+# directory that holds documents
+DOCUMENTS_DIR = "/var/openPLM/docs"

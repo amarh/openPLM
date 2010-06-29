@@ -20,7 +20,8 @@ import sys, os
 sys.path.append(os.path.abspath('../'))
 sys.path.append(os.path.abspath('../openPLM'))
 
-from django.conf import settings
+from django.conf import global_settings, settings
+global_settings.DOCUMENTS_DIR = "/tmp"
 settings.configure()
 
 # -- General configuration -----------------------------------------------------
