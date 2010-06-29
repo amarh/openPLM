@@ -152,6 +152,19 @@ class ControllerTest(TestCase):
         for attr in controller.get_modification_fields():
             self.assertEqual(getattr(controller, attr), getattr(rev, attr))
 
+    def test_revise_error1(self):
+        "Revision : error : empty name"
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        self.assertRaises(RevisionError, controller.revise, "")
+    
+    def test_revise_error2(self):
+        "Revision : error : same revision name"
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        self.assertRaises(RevisionError, controller.revise, "a")
+
+
 class PartControllerTest(ControllerTest):
     TYPE = "Part"
     CONTROLLER = PartController
