@@ -4,7 +4,7 @@ from django.contrib import admin
 try:
     from openPLM.plmapp.models import Part
     from openPLM.plmapp.controllers import PartController
-except ImportError:
+except (ImportError, AttributeError):
     from plmapp.models import Part
     from plmapp.controllers import PartController
 

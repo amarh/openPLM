@@ -9,13 +9,14 @@ from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core.files.base import ContentFile
-
+from django.core.files import File
 
 from openPLM.plmapp.utils import *
+from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
 from openPLM.plmapp.lifecycle import *
-from openPLM.plmapp.models import *
 from openPLM.plmapp.customized_models.computer import *
+from openPLM.plmapp.customized_models.office import *
 
 class LifecycleTest(TestCase):
     def test_get_default(self):
@@ -297,36 +298,65 @@ class DocumentControllerTest(ControllerTest):
         self.controller = self.CONTROLLER.create("adoc", self.TYPE, "a",
                                                  self.user, self.DATA)
         self.part = PartController.create("mpart", "Part", "a", self.user)
+        self.old_files = []
+
+    def tearDown(self):
+        for f in list(self.controller.files.all()) + self.old_files:
+            os.chmod(f.file.path, 0700)
+            os.remove(f.file.path)
 
     def test_initial_lock(self):
-        self.assertEqual(self.controller.locked, False)
-        self.assertEqual(self.controller.locker, None)
+        d = self.controller.add_file(self.get_file())
+        self.assertEqual(d.locked, False)
+        self.assertEqual(d.locker, None)
 
     def test_lock(self):
-        self.controller.lock()
-        self.assertEqual(self.controller.locked, True)
-        self.assertEqual(self.controller.locker, self.user)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertEqual(d.locked, True)
+        self.assertEqual(d.locker, self.user)
 
     def test_lock_error1(self):
         "Error : already locked"
-        self.controller.lock()
-        self.assertRaises(LockError, self.controller.lock)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertRaises(LockError, self.controller.lock, d)
+    
+    def test_lock_error2(self):
+        "Error : bad file"
+        controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
+                                                 self.user, self.DATA)
+        d = controller.add_file(self.get_file())
+        self.old_files.append(d)
+        self.assertRaises(ValueError, self.controller.lock, d)
     
     def test_unlock(self):
-        self.controller.lock()
-        self.controller.unlock()
-        self.assertEqual(self.controller.locked, False)
-        self.assertEqual(self.controller.locker, None)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.controller.unlock(d)
+        self.assertEqual(d.locked, False)
+        self.assertEqual(d.locker, None)
     
     def test_unlock_error1(self):
-        self.assertRaises(UnlockError, self.controller.unlock)
+        d = self.controller.add_file(self.get_file())
+        self.assertRaises(UnlockError, self.controller.unlock, d)
 
     def test_unlock_error2(self):
         user = User(username="baduser")
         user.set_password("password")
         user.save()
         controller = self.CONTROLLER(self.controller.object, user)
-        self.assertRaises(UnlockError, controller.unlock)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertRaises(UnlockError, controller.unlock, d)
+    
+    def test_unlock_error3(self):
+        "Error : bad file"
+        controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
+                                                 self.user, self.DATA)
+        d = controller.add_file(self.get_file())
+        self.assertRaises(ValueError, self.controller.unlock, d)
+        self.old_files.append(d)
     
     def get_file(self, name="temp.txt", data="data"):
         f = ContentFile(data)
@@ -351,9 +381,6 @@ class DocumentControllerTest(ControllerTest):
         self.failUnless(os.access(f2.file.path, os.R_OK))
         self.failUnless(not os.access(f2.file.path, os.W_OK))
         self.failUnless(not os.access(f2.file.path, os.X_OK))
-        # clean up
-        os.chmod(f2.file.path, 0700)
-        os.remove(f2.file.path)
 
     def test_add_several_files(self):
         nb = 5
@@ -365,14 +392,7 @@ class DocumentControllerTest(ControllerTest):
         for i, f2 in enumerate(files):
             self.assertEqual(f2.filename, "temp%d.txt" % i)
             self.assertEqual(f2.file.read(), "data%d" % i)
-            os.chmod(f2.file.path, 0700)
-            os.remove(f2.file.path)
-
-    def test_add_file_error(self):
-        self.controller.lock()
-        self.assertRaises(AddFileError, self.controller.add_file,
-                          self.get_file())
-
+  
     def test_delete_file(self):
         self.controller.add_file(self.get_file())
         f2 = self.controller.files.all()[0]
@@ -380,12 +400,20 @@ class DocumentControllerTest(ControllerTest):
         self.controller.delete_file(f2)
         self.assertEqual([], list(self.controller.files.all()))
         self.failIf(os.path.exists(path))
-
+ 
     def test_delete_file_error(self):
         self.controller.add_file(self.get_file())
         f2 = self.controller.files.all()[0]
-        self.controller.lock()
+        self.controller.lock(f2)
         self.assertRaises(DeleteFileError, self.controller.delete_file, f2)
+
+    def test_delete_file_error2(self):
+        "Error : bad file"
+        controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
+                                                 self.user, self.DATA)
+        d = controller.add_file(self.get_file())
+        self.assertRaises(ValueError, self.controller.delete_file, d)
+        self.old_files.append(d)
 
     def test_attach_to_part(self):
         self.controller.attach_to_part(self.part)
@@ -405,6 +433,11 @@ class DocumentControllerTest(ControllerTest):
         obj = self.CONTROLLER.create("ob", self.TYPE, "a", self.user, self.DATA)
         self.assertRaises(ValueError, self.controller.attach_to_part, obj)
     
+    def test_detach_part(self):
+        self.controller.attach_to_part(self.part)
+        self.controller.detach_part(self.part)
+        self.assertEqual(len(self.controller.get_attached_parts()), 0)
+
     def test_get_attached_parts(self):
         self.controller.attach_to_part(self.part)
         links = list(self.controller.get_attached_parts())
@@ -424,11 +457,71 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(len(rev.files.all()), 1)
         self.assertEqual(len(self.controller.files.all()), 1)
         f2 = rev.files.all()[0]
+        self.assertEqual(f2.locker, None)
+        self.assertEqual(f2.locked, False)
         self.assertEqual(f1.filename, f2.filename)
         self.assertEqual(f1.size, f2.size)
         self.assertEqual(f1.file.read(), f2.file.read())
         self.failIf(f1.file.path == f2.file.path)
+        self.old_files.append(f2)
+
+    def test_checkin(self):
+        d = self.controller.add_file(self.get_file())
+        self.controller.checkin(d, self.get_file(data="new_data"))
+        self.assertEqual(len(self.controller.files), 1)
+        f = self.controller.files.all()[0]
+        self.assertEqual(f.file.read(), "new_data")
+
+    def test_checkin_error1(self):
+        controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
+                                                 self.user, self.DATA)
+        d = controller.add_file(self.get_file())
+        self.old_files.append(d)
+        self.assertRaises(ValueError, self.controller.checkin, 
+                          d, self.get_file(data="new_data"))
         
+    def test_checkin_error2(self):
+        user = User(username="baduser")
+        user.set_password("password")
+        user.save()
+        controller = self.CONTROLLER(self.controller.object, user)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertRaises(UnlockError, controller.checkin, d,
+                          self.get_file())
+        
+class OfficeTest(DocumentControllerTest):
+    TYPE = "OfficeDocument"
+    CONTROLLER = OfficeDocumentController
+    DATA = {}
+
+    def test_add_odt(self):
+        # format a4, 3 pages
+        f = file("datatests/office_a4_3p.odt", "rb")
+        my_file = File(f)
+        self.controller.add_file(my_file)
+        self.assertEquals(self.controller.nb_pages, 3)
+        self.assertEquals(self.controller.format, "A4")
+        f2 = self.controller.files.all()[0]
+        self.failUnless(f2.file.path.endswith(".odt"))
+        self.controller.delete_file(f2)
+
+    def test_add_odt2(self):
+        # fake odt
+        # No exceptions should be raised
+        self.controller.add_file(self.get_file("plop.odt"))
+        f2 = self.controller.files.all()[0]
+        self.controller.delete_file(f2)
+
+    def test_add_odt3(self):
+        # do not update fields
+        f = file("datatests/office_a4_3p.odt", "rb")
+        my_file = File(f)
+        self.controller.add_file(my_file, False)
+        self.assertEquals(self.controller.nb_pages, None)
+        f2 = self.controller.files.all()[0]
+        self.controller.delete_file(f2)
+
         
 class CommonViewTest(TestCase):
     TYPE = "Part"

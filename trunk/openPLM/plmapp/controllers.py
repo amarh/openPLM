@@ -120,7 +120,7 @@ This module defines several classes, here is a summary:
 import os
 import re
 import shutil
-from datetime import datetime
+import datetime
 from collections import namedtuple
 
 from django.conf import settings
@@ -487,7 +487,7 @@ class PartController(PLMObjectController):
             child = child.object
         link = models.ParentChildLink.objects.get(parent=self.object, 
                                                   child=child, end_time=None)
-        link.end_time = datetime.today()
+        link.end_time = datetime.datetime.today()
         link.save()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
@@ -511,7 +511,7 @@ class PartController(PLMObjectController):
         if link.quantity == new_quantity and link.order == new_order:
             # do not make an update if it is useless
             return
-        link.end_time = datetime.today()
+        link.end_time = datetime.datetime.today()
         link.save()
         # make a new link
         link2 = models.ParentChildLink(parent=self.object, child=child,
@@ -599,55 +599,61 @@ class PartController(PLMObjectController):
 
 class DocumentController(PLMObjectController):
     
-    def lock(self):
-        if not self.object.locked:
-            self.object.locked = True
-            self.object.locker = self._user
-            self.save(with_history=False)
-            self._save_histo("Locked", "locked by %s" % self._user)
+    def lock(self, doc_file):
+        if doc_file.document.pk != self.object.pk:
+            raise ValueError("Bad file's document")
+        if not doc_file.locked:
+            doc_file.locked = True
+            doc_file.locker = self._user
+            doc_file.save()
+            self._save_histo("Locked",
+                             "%s locked by %s" % (doc_file.filename, self._user))
         else:
-            raise LockError("Document already locked")
+            raise LockError("File already locked")
 
-    def unlock(self):
-        if not self.object.locked:
-            raise UnlockError("Document already unlocked")
-        if self.object.locker != self._user:
+    def unlock(self, doc_file):
+        if doc_file.document.pk != self.object.pk:
+            raise ValueError("Bad file's document")
+        if not doc_file.locked:
+            raise UnlockError("File already unlocked")
+        if doc_file.locker != self._user:
             raise UnlockError("Bad user")
 
-        self.object.locked = False
-        self.object.locker = None
-        self.save(with_history=False)
-        self._save_histo("Unlocked", "Unlocked by %s" % self._user)
+        doc_file.locked = False
+        doc_file.locker = None
+        doc_file.save()
+        self._save_histo("Locked",
+                         "%s unlocked by %s" % (doc_file.filename, self._user))
 
-    def add_file(self, f):
-        if not self.object.locked:
-            doc_file = models.DocumentFile()
-            doc_file.filename = f.name
-            doc_file.size = f.size
-            doc_file.file = models.docfs.save(f.name, f)
-            doc_file.save()
-            self.object.files.add(doc_file)
-            self.save(False)
-            # set read only file
-            os.chmod(doc_file.file.path, 0400)
-            self._save_histo("File added", "file : %s" % f.name)
-            self.handle_add_file(doc_file)
-        else:
-            raise AddFileError("Document is locked")
+    def add_file(self, f, update_attributes=True):
+        doc_file = models.DocumentFile()
+        doc_file.filename = f.name
+        doc_file.size = f.size
+        doc_file.file = models.docfs.save(f.name, f)
+        doc_file.document = self.object
+        doc_file.save()
+        self.save(False)
+        # set read only file
+        os.chmod(doc_file.file.path, 0400)
+        self._save_histo("File added", "file : %s" % f.name)
+        if update_attributes:
+            self.handle_added_file(doc_file)
+        return doc_file
 
     def delete_file(self, doc_file):
-        if self.object.locked:
-            raise DeleteFileError("Document is locked")
+        if doc_file.document.pk != self.object.pk:
+            raise ValueError("Bad file's document")
+        if doc_file.locked:
+            raise DeleteFileError("File is locked")
         path = os.path.realpath(doc_file.file.path)
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
         os.chmod(path, 0700)
         os.remove(path)
         self._save_histo("File deleted", "file : %s" % doc_file.filename)
-        self.files.remove(doc_file)
         doc_file.delete()
 
-    def handle_add_file(self, doc_file):
+    def handle_added_file(self, doc_file):
         pass
 
     def attach_to_part(self, part):
@@ -657,19 +663,41 @@ class DocumentController(PLMObjectController):
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (part, self.object))
 
+    def detach_part(self, part):
+        if isinstance(part, PLMObjectController):
+            part = part.object
+        link = models.DocumentPartLink.objects.get(document=self.object,
+                                                   part=part)
+        link.delete()
+        self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
+                         "Part : %s - Document : %s" % (part, self.object))
+
     def get_attached_parts(self):
         return models.DocumentPartLink.objects.filter(document=self.object)
 
     def revise(self, new_revision):
         rev = super(DocumentController, self).revise(new_revision)
-        rev.locked = False
-        rev.locker = None
         for doc_file in self.object.files.all():
             filename = doc_file.filename
             path = models.docfs.get_available_name(filename)
             shutil.copy(doc_file.file.path, path)
             new_doc = models.DocumentFile.objects.create(file=path,
-                filename=filename, size=doc_file.size)
-            rev.files.add(new_doc)
+                filename=filename, size=doc_file.size, document=rev.object)
+            new_doc.locked = False
+            new_doc.locker = None
+            new_doc.save()
         return rev
 
+    def checkin(self, doc_file, new_file):
+        if doc_file.document.pk != self.object.pk:
+            raise ValueError("Bad file's document")
+        if doc_file.locked:
+            self.unlock(doc_file)   
+        os.chmod(doc_file.file.path, 0700)
+        os.remove(doc_file.file.path)
+        doc_file.filename = new_file.name
+        doc_file.size = new_file.size
+        doc_file.file = models.docfs.save(new_file.name, new_file)
+        os.chmod(doc_file.file.path, 0400)
+        doc_file.save()
+        self._save_histo("Check-in", doc_file.filename) 
