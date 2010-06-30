@@ -1,0 +1,17 @@
+{% extends "MiddleDisplayObjectAndHomePage4ChildAddition.htm" %}
+
+<!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
+
+{% block content %}
+<h3>RELATED DOCUMENTS AND CAD :</h3>
+<br/>
+<form method="POST" action="">
+    <table class="Content">
+        {{add_doc_cad_form}}
+    </table>
+    <input type="submit" value="Validate" name="action"/>
+    <input type="submit" value="Undo" name="action"/>
+</form>
+{% endblock %}
+
+

@@ -19,19 +19,18 @@
         </tr>
     </table>
     <form method="GET" action="">
-        Display :
-        {% for level, name in display_form.LEVELS %}
-            <input type="radio" value={{level}} name="level" /> {{name}}
-        {% endfor %}
-        {{ display_form.date }}
+        Display :<br />
+        <ul>
+        {{display_form.as_ul}}
+        </ul>
         <input type="submit" value="GO !"><br/>
     </form>
 	<br/>
     <table class="Content">
         <tr>
             <th class="Content"> </th>
-            <th class="Content"> Order </th>
-            <th class="Content"> Quantity </th>
+            <th class="Content"> Ord. </th>
+            <th class="Content"> Qty </th>
             <th class="Content"> {{ obj.reference }} </th>
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
@@ -40,7 +39,7 @@
         </tr>
         {% for level, link in children %}
         <tr class="Content"> 
-            <td class="Content">{{ level|safe}} ↳</td>
+            <td class="Content" style="width:50px">{{ level|safe}} ↳</td>
             <td class="Content"> {{ link.order }} </td>
             <td class="Content"> {{ link.quantity }} </td>
             <td class="Content"> 
