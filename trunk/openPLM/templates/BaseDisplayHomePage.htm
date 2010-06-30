@@ -19,7 +19,11 @@
 			<div id="SearchBox">
 				{% block SearchBlock %}{% endblock %}
 			</div>
-			<div id="SearchBox">
+			{% if class4search_div %}
+			    <div id="ResultBox4Search">
+			{% else %}
+			    <div id="ResultBox">
+			{% endif %}
 				{% block ResultBlock %}{% endblock %}
 			</div>
 		</div>
@@ -30,7 +34,7 @@
 			<div id="LoggedPersonBox">
 				{% block CreationBlock %}{% endblock %}
 			</div>
-			<div id="NavigateBox">
+			<div id={{class4div}}>
 				{% block ObjectBlock %}{% endblock %}
 			</div>
 		</div>
