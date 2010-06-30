@@ -336,7 +336,7 @@ class DocumentStorage(FileSystemStorage):
             return r
         basename = os.path.basename(name)
         base, ext = os.path.splitext(basename)
-        ext2 = ext.lstrip(".") or "no_ext"
+        ext2 = ext.lstrip(".").lower() or "no_ext"
         md5 = hashlib.md5()
         md5.update(basename)
         md5_value = md5.hexdigest() + "-%s" + ext
@@ -352,10 +352,6 @@ class DocumentFile(models.Model):
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to="docs", storage=docfs)
     size = models.PositiveIntegerField()
-
-
-class Document(PLMObject):
-
     # locking stuff
     locked = models.BooleanField(default=lambda: False)
     # null if unlocked
@@ -363,11 +359,23 @@ class Document(PLMObject):
                                related_name="%(class)s_locker",
                                default=lambda: None)
 
-    files = models.ManyToManyField(DocumentFile, related_name="%(class)s_files")
+    document = models.ForeignKey('Document', related_name="%(class)s_doc")
+
+class Document(PLMObject):
+    
+    @property
+    def files(self):
+        return DocumentFile.objects.filter(document__id=self.id)
 
     def is_promotable(self):
         # TODO check file
         return True
+
+    @property
+    def menu_items(self):
+        items = list(super(Document, self).menu_items)
+        items.extend(["parts", "files"])
+        return items
 
     @property
     def attributes(self):
@@ -516,11 +524,15 @@ def import_models(force_reload=False):
 
     MODELS_DIR = "customized_models"
     IMPORT_ROOT = "openPLM.plmapp.%s" % MODELS_DIR
+    if __name__ != "openPLM.plmapp.models":
+        return
     if force_reload or not hasattr(import_models, "done"):
         import_models.done = True
         models_dir = os.path.join(os.path.split(__file__)[0], MODELS_DIR)
         for root, dirs, files in os.walk(models_dir):
-            for module in fnmatch.filter(files, "*.py"):
+            for module in sorted(fnmatch.filter(files, "*.py")):
+                if module == "__init__.py":
+                    continue
                 module_name = os.path.splitext(os.path.basename(module))[0]
                 import_dir = root.split(MODELS_DIR, 1)[-1].replace(os.path.sep, ".")
                 import_name = "%s.%s.%s" % (IMPORT_ROOT, import_dir, module_name)
@@ -528,8 +540,8 @@ def import_models(force_reload=False):
                 try:
                     __import__(import_name, globals(), locals(), [], -1)
                 except ImportError, exc:
-                    print "Exception in import_models", exc
+                    print "Exception in import_models", module_name, exc
                 except StandardError, exc:
-                    print "Exception in import_models", type(exc), exc
+                    print "Exception in import_models", module_name, type(exc), exc
 import_models()
 

@@ -3,8 +3,7 @@ from django.contrib import admin
 
 try:
     from openPLM.plmapp.models import Document
-except ImportError, e:
-    print e
+except (ImportError, AttributeError):
     from plmapp.models import Document
 
 class MyDocument(Document):
