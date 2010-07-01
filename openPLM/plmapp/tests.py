@@ -17,6 +17,7 @@ from openPLM.plmapp.controllers import *
 from openPLM.plmapp.lifecycle import *
 from openPLM.plmapp.customized_models.computer import *
 from openPLM.plmapp.customized_models.office import *
+from openPLM.plmapp.customized_models.design import *
 
 class LifecycleTest(TestCase):
     def test_get_default(self):
@@ -522,6 +523,10 @@ class OfficeTest(DocumentControllerTest):
         f2 = self.controller.files.all()[0]
         self.controller.delete_file(f2)
 
+class Design(DocumentControllerTest):
+    TYPE = "Drawing"
+    CONTROLLER = DrawingController
+    DATA = {}
         
 class CommonViewTest(TestCase):
     TYPE = "Part"
@@ -618,7 +623,8 @@ class SearchViewTest(CommonViewTest):
     
     def test_session_forms(self):
         "Tests if form field are kept between two search"
-        response = self.client.get("/home/", {"revision" : "c", "name" : "a name"})
+        response = self.client.get("/home/", {"type" : "Part",
+                                "revision" : "c", "name" : "a name"})
         self.assertEqual(response.status_code, 200)
         response = self.client.get("/home/")
         self.assertEqual(response.status_code, 200)

@@ -3,14 +3,10 @@ import os
 from django.db import models
 from django.contrib import admin
 
-# see odfpy (sudo easy_install odfpy)
-from odf.opendocument import load
-from odf.meta import DocumentStatistic
-from odf.style import PageLayoutProperties
-
+from openPLM.plmapp.filehandlers import HandlersManager
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
-from openPLM.plmapp.utils import size_to_format, UNITS
+from openPLM.plmapp.utils import UNITS
 
 def register(cls):
     try:
@@ -37,17 +33,11 @@ class OfficeDocumentController(DocumentController):
 
     def handle_added_file(self, doc_file):
         if os.path.splitext(doc_file.file.path)[1].lower() == ".odt":
-            try:
-                doc = load(doc_file.file.path)
-                stat = doc.getElementsByType(DocumentStatistic)[0]
-                page = doc.getElementsByType(PageLayoutProperties)[0]
-                self.nb_pages = int(stat.attributes["meta:page-count"])
-                w = page.attribute['fo:page-width']
-                h = page.attribute['fo:page-height']
-                self.format = size_to_format(w, h)
-            except Exception:
-                # load may raise several exceptions...
-                pass
+            handler_cls = HandlersManager.get_best_handler(".odt")
+            handler = handler_cls(doc_file.file.path, doc_file.filename)
+            if handler.is_valid():
+                self.nb_pages = handler.nb_pages
+                self.format = handler.format
         self.save()
 
 register(OfficeDocument)

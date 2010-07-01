@@ -377,22 +377,6 @@ class Document(PLMObject):
         items.extend(["parts", "files"])
         return items
 
-    @property
-    def attributes(self):
-        attrs = list(super(Document, self).attributes)
-        attrs.extend(["locked", "locker"])
-        return attrs
-    
-    @classmethod
-    def excluded_creation_fields(cls):
-        return super(Document, cls).excluded_creation_fields() + \
-                ["locked", "locker"]
-    
-    @classmethod
-    def excluded_modification_fields(cls):
-        return super(Document, cls).excluded_modification_fields() + \
-                ["locked", "locker"]
-
 
 def get_all_documents():
     u"""
