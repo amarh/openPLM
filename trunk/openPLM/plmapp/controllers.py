@@ -598,8 +598,24 @@ class PartController(PLMObjectController):
         return new_controller
 
 class DocumentController(PLMObjectController):
+    """
+    A :class:`PLMObjectController` which manages 
+    :class:`~openPLM.plmapp.models.Document`
     
+    It provides methods to add or delete files, (un)lock them and attach a
+    :class:`~openPLM.plmapp.models.Document` to a :class:`~openPLM.plmapp.models.Part`.
+    """
+
     def lock(self, doc_file):
+        """
+        Lock *doc_file* so that it can not be modified or deleted
+        
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.document is not self.object
+
+        :param doc_file:
+        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        """
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.locked:
@@ -612,6 +628,18 @@ class DocumentController(PLMObjectController):
             raise LockError("File already locked")
 
     def unlock(self, doc_file):
+        """
+        Unlock *doc_file* so that it can be modified or deleted
+        
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`plmapp.exceptions.UnlockError` if *doc_file* is already
+              unlocked or *doc_file.locker* is not the current user
+
+        :param doc_file:
+        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        """
+
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.locked:
@@ -626,6 +654,15 @@ class DocumentController(PLMObjectController):
                          "%s unlocked by %s" % (doc_file.filename, self._user))
 
     def add_file(self, f, update_attributes=True):
+        """
+        Adds file *f* to the document. *f* should be a :class:`~django.core.files.File`
+        with an attribute *name* (like an :class:`UploadedFile`).
+
+        If *update_attributes* is True (the default), :meth:`handle_added_file`
+        will be called with *f* as parameter.
+
+        :return: the :class:`~openPLM.plmapp.models.DocumentFile` created.
+        """
         doc_file = models.DocumentFile()
         doc_file.filename = f.name
         doc_file.size = f.size
@@ -641,6 +678,19 @@ class DocumentController(PLMObjectController):
         return doc_file
 
     def delete_file(self, doc_file):
+        """
+        Deletes *doc_file*, the file attached to *doc_file* is physically
+        removed.
+
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`plmapp.exceptions.DeleteFileError` if *doc_file* is
+              locked
+
+        :param doc_file:
+        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        """
+
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.locked:
@@ -654,9 +704,24 @@ class DocumentController(PLMObjectController):
         doc_file.delete()
 
     def handle_added_file(self, doc_file):
+        """
+        Method called when adding a file (method :meth:`add_file`) with
+        *updates_attributes* true.
+
+        This method may be overridden to updates attributes with data from
+        *doc_file*. The default implementation does nothing.
+        
+        :param doc_file:
+        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        """
         pass
 
     def attach_to_part(self, part):
+        """
+        Links *part* (a :class:`~openPLM.plmapp.models.Part`) with
+        :attr:`object`.
+        """
+
         if isinstance(part, PLMObjectController):
             part = part.object
         models.DocumentPartLink.objects.create(document=self.object, part=part)
@@ -664,6 +729,11 @@ class DocumentController(PLMObjectController):
                          "Part : %s - Document : %s" % (part, self.object))
 
     def detach_part(self, part):
+        """
+        Delete link between *part* (a :class:`~openPLM.plmapp.models.Part`) and
+        :attr:`object`.
+        """
+
         if isinstance(part, PLMObjectController):
             part = part.object
         link = models.DocumentPartLink.objects.get(document=self.object,
@@ -673,6 +743,10 @@ class DocumentController(PLMObjectController):
                          "Part : %s - Document : %s" % (part, self.object))
 
     def get_attached_parts(self):
+        """
+        Returns all :class:`~openPLM.plmapp.models.Part` attached to
+        :attr:`object`.
+        """
         return models.DocumentPartLink.objects.filter(document=self.object)
 
     def revise(self, new_revision):
@@ -688,7 +762,22 @@ class DocumentController(PLMObjectController):
             new_doc.save()
         return rev
 
-    def checkin(self, doc_file, new_file):
+    def checkin(self, doc_file, new_file, update_attributes=True):
+        """
+        Updates *doc_file* with data from *new_file*.
+        
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`plmapp.exceptions.UnlockError` if *doc_file* is locked
+              but *doc_file.locker* is not the current user
+
+        :param doc_file:
+        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :param new_file: file with new data, same parameter as *f*
+                         in :meth:`add_file`
+        :param update_attributes: True if :meth:`handle_added_file` should be
+                                  called
+        """
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.locked:
@@ -700,4 +789,6 @@ class DocumentController(PLMObjectController):
         doc_file.file = models.docfs.save(new_file.name, new_file)
         os.chmod(doc_file.file.path, 0400)
         doc_file.save()
-        self._save_histo("Check-in", doc_file.filename) 
+        self._save_histo("Check-in", doc_file.filename)
+        if update_attributes:
+            self.handle_added_file(doc_file)
