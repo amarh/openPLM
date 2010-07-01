@@ -3,6 +3,9 @@
 <!-- Manage html display of the home page -->
 
 {% block LoggedPersonBlock %}
+    <a href="/logout/">
+        <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
+    </a>
     {{log_in_person}} | {{current_date|date:"l j F Y, G:i"}}
 {% endblock %}
 
