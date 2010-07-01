@@ -6,13 +6,21 @@
 Welcome to openPLM's documentation!
 ===================================
 
-Contents:
+How-tos
+----------
 
+.. toctree::
+    
+    how-tos
+
+Modules
+---------
 .. toctree::
     :maxdepth: 2
     
     controllers
     exceptions
+    filehandlers
     forms
     lifecycle
     models
