@@ -8,5 +8,6 @@
     :undoc-members:
   
 .. toctree::
-    
+    :maxdepth: 2
+
     filehandlers_base
