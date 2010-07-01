@@ -6,7 +6,7 @@
 Welcome to openPLM's documentation!
 ===================================
 
-How-tos
+How-to's
 ----------
 
 .. toctree::
