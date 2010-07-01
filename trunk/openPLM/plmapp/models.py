@@ -365,6 +365,7 @@ class Document(PLMObject):
     
     @property
     def files(self):
+        "Queryset of all :class:`DocumentFile` linked to self"
         return DocumentFile.objects.filter(document__id=self.id)
 
     def is_promotable(self):
