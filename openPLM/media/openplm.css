@@ -1,223 +1,195 @@
 /* Definir le style de la page entière */
-body 	{
-		background-color: #dddddd;
-		/* background-image: url(/media/img/fond-page.gif); */
-		/*	background-repeat: repeat-y; */
-		font-family: Comic Sans MS, Verdana, Arial, sans-serif;
-		text-align: center;
-		padding: 0px;
-		margin: 5px;
-		}
-	
-/* Definir le style de la Page limitee a 700px */
-div#Page	{
-			width: 1200px;
-			background-color: #99ccff;		
-			-moz-border-radius: 3em;
-			-webkit-box-shadow: 3px 3px 6px #666;
-			-moz-box-shadow: 3px 3px 6px #666;
-			box-shadow: 3px 3px 6px #666;
-			min-height: 350px;
-			}
+
+*   {
+    padding: 0px;
+    margin: 0px;
+    }
+
+body 
+{
+background-color: #aaaaaa;
+background-image: url(img/ciel_etoile111.jpg);
+font-family: Comic Sans MS, Verdana, Arial, sans-serif;
+text-align: center;
+margin: 5px;
+}
+
+.clear
+{
+clear: both;
+}
+
+div
+{
+-moz-border-radius: 1em;
+-webkit-box-shadow: 3px 3px 6px #666;
+-moz-box-shadow: 3px 3px 6px #666;
+box-shadow: 3px 3px 6px #666;
+}
+
+#HomePage
+{
+background-color: #ffffff;	
+width: 1200px;
+filter: alpha(opacity=90);
+opacity: 0.90; 
+}
+
+#SearchArea, #NavigateArea
+{
+float: left;
+min-height: 500px;
+border-style: none;
+}
+
+div#SearchArea
+{
+width: 400px;
+}
+
+div#NavigateArea
+{
+width: 800px;
+}
+
+div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
+{
+float: top;
+background-color: #99ccff;
+margin: 8px;
+padding: 5px;
+}
+
+div#SearchBox
+{
+min-height: 180px;
+}
+
+div#ResultBox
+{
+min-height: 200px;
+/*overflow: scroll;*/
+}
+
+div#ResultBox4Search
+{
+background-color: #fec3c3;		
+min-height: 350px;
+}
+
+div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
+{
+float: left;
+}
+
+div#LoggedPersonBox
+{
+width: 374px;
+height: 30px;
+}
+
+div#NavigateBox4Part, div#NavigateBox4Doc
+{
+width: 772px;
+min-height: 500px;
+}
+
+div#NavigateBox4Doc
+{
+background-color: #FDFEBF;
+}
+
+div#PageBanner, div#PageLeft, div#PageCenter
+{
+-moz-border-radius: 0em;
+-webkit-box-shadow: 0px 0px 0px #666;
+-moz-box-shadow: 0px 0px 0px #666;
+box-shadow: 0px 0px 0px #666;
+float: top;
+}
+
 /* Definir le style de la Banniere en haut de page */
-div#PageBanner	{
-				width: 100%;
-				float: top;
-				/*border-left: 3px solid #AAAAAA;*/
-				border-bottom: 7px solid #CCCCCC;
-				/*border: solid;*/
-				margin: 0px;
-				padding-top: 5px;
-				padding-left: 0px;
-				text-align: left;
-				}
+div#PageBanner
+{
+border-bottom: 7px solid #CCCCCC;
+text-align: left;
+font-size: 175%;
+font-weight: lighter;
+}
+
 /* Definir le style de la partie Gauche de la page */
-div#PageLeft	{
-			/* background-color: #99ccff; */
-			width: 100%;
-			float: top;
-			min-height: 30px;
-			/*border: solid;*/
-			}
+div#PageLeft
+{
+background-color: #CCCCCC;
+}
 
 /* Definir le style de la partie Centrale de la page */
-div#PageCenter	{
-			width: 100%;
-			min-height: 300px;
-			float: top;
-			/*border-left: 3px solid #AAAAAA;*/
-			margin: 0px;
-			padding: 0px;
-			text-align: left;
-			vertical-align: center;
-			filter: alpha(opacity=80);
-			opacity: 0.80; 
-			}
+div#PageCenter
+{
+text-align: left;
+}
 
-.clear {
-		clear: both;
-		}
+table.MenuTable
+{
+width: 100%;
+border-spacing: 0;
+}
 
-a {text-decoration: none;
-	color: blue;}
-
-table.MenuTable 	{
-				width: 100%;
-				border-width: 3px;
-				border-style: none;
-				border-color: #777777;
-				border-spacing: 0;
-				}
-
-.MenuTable td 	{
-						background-color: #CCCCCC;
-						padding: 0px 0px 0px 0px;
-						border-width: 1px;
-						border-style: none;
-						border-color: #777777;
-						text-align: center;
-						font-size: 100%;
-						}
+.MenuTable td
+{
+text-align: center;
+font-size: 100%;
+}
 
 .MenuTable td:hover {background-color: #E6E6FF;}
-.MenuTable td:visited {background-color: #99ccff;}
 
-.MenuTable a {text-decoration: none;
-	color: black;}
+.MenuTable a
+{text-decoration: none;
+color: black;
+}
 
-/* .MenuTable a:link, a:visited {
-						color: green;
-						
-						} */
-	
-/* .MenuTable a:hover, a:active, a:focus {
-						color: blue;
-						background-color: #FFFFFF;
-						} */
+table.Content, table.Result
+{
+width: 100%;
+border-spacing: 0;
+}
 
+table.Result
+{
+margin: 0px;
+overflow-x: top sroll;
+overflow-y: hidden;
+}
 
-table.Content 	{
-				width: 99%;
-				border-width: 1px;
-				border-style: none;
-				border-color: #777777;
-				border-spacing: 0;
-				margin: 0px;
-				}
+th.Content, td.Content, td.Content2
+{
+padding: 3px;
+border-width: 1px;
+border-style: solid;
+border-color: #99ccff;
+}
 
-tr.Content	{
-
-			}
-
-td.Content	{
-			background-color: #E6E6FF;
-			padding: 3px;
-			border-width: 1px;
-			border-style: dotted;
-			border-color: #777777;
-			}
+td.Content
+{
+background-color: #E6E6FF;
+}
 
 td.Content2	{
-            background-color: #AAAAAA;
-			padding: 3px;
-			border-width: 1px;
-			border-style: dotted;
-			border-color: #777777;
-			}
-			
-td.Content4ChildAddition	{
-            background-color: #fec3c3;
-			padding: 3px;
-			border-width: 1px;
-			border-style: dotted;
-			border-color: #777777;
-			}
-			
-td.Content4ChildAddition2	{
-            background-color: #ffd9da;
-			padding: 3px;
-			border-width: 1px;
-			border-style: dotted;
-			border-color: #777777;
-			}
-			
-th.Content	{
-			/*background-color: #E6E6FF;*/
-			padding: 3px;
-			border-width: 1px;
-			border-style: solid;
-			border-color: #777777;
-			}
+background-color: #AAAAAA;
+}
 
-div#HomePage	{
-			background-color: #ffffff;	
-			width: 1000px;
-			min-height: 550px;
-			padding: 0%;
-			margin: 0px;
-			-moz-border-radius: 1em;
-					-webkit-box-shadow: 3px 3px 6px #666;
-					-moz-box-shadow: 3px 3px 6px #666;
-					box-shadow: 3px 3px 6px #666;
-			}
-
-div#SearchArea	{
-			float: left;
-			width: 35%;
-			min-height: 550px;
-			border-style: none;
-			margin: 0px;
-			padding: 0px;
-			}
-			
-div#NavigateArea	{
-			float: left;
-			width: 65%;
-			min-height: 550px;
-			border-style: none;
-			margin: 0px;
-			padding: 0px;
-			}
-
-div#LoggedPersonBox	{
-					float: left;
-					width: 44%;
-					margin: 1%;
-					background-color: #99ccff;		
-					-moz-border-radius: 1em;
-					-webkit-box-shadow: 3px 3px 6px #666;
-					-moz-box-shadow: 3px 3px 6px #666;
-					box-shadow: 3px 3px 6px #666;
-					height: 30px;
-					padding: 10px;
-					}
-
-div#SearchBox	{
-					float: top;
-					margin: 1%;
-					background-color: #99ccff;		
-					-moz-border-radius: 1em;
-					-webkit-box-shadow: 3px 3px 6px #666;
-					-moz-box-shadow: 3px 3px 6px #666;
-					box-shadow: 3px 3px 6px #666;
-					min-height: 200px;
-					padding: 5px;
-					}
-
-div#NavigateBox	{
-					float: left;
-					margin: 1%;
-					background-color: #99ccff;		
-					-moz-border-radius: 1em;
-					-webkit-box-shadow: 3px 3px 6px #666;
-					-moz-box-shadow: 3px 3px 6px #666;
-					box-shadow: 3px 3px 6px #666;
-					width: 96%;
-					min-height: 400px;
-					padding: 5px;
-					}
-
-
-
-
+ul
+{
+display: inline;
+padding: 0px;
+text-indent: 0px;
+}
+	
+li
+{
+display: inline;
+list-style-type: none;
+padding: 0px;
+text-indent: 0px;
+}
 

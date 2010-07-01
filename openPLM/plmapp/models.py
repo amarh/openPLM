@@ -288,7 +288,7 @@ class Part(PLMObject):
     @property
     def menu_items(self):
         items = list(super(Part, self).menu_items)
-        items.extend(["BOM-child", "parents"])
+        items.extend(["BOM-child", "parents", "doc-cad"])
         return items
 
     def is_promotable(self):
