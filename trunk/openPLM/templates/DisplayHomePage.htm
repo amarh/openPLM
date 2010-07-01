@@ -30,11 +30,15 @@
 				{% if forloop.counter|divisibleby:"2" %}
 				    <tr class="Content">
 					    <td class="Content2">{{object.type|escape}}</td>
-					    <td class="Content2"><a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference|escape}}</a></td>
+					    <td class="Content2">
+					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
+					                {{object.reference|escape}}
+			                </a>
+		                </td>
 					    <td class="Content2">{{object.revision|escape}}</td>
 					    <td class="Content2">
 					        <a class="info">
-					            {{object.name|escape|slice:":10"}}
+					            {{object.name|escape|slice:":10"}}...
 					            <span>{{object.name|escape}}</span>
 				            </a>
 					    </td>
@@ -42,11 +46,15 @@
 			    {% else %}
 			        <tr class="Content">
 					    <td class="Content">{{object.type|escape}}</td>
-					    <td class="Content"><a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference|escape}}</a></td>
+					    <td class="Content">
+					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
+					            {{object.reference|escape}}
+				            </a>
+			            </td>
 					    <td class="Content">{{object.revision|escape}}</td>
 					    <td class="Content">
 					        <a class="info">
-					            {{object.name|escape|slice:":10"}}
+					            {{object.name|escape|slice:":10"}}...
 					            <span>{{object.name|escape}}</span>
 				            </a>
 				        </td>

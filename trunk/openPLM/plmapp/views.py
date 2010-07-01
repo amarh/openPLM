@@ -6,10 +6,12 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller
 
 from django.db.models import Q
-from django.http import HttpResponseRedirect, QueryDict
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse
 
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.utils import get_next_revision
+
+from django.contrib import auth
 
 ##########################################################################################
 def replace_white_spaces(Chain):
@@ -103,6 +105,25 @@ def display_global_page(request_dict):
     return context_dict, request_dict.session
 #    return render_to_response('display_home_page.htm', context_dict)
 
+##########################################################################################
+###                    Function which manage the html login page                        ###
+##########################################################################################
+
+def display_login_page(request):
+    if request.method == 'POST':
+        if request.POST:
+            username_value = request.POST['username']
+            password_value = request.POST['password']
+            user = auth.authenticate(username=username_value, password=password_value)
+            if user is not None and user.is_active:
+                auth.login(request, user)
+                return HttpResponseRedirect("/home/")
+            else:
+                return HttpResponse('Mauvais login, mauvais mot de passe ou compte inactif')
+        else:
+            return HttpResponse('mauvaise requete post')
+    else:
+        return render_to_response('DisplayLoginPage.htm', {})
 
 ##########################################################################################
 ###                    Function which manage the html home page                        ###
@@ -136,6 +157,7 @@ def display_object(request, object_type_value, object_reference_value, object_re
     context_dict.update({'current_page':'attributes', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
+    print request.user
     context_dict.update(var_dict)
     return render_to_response('DisplayObject.htm', context_dict)
 
@@ -455,7 +477,25 @@ def add_rel_part(request, object_type_value, object_reference_value, object_revi
         add_rel_part_form_instance = add_rel_part_form()
         context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
         return render_to_response('DisplayRelPartAdd.htm', context_dict)
-    
+
+##########################################################################################
+def display_files(request, object_type_value, object_reference_value, object_revision_value):
+    """ Manage html page for files contained by the document"""
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    if isinstance(obj, models.Document):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    object_files_list = [('essais-endurance.pdf', 120, False), ('rapport-essais.odf', 45, True)]
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    context_dict.update({'current_page':'files', 'class4div': class_for_div, 'object_menu': menu_list, 'object_files': object_files_list})
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    return render_to_response('DisplayObjectFiles.htm', context_dict)
+
+
 ##########################################################################################
 ###             Manage html pages for part creation / modification                     ###
 ##########################################################################################
