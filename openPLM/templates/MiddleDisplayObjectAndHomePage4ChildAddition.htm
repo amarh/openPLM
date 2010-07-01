@@ -35,51 +35,51 @@
 				<form method="post" action="." enctype="multipart/form-data">
 				{% if forloop.counter|divisibleby:"2" %}
 				    <tr class="Content">
-					    <td class="Content4ChildAddition2">
+					    <td class="Content2">
 					        {{object.type|escape}}
 					        <input type="hidden" name="type" value="{{object.type|escape}}">
 				        </td>
-					    <td class="Content4ChildAddition2">
+					    <td class="Content2">
 					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
 			                    {{object.reference|escape}}
 		                    </a>
 		                    <input type="hidden" name="reference" value="{{object.reference|escape}}">
 				        </td>
-					    <td class="Content4ChildAddition2">
+					    <td class="Content2">
 					        {{object.revision|escape}}
 					        <input type="hidden" name="revision" value="{{object.revision|escape}}">
 				        </td>
 				    </tr>
 				    <tr>
-					    <td class="Content4ChildAddition2" colspan="2" align="right">
+					    <td class="Content2" colspan="2" align="right">
 					        {{object.name|escape}}
 				        </td>
-					    <td class="Content4ChildAddition2">
+					    <td class="Content2">
 					        <input type="submit" value="ADD">
 				        </td>
 				    </tr>
 			    {% else %}
-			        <tr class="Content4ChildAddition">
-					    <td class="Content4ChildAddition">
+			        <tr class="Content">
+					    <td class="Content">
 					        {{object.type|escape}}
 					        <input type="hidden" name="type" value={{object.type|escape}}>
 				        </td>
-					    <td class="Content4ChildAddition">
+					    <td class="Content">
 					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
 			                    {{object.reference|escape}}
 		                    </a>
 		                    <input type="hidden" name="reference" value={{object.reference|escape}}>
 				        </td>
-					    <td class="Content4ChildAddition">
+					    <td class="Content">
 					        {{object.revision|escape}}
 					        <input type="hidden" name="revision" value={{object.revision|escape}}>
 				        </td>
 				    </tr>
 				    <tr>
-					    <td class="Content4ChildAddition" colspan="2" align="right">
+					    <td class="Content" colspan="2" align="right">
 					        {{object.name|escape}}
 				        </td>
-					    <td class="Content4ChildAddition">
+					    <td class="Content">
 					        <input type="submit" value="ADD">
 				        </td>
 				    </tr>

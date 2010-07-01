@@ -133,7 +133,7 @@ def display_object(request, object_type_value, object_reference_value, object_re
         item = obj._meta.get_field(attr).verbose_name
         object_attributes_list.append((item, getattr(obj, attr)))
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})
+    context_dict.update({'current_page':'attributes', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -159,7 +159,7 @@ def display_object_lifecycle(request, object_type_value, object_reference_value,
     for st in lifecycle:
         object_lifecycle_list.append((st, st == state))
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'object_lifecycle': object_lifecycle_list})
+    context_dict.update({'current_page':'lifecycle', 'class4div': class_for_div, 'object_menu': menu_list, 'object_lifecycle': object_lifecycle_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -185,7 +185,7 @@ def display_object_revisions(request, object_type_value, object_reference_value,
         add_form = None
     revisions = obj.get_all_revisions()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'revisions': revisions,
+    context_dict.update({'current_page':'revisions', 'class4div': class_for_div, 'object_menu': menu_list, 'revisions': revisions,
                          'add_revision_form' : add_form})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
@@ -206,7 +206,7 @@ def display_object_history(request, object_type_value, object_reference_value, o
     for histo in histos:
         object_history_list.append((histo.date, histo.action, histo.details))
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'object_history': object_history_list})
+    context_dict.update({'current_page':'history', 'class4div': class_for_div, 'object_menu': menu_list, 'object_history': object_history_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -243,7 +243,7 @@ def display_object_child(request, object_type_value, object_reference_value, obj
     children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
 
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
+    context_dict.update({'current_page':'BOM-child', 'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
                                  'children': children, "display_form" : display_form})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
@@ -272,7 +272,7 @@ def edit_children(request, object_type_value, object_reference_value, object_rev
     else:
         formset = get_children_formset(obj)
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
+    context_dict.update({'current_page':'BOM-child', 'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
                                  'children_formset': formset, })
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
@@ -310,7 +310,7 @@ def add_children(request, object_type_value, object_reference_value, object_revi
             return render_to_response('DisplayObjectChildAdd.htm', context_dict)
     else:
         add_child_form_instance = add_child_form()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+        context_dict.update({'current_page':'BOM-child', 'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
         return render_to_response('DisplayObjectChildAdd.htm', context_dict)
     
 ##########################################################################################    
@@ -342,7 +342,7 @@ def display_object_parents(request, object_type_value, object_reference_value, o
         parents = (c for c in parents if c.level == maximum)
 
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'parents' :  parents,
+    context_dict.update({'current_page':'parents', 'class4div': class_for_div, 'object_menu': menu_list, 'parents' :  parents,
                                  'display_form' : display_form, 'obj': obj})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
@@ -365,7 +365,7 @@ def display_object_doc_cad(request, object_type_value, object_reference_value, o
         (["CatDrawing", "Cad00123", "a", "Vue d'ensemble", "official"], replace_white_spaces("/object/CatDrawing/Cad00123/a/")),
         ]
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list})
+    context_dict.update({'current_page':'doc-cad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -418,7 +418,7 @@ def display_related_part(request, object_type_value, object_reference_value, obj
         (["ComputerSet", "MOP-2010", "a", "My Open Computer", "obsolete"], replace_white_spaces("/object/ComputerSet/MOP-2010/a/")),
         ]
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list})
+    context_dict.update({'current_page':'rel-part', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
