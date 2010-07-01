@@ -90,3 +90,9 @@ INSTALLED_APPS = (
 
 # directory that holds documents
 DOCUMENTS_DIR = "/var/openPLM/docs"
+
+# Cookie used for session is temporary and is deleted when browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+
