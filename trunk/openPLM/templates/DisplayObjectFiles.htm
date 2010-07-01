@@ -1,0 +1,29 @@
+{% extends "MiddleDisplayObject.htm" %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block content %}
+
+	<input type="submit" value="ADD"><input type="submit" value="DELETE"><br>
+	<br>
+	<table class="Content">
+	{% for object_file_name, object_file_size, object_file_is_locked in object_files %}
+		<tr class="Content">
+				<td class="Content"><input type="checkbox" name="ToBeDeleted"/></td>
+				<td class="Content">
+				    {% if object_file_is_locked %}
+				        <img src="/media/img/verrou_ferme.gif" title="Unlock" alt="Unlock" width="20" height="20"/>
+			        {% else %}
+			            <img src="/media/img/verrou_ouvert.jpg" title="Unlock" alt="Unlock" width="20" height="20"/>
+			        {% endif %}
+			    </td>
+				<td class="Content">{{object_file_name}}</td>
+				<td class="Content">{{object_file_size}}</td>
+				<td class="Content"><input type="submit" value="DOWNLOAD"></td>
+				<td class="Content"><input type="submit" value="CHECKOUT"></td>
+		</tr>	
+	{% endfor %}
+	</table>
+{% endblock %}
+
+
