@@ -10,6 +10,7 @@ How-to's
 ----------
 
 .. toctree::
+    :maxdepth: 2
     
     how-tos
 
