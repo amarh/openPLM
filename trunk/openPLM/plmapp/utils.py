@@ -141,6 +141,9 @@ FORMATS = {
     ("37.0", "52.0") : "A9", 
     ("26.0", "37.0") : "A10",
 }
+CFORMATS = [(x, x) for x in FORMATS.itervalues()]
+CFORMATS.sort()
+CFORMATS.append(("Other", "Other"))
 def size_to_format(width_lg, height_lg):
     """
     Example::
@@ -151,7 +154,7 @@ def size_to_format(width_lg, height_lg):
         'A4'
     """
     size = (normalize_length(width_lg), normalize_length(height_lg))
-    return FORMATS.get(size, "Others")
+    return FORMATS.get(size, "Other")
 
 if __name__ == "__main__":
     import doctest

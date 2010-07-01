@@ -6,7 +6,7 @@ from django.contrib import admin
 from openPLM.plmapp.filehandlers import HandlersManager
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
-from openPLM.plmapp.utils import UNITS
+from openPLM.plmapp.utils import CFORMATS
 
 def register(cls):
     try:
@@ -19,9 +19,8 @@ class OfficeDocument(Document):
     class Meta:
         app_label = "plmapp"
 
-    FORMATS = zip(UNITS.itervalues(), UNITS.itervalues()) 
     nb_pages = models.PositiveIntegerField("Number of pages", blank=True, null=True)
-    format = models.CharField(max_length=10, choices=FORMATS, default=lambda: "A4")
+    format = models.CharField(max_length=10, choices=CFORMATS, default=lambda: "A4")
 
     @property
     def attributes(self):
