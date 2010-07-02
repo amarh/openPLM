@@ -719,7 +719,7 @@ class DocumentController(PLMObjectController):
     def attach_to_part(self, part):
         """
         Links *part* (a :class:`~openPLM.plmapp.models.Part`) with
-        :attr:`object`.
+        :attr:`~PLMObjectController.object`.
         """
 
         if isinstance(part, PLMObjectController):
@@ -731,7 +731,7 @@ class DocumentController(PLMObjectController):
     def detach_part(self, part):
         """
         Delete link between *part* (a :class:`~openPLM.plmapp.models.Part`) and
-        :attr:`object`.
+        :attr:`~PLMObjectController.object`.
         """
 
         if isinstance(part, PLMObjectController):
@@ -745,7 +745,7 @@ class DocumentController(PLMObjectController):
     def get_attached_parts(self):
         """
         Returns all :class:`~openPLM.plmapp.models.Part` attached to
-        :attr:`object`.
+        :attr:`~PLMObjectController.object`.
         """
         return models.DocumentPartLink.objects.filter(document=self.object)
 
