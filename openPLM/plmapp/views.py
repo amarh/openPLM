@@ -3,7 +3,7 @@ import datetime
 from operator import attrgetter
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller
+from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
 
 from django.db.models import Q
 from django.http import HttpResponseRedirect, QueryDict, HttpResponse
@@ -12,6 +12,7 @@ from openPLM.plmapp.forms import *
 from openPLM.plmapp.utils import get_next_revision
 
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 
 ##########################################################################################
 def replace_white_spaces(Chain):
@@ -56,7 +57,7 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 def display_global_page(request_dict):
     """ Get a request and return a dictionnary with elements common to all pages """
     log_in_person="pjoulaud"
-    context_dict = {'log_in_person' : log_in_person}
+    context_dict = {'log_in_person' : request_dict.user}
     query_dict = {}
     type_form_instance = type_form()
     attributes_form_instance = attributes_form()
@@ -128,7 +129,7 @@ def display_login_page(request):
 ##########################################################################################
 ###                    Function which manage the html home page                        ###
 ##########################################################################################
-
+@login_required
 def display_home_page(request):
     now = datetime.datetime.now()
     context_dict, SessionDictionnary= display_global_page(request)
@@ -140,11 +141,11 @@ def display_home_page(request):
 ##########################################################################################
 ###     All functions which manage the different html pages related to a part          ###
 ##########################################################################################
-
+@login_required
 def display_object(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for attributes """
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -162,10 +163,11 @@ def display_object(request, object_type_value, object_reference_value, object_re
     return render_to_response('DisplayObject.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_object_lifecycle(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for Lifecycle """
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -188,10 +190,11 @@ def display_object_lifecycle(request, object_type_value, object_reference_value,
     return render_to_response('DisplayObjectLifecycle.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_object_revisions(request, object_type_value, object_reference_value, object_revision_value):
     """Manage html page for revisions"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -215,10 +218,11 @@ def display_object_revisions(request, object_type_value, object_reference_value,
     return render_to_response('DisplayObjectRevisions.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_object_history(request, object_type_value, object_reference_value, object_revision_value):
     """Manage html page for history"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -235,10 +239,11 @@ def display_object_history(request, object_type_value, object_reference_value, o
     return render_to_response('DisplayObjectHistory.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_object_child(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part """
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -273,10 +278,11 @@ def display_object_child(request, object_type_value, object_reference_value, obj
     return render_to_response('DisplayObjectChild.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def edit_children(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : edition"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -302,11 +308,12 @@ def edit_children(request, object_type_value, object_reference_value, object_rev
     return render_to_response('DisplayObjectChildEdit.htm', context_dict)
 
 ##########################################################################################    
+@login_required
 def add_children(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : add new link"""
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -336,10 +343,11 @@ def add_children(request, object_type_value, object_reference_value, object_revi
         return render_to_response('DisplayObjectChildAdd.htm', context_dict)
     
 ##########################################################################################    
+@login_required
 def display_object_parents(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for "where is used / parents" of the part """
     obj = get_obj( object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -372,10 +380,11 @@ def display_object_parents(request, object_type_value, object_reference_value, o
     return render_to_response('DisplayObjectParents.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_object_doc_cad(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for related documents and CAD of the part"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -394,11 +403,12 @@ def display_object_doc_cad(request, object_type_value, object_reference_value, o
     return render_to_response('DisplayObjectDocCad.htm', context_dict)
 
 ##########################################################################################    
+@login_required
 def add_doc_cad(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for BOM and children of the part : add new link"""
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -426,32 +436,43 @@ def add_doc_cad(request, object_type_value, object_reference_value, object_revis
         return render_to_response('DisplayDocCadAdd.htm', context_dict)
     
 ##########################################################################################
+@login_required
 def display_related_part(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for related parts of the document"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-    object_rel_part_list = [
-        (["Type", "Reference", "Revision", "Name", "Status"], ""),
-        (["OtherAssembly", "part0079", "a", "Motherboard Assembly", "official"], replace_white_spaces("/object/OtherAssembly/part0079/a/")),
-        (["ComputerSet", "MOP-2010", "a", "My Open Computer", "obsolete"], replace_white_spaces("/object/ComputerSet/MOP-2010/a/")),
-        ]
+
+    if not hasattr(obj, "get_attached_parts"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        print request.POST.items()
+        formset = get_rel_part_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_rel_part(formset)
+            return HttpResponseRedirect(".")
+    else:
+        formset = get_rel_part_formset(obj)
+
+    object_rel_part_list = obj.get_attached_parts()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'rel-part', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list})
+    context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectRelPart.htm', context_dict)
 
 ##########################################################################################    
+@login_required
 def add_rel_part(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for related part of the document : add new link"""
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -460,29 +481,30 @@ def add_rel_part(request, object_type_value, object_reference_value, object_revi
     request.session.update(request_dict)
     context_dict.update(var_dict)
     if request.POST:
-        add_rel_part_form_instance = add_rel_part_form(request.POST)
+        add_rel_part_form_instance = AddRelPartForm(request.POST)
         if add_rel_part_form_instance.is_valid():
-            rel_part_obj = get_obj(add_rel_part_form_instance.cleaned_data["type"], \
+            part_obj = get_obj(add_rel_part_form_instance.cleaned_data["type"], \
                         add_rel_part_form_instance.cleaned_data["reference"], \
                         add_rel_part_form_instance.cleaned_data["revision"])
-            obj.add_rel_part(rel_part_obj)
+            obj.attach_to_part(part_obj)
             context_dict.update({'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/rel-part/" \
+            return HttpResponseRedirect("/object/%s/%s/%s/parts/" \
                                         % (object_type_value, object_reference_value, object_revision_value) )
         else:
             add_rel_part_form_instance = add_rel_part_form(request.POST)
             context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
             return render_to_response('DisplayRelPartAdd.htm', context_dict)
     else:
-        add_rel_part_form_instance = add_rel_part_form()
+        add_rel_part_form_instance = AddRelPartForm()
         context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
         return render_to_response('DisplayRelPartAdd.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def display_files(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for files contained by the document"""
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -499,7 +521,7 @@ def display_files(request, object_type_value, object_reference_value, object_rev
 ##########################################################################################
 ###             Manage html pages for part creation / modification                     ###
 ##########################################################################################
-
+@login_required
 def create_non_modifyable_attributes_list(Classe=models.PLMObject):
     """ Create a list of an object's attributes we can't modify' and set them a value """
     non_modifyable_fields_list = Classe.excluded_creation_fields()
@@ -511,6 +533,7 @@ def create_non_modifyable_attributes_list(Classe=models.PLMObject):
     return non_modifyable_attributes_list
 
 ##########################################################################################
+@login_required
 def create_object(request):
     """ Manage html page for the part creation """
     now = datetime.datetime.now()
@@ -552,6 +575,7 @@ def create_object(request):
     return render_to_response('DisplayObject4creation.htm', context_dict)
 
 ##########################################################################################
+@login_required
 def modify_object(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for part modification """
     log_in_person="pjoulaud"
@@ -561,7 +585,7 @@ def modify_object(request, object_type_value, object_reference_value, object_rev
     cls = models.get_all_plmobjects()[object_type_value]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
     current_object = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(current_object, models.Document):
+    if isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"

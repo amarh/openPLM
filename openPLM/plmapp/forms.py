@@ -127,3 +127,28 @@ def get_children_formset(controller, data=None):
 
 class AddRevisionForm(forms.Form):
     revision = forms.CharField()
+    
+class AddRelPartForm(forms.Form):
+    type = forms.CharField()
+    reference = forms.CharField()
+    revision = forms.CharField()
+    
+class ModifyRelPartForm(forms.ModelForm):
+    delete = forms.BooleanField(required=False, initial=False)
+    document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
+                                   widget=forms.HiddenInput())
+    part = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   widget=forms.HiddenInput())
+    class Meta:
+        model = m.DocumentPartLink
+        fields = ["document", "part"]
+        
+def get_rel_part_formset(controller, data=None):
+    Formset = modelformset_factory(m.DocumentPartLink, form=ModifyRelPartForm, extra=0)
+    if data is None:
+        queryset = controller.get_attached_parts()
+        formset = Formset(queryset=queryset)
+    else:
+        formset = Formset(data=data)
+    return formset
+

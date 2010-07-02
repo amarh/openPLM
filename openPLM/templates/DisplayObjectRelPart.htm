@@ -4,29 +4,35 @@
 
 {% block content %}
 
-	<input type="submit" value="ADD"><input type="submit" value="DISCONNECT"><br>
-	<br>
-	<table class="Content">
-	{% for object_rel_part_item, object_rel_part_itemURL in object_rel_part %}
-		<tr class="Content">
-			{% if not forloop.first %}
-				<td class="Content"><input type="checkbox" name="ToBeDisconnected"/></td>
-				{% for object_rel_part_item_individual in object_rel_part_item %}
-					{% ifequal forloop.counter 2 %}
-						<td class="Content"><a href={{object_rel_part_itemURL}}>{{object_rel_part_item_individual}}</a></td>
-					{% else %}
-						<td class="Content">{{object_rel_part_item_individual}}</td>
-					{% endifequal %}
-				{% endfor %}
-			{% else %}
-				<td class="Content"></td>
-				{% for object_rel_part_item_individual in object_rel_part_item %}
-					<th class="Content">{{object_rel_part_item_individual}}</th>
-				{% endfor %}
-			{% endif %}
-		</tr>	
-	{% endfor %}
-	</table>
+    <form action="./add">
+        <input type="submit" value="ADD">
+    </form>
+	<br />
+    <form method="post" action="">	
+        {{ rel_part_formset.management_form }}
+	    <table class="Content">
+	        {% for form in rel_part_formset.forms %}
+                {{ form.id }}
+                {{ form.document }}
+                {{ form.part }}
+		        <tr class="Content">
+			        <td class="Content">{{ form.delete }}</td>
+			        <td class="Content">{{ form.instance.part.type }}</a></td>
+			        <td class="Content">
+			            <a href="/object/{{ form.instance.part.type }}/{{ form.instance.part.reference }}/{{ form.instance.part.revision }}"/>
+			                {{ form.instance.part.reference }}
+		                </a>
+	                </td>
+			        <td class="Content">{{ form.instance.part.revision }}</td>
+		        </tr>	
+	        {% endfor %}
+	        <tr>
+	            <td>
+	                <input type="submit" value="DISCONNECT"><br />
+                </td>
+            </tr>
+	    </table>
+    </form>
 {% endblock %}
 
 

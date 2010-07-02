@@ -792,3 +792,28 @@ class DocumentController(PLMObjectController):
         self._save_histo("Check-in", doc_file.filename)
         if update_attributes:
             self.handle_added_file(doc_file)
+            
+    def update_rel_part(self, formset):
+        u"""
+        Updates related part informations with data from *formset*
+        
+        :param formset:
+        :type formset: a modelfactory_formset of 
+                        :class:`~plmapp.forms.ModifyRelPartForm`
+        """
+        if formset.is_valid():
+            for form in formset.forms:
+                document = form.cleaned_data["document"]
+                if document.pk != self.document.pk:
+                    raise ValueError("Bad document %s (%s expected)" % (document, self.object))
+                delete = form.cleaned_data["delete"]
+                part = form.cleaned_data["part"]
+                if delete:
+                    self.detach_part(part)
+                    
+                    
+                    
+                    
+                    
+                    
+                    

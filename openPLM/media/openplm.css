@@ -99,6 +99,15 @@ div#NavigateBox4Doc
 background-color: #fef176;
 }
 
+div#LoginBox
+{
+background-color: #99ccff;
+width: 400px;
+height: 150px;
+padding: 50px;
+}
+
+
 div#PageBanner, div#PageLeft, div#PageCenter
 {
 -moz-border-radius: 0em;

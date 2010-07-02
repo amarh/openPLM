@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from openPLM.plmapp.views import *
+from django.contrib.auth.views import login, logout
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -9,7 +10,8 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     (r'^bollox/', display_bollox),
-    (r'^login/', display_login_page),
+    (r'^login/', login, {'template_name': 'DisplayLoginPage.htm', }),
+    (r'^logout/', logout, {'next_page': 'http://www.google.fr', }),
     (r'^home/', display_home_page),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/$', display_object),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/attributes/$', display_object),
@@ -22,8 +24,8 @@ urlpatterns = patterns('',
     (r'^object/([^/]+)/([^/]+)/([^/]+)/parents/$', display_object_parents),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/doc-cad/$', display_object_doc_cad),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/doc-cad/add/$', add_doc_cad),
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/rel-part/$', display_related_part),
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/doc-cad/add/$', add_rel_part),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/parts/$', display_related_part),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/parts/add/$', add_rel_part),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/files/$', display_files),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/modify/$', modify_object),
     (r'^object/create/$', create_object),
