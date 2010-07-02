@@ -8,7 +8,7 @@ Models for openPLM
 
 This module contains openPLM's main models.
 
-There are 3 kinds of models:
+There are 4 kinds of models:
 
     * Lifecycle related models :
         - :class:`Lifecycle`
@@ -18,15 +18,21 @@ There are 3 kinds of models:
             - :func:`get_default_lifecycle`
             - :func:`get_default_state`
     * :class:`History` model
-    * PLMOBject models:
+    * PLMObject models:
         - :class:`PLMObject` is the base class
         - :class:`Part`
-        - :class:`Document`
+        - :class:`Document` and related classes:
+            - :class:`DocumentStorage` (see also :obj:`docfs`)
+            - :class:`DocumentFile`
         - functions:
             - :func:`get_all_plmobjects`
             - :func:`get_all_parts`
             - :func:`get_all_documents`
             - :func:`import_models`
+    * :class:`Link` models:
+        - :class:`RevisionLink`
+        - :class:`ParentChildLink`
+        - :class:`DocumentPartLink`
 
 
 Inheritance diagram
@@ -284,6 +290,9 @@ class PLMObject(models.Model):
 # parts stuff
 
 class Part(PLMObject):
+    """
+    Model for parts
+    """
 
     @property
     def menu_items(self):
@@ -326,8 +335,36 @@ def get_all_parts():
 
 # document stuff
 class DocumentStorage(FileSystemStorage):
-
+    """
+    File system storage which stores files with a specific name
+    """
     def get_available_name(self, name):
+        """
+        Returns a path for a file *name*, the path always refers to a file
+        which do not exist.
+        
+        The path is computed as follow:
+            #. a root directory: :const:`settings.DOCUMENTS_DIR`
+            #. a directory which name is the last extension of *name*.
+               For example, it is :file:`gz` if *name* is :file:`a.tar.gz`.
+               If *name* does not have an extension, the directory is 
+               :file:`no_ext/`.
+            #. a file name with 4 parts:
+                #. the md5 sum of *name*
+                #. a dash separator: ``-``
+                #. a random part with 3 characters in ``[a-z0-9]``
+                #. the extension, like :file:`.gz`
+            
+            For example, if :const:`~settings.DOCUMENTS_DIR` is
+            :file:`/var/openPLM/docs/`, and *name* is :file:`my_file.tar.gz`,
+            a possible output is:
+
+                :file:`/var/openPLM/docs/gz/c7bfe8d00ea6e7138215ebfafff187af-jj6.gz`
+
+            If *name* is :file:`my_file`, a possible output is:
+
+                :file:`/var/openPLM/docs/no_ext/59c211e8fc0f14b21c78c87eafe1ab72-dhh`
+        """
        
         def rand():
             r = ""
@@ -342,27 +379,52 @@ class DocumentStorage(FileSystemStorage):
         md5_value = md5.hexdigest() + "-%s" + ext
         path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
         while os.path.exists(path):
+
             path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
         return path
 
+#: :class:`DocumentStorage` instance which stores files in :const:`settings.DOCUMENTS_DIR`
 docfs = DocumentStorage(location=settings.DOCUMENTS_DIR)
 
 class DocumentFile(models.Model):
+    """
+    Model which stores informations of a file link to a :class:`Document`
     
+    :model attributes:
+        .. attribute:: filename
+            
+            original filename
+        .. attribute:: file
+            
+            file stored in :obj:`docfs`
+        .. attribute:: size
+            
+            size of the file in Byte
+        .. attribute:: locked
+
+            True if the file is locked
+        .. attribute:: locker
+            
+            :class:`~django.contrib.auth.models.User` who locked the file,
+            None, if the file is not locked
+        .. attribute document
+
+            :class:`Document` linked to the file
+    """
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to="docs", storage=docfs)
     size = models.PositiveIntegerField()
-    # locking stuff
     locked = models.BooleanField(default=lambda: False)
-    # null if unlocked
     locker = models.ForeignKey(User, null=True, blank=True,
                                related_name="%(class)s_locker",
                                default=lambda: None)
-
     document = models.ForeignKey('Document', related_name="%(class)s_doc")
 
 class Document(PLMObject):
-    
+    """
+    Model for documents
+    """
+
     @property
     def files(self):
         "Queryset of all :class:`DocumentFile` linked to self"
@@ -446,9 +508,19 @@ class History(models.Model):
 
 class Link(models.Model):
     u"""
-    Link base class.
+    Abstract link base class.
 
     This class represents a link between two :class:`PLMObject`
+    
+    :model attributes:
+        .. attribute:: ctime
+
+            date of creation of the link (automatically set)
+
+    :class attributes:
+        .. attribute:: ACTION_NAME
+
+            an identifier used to set :attr:`History.action` field
     """
 
     ctime = models.DateTimeField(auto_now_add=True)
@@ -458,6 +530,17 @@ class Link(models.Model):
         abstract = True
 
 class RevisionLink(Link):
+    """
+    Link between two revisions of a :class:`PLMObject`
+    
+    :model attributes:
+        .. attribute:: old
+
+            old revision (a :class:`PLMObject`)
+        .. attribute:: new
+
+            new revision (a :class:`PLMObject`)
+    """
     
     ACTION_NAME = "Link : revision"
     old = models.ForeignKey(PLMObject, related_name="%(class)s_old")    
@@ -471,6 +554,26 @@ class RevisionLink(Link):
     
 
 class ParentChildLink(Link):
+    """
+    Link between two :class:`Part`: a parent and a child
+    
+    :model attributes:
+        .. attribute:: parent
+
+            a :class:`Part`
+        .. attribute:: child
+
+            a :class:`Part`
+        .. attribute:: quantity
+            
+            amount of child (a positive float)
+        .. attribute:: order
+            
+            positive integer
+        .. attribute:: end_time
+            
+            date of end of the link, None if the link is still alive
+    """
 
     ACTION_NAME = "Link : parent-child"
 
@@ -488,6 +591,17 @@ class ParentChildLink(Link):
                                                      self.quantity, self.order)
 
 class DocumentPartLink(Link):
+    """
+    Link between a :class:`Part` and a :class:`Document`
+    
+    :model attributes:
+        .. attribute:: part
+
+            a :class:`Part`
+        .. attribute:: document
+
+            a :class:`Document`
+    """
 
     ACTION_NAME = "Link : document-part"
 
