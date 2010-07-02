@@ -20,16 +20,11 @@ must be a `valid Python module name <http://docs.python.org/reference/lexical_an
 Imports
 ====================
 
-Now you can edit your file, and add some useful imports::
+Now you can edit your file, and add some useful imports
 
-   import os
-
-   from django.db import models
-   from django.contrib import admin
-
-   from openPLM.plmapp.models import Part
-   from openPLM.plmapp.controllers import PartController
-   from openPLM.plmapp.utils import get_next_revision
+.. literalinclude:: code/bicycle.py
+    :linenos:
+    :end-before: end of imports
 
 .. todo::
     explain import
@@ -38,13 +33,25 @@ Now you can edit your file, and add some useful imports::
 First class
 =====================
 
-class::
+After the import, you can add a new class. The name of this class, would be the
+name displayed in the *type* field in search/creation pages.
 
-    class Bicycle(Part):
+In our case, we call it **Bicycle**:
 
-        class Meta:
-            app_label = "plmapp"
+.. literalinclude:: code/bicycle.py
+    :start-after: class Bicycle
+    :end-before: bicycle fields
+    :linenos:
 
+
+As you can see, this class contains another class called **Meta**. This is a 
+mechanism from Django to customize some model options such as ordering option.
+Here, we set ``app_label`` to ``"plmapp"`` so that our model can be managed by
+Django.
+
+.. seealso::
+    
+    The Django documentation for `Meta options <http://docs.djangoproject.com/en/1.2/topics/db/models/#id3>`_
 
 Custom fields
 ======================
@@ -52,40 +59,111 @@ Custom fields
 Adding fields
 +++++++++++++++++++++++++
 
-class::
-    
-    class Bicycle(Part):
+Now, we can add fields to our models. A field describe which data would be
+saved in the database.
 
-        class Meta:
-            app_label = "plmapp"
-    
-        nb_wheels = models.PositiveIntegerField("Number of wheels", default=lambda: 2)
-        color = models.CharField(max_length=25, blank=False)
-        details = model.TextField()
-    
+.. literalinclude:: code/bicycle.py
+    :start-after: class Bicycle
+    :end-before: bicycle properties 
+    :linenos:
+
+We add 3 fields:
+
+    nb_wheels
+        as it says, the number of wheels
+
+        This field is a :class:`~django.db.models.PositiveIntegerField`.
+        As first argument, we give a more comprehensive name that would be
+        displayed in the attributes page.
+
+        We also set a default value for this field with ``default=lambda: 2``.
+        The *default* argument does not take a value but a function which does
+        takes no argument and return a value. Here, we use a `lambda expression
+        <http://docs.python.org/tutorial/controlflow.html#lambda-forms>`_
+        which always returns *2*.
+
+    color
+        the color of the bicycle
+
+        This field is a :class:`~django.db.models.CharField`. With a CharField,
+        you must define the *max_length* argument. This is the maximal number of
+        characters that can be stored in the database for this field.
+
+        We also set *blank* to True, this means that this field can be empty
+        in a form.
+
+    details
+        a field for quite long details
+
+        This field is a :class:`~django.db.models.TextField`. This is a field
+        that is displayed with a textarea in forms.
+
+.. seealso::
+
+    The Django `model field reference
+    <http://docs.djangoproject.com/en/1.2/ref/models/fields/#ref-models-fields>`_ 
+    for all types of field that can be used and their arguments
+  
+
 Selecting which fields should be displayed
 +++++++++++++++++++++++++++++++++++++++++++++
 
-::
-    
-    @property
-    def attributes(self):
-        attrs = list(super(Bicycle, self).attributes)
-        attrs.extend(["nb_wheels", "color", "details"])
-        return attrs
+By default, the fields are not displayed. To select which fields should be
+displayed, you can override the method
+:attr:`~openPLM.plmapp.models.PLMObject.attributes` like in the example above:
 
-::
+.. _prop-attr:
 
-    @classmethod
-    def get_excluded_creation_fields(cls):
-        return super(Bicycle, self).get_excluded_creation_fields() + ["details"]
+.. literalinclude:: code/bicycle.py
+    :start-after: bicycle properties
+    :end-before: get_excluded_creation_fields
+    :linenos:
 
+:attr:`attributes` is a read-only :func:`property`. This property is a list
+of attributes, so all elements must be a valid field name. For example, 
+``"spam"`` is not valid since *spam* is not a field of :class:`Bicycle`.
+The property should return attributes from the parent class (:class:`Part` in
+our case). That's why we call :func:`super`. In our case, we extends Part 
+attributes with *nb_wheels*, *color* and *details*
+
+Other methods that can be overridden
++++++++++++++++++++++++++++++++++++++++
+
+There are other methods that can be overridden to select attributes displayed
+in creation/modification forms.
+
+These methods are listed in :class:`~openPLM.plmapp.models.PLMObject`.
+
+Here, we will excluded *details* from a creation form:
+
+.. literalinclude:: code/bicycle.py
+    :start-after: get_excluded_creation_fields
+    :end-before: end Bicycle 
+    :linenos:
+
+This code is similar to :ref:`the attributes property <prop-attr>`. Nevertheless,
+:meth:`~openPLM.plmapp.models.PLMObject.get_excluded_creation_fields` is a
+:func:`classmethod` since we do not have a :class:`PLMObject` when we build a
+creation form.
 
 syncdb
 ======================
+
+register
+manage.py sql plmapp
+manage.py syncdb
 
 Controller
 =======================
 
 Tests
 ======================
+
+Alltogether
+===============
+
+:download:`Plain text <./code/bicycle.py>`
+
+.. literalinclude:: code/bicycle.py
+    :linenos:
+
