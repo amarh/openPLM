@@ -266,7 +266,12 @@ class PLMObject(models.Model):
 
     @classmethod
     def get_creation_fields(cls):
-        "Returns fields which should be displayed in a creation form"
+        """
+        Returns fields which should be displayed in a creation form.
+
+        By default, it returns :attr:`attributes` less attributes returned by
+        :meth:`excluded_creation_fields`
+        """
         fields = ["reference", "type", "revision", "lifecycle", "state"]
         for field in cls().attributes:
             if field not in cls.excluded_creation_fields():
@@ -275,7 +280,12 @@ class PLMObject(models.Model):
 
     @classmethod
     def excluded_modification_fields(cls):
-        "Returns fields which should not be available in a modification form"
+        """
+        Returns fields which should not be available in a modification form
+        
+        By default, it returns :attr:`attributes` less attributes returned by
+        :meth:`excluded_modification_fields`
+        """
         return ["creator", "ctime", "mtime"]
 
     @classmethod
