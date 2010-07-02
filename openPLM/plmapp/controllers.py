@@ -597,6 +597,40 @@ class PartController(PLMObjectController):
             new_controller.add_child(link.child, link.quantity, link.order)
         return new_controller
 
+    def attach_to_document(self, document):
+        """
+        Links *document* (a :class:`~openPLM.plmapp.models.Document`) with
+        :attr:`~PLMObjectController.object`.
+        """
+
+        if isinstance(document, PLMObjectController):
+            document = document.object
+        models.DocumentPartLink.objects.create(part=self.object, document=document)
+        self._save_histo(models.DocumentPartLink.ACTION_NAME,
+                         "Part : %s - Document : %s" % (self.object, document))
+
+    def detach_document(self, document):
+        """
+        Delete link between *document* (a :class:`~openPLM.plmapp.models.Document`)
+        and :attr:`~PLMObjectController.object`.
+        """
+
+        if isinstance(document, PLMObjectController):
+            document = document.object
+        link = models.DocumentPartLink.objects.get(document=document,
+                                                   part=self.object)
+        link.delete()
+        self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
+                         "Part : %s - Document : %s" % (self.object, document))
+
+    def get_attached_documents(self):
+        """
+        Returns all :class:`~openPLM.plmapp.models.Document` attached to
+        :attr:`~PLMObjectController.object`.
+        """
+        return models.DocumentPartLink.objects.filter(part=self.object)
+
+
 class DocumentController(PLMObjectController):
     """
     A :class:`PLMObjectController` which manages 
@@ -810,10 +844,4 @@ class DocumentController(PLMObjectController):
                 part = form.cleaned_data["part"]
                 if delete:
                     self.detach_part(part)
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+
