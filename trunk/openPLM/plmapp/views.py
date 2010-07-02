@@ -521,7 +521,6 @@ def display_files(request, object_type_value, object_reference_value, object_rev
 ##########################################################################################
 ###             Manage html pages for part creation / modification                     ###
 ##########################################################################################
-@login_required
 def create_non_modifyable_attributes_list(Classe=models.PLMObject):
     """ Create a list of an object's attributes we can't modify' and set them a value """
     non_modifyable_fields_list = Classe.excluded_creation_fields()
