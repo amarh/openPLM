@@ -146,6 +146,14 @@ This code is similar to :ref:`the attributes property <prop-attr>`. Nevertheless
 :func:`classmethod` since we do not have a :class:`PLMObject` when we build a
 creation form.
 
+The complete class Bicycle
+===============================
+
+.. literalinclude:: code/bicycle.py
+    :pyobject: Bicycle
+    :linenos:
+
+
 syncdb
 ======================
 
@@ -155,6 +163,14 @@ manage.py syncdb
 
 Controller
 =======================
+
+See :mod:`~plmapp.controllers` and :ref:`how-to-add-a-controller` for details
+about controllers.
+
+.. literalinclude:: code/bicycle.py
+    :pyobject: BicycleController
+    :linenos:
+
 
 Tests
 ======================
