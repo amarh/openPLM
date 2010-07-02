@@ -32,3 +32,19 @@ class Bicycle(Part):
         return super(Bicycle, cls).get_excluded_creation_fields() + ["details"]
 
 # end Bicycle
+
+# class BicycleController
+class BicycleController(PartController):
+
+    def revise(self, new_revision):
+        if new_revision == get_next_revision(get_next_revision(self.revision)):
+            self.details += """
+            ----------------
+            hello easter egg
+            ----------------
+            """
+            self.save()
+        return super(BicycleController, self).revise(new_revision)
+
+# end BicycleController
+

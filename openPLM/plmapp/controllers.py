@@ -59,6 +59,8 @@ to update informations from a form created with
 :func:`plmapp.forms.get_modification_form`.
     
 
+.. _how-to-add-a-controller:
+
 How to add a controller
 =======================
 
