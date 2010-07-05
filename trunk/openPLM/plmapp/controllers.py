@@ -847,3 +847,24 @@ class DocumentController(PLMObjectController):
                 if delete:
                     self.detach_part(part)
 
+
+    def update_file(self, formset):
+        u"""
+        Updates uploaded file informations with data from *formset*
+        
+        :param formset:
+        :type formset: a modelfactory_formset of 
+                        :class:`~plmapp.forms.ModifyFileForm`
+        """
+        if formset.is_valid():
+            for form in formset.forms:
+                document = form.cleaned_data["document"]
+                if document.pk != self.document.pk:
+                    raise ValueError("Bad document %s (%s expected)" % (document, self.object))
+                delete = form.cleaned_data["delete"]
+                filename = form.cleaned_data["id"]
+                if delete:
+                    self.delete_file(filename)
+
+                    
+

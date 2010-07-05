@@ -401,6 +401,28 @@ def display_object_doc_cad(request, object_type_value, object_reference_value, o
     request.session.update(request_dict)
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectDocCad.htm', context_dict)
+    
+    
+
+    if not hasattr(obj, "get_attached_parts"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        print request.POST.items()
+        formset = get_rel_part_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_rel_part(formset)
+            return HttpResponseRedirect(".")
+    else:
+        formset = get_rel_part_formset(obj)
+    object_rel_part_list = obj.get_attached_parts()
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    return render_to_response('DisplayObjectRelPart.htm', context_dict)
+
 
 ##########################################################################################    
 @login_required
@@ -445,7 +467,6 @@ def display_related_part(request, object_type_value, object_reference_value, obj
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-
     if not hasattr(obj, "get_attached_parts"):
         # TODO
         raise TypeError()
@@ -457,7 +478,6 @@ def display_related_part(request, object_type_value, object_reference_value, obj
             return HttpResponseRedirect(".")
     else:
         formset = get_rel_part_formset(obj)
-
     object_rel_part_list = obj.get_attached_parts()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
@@ -509,14 +529,56 @@ def display_files(request, object_type_value, object_reference_value, object_rev
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-    object_files_list = [('essais-endurance.pdf', 120, False), ('rapport-essais.odf', 45, True)]
+
+    if not hasattr(obj, "files"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        formset = get_file_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_file(formset)
+            return HttpResponseRedirect(".")
+    else:
+        formset = get_file_formset(obj)
+
+    object_files_list = obj.files
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'files', 'class4div': class_for_div, 'object_menu': menu_list, 'object_files': object_files_list})
+    context_dict.update({'current_page':'files', 'class4div': class_for_div, 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectFiles.htm', context_dict)
 
+##########################################################################################
+@login_required
+def add_file(request, object_type_value, object_reference_value, object_revision_value):
+    """ Manage html page for file addition in the document"""
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    if isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    if request.POST:
+        print request.FILES
+        add_file_form_instance = AddFileForm(request.POST, request.FILES)
+        if add_file_form_instance.is_valid():
+            obj.add_file(request.FILES["filename"])
+            context_dict.update({'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
+                                        % (object_type_value, object_reference_value, object_revision_value) )
+        else:
+            add_file_form_instance = AddFileForm(request.POST)
+            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            return render_to_response('DisplayRelPartAdd.htm', context_dict)
+    else:
+        add_file_form_instance = AddFileForm()
+        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+        return render_to_response('DisplayFileAdd.htm', context_dict)
 
 ##########################################################################################
 ###             Manage html pages for part creation / modification                     ###
