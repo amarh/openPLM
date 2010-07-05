@@ -631,6 +631,24 @@ class PartController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return models.DocumentPartLink.objects.filter(part=self.object)
+        
+    def update_doc_cad(self, formset):
+        u"""
+        Updates doc_cad informations with data from *formset*
+        
+        :param formset:
+        :type formset: a modelfactory_formset of 
+                        :class:`~plmapp.forms.ModifyChildForm`
+        """
+        if formset.is_valid():
+            for form in formset.forms:
+                part = form.cleaned_data["part"]
+                if part.pk != self.object.pk:
+                    raise ValueError("Bad part %s (%s expected)" % (part, self.object))
+                delete = form.cleaned_data["delete"]
+                document = form.cleaned_data["document"]
+                if delete:
+                    self.detach_document(document)
 
 
 class DocumentController(PLMObjectController):
