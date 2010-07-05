@@ -3,13 +3,15 @@
 <!-- Manage html display in the Content div which correspond to the "files" menu -->
 
 {% block content %}
-    <form method="POST" action="./add/">
-        <input type="submit" value="ADD">
-    </form>
+    
     <form method="POST" action="">
         {{ file_formset.management_form }}
-	    <br />
 	    <table class="Content">
+	        <tr>
+		        <td></td>
+		        <td><a href="./add/">ADD</a></td>
+	    	    <td><input type="submit" value="DELETE"></td>
+    	    </tr>
 		    <tr class="Content">
 		        {% for form in file_formset.forms %}
                 {{ form.id }}
@@ -25,14 +27,10 @@
 			    <td class="Content">{{form.instance.filename}}</td>
 			    <td class="Content">{{form.instance.size}}</td>
 			    <td class="Content"><input type="submit" value="DOWNLOAD"></td>
-			    <td class="Content"><input type="submit" value="CHECKOUT"></td>
+			    <td class="Content"><input type="submit" value="CHECK-OUT"></td>
+			    <td class="Content"><a href="./checkin/{{form.instance.id}}/">CHECK-IN</a></td>
 		    </tr>
 	    {% endfor %}
-	        <tr>
-		        <td></td>
-		        <td></td>
-	    	    <td><input type="submit" value="DELETE"></td>
-    	    </tr>
 	    </table>
     </form>
 {% endblock %}
