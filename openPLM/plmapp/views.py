@@ -569,6 +569,36 @@ def add_file(request, object_type_value, object_reference_value, object_revision
         return render_to_response('DisplayFileAdd.htm', context_dict)
 
 ##########################################################################################
+@login_required
+def checkin_file(request, object_type_value, object_reference_value, object_revision_value, file_id_value):
+    """ Manage html page for file checkin in the document"""
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    if isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    if request.POST:
+        checkin_file_form_instance = AddFileForm(request.POST, request.FILES)
+        if checkin_file_form_instance.is_valid():
+            obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
+            context_dict.update({'object_menu': menu_list, })
+            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
+                                        % (object_type_value, object_reference_value, object_revision_value) )
+        else:
+            checkin_file_form_instance = AddFileForm(request.POST)
+            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            return render_to_response('DisplayFileAdd.htm', context_dict)
+    else:
+        checkin_file_form_instance = AddFileForm()
+        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
+        return render_to_response('DisplayFileAdd.htm', context_dict)
+
+##########################################################################################
 ###             Manage html pages for part creation / modification                     ###
 ##########################################################################################
 def create_non_modifyable_attributes_list(Classe=models.PLMObject):

@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     (r'^object/([^/]+)/([^/]+)/([^/]+)/parts/add/$', add_rel_part),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/files/$', display_files),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/files/add/$', add_file),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/files/checkin/([^/]+)/$', checkin_file),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/modify/$', modify_object),
     (r'^object/create/$', create_object),
 

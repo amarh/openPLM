@@ -834,6 +834,8 @@ class DocumentController(PLMObjectController):
         """
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
+        if doc_file.filename != new_file.name:
+            raise ValueError("Checkin document and document already in plm have different names")
         if doc_file.locked:
             self.unlock(doc_file)   
         os.chmod(doc_file.file.path, 0700)
@@ -881,6 +883,8 @@ class DocumentController(PLMObjectController):
                     raise ValueError("Bad document %s (%s expected)" % (document, self.object))
                 delete = form.cleaned_data["delete"]
                 filename = form.cleaned_data["id"]
+                print "filename"
+                print form.instance.id
                 if delete:
                     self.delete_file(filename)
 

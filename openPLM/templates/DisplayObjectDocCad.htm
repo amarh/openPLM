@@ -3,14 +3,13 @@
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
 
 {% block content %}
-
-    <form method="post" action="./add/">
-	    <input type="submit" value="ADD">
-    </form>
-	<br />
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
 	    <table class="Content">
+	         <tr>
+	            <td><a href="./add/">ADD</a></td>
+	            <td><input type="submit" value="DISCONNECT"></td>
+	        </tr>
 	        {% for form in doc_cad_formset.forms %}
                     {{ form.id }}
                     {{ form.part }}
@@ -26,10 +25,6 @@
 			            <td class="Content">{{ form.instance.document.revision }}</td>
 		        </tr>	
 	        {% endfor %}
-	        <tr>
-	            <td></td>
-	            <td><input type="submit" value="DISCONNECT"></td>
-	        </tr>
 	    </table>
     </form>
 {% endblock %}
