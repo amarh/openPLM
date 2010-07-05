@@ -21,6 +21,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330,
 #  Boston, MA 02111-1307, USA.
 
+import json
 import urllib
 import urllib2
 import gedit, gtk
@@ -58,6 +59,7 @@ class OpenPLMPluginInstance(object):
         self._activate_id = 0
         
         self.opener = None
+        self.username = ""
 
         self.insert_menu()
         self.update()
@@ -85,7 +87,7 @@ class OpenPLMPluginInstance(object):
                     ("login", None, _("Login"), None,
                 _("Login"), lambda a: self.login()),
                  ("checkout", None, _("Check out"), None,
-                _("Check out"), lambda a: self.login()),
+                _("Check out"), lambda a: self.checkout()),
                  ])
 
         manager.insert_action_group(self._action_group, -1)
@@ -113,21 +115,97 @@ class OpenPLMPluginInstance(object):
         diag = LoginDialog(self._window)
         resp = diag.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            username = diag.get_username()
-            password = diag.get_password()
-            auth_handler = urllib2.HTTPBasicAuthHandler()
-            auth_handler.add_password(realm="", uri=self.SERVER ,
-                                      user=username,
-                                      passwd=password)
+            self.username = diag.get_username()
+            self.password = diag.get_password()
 
             self.opener = urllib2.build_opener(urllib2.HTTPRedirectHandler(),
                                               urllib2.HTTPCookieProcessor())
-            data = urllib.urlencode(dict(username=username, password=password,
-                                         next="home/"))
-            f = self.opener.open(self.SERVER + "login/", data)
-
+            data = urllib.urlencode(dict(username=self.username,
+                                         password=self.password, next="home/"))
+            self.opener.open(self.SERVER + "login/", data)
         diag.destroy()
 
+    def checkout(self):
+        diag = CheckOutDialog(self._window, self)
+        diag.run()
+        diag.destroy()
+    
+    def get_data(self, url, data=None):
+        if data:
+            data_enc = urllib.urlencode(data)
+            return json.load(self.opener.open(self.SERVER + url, data_enc)) 
+        else:
+            return json.load(self.opener.open(self.SERVER + url)) 
+
+
+class CheckOutDialog(gtk.Dialog):
+    
+    def __init__(self, window, instance):
+        super(CheckOutDialog, self).__init__(_("Login"), window,
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
+                        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+        self.instance = instance
+        docs = self.instance.get_data("api/docs/")
+        table = gtk.Table(2, 3)
+        self.vbox.pack_start(table)
+        self.type_entry = gtk.combo_box_entry_new_text()
+        for t in docs["types"]:
+            self.type_entry.append_text(t)
+        self.type_entry.child.set_text("Document")
+        self.name_entry = gtk.Entry()
+        self.rev_entry = gtk.Entry()
+        self.fields = (("type", self.type_entry),
+                  ("name", self.name_entry),
+                  ("revision", self.rev_entry),
+                 )
+        for i, (text, entry) in enumerate(self.fields): 
+            table.attach(gtk.Label(_(text.capitalize()+":")), 0, 1, i, i+1)
+            table.attach(entry, 1, 2, i, i+1)
+        
+        search_button = gtk.Button(_("Search"))
+        search_button.connect("clicked", self.search)
+        self.vbox.pack_start(search_button)
+
+        self.results_box = gtk.VBox()
+        self.vbox.pack_start(self.results_box)
+        self.vbox.show_all()
+
+    def display_results(self, results):
+        def expand_cb(widget):
+            box = widget.get_child()
+            if box.get_children():
+                return
+            files = self.instance.get_data("api/object/%s/files/" % widget.id)["files"]
+            for f in files:
+                hbox = gtk.HBox()
+                label = gtk.Label(f["filename"])
+                check_out = gtk.Button(_("Check out"), widget.id, f.id)
+                hbox.pack_start(label)
+                hbox.pack_start(check_out)
+                box.pack_start(vox)
+            widget.show_all()
+        for child in self.results_box.get_children():
+            child.destroy()
+        for res in results:
+            child = gtk.Expander("%(reference)s|%(type)s|%(revision)s" % res)
+            child.id = res["id"]
+            child.add(gtk.VBox())
+            child.connect("activate", expand_cb)
+            self.results_box.pack_start(child)
+        self.results_box.show_all()
+            
+    def search(self, *args):
+        data = {}
+        for text, entry in self.fields:
+            if hasattr(entry, "child"):
+                entry = entry.child
+            data[text] = entry.get_text()
+        get = urllib.urlencode(data)
+        self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
+
+    def check_out(self, button, doc, doc_file):
+        self.instance.get_data("api/objects/%s/checkout/%s" % (doc, doc_file))
+        
 
 class LoginDialog(gtk.Dialog):
     
@@ -152,6 +230,8 @@ class LoginDialog(gtk.Dialog):
 
     def get_password(self):
         return self.pw_entry.get_text()
+
+
 
 
 class OpenPLMPlugin(gedit.Plugin):
