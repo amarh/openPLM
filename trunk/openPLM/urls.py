@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from openPLM.plmapp.views import *
+import openPLM.plmapp.api as api
 from django.contrib.auth.views import login, logout
 
 # Uncomment the next two lines to enable the admin:
@@ -32,5 +33,17 @@ urlpatterns = patterns('',
     (r'^object/create/$', create_object),
 
 	# In order to take into account the css file
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'})
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
+    (r'^file/(?P<docfile_id>\d+)/$', download),
+    (r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
+
+)
+
+
+urlpatterns += patterns('',
+    (r'^api/types/$', api.get_all_types),
+    (r'^api/docs/$', api.get_all_docs),
+    (r'^api/search/$', api.search),
+    (r'^api/object/(?P<doc_id>\d+)/files/$', api.get_files),
+    (r'^api/object/(?P<doc_id>\d+)/checkout/(?P<df_id>\d+)$', api.check_out),
 )

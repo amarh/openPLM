@@ -1,6 +1,10 @@
+import os
 from django.shortcuts import render_to_response, get_object_or_404
 import datetime
 from operator import attrgetter
+from mimetypes import guess_type
+
+from django.conf import settings
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
@@ -630,7 +634,7 @@ def modify_object(request, object_type_value, object_reference_value, object_rev
     cls = models.get_all_plmobjects()[object_type_value]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
     current_object = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, DocumentController):
+    if isinstance(current_object, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
@@ -659,10 +663,16 @@ def display_bollox(request):
     return render_to_response('bollox.htm', context_dict)
     
     
-    
-    
-    
-    
-    
-    
-    
+@login_required 
+def download(request, docfile_id):
+    doc_file = models.DocumentFile.objects.get(id=docfile_id)
+    name = doc_file.filename
+    rep = "docs/%s/" % docfile_id
+    if not os.path.exists(rep):
+        os.mkdir(rep)
+    dst = os.path.join(rep, name)
+    if os.path.exists(dst):
+        os.unlink(dst)
+    os.symlink(doc_file.file.path, dst)
+    return HttpResponseRedirect("/" + dst)
+
