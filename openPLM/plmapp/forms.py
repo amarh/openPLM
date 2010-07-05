@@ -152,3 +152,30 @@ def get_rel_part_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
+
+
+
+
+class AddFileForm(forms.Form):
+    filename = forms.FileField()
+    
+class ModifyFileForm(forms.ModelForm):
+    delete = forms.BooleanField(required=False, initial=False)
+    document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
+                                   widget=forms.HiddenInput())
+    class Meta:
+        model = m.DocumentFile
+        fields = ["document"]
+        
+def get_file_formset(controller, data=None):
+    Formset = modelformset_factory(m.DocumentFile, form=ModifyFileForm, extra=0)
+    if data is None:
+        queryset = controller.files
+        formset = Formset(queryset=queryset)
+    else:
+        formset = Formset(data=data)
+    return formset
+
+
+
+
