@@ -1,0 +1,8 @@
+[Gedit Plugin]
+Loader=python
+Module=openplm
+IAge=2
+Name=openPLM
+Description=OpenPLM integration
+Version=0.1
+
