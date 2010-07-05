@@ -152,10 +152,6 @@ def get_rel_part_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
-
-
-
-
 class AddFileForm(forms.Form):
     filename = forms.FileField()
     
@@ -176,6 +172,31 @@ def get_file_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
+
+
+class AddDocCadForm(forms.Form):
+    type = forms.CharField()
+    reference = forms.CharField()
+    revision = forms.CharField()
+    
+class ModifyDocCadForm(forms.ModelForm):
+    delete = forms.BooleanField(required=False, initial=False)
+    part = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   widget=forms.HiddenInput())
+    document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
+                                   widget=forms.HiddenInput())
+    class Meta:
+        model = m.DocumentPartLink
+        fields = ["part", "document"]
+        
+def get_doc_cad_formset(controller, data=None):
+    Formset = modelformset_factory(m.DocumentPartLink, form=ModifyDocCadForm, extra=0)
+    if data is None:
+        queryset = controller.get_attached_documents()
+        formset = Formset(queryset=queryset)
+    else:
+        formset = Formset(data=data)
+    return formset
 
 
 

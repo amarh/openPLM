@@ -389,39 +389,23 @@ def display_object_doc_cad(request, object_type_value, object_reference_value, o
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-    object_doc_cad_list = [
-        (["Type", "Reference", "Revision", "Name", "Status"], ""),
-        (["Rapport essais", "Doc0045", "a", "Essais de compatibilite electro-magnetique", "official"], replace_white_spaces("/object/Rapport essais/Doc0045/a/")),
-        (["Incident Qualite", "Doc0066", "b", "Probleme de casse chaine", "obsolete"], replace_white_spaces("/object/Incident Qualite/Doc0066/b/")),
-        (["CatDrawing", "Cad00123", "a", "Vue d'ensemble", "official"], replace_white_spaces("/object/CatDrawing/Cad00123/a/")),
-        ]
+    if not hasattr(obj, "get_attached_documents"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        formset = get_doc_cad_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_doc_cad(formset)
+            return HttpResponseRedirect(".")
+    else:
+        formset = get_doc_cad_formset(obj)
+    object_doc_cad_list = obj.get_attached_documents()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'doc-cad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list})
+    context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectDocCad.htm', context_dict)
-    
-    
-
-    if not hasattr(obj, "get_attached_parts"):
-        # TODO
-        raise TypeError()
-    if request.method == "POST":
-        print request.POST.items()
-        formset = get_rel_part_formset(obj, request.POST)
-        if formset.is_valid():
-            obj.update_rel_part(formset)
-            return HttpResponseRedirect(".")
-    else:
-        formset = get_rel_part_formset(obj)
-    object_rel_part_list = obj.get_attached_parts()
-    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
-    var_dict, request_dict = display_global_page(request)
-    request.session.update(request_dict)
-    context_dict.update(var_dict)
-    return render_to_response('DisplayObjectRelPart.htm', context_dict)
 
 
 ##########################################################################################    
@@ -439,21 +423,21 @@ def add_doc_cad(request, object_type_value, object_reference_value, object_revis
     request.session.update(request_dict)
     context_dict.update(var_dict)
     if request.POST:
-        add_doc_cad_form_instance = add_doc_cad_form(request.POST)
+        add_doc_cad_form_instance = AddDocCadForm(request.POST)
         if add_doc_cad_form_instance.is_valid():
             doc_cad_obj = get_obj(add_doc_cad_form_instance.cleaned_data["type"], \
                         add_doc_cad_form_instance.cleaned_data["reference"], \
                         add_doc_cad_form_instance.cleaned_data["revision"])
-            obj.add_doc_cad(doc_cad_obj)
+            obj.attach_to_document(doc_cad_obj)
             context_dict.update({'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
             return HttpResponseRedirect("/object/%s/%s/%s/doc-cad/" \
                                         % (object_type_value, object_reference_value, object_revision_value) )
         else:
-            add_doc_cad_form_instance = add_doc_cad_form(request.POST)
+            add_doc_cad_form_instance = AddDocCadForm(request.POST)
             context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
             return render_to_response('DisplayDocCadAdd.htm', context_dict)
     else:
-        add_doc_cad_form_instance = add_doc_cad_form()
+        add_doc_cad_form_instance = AddDocCadForm()
         context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
         return render_to_response('DisplayDocCadAdd.htm', context_dict)
     

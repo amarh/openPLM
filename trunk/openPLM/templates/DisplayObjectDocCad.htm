@@ -4,29 +4,34 @@
 
 {% block content %}
 
-	<input type="submit" value="ADD"><input type="submit" value="DISCONNECT"><br>
-	<br>
-	<table class="Content">
-	{% for object_doc_cad_item, object_doc_cad_itemURL in object_doc_cad %}
-		<tr class="Content">
-			{% if not forloop.first %}
-				<td class="Content"><input type="checkbox" name="ToBeDisconnected"/></td>
-				{% for object_doc_cad_item_individual in object_doc_cad_item %}
-					{% ifequal forloop.counter 2 %}
-						<td class="Content"><a href={{object_doc_cad_itemURL}}>{{object_doc_cad_item_individual}}</a></td>
-					{% else %}
-						<td class="Content">{{object_doc_cad_item_individual}}</td>
-					{% endifequal %}
-				{% endfor %}
-			{% else %}
-				<td class="Content"></td>
-				{% for object_doc_cad_item_individual in object_doc_cad_item %}
-					<th class="Content">{{object_doc_cad_item_individual}}</th>
-				{% endfor %}
-			{% endif %}
-		</tr>	
-	{% endfor %}
-	</table>
+    <form method="post" action="./add/">
+	    <input type="submit" value="ADD">
+    </form>
+	<br />
+    <form method="post" action="">	
+        {{ doc_cad_formset.management_form }}
+	    <table class="Content">
+	        {% for form in doc_cad_formset.forms %}
+                    {{ form.id }}
+                    {{ form.part }}
+                    {{ form.document }}
+		        <tr class="Content">
+			        <td class="Content">{{ form.delete }}</td>
+			            <td class="Content">{{ form.instance.document.type }}</td>
+			            <td class="Content">
+			                <a href="/object/{{ form.instance.document.type }}/{{ form.instance.document.reference }}/{{ form.instance.document.revision }}"/>
+			                    {{ form.instance.document.reference }}
+		                    </a>
+	                    </td>
+			            <td class="Content">{{ form.instance.document.revision }}</td>
+		        </tr>	
+	        {% endfor %}
+	        <tr>
+	            <td></td>
+	            <td><input type="submit" value="DISCONNECT"></td>
+	        </tr>
+	    </table>
+    </form>
 {% endblock %}
 
 
