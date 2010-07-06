@@ -21,16 +21,18 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330,
 #  Boston, MA 02111-1307, USA.
 
+import os
+import shutil
 import json
 import urllib
 import urllib2
 import gedit, gtk
 import gettext
-from gpdefs import *
+import gpdefs
 
 try:
-    gettext.bindtextdomain(GETTEXT_PACKAGE, GP_LOCALEDIR)
-    _ = lambda s: gettext.dgettext(GETTEXT_PACKAGE, s);
+    gettext.bindtextdomain(gpdefs.GETTEXT_PACKAGE, gpdefs.GP_LOCALEDIR)
+    _ = lambda s: gettext.dgettext(gpdefs.GETTEXT_PACKAGE, s);
 except:
     _ = lambda s: s
 
@@ -38,11 +40,12 @@ ui_str = """
 <ui>
   <menubar name="MenuBar">
     <menu name="FileMenu" action="File">
-      <placeholder name="open_plm">
+      <placeholder name="open_plm" position="top">
         <menu name="OpenPLM" action="openplm">
             <menuitem name="login" action="login"/>
             <menuitem name="checkout" action="checkout"/>
          </menu>
+         <separator/>
       </placeholder>
     </menu>
   </menubar>
@@ -52,6 +55,7 @@ ui_str = """
 class OpenPLMPluginInstance(object):
     
     SERVER = "http://localhost:8000/"
+    OPENPLM_DIR = os.path.expanduser("~/.openplm")
 
     def __init__(self, plugin, window):
         self._window = window
@@ -75,38 +79,40 @@ class OpenPLMPluginInstance(object):
 
         self._window = None
         self._plugin = None
-        self._action_group = None
+        self._action_group1 = None
+        self._action_group2 = None
         self._activate_id = 0
 
     def insert_menu(self):
         manager = self._window.get_ui_manager()
 
-        self._action_group = gtk.ActionGroup("GeditOpenPLMPluginActions")
-        self._action_group.add_actions( 
+        self._action_group1 = gtk.ActionGroup("GeditOpenPLMPluginActions1")
+        self._action_group1.add_actions( 
                 [("openplm", None, ("OpenPLM")),
-                    ("login", None, _("Login"), None,
-                _("Login"), lambda a: self.login()),
-                 ("checkout", None, _("Check out"), None,
-                _("Check out"), lambda a: self.checkout()),
+                 ("login", None, _("Login"), None,
+                    _("Login"), lambda a: self.login()),
                  ])
 
-        manager.insert_action_group(self._action_group, -1)
+        manager.insert_action_group(self._action_group1, -1)
+        self._action_group2 = gtk.ActionGroup("GeditOpenPLMPluginActions2")
+        self._action_group2.add_actions([ 
+                 ("checkout", None, _("Check out"), None,
+                     _("Check out"), lambda a: self.checkout()),
+                 ])
+        self._action_group2.set_sensitive(False)
+        manager.insert_action_group(self._action_group2, -1)
         self._ui_id = manager.add_ui_from_string(ui_str)
 
     def remove_menu(self):
         manager = self._window.get_ui_manager()
 
         manager.remove_ui(self._ui_id)
-        manager.remove_action_group(self._action_group)
+        manager.remove_action_group(self._action_group1)
+        manager.remove_action_group(self._action_group2)
         manager.ensure_update()
 
     def update(self):
-        tab = self._window.get_active_tab()
-        self._action_group.set_sensitive(tab != None)
-
-        if not tab and self._plugin._dialog and \
-                self._plugin._dialog.get_transient_for() == self._window:
-            self._plugin._dialog.response(gtk.RESPONSE_CLOSE)
+        pass
 
     def on_window_activate(self, window, event):
         self._plugin.dialog_transient_for(window)
@@ -123,6 +129,7 @@ class OpenPLMPluginInstance(object):
             data = urllib.urlencode(dict(username=self.username,
                                          password=self.password, next="home/"))
             self.opener.open(self.SERVER + "login/", data)
+            self._action_group2.set_sensitive(True)
         diag.destroy()
 
     def checkout(self):
@@ -136,6 +143,24 @@ class OpenPLMPluginInstance(object):
             return json.load(self.opener.open(self.SERVER + url, data_enc)) 
         else:
             return json.load(self.opener.open(self.SERVER + url)) 
+
+    def check_out(self, doc, doc_file):
+        self.document = doc
+        self.get_data("api/object/%s/checkout/%s" % (doc["id"], doc_file["id"]))
+        f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
+        rep = os.path.join(self.OPENPLM_DIR, "gedit", doc["type"], 
+                           doc["reference"], doc["revision"])
+        try:
+            os.makedirs(rep, 0700)
+        except os.error:
+            # directory already exists
+            pass
+        dst_name= os.path.join(rep, doc_file["filename"])
+        dst = open(dst_name, "wb")
+        shutil.copyfileobj(f, dst)
+        f.close()
+        dst.close()
+        gedit.commands.load_uri(self._window, "file://" + dst_name, None, -1)
 
 
 class CheckOutDialog(gtk.Dialog):
@@ -175,20 +200,21 @@ class CheckOutDialog(gtk.Dialog):
             box = widget.get_child()
             if box.get_children():
                 return
-            files = self.instance.get_data("api/object/%s/files/" % widget.id)["files"]
+            files = self.instance.get_data("api/object/%s/files/" % widget.res["id"])["files"]
             for f in files:
                 hbox = gtk.HBox()
                 label = gtk.Label(f["filename"])
-                check_out = gtk.Button(_("Check out"), widget.id, f.id)
+                check_out = gtk.Button(_("Check out"))
+                check_out.connect("clicked", self.check_out, widget.res, f)
                 hbox.pack_start(label)
                 hbox.pack_start(check_out)
-                box.pack_start(vox)
+                box.pack_start(hbox)
             widget.show_all()
         for child in self.results_box.get_children():
             child.destroy()
         for res in results:
             child = gtk.Expander("%(reference)s|%(type)s|%(revision)s" % res)
-            child.id = res["id"]
+            child.res = res
             child.add(gtk.VBox())
             child.connect("activate", expand_cb)
             self.results_box.pack_start(child)
@@ -203,8 +229,12 @@ class CheckOutDialog(gtk.Dialog):
         get = urllib.urlencode(data)
         self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
 
+    def set_doc(self, doc):
+        self.document = doc
+
     def check_out(self, button, doc, doc_file):
-        self.instance.get_data("api/objects/%s/checkout/%s" % (doc, doc_file))
+        self.instance.check_out(doc, doc_file)
+        self.destroy()
         
 
 class LoginDialog(gtk.Dialog):
@@ -219,19 +249,25 @@ class LoginDialog(gtk.Dialog):
         table.attach(gtk.Label(_("Username")), 0, 1, 0, 1)
         table.attach(gtk.Label(_("Password")), 0, 1, 1, 2)
         self.user_entry = gtk.Entry()
+        self.user_entry.connect("activate", self.user_entry_activate_cb)
         table.attach(self.user_entry, 1, 2, 0, 1)
         self.pw_entry = gtk.Entry()
         self.pw_entry.set_visibility(False)
+        self.pw_entry.connect("activate", self.pw_entry_activate_cb)
         table.attach(self.pw_entry, 1, 2, 1, 2)
         table.show_all()
+    
+    def user_entry_activate_cb(self, entry):
+        self.do_move_focus(self, gtk.DIR_TAB_FORWARD)
+
+    def pw_entry_activate_cb(self, entry):
+        self.response(gtk.RESPONSE_ACCEPT)
 
     def get_username(self):
         return self.user_entry.get_text()
 
     def get_password(self):
         return self.pw_entry.get_text()
-
-
 
 
 class OpenPLMPlugin(gedit.Plugin):

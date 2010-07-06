@@ -13,6 +13,7 @@ from openPLM.plmapp.controllers import PLMObjectController, get_controller, Docu
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
 
+API_VERSION = "1.0"
 
 def json_view(func):
     def wrap(request, *a, **kw):
@@ -43,7 +44,7 @@ def json_view(func):
             msg = _('Internal error')+': '+str(e)
             response = {'result': 'error',
                         'text': msg}
-
+        response["api_version"] = API_VERSION
         json = simplejson.dumps(response)
         return HttpResponse(json, mimetype='application/json')
     return wrap
@@ -118,8 +119,7 @@ def get_files(request, doc_id):
     document = models.get_all_plmobjects()[document.type].objects.get(id=doc_id)
     files = []
     for df in document.files:
-        files.append(dict(id=df.id, filename=df.filename, size=df.size,
-                         url=df.path.url))
+        files.append(dict(id=df.id, filename=df.filename, size=df.size))
     return {"files" : files}
 
 @login_required
