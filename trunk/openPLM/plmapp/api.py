@@ -141,3 +141,21 @@ def check_in(request, doc_id, df_id):
     if form.is_valid():
         doc.checkin(df, request.FILES['filename'])
     return {}
+
+
+@login_required
+@json_view
+def get_advanced_search_fields(request, typename):
+    try:
+        form = forms.get_search_form(models.get_all_plmobjects()[typename])
+    except KeyError:
+        return {"result" : "error", "fields" : []}
+    fields = []
+    for field_name, field in form.fields.iteritems():
+        if hasattr(field, "choices"):
+            choices = tuple(field.choices)
+        else:
+            choices = ()
+        fields.append((field_name, choices))
+    return {"fields" : fields}
+
