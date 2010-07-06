@@ -112,7 +112,7 @@ class OpenPLMPluginInstance(object):
                  ("checkout", None, _("Check-out"), None,
                      _("Check out"), lambda a: self.check_out_cb()),
                  ("checkin", None, _("Check-in"), None,
-                     _("Check-in"), lambda a: self.check_in()),
+                     _("Check-in"), lambda a: self.check_in_cb()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -221,7 +221,7 @@ class OpenPLMPluginInstance(object):
             gdoc.set_data("openplm_file_id", doc_file_id)
             gdoc.set_data("openplm_path", path)
 
-    def check_in(self):
+    def check_in(self, unlock):
         gdoc = self._window.get_active_document()
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
@@ -235,14 +235,49 @@ class OpenPLMPluginInstance(object):
             url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
             request = urllib2.Request(url, datagen, headers)
             res = self.opener.open(request)
+            if not unlock:
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
         else:
             # TODO
+            print 'can not check in'
             pass
+
+    def check_in_cb(self):
+        gdoc = self._window.get_active_document()
+        doc = gdoc.get_data("openplm_doc")
+        name = os.path.basename(gdoc.get_data("openplm_path"))
+        diag = CheckInDialog(self._window, self, doc, name)
+        resp = diag.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            self.check_in(diag.get_unlocked())
+        diag.destroy()
+
+
+class CheckInDialog(gtk.Dialog):
+    
+    def __init__(self, window, instance, doc, filename):
+        super(CheckInDialog, self).__init__(_("Check-in"), window,
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
+                        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                        "Check-in", gtk.RESPONSE_ACCEPT))
+        self.instance = instance
+        label = gtk.Label("%s|%s|%s"% (doc["reference"], doc["revision"],
+                                       doc["type"]))
+        self.vbox.pack_start(label)
+        label2 = gtk.Label(filename)
+        self.vbox.pack_start(label2)
+        self.unlock_button = gtk.CheckButton("Unlock ?")
+        self.vbox.pack_start(self.unlock_button)
+        self.vbox.show_all()
+
+    def get_unlocked(self):
+        return self.unlock_button.get_active()
+        
 
 class CheckOutDialog(gtk.Dialog):
     
     def __init__(self, window, instance):
-        super(CheckOutDialog, self).__init__(_("Login"), window,
+        super(CheckOutDialog, self).__init__(_("Check-out"), window,
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
         self.instance = instance
