@@ -46,5 +46,6 @@ urlpatterns += patterns('',
     (r'^api/docs/$', api.get_all_docs),
     (r'^api/search/$', api.search),
     (r'^api/object/(?P<doc_id>\d+)/files/$', api.get_files),
-    (r'^api/object/(?P<doc_id>\d+)/checkout/(?P<df_id>\d+)$', api.check_out),
+    (r'^api/object/(?P<doc_id>\d+)/(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
+    (r'^api/object/(?P<doc_id>\d+)/checkin/(?P<df_id>\d+)/$', api.check_in),
 )
