@@ -282,21 +282,28 @@ class CheckOutDialog(gtk.Dialog):
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
         self.instance = instance
         docs = self.instance.get_data("api/docs/")
+        self.types = docs["types"]
         table = gtk.Table(2, 3)
         self.vbox.pack_start(table)
         self.type_entry = gtk.combo_box_entry_new_text()
         for t in docs["types"]:
             self.type_entry.append_text(t)
         self.type_entry.child.set_text("Document")
+        self.type_entry.connect("changed", self.type_entry_activate_cb)
         self.name_entry = gtk.Entry()
         self.rev_entry = gtk.Entry()
-        self.fields = (("type", self.type_entry),
-                  ("name", self.name_entry),
-                  ("revision", self.rev_entry),
-                 )
+        self.fields = [("type", self.type_entry),
+                       ("reference", self.name_entry),
+                       ("revision", self.rev_entry),
+                      ]
         for i, (text, entry) in enumerate(self.fields): 
             table.attach(gtk.Label(_(text.capitalize()+":")), 0, 1, i, i+1)
             table.attach(entry, 1, 2, i, i+1)
+        
+        self.advanced_table = gtk.Table(2, 3)
+        self.advanced_fields = []
+        self.vbox.pack_start(self.advanced_table)
+        self.display_fields("Document")
         
         search_button = gtk.Button(_("Search"))
         search_button.connect("clicked", self.search)
@@ -305,6 +312,68 @@ class CheckOutDialog(gtk.Dialog):
         self.results_box = gtk.VBox()
         self.vbox.pack_start(self.results_box)
         self.vbox.show_all()
+
+    def type_entry_activate_cb(self, entry):
+        typename = entry.child.get_text()
+        if typename in self.types:
+            self.display_fields(typename)
+
+    def display_fields(self, typename):
+        fields = self.instance.get_data("api/search_fields/%s/" % typename)["fields"]
+        temp = {}
+        for field, entry in self.advanced_fields:
+            temp[field] = self.get_value(entry)
+        for child in self.advanced_table.get_children():
+            child.destroy()
+        self.advanced_fields = []
+        self.advanced_table.resize(2, len(fields))
+        for i, (text, choices) in enumerate(fields):
+            self.advanced_table.attach(gtk.Label(_(text.capitalize()+":")),
+                                       0, 1, i, i+1)
+            if choices:
+                model = gtk.ListStore(object, str)
+                if [u'', u'---------'] not in choices:
+                    choices = ([u'', u'---------'],) + tuple(choices)
+                for c in choices:
+                    model.append(c)
+                widget = gtk.ComboBox(model)
+                cell = gtk.CellRendererText()
+                widget.pack_start(cell, True)
+                widget.add_attribute(cell, 'text', 1)  
+            else:
+                widget = gtk.Entry()
+            if text in temp:
+                self.set_value(widget, temp[text])
+            self.advanced_table.attach(widget, 1, 2, i, i+1)
+            self.advanced_fields.append((text, widget))
+        self.advanced_table.show_all()
+
+    def get_value(self, entry):
+        if isinstance(entry, gtk.ComboBoxEntry):
+            value = entry.child.get_text()
+        elif isinstance(entry, gtk.ComboBox):
+            model = entry.get_model()
+            active = entry.get_active()
+            if active < 0:
+                value = ""
+            else:
+                value = model[active][0]
+        elif isinstance(entry, gtk.Entry):
+            value = entry.get_text()
+        return value
+
+    def set_value(self, entry, value):
+        if isinstance(entry, gtk.ComboBoxEntry):
+            entry.child.set_text(entry)
+        elif isinstance(entry, gtk.ComboBox):
+            model = entry.get_model()
+            for i, it in enumerate(iter(model)):
+                if value == it[0]:
+                    entry.set_active(i)
+                    return
+        elif isinstance(entry, gtk.Entry):
+            entry.set_text(value)
+
 
     def display_results(self, results):
         def expand_cb(widget):
@@ -333,10 +402,10 @@ class CheckOutDialog(gtk.Dialog):
             
     def search(self, *args):
         data = {}
-        for text, entry in self.fields:
-            if hasattr(entry, "child"):
-                entry = entry.child
-            data[text] = entry.get_text()
+        for text, entry in self.fields + self.advanced_fields:
+            value = self.get_value(entry)
+            if value:
+                data[text] = value
         get = urllib.urlencode(data)
         self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
 
