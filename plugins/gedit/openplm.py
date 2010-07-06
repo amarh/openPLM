@@ -25,6 +25,11 @@ import os
 import shutil
 import json
 import urllib
+
+# sudo easy_install poster
+from poster.encode import multipart_encode
+from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHandler
+
 import urllib2
 import gedit, gtk
 import gettext
@@ -44,6 +49,7 @@ ui_str = """
         <menu name="OpenPLM" action="openplm">
             <menuitem name="login" action="login"/>
             <menuitem name="checkout" action="checkout"/>
+            <menuitem name="checkin" action="checkin"/>
          </menu>
          <separator/>
       </placeholder>
@@ -56,6 +62,8 @@ class OpenPLMPluginInstance(object):
     
     SERVER = "http://localhost:8000/"
     OPENPLM_DIR = os.path.expanduser("~/.openplm")
+    PLUGIN_DIR = os.path.join(OPENPLM_DIR, "gedit")
+    CONF_FILE = os.path.join(PLUGIN_DIR, "conf.json")
 
     def __init__(self, plugin, window):
         self._window = window
@@ -70,6 +78,11 @@ class OpenPLMPluginInstance(object):
 
         self._activate_id = self._window.connect('focus-in-event', \
                 self.on_window_activate)
+
+        try:
+            os.makedirs(self.OPENPLM_DIR, 0700)
+        except os.error:
+            pass
 
     def stop(self):
         self.remove_menu()
@@ -96,8 +109,10 @@ class OpenPLMPluginInstance(object):
         manager.insert_action_group(self._action_group1, -1)
         self._action_group2 = gtk.ActionGroup("GeditOpenPLMPluginActions2")
         self._action_group2.add_actions([ 
-                 ("checkout", None, _("Check out"), None,
-                     _("Check out"), lambda a: self.checkout()),
+                 ("checkout", None, _("Check-out"), None,
+                     _("Check out"), lambda a: self.check_out_cb()),
+                 ("checkin", None, _("Check-in"), None,
+                     _("Check-in"), lambda a: self.check_in()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -124,15 +139,17 @@ class OpenPLMPluginInstance(object):
             self.username = diag.get_username()
             self.password = diag.get_password()
 
-            self.opener = urllib2.build_opener(urllib2.HTTPRedirectHandler(),
+            self.opener = urllib2.build_opener(StreamingHTTPHandler(),
+                                               StreamingHTTPRedirectHandler(),
                                               urllib2.HTTPCookieProcessor())
             data = urllib.urlencode(dict(username=self.username,
                                          password=self.password, next="home/"))
             self.opener.open(self.SERVER + "login/", data)
             self._action_group2.set_sensitive(True)
+            self.load_managed_files()
         diag.destroy()
 
-    def checkout(self):
+    def check_out_cb(self):
         diag = CheckOutDialog(self._window, self)
         diag.run()
         diag.destroy()
@@ -146,22 +163,81 @@ class OpenPLMPluginInstance(object):
 
     def check_out(self, doc, doc_file):
         self.document = doc
-        self.get_data("api/object/%s/checkout/%s" % (doc["id"], doc_file["id"]))
+        self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
-        rep = os.path.join(self.OPENPLM_DIR, "gedit", doc["type"], 
-                           doc["reference"], doc["revision"])
+        rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
+                           doc["revision"])
         try:
             os.makedirs(rep, 0700)
         except os.error:
             # directory already exists
             pass
-        dst_name= os.path.join(rep, doc_file["filename"])
+        dst_name = os.path.join(rep, doc_file["filename"])
         dst = open(dst_name, "wb")
         shutil.copyfileobj(f, dst)
         f.close()
         dst.close()
+        self.add_managed_file(doc, doc_file, dst_name)
         gedit.commands.load_uri(self._window, "file://" + dst_name, None, -1)
+        gdoc = self._window.get_active_document()
+        gdoc.set_data("openplm_doc", doc)
+        gdoc.set_data("openplm_file", doc_file)
+        gdoc.set_data("openplm_path", dst_name)
 
+    def add_managed_file(self, document, doc_file, path):
+        f = open(self.CONF_FILE, "r")
+        try:
+            data = json.load(f)
+        except ValueError:
+            data = {}
+        f.close()
+        documents = data.get("documents", {})
+        doc = documents.get(document["id"], dict(document))
+        files = doc.get("files", {})
+        files[doc_file["id"]] = path
+        doc["files"] = files
+        documents["id"] = doc
+        data["documents"] = documents
+        f = open(self.CONF_FILE, "w")
+        json.dump(data, f)
+        f.close()
+
+    def get_managed_files(self):
+        with open(self.CONF_FILE, "r") as f:
+            try:
+                data = json.load(f)
+            except ValueError:
+                data = {}
+            files = []
+            for doc in data.get("documents", {}).itervalues():
+                files.extend((d, doc) for d in doc.get("files", {}).items())
+            return files
+    
+    def load_managed_files(self):
+        for (doc_file_id, path), doc in self.get_managed_files():
+            gedit.commands.load_uri(self._window, "file://" + path, None, -1)
+            gdoc = self._window.get_active_document()
+            gdoc.set_data("openplm_doc", doc)
+            gdoc.set_data("openplm_file_id", doc_file_id)
+            gdoc.set_data("openplm_path", path)
+
+    def check_in(self):
+        gdoc = self._window.get_active_document()
+        doc = gdoc.get_data("openplm_doc")
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        path = gdoc.get_data("openplm_path")
+        if doc and doc_file_id and path:
+            gedit.commands.save_document(self._window, gdoc)
+            # headers contains the necessary Content-Type and Content-Length
+            # datagen is a generator object that yields the encoded parameters
+            datagen, headers = multipart_encode({"filename": open(path, "rb")})
+            # Create the Request object
+            url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
+            request = urllib2.Request(url, datagen, headers)
+            res = self.opener.open(request)
+        else:
+            # TODO
+            pass
 
 class CheckOutDialog(gtk.Dialog):
     

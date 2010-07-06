@@ -119,7 +119,8 @@ def get_files(request, doc_id):
     document = models.get_all_plmobjects()[document.type].objects.get(id=doc_id)
     files = []
     for df in document.files:
-        files.append(dict(id=df.id, filename=df.filename, size=df.size))
+        if not df.locked:
+            files.append(dict(id=df.id, filename=df.filename, size=df.size))
     return {"files" : files}
 
 @login_required
@@ -128,4 +129,15 @@ def check_out(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
     doc.lock(df)
+    return {}
+
+
+@login_required
+@json_view
+def check_in(request, doc_id, df_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    df = models.DocumentFile.objects.get(id=df_id)
+    form = forms.AddFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        doc.checkin(df, request.FILES['filename'])
     return {}
