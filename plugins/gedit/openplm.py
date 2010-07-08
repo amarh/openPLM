@@ -208,11 +208,7 @@ class OpenPLMPluginInstance(object):
         f.close()
         dst.close()
         self.add_managed_file(doc, doc_file, dst_name)
-        gedit.commands.load_uri(self._window, "file://" + dst_name, None, -1)
-        gdoc = self._window.get_active_document()
-        gdoc.set_data("openplm_doc", doc)
-        gdoc.set_data("openplm_file", doc_file)
-        gdoc.set_data("openplm_path", dst_name)
+        self.load_file(doc, doc_file["id"], dst_name)
 
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
@@ -254,19 +250,32 @@ class OpenPLMPluginInstance(object):
         doc_file_id = gdoc.get_data("openplm_file_id")
         path = gdoc.get_data("openplm_path")
         if doc and doc_file_id and path:
+            label = gdoc.get_data("openplm_label")
+            label.destroy()
             data = self.get_conf_data()
-            del data["documents"][str(doc["id"])]["files"][doc_file_id]
+            del data["documents"][str(doc["id"])]["files"][str(doc_file_id)]
             f = open(self.CONF_FILE, "w")
             json.dump(data, f)
             f.close()
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
-            gedit.commands.load_uri(self._window, "file://" + path, None, -1)
-            gdoc = self._window.get_active_document()
-            gdoc.set_data("openplm_doc", doc)
-            gdoc.set_data("openplm_file_id", doc_file_id)
-            gdoc.set_data("openplm_path", path)
+            self.load_file(doc, doc_file_id, path)
+
+    def load_file(self, doc, doc_file_id, path):
+        gedit.commands.load_uri(self._window, "file://" + path, None, -1)
+        gdoc = self._window.get_active_document()
+        gdoc.set_data("openplm_doc", doc)
+        gdoc.set_data("openplm_file_id", doc_file_id)
+        gdoc.set_data("openplm_path", path)
+        tab = self._window.get_active_tab()
+        notebook = tab.get_parent()
+        tab_label = notebook.get_tab_label(tab)
+        box = tab_label.get_children()[0].get_child()
+        label = gtk.Label("[PLM]")
+        label.show()
+        box.pack_start(label)
+        gdoc.set_data("openplm_label", label)
 
     def check_in(self, unlock):
         gdoc = self._window.get_active_document()
