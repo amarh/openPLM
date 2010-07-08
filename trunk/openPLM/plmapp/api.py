@@ -5,7 +5,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, QueryDict, HttpResponse
 
 import openPLM.plmapp.models as models
@@ -14,6 +15,8 @@ import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
 
 API_VERSION = "1.0"
+api_login_required = user_passes_test(lambda u: u.is_authenticated(), 
+                                      login_url="/api/needlogin/")
 
 def json_view(func):
     def wrap(request, *a, **kw):
@@ -53,7 +56,6 @@ def replace_white_spaces(Chain):
     """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
     return Chain.replace(" ","%20")
 
-
 def get_obj(object_type_value, object_reference_value, object_revision_value):
     """ Get Type, Reference and Revision and return an object """
     obj = get_object_or_404(models.PLMObject, type=object_type_value,
@@ -78,18 +80,22 @@ def get_obj_by_id(obj_id, user):
     obj = models.get_all_plmobjects()[obj.type].objects.get(id=obj_id)
     return get_controller(obj.type)(obj, user)
 
-@login_required
+@json_view
+def need_login(request):
+    return {'result' : 'error', 'error' : 'user must be login'}
+
+@api_login_required
 @json_view
 def get_all_types(request):
     return {"types" : sorted(models.get_all_plmobjects().keys())}
 
-@login_required
+@api_login_required
 @json_view
 def get_all_docs(request):
     return {"types" : sorted(models.get_all_documents().keys())}
 
 
-@login_required
+@api_login_required
 @json_view
 def search(request):
         
@@ -112,7 +118,7 @@ def search(request):
                 return {"objects" : objects} 
     return {"result": "error"}
 
-@login_required
+@api_login_required
 @json_view
 def get_files(request, doc_id):
     document = models.Document.objects.get(id=doc_id)
@@ -123,7 +129,7 @@ def get_files(request, doc_id):
             files.append(dict(id=df.id, filename=df.filename, size=df.size))
     return {"files" : files}
 
-@login_required
+@api_login_required
 @json_view
 def check_out(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
@@ -132,7 +138,7 @@ def check_out(request, doc_id, df_id):
     return {}
 
 
-@login_required
+@api_login_required
 @json_view
 def check_in(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
@@ -143,7 +149,7 @@ def check_in(request, doc_id, df_id):
     return {}
 
 
-@login_required
+@api_login_required
 @json_view
 def get_advanced_search_fields(request, typename):
     try:
@@ -159,3 +165,24 @@ def get_advanced_search_fields(request, typename):
         fields.append((field_name, choices))
     return {"fields" : fields}
 
+@json_view
+def api_login(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            return {"username" : username, "first_name" : user.first_name,
+                    "last_name" : user.last_name}
+        else:
+            return {"result" : 'error', 'error' : 'user is inactive'}
+    else:
+        return {"result" : 'error', 'error' : 'login invalid'}
+
+
+@api_login_required
+@json_view
+def test_login(request):
+    # do nothing, if user is authenticated, json_view sets *result* to 'ok'
+    return {}

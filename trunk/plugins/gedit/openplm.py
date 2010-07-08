@@ -26,6 +26,7 @@ import shutil
 import json
 import urllib
 
+# poster makes it possible to send http request with files
 # sudo easy_install poster
 from poster.encode import multipart_encode
 from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHandler
@@ -48,8 +49,10 @@ ui_str = """
       <placeholder name="open_plm" position="top">
         <menu name="OpenPLM" action="openplm">
             <menuitem name="login" action="login"/>
+            <separator/>
             <menuitem name="checkout" action="checkout"/>
             <menuitem name="checkin" action="checkin"/>
+            <menuitem name="download" action="download"/>
          </menu>
          <separator/>
       </placeholder>
@@ -60,9 +63,13 @@ ui_str = """
 
 class OpenPLMPluginInstance(object):
     
+    #: location of oepnPLM server
     SERVER = "http://localhost:8000/"
+    #: OpenPLM main directory
     OPENPLM_DIR = os.path.expanduser("~/.openplm")
+    #: directory where files are stored
     PLUGIN_DIR = os.path.join(OPENPLM_DIR, "gedit")
+    #: gedit plugin configuration file
     CONF_FILE = os.path.join(PLUGIN_DIR, "conf.json")
 
     def __init__(self, plugin, window):
@@ -70,7 +77,9 @@ class OpenPLMPluginInstance(object):
         self._plugin = plugin
         self._activate_id = 0
         
-        self.opener = None
+        self.opener = urllib2.build_opener(StreamingHTTPHandler(),
+                                           StreamingHTTPRedirectHandler(),
+                                           urllib2.HTTPCookieProcessor())
         self.username = ""
 
         self.insert_menu()
@@ -113,6 +122,9 @@ class OpenPLMPluginInstance(object):
                      _("Check out"), lambda a: self.check_out_cb()),
                  ("checkin", None, _("Check-in"), None,
                      _("Check-in"), lambda a: self.check_in_cb()),
+                 ("download", None, _("Download from openPLM"), None,
+                     _("Download and open a file from openPLM"),
+                      lambda a: self.download_cb()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -133,24 +145,40 @@ class OpenPLMPluginInstance(object):
         self._plugin.dialog_transient_for(window)
 
     def login(self):
+        """
+        Open a login dialog and connect the user
+        """
         diag = LoginDialog(self._window)
-        resp = diag.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            self.username = diag.get_username()
-            self.password = diag.get_password()
+        def response_cb(diag, resp):
+            if resp == gtk.RESPONSE_ACCEPT:
+                self.username = diag.get_username()
+                self.password = diag.get_password()
 
-            self.opener = urllib2.build_opener(StreamingHTTPHandler(),
-                                               StreamingHTTPRedirectHandler(),
-                                              urllib2.HTTPCookieProcessor())
-            data = urllib.urlencode(dict(username=self.username,
-                                         password=self.password, next="home/"))
-            self.opener.open(self.SERVER + "login/", data)
-            self._action_group2.set_sensitive(True)
-            self.load_managed_files()
-        diag.destroy()
+                data = dict(username=self.username, password=self.password)
+                res = self.get_data("api/login/", data)
+                if res["result"] == "ok":
+                    self._action_group2.set_sensitive(True)
+                    self.load_managed_files()
+                    diag.destroy()
+                else:
+                    mdiag = gtk.MessageDialog(diag, type=gtk.MESSAGE_ERROR,
+                                             buttons=gtk.BUTTONS_OK)
+                    mdiag.set_markup(res.get("error", _("Login invalid")))
+                    mdiag.set_title(_("Error"))
+                    mdiag.run()
+                    mdiag.destroy()
+            else:
+                diag.destroy()
+        diag.connect("response", response_cb)
+        diag.show()
 
     def check_out_cb(self):
         diag = CheckOutDialog(self._window, self)
+        diag.run()
+        diag.destroy()
+    
+    def download_cb(self):
+        diag = DownloadDialog(self._window, self)
         diag.run()
         diag.destroy()
     
@@ -161,16 +189,14 @@ class OpenPLMPluginInstance(object):
         else:
             return json.load(self.opener.open(self.SERVER + url)) 
 
-    def check_out(self, doc, doc_file):
-        self.document = doc
-        self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
+    def download(self, doc, doc_file):
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
         rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
                            doc["revision"])
         try:
             os.makedirs(rep, 0700)
         except os.error:
-            # directory already exists
+            # directory already exists, just ignores the execption
             pass
         dst_name = os.path.join(rep, doc_file["filename"])
         dst = open(dst_name, "wb")
@@ -183,6 +209,10 @@ class OpenPLMPluginInstance(object):
         gdoc.set_data("openplm_doc", doc)
         gdoc.set_data("openplm_file", doc_file)
         gdoc.set_data("openplm_path", dst_name)
+
+    def check_out(self, doc, doc_file):
+        self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
+        self.download(doc, doc_file)
 
     def add_managed_file(self, document, doc_file, path):
         f = open(self.CONF_FILE, "r")
@@ -203,15 +233,21 @@ class OpenPLMPluginInstance(object):
         f.close()
 
     def get_managed_files(self):
-        with open(self.CONF_FILE, "r") as f:
-            try:
-                data = json.load(f)
-            except ValueError:
-                data = {}
-            files = []
-            for doc in data.get("documents", {}).itervalues():
-                files.extend((d, doc) for d in doc.get("files", {}).items())
-            return files
+        try:
+            with open(self.CONF_FILE, "r") as f:
+                try:
+                    data = json.load(f)
+                except ValueError:
+                    # the file may be empty
+                    data = {}
+                files = []
+                for doc in data.get("documents", {}).itervalues():
+                    files.extend((d, doc) for d in doc.get("files", {}).items())
+                return files
+        except IOError:
+            # the file may not exists (first launch...)
+            # just returns an empty list
+            return []
     
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
@@ -272,12 +308,14 @@ class CheckInDialog(gtk.Dialog):
 
     def get_unlocked(self):
         return self.unlock_button.get_active()
-        
+       
 
-class CheckOutDialog(gtk.Dialog):
-    
+class SearchDialog(gtk.Dialog):
+    TITLE = _("Search")
+    ACTION_NAME = _("...")
+
     def __init__(self, window, instance):
-        super(CheckOutDialog, self).__init__(_("Check-out"), window,
+        super(SearchDialog, self).__init__(self.TITLE, window,
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
         self.instance = instance
@@ -374,7 +412,6 @@ class CheckOutDialog(gtk.Dialog):
         elif isinstance(entry, gtk.Entry):
             entry.set_text(value)
 
-
     def display_results(self, results):
         def expand_cb(widget):
             box = widget.get_child()
@@ -384,8 +421,8 @@ class CheckOutDialog(gtk.Dialog):
             for f in files:
                 hbox = gtk.HBox()
                 label = gtk.Label(f["filename"])
-                check_out = gtk.Button(_("Check out"))
-                check_out.connect("clicked", self.check_out, widget.res, f)
+                check_out = gtk.Button(self.ACTION_NAME)
+                check_out.connect("clicked", self.do_action, widget.res, f)
                 hbox.pack_start(label)
                 hbox.pack_start(check_out)
                 box.pack_start(hbox)
@@ -412,10 +449,26 @@ class CheckOutDialog(gtk.Dialog):
     def set_doc(self, doc):
         self.document = doc
 
-    def check_out(self, button, doc, doc_file):
+    def do_action(self, button, doc, doc_file):
+        pass
+
+class CheckOutDialog(SearchDialog):
+    TITLE = _("Check-out")
+    ACTION_NAME = _("Check-out")
+
+    def do_action(self, button, doc, doc_file):
         self.instance.check_out(doc, doc_file)
         self.destroy()
         
+
+class DownloadDialog(SearchDialog):
+    TITLE = _("Download")
+    ACTION_NAME = _("Download")
+
+    def do_action(self, button, doc, doc_file):
+        self.instance.download(doc, doc_file)
+        self.destroy()
+
 
 class LoginDialog(gtk.Dialog):
     
@@ -426,8 +479,8 @@ class LoginDialog(gtk.Dialog):
                                           gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         table = gtk.Table(2, 2)
         self.vbox.pack_start(table)
-        table.attach(gtk.Label(_("Username")), 0, 1, 0, 1)
-        table.attach(gtk.Label(_("Password")), 0, 1, 1, 2)
+        table.attach(gtk.Label(_("Username:")), 0, 1, 0, 1)
+        table.attach(gtk.Label(_("Password:")), 0, 1, 1, 2)
         self.user_entry = gtk.Entry()
         self.user_entry.connect("activate", self.user_entry_activate_cb)
         table.attach(self.user_entry, 1, 2, 0, 1)
