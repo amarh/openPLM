@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, QueryDict, HttpResponse
+import django.forms
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
@@ -148,6 +149,19 @@ def check_in(request, doc_id, df_id):
         doc.checkin(df, request.FILES['filename'])
     return {}
 
+def field_to_type(field):
+    types = {django.forms.IntegerField : "int",
+             django.forms.DecimalField : "decimal",
+             django.forms.FloatField : "float",
+             django.forms.BooleanField : "boolean",
+             django.forms.ChoiceField : "choice",
+           }
+    if field in types:
+        return types[field]
+    for key in types:
+        if isinstance(field, key):
+            return types[key]
+    return "text"
 
 @api_login_required
 @json_view
@@ -158,11 +172,14 @@ def get_advanced_search_fields(request, typename):
         return {"result" : "error", "fields" : []}
     fields = []
     for field_name, field in form.fields.iteritems():
+        data = dict(name=field_name, label=field.label, initial=field.initial)
+        data["type"] = field_to_type(field)
         if hasattr(field, "choices"):
-            choices = tuple(field.choices)
-        else:
-            choices = ()
-        fields.append((field_name, choices))
+            data["choices"] =  tuple(field.choices)
+        for attr in ("min_value", "max_value", "min_length", "max_length"):
+            if hasattr(field, attr):
+                data[attr] = getattr(field, attr)
+        fields.append(data)
     return {"fields" : fields}
 
 @json_view
