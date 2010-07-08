@@ -54,6 +54,8 @@ ui_str = """
             <menuitem name="checkin" action="checkin"/>
             <menuitem name="download" action="download"/>
             <menuitem name="forget" action="forget"/>
+            <menuitem name="revise" action="revise"/>
+            <menuitem name="attach" action="attach"/>
          </menu>
          <separator/>
       </placeholder>
@@ -131,6 +133,13 @@ def field_to_widget(field):
     set_value(widget, field["initial"])
     return widget
 
+def show_error(message, parent=None):
+    mdiag = gtk.MessageDialog(parent, type=gtk.MESSAGE_ERROR,
+                              buttons=gtk.BUTTONS_OK)
+    mdiag.set_markup(message)
+    mdiag.set_title(_("Error"))
+    mdiag.run()
+    mdiag.destroy()
 
 class OpenPLMPluginInstance(object):
     
@@ -199,6 +208,12 @@ class OpenPLMPluginInstance(object):
                  ("forget", None, _("Forget current file"), None,
                      _("Forget current file"),
                       lambda a: self.forget()),
+                 ("revise", None, _("Create a new revision"), None,
+                     _("Create a new revision in openPLM"),
+                    lambda a:self.revise_cb()),
+                 ("attach", None, _("Link with part"), None,
+                     _("Link with part"),
+                    lambda a:self.attach_cb()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -235,12 +250,7 @@ class OpenPLMPluginInstance(object):
                     self.load_managed_files()
                     diag.destroy()
                 else:
-                    mdiag = gtk.MessageDialog(diag, type=gtk.MESSAGE_ERROR,
-                                             buttons=gtk.BUTTONS_OK)
-                    mdiag.set_markup(res.get("error", _("Login invalid")))
-                    mdiag.set_title(_("Error"))
-                    mdiag.run()
-                    mdiag.destroy()
+                    show_error(res.get("error", _("Login invalid")), diag)
             else:
                 diag.destroy()
         diag.connect("response", response_cb)
@@ -253,6 +263,16 @@ class OpenPLMPluginInstance(object):
     
     def download_cb(self):
         diag = DownloadDialog(self._window, self)
+        diag.run()
+        diag.destroy()
+        
+    def attach_cb(self):
+        gdoc = self._window.get_active_document()
+        doc = gdoc.get_data("openplm_doc")
+        if not doc:
+            return
+        diag = AttachToPartDialog(self._window, self)
+        diag.doc = doc
         diag.run()
         diag.destroy()
     
@@ -276,6 +296,9 @@ class OpenPLMPluginInstance(object):
         dst.close()
         self.add_managed_file(doc, doc_file, dst_name)
         self.load_file(doc, doc_file["id"], dst_name)
+
+    def attach_to_part(self, doc, part_id):
+        self.get_data("api/object/%s/attach_to_part/%s/" % (doc["id"], part_id))
 
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
@@ -348,8 +371,7 @@ class OpenPLMPluginInstance(object):
             box.pack_start(label)
             gdoc.set_data("openplm_label", label)
 
-    def check_in(self, unlock):
-        gdoc = self._window.get_active_document()
+    def check_in(self, gdoc, unlock):
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
         path = gdoc.get_data("openplm_path")
@@ -372,13 +394,63 @@ class OpenPLMPluginInstance(object):
     def check_in_cb(self):
         gdoc = self._window.get_active_document()
         doc = gdoc.get_data("openplm_doc")
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        if not doc or not self.check_is_locked(doc["id"], doc_file_id):
+            return
         name = os.path.basename(gdoc.get_data("openplm_path"))
         diag = CheckInDialog(self._window, self, doc, name)
         resp = diag.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            self.check_in(diag.get_unlocked())
+            self.check_in(gdoc, diag.get_unlocked())
+        diag.destroy()
+    
+    def revise(self, gdoc, revision, unlock):
+        doc = gdoc.get_data("openplm_doc")
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        path = gdoc.get_data("openplm_path")
+        if doc and doc_file_id and path:
+            gedit.commands.save_document(self._window, gdoc)
+            new_doc = self.get_data("api/object/%s/revise/" % doc["id"],
+                          {"revision" : revision})["rev_id"]
+            if not unlock:
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+        else:
+            # TODO
+            print 'can not check in'
+            pass
+
+    def revise_cb(self):
+        gdoc = self._window.get_active_document()
+        doc = gdoc.get_data("openplm_doc")
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        if not doc or not self.check_is_locked(doc["id"], doc_file_id):
+            return
+        revisable = self.get_data("api/object/%s/isrevisable/" % doc["id"])["revisable"]
+        if not revisable:
+            show_error(_("Document can not be revised"), self._window)
+            return
+        name = os.path.basename(gdoc.get_data("openplm_path"))
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        res = self.get_data("api/object/%s/nextrevision/" % doc["id"])
+        revision = res["revision"]
+        diag = ReviseDialog(self._window, self, doc, name, revision)
+        resp = diag.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            self.revise(gdoc, diag.get_revision(), diag.get_unlocked())
         diag.destroy()
 
+
+    def check_is_locked(self, doc_id, file_id, error_dialog=True):
+        """
+        Return True if file which is is *file_id* is locked.
+
+        If it is unlocked and *error_dialog* is True, an ErrorDialog is 
+        displayed
+        """
+        locked = self.get_data("api/object/%s/islocked/%s/" % (doc_id, file_id))["locked"]
+        if not locked and error_dialog:
+            show_error(_("File is not locked, action not allowed"), self._window)
+        return locked
 
 class CheckInDialog(gtk.Dialog):
     
@@ -388,8 +460,8 @@ class CheckInDialog(gtk.Dialog):
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                         "Check-in", gtk.RESPONSE_ACCEPT))
         self.instance = instance
-        label = gtk.Label("%s|%s|%s"% (doc["reference"], doc["revision"],
-                                       doc["type"]))
+        label = gtk.Label("%s|%s|%s" % (doc["reference"], doc["revision"],
+                                        doc["type"]))
         self.vbox.pack_start(label)
         label2 = gtk.Label(filename)
         self.vbox.pack_start(label2)
@@ -399,25 +471,55 @@ class CheckInDialog(gtk.Dialog):
 
     def get_unlocked(self):
         return self.unlock_button.get_active()
-       
+
+class ReviseDialog(gtk.Dialog):
+    
+    def __init__(self, window, instance, doc, filename, revision):
+        super(ReviseDialog, self).__init__(_("Revise"), window,
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
+                        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                        "Revise", gtk.RESPONSE_ACCEPT))
+        self.instance = instance
+        hbox = gtk.HBox()
+        label = gtk.Label("%s|" % doc["reference"])
+        hbox.pack_start(label)
+        self.rev_entry = gtk.Entry()
+        self.rev_entry.set_text(revision)
+        hbox.pack_start(self.rev_entry)
+        label = gtk.Label("|%s" % doc["type"])
+        hbox.pack_start(label)
+        self.vbox.pack_start(hbox)
+        label2 = gtk.Label(filename)
+        self.vbox.pack_start(label2)
+        self.unlock_button = gtk.CheckButton("Unlock ?")
+        self.vbox.pack_start(self.unlock_button)
+        self.vbox.show_all()
+
+    def get_unlocked(self):
+        return self.unlock_button.get_active()      
+    
+    def get_revision(self):
+        return self.rev_entry.get_text()      
 
 class SearchDialog(gtk.Dialog):
     TITLE = _("Search")
     ACTION_NAME = _("...")
+    TYPE = "Document"
+    TYPES_URL = "api/docs/"
 
     def __init__(self, window, instance):
         super(SearchDialog, self).__init__(self.TITLE, window,
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
         self.instance = instance
-        docs = self.instance.get_data("api/docs/")
+        docs = self.instance.get_data(self.TYPES_URL)
         self.types = docs["types"]
         table = gtk.Table(2, 3)
         self.vbox.pack_start(table)
         self.type_entry = gtk.combo_box_entry_new_text()
         for t in docs["types"]:
             self.type_entry.append_text(t)
-        self.type_entry.child.set_text("Document")
+        self.type_entry.child.set_text(self.TYPE)
         self.type_entry.connect("changed", self.type_entry_activate_cb)
         self.name_entry = gtk.Entry()
         self.rev_entry = gtk.Entry()
@@ -432,14 +534,17 @@ class SearchDialog(gtk.Dialog):
         self.advanced_table = gtk.Table(2, 3)
         self.advanced_fields = []
         self.vbox.pack_start(self.advanced_table)
-        self.display_fields("Document")
+        self.display_fields(self.TYPE)
         
         search_button = gtk.Button(_("Search"))
         search_button.connect("clicked", self.search)
         self.vbox.pack_start(search_button)
 
         self.results_box = gtk.VBox()
-        self.vbox.pack_start(self.results_box)
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw.add_with_viewport(self.results_box)
+        self.vbox.pack_start(sw)
         self.vbox.show_all()
 
     def type_entry_activate_cb(self, entry):
@@ -529,6 +634,29 @@ class DownloadDialog(SearchDialog):
         self.destroy()
 
 
+class AttachToPartDialog(SearchDialog):
+    TITLE = _("Attach to part")
+    ACTION_NAME = _("Attach")
+    TYPE = "Part"
+    TYPES_URL = "api/parts/"
+
+    def do_action(self, button, part):
+        self.instance.attach_to_part(self.doc, part)
+        self.destroy()
+    
+    def display_results(self, results):
+        for child in self.results_box.get_children():
+            child.destroy()
+        for res in results:
+            hbox = gtk.HBox()
+            label = gtk.Label("%(reference)s|%(type)s|%(revision)s" % res)
+            attach = gtk.Button(self.ACTION_NAME)
+            attach.connect("clicked", self.do_action, res["id"])
+            hbox.pack_start(label)
+            hbox.pack_start(attach)
+            self.results_box.pack_start(hbox)
+        self.results_box.show_all()
+        
 class LoginDialog(gtk.Dialog):
     
     def __init__(self, window):

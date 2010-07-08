@@ -95,6 +95,10 @@ def get_all_types(request):
 def get_all_docs(request):
     return {"types" : sorted(models.get_all_documents().keys())}
 
+@api_login_required
+@json_view
+def get_all_parts(request):
+    return {"types" : sorted(models.get_all_parts().keys())}
 
 @api_login_required
 @json_view
@@ -149,6 +153,13 @@ def check_in(request, doc_id, df_id):
         doc.checkin(df, request.FILES['filename'])
     return {}
 
+@api_login_required
+@json_view
+def is_locked(request, doc_id, df_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    df = models.DocumentFile.objects.get(id=df_id)
+    return {"locked" : df.locked}
+
 def field_to_type(field):
     types = {django.forms.IntegerField : "int",
              django.forms.DecimalField : "decimal",
@@ -202,4 +213,36 @@ def api_login(request):
 @json_view
 def test_login(request):
     # do nothing, if user is authenticated, json_view sets *result* to 'ok'
+    return {}
+
+@api_login_required
+@json_view
+def next_revision(request, doc_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    return {"revision" : get_next_revision(doc.revision)}
+
+@api_login_required
+@json_view
+def revise(request, doc_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    form = forms.AddRevisionForm(request.POST)
+    if form.is_valid():
+        rev = doc.revise(form.cleaned_data["revision"])
+        return {"rev_id" : doc.pk}
+    else:
+        return {"result" : 'error'}
+
+@api_login_required
+@json_view
+def is_revisable(request, doc_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    return {"revisable" : doc.is_revisable()}
+
+
+@api_login_required
+@json_view
+def attach_to_part(request, doc_id, part_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    part = get_obj_by_id(part_id, request.user)
+    doc.attach_to_part(part)
     return {}
