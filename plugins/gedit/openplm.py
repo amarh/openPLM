@@ -53,6 +53,7 @@ ui_str = """
             <menuitem name="checkout" action="checkout"/>
             <menuitem name="checkin" action="checkin"/>
             <menuitem name="download" action="download"/>
+            <menuitem name="forget" action="forget"/>
          </menu>
          <separator/>
       </placeholder>
@@ -125,6 +126,9 @@ class OpenPLMPluginInstance(object):
                  ("download", None, _("Download from openPLM"), None,
                      _("Download and open a file from openPLM"),
                       lambda a: self.download_cb()),
+                 ("forget", None, _("Forget current file"), None,
+                     _("Forget current file"),
+                      lambda a: self.forget()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -215,40 +219,47 @@ class OpenPLMPluginInstance(object):
         self.download(doc, doc_file)
 
     def add_managed_file(self, document, doc_file, path):
-        f = open(self.CONF_FILE, "r")
-        try:
-            data = json.load(f)
-        except ValueError:
-            data = {}
-        f.close()
+        data = self.get_conf_data()
         documents = data.get("documents", {})
-        doc = documents.get(document["id"], dict(document))
+        doc = documents.get(str(document["id"]), dict(document))
         files = doc.get("files", {})
         files[doc_file["id"]] = path
         doc["files"] = files
-        documents["id"] = doc
+        documents[doc["id"]] = doc
         data["documents"] = documents
         f = open(self.CONF_FILE, "w")
         json.dump(data, f)
         f.close()
-
-    def get_managed_files(self):
+    
+    def get_conf_data(self):
         try:
             with open(self.CONF_FILE, "r") as f:
                 try:
-                    data = json.load(f)
+                    return json.load(f)
                 except ValueError:
-                    # the file may be empty
-                    data = {}
-                files = []
-                for doc in data.get("documents", {}).itervalues():
-                    files.extend((d, doc) for d in doc.get("files", {}).items())
-                return files
+                    return {}
         except IOError:
-            # the file may not exists (first launch...)
-            # just returns an empty list
-            return []
-    
+            return {}
+
+    def get_managed_files(self):
+        data = self.get_conf_data()
+        files = []
+        for doc in data.get("documents", {}).itervalues():
+            files.extend((d, doc) for d in doc.get("files", {}).items())
+        return files
+   
+    def forget(self):
+        gdoc = self._window.get_active_document()
+        doc = gdoc.get_data("openplm_doc")
+        doc_file_id = gdoc.get_data("openplm_file_id")
+        path = gdoc.get_data("openplm_path")
+        if doc and doc_file_id and path:
+            data = self.get_conf_data()
+            del data["documents"][str(doc["id"])]["files"][doc_file_id]
+            f = open(self.CONF_FILE, "w")
+            json.dump(data, f)
+            f.close()
+
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
             gedit.commands.load_uri(self._window, "file://" + path, None, -1)
