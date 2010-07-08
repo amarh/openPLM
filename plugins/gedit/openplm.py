@@ -62,6 +62,76 @@ ui_str = """
 </ui>
 """
 
+def get_value(entry, field):
+    value = None
+    if isinstance(entry, gtk.ComboBoxEntry):
+        value = entry.child.get_text()
+    elif isinstance(entry, gtk.ComboBox):
+        model = entry.get_model()
+        active = entry.get_active()
+        if active < 0:
+            value = ""
+        else:
+            value = model[active][0]
+    elif isinstance(entry, gtk.Entry):
+        value = entry.get_text()
+    elif isinstance(entry, gtk.CheckButton):
+        value = entry.get_active()
+    elif isinstance(entry, gtk.SpinButton):
+        if field["type"] == "int":
+            value = entry.get_value_as_int()
+        else:
+            value = entry.set_value() 
+    return value
+
+def set_value(entry, value):
+    if isinstance(entry, gtk.ComboBoxEntry):
+        entry.child.set_text(entry or "")
+    elif isinstance(entry, gtk.ComboBox):
+        model = entry.get_model()
+        for i, it in enumerate(iter(model)):
+            if value == it[0]:
+                entry.set_active(i)
+                return
+    elif isinstance(entry, gtk.Entry):
+        entry.set_text(value or "")
+    elif isinstance(entry, gtk.CheckButton):
+        entry.set_active(value)
+    elif isinstance(entry, gtk.SpinButton) and isinstance(value, (int, float, long)):
+        entry.set_value(value)
+    
+def field_to_widget(field):
+    widget = None
+    if field["type"] in ("text", "int", "decimal", "float"):
+        widget = gtk.Entry()
+        widget.set_max_length(field.get("max_length", 0))
+    elif field["type"] == "boolean":
+        widget = gtk.CheckButton()
+    #elif field["type"] in ("int", "decimal", "float"):
+        #widget = gtk.SpinButton()
+        #if field["max_value"] is not None and field["min_value"] is not None:
+            #widget.set_range(float(field["min_value"]), float(field["max_value"]))
+            #if field["type"] == "int":
+                #widget.set_increments(1, 1)
+            #else:
+                #widget.set_increments(.1, .1)
+    elif field["type"] == "choice":
+        model = gtk.ListStore(object, str)
+        choices = field["choices"]
+        if [u'', u'---------'] not in choices:
+            choices = ([u'', u'---------'],) + tuple(choices)
+        for c in choices:
+            model.append(c)
+        widget = gtk.ComboBox(model)
+        cell = gtk.CellRendererText()
+        widget.pack_start(cell, True)
+        widget.add_attribute(cell, 'text', 1)
+    if widget == None:
+        raise ValueError()
+    set_value(widget, field["initial"])
+    return widget
+
+
 class OpenPLMPluginInstance(object):
     
     #: location of oepnPLM server
@@ -187,11 +257,8 @@ class OpenPLMPluginInstance(object):
         diag.destroy()
     
     def get_data(self, url, data=None):
-        if data:
-            data_enc = urllib.urlencode(data)
-            return json.load(self.opener.open(self.SERVER + url, data_enc)) 
-        else:
-            return json.load(self.opener.open(self.SERVER + url)) 
+        data_enc = urllib.urlencode(data) if data else None
+        return json.load(self.opener.open(self.SERVER + url, data_enc)) 
 
     def download(self, doc, doc_file):
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
@@ -233,8 +300,10 @@ class OpenPLMPluginInstance(object):
                 try:
                     return json.load(f)
                 except ValueError:
+                    # empty/bad config file
                     return {}
         except IOError:
+            # file does not exist
             return {}
 
     def get_managed_files(self):
@@ -268,14 +337,16 @@ class OpenPLMPluginInstance(object):
         gdoc.set_data("openplm_doc", doc)
         gdoc.set_data("openplm_file_id", doc_file_id)
         gdoc.set_data("openplm_path", path)
-        tab = self._window.get_active_tab()
-        notebook = tab.get_parent()
-        tab_label = notebook.get_tab_label(tab)
-        box = tab_label.get_children()[0].get_child()
-        label = gtk.Label("[PLM]")
-        label.show()
-        box.pack_start(label)
-        gdoc.set_data("openplm_label", label)
+        if not gdoc.get_data("openplm_label"):
+            tab = self._window.get_active_tab()
+            notebook = tab.get_parent()
+            tab_label = notebook.get_tab_label(tab)
+            box = tab_label.get_children()[0].get_child()
+            # tag already present if we refresh the file
+            label = gtk.Label("[PLM]")
+            label.show()
+            box.pack_start(label)
+            gdoc.set_data("openplm_label", label)
 
     def check_in(self, unlock):
         gdoc = self._window.get_active_document()
@@ -380,57 +451,21 @@ class SearchDialog(gtk.Dialog):
         fields = self.instance.get_data("api/search_fields/%s/" % typename)["fields"]
         temp = {}
         for field, entry in self.advanced_fields:
-            temp[field] = self.get_value(entry)
+            temp[field["name"]] = get_value(entry, field)
         for child in self.advanced_table.get_children():
             child.destroy()
         self.advanced_fields = []
         self.advanced_table.resize(2, len(fields))
-        for i, (text, choices) in enumerate(fields):
+        for i, field in enumerate(fields):
+            text = field["label"]
             self.advanced_table.attach(gtk.Label(_(text.capitalize()+":")),
                                        0, 1, i, i+1)
-            if choices:
-                model = gtk.ListStore(object, str)
-                if [u'', u'---------'] not in choices:
-                    choices = ([u'', u'---------'],) + tuple(choices)
-                for c in choices:
-                    model.append(c)
-                widget = gtk.ComboBox(model)
-                cell = gtk.CellRendererText()
-                widget.pack_start(cell, True)
-                widget.add_attribute(cell, 'text', 1)  
-            else:
-                widget = gtk.Entry()
-            if text in temp:
-                self.set_value(widget, temp[text])
+            widget = field_to_widget(field)
+            if field["name"] in temp:
+                set_value(widget, temp[field["name"]])
             self.advanced_table.attach(widget, 1, 2, i, i+1)
-            self.advanced_fields.append((text, widget))
+            self.advanced_fields.append((field, widget))
         self.advanced_table.show_all()
-
-    def get_value(self, entry):
-        if isinstance(entry, gtk.ComboBoxEntry):
-            value = entry.child.get_text()
-        elif isinstance(entry, gtk.ComboBox):
-            model = entry.get_model()
-            active = entry.get_active()
-            if active < 0:
-                value = ""
-            else:
-                value = model[active][0]
-        elif isinstance(entry, gtk.Entry):
-            value = entry.get_text()
-        return value
-
-    def set_value(self, entry, value):
-        if isinstance(entry, gtk.ComboBoxEntry):
-            entry.child.set_text(entry)
-        elif isinstance(entry, gtk.ComboBox):
-            model = entry.get_model()
-            for i, it in enumerate(iter(model)):
-                if value == it[0]:
-                    entry.set_active(i)
-                    return
-        elif isinstance(entry, gtk.Entry):
-            entry.set_text(value)
 
     def display_results(self, results):
         def expand_cb(widget):
@@ -459,10 +494,14 @@ class SearchDialog(gtk.Dialog):
             
     def search(self, *args):
         data = {}
-        for text, entry in self.fields + self.advanced_fields:
-            value = self.get_value(entry)
+        for text, entry in self.fields:
+            value = get_value(entry, None)
             if value:
                 data[text] = value
+        for field, entry in self.advanced_fields:
+            value = get_value(entry, field)
+            if value:
+                data[field["name"]] = value
         get = urllib.urlencode(data)
         self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
 
