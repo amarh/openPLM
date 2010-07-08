@@ -42,6 +42,9 @@ urlpatterns = patterns('',
 
 
 urlpatterns += patterns('',
+    (r'^api/login/', api.api_login),
+    (r'^api/needlogin/', api.need_login),
+    (r'^api/testlogin/', api.test_login),
     (r'^api/types/$', api.get_all_types),
     (r'^api/docs/$', api.get_all_docs),
     (r'^api/search/$', api.search),
