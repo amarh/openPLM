@@ -160,6 +160,15 @@ def is_locked(request, doc_id, df_id):
     df = models.DocumentFile.objects.get(id=df_id)
     return {"locked" : df.locked}
 
+@api_login_required
+@json_view
+def unlock(request, doc_id, df_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    df = models.DocumentFile.objects.get(id=df_id)
+    if df.locked:
+        doc.unlock(df)
+    return {}
+
 def field_to_type(field):
     types = {django.forms.IntegerField : "int",
              django.forms.DecimalField : "decimal",
@@ -167,8 +176,8 @@ def field_to_type(field):
              django.forms.BooleanField : "boolean",
              django.forms.ChoiceField : "choice",
            }
-    if field in types:
-        return types[field]
+    if type(field) in types:
+        return types[type(field)]
     for key in types:
         if isinstance(field, key):
             return types[key]
@@ -228,7 +237,13 @@ def revise(request, doc_id):
     form = forms.AddRevisionForm(request.POST)
     if form.is_valid():
         rev = doc.revise(form.cleaned_data["revision"])
-        return {"rev_id" : doc.pk}
+        ret = {"doc" : dict(id=rev.id, name=rev.name, type=rev.type,
+                            revision=rev.revision, reference=rev.reference)}
+        files = []
+        for df in rev.files:
+            files.append(dict(id=df.id, filename=df.filename, size=df.size))
+        ret["files"] = files
+        return ret
     else:
         return {"result" : 'error'}
 

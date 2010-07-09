@@ -25,6 +25,7 @@ import os
 import shutil
 import json
 import urllib
+import threading
 
 # poster makes it possible to send http request with files
 # sudo easy_install poster
@@ -141,9 +142,34 @@ def show_error(message, parent=None):
     mdiag.run()
     mdiag.destroy()
 
+def save_document(window, gdoc, func):
+    tab = gedit.tab_get_from_document(gdoc)
+    if tab.get_state() != gedit.TAB_STATE_NORMAL:
+        return
+    def handler(*args):
+        if tab.get_state() == gedit.TAB_STATE_NORMAL:
+            tab.disconnect(gdoc.get_data("openplm_sig"))
+            func()
+    sig = tab.connect_after("notify::state", handler)
+    gdoc.set_data("openplm_sig", sig)
+    gedit.commands.save_document(window, gdoc)
+ 
+def load_document(window, gdoc, path):
+    event = threading.Event()
+    def f():
+        def handler(*args):
+            gdoc.disconnect(gdoc.get_data("openplm_sig"))
+            event.set()
+        sig = gdoc.connect_after("load", handler)
+        gdoc.set_data("openplm_sig", sig)
+        #gdoc.load("file://" + path, gdoc.get_encoding(), 0, 0)
+        gedit.commands.load_uri(window, "file://" + path, gdoc.get_encoding(), 0)
+    threading.Thread(target=f).start()
+    event.wait()
+
 class OpenPLMPluginInstance(object):
     
-    #: location of oepnPLM server
+    #: location of openPLM server
     SERVER = "http://localhost:8000/"
     #: OpenPLM main directory
     OPENPLM_DIR = os.path.expanduser("~/.openplm")
@@ -287,7 +313,7 @@ class OpenPLMPluginInstance(object):
         try:
             os.makedirs(rep, 0700)
         except os.error:
-            # directory already exists, just ignores the execption
+            # directory already exists, just ignores the exception
             pass
         dst_name = os.path.join(rep, doc_file["filename"])
         dst = open(dst_name, "wb")
@@ -336,8 +362,8 @@ class OpenPLMPluginInstance(object):
             files.extend((d, doc) for d in doc.get("files", {}).items())
         return files
    
-    def forget(self):
-        gdoc = self._window.get_active_document()
+    def forget(self, gdoc=None, delete=True):
+        gdoc = gdoc or self._window.get_active_document()
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
         path = gdoc.get_data("openplm_path")
@@ -346,17 +372,24 @@ class OpenPLMPluginInstance(object):
             label.destroy()
             data = self.get_conf_data()
             del data["documents"][str(doc["id"])]["files"][str(doc_file_id)]
+            if not  data["documents"][str(doc["id"])]["files"]:
+                del data["documents"][str(doc["id"])]
             f = open(self.CONF_FILE, "w")
             json.dump(data, f)
             f.close()
+            if delete and os.path.exists(path):
+                os.remove(path)
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
             self.load_file(doc, doc_file_id, path)
 
-    def load_file(self, doc, doc_file_id, path):
-        gedit.commands.load_uri(self._window, "file://" + path, None, -1)
-        gdoc = self._window.get_active_document()
+    def load_file(self, doc, doc_file_id, path, gdoc=None):
+        if gdoc:
+            load_document(self.window, gdoc, path)
+        else:
+            gedit.commands.load_uri(self._window, "file://" + path, None, -1)
+            gdoc = self._window.get_active_document()
         gdoc.set_data("openplm_doc", doc)
         gdoc.set_data("openplm_file_id", doc_file_id)
         gdoc.set_data("openplm_path", path)
@@ -370,22 +403,28 @@ class OpenPLMPluginInstance(object):
             label.show()
             box.pack_start(label)
             gdoc.set_data("openplm_label", label)
+        return gdoc
 
-    def check_in(self, gdoc, unlock):
+    def check_in(self, gdoc, unlock, save=True):
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
         path = gdoc.get_data("openplm_path")
         if doc and doc_file_id and path:
-            gedit.commands.save_document(self._window, gdoc)
-            # headers contains the necessary Content-Type and Content-Length
-            # datagen is a generator object that yields the encoded parameters
-            datagen, headers = multipart_encode({"filename": open(path, "rb")})
-            # Create the Request object
-            url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
-            request = urllib2.Request(url, datagen, headers)
-            res = self.opener.open(request)
-            if not unlock:
-                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+            def func():
+                # headers contains the necessary Content-Type and Content-Length>
+                # datagen is a generator object that yields the encoded parameters
+                datagen, headers = multipart_encode({"filename": open(path, "rb")})
+                # Create the Request object
+                url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
+                request = urllib2.Request(url, datagen, headers)
+                res = self.opener.open(request)
+                print res.read()
+                if not unlock:
+                    self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+            if save:
+                save_document(self._window, gdoc, func)
+            else:
+                func()
         else:
             # TODO
             print 'can not check in'
@@ -409,15 +448,39 @@ class OpenPLMPluginInstance(object):
         doc_file_id = gdoc.get_data("openplm_file_id")
         path = gdoc.get_data("openplm_path")
         if doc and doc_file_id and path:
-            gedit.commands.save_document(self._window, gdoc)
-            new_doc = self.get_data("api/object/%s/revise/" % doc["id"],
-                          {"revision" : revision})["rev_id"]
-            if not unlock:
-                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+          
+            res = self.get_data("api/object/%s/revise/" % doc["id"],
+                                {"revision" : revision})
+            new_doc = res["doc"]
+            name = os.path.basename(gdoc.get_uri())
+            doc_file = None
+            for f in res["files"]:
+                if f["filename"] == name:
+                    doc_file = f
+                    break
+            # create a new doc
+            rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
+                               revision)
+            try:
+                os.makedirs(rep, 0700)
+            except os.error:
+                # directory already exists, just ignores the exception
+                pass
+
+            self.forget(gdoc)
+            path = os.path.join(rep, name)
+            gdoc.set_uri("file://" + path)
+            def func():
+                #tab = gedit.tab_get_from_document(gdoc)
+                #self._window.close_tab(tab)
+                gd = self.load_file(new_doc, doc_file["id"], path)
+                self.add_managed_file(new_doc, doc_file, path)
+                self.check_in(gd, unlock, False)
+                self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
+            save_document(self._window, gdoc, func)
         else:
             # TODO
-            print 'can not check in'
-            pass
+            print 'can not revise'
 
     def revise_cb(self):
         gdoc = self._window.get_active_document()
@@ -491,8 +554,10 @@ class ReviseDialog(gtk.Dialog):
         self.vbox.pack_start(hbox)
         label2 = gtk.Label(filename)
         self.vbox.pack_start(label2)
-        self.unlock_button = gtk.CheckButton("Unlock ?")
+        self.unlock_button = gtk.CheckButton(_("Unlock last revision ?"))
         self.vbox.pack_start(self.unlock_button)
+        warn_message = gtk.Label(_("Warning, old revision will be automatically unlocked"))
+        self.vbox.pack_start(warn_message)
         self.vbox.show_all()
 
     def get_unlocked(self):

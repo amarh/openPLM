@@ -58,6 +58,7 @@ urlpatterns += patterns('',
     (r'^api/object/(?P<doc_id>\d+)/next_?revision/$', api.next_revision),
     (r'^api/object/(?P<doc_id>\d+)/is_?revisable/$', api.is_revisable),
     (r'^api/object/(?P<doc_id>\d+)/(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
+    (r'^api/object/(?P<doc_id>\d+)/unlock/(?P<df_id>\d+)/$', api.unlock),
     (r'^api/object/(?P<doc_id>\d+)/is_?locked/(?P<df_id>\d+)/$', api.is_locked),
     (r'^api/object/(?P<doc_id>\d+)/checkin/(?P<df_id>\d+)/$', api.check_in),
 )
