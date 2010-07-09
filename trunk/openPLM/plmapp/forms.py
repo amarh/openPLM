@@ -71,9 +71,8 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
     
 class type_form(forms.Form):
-    DICT = m.get_all_plmobjects()
-    TYPES = [(v, v) for v in DICT]
-    type = forms.TypedChoiceField(choices=TYPES)
+    LISTE = m.get_all_plmobjects_with_level()
+    type = forms.TypedChoiceField(choices=LISTE)
 
 class attributes_form(type_form):
     reference = forms.CharField(widget=forms.TextInput(), required=False)

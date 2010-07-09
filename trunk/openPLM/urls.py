@@ -12,10 +12,10 @@ urlpatterns = patterns('',
 
     (r'^bollox/', display_bollox),
     (r'^login/', login, {'template_name': 'DisplayLoginPage.htm', }),
-    (r'^logout/', logout, {'next_page': 'http://www.google.fr', }),
+    (r'^logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/$', display_object),
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/attributes/$', display_object),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/attributes/$', display_object_attributes),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/lifecycle/$', display_object_lifecycle),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/revisions/$', display_object_revisions),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/history/$', display_object_history),
@@ -31,11 +31,13 @@ urlpatterns = patterns('',
     (r'^object/([^/]+)/([^/]+)/([^/]+)/files/add/$', add_file),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/files/checkin/([^/]+)/$', checkin_file),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/modify/$', modify_object),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/navigate/$', navigate),
     (r'^object/create/$', create_object),
 
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
+    (r'^object/([^/]+)/([^/]+)/([^/]+)/files/checkout/([^/]+)/$', checkout_file),
     (r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
 
 )

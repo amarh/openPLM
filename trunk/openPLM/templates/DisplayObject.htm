@@ -4,8 +4,8 @@
 
 {% block content %}
 	<form method="POST" action="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
-		<input type="submit" value="EDIT"><br>
-	<br>
+		<input type="submit" value="EDIT"><br />
+	<br />
 	<table class="Content">
 	{% for description,attribute in object_attributes %}
 		<tr class="Content">

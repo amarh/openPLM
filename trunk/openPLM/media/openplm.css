@@ -37,18 +37,19 @@ opacity: 0.90;
 
 #SearchArea, #NavigateArea
 {
-float: left;
 min-height: 500px;
 border-style: none;
 }
 
 div#SearchArea
 {
+float: left;
 width: 400px;
 }
 
 div#NavigateArea
 {
+float: right;
 width: 800px;
 }
 
@@ -63,18 +64,21 @@ padding: 5px;
 div#SearchBox
 {
 min-height: 180px;
+margin-right: 0px;
 }
 
 div#ResultBox
 {
 min-height: 200px;
+margin-right: 0px;
 /*overflow: scroll;*/
 }
 
 div#ResultBox4Search
 {
-background-color: #fec3c3;		
+background-color: #ff4848;		
 min-height: 350px;
+margin-right: 0px;
 }
 
 div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
@@ -164,14 +168,29 @@ border-bottom-style: none;
 border-width: 1px;
 }
 
+div#NavigateBox4Doc td.CurrentPage
+{
+background-color: #fef176;
+}
+
 .MenuTable td:hover
 {
 background-color: #E6E6FF;
 }
 
+div#NavigateBox4Doc td:hover
+{
+background-color: #fff8ba;
+}
+
 .MenuTable td.CurrentPage:hover
 {
 background-color: #99ccff;
+}
+
+div#NavigateBox4Doc td.CurrentPage:hover
+{
+background-color: #fef176;
 }
 
 .MenuTable a
@@ -245,5 +264,11 @@ font-size: 30px;
 line-height: 1.4;
 }
 
-
+div#Navigate
+{
+border: 1px solid #000000
+width: 790px;
+height: 430px;
+background-color: #FFFFFF;
+}
 

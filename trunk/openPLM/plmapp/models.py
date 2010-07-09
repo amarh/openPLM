@@ -624,6 +624,26 @@ class DocumentPartLink(Link):
     def __unicode__(self):
         return u"DocumentPartLink<%s, %s" % (self.document, self.part)
 
+def _get_all_subclasses_with_level(base, lst, level):
+    level = "=" + level
+    if base.__name__ not in lst:
+        lst.append((base.__name__,level[3:] + base.__name__))
+    for part in base.__subclasses__():
+        _get_all_subclasses_with_level(part, lst, level)
+
+def get_all_plmobjects_with_level():
+    u"""
+    Returns a list<name, class> of all available :class:`PLMObject` subclasses
+    with 1 or more "=>" depending on the level
+    """
+
+    lst = []
+    level=">"
+    _get_all_subclasses_with_level(PLMObject, lst, level)
+    if lst: del lst[0]
+    return lst
+
+
 # import_models should be the last function
 
 def import_models(force_reload=False):

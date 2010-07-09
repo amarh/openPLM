@@ -11,8 +11,11 @@
 {% block ObjectBlock %}
     <div id="PageBanner">
 		<h2>
-		    <a href="./navigate.htm">
+		    <a href="../navigate/">
 		        <img src="/media/img/navigation2.png" title="Navigate" alt="Navigate" width="30" height="30"/>
+	        </a>
+	        <a href="../attributes/">
+		        <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
 	        </a>
 		    {{object_type}} | {{object_reference}} | {{object_revision}}
 	    </h2>
@@ -41,8 +44,7 @@
 	
 	<div id="PageCenter">
 		{% block content %}{% endblock %}
-		<p>&nbsp</p>
-		<p>&nbsp</p>
+		
 	</div>
-	<br class="clear" />
+
 {% endblock %}
