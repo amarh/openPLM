@@ -10,7 +10,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
 
 from django.db.models import Q
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse, HttpResponsePermanentRedirect
 
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.utils import get_next_revision
@@ -63,7 +63,7 @@ def display_global_page(request_dict):
     log_in_person="pjoulaud"
     context_dict = {'log_in_person' : request_dict.user}
     query_dict = {}
-    type_form_instance = type_form()
+    request_dict.session['type'] = 'Part'
     attributes_form_instance = attributes_form()
     extra_attributes_form_instance = get_search_form()
     results=[]
@@ -146,7 +146,7 @@ def display_home_page(request):
 ###     All functions which manage the different html pages related to a part          ###
 ##########################################################################################
 @login_required
-def display_object(request, object_type_value, object_reference_value, object_revision_value):
+def display_object_attributes(request, object_type_value, object_reference_value, object_revision_value):
     """ Manage html page for attributes """
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     if isinstance(obj, DocumentController):
@@ -165,6 +165,13 @@ def display_object(request, object_type_value, object_reference_value, object_re
     print request.user
     context_dict.update(var_dict)
     return render_to_response('DisplayObject.htm', context_dict)
+
+##########################################################################################
+@login_required
+def display_object(request, object_type_value, object_reference_value, object_revision_value):
+    """ Manage html page for attributes """
+    return HttpResponsePermanentRedirect("/object/%s/%s/%s/attributes/" \
+                                        % (object_type_value, object_reference_value, object_revision_value) )
 
 ##########################################################################################
 @login_required
@@ -405,7 +412,7 @@ def display_object_doc_cad(request, object_type_value, object_reference_value, o
         formset = get_doc_cad_formset(obj)
     object_doc_cad_list = obj.get_attached_documents()
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'parts', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
+    context_dict.update({'current_page':'doc-cad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -528,10 +535,11 @@ def display_files(request, object_type_value, object_reference_value, object_rev
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
-
+    is_owner_bool = (request.user == models.PLMObject.objects.get(type=object_type_value, \
+                                        reference=object_reference_value, revision=object_revision_value).owner)
     object_files_list = obj.files
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    context_dict.update({'current_page':'files', 'class4div': class_for_div, 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
+    context_dict.update({'is_owner':is_owner_bool, 'current_page':'files', 'class4div': class_for_div, 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
@@ -565,37 +573,7 @@ def add_file(request, object_type_value, object_reference_value, object_revision
             return render_to_response('DisplayRelPartAdd.htm', context_dict)
     else:
         add_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
-        return render_to_response('DisplayFileAdd.htm', context_dict)
-
-##########################################################################################
-@login_required
-def checkin_file(request, object_type_value, object_reference_value, object_revision_value, file_id_value):
-    """ Manage html page for file checkin in the document"""
-    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
-    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
-    if isinstance(obj, DocumentController):
-        class_for_div="NavigateBox4Doc"
-    else:
-        class_for_div="NavigateBox4Part"
-    menu_list = obj.menu_items
-    var_dict, request_dict = display_global_page(request)
-    request.session.update(request_dict)
-    context_dict.update(var_dict)
-    if request.POST:
-        checkin_file_form_instance = AddFileForm(request.POST, request.FILES)
-        if checkin_file_form_instance.is_valid():
-            obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
-            context_dict.update({'object_menu': menu_list, })
-            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
-                                        % (object_type_value, object_reference_value, object_revision_value) )
-        else:
-            checkin_file_form_instance = AddFileForm(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
-            return render_to_response('DisplayFileAdd.htm', context_dict)
-    else:
-        checkin_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
+        context_dict.update({'class4search_div': False, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
         return render_to_response('DisplayFileAdd.htm', context_dict)
 
 ##########################################################################################
@@ -692,7 +670,41 @@ def display_bollox(request):
     context_dict={}
     return render_to_response('bollox.htm', context_dict)
     
-    
+##########################################################################################
+###             Manage html pages for file check-in / check-out / download             ###
+##########################################################################################    
+@login_required
+def checkin_file(request, object_type_value, object_reference_value, object_revision_value, file_id_value):
+    """ Manage html page for file checkin in the document"""
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    if isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    if request.POST :
+        checkin_file_form_instance = AddFileForm(request.POST, request.FILES)
+        if checkin_file_form_instance.is_valid():
+            obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
+            context_dict.update({'object_menu': menu_list, })
+            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
+                                        % (object_type_value, object_reference_value, object_revision_value) )
+        else:
+            checkin_file_form_instance = AddFileForm(request.POST)
+            context_dict.update({'class4search_div': True, 'class4div': class_for_div, \
+                                 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            return render_to_response('DisplayFileAdd.htm', context_dict)
+    else:
+        checkin_file_form_instance = AddFileForm()
+        context_dict.update({'class4search_div': True, 'class4div': class_for_div, \
+                            'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
+        return render_to_response('DisplayFileAdd.htm', context_dict)
+
+##########################################################################################
 @login_required 
 def download(request, docfile_id):
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
@@ -701,8 +713,34 @@ def download(request, docfile_id):
     if not os.path.exists(rep):
         os.mkdir(rep)
     dst = os.path.join(rep, name)
-    if os.path.exists(dst):
+    if os.path.lexists(dst):
         os.unlink(dst)
     os.symlink(doc_file.file.path, dst)
     return HttpResponseRedirect("/" + dst)
+    
+##########################################################################################
+@login_required 
+def checkout_file(request, object_type_value, object_reference_value, object_revision_value, docfile_id):
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    doc_file = models.DocumentFile.objects.get(id=docfile_id)
+    if request.user == models.PLMObject.objects.get(type=object_type_value, reference=object_reference_value, revision=object_revision_value).owner:
+        obj.lock(doc_file)
+        return download(request, docfile_id)
+
+##########################################################################################
+###                     Manage html pages for navigate function                        ###
+##########################################################################################    
+@login_required
+def navigate(request, object_type_value, object_reference_value, object_revision_value):   
+    context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
+    obj = get_obj(object_type_value, object_reference_value, object_revision_value)
+    if isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    context_dict.update({'class4div': class_for_div})
+    return render_to_response('Navigate.htm', context_dict)
 

@@ -9,7 +9,10 @@
 	    <table class="Content">
 	        <tr>
 		        <td></td>
-		        <td><a href="./add/">ADD</a></td>
+		        <td>
+		            {% if is_owner %}
+		                <a href="./add/">ADD</a></td>
+	                {% endif %}
 	    	    <td><input type="submit" value="DELETE"></td>
     	    </tr>
 		    <tr class="Content">
@@ -26,9 +29,21 @@
 		        </td>
 			    <td class="Content">{{form.instance.filename}}</td>
 			    <td class="Content">{{form.instance.size}}</td>
-			    <td class="Content"><input type="submit" value="DOWNLOAD"></td>
-			    <td class="Content"><input type="submit" value="CHECK-OUT"></td>
-			    <td class="Content"><a href="./checkin/{{form.instance.id}}/">CHECK-IN</a></td>
+			    <td class="Content"><a href="/file/{{form.instance.id}}/">DOWNLOAD</a></td>
+			    <td class="Content">
+			        {% if is_owner %}
+			            <a href="./checkout/{{form.instance.id}}/">CHECK-OUT</a>
+		            {% else %}
+		                CHECK-OUT
+		            {% endif %}
+		            </td>
+			    <td class="Content">
+			        {% if is_owner %}
+			            <a href="./checkin/{{form.instance.id}}/">CHECK-IN</a>
+		            {% else %}
+		                CHECK-IN
+		            {% endif %}
+	            </td>
 		    </tr>
 	    {% endfor %}
 	    </table>
