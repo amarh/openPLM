@@ -181,9 +181,6 @@ class OpenPLMPluginInstance(object):
         self.insert_menu()
         self.update()
 
-        self._activate_id = self._window.connect('focus-in-event', \
-                self.on_window_activate)
-
         try:
             os.makedirs(self.OPENPLM_DIR, 0700)
         except os.error:
@@ -192,14 +189,10 @@ class OpenPLMPluginInstance(object):
     def stop(self):
         self.remove_menu()
 
-        if self._activate_id:
-            self._window.handler_disconnect(self._activate_id)
-
         self._window = None
         self._plugin = None
         self._action_group1 = None
         self._action_group2 = None
-        self._activate_id = 0
 
     def insert_menu(self):
         manager = self._window.get_ui_manager()
@@ -247,9 +240,6 @@ class OpenPLMPluginInstance(object):
 
     def update(self):
         pass
-
-    def on_window_activate(self, window, event):
-        self._plugin.dialog_transient_for(window)
 
     def login(self):
         """
@@ -313,6 +303,7 @@ class OpenPLMPluginInstance(object):
                         return
                     else:
                         doc = res["object"]
+                        unlock = diag.get_unlock()
                         diag.destroy()
                         # create a new doc
                         rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
@@ -329,6 +320,8 @@ class OpenPLMPluginInstance(object):
                             doc_file = self.upload_file(doc, path)
                             self.add_managed_file(doc, doc_file, path)
                             self.load_file(doc, doc_file["id"], path)
+                            if not unlock:
+                                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
                         save_document(self._window, gdoc, f)
                 else:
                     diag.destroy()
@@ -457,7 +450,6 @@ class OpenPLMPluginInstance(object):
                 url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
                 request = urllib2.Request(url, datagen, headers)
                 res = self.opener.open(request)
-                print res.read()
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
             if save:
@@ -479,7 +471,7 @@ class OpenPLMPluginInstance(object):
         diag = CheckInDialog(self._window, self, doc, name)
         resp = diag.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            self.check_in(gdoc, diag.get_unlocked())
+            self.check_in(gdoc, diag.get_unlock())
         diag.destroy()
     
     def revise(self, gdoc, revision, unlock):
@@ -536,9 +528,8 @@ class OpenPLMPluginInstance(object):
         diag = ReviseDialog(self._window, self, doc, name, revision)
         resp = diag.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            self.revise(gdoc, diag.get_revision(), diag.get_unlocked())
+            self.revise(gdoc, diag.get_revision(), diag.get_unlock())
         diag.destroy()
-
 
     def check_is_locked(self, doc_id, file_id, error_dialog=True):
         """
@@ -558,18 +549,17 @@ class CheckInDialog(gtk.Dialog):
         super(CheckInDialog, self).__init__(_("Check-in"), window,
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                        "Check-in", gtk.RESPONSE_ACCEPT))
-        self.instance = instance
+                        _("Check-in"), gtk.RESPONSE_ACCEPT))
         label = gtk.Label("%s|%s|%s" % (doc["reference"], doc["revision"],
                                         doc["type"]))
         self.vbox.pack_start(label)
         label2 = gtk.Label(filename)
         self.vbox.pack_start(label2)
-        self.unlock_button = gtk.CheckButton("Unlock ?")
+        self.unlock_button = gtk.CheckButton(_("Unlock ?"))
         self.vbox.pack_start(self.unlock_button)
         self.vbox.show_all()
 
-    def get_unlocked(self):
+    def get_unlock(self):
         return self.unlock_button.get_active()
 
 class ReviseDialog(gtk.Dialog):
@@ -579,7 +569,6 @@ class ReviseDialog(gtk.Dialog):
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                         "Revise", gtk.RESPONSE_ACCEPT))
-        self.instance = instance
         hbox = gtk.HBox()
         label = gtk.Label("%s|" % doc["reference"])
         hbox.pack_start(label)
@@ -597,7 +586,7 @@ class ReviseDialog(gtk.Dialog):
         self.vbox.pack_start(warn_message)
         self.vbox.show_all()
 
-    def get_unlocked(self):
+    def get_unlock(self):
         return self.unlock_button.get_active()      
     
     def get_revision(self):
@@ -715,9 +704,6 @@ class SearchDialog(gtk.Dialog):
         get = urllib.urlencode(data)
         self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
 
-    def set_doc(self, doc):
-        self.document = doc
-
     def do_action(self, button, doc, doc_file):
         pass
 
@@ -767,9 +753,9 @@ class LoginDialog(gtk.Dialog):
     
     def __init__(self, window):
         super(LoginDialog, self).__init__(_("Login"), window,
-                                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                                         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         table = gtk.Table(2, 2)
         self.vbox.pack_start(table)
         table.attach(gtk.Label(_("Username:")), 0, 1, 0, 1)
@@ -827,7 +813,12 @@ class CreateDialog(gtk.Dialog):
         self.vbox.pack_start(self.advanced_table)
         self.display_fields(self.TYPE)
         
+        self.unlock_button = gtk.CheckButton(_("Unlock ?"))
+        self.vbox.pack_start(self.unlock_button)
         self.vbox.show_all()
+
+    def get_unlock(self):
+        return self.unlock_button.get_active()
 
     def type_entry_activate_cb(self, entry):
         typename = entry.child.get_text()
@@ -885,8 +876,5 @@ class OpenPLMPlugin(gedit.Plugin):
     def update_ui(self, window):
         self.get_instance(window).update()
 
-    def dialog_transient_for(self, window):
-        if self._dialog:
-            self._dialog.set_transient_for(window)
 
 
