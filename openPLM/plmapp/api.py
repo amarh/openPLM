@@ -53,6 +53,10 @@ def json_view(func):
         return HttpResponse(json, mimetype='application/json')
     return wrap
 
+
+login_json = lambda f: api_login_required(json_view(f))
+
+
 def replace_white_spaces(Chain):
     """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
     return Chain.replace(" ","%20")
@@ -85,23 +89,19 @@ def get_obj_by_id(obj_id, user):
 def need_login(request):
     return {'result' : 'error', 'error' : 'user must be login'}
 
-@api_login_required
-@json_view
+@login_json
 def get_all_types(request):
     return {"types" : sorted(models.get_all_plmobjects().keys())}
 
-@api_login_required
-@json_view
+@login_json
 def get_all_docs(request):
     return {"types" : sorted(models.get_all_documents().keys())}
 
-@api_login_required
-@json_view
+@login_json
 def get_all_parts(request):
     return {"types" : sorted(models.get_all_parts().keys())}
 
-@api_login_required
-@json_view
+@login_json
 def search(request):
         
     if request.GET and "type" in request.GET:
@@ -123,19 +123,17 @@ def search(request):
                 return {"objects" : objects} 
     return {"result": "error"}
 
-@api_login_required
-@json_view
-def get_files(request, doc_id):
+@login_json
+def get_files(request, doc_id, all_files=False):
     document = models.Document.objects.get(id=doc_id)
     document = models.get_all_plmobjects()[document.type].objects.get(id=doc_id)
     files = []
     for df in document.files:
-        if not df.locked:
+        if all_files or not df.locked:
             files.append(dict(id=df.id, filename=df.filename, size=df.size))
     return {"files" : files}
 
-@api_login_required
-@json_view
+@login_json
 def check_out(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
@@ -143,8 +141,7 @@ def check_out(request, doc_id, df_id):
     return {}
 
 
-@api_login_required
-@json_view
+@login_json
 def check_in(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
@@ -153,15 +150,13 @@ def check_in(request, doc_id, df_id):
         doc.checkin(df, request.FILES['filename'])
     return {}
 
-@api_login_required
-@json_view
+@login_json
 def is_locked(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
     return {"locked" : df.locked}
 
-@api_login_required
-@json_view
+@login_json
 def unlock(request, doc_id, df_id):
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
@@ -183,13 +178,7 @@ def field_to_type(field):
             return types[key]
     return "text"
 
-@api_login_required
-@json_view
-def get_advanced_search_fields(request, typename):
-    try:
-        form = forms.get_search_form(models.get_all_plmobjects()[typename])
-    except KeyError:
-        return {"result" : "error", "fields" : []}
+def get_fields_from_form(form):
     fields = []
     for field_name, field in form.fields.iteritems():
         data = dict(name=field_name, label=field.label, initial=field.initial)
@@ -200,7 +189,23 @@ def get_advanced_search_fields(request, typename):
             if hasattr(field, attr):
                 data[attr] = getattr(field, attr)
         fields.append(data)
-    return {"fields" : fields}
+    return fields
+
+@login_json
+def get_advanced_search_fields(request, typename):
+    try:
+        form = forms.get_search_form(models.get_all_plmobjects()[typename])
+    except KeyError:
+        return {"result" : "error", "fields" : []}
+    return {"fields" : get_fields_from_form(form)}
+
+@login_json
+def get_creation_fields(request, typename):
+    try:
+        form = forms.get_creation_form(models.get_all_plmobjects()[typename])
+    except KeyError:
+        return {"result" : "error", "fields" : []}
+    return {"fields" : get_fields_from_form(form)}
 
 @json_view
 def api_login(request):
@@ -218,20 +223,17 @@ def api_login(request):
         return {"result" : 'error', 'error' : 'login invalid'}
 
 
-@api_login_required
-@json_view
+@login_json
 def test_login(request):
     # do nothing, if user is authenticated, json_view sets *result* to 'ok'
     return {}
 
-@api_login_required
-@json_view
+@login_json
 def next_revision(request, doc_id):
     doc = get_obj_by_id(doc_id, request.user)
     return {"revision" : get_next_revision(doc.revision)}
 
-@api_login_required
-@json_view
+@login_json
 def revise(request, doc_id):
     doc = get_obj_by_id(doc_id, request.user)
     form = forms.AddRevisionForm(request.POST)
@@ -247,17 +249,41 @@ def revise(request, doc_id):
     else:
         return {"result" : 'error'}
 
-@api_login_required
-@json_view
+@login_json
 def is_revisable(request, doc_id):
     doc = get_obj_by_id(doc_id, request.user)
     return {"revisable" : doc.is_revisable()}
 
 
-@api_login_required
-@json_view
+@login_json
 def attach_to_part(request, doc_id, part_id):
     doc = get_obj_by_id(doc_id, request.user)
     part = get_obj_by_id(part_id, request.user)
     doc.attach_to_part(part)
     return {}
+
+@login_json
+def create(request):
+    try:
+        type_name = request.POST["type"]
+        cls = models.get_all_plmobjects()[type_name]
+    except KeyError:
+        return {"result" : "error", 'error' : 'bad type'}
+    form = forms.get_creation_form(cls, request.POST)
+    if form.is_valid():
+        controller_cls = get_controller(type_name)
+        controller = controller_cls.create_from_form(form, request.user)
+        ret = {"object" : dict(id=controller.id, name=controller.name,
+                               type=controller.type, revision=controller.revision,
+                               reference=controller.reference)}
+        return ret
+    else:
+        return {"result" : "error", "errors" : forms.errors}
+
+@login_json
+def add_file(request, doc_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    add_file_form_instance = forms.AddFileForm(request.POST, request.FILES)
+    df = doc.add_file(request.FILES["filename"])
+    return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
+

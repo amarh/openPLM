@@ -25,7 +25,6 @@ import os
 import shutil
 import json
 import urllib
-import threading
 
 # poster makes it possible to send http request with files
 # sudo easy_install poster
@@ -52,11 +51,14 @@ ui_str = """
             <menuitem name="login" action="login"/>
             <separator/>
             <menuitem name="checkout" action="checkout"/>
-            <menuitem name="checkin" action="checkin"/>
             <menuitem name="download" action="download"/>
             <menuitem name="forget" action="forget"/>
+            <separator/>
+            <menuitem name="checkin" action="checkin"/>
             <menuitem name="revise" action="revise"/>
+            <separator/>
             <menuitem name="attach" action="attach"/>
+            <menuitem name="create" action="create"/>
          </menu>
          <separator/>
       </placeholder>
@@ -153,19 +155,7 @@ def save_document(window, gdoc, func):
     sig = tab.connect_after("notify::state", handler)
     gdoc.set_data("openplm_sig", sig)
     gedit.commands.save_document(window, gdoc)
- 
-def load_document(window, gdoc, path):
-    event = threading.Event()
-    def f():
-        def handler(*args):
-            gdoc.disconnect(gdoc.get_data("openplm_sig"))
-            event.set()
-        sig = gdoc.connect_after("load", handler)
-        gdoc.set_data("openplm_sig", sig)
-        #gdoc.load("file://" + path, gdoc.get_encoding(), 0, 0)
-        gedit.commands.load_uri(window, "file://" + path, gdoc.get_encoding(), 0)
-    threading.Thread(target=f).start()
-    event.wait()
+
 
 class OpenPLMPluginInstance(object):
     
@@ -222,6 +212,7 @@ class OpenPLMPluginInstance(object):
                  ])
 
         manager.insert_action_group(self._action_group1, -1)
+        # actions available only if connected
         self._action_group2 = gtk.ActionGroup("GeditOpenPLMPluginActions2")
         self._action_group2.add_actions([ 
                  ("checkout", None, _("Check-out"), None,
@@ -238,8 +229,9 @@ class OpenPLMPluginInstance(object):
                      _("Create a new revision in openPLM"),
                     lambda a:self.revise_cb()),
                  ("attach", None, _("Link with part"), None,
-                     _("Link with part"),
-                    lambda a:self.attach_cb()),
+                     _("Link with part"), lambda a:self.attach_cb()),
+                 ("create", None, _("Create"), None,
+                     _("Create"), lambda a:self.create_cb()),
                  ])
         self._action_group2.set_sensitive(False)
         manager.insert_action_group(self._action_group2, -1)
@@ -301,10 +293,60 @@ class OpenPLMPluginInstance(object):
         diag.doc = doc
         diag.run()
         diag.destroy()
+
+    def create_cb(self):
+        gdoc = self._window.get_active_document()
+        if not gdoc:
+            show_error(_("Need an opened file to create a document"))
+            return
+        if gdoc.get_data("openplm_doc"):
+            show_error(_("Current file already attached to a document"))
+            return
+        def func():
+            diag = CreateDialog(self._window, self)
+            def response_cb(diag, resp):
+                if resp == gtk.RESPONSE_ACCEPT:
+                    data = diag.get_creation_data()
+                    res = self.get_data("api/create/", data)
+                    if res["result"] != "ok":
+                        # TODO
+                        return
+                    else:
+                        doc = res["object"]
+                        diag.destroy()
+                        # create a new doc
+                        rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
+                                           doc["revision"])
+                        try:
+                            os.makedirs(rep, 0700)
+                        except os.error:
+                            # directory already exists, just ignores the exception
+                            pass
+                        filename = os.path.basename(gdoc.get_uri())
+                        path = os.path.join(rep, filename)
+                        gdoc.set_uri("file://" + path)
+                        def f():
+                            doc_file = self.upload_file(doc, path)
+                            self.add_managed_file(doc, doc_file, path)
+                            self.load_file(doc, doc_file["id"], path)
+                        save_document(self._window, gdoc, f)
+                else:
+                    diag.destroy()
+            diag.connect("response", response_cb)
+            diag.show()
+        save_document(self._window, gdoc, func)
     
     def get_data(self, url, data=None):
         data_enc = urllib.urlencode(data) if data else None
         return json.load(self.opener.open(self.SERVER + url, data_enc)) 
+
+    def upload_file(self, doc, path):
+        url = self.SERVER + "api/object/%s/add_file/" % doc["id"]
+        datagen, headers = multipart_encode({"filename": open(path, "rb")})
+        # Create the Request object
+        request = urllib2.Request(url, datagen, headers)
+        res = json.load(self.opener.open(request))
+        return res["doc_file"]
 
     def download(self, doc, doc_file):
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
@@ -384,12 +426,9 @@ class OpenPLMPluginInstance(object):
         for (doc_file_id, path), doc in self.get_managed_files():
             self.load_file(doc, doc_file_id, path)
 
-    def load_file(self, doc, doc_file_id, path, gdoc=None):
-        if gdoc:
-            load_document(self.window, gdoc, path)
-        else:
-            gedit.commands.load_uri(self._window, "file://" + path, None, -1)
-            gdoc = self._window.get_active_document()
+    def load_file(self, doc, doc_file_id, path):
+        gedit.commands.load_uri(self._window, "file://" + path, None, -1)
+        gdoc = self._window.get_active_document()
         gdoc.set_data("openplm_doc", doc)
         gdoc.set_data("openplm_file_id", doc_file_id)
         gdoc.set_data("openplm_path", path)
@@ -471,8 +510,6 @@ class OpenPLMPluginInstance(object):
             path = os.path.join(rep, name)
             gdoc.set_uri("file://" + path)
             def func():
-                #tab = gedit.tab_get_from_document(gdoc)
-                #self._window.close_tab(tab)
                 gd = self.load_file(new_doc, doc_file["id"], path)
                 self.add_managed_file(new_doc, doc_file, path)
                 self.check_in(gd, unlock, False)
@@ -571,6 +608,7 @@ class SearchDialog(gtk.Dialog):
     ACTION_NAME = _("...")
     TYPE = "Document"
     TYPES_URL = "api/docs/"
+    ALL_FILES = False
 
     def __init__(self, window, instance):
         super(SearchDialog, self).__init__(self.TITLE, window,
@@ -642,7 +680,9 @@ class SearchDialog(gtk.Dialog):
             box = widget.get_child()
             if box.get_children():
                 return
-            files = self.instance.get_data("api/object/%s/files/" % widget.res["id"])["files"]
+            suffix = "all/" if self.ALL_FILES else ""
+            url = "api/object/%s/files/%s" % (widget.res["id"], suffix)
+            files = self.instance.get_data(url)["files"]
             for f in files:
                 hbox = gtk.HBox()
                 label = gtk.Label(f["filename"])
@@ -693,6 +733,7 @@ class CheckOutDialog(SearchDialog):
 class DownloadDialog(SearchDialog):
     TITLE = _("Download")
     ACTION_NAME = _("Download")
+    ALL_FILES = True
 
     def do_action(self, button, doc, doc_file):
         self.instance.download(doc, doc_file)
@@ -754,6 +795,72 @@ class LoginDialog(gtk.Dialog):
     def get_password(self):
         return self.pw_entry.get_text()
 
+
+class CreateDialog(gtk.Dialog):
+    TITLE = _("Create")
+    TYPE = "Document"
+    TYPES_URL = "api/docs/"
+
+    def __init__(self, window, instance):
+        super(CreateDialog, self).__init__(self.TITLE, window,
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  
+                        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self.instance = instance
+        docs = self.instance.get_data(self.TYPES_URL)
+        self.types = docs["types"]
+        table = gtk.Table(2, 1)
+        self.vbox.pack_start(table)
+        self.type_entry = gtk.combo_box_entry_new_text()
+        for t in docs["types"]:
+            self.type_entry.append_text(t)
+        self.type_entry.child.set_text(self.TYPE)
+        self.type_entry.connect("changed", self.type_entry_activate_cb)
+        self.fields = [("type", self.type_entry),
+                      ]
+        for i, (text, entry) in enumerate(self.fields): 
+            table.attach(gtk.Label(_(text.capitalize()+":")), 0, 1, i, i+1)
+            table.attach(entry, 1, 2, i, i+1)
+        
+        self.advanced_table = gtk.Table(2, 3)
+        self.advanced_fields = []
+        self.vbox.pack_start(self.advanced_table)
+        self.display_fields(self.TYPE)
+        
+        self.vbox.show_all()
+
+    def type_entry_activate_cb(self, entry):
+        typename = entry.child.get_text()
+        if typename in self.types:
+            self.display_fields(typename)
+
+    def display_fields(self, typename):
+        fields = self.instance.get_data("api/creation_fields/%s/" % typename)["fields"]
+        temp = {}
+        for field, entry in self.advanced_fields:
+            temp[field["name"]] = get_value(entry, field)
+        for child in self.advanced_table.get_children():
+            child.destroy()
+        self.advanced_fields = []
+        self.advanced_table.resize(2, len(fields))
+        for i, field in enumerate(fields):
+            text = field["label"]
+            self.advanced_table.attach(gtk.Label(_(text.capitalize()+":")),
+                                       0, 1, i, i+1)
+            widget = field_to_widget(field)
+            if field["name"] in temp:
+                set_value(widget, temp[field["name"]])
+            self.advanced_table.attach(widget, 1, 2, i, i+1)
+            self.advanced_fields.append((field, widget))
+        self.advanced_table.show_all()
+
+    def get_creation_data(self):
+        data = {}
+        for field_name, widget in self.fields:
+            data[field_name] = get_value(widget, None)
+        for field, widget in self.advanced_fields:
+            data[field["name"]] = get_value(widget, field)
+        return data
 
 class OpenPLMPlugin(gedit.Plugin):
     DATA_TAG = "OpenPLMPluginInstance"
