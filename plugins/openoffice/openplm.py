@@ -11,9 +11,14 @@ from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHand
 import urllib2
 
 import traceback
+import uno
 import unohelper
 
 from com.sun.star.task import XJobExecutor
+from com.sun.star.awt import XActionListener, XItemListener
+from com.sun.star.awt.InvalidateStyle import CHILDREN, UPDATE
+from com.sun.star.awt.tree import XTreeExpansionListener
+from com.sun.star.view import XSelectionChangeListener
 
 
 class OpenPLMPluginInstance(object):
@@ -336,8 +341,8 @@ class OpenPLMPluginInstance(object):
 
 
 PLUGIN = OpenPLMPluginInstance()
-
-from com.sun.star.awt import XActionListener
+def show_error(message, parent=None):
+    print message
 
 class Dialog(unohelper.Base, XActionListener):
     def __init__(self, ctx):
@@ -345,17 +350,70 @@ class Dialog(unohelper.Base, XActionListener):
         self.msg = None
 
     def addWidget(self, name, type, x, y, w, h, **kwargs):
-        widget = self.dialog.createInstance('com.sun.star.awt.UnoControl%sModel' % type)
+        if "." in type:
+            widget = self.dialog.createInstance('com.sun.star.awt.%s' % type)
+        else:
+            widget = self.dialog.createInstance('com.sun.star.awt.UnoControl%sModel' % type)
         widget.Name = name
-        widget.PositionX = x
-        widget.PositionY = y
-        widget.Width = w
-        widget.Height = h
+        widget.PositionX = int(x)
+        widget.PositionY = int(y)
+        widget.Width = int(w)
+        widget.Height = int(h)
         for k, w in kwargs.items():
             setattr(widget, k, w)
         self.dialog.insertByName(name, widget)
         return widget
     
+
+    def get_value(self, entry, field):
+        value = None
+        if hasattr(entry, "Text"):
+            value = entry.Text
+        elif hasattr(entry, 'SelectedItems'):
+            if not field:
+                value = entry.StringItemList[entry.SelectedItems[0]]
+            else:
+                value = field["choices"][entry.SelectedItems[0]][0]
+        elif hasattr(entry, "State"):
+            value = bool(entry.State)
+        return value
+
+    def set_value(self, entry, value, field=None):
+        if hasattr(entry, "Text"):
+            entry.Text = value or ''
+        elif hasattr(entry, 'SelectedItems'):
+            choices = [c[0] for c in field["choices"]]
+            entry.SelectedItems = (choices.index(value or ''), )
+        elif hasattr(entry, "State"):
+            entry.State = int(value or 0)
+    
+    def field_to_widget(self, field, x, y, w, h):
+        type = ""
+        attributes = {}
+        if field["type"] in ("text", "int", "decimal", "float"):
+            type = "Edit"
+        elif field["type"] == "boolean":
+            type = "CheckBox"
+        elif field["type"] == "choice":
+            type = "ListBox"
+            choices = field["choices"]
+            if [u'', u'---------'] not in choices:
+                choices = ([u'', u'---------'],) + tuple(choices)
+            field["choices"] = choices
+            values = []
+            for _, c in choices:
+                values.append(c)
+            attributes['StringItemList'] = tuple(values)
+            attributes['Dropdown'] = True
+            attributes['MultiSelection'] = False
+        if type == "":
+            raise ValueError()
+        widget = self.addWidget("%s_entry" % field["name"], type, x, y, w, h,
+                                **attributes) 
+        self.set_value(widget, field["initial"], field)
+        return widget
+
+
     def run(self):
         pass
 
@@ -374,7 +432,7 @@ class LoginDialog(Dialog):
         label = self.addWidget('Username', 'FixedText', 5, 10, 100, 14,
                                Label = 'Username:')
         self.username = self.addWidget('UsernameEntry', 'Edit', 90, 10, 100, 14)
-        label = self.addWidget('assword', 'FixedText', 5, 30, 100, 14,
+        label = self.addWidget('password', 'FixedText', 5, 30, 100, 14,
                                Label = 'Password:')
         self.password = self.addWidget('PasswordEntry', 'Edit', 90, 30, 100, 14,
                                        EchoChar=ord('*'))
@@ -403,47 +461,180 @@ class LoginDialog(Dialog):
         except:
             traceback.print_exc()
 
-class CheckOutDialog(Dialog):
+class SearchDialog(Dialog, XItemListener,
+                   XTreeExpansionListener, XSelectionChangeListener):
+
+    TITLE = "Search"
+    ACTION_NAME = "..."
+    TYPE = "Document"
+    TYPES_URL = "api/docs/"
+    ALL_FILES = False
+
+    WIDTH = 200
+    HEIGHT = 300
+    PAD = 5
+    ROW_HEIGHT = 15
+    ROW_PAD = 2
+
+
+    def get_position(self, row, column):
+        if column == 1:
+            x = self.PAD
+            w = (self.WIDTH - 3 * self.PAD) / 3
+        else:
+            x = self.PAD * 2 + (self.WIDTH-3*self.PAD) *1/3
+            w = (self.WIDTH - 3 * self.PAD) * 2 / 3
+        y = self.PAD + (self.ROW_HEIGHT + self.ROW_PAD) * row
+        return x, y, w, self.ROW_HEIGHT
 
     def run(self):
+        
+        docs = PLUGIN.get_data(self.TYPES_URL)
+        self.types = docs["types"]
+
         smgr = self.ctx.ServiceManager
         self.dialog = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = 200
-        self.dialog.Height = 105
-        self.dialog.Title = 'Login'
-        label = self.addWidget('Username', 'FixedText', 5, 10, 100, 14,
-                               Label = 'Username:')
-        self.username = self.addWidget('UsernameEntry', 'Edit', 90, 10, 100, 14)
-        label = self.addWidget('assword', 'FixedText', 5, 30, 100, 14,
-                               Label = 'Password:')
-        self.password = self.addWidget('PasswordEntry', 'Edit', 90, 30, 100, 14,
-                                       EchoChar=ord('*'))
+        self.dialog.Width = self.WIDTH
+        self.dialog.Height = self.HEIGHT
+        self.dialog.Title = self.TITLE
+        
+        fields = [("type", 'ListBox'),
+                  ("reference", 'Edit'),
+                  ("revision", 'Edit'),
+                 ]
+        self.fields = []
+        for i, (text, entry) in enumerate(fields): 
+            x, y, w, h = self.get_position(i, 1)
+            label = self.addWidget('%s_label' % text, 'FixedText', x, y, w, h,
+                               Label = '%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i, 2)
+            widget = self.addWidget('%s_entry' % text, entry, x, y, w, h)
+            self.fields.append((text, widget))
 
-        button = self.addWidget('login', 'Button', 55, 85, 50, 14,
-                                Label = 'Login')
+        self.type_entry = self.fields[0][1]
+        self.type_entry.StringItemList = tuple(self.types)
+        self.type_entry.SelectedItems = (self.types.index(self.TYPE),)
+        self.type_entry.Dropdown = True
+        self.type_entry.MultiSelection = False
+        
+        self.advanced_fields = []
+        self.display_fields(self.TYPE)
+        
+        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 2)
+        self.search_button = self.addWidget('search_button', 'Button', x, y, w, h,
+                                Label = 'Search')
+        
+        self.tree = self.addWidget('tree', 'tree.TreeControlModel', 
+                                   self.PAD, y + h +5, self.WIDTH-2*self.PAD, self.HEIGHT- (y+ h + 20))
+
+        self.tree_model = self.createService("com.sun.star.awt.tree.MutableTreeDataModel")
+        self.tree_root = self.tree_model.createNode("Results", True)
+        self.tree_model.setRoot(self.tree_root)
+        self.tree.DataModel = self.tree_model
+        
+        #self.tree.addSelectionChangeListener(self)
+
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
         self.container.setModel(self.dialog)
-        self.container.getControl('login').addActionListener(self)
+        self.container.getControl('search_button').addActionListener(self)
+        self.container.getControl('type_entry').addItemListener(self)
+        self.container.getControl('tree').addTreeExpansionListener(self)
         toolkit = smgr.createInstanceWithContext(
             'com.sun.star.awt.ExtToolkit', self.ctx)
         self.container.setVisible(False)
         self.container.createPeer(toolkit, None)
         self.container.execute()
 
+    def createService(self, cClass):
+        return self.ctx.ServiceManager.createInstanceWithContext(cClass, self.ctx)
+
+
+    def display_fields(self, typename):
+        fields = PLUGIN.get_data("api/search_fields/%s/" % typename)["fields"]
+        temp = {}
+        for field, entry in self.advanced_fields:
+            temp[field["name"]] = self.get_value(entry, field)
+            entry.PositionX = -1000
+            entry.PositionY = -1000
+            entry.dispose()
+            self.dialog.removeByName(entry.Name)
+            label = self.dialog.getByName("%s_label" % field["name"])
+            label.dispose()
+            label.PositionX = -1000
+            label.PositionY = -1000
+            self.dialog.removeByName("%s_label" % field["name"])
+        self.advanced_fields = []
+        j = len(self.fields)
+        for i, field in enumerate(fields):
+            text = field["label"]
+            x, y, w, h = self.get_position(i + j, 1)
+            label = self.addWidget('%s_label' % field["name"], 'FixedText',
+                                   x, y, w, h,
+                                   Label = '%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i + j, 2)
+            widget = self.field_to_widget(field, x, y, w, h)
+            if field["name"] in temp:
+                self.set_value(widget, temp[field["name"]], field)
+            self.advanced_fields.append((field, widget))
+        if hasattr(self, 'container'):
+            self.container.getPeer().invalidate(UPDATE|1)
+            #self.container.setVisible(True)
+            x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 2)
+            self.search_button.PositionX = x
+            self.search_button.PositionY = y
+
     def actionPerformed(self, actionEvent):
         try:
-            username = self.username.Text
-            password = self.password.Text
-            try:
-                PLUGIN.login(username, password)
-                self.container.endExecute()
-            except ValueError, e:
-                print e
+            self.search()
         except:
             traceback.print_exc()
 
+    def itemStateChanged(self, itemEvent):
+        try:
+            typename = self.types[self.type_entry.SelectedItems[0]]
+            self.display_fields(typename)
+        except:
+            traceback.print_exc()
+
+    def requestChildNodes(self, event):
+        res = self.nodes[event.Node.getDisplayValue()]
+        suffix = "all/" if self.ALL_FILES else ""
+        url = "api/object/%s/files/%s" % (res["id"], suffix)
+        files = PLUGIN.get_data(url)["files"]
+        res["files"] = files
+        for f in files:
+            node = self.tree_model.createNode(f["filename"], False)
+            event.Node.appendChild(node)
+
+    def display_results(self, results):
+        self.nodes = {}
+        while self.tree_root.getChildCount():
+            self.tree_root.removeChildByIndex(0)
+        for res in results:
+            text = "%(reference)s|%(type)s|%(revision)s" % res
+            node = self.tree_model.createNode(text, True)
+            self.tree_root.appendChild(node)
+            self.nodes[node.getDisplayValue()] = res
+
+    def search(self, *args):
+        data = {}
+        for text, entry in self.fields:
+            value = self.get_value(entry, None)
+            if value:
+                data[text] = value
+        for field, entry in self.advanced_fields:
+            value = self.get_value(entry, field)
+            if value:
+                data[field["name"]] = value
+        get = urllib.urlencode(data)
+        self.display_results(PLUGIN.get_data("api/search/?%s" % get)["objects"])
+
+
+class CheckOutDialog(SearchDialog):
+    TITLE = "Check-out..."
+    ACTION_NAME = "Check-out"
 
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
