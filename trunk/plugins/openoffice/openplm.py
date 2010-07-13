@@ -19,6 +19,7 @@ from com.sun.star.awt import XActionListener, XItemListener
 from com.sun.star.awt.InvalidateStyle import CHILDREN, UPDATE
 from com.sun.star.awt.tree import XTreeExpansionListener
 from com.sun.star.view import XSelectionChangeListener
+from com.sun.star.view.SelectionType import SINGLE
 
 
 class OpenPLMPluginInstance(object):
@@ -216,21 +217,10 @@ class OpenPLMPluginInstance(object):
             self.load_file(doc, doc_file_id, path)
 
     def load_file(self, doc, doc_file_id, path):
-        gedit.commands.load_uri(self._window, "file://" + path, None, -1)
-        gdoc = self._window.get_active_document()
+        document = desktop.loadComponentFromURL("file://" + path ,"_blank", 0, ()) 
         gdoc.set_data("openplm_doc", doc)
         gdoc.set_data("openplm_file_id", doc_file_id)
         gdoc.set_data("openplm_path", path)
-        if not gdoc.get_data("openplm_label"):
-            tab = self._window.get_active_tab()
-            notebook = tab.get_parent()
-            tab_label = notebook.get_tab_label(tab)
-            box = tab_label.get_children()[0].get_child()
-            # tag already present if we refresh the file
-            label = gtk.Label("[PLM]")
-            label.show()
-            box.pack_start(label)
-            gdoc.set_data("openplm_label", label)
         return gdoc
 
     def check_in(self, gdoc, unlock, save=True):
@@ -526,19 +516,24 @@ class SearchDialog(Dialog, XItemListener,
                                 Label = 'Search')
         
         self.tree = self.addWidget('tree', 'tree.TreeControlModel', 
-                                   self.PAD, y + h +5, self.WIDTH-2*self.PAD, self.HEIGHT- (y+ h + 20))
+                                   self.PAD, y + h +5, self.WIDTH-2*self.PAD, self.HEIGHT- (y+  2*h + 20))
 
         self.tree_model = self.createService("com.sun.star.awt.tree.MutableTreeDataModel")
         self.tree_root = self.tree_model.createNode("Results", True)
         self.tree_model.setRoot(self.tree_root)
         self.tree.DataModel = self.tree_model
+        self.tree.SelectionType = SINGLE
         
+        y = self.HEIGHT - self.PAD - h
+        self.action_button = self.addWidget('action_button', 'Button', x, y, w, h,
+                                Label = self.ACTION_NAME)
         #self.tree.addSelectionChangeListener(self)
 
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
         self.container.setModel(self.dialog)
         self.container.getControl('search_button').addActionListener(self)
+        self.container.getControl('action_button').addActionListener(self)
         self.container.getControl('type_entry').addItemListener(self)
         self.container.getControl('tree').addTreeExpansionListener(self)
         toolkit = smgr.createInstanceWithContext(
@@ -584,10 +579,19 @@ class SearchDialog(Dialog, XItemListener,
             x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 2)
             self.search_button.PositionX = x
             self.search_button.PositionY = y
+            pos = self.tree.PositionY
+            self.tree.PositionY = y + h + 5
+            self.tree.Height -= self.tree.PositionY - pos
 
     def actionPerformed(self, actionEvent):
         try:
-            self.search()
+            if actionEvent.Source == self.container.getControl('search_button'):
+                self.search()
+            elif actionEvent.Source == self.container.getControl('action_button'):
+                node =  self.container.getControl('tree').getSelection()
+                doc = self.nodes[node.getParent().getDisplayValue()]
+                doc_file = doc["files"][node.getParent().getIndex(node)]
+                self.do_action(doc, doc_file)
         except:
             traceback.print_exc()
 
@@ -607,6 +611,7 @@ class SearchDialog(Dialog, XItemListener,
         for f in files:
             node = self.tree_model.createNode(f["filename"], False)
             event.Node.appendChild(node)
+        self.container.getPeer().invalidate(UPDATE|1)
 
     def display_results(self, results):
         self.nodes = {}
@@ -617,6 +622,7 @@ class SearchDialog(Dialog, XItemListener,
             node = self.tree_model.createNode(text, True)
             self.tree_root.appendChild(node)
             self.nodes[node.getDisplayValue()] = res
+        self.container.getPeer().invalidate(UPDATE|1)
 
     def search(self, *args):
         data = {}
@@ -631,10 +637,16 @@ class SearchDialog(Dialog, XItemListener,
         get = urllib.urlencode(data)
         self.display_results(PLUGIN.get_data("api/search/?%s" % get)["objects"])
 
+    def do_action(self, doc, doc_file):
+        print doc, doc_file
 
 class CheckOutDialog(SearchDialog):
     TITLE = "Check-out..."
     ACTION_NAME = "Check-out"
+
+    def do_action(self, doc, doc_file):
+        PLUGIN.check_out(doc, doc_file)
+        self.container.endExecute()
 
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
