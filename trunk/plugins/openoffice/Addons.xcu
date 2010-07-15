@@ -62,10 +62,10 @@
                     
                     <node oor:name="m5" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
-                            <value>Check-in</value>
+                            <value>Revise</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
-                            <value>service:org.example.OpenPLMCheckIn</value>
+                            <value>service:org.example.OpenPLMRevise</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>

@@ -11,17 +11,16 @@ from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHand
 import urllib2
 
 import traceback
-import uno
 import unohelper
 
 from com.sun.star.beans import PropertyValue
 from com.sun.star.task import XJobExecutor
 from com.sun.star.awt import XActionListener, XItemListener
-from com.sun.star.awt.InvalidateStyle import CHILDREN, UPDATE
+from com.sun.star.awt.InvalidateStyle import UPDATE
 from com.sun.star.awt.tree import XTreeExpansionListener
 from com.sun.star.view import XSelectionChangeListener
 from com.sun.star.view.SelectionType import SINGLE
-
+from com.sun.star.util import CloseVetoException
 
 class OpenPLMPluginInstance(object):
     
@@ -67,11 +66,6 @@ class OpenPLMPluginInstance(object):
         else:
             raise ValueError()
 
-    def download_cb(self):
-        diag = DownloadDialog(self._window, self)
-        diag.run()
-        diag.destroy()
-        
     def attach_cb(self):
         gdoc = self._window.get_active_document()
         doc = gdoc.get_data("openplm_doc")
@@ -262,15 +256,14 @@ class OpenPLMPluginInstance(object):
             pass
 
     def revise(self, gdoc, revision, unlock):
-        doc = gdoc.get_data("openplm_doc")
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        path = gdoc.get_data("openplm_path")
-        if doc and doc_file_id and path:
-          
+        if gdoc and gdoc.URL in self.documents:
+            doc = self.documents[gdoc.URL]["openplm_doc"]
+            doc_file_id = self.documents[gdoc.URL]["openplm_file_id"]
+            path = self.documents[gdoc.URL]["openplm_path"]
             res = self.get_data("api/object/%s/revise/" % doc["id"],
                                 {"revision" : revision})
             new_doc = res["doc"]
-            name = os.path.basename(gdoc.get_uri())
+            name = os.path.basename(gdoc.URL)
             doc_file = None
             for f in res["files"]:
                 if f["filename"] == name:
@@ -284,39 +277,18 @@ class OpenPLMPluginInstance(object):
             except os.error:
                 # directory already exists, just ignores the exception
                 pass
-
-            self.forget(gdoc)
-            path = os.path.join(rep, name)
-            gdoc.set_uri("file://" + path)
-            def func():
-                gd = self.load_file(new_doc, doc_file["id"], path)
-                self.add_managed_file(new_doc, doc_file, path)
-                self.check_in(gd, unlock, False)
-                self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
-            save_document(self._window, gdoc, func)
+            
+            gdoc.store()
+            new_path = os.path.join(rep, name)
+            shutil.move(path, new_path)
+            self.forget(gdoc, delete=False)
+            gd = self.load_file(new_doc, doc_file["id"], new_path)
+            self.add_managed_file(new_doc, doc_file, new_path)
+            self.check_in(gd, unlock, False)
+            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
         else:
             # TODO
             print 'can not revise'
-
-    def revise_cb(self):
-        gdoc = self._window.get_active_document()
-        doc = gdoc.get_data("openplm_doc")
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        if not doc or not self.check_is_locked(doc["id"], doc_file_id):
-            return
-        revisable = self.get_data("api/object/%s/isrevisable/" % doc["id"])["revisable"]
-        if not revisable:
-            show_error(_("Document can not be revised"), self._window)
-            return
-        name = os.path.basename(gdoc.get_data("openplm_path"))
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        res = self.get_data("api/object/%s/nextrevision/" % doc["id"])
-        revision = res["revision"]
-        diag = ReviseDialog(self._window, self, doc, name, revision)
-        resp = diag.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            self.revise(gdoc, diag.get_revision(), diag.get_unlock())
-        diag.destroy()
 
     def check_is_locked(self, doc_id, file_id, error_dialog=True):
         """
@@ -327,7 +299,7 @@ class OpenPLMPluginInstance(object):
         """
         locked = self.get_data("api/object/%s/islocked/%s/" % (doc_id, file_id))["locked"]
         if not locked and error_dialog:
-            show_error(_("File is not locked, action not allowed"), self._window)
+            show_error("File is not locked, action not allowed")
         return locked
 
 
@@ -691,7 +663,7 @@ class CheckInDialog(Dialog):
         text = "%s|%s|%s" % (self.doc["reference"], self.doc["revision"],
                                        self.doc["type"])
 
-        label = self.addWidget('Username', 'FixedText', 5, 10, 60, 14,
+        label = self.addWidget('label', 'FixedText', 5, 10, 60, 14,
                                Label = text)
         self.unlock_button = self.addWidget('unlock_button', 'CheckBox',
                                             5, 30, 100, 14, Label='Unlock ?')
@@ -720,6 +692,65 @@ class CheckInDialog(Dialog):
                 print e
         except:
             traceback.print_exc()
+
+class ReviseDialog(Dialog):
+
+    TITLE = "Revise..."
+    ACTION_NAME = "Revise"
+    WIDTH = 200
+    HEIGHT = 100
+
+    def __init__(self, ctx, doc, name, revision):
+        Dialog.__init__(self, ctx)
+        self.doc = doc
+        self.name = name
+        self.revision = revision
+
+    def run(self):
+        smgr = self.ctx.ServiceManager
+        self.dialog = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
+        self.dialog.Width = self.WIDTH
+        self.dialog.Height = self.HEIGHT
+        self.dialog.Title = self.TITLE
+        
+        text = "%s|" % self.doc["reference"]
+        label = self.addWidget('ref', 'FixedText', 5, 10, 60, 14,
+                               Label = text)
+        self.revision_entry = self.addWidget("rev_button", "Edit", 70, 10, 60, 14,
+                                              Text=self.revision)
+        text = "|%s" % self.doc["type"]
+        label = self.addWidget('type', 'FixedText', 135, 10, 60, 14,
+                               Label=text)
+        self.unlock_button = self.addWidget('unlock_button', 'CheckBox',
+                                            5, 30, 100, 14, Label='Unlock ?')
+
+        button = self.addWidget('action', 'Button', 55, 85, 50, 14,
+                                Label=self.ACTION_NAME)
+        self.container = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialog', self.ctx)
+        self.container.setModel(self.dialog)
+        self.container.getControl('action').addActionListener(self)
+        toolkit = smgr.createInstanceWithContext(
+            'com.sun.star.awt.ExtToolkit', self.ctx)
+        self.container.setVisible(False)
+        self.container.createPeer(toolkit, None)
+        self.container.execute()
+
+    def actionPerformed(self, actionEvent):
+        try:
+            try:
+                desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+                PLUGIN.revise(desktop.getCurrentComponent(),
+                                self.get_value(self.revision_entry, None),
+                                self.get_value(self.unlock_button, None))
+                self.container.endExecute()
+            except ValueError, e:
+                print e
+        except:
+            traceback.print_exc()
+
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
@@ -798,10 +829,41 @@ class OpenPLMCheckIn(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
+class OpenPLMRevise(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            gdoc = desktop.getCurrentComponent()
+            if gdoc and gdoc.URL in PLUGIN.documents:
+                doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
+                doc_file_id = PLUGIN.documents[gdoc.URL]["openplm_file_id"]
+                path = PLUGIN.documents[gdoc.URL]["openplm_path"]
+                if not doc or not PLUGIN.check_is_locked(doc["id"], doc_file_id):
+                    return
+                revisable = PLUGIN.get_data("api/object/%s/isrevisable/" % doc["id"])["revisable"]
+                if not revisable:
+                    show_error("Document can not be revised")
+                    return
+                res = PLUGIN.get_data("api/object/%s/nextrevision/" % doc["id"])
+                revision = res["revision"]
+                name = os.path.basename(path)
+                dialog = ReviseDialog(self.ctx, doc, name, revision)
+                dialog.run()
+                try:
+                    gdoc.close(True)
+                except CloseVetoException:
+                    pass
+        except:
+            traceback.print_exc()
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
 for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload, OpenPLMForget,
-            OpenPLMCheckIn):
+            OpenPLMCheckIn, OpenPLMRevise):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
