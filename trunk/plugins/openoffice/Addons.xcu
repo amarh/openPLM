@@ -47,6 +47,30 @@
                             <value>_self</value>
                         </prop>
                     </node>
+                    
+                    <node oor:name="m4" oor:op="replace">
+                        <prop oor:name="Title" oor:type="xs:string">
+                            <value>Forget current file</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>service:org.example.OpenPLMForget</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
+                    
+                    <node oor:name="m5" oor:op="replace">
+                        <prop oor:name="Title" oor:type="xs:string">
+                            <value>Check-in</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>service:org.example.OpenPLMCheckIn</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
  
                 </node>
             </node>
