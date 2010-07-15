@@ -194,7 +194,11 @@ background-color: #fef176;
 }
 
 .MenuTable a
-{text-decoration: none;
+{
+height: 40px;
+display: block;
+line-height: 2.5;
+text-decoration: none;
 color: black;
 }
 
@@ -270,5 +274,21 @@ border: 1px solid #000000
 width: 790px;
 height: 430px;
 background-color: #FFFFFF;
+overflow: hidden;
+}
+
+img#img_nav
+{
+float: top;
+position: relative;
+border-style: none;
+}
+
+img#img_management
+{
+position: absolute;
+right: 110px;
+top: 210px;
+border-style: none;
 }
 
