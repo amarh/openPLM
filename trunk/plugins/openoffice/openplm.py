@@ -305,7 +305,7 @@ def show_error(message, parent=None):
 
 class Dialog(unohelper.Base, XActionListener):
 
-    TITLE = "Search"
+    TITLE = "..."
     ACTION_NAME = "..."
 
     WIDTH = 200
@@ -317,7 +317,13 @@ class Dialog(unohelper.Base, XActionListener):
     def __init__(self, ctx):
         self.ctx = ctx
         self.msg = None
-
+        smgr = self.ctx.ServiceManager
+        self.dialog = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
+        self.dialog.Width = self.WIDTH
+        self.dialog.Height = self.HEIGHT
+        self.dialog.Title = self.TITLE
+   
     def addWidget(self, name, type, x, y, w, h, **kwargs):
         if "." in type:
             widget = self.dialog.createInstance('com.sun.star.awt.%s' % type)
@@ -381,7 +387,6 @@ class Dialog(unohelper.Base, XActionListener):
         self.set_value(widget, field["initial"], field)
         return widget
 
-
     def run(self):
         pass
 
@@ -389,24 +394,21 @@ class Dialog(unohelper.Base, XActionListener):
         pass
 
 class LoginDialog(Dialog):
-
+    HEIGHT = 105
+    TITLE = 'Login'
+    
     def run(self):
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = 200
-        self.dialog.Height = 105
-        self.dialog.Title = 'Login'
         label = self.addWidget('Username', 'FixedText', 5, 10, 60, 14,
-                               Label = 'Username:')
+                               Label='Username:')
         self.username = self.addWidget('UsernameEntry', 'Edit', 90, 10, 100, 14)
         label = self.addWidget('password', 'FixedText', 5, 30, 60, 14,
-                               Label = 'Password:')
+                               Label='Password:')
         self.password = self.addWidget('PasswordEntry', 'Edit', 90, 30, 100, 14,
                                        EchoChar=ord('*'))
 
         button = self.addWidget('login', 'Button', 55, 85, 50, 14,
-                                Label = 'Login')
+                                Label='Login')
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
         self.container.setModel(self.dialog)
@@ -431,20 +433,18 @@ class LoginDialog(Dialog):
 
 class ConfigureDialog(Dialog):
 
+    TITLE = "Conffigure"
+    HEIGHT = 105
+
     def run(self):
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = 200
-        self.dialog.Height = 105
-        self.dialog.Title = 'Configure'
         label = self.addWidget('url', 'FixedText', 5, 10, 60, 14,
                                Label="OpenPLM server's location:")
         self.url_entry = self.addWidget('UrlEntry', 'Edit', 90, 10, 100, 14)
         self.url_entry.Text = PLUGIN.SERVER
 
         button = self.addWidget('configure', 'Button', 55, 85, 50, 14,
-                                Label = 'Configure')
+                                Label='Configure')
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
         self.container.setModel(self.dialog)
@@ -479,7 +479,6 @@ class SearchDialog(Dialog, XItemListener,
     ROW_HEIGHT = 15
     ROW_PAD = 2
 
-
     def get_position(self, row, column):
         if column == 1:
             x = self.PAD
@@ -496,11 +495,6 @@ class SearchDialog(Dialog, XItemListener,
         self.types = docs["types"]
 
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = self.WIDTH
-        self.dialog.Height = self.HEIGHT
-        self.dialog.Title = self.TITLE
         
         fields = [("type", 'ListBox'),
                   ("reference", 'Edit'),
@@ -540,7 +534,6 @@ class SearchDialog(Dialog, XItemListener,
         y = self.HEIGHT - self.PAD - h
         self.action_button = self.addWidget('action_button', 'Button', x, y, w, h,
                                 Label = self.ACTION_NAME)
-        #self.tree.addSelectionChangeListener(self)
 
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
@@ -562,33 +555,30 @@ class SearchDialog(Dialog, XItemListener,
         fields = PLUGIN.get_data("api/search_fields/%s/" % typename)["fields"]
         temp = {}
         for field, entry in self.advanced_fields:
-            temp[field["name"]] = self.get_value(entry, field)
-            entry.PositionX = -1000
-            entry.PositionY = -1000
+            name = field["name"]
+            temp[name] = self.get_value(entry, field)
+            self.container.getControl(entry.Name).setVisible(False)
             entry.dispose()
             self.dialog.removeByName(entry.Name)
-            label = self.dialog.getByName("%s_label" % field["name"])
+            label = self.dialog.getByName("%s_label" % name)
+            self.container.getControl(label.Name).setVisible(False)
             label.dispose()
-            label.PositionX = -1000
-            label.PositionY = -1000
-            self.dialog.removeByName("%s_label" % field["name"])
+            self.dialog.removeByName(label.Name)
         self.advanced_fields = []
-        j = len(self.fields)
+        row = len(self.fields)
         for i, field in enumerate(fields):
-            text = field["label"]
-            x, y, w, h = self.get_position(i + j, 1)
-            label = self.addWidget('%s_label' % field["name"], 'FixedText',
-                                   x, y, w, h,
-                                   Label = '%s:' % text.capitalize())
-            x, y, w, h = self.get_position(i + j, 2)
+            text, name = field["label"], field["name"]
+            x, y, w, h = self.get_position(i + row, 1)
+            label = self.addWidget('%s_label' % name, 'FixedText',
+                                   x, y, w, h, Label='%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i + row, 2)
             widget = self.field_to_widget(field, x, y, w, h)
-            if field["name"] in temp:
-                self.set_value(widget, temp[field["name"]], field)
+            if name in temp:
+                self.set_value(widget, temp[name], field)
             self.advanced_fields.append((field, widget))
         if hasattr(self, 'container'):
             self.container.getPeer().invalidate(UPDATE|1)
-            #self.container.setVisible(True)
-            x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 2)
+            x, y, w, h = self.get_position(row + i + 2, 2)
             self.search_button.PositionX = x
             self.search_button.PositionY = y
             pos = self.tree.PositionY
@@ -684,11 +674,6 @@ class CheckInDialog(Dialog):
 
     def run(self):
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = self.WIDTH
-        self.dialog.Height = self.HEIGHT
-        self.dialog.Title = self.TITLE
         
         text = "%s|%s|%s" % (self.doc["reference"], self.doc["revision"],
                                        self.doc["type"])
@@ -738,11 +723,6 @@ class ReviseDialog(Dialog):
 
     def run(self):
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = self.WIDTH
-        self.dialog.Height = self.HEIGHT
-        self.dialog.Title = self.TITLE
         
         text = "%s|" % self.doc["reference"]
         label = self.addWidget('ref', 'FixedText', 5, 10, 60, 14,
@@ -815,7 +795,7 @@ class CreateDialog(SearchDialog):
     TYPES_URL = "api/docs/"
 
     WIDTH = 200
-    HEIGHT = 300
+    HEIGHT = 200
     PAD = 5
     ROW_HEIGHT = 15
     ROW_PAD = 2
@@ -826,11 +806,6 @@ class CreateDialog(SearchDialog):
         self.types = docs["types"]
 
         smgr = self.ctx.ServiceManager
-        self.dialog = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
-        self.dialog.Width = self.WIDTH
-        self.dialog.Height = self.HEIGHT
-        self.dialog.Title = self.TITLE
         
         fields = [("type", 'ListBox'),
                  ]
@@ -851,19 +826,19 @@ class CreateDialog(SearchDialog):
         
         self.advanced_fields = []
         self.display_fields(self.TYPE)
-        
-        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields), 1)
-        self.filename_label = self.addWidget('filenameLabel', 'FixedText', x, y, w, h,
-                               Label="Filename")
-        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields), 2)
+       
+        row = len(self.fields) + len(self.advanced_fields)
+        x, y, w, h = self.get_position(row, 1)
+        self.filename_label = self.addWidget('filenameLabel', 'FixedText',
+                                             x, y, w, h, Label="Filename")
+        x, y, w, h = self.get_position(row, 2)
         self.filename_entry = self.addWidget('filename', 'Edit', x, y, w, h)
-
-        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 1)
+        x, y, w, h = self.get_position(row + 1, 1)
         self.unlock_button = self.addWidget('unlock', 'CheckBox', x, y, w, h,
                                 Label="Unlock ?")
-        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+2, 1)
+        x, y, w, h = self.get_position(row + 2, 2)
         self.action_button = self.addWidget('action_button', 'Button', x, y, w, h,
-                                Label = self.ACTION_NAME)
+                                Label=self.ACTION_NAME)
 
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
@@ -880,37 +855,36 @@ class CreateDialog(SearchDialog):
         fields = PLUGIN.get_data("api/creation_fields/%s/" % typename)["fields"]
         temp = {}
         for field, entry in self.advanced_fields:
-            temp[field["name"]] = self.get_value(entry, field)
-            self.container.getControl("%s_entry" % field["name"]).setVisible(False)
+            name = field["name"]
+            temp[name] = self.get_value(entry, field)
+            self.container.getControl(entry.Name).setVisible(False)
             entry.dispose()
             self.dialog.removeByName(entry.Name)
-            label = self.dialog.getByName("%s_label" % field["name"])
-            self.container.getControl("%s_label" % field["name"]).setVisible(False)
+            label = self.dialog.getByName("%s_label" % name)
+            self.container.getControl(label.Name).setVisible(False)
             label.dispose()
-            self.dialog.removeByName("%s_label" % field["name"])
+            self.dialog.removeByName(label.Name)
         self.advanced_fields = []
-        j = len(self.fields)
+        row = len(self.fields)
         for i, field in enumerate(fields):
-            text = field["label"]
-            x, y, w, h = self.get_position(i + j, 1)
-            label = self.addWidget('%s_label' % field["name"], 'FixedText',
-                                   x, y, w, h,
-                                   Label = '%s:' % text.capitalize())
-            x, y, w, h = self.get_position(i + j, 2)
+            text, name = field["label"], field["name"]
+            x, y, w, h = self.get_position(i + row, 1)
+            label = self.addWidget('%s_label' % name, 'FixedText',
+                                   x, y, w, h, Label='%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i + row, 2)
             widget = self.field_to_widget(field, x, y, w, h)
-            if field["name"] in temp:
-                self.set_value(widget, temp[field["name"]], field)
+            if name in temp:
+                self.set_value(widget, temp[name], field)
             self.advanced_fields.append((field, widget))
         if hasattr(self, 'container'):
             self.container.getPeer().invalidate(UPDATE|1)
-            j = len(self.fields) + len(self.advanced_fields) 
-            x, y, w, h = self.get_position(j, 1)
-            self.filename_label.PositionY= y
-            self.filename_entry.PositionY= y
-            x, y, w, h = self.get_position(j + 1, 1)
-            self.unlock_button.PositionY= y
-            x, y, w, h = self.get_position(j + 2, 1)
-            self.action_button.PositionY= y
+            x, y, w, h = self.get_position(row + i + 1, 1)
+            self.filename_label.PositionY = y
+            self.filename_entry.PositionY = y
+            x, y, w, h = self.get_position(row + i + 2, 1)
+            self.unlock_button.PositionY = y
+            x, y, w, h = self.get_position(row + i + 3, 1)
+            self.action_button.PositionY = y
 
     def actionPerformed(self, actionEvent):
         try:
@@ -940,12 +914,12 @@ class CreateDialog(SearchDialog):
         except:
             traceback.print_exc()
 
-    def do_action(self, doc, doc_file):
-        print doc, doc_file
 
-class OpenPLMLogin(unohelper.Base, XJobExecutor):
+class Job(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
+
+class OpenPLMLogin(Job):
 
     def trigger(self, args):
         try:
@@ -957,9 +931,7 @@ class OpenPLMLogin(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMConfigure(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
+class OpenPLMConfigure(Job):
 
     def trigger(self, args):
         try:
@@ -971,9 +943,7 @@ class OpenPLMConfigure(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMCheckOut(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
+class OpenPLMCheckOut(Job):
 
     def trigger(self, args):
         try:
@@ -985,10 +955,8 @@ class OpenPLMCheckOut(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMDownload(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
-
+class OpenPLMDownload(Job):
+    
     def trigger(self, args):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
@@ -999,9 +967,7 @@ class OpenPLMDownload(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMForget(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
+class OpenPLMForget(Job):
 
     def trigger(self, args):
         try:
@@ -1012,10 +978,8 @@ class OpenPLMForget(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMCheckIn(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
-
+class OpenPLMCheckIn(Job):
+    
     def trigger(self, args):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
@@ -1034,9 +998,7 @@ class OpenPLMCheckIn(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMRevise(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
+class OpenPLMRevise(Job):
 
     def trigger(self, args):
         try:
@@ -1067,9 +1029,7 @@ class OpenPLMRevise(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMAttach(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
+class OpenPLMAttach(Job):
 
     def trigger(self, args):
         try:
@@ -1087,10 +1047,8 @@ class OpenPLMAttach(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
-class OpenPLMCreate(unohelper.Base, XJobExecutor):
-    def __init__(self, ctx):
-        self.ctx = ctx
-
+class OpenPLMCreate(Job):
+    
     def trigger(self, args):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
