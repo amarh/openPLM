@@ -342,7 +342,7 @@ class Dialog(unohelper.Base, XActionListener):
     def get_value(self, entry, field):
         value = None
         if hasattr(entry, "Text"):
-            value = entry.Text
+            value = entry.Text.encode("utf-8")
         elif hasattr(entry, 'SelectedItems'):
             if not field:
                 value = entry.StringItemList[entry.SelectedItems[0]]
