@@ -86,6 +86,18 @@
 
                     <node oor:name="m7" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
+                            <value>Create a document</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>service:org.example.OpenPLMCreate</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
+
+                    <node oor:name="m8" oor:op="replace">
+                        <prop oor:name="Title" oor:type="xs:string">
                             <value>Configure</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
