@@ -36,6 +36,18 @@
                         </prop>
                     </node>
 
+                    <node oor:name="m3" oor:op="replace">
+                        <prop oor:name="Title" oor:type="xs:string">
+                            <value>Download from OpenPLM</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>service:org.example.OpenPLMDownload</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
+ 
                 </node>
             </node>
         </node>
