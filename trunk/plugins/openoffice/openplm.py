@@ -71,51 +71,33 @@ class OpenPLMPluginInstance(object):
         else:
             raise ValueError()
 
-    def create_cb(self):
-        gdoc = self._window.get_active_document()
-        if not gdoc:
-            show_error(_("Need an opened file to create a document"))
-            return
-        if gdoc.get_data("openplm_doc"):
-            show_error(_("Current file already attached to a document"))
-            return
-        def func():
-            diag = CreateDialog(self._window, self)
-            def response_cb(diag, resp):
-                if resp == gtk.RESPONSE_ACCEPT:
-                    data = diag.get_creation_data()
-                    res = self.get_data("api/create/", data)
-                    if res["result"] != "ok":
-                        # TODO
-                        return
-                    else:
-                        doc = res["object"]
-                        unlock = diag.get_unlock()
-                        diag.destroy()
-                        # create a new doc
-                        rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
-                                           doc["revision"])
-                        try:
-                            os.makedirs(rep, 0700)
-                        except os.error:
-                            # directory already exists, just ignores the exception
-                            pass
-                        filename = os.path.basename(gdoc.get_uri())
-                        path = os.path.join(rep, filename)
-                        gdoc.set_uri("file://" + path)
-                        def f():
-                            doc_file = self.upload_file(doc, path)
-                            self.add_managed_file(doc, doc_file, path)
-                            self.load_file(doc, doc_file["id"], path)
-                            if not unlock:
-                                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
-                        save_document(self._window, gdoc, f)
-                else:
-                    diag.destroy()
-            diag.connect("response", response_cb)
-            diag.show()
-        save_document(self._window, gdoc, func)
-    
+    def create(self, data, filename, unlock):
+        res = self.get_data("api/create/", data)
+        if not filename:
+            return False, "Bad file name"
+        if res["result"] != "ok":
+            # TODO
+            return False, res["error"]
+        else:
+            doc = res["object"]
+            # create a new doc
+            rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
+                               doc["revision"])
+            try:
+                os.makedirs(rep, 0700)
+            except os.error:
+                # directory already exists, just ignores the exception
+                pass
+            gdoc = self.desktop.getCurrentComponent()
+            path = os.path.join(rep, filename)
+            gdoc.storeAsURL("file://" + path, ())
+            doc_file = self.upload_file(doc, path)
+            self.add_managed_file(doc, doc_file, path)
+            self.load_file(doc, doc_file["id"], path)
+            if not unlock:
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
+            return True, ""
+
     def get_data(self, url, data=None):
         data_enc = urllib.urlencode(data) if data else None
         return json.load(self.opener.open(self.SERVER + url, data_enc)) 
@@ -224,7 +206,8 @@ class OpenPLMPluginInstance(object):
             self.load_file(doc, doc_file_id, path)
 
     def load_file(self, doc, doc_file_id, path):
-        document = self.desktop.loadComponentFromURL("file://" + path, "_blank", 0, ())
+        document = self.desktop.loadComponentFromURL("file://" + path,
+                                                     "_default", 0, ())
         if not document:
             # document may be a simple text file
             op1 = PropertyValue()
@@ -235,7 +218,7 @@ class OpenPLMPluginInstance(object):
             op2.Value = 'UTF8'
             options = (op1, op2)
             document = self.desktop.loadComponentFromURL("file://" + path,
-                "_blank", 0, options)
+                "_default", 0, options)
         if not document:
             show_error("Can not load %s" % path)
             return
@@ -824,6 +807,141 @@ class AttachToPartDialog(SearchDialog):
         except:
             traceback.print_exc()
 
+class CreateDialog(SearchDialog):
+
+    TITLE = "Create a document..."
+    ACTION_NAME = "Create"
+    TYPE = "Document"
+    TYPES_URL = "api/docs/"
+
+    WIDTH = 200
+    HEIGHT = 300
+    PAD = 5
+    ROW_HEIGHT = 15
+    ROW_PAD = 2
+
+    def run(self):
+        
+        docs = PLUGIN.get_data(self.TYPES_URL)
+        self.types = docs["types"]
+
+        smgr = self.ctx.ServiceManager
+        self.dialog = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
+        self.dialog.Width = self.WIDTH
+        self.dialog.Height = self.HEIGHT
+        self.dialog.Title = self.TITLE
+        
+        fields = [("type", 'ListBox'),
+                 ]
+        self.fields = []
+        for i, (text, entry) in enumerate(fields): 
+            x, y, w, h = self.get_position(i, 1)
+            label = self.addWidget('%s_label' % text, 'FixedText', x, y, w, h,
+                               Label = '%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i, 2)
+            widget = self.addWidget('%s_entry' % text, entry, x, y, w, h)
+            self.fields.append((text, widget))
+
+        self.type_entry = self.fields[0][1]
+        self.type_entry.StringItemList = tuple(self.types)
+        self.type_entry.SelectedItems = (self.types.index(self.TYPE),)
+        self.type_entry.Dropdown = True
+        self.type_entry.MultiSelection = False
+        
+        self.advanced_fields = []
+        self.display_fields(self.TYPE)
+        
+        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields), 1)
+        self.filename_label = self.addWidget('filenameLabel', 'FixedText', x, y, w, h,
+                               Label="Filename")
+        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields), 2)
+        self.filename_entry = self.addWidget('filename', 'Edit', x, y, w, h)
+
+        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+1, 1)
+        self.unlock_button = self.addWidget('unlock', 'CheckBox', x, y, w, h,
+                                Label="Unlock ?")
+        x, y, w, h = self.get_position(len(self.fields)+len(self.advanced_fields)+2, 1)
+        self.action_button = self.addWidget('action_button', 'Button', x, y, w, h,
+                                Label = self.ACTION_NAME)
+
+        self.container = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialog', self.ctx)
+        self.container.setModel(self.dialog)
+        self.container.getControl('action_button').addActionListener(self)
+        self.container.getControl('type_entry').addItemListener(self)
+        toolkit = smgr.createInstanceWithContext(
+            'com.sun.star.awt.ExtToolkit', self.ctx)
+        self.container.setVisible(False)
+        self.container.createPeer(toolkit, None)
+        self.container.execute()
+
+    def display_fields(self, typename):
+        fields = PLUGIN.get_data("api/creation_fields/%s/" % typename)["fields"]
+        temp = {}
+        for field, entry in self.advanced_fields:
+            temp[field["name"]] = self.get_value(entry, field)
+            self.container.getControl("%s_entry" % field["name"]).setVisible(False)
+            entry.dispose()
+            self.dialog.removeByName(entry.Name)
+            label = self.dialog.getByName("%s_label" % field["name"])
+            self.container.getControl("%s_label" % field["name"]).setVisible(False)
+            label.dispose()
+            self.dialog.removeByName("%s_label" % field["name"])
+        self.advanced_fields = []
+        j = len(self.fields)
+        for i, field in enumerate(fields):
+            text = field["label"]
+            x, y, w, h = self.get_position(i + j, 1)
+            label = self.addWidget('%s_label' % field["name"], 'FixedText',
+                                   x, y, w, h,
+                                   Label = '%s:' % text.capitalize())
+            x, y, w, h = self.get_position(i + j, 2)
+            widget = self.field_to_widget(field, x, y, w, h)
+            if field["name"] in temp:
+                self.set_value(widget, temp[field["name"]], field)
+            self.advanced_fields.append((field, widget))
+        if hasattr(self, 'container'):
+            self.container.getPeer().invalidate(UPDATE|1)
+            j = len(self.fields) + len(self.advanced_fields) 
+            x, y, w, h = self.get_position(j, 1)
+            self.filename_label.PositionY= y
+            self.filename_entry.PositionY= y
+            x, y, w, h = self.get_position(j + 1, 1)
+            self.unlock_button.PositionY= y
+            x, y, w, h = self.get_position(j + 2, 1)
+            self.action_button.PositionY= y
+
+    def actionPerformed(self, actionEvent):
+        try:
+            if actionEvent.Source == self.container.getControl('action_button'):
+                b, error = PLUGIN.create(self.get_creation_data(),
+                              self.get_value(self.filename_entry, None),
+                              self.get_value(self.unlock_button, None))
+                if b:
+                    self.container.endExecute()
+                else:
+                    self.show_error(error)
+        except:
+            traceback.print_exc()
+
+    def get_creation_data(self):
+        data = {}
+        for field_name, widget in self.fields:
+            data[field_name] = self.get_value(widget, None)
+        for field, widget in self.advanced_fields:
+            data[field["name"]] = self.get_value(widget, field)
+        return data
+
+    def itemStateChanged(self, itemEvent):
+        try:
+            typename = self.types[self.type_entry.SelectedItems[0]]
+            self.display_fields(typename)
+        except:
+            traceback.print_exc()
+
+    def do_action(self, doc, doc_file):
+        print doc, doc_file
 
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
@@ -969,11 +1087,33 @@ class OpenPLMAttach(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
+class OpenPLMCreate(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            gdoc = desktop.getCurrentComponent()
+            if not gdoc:
+                show_error("Need an opened file to create a document")
+                return
+            if gdoc.URL in PLUGIN.documents:
+                show_error("Current file already attached to a document")
+                return
+            dialog = CreateDialog(self.ctx)
+            dialog.run() 
+        except:
+            traceback.print_exc()
+
 
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
 for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload, OpenPLMForget,
-            OpenPLMCheckIn, OpenPLMRevise, OpenPLMAttach, OpenPLMConfigure):
+            OpenPLMCheckIn, OpenPLMRevise, OpenPLMAttach, OpenPLMConfigure,
+            OpenPLMCreate):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
