@@ -14,6 +14,7 @@ import traceback
 import uno
 import unohelper
 
+from com.sun.star.beans import PropertyValue
 from com.sun.star.task import XJobExecutor
 from com.sun.star.awt import XActionListener, XItemListener
 from com.sun.star.awt.InvalidateStyle import CHILDREN, UPDATE
@@ -39,11 +40,16 @@ class OpenPLMPluginInstance(object):
                                            StreamingHTTPRedirectHandler(),
                                            urllib2.HTTPCookieProcessor())
         self.username = ""
+        self.desktop = None
+        self.documents = {}
 
         try:
             os.makedirs(self.OPENPLM_DIR, 0700)
         except os.error:
             pass
+
+    def set_desktop(self, desktop):
+        self.desktop = desktop
 
     def login(self, username, password):
         """
@@ -61,11 +67,6 @@ class OpenPLMPluginInstance(object):
         else:
             raise ValueError()
 
-    def check_out_cb(self):
-        diag = CheckOutDialog(self._window, self)
-        diag.run()
-        diag.destroy()
-    
     def download_cb(self):
         diag = DownloadDialog(self._window, self)
         diag.run()
@@ -217,11 +218,24 @@ class OpenPLMPluginInstance(object):
             self.load_file(doc, doc_file_id, path)
 
     def load_file(self, doc, doc_file_id, path):
-        document = desktop.loadComponentFromURL("file://" + path ,"_blank", 0, ()) 
-        gdoc.set_data("openplm_doc", doc)
-        gdoc.set_data("openplm_file_id", doc_file_id)
-        gdoc.set_data("openplm_path", path)
-        return gdoc
+        document = self.desktop.loadComponentFromURL("file://" + path, "_blank", 0, ())
+        if not document:
+            # document may be a simple text file
+            op1 = PropertyValue()
+            op1.Name = 'FilterName'
+            op1.Value = 'Text (encoded)'
+            op2 = PropertyValue()
+            op2.Name = 'FilterOptions'
+            op2.Value = 'UTF8'
+            options = (op1, op2)
+            document = self.desktop.loadComponentFromURL("file://" + path,
+                "_blank", 0, options)
+        if not document:
+            show_error("Can not load %s" % path)
+            return
+        self.documents[document.URL] = dict(openplm_doc=doc,
+            openplm_file_id=doc_file_id, openplm_path=path)
+        return document
 
     def check_in(self, gdoc, unlock, save=True):
         doc = gdoc.get_data("openplm_doc")
@@ -353,7 +367,6 @@ class Dialog(unohelper.Base, XActionListener):
             setattr(widget, k, w)
         self.dialog.insertByName(name, widget)
         return widget
-    
 
     def get_value(self, entry, field):
         value = None
@@ -591,6 +604,7 @@ class SearchDialog(Dialog, XItemListener,
                 node =  self.container.getControl('tree').getSelection()
                 doc = self.nodes[node.getParent().getDisplayValue()]
                 doc_file = doc["files"][node.getParent().getIndex(node)]
+                del doc["files"]
                 self.do_action(doc, doc_file)
         except:
             traceback.print_exc()
@@ -648,6 +662,16 @@ class CheckOutDialog(SearchDialog):
         PLUGIN.check_out(doc, doc_file)
         self.container.endExecute()
 
+class DownloadDialog(SearchDialog):
+    TITLE = "Download..."
+    ACTION_NAME = "Download"
+    ALL_FILES = True
+
+    def do_action(self, doc, doc_file):
+        PLUGIN.check_out(doc, doc_file)
+        self.container.endExecute()
+
+
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
@@ -656,6 +680,7 @@ class OpenPLMLogin(unohelper.Base, XJobExecutor):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
             dialog = LoginDialog(self.ctx)
             dialog.run()
         except:
@@ -670,17 +695,30 @@ class OpenPLMCheckOut(unohelper.Base, XJobExecutor):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
             dialog = CheckOutDialog(self.ctx)
             dialog.run()
-            #doc = desktop.getCurrentComponent()
-            #cursor = doc.getCurrentController().getViewCursor()
-            #doc.Text.insertString(cursor, 'Hello World', 0)
         except:
             traceback.print_exc()
 
+class OpenPLMDownload(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            dialog = DownloadDialog(self.ctx)
+            dialog.run()
+        except:
+            traceback.print_exc()
+
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
-for cls in (OpenPLMLogin, OpenPLMCheckOut):
+for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
