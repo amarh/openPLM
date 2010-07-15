@@ -196,13 +196,12 @@ class OpenPLMPluginInstance(object):
         return files
    
     def forget(self, gdoc=None, delete=True):
-        gdoc = gdoc or self._window.get_active_document()
-        doc = gdoc.get_data("openplm_doc")
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        path = gdoc.get_data("openplm_path")
-        if doc and doc_file_id and path:
-            label = gdoc.get_data("openplm_label")
-            label.destroy()
+        gdoc = gdoc or self.desktop.getCurrentComponent()
+        if gdoc and gdoc.URL in self.documents:
+            doc = self.documents[gdoc.URL]["openplm_doc"]
+            doc_file_id = self.documents[gdoc.URL]["openplm_file_id"]
+            path = self.documents[gdoc.URL]["openplm_path"]
+            del self.documents[gdoc.URL]
             data = self.get_conf_data()
             del data["documents"][str(doc["id"])]["files"][str(doc_file_id)]
             if not  data["documents"][str(doc["id"])]["files"]:
@@ -238,10 +237,10 @@ class OpenPLMPluginInstance(object):
         return document
 
     def check_in(self, gdoc, unlock, save=True):
-        doc = gdoc.get_data("openplm_doc")
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        path = gdoc.get_data("openplm_path")
-        if doc and doc_file_id and path:
+        if gdoc and gdoc.URL in self.documents:
+            doc = self.documents[gdoc.URL]["openplm_doc"]
+            doc_file_id = self.documents[gdoc.URL]["openplm_file_id"]
+            path = self.documents[gdoc.URL]["openplm_path"]
             def func():
                 # headers contains the necessary Content-Type and Content-Length>
                 # datagen is a generator object that yields the encoded parameters
@@ -253,7 +252,8 @@ class OpenPLMPluginInstance(object):
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
             if save:
-                save_document(self._window, gdoc, func)
+                gdoc.store()
+                func()
             else:
                 func()
         else:
@@ -261,19 +261,6 @@ class OpenPLMPluginInstance(object):
             print 'can not check in'
             pass
 
-    def check_in_cb(self):
-        gdoc = self._window.get_active_document()
-        doc = gdoc.get_data("openplm_doc")
-        doc_file_id = gdoc.get_data("openplm_file_id")
-        if not doc or not self.check_is_locked(doc["id"], doc_file_id):
-            return
-        name = os.path.basename(gdoc.get_data("openplm_path"))
-        diag = CheckInDialog(self._window, self, doc, name)
-        resp = diag.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            self.check_in(gdoc, diag.get_unlock())
-        diag.destroy()
-    
     def revise(self, gdoc, revision, unlock):
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
@@ -349,6 +336,16 @@ def show_error(message, parent=None):
     print message
 
 class Dialog(unohelper.Base, XActionListener):
+
+    TITLE = "Search"
+    ACTION_NAME = "..."
+
+    WIDTH = 200
+    HEIGHT = 300
+    PAD = 5
+    ROW_HEIGHT = 15
+    ROW_PAD = 2
+    
     def __init__(self, ctx):
         self.ctx = ctx
         self.msg = None
@@ -432,10 +429,10 @@ class LoginDialog(Dialog):
         self.dialog.Width = 200
         self.dialog.Height = 105
         self.dialog.Title = 'Login'
-        label = self.addWidget('Username', 'FixedText', 5, 10, 100, 14,
+        label = self.addWidget('Username', 'FixedText', 5, 10, 60, 14,
                                Label = 'Username:')
         self.username = self.addWidget('UsernameEntry', 'Edit', 90, 10, 100, 14)
-        label = self.addWidget('password', 'FixedText', 5, 30, 100, 14,
+        label = self.addWidget('password', 'FixedText', 5, 30, 60, 14,
                                Label = 'Password:')
         self.password = self.addWidget('PasswordEntry', 'Edit', 90, 30, 100, 14,
                                        EchoChar=ord('*'))
@@ -671,7 +668,58 @@ class DownloadDialog(SearchDialog):
         PLUGIN.check_out(doc, doc_file)
         self.container.endExecute()
 
+class CheckInDialog(Dialog):
 
+    TITLE = "Check-in..."
+    ACTION_NAME = "Check-in"
+    WIDTH = 200
+    HEIGHT = 100
+
+    def __init__(self, ctx, doc, name):
+        Dialog.__init__(self, ctx)
+        self.doc = doc
+        self.name = name
+
+    def run(self):
+        smgr = self.ctx.ServiceManager
+        self.dialog = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
+        self.dialog.Width = self.WIDTH
+        self.dialog.Height = self.HEIGHT
+        self.dialog.Title = self.TITLE
+        
+        text = "%s|%s|%s" % (self.doc["reference"], self.doc["revision"],
+                                       self.doc["type"])
+
+        label = self.addWidget('Username', 'FixedText', 5, 10, 60, 14,
+                               Label = text)
+        self.unlock_button = self.addWidget('unlock_button', 'CheckBox',
+                                            5, 30, 100, 14, Label='Unlock ?')
+
+        button = self.addWidget('action', 'Button', 55, 85, 50, 14,
+                                Label=self.ACTION_NAME)
+        self.container = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialog', self.ctx)
+        self.container.setModel(self.dialog)
+        self.container.getControl('action').addActionListener(self)
+        toolkit = smgr.createInstanceWithContext(
+            'com.sun.star.awt.ExtToolkit', self.ctx)
+        self.container.setVisible(False)
+        self.container.createPeer(toolkit, None)
+        self.container.execute()
+
+    def actionPerformed(self, actionEvent):
+        try:
+            try:
+                desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+                PLUGIN.check_in(desktop.getCurrentComponent(),
+                                self.get_value(self.unlock_button, None))
+                self.container.endExecute()
+            except ValueError, e:
+                print e
+        except:
+            traceback.print_exc()
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
@@ -715,10 +763,45 @@ class OpenPLMDownload(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
+class OpenPLMForget(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            PLUGIN.forget()
+        except:
+            traceback.print_exc()
+
+class OpenPLMCheckIn(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            gdoc = desktop.getCurrentComponent()
+            if gdoc and gdoc.URL in PLUGIN.documents:
+                doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
+                doc_file_id = PLUGIN.documents[gdoc.URL]["openplm_file_id"]
+                path = PLUGIN.documents[gdoc.URL]["openplm_path"]
+                if not doc or not PLUGIN.check_is_locked(doc["id"], doc_file_id):
+                    return
+                name = os.path.basename(path)
+                dialog = CheckInDialog(self.ctx, doc, name)
+                dialog.run() 
+        except:
+            traceback.print_exc()
 
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
-for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload):
+for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload, OpenPLMForget,
+            OpenPLMCheckIn):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
