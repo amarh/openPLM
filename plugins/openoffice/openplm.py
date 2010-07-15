@@ -2,6 +2,7 @@ import os
 import shutil
 import json
 import urllib
+import webbrowser
 
 # poster makes it possible to send http request with files
 # sudo easy_install poster
@@ -65,16 +66,6 @@ class OpenPLMPluginInstance(object):
             self.load_managed_files()
         else:
             raise ValueError()
-
-    def attach_cb(self):
-        gdoc = self._window.get_active_document()
-        doc = gdoc.get_data("openplm_doc")
-        if not doc:
-            return
-        diag = AttachToPartDialog(self._window, self)
-        diag.doc = doc
-        diag.run()
-        diag.destroy()
 
     def create_cb(self):
         gdoc = self._window.get_active_document()
@@ -151,7 +142,13 @@ class OpenPLMPluginInstance(object):
         self.load_file(doc, doc_file["id"], dst_name)
 
     def attach_to_part(self, doc, part_id):
-        self.get_data("api/object/%s/attach_to_part/%s/" % (doc["id"], part_id))
+        res = self.get_data("api/object/%s/attach_to_part/%s/" % (doc["id"], part_id))
+        if res["result"] == "ok":
+            url = self.SERVER + "object/%s/%s/%s/parts" % (doc["type"],
+                    doc["reference"], doc["revision"])
+            webbrowser.open_new_tab(url)
+        else:
+            show_error("Can not attach\n%s" % res.get('error', ''))
 
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
@@ -441,6 +438,7 @@ class SearchDialog(Dialog, XItemListener,
     TYPE = "Document"
     TYPES_URL = "api/docs/"
     ALL_FILES = False
+    EXPAND_FILES = True
 
     WIDTH = 200
     HEIGHT = 300
@@ -527,7 +525,6 @@ class SearchDialog(Dialog, XItemListener,
     def createService(self, cClass):
         return self.ctx.ServiceManager.createInstanceWithContext(cClass, self.ctx)
 
-
     def display_fields(self, typename):
         fields = PLUGIN.get_data("api/search_fields/%s/" % typename)["fields"]
         temp = {}
@@ -602,7 +599,7 @@ class SearchDialog(Dialog, XItemListener,
             self.tree_root.removeChildByIndex(0)
         for res in results:
             text = "%(reference)s|%(type)s|%(revision)s" % res
-            node = self.tree_model.createNode(text, True)
+            node = self.tree_model.createNode(text, self.EXPAND_FILES)
             self.tree_root.appendChild(node)
             self.nodes[node.getDisplayValue()] = res
         self.container.getPeer().invalidate(UPDATE|1)
@@ -751,6 +748,33 @@ class ReviseDialog(Dialog):
         except:
             traceback.print_exc()
 
+class AttachToPartDialog(SearchDialog):
+    TITLE = "Attach to part"
+    ACTION_NAME = "Attach"
+    TYPE = "Part"
+    TYPES_URL = "api/parts/"
+    EXPAND_FILES = False
+
+    def __init__(self, ctx, doc):
+        SearchDialog.__init__(self, ctx)
+        self.doc = doc
+    
+    def do_action(self, part):
+        PLUGIN.attach_to_part(self.doc, part["id"])
+        self.container.endExecute()
+    
+    def actionPerformed(self, actionEvent):
+        try:
+            if actionEvent.Source == self.container.getControl('search_button'):
+                self.search()
+            elif actionEvent.Source == self.container.getControl('action_button'):
+                node =  self.container.getControl('tree').getSelection()
+                doc = self.nodes[node.getDisplayValue()]
+                self.do_action(doc)
+        except:
+            traceback.print_exc()
+
+
 class OpenPLMLogin(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
@@ -854,16 +878,38 @@ class OpenPLMRevise(unohelper.Base, XJobExecutor):
                 name = os.path.basename(path)
                 dialog = ReviseDialog(self.ctx, doc, name, revision)
                 dialog.run()
-                try:
-                    gdoc.close(True)
-                except CloseVetoException:
-                    pass
+                if gdoc.URL not in PLUGIN.documents:
+                    try:
+                        gdoc.close(True)
+                    except CloseVetoException:
+                        pass
         except:
             traceback.print_exc()
+
+class OpenPLMAttach(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            gdoc = desktop.getCurrentComponent()
+            if gdoc and gdoc.URL in PLUGIN.documents:
+                doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
+                if not doc:
+                    show_error("Document not stored in OpenPLM")
+                    return
+                dialog = AttachToPartDialog(self.ctx, doc)
+                dialog.run() 
+        except:
+            traceback.print_exc()
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
 for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload, OpenPLMForget,
-            OpenPLMCheckIn, OpenPLMRevise):
+            OpenPLMCheckIn, OpenPLMRevise, OpenPLMAttach):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
