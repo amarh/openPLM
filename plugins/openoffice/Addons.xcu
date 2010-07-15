@@ -47,7 +47,7 @@
                             <value>_self</value>
                         </prop>
                     </node>
-                    
+
                     <node oor:name="m4" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Forget current file</value>
@@ -59,7 +59,7 @@
                             <value>_self</value>
                         </prop>
                     </node>
-                    
+
                     <node oor:name="m5" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Revise</value>
@@ -71,7 +71,7 @@
                             <value>_self</value>
                         </prop>
                     </node>
-                        
+
                     <node oor:name="m6" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Attach to part</value>
@@ -84,7 +84,18 @@
                         </prop>
                     </node>
 
- 
+                    <node oor:name="m7" oor:op="replace">
+                        <prop oor:name="Title" oor:type="xs:string">
+                            <value>Configure</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>service:org.example.OpenPLMConfigure</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
+
                 </node>
             </node>
         </node>

@@ -43,6 +43,10 @@ class OpenPLMPluginInstance(object):
         self.desktop = None
         self.documents = {}
 
+        data = self.get_conf_data()
+        if "server" in data:
+            type(self).SERVER = data["server"]
+
         try:
             os.makedirs(self.OPENPLM_DIR, 0700)
         except os.error:
@@ -163,6 +167,9 @@ class OpenPLMPluginInstance(object):
         doc["files"] = files
         documents[doc["id"]] = doc
         data["documents"] = documents
+        self.save_conf(data)
+
+    def save_conf(self, data):
         f = open(self.CONF_FILE, "w")
         json.dump(data, f)
         f.close()
@@ -178,6 +185,17 @@ class OpenPLMPluginInstance(object):
         except IOError:
             # file does not exist
             return {}
+    
+    def set_server(self, url):
+        data = self.get_conf_data()
+        data["server"] = url
+        type(self).SERVER = url
+        self.save_conf(data)
+        if self.username:
+            try:
+                self.login(self.username, self.password)
+            except ValueError:
+                pass
 
     def get_managed_files(self):
         data = self.get_conf_data()
@@ -197,9 +215,7 @@ class OpenPLMPluginInstance(object):
             del data["documents"][str(doc["id"])]["files"][str(doc_file_id)]
             if not  data["documents"][str(doc["id"])]["files"]:
                 del data["documents"][str(doc["id"])]
-            f = open(self.CONF_FILE, "w")
-            json.dump(data, f)
-            f.close()
+            self.save_conf(data)
             if delete and os.path.exists(path):
                 os.remove(path)
 
@@ -427,6 +443,40 @@ class LoginDialog(Dialog):
                 self.container.endExecute()
             except ValueError, e:
                 print e
+        except:
+            traceback.print_exc()
+
+class ConfigureDialog(Dialog):
+
+    def run(self):
+        smgr = self.ctx.ServiceManager
+        self.dialog = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialogModel', self.ctx)
+        self.dialog.Width = 200
+        self.dialog.Height = 105
+        self.dialog.Title = 'Configure'
+        label = self.addWidget('url', 'FixedText', 5, 10, 60, 14,
+                               Label="OpenPLM server's location:")
+        self.url_entry = self.addWidget('UrlEntry', 'Edit', 90, 10, 100, 14)
+        self.url_entry.Text = PLUGIN.SERVER
+
+        button = self.addWidget('configure', 'Button', 55, 85, 50, 14,
+                                Label = 'Configure')
+        self.container = smgr.createInstanceWithContext(
+            'com.sun.star.awt.UnoControlDialog', self.ctx)
+        self.container.setModel(self.dialog)
+        self.container.getControl('configure').addActionListener(self)
+        toolkit = smgr.createInstanceWithContext(
+            'com.sun.star.awt.ExtToolkit', self.ctx)
+        self.container.setVisible(False)
+        self.container.createPeer(toolkit, None)
+        self.container.execute()
+
+    def actionPerformed(self, actionEvent):
+        try:
+            url = self.url_entry.Text
+            PLUGIN.set_server(url)
+            self.container.endExecute()
         except:
             traceback.print_exc()
 
@@ -789,6 +839,19 @@ class OpenPLMLogin(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
+class OpenPLMConfigure(unohelper.Base, XJobExecutor):
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def trigger(self, args):
+        try:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+            PLUGIN.set_desktop(desktop)
+            dialog = ConfigureDialog(self.ctx)
+            dialog.run()
+        except:
+            traceback.print_exc()
 
 class OpenPLMCheckOut(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
@@ -906,10 +969,11 @@ class OpenPLMAttach(unohelper.Base, XJobExecutor):
         except:
             traceback.print_exc()
 
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 
 for cls in (OpenPLMLogin, OpenPLMCheckOut, OpenPLMDownload, OpenPLMForget,
-            OpenPLMCheckIn, OpenPLMRevise, OpenPLMAttach):
+            OpenPLMCheckIn, OpenPLMRevise, OpenPLMAttach, OpenPLMConfigure):
     g_ImplementationHelper.addImplementation(cls,
                                          'org.example.%s' % cls.__name__,
                                          ('com.sun.star.task.Job',))
