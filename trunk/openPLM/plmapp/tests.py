@@ -564,8 +564,8 @@ class ViewTest(CommonViewTest):
         self.assertEqual(response.status_code, 200)
 
     def test_display_attributes(self):
-        response = self.client.get(self.base_url)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.base_url + "attributes/")
+        self.assertEqual(response.status_code,  200)
         self.failUnless(response.context["object_attributes"])
         attributes = dict(response.context["object_attributes"])
         # name : empty value
@@ -688,7 +688,7 @@ class HardDiskViewTest(ViewTest):
             "supplier" : "ASupplier"}
     
     def test_display_attributes2(self):
-        response = self.client.get(self.base_url)
+        response = self.client.get(self.base_url + "attributes/")
         self.assertEqual(response.status_code, 200)
         self.failUnless(response.context["object_attributes"])
         attributes = dict(response.context["object_attributes"])
