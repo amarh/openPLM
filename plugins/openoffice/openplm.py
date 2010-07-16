@@ -16,12 +16,17 @@ import unohelper
 
 from com.sun.star.beans import PropertyValue
 from com.sun.star.task import XJobExecutor
-from com.sun.star.awt import XActionListener, XItemListener
+from com.sun.star.awt import XActionListener, XItemListener, WindowDescriptor
 from com.sun.star.awt.InvalidateStyle import UPDATE
 from com.sun.star.awt.tree import XTreeExpansionListener
 from com.sun.star.view import XSelectionChangeListener
 from com.sun.star.view.SelectionType import SINGLE
 from com.sun.star.util import CloseVetoException
+ 
+from com.sun.star.awt.WindowClass import MODALTOP
+from com.sun.star.awt.VclWindowPeerAttribute import OK, OK_CANCEL, YES_NO, YES_NO_CANCEL, \
+                                       RETRY_CANCEL, DEF_OK, DEF_CANCEL, DEF_RETRY, DEF_YES, DEF_NO
+
 
 class OpenPLMPluginInstance(object):
     
@@ -54,6 +59,7 @@ class OpenPLMPluginInstance(object):
 
     def set_desktop(self, desktop):
         self.desktop = desktop
+        self.window = desktop.getCurrentFrame().ContainerWindow
 
     def login(self, username, password):
         """
@@ -98,9 +104,21 @@ class OpenPLMPluginInstance(object):
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
             return True, ""
 
-    def get_data(self, url, data=None):
+    def get_data(self, url, data=None, show_errors=True, reraise=False):
         data_enc = urllib.urlencode(data) if data else None
-        return json.load(self.opener.open(self.SERVER + url, data_enc)) 
+        try:
+            return json.load(self.opener.open(self.SERVER + url, data_enc)) 
+        except urllib2.URLError as e:
+            if show_errors:
+                message = e.reason if hasattr(e, "reason") else ""
+                if not isinstance(message, basestring):
+                    message = str(e)
+                show_error(u"Can not open '%s':>\n\t%s" % \
+                           (url, unicode(message, "utf-8")), self.window)
+            if reraise:
+                raise
+            else:
+                return {"result" : "error", "error" : ""}
 
     def upload_file(self, doc, path):
         url = self.SERVER + "api/object/%s/add_file/" % doc["id"]
@@ -134,7 +152,7 @@ class OpenPLMPluginInstance(object):
                     doc["reference"], doc["revision"])
             webbrowser.open_new_tab(url)
         else:
-            show_error("Can not attach\n%s" % res.get('error', ''))
+            show_error("Can not attach\n%s" % res.get('error', ''), self.window)
 
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
@@ -211,16 +229,12 @@ class OpenPLMPluginInstance(object):
         if not document:
             # document may be a simple text file
             op1 = PropertyValue()
-            op1.Name = 'FilterName'
-            op1.Value = 'Text (encoded)'
-            op2 = PropertyValue()
-            op2.Name = 'FilterOptions'
-            op2.Value = 'UTF8'
-            options = (op1, op2)
+            op1.Name = 'InteractionHandler'
+            op1.Value = self.smgr.createInstance("com.sun.star.task.InteractionHandler") 
             document = self.desktop.loadComponentFromURL("file://" + path,
-                "_default", 0, options)
+                "_default", 0, (op1,))
         if not document:
-            show_error("Can not load %s" % path)
+            show_error("Can not load %s" % path, self.window)
             return
         self.documents[document.URL] = dict(openplm_doc=doc,
             openplm_file_id=doc_file_id, openplm_path=path)
@@ -295,13 +309,35 @@ class OpenPLMPluginInstance(object):
         """
         locked = self.get_data("api/object/%s/islocked/%s/" % (doc_id, file_id))["locked"]
         if not locked and error_dialog:
-            show_error("File is not locked, action not allowed")
+            show_error("File is not locked, action not allowed", self.window)
         return locked
 
 
 PLUGIN = OpenPLMPluginInstance()
-def show_error(message, parent=None):
-    print message
+# Show a message box with the UNO based toolkit
+def MessageBox(ParentWin, MsgText, MsgTitle, MsgType="messbox", MsgButtons=OK):
+    MsgType = MsgType.lower()
+    #available msg types
+    MsgTypes = ("messbox", "infobox", "errorbox", "warningbox", "querybox")
+    if MsgType not in MsgTypes:
+        MsgType = "messbox"
+    #describe window properties.
+    aDescriptor = WindowDescriptor()
+    aDescriptor.Type = MODALTOP
+    aDescriptor.WindowServiceName = MsgType
+    aDescriptor.ParentIndex = -1
+    aDescriptor.Parent = ParentWin
+    #aDescriptor.Bounds = Rectangle()
+    aDescriptor.WindowAttributes = MsgButtons
+    tk = ParentWin.getToolkit()
+    msgbox = tk.createWindow(aDescriptor)
+    msgbox.setMessageText(MsgText)
+    if MsgTitle :
+        msgbox.setCaptionText(MsgTitle)
+    return msgbox.execute()
+
+def show_error(message, parent):
+    MessageBox(parent, message, "Error", "errorbox")
 
 class Dialog(unohelper.Base, XActionListener):
 
@@ -895,7 +931,7 @@ class CreateDialog(SearchDialog):
                 if b:
                     self.container.endExecute()
                 else:
-                    self.show_error(error)
+                    show_error(error, self.container.getPeer())
         except:
             traceback.print_exc()
 
@@ -918,14 +954,15 @@ class CreateDialog(SearchDialog):
 class Job(unohelper.Base, XJobExecutor):
     def __init__(self, ctx):
         self.ctx = ctx
+        self.desktop = self.ctx.ServiceManager.createInstanceWithContext(
+                'com.sun.star.frame.Desktop', self.ctx)
+        PLUGIN.set_desktop(self.desktop)
+        PLUGIN.smgr = self.ctx.ServiceManager
 
 class OpenPLMLogin(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
             dialog = LoginDialog(self.ctx)
             dialog.run()
         except:
@@ -935,9 +972,6 @@ class OpenPLMConfigure(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
             dialog = ConfigureDialog(self.ctx)
             dialog.run()
         except:
@@ -947,9 +981,6 @@ class OpenPLMCheckOut(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
             dialog = CheckOutDialog(self.ctx)
             dialog.run()
         except:
@@ -959,9 +990,6 @@ class OpenPLMDownload(Job):
     
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
             dialog = DownloadDialog(self.ctx)
             dialog.run()
         except:
@@ -971,9 +999,6 @@ class OpenPLMForget(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
             PLUGIN.forget()
         except:
             traceback.print_exc()
@@ -982,10 +1007,7 @@ class OpenPLMCheckIn(Job):
     
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
-            gdoc = desktop.getCurrentComponent()
+            gdoc = self.desktop.getCurrentComponent()
             if gdoc and gdoc.URL in PLUGIN.documents:
                 doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
                 doc_file_id = PLUGIN.documents[gdoc.URL]["openplm_file_id"]
@@ -1002,10 +1024,7 @@ class OpenPLMRevise(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
-            gdoc = desktop.getCurrentComponent()
+            gdoc = self.desktop.getCurrentComponent()
             if gdoc and gdoc.URL in PLUGIN.documents:
                 doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
                 doc_file_id = PLUGIN.documents[gdoc.URL]["openplm_file_id"]
@@ -1014,7 +1033,8 @@ class OpenPLMRevise(Job):
                     return
                 revisable = PLUGIN.get_data("api/object/%s/isrevisable/" % doc["id"])["revisable"]
                 if not revisable:
-                    show_error("Document can not be revised")
+                    win = gdoc.CurrentController.Frame.ContainerWindow
+                    show_error("Document can not be revised", win)
                     return
                 res = PLUGIN.get_data("api/object/%s/nextrevision/" % doc["id"])
                 revision = res["revision"]
@@ -1033,17 +1053,14 @@ class OpenPLMAttach(Job):
 
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
-            gdoc = desktop.getCurrentComponent()
+            gdoc = self.desktop.getCurrentComponent()
             if gdoc and gdoc.URL in PLUGIN.documents:
                 doc = PLUGIN.documents[gdoc.URL]["openplm_doc"]
-                if not doc:
-                    show_error("Document not stored in OpenPLM")
-                    return
                 dialog = AttachToPartDialog(self.ctx, doc)
-                dialog.run() 
+                dialog.run()
+            else:
+                win = gdoc.CurrentController.Frame.ContainerWindow
+                show_error("Document not stored in OpenPLM", win)
         except:
             traceback.print_exc()
 
@@ -1051,15 +1068,13 @@ class OpenPLMCreate(Job):
     
     def trigger(self, args):
         try:
-            desktop = self.ctx.ServiceManager.createInstanceWithContext(
-                'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.set_desktop(desktop)
-            gdoc = desktop.getCurrentComponent()
+            gdoc = self.desktop.getCurrentComponent()
+            win = gdoc.CurrentController.Frame.ContainerWindow
             if not gdoc:
-                show_error("Need an opened file to create a document")
+                show_error("Need an opened file to create a document", win)
                 return
             if gdoc.URL in PLUGIN.documents:
-                show_error("Current file already attached to a document")
+                show_error("Current file already attached to a document", win)
                 return
             dialog = CreateDialog(self.ctx)
             dialog.run() 
