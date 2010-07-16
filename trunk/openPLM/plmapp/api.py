@@ -278,7 +278,7 @@ def create(request):
                                reference=controller.reference)}
         return ret
     else:
-        return {"result" : "error", "errors" : forms.errors}
+        return {"result" : "error", "error" : form.errors.as_text()}
 
 @login_json
 def add_file(request, doc_id):
