@@ -23,8 +23,14 @@
                             <value>_self</value>
                         </prop>
                     </node>
-
+                    
                     <node oor:name="m2" oor:op="replace">
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>private:separator</value>
+                        </prop>
+                    </node>
+                    
+                    <node oor:name="m3" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Check-out</value>
                         </prop>
@@ -36,7 +42,7 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m3" oor:op="replace">
+                    <node oor:name="m4" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Download from OpenPLM</value>
                         </prop>
@@ -48,7 +54,7 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m4" oor:op="replace">
+                    <node oor:name="m5" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Forget current file</value>
                         </prop>
@@ -60,7 +66,7 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m5" oor:op="replace">
+                    <node oor:name="m6" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Revise</value>
                         </prop>
@@ -72,7 +78,13 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m6" oor:op="replace">
+                    <node oor:name="m7" oor:op="replace">
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>private:separator</value>
+                        </prop>
+                    </node>
+                    
+                    <node oor:name="m8" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Attach to part</value>
                         </prop>
@@ -84,7 +96,7 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m7" oor:op="replace">
+                    <node oor:name="m9" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Create a document</value>
                         </prop>
@@ -96,7 +108,13 @@
                         </prop>
                     </node>
 
-                    <node oor:name="m8" oor:op="replace">
+                    <node oor:name="m10" oor:op="replace">
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>private:separator</value>
+                        </prop>
+                    </node>
+
+                    <node oor:name="m11" oor:op="replace">
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Configure</value>
                         </prop>

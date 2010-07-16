@@ -310,6 +310,7 @@ class OpenPLMPluginInstance(object):
 
 
 PLUGIN = OpenPLMPluginInstance()
+
 # Show a message box with the UNO based toolkit
 def MessageBox(ParentWin, MsgText, MsgTitle, MsgType="messbox", MsgButtons=OK):
     MsgType = MsgType.lower()
@@ -765,6 +766,9 @@ class ReviseDialog(Dialog):
 
         button = self.addWidget('action', 'Button', 55, 85, 50, 14,
                                 Label=self.ACTION_NAME)
+        text = "Warning, old revision file will be automatically unlocked!"
+        label = self.addWidget('warning', 'FixedText', 5, 45, 150, 14,
+                               Label=text)
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
         self.container.setModel(self.dialog)
