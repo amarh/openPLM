@@ -75,14 +75,13 @@ class OpenPLMPluginInstance(object):
             #self._action_group2.set_sensitive(True)
             self.load_managed_files()
         else:
-            raise ValueError()
+            raise ValueError(res["error"])
 
     def create(self, data, filename, unlock):
         res = self.get_data("api/create/", data)
         if not filename:
             return False, "Bad file name"
         if res["result"] != "ok":
-            # TODO
             return False, res["error"]
         else:
             doc = res["object"]
@@ -261,9 +260,7 @@ class OpenPLMPluginInstance(object):
             else:
                 func()
         else:
-            # TODO
-            print 'can not check in'
-            pass
+            show_error('Can not check in : file not in openPLM', self.window)
 
     def revise(self, gdoc, revision, unlock):
         if gdoc and gdoc.URL in self.documents:
@@ -297,8 +294,7 @@ class OpenPLMPluginInstance(object):
             self.check_in(gd, unlock, False)
             self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
         else:
-            # TODO
-            print 'can not revise'
+            show_error("Can not revise : file not in openPLM", self.window)
 
     def check_is_locked(self, doc_id, file_id, error_dialog=True):
         """
@@ -327,7 +323,6 @@ def MessageBox(ParentWin, MsgText, MsgTitle, MsgType="messbox", MsgButtons=OK):
     aDescriptor.WindowServiceName = MsgType
     aDescriptor.ParentIndex = -1
     aDescriptor.Parent = ParentWin
-    #aDescriptor.Bounds = Rectangle()
     aDescriptor.WindowAttributes = MsgButtons
     tk = ParentWin.getToolkit()
     msgbox = tk.createWindow(aDescriptor)
@@ -463,7 +458,7 @@ class LoginDialog(Dialog):
                 PLUGIN.login(username, password)
                 self.container.endExecute()
             except ValueError, e:
-                print e
+                show_error("Can not login: %s" % str(e), self.container.getPeer())
         except:
             traceback.print_exc()
 
@@ -733,14 +728,11 @@ class CheckInDialog(Dialog):
 
     def actionPerformed(self, actionEvent):
         try:
-            try:
-                desktop = self.ctx.ServiceManager.createInstanceWithContext(
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
-                PLUGIN.check_in(desktop.getCurrentComponent(),
-                                self.get_value(self.unlock_button, None))
-                self.container.endExecute()
-            except ValueError, e:
-                print e
+            PLUGIN.check_in(desktop.getCurrentComponent(),
+                            self.get_value(self.unlock_button, None))
+            self.container.endExecute()
         except:
             traceback.print_exc()
 
@@ -785,15 +777,12 @@ class ReviseDialog(Dialog):
 
     def actionPerformed(self, actionEvent):
         try:
-            try:
-                desktop = self.ctx.ServiceManager.createInstanceWithContext(
+            desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
-                PLUGIN.revise(desktop.getCurrentComponent(),
-                                self.get_value(self.revision_entry, None),
-                                self.get_value(self.unlock_button, None))
-                self.container.endExecute()
-            except ValueError, e:
-                print e
+            PLUGIN.revise(desktop.getCurrentComponent(),
+                          self.get_value(self.revision_entry, None),
+                          self.get_value(self.unlock_button, None))
+            self.container.endExecute()
         except:
             traceback.print_exc()
 
