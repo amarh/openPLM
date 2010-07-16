@@ -47,6 +47,7 @@ class OpenPLMPluginInstance(object):
         self.username = ""
         self.desktop = None
         self.documents = {}
+        self.disable_menuitems()
 
         data = self.get_conf_data()
         if "server" in data:
@@ -61,6 +62,12 @@ class OpenPLMPluginInstance(object):
         self.desktop = desktop
         self.window = desktop.getCurrentFrame().ContainerWindow
 
+    def disable_menuitems(self):
+        pass
+
+    def enable_menuitems(self):
+        pass
+
     def login(self, username, password):
         """
         Open a login dialog and connect the user
@@ -74,7 +81,9 @@ class OpenPLMPluginInstance(object):
         if res["result"] == "ok":
             #self._action_group2.set_sensitive(True)
             self.load_managed_files()
+            self.enable_menuitems()
         else:
+            self.disable_menuitems()
             raise ValueError(res["error"])
 
     def create(self, data, filename, unlock):
