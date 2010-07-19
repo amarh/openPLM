@@ -715,12 +715,13 @@ def download(request, docfile_id):
     base_dir = os.path.dirname(__file__)
     rep1 = os.path.join(base_dir, "..", "docs", "%s/" % docfile_id)
     rep = os.path.join("docs", "%s/" % docfile_id)
+    dst1 = os.path.join(rep1, name)
     if not os.path.exists(rep1):
         os.mkdir(rep1)
+    if os.path.lexists(dst1):
+        os.unlink(dst1)
+    os.symlink(doc_file.file.path, dst1)
     dst = os.path.join(rep, name)
-    if os.path.lexists(dst):
-        os.unlink(dst)
-    os.symlink(doc_file.file.path, dst)
     return HttpResponseRedirect("/" + dst)
     
 ##########################################################################################
