@@ -32,6 +32,7 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHandler
 
 import urllib2
+import glib
 import gedit, gtk
 import gettext
 import gpdefs
@@ -322,6 +323,8 @@ class OpenPLMPluginInstance(object):
                             self.load_file(doc, doc_file["id"], path)
                             if not unlock:
                                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
+                            else:
+                                self.forget(gdoc)
                         save_document(self._window, gdoc, f)
                 else:
                     diag.destroy()
@@ -397,7 +400,7 @@ class OpenPLMPluginInstance(object):
             files.extend((d, doc) for d in doc.get("files", {}).items())
         return files
    
-    def forget(self, gdoc=None, delete=True):
+    def forget(self, gdoc=None, delete=True, close=True):
         gdoc = gdoc or self._window.get_active_document()
         doc = gdoc.get_data("openplm_doc")
         doc_file_id = gdoc.get_data("openplm_file_id")
@@ -414,6 +417,12 @@ class OpenPLMPluginInstance(object):
             f.close()
             if delete and os.path.exists(path):
                 os.remove(path)
+            if close:
+                glib.timeout_add(1, self.close, gdoc)
+
+    def close(self, gdoc):
+        self._window.close_tab(gedit.tab_get_from_document(gdoc))
+        return False
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
@@ -452,6 +461,8 @@ class OpenPLMPluginInstance(object):
                 res = self.opener.open(request)
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+                else:
+                    self.forget(gdoc)
             if save:
                 save_document(self._window, gdoc, func)
             else:
@@ -498,7 +509,7 @@ class OpenPLMPluginInstance(object):
                 # directory already exists, just ignores the exception
                 pass
 
-            self.forget(gdoc)
+            self.forget(gdoc, close=False)
             path = os.path.join(rep, name)
             gdoc.set_uri("file://" + path)
             def func():
