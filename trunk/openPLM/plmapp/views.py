@@ -166,7 +166,6 @@ def display_object_attributes(request, object_type_value, object_reference_value
     context_dict.update({'current_page':'attributes', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
-    print request.user
     context_dict.update(var_dict)
     return render_to_response('DisplayObject.htm', context_dict)
 
@@ -470,7 +469,6 @@ def display_related_part(request, object_type_value, object_reference_value, obj
         # TODO
         raise TypeError()
     if request.method == "POST":
-        print request.POST.items()
         formset = get_rel_part_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_rel_part(formset)
@@ -564,7 +562,6 @@ def add_file(request, object_type_value, object_reference_value, object_revision
     request.session.update(request_dict)
     context_dict.update(var_dict)
     if request.POST:
-        print request.FILES
         add_file_form_instance = AddFileForm(request.POST, request.FILES)
         if add_file_form_instance.is_valid():
             obj.add_file(request.FILES["filename"])

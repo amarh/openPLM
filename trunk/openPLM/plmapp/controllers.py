@@ -883,8 +883,6 @@ class DocumentController(PLMObjectController):
                     raise ValueError("Bad document %s (%s expected)" % (document, self.object))
                 delete = form.cleaned_data["delete"]
                 filename = form.cleaned_data["id"]
-                print "filename"
-                print form.instance.id
                 if delete:
                     self.delete_file(filename)
 

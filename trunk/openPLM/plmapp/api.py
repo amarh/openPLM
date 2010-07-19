@@ -30,7 +30,6 @@ def json_view(func):
             # Allow keyboard interrupts through for debugging.
             raise
         except Exception, e:
-            print e
             #Mail the admins with the error
             exc_info = sys.exc_info()
             subject = 'JSON view error: %s' % request.path
@@ -182,6 +181,10 @@ def get_fields_from_form(form):
     fields = []
     for field_name, field in form.fields.iteritems():
         data = dict(name=field_name, label=field.label, initial=field.initial)
+        if callable(field.initial):
+            data["initial"] = field.initial()
+            if hasattr(data["initial"], "pk"):
+                data["initial"] = data["initial"].pk
         data["type"] = field_to_type(field)
         if hasattr(field, "choices"):
             data["choices"] =  tuple(field.choices)
