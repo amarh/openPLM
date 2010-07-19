@@ -64,7 +64,7 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 
 def display_global_page(request_dict):
     """ Get a request and return a dictionnary with elements common to all pages """
-    log_in_person="pjoulaud"
+#    log_in_person="pjoulaud"
     context_dict = {'log_in_person' : request_dict.user}
     query_dict = {}
     request_dict.session['type'] = 'Part'
@@ -602,7 +602,7 @@ def create_object(request):
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
-    log_in_person="pjoulaud"
+#    log_in_person="pjoulaud"
     context_dict.update({'log_in_person' : log_in_person})
     if request.method == 'GET':
         if request.GET:
@@ -628,7 +628,7 @@ def create_object(request):
                 non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
                 creation_form_instance = get_creation_form(cls, request.POST)
                 if creation_form_instance.is_valid():
-                    user = models.User.objects.get(username=context_dict['log_in_person'])
+                    user = request.user
                     controller_cls = get_controller(type_name)
                     controller = PLMObjectController.create_from_form(creation_form_instance, user)
                     return HttpResponseRedirect("/object/%s/%s/%s/" % (controller.type, controller.reference, controller.revision) )
