@@ -712,9 +712,11 @@ def checkin_file(request, object_type_value, object_reference_value, object_revi
 def download(request, docfile_id):
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
     name = doc_file.filename
-    rep = "docs/%s/" % docfile_id
-    if not os.path.exists(rep):
-        os.mkdir(rep)
+    base_dir = os.path.dirname(__file__)
+    rep1 = os.path.join(base_dir, "..", "docs", "%s/" % docfile_id)
+    rep = os.path.join("docs", "%s/" % docfile_id)
+    if not os.path.exists(rep1):
+        os.mkdir(rep1)
     dst = os.path.join(rep, name)
     if os.path.lexists(dst):
         os.unlink(dst)
