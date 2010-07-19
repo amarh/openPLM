@@ -197,5 +197,13 @@ def get_doc_cad_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
-
+class FilterObjectForm(forms.Form):
+    LISTE = [('neato', 'neato'),('dot', 'dot'),('twopi', 'twopi'),('circo','circo'),('fdp','fdp'),('nop','nop')]
+    Child = forms.BooleanField()
+    Parents = forms.BooleanField()
+    Doc = forms.BooleanField()
+    Cad = forms.BooleanField()
+    User = forms.BooleanField()
+    method = forms.TypedChoiceField(choices=LISTE)
+    
 

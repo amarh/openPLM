@@ -22,6 +22,8 @@ import pygraphviz as pgv
 
 from openPLM.plmapp.api import get_obj_by_id
 
+import Image
+
 ##########################################################################################
 def replace_white_spaces(Chain):
     """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
@@ -740,33 +742,47 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
+    if request.POST:
+        filter_object_form_instance = FilterObjectForm(request.POST)
+        if filter_object_form_instance.is_valid:
+            layout_method = request.POST['method']
+            request.session['method']=layout_method
+    else :
+        filter_object_form_instance = FilterObjectForm()
+        layout_method = "neato"
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     navigate_graph=pgv.AGraph()
+    navigate_graph.clear()
     navigate_graph.graph_attr['dpi']='96.0'
-    navigate_graph.graph_attr['aspect']='1'
-    img_width = 8.14*int(zoom)/100
-    img_height = 4.44*int(zoom)/100
-    navigate_graph.graph_attr['size']=str(img_width)+","+str(img_height)
+    navigate_graph.graph_attr['aspect']='1.83'
+    navigate_graph.graph_attr['size']= '16.28, 8.88'
 #    navigate_graph.graph_attr['label']=''
 #    navigate_graph.graph_attr['outputorder']='edgesfirst'
 #    navigate_graph.graph_attr['viewPort']='10, 10, 0.1, 70, 70'
-    navigate_graph.graph_attr['ratio']='expand'
+#    navigate_graph.graph_attr['ratio']='expand'
+#    navigate_graph.graph_attr['bb']='10, 10, 1000, 1000'
     navigate_graph.graph_attr['center']='true'
-    navigate_graph.graph_attr['ranksep']='1.5'
+    navigate_graph.graph_attr['ranksep']='1.2'
     navigate_graph.graph_attr['pad']='0.1'
     navigate_graph.node_attr['shape']='none'
     navigate_graph.node_attr['fixedsize']='true'
     navigate_graph.node_attr['fontsize']='10'
     navigate_graph.node_attr['style']='filled'
     navigate_graph.edge_attr['color']='#000000'
-    navigate_graph.node_attr['image']="media/img/part.png"
-#    navigate_graph.node_attr['width']="1.0"
+    edge_length = 1.2*int(zoom)/100
+    navigate_graph.edge_attr['len']=str(edge_length)
+    navigate_graph.node_attr['width']="0.8"
+    navigate_graph.node_attr['height']="0.6"
     navigate_graph.edge_attr['arrowhead']='normal'
 #    navigate_graph.edge_attr['headlabel']='bollox'
     def create_child_edges(object_id):
         object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
         children_list = object_item.get_children()
+        navigate_graph.edge_attr['color']='#000000'
+        navigate_graph.node_attr['color']='#99ccff'
+        navigate_graph.node_attr['shape']='none'
+        navigate_graph.node_attr['image']="media/img/part.png"
         if children_list:
             for children in children_list:
                 child_id = children.link.child.id
@@ -778,12 +794,17 @@ def navigate(request, object_type_value, object_reference_value, object_revision
                 child_node.attr['URL'] = "/object/"+children.link.child.type.encode('utf-8')\
                                             +"/"+children.link.child.reference.encode('utf-8')\
                                             +"/"+children.link.child.revision.encode('utf-8')+"/navigate/0/0/100/"
+                create_document_edges(child_id)
                 create_child_edges(child_id)
         else:
             return
     def create_parent_edges(object_id):
         object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
         parent_list = object_item.get_parents()
+        navigate_graph.edge_attr['color']='#000000'
+        navigate_graph.node_attr['color']='#99ccff'
+        navigate_graph.node_attr['shape']='none'
+        navigate_graph.node_attr['image']="media/img/part.png"
         if parent_list:
             for parent in parent_list:
                 parent_id = parent.link.parent.id
@@ -795,22 +816,55 @@ def navigate(request, object_type_value, object_reference_value, object_revision
                 parent_node.attr['URL'] = "/object/"+parent.link.parent.type.encode('utf-8')\
                                             +"/"+parent.link.parent.reference.encode('utf-8')\
                                             +"/"+parent.link.parent.revision.encode('utf-8')+"/navigate/0/0/100/"
+                create_document_edges(parent_id)
                 create_parent_edges(parent_id)
         else :
             return
+    def create_document_edges(object_id):
+        object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
+        document_list = object_item.get_attached_documents()
+        navigate_graph.edge_attr['color']='#000000'
+        navigate_graph.node_attr['image']='none'
+        navigate_graph.node_attr['color']='#fef176'
+        navigate_graph.node_attr['shape']='note'
+        if document_list:
+            for document_item in document_list:
+                document_id = document_item.document.id
+                navigate_graph.add_edge(object_id, document_id)
+                document_node = navigate_graph.get_node(document_id)
+                document_node.attr['label'] = document_item.document.type.encode('utf-8')\
+                                            +"\\n"+document_item.document.reference.encode('utf-8')\
+                                            +"\\n"+document_item.document.revision.encode('utf-8')
+                document_node.attr['URL'] = "/object/"+document_item.document.type.encode('utf-8')\
+                                            +"/"+document_item.document.reference.encode('utf-8')\
+                                            +"/"+document_item.document.revision.encode('utf-8')+"/"
+        else :
+            return
     part_id = obj.id
-    create_child_edges(part_id)
-    create_parent_edges(part_id)
+    navigate_graph.add_node(part_id)
     part_node = navigate_graph.get_node(part_id)
     part_node.attr['root'] = 'true'
+#    part_node.attr['pos'] = '4.07, 2.22 !'
+#    part_node.attr['pin'] = 'false'
+    
     part_node.attr['label'] = obj.type.encode('utf-8')\
                                 +"\\n"+obj.reference.encode('utf-8')\
                                 +"\\n"+obj.revision.encode('utf-8')
     part_node.attr['shape']='box'
+    part_node.attr['image']="media/img/part.png"
+    create_document_edges(part_id)
+    create_child_edges(part_id)
+    create_parent_edges(part_id)
     navigate_graph.layout()
-    navigate_graph.draw('media/img/navigate.dot', format='dot', prog='neato')
-    navigate_graph.draw('media/img/navigate.gif', format='gif', prog='twopi')
-    navigate_graph.draw('media/img/navigate.map', format='imap', prog='twopi')
+    navigate_graph.draw('media/img/navigate.dot', format='dot', prog=layout_method)
+    navigate_graph.draw('media/img/navigate.gif', format='gif', prog=layout_method)
+    navigate_graph.draw('media/img/navigate.map', format='imap', prog=layout_method)
+    part_node_position = navigate_graph.get_node(part_id).attr['pos']
+    x_part_node_position, y_part_node_position = part_node_position.split(",")
+    graph_image=Image.open("media/img/navigate.gif")
+    x_size_graph_image, y_size_graph_image = graph_image.size
+    x_img_position_corrected = int(x_img_position) + 790/2 - 72 - int(x_part_node_position)
+    y_img_position_corrected = int(y_img_position) + 430/2 -48 - y_size_graph_image + int(y_part_node_position)
     file_object = open("media/img/navigate.map","rb",0)
     map_string = file_object.read()
     file_object.close()
@@ -823,19 +877,20 @@ def navigate(request, object_type_value, object_reference_value, object_revision
             map_list[i]={'shape': map_line_item[0], 'url': map_line_item[1], '1st_point': map_line_item[2], '2nd_point': map_line_item[3]}
         i+=1
     context_dict.update(var_dict)
-    context_dict.update({'class4div': class_for_div, 'map_areas': map_list, 'x_img_position': int(x_img_position), 'y_img_position': int(y_img_position)})
+    context_dict.update({'class4div': class_for_div, 'filter_object_form': filter_object_form_instance ,'map_areas': map_list, 'x_img_position': int(x_img_position_corrected), 'y_img_position': int(y_img_position_corrected)})
+    navigate_graph.clear()
     return render_to_response('Navigate.htm', context_dict)
 
 def navigate_toward(request, object_type_value, object_reference_value, object_revision_value,\
                  x_img_position, y_img_position, zoom, direction):
     if direction=='left':
-        x_img_position=int(x_img_position)-100
-    if direction=='right':
         x_img_position=int(x_img_position)+100
+    if direction=='right':
+        x_img_position=int(x_img_position)-100
     if direction=='top':
-        y_img_position=int(y_img_position)-100
-    if direction=='bottom':
         y_img_position=int(y_img_position)+100
+    if direction=='bottom':
+        y_img_position=int(y_img_position)-100
     if direction=="zoom-in":
         zoom=int(int(zoom)*1.2)
     if direction=="zoom-out":

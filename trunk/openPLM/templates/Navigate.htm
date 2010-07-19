@@ -3,11 +3,11 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	Display : 
-	<input type="checkbox" value="Parts" checked="checked">Parts
-	<input type="checkbox" value="Parts">Documents
-	<input type="checkbox" value="Parts">CAD
-	<input type="checkbox" value="Parts">Users
+	<form method="post" action="." >
+	    Display : 
+	    {{filter_object_form}}
+        <input type="submit" value="FILTER">
+    </form>
     <br />
     <div id="Navigate">
         
@@ -19,10 +19,10 @@
                     coords="{{map_line.1st_point}},{{map_line.2nd_point}}" />
             {%endfor%}
         </map>
-        <img id="img_management" src="/media/img/logo-nav3.gif" 
+        <img id="img_management" src="/media/img/logo-nav2.gif" width="100" height="164"
                 usemap="#imgmap" title="Move image" alt="Move_image"/>
         <map id="imgmap" name="imgmap">
-            <area href="../../../0/0/100" shape="rect" coords="26, 65, 74, 100" alt="back to initial"/>
+            <area href="../../../0/0/100/" shape="rect" coords="26, 65, 74, 100" alt="back to initial"/>
             <area href="./left" shape="rect" coords="0, 27, 26, 138" alt="move left"/>
             <area href="./top" shape="rect" coords="0, 0, 100, 27" alt="move up"/>
             <area href="./right" shape="rect" coords="74, 27, 100, 138" alt="move right"/>
