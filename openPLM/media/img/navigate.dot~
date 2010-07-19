@@ -1,0 +1,17 @@
+strict graph {
+	graph [bb="0,0,211,188", center=true, dpi="96.0", outputorder=edgesfirst, size="8.14,4.48"];
+	node [label="\N", fixedsize=true, fontsize=10, image="media/img/part.png", shape=none, style=filled];
+	edge [arrowhead=normal, color="#000000"];
+	graph [bb="0,0,211,187"];
+	1 [label="ComputerSet\nMOP-2010\na", height="0.50", pos="107,87", width="0.75"];
+	2 [label="CentralUnit\nCU-00101\na", height="0.50", pos="158,24", width="0.75"];
+	5 [label="BiosOs\nBI-0044\n1.4.3", height="0.50", pos="63,19", width="0.75"];
+	6 [label="Screen\nVH196S\na", height="0.50", pos="28,108", width="0.75"];
+	7 [label="KeyBoard\nKB-2200\na", height="0.50", pos="183,116", width="0.75"];
+	8 [label="Mouse\nM500\na", height="0.50", pos="103,168", width="0.75"];
+	1 -- 2 [labelURL="http://www.google.fr", pos="e,50 50 100 100 50"];
+	1 -- 5 [labelURL="http://www.google.fr", pos="e,75,37 95,69 91,62 85,53 80,46"];
+	1 -- 6 [labelURL="http://www.google.fr", pos="e,55,101 80,94 75,95 70,96 65,98"];
+	1 -- 7 [labelURL="http://www.google.fr", pos="e,156,106 134,97 138,99 142,100 146,102"];
+	1 -- 8 [labelURL="http://www.google.fr", pos="e,104,150 106,105 105,115 105,128 105,140"];
+}

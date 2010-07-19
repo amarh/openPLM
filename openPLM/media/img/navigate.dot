@@ -1,0 +1,18 @@
+strict graph {
+	graph [aspect="1.83", bb="0,0,305,235", center=true, dpi="96.0", pad="0.1", ranksep="1.2", size="16.28, 8.88"];
+	node [label="\N", color="#99ccff", fixedsize=true, fontsize=10, height="0.6", image="media/img/part.png", shape=none, style=filled, width="0.8"];
+	edge [arrowhead=normal, color="#000000", len="1.092"];
+	3 [label="MechanicalPart\npart0077\na", color="#fef176", height="0.60", shape=box, width="0.81", pos="30,89", root=true];
+	2 [label="CentralUnit\nCU-00101\na", height="0.60", width="0.81", pos="114,111", URL="/object/CentralUnit/CU-00101/a/navigate/0/0/100/"];
+	1 [label="ComputerSet\nMOP-2010\na", height="0.60", width="0.81", pos="201,135", URL="/object/ComputerSet/MOP-2010/a/navigate/0/0/100/"];
+	23 [label="Document\nessaispjo\n3", color="#fef176", height="0.60", image=none, shape=note, width="0.81", pos="240,213", URL="/object/Document/essaispjo/3/"];
+	24 [label="Document\nessaispjo\n4", color="#fef176", height="0.60", image=none, shape=note, width="0.81", pos="275,89", URL="/object/Document/essaispjo/4/"];
+	15 [label="ComputerSet\nMOP-2010\nb", height="0.60", width="0.81", pos="69,188", URL="/object/ComputerSet/MOP-2010/b/navigate/0/0/100/"];
+	16 [label="ComputerSet\nMOP-2010\nc", height="0.60", width="0.81", pos="113,22", URL="/object/ComputerSet/MOP-2010/c/navigate/0/0/100/"];
+	2 -- 3 [pos="e,59,97 85,103 80,102 75,101 69,99"];
+	1 -- 2 [pos="e,143,119 172,127 166,125 159,123 153,122"];
+	1 -- 23 [pos="e,229,191 212,157 216,165 220,174 224,182"];
+	1 -- 24 [pos="e,246,107 230,117 232,116 235,114 237,112"];
+	15 -- 2 [pos="e,101,133 82,166 86,158 91,150 96,142"];
+	16 -- 2 [pos="e,114,89 113,44 114,55 114,68 114,79"];
+}
