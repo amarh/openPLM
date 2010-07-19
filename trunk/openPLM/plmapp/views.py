@@ -603,7 +603,7 @@ def create_object(request):
     request.session.update(request_dict)
     context_dict.update(var_dict)
 #    log_in_person="pjoulaud"
-    context_dict.update({'log_in_person' : log_in_person})
+#    context_dict.update({'log_in_person' : log_in_person})
     if request.method == 'GET':
         if request.GET:
             type_form_instance = type_form(request.GET)
