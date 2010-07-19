@@ -43,6 +43,8 @@ try:
 except:
     _ = lambda s: s
 
+escape = glib.markup_escape_text
+
 ui_str = """
 <ui>
   <menubar name="MenuBar">
@@ -110,17 +112,9 @@ def field_to_widget(field):
     widget = None
     if field["type"] in ("text", "int", "decimal", "float"):
         widget = gtk.Entry()
-        widget.set_max_length(field.get("max_length", 0))
+        widget.set_max_length(int(field.get("max_length") or 0))
     elif field["type"] == "boolean":
         widget = gtk.CheckButton()
-    #elif field["type"] in ("int", "decimal", "float"):
-        #widget = gtk.SpinButton()
-        #if field["max_value"] is not None and field["min_value"] is not None:
-            #widget.set_range(float(field["min_value"]), float(field["max_value"]))
-            #if field["type"] == "int":
-                #widget.set_increments(1, 1)
-            #else:
-                #widget.set_increments(.1, .1)
     elif field["type"] == "choice":
         model = gtk.ListStore(object, str)
         choices = field["choices"]
@@ -618,7 +612,7 @@ class SearchDialog(gtk.Dialog):
         docs = self.instance.get_data(self.TYPES_URL)
         self.types = docs["types"]
         table = gtk.Table(2, 3)
-        self.vbox.pack_start(table)
+        self.vbox.pack_start(table, False)
         self.type_entry = gtk.combo_box_entry_new_text()
         for t in docs["types"]:
             self.type_entry.append_text(t)
@@ -636,18 +630,19 @@ class SearchDialog(gtk.Dialog):
         
         self.advanced_table = gtk.Table(2, 3)
         self.advanced_fields = []
-        self.vbox.pack_start(self.advanced_table)
+        self.vbox.pack_start(self.advanced_table, False, 0)
         self.display_fields(self.TYPE)
         
         search_button = gtk.Button(_("Search"))
         search_button.connect("clicked", self.search)
-        self.vbox.pack_start(search_button)
+        self.vbox.pack_start(search_button, False, 0)
 
         self.results_box = gtk.VBox()
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         sw.add_with_viewport(self.results_box)
-        self.vbox.pack_start(sw)
+        sw.set_size_request(400, 150)
+        self.vbox.pack_start(sw, True)
         self.vbox.show_all()
 
     def type_entry_activate_cb(self, entry):
@@ -691,12 +686,20 @@ class SearchDialog(gtk.Dialog):
                 hbox.pack_start(label)
                 hbox.pack_start(check_out)
                 box.pack_start(hbox)
+            if not files:
+                box.pack_start(gtk.Label(_("No files attached")))
             widget.show_all()
         for child in self.results_box.get_children():
             child.destroy()
         for res in results:
-            child = gtk.Expander("%(reference)s|%(type)s|%(revision)s" % res)
+            res2 = res.copy()
+            for key, value in res2.iteritems():
+                if isinstance(value, basestring):
+                    res2[key] = escape(value)
+            label = "%(reference)s|%(type)s|%(revision)s : <b>%(name)s</b>" % res2
+            child = gtk.Expander(label)
             child.res = res
+            child.set_use_markup(True)
             child.add(gtk.VBox())
             child.connect("activate", expand_cb)
             self.results_box.pack_start(child)
