@@ -22,9 +22,9 @@ clear: both;
 div
 {
 -moz-border-radius: 1em;
--webkit-box-shadow: 3px 3px 6px #666;
--moz-box-shadow: 3px 3px 6px #666;
-box-shadow: 3px 3px 6px #666;
+/* -webkit-box-shadow: 3px 3px 6px #666; */
+/* -moz-box-shadow: 3px 3px 6px #666; */
+/* box-shadow: 3px 3px 6px #666; */
 }
 
 #HomePage
