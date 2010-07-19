@@ -698,7 +698,7 @@ class DownloadDialog(SearchDialog):
     ALL_FILES = True
 
     def do_action(self, doc, doc_file):
-        PLUGIN.check_out(doc, doc_file)
+        PLUGIN.download(doc, doc_file)
         self.container.endExecute()
 
 class CheckInDialog(Dialog):
