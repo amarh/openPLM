@@ -22,11 +22,40 @@ from com.sun.star.awt.tree import XTreeExpansionListener
 from com.sun.star.view import XSelectionChangeListener
 from com.sun.star.view.SelectionType import SINGLE
 from com.sun.star.util import CloseVetoException
+from com.sun.star.frame.FrameSearchFlag import CREATE, ALL 
+
  
 from com.sun.star.awt.WindowClass import MODALTOP
 from com.sun.star.awt.VclWindowPeerAttribute import OK, OK_CANCEL, YES_NO, YES_NO_CANCEL, \
                                        RETRY_CANCEL, DEF_OK, DEF_CANCEL, DEF_RETRY, DEF_YES, DEF_NO
+def doc_to_type(doc):
+    services = doc.SupportedServiceNames
+    types = {'com.sun.star.text.TextDocument' : 'swriter',
+             'com.sun.star.sheet.SpreadsheetDocument' : 'scalc',
+             'com.sun.star.presentation.PresentationDocument' : 'simpress',
+             'com.sun.star.drawing.DrawingDocument' : 'sdraw'}
+    for key in types:
+        if key in services:
+            return types[key]
+    return "swriter"
 
+
+def close(gdoc, desktop):
+    enum = desktop.getComponents().createEnumeration()
+    cpt = 0
+    while enum.hasMoreElements():
+        cpt += 1
+        enum.nextElement()
+    gdoc.setModified(False)
+    if cpt == 1:
+        name = "_default"
+        type = doc_to_type(gdoc)
+        desktop.loadComponentFromURL("private:factory/" + type, name,
+                                     CREATE | ALL, ())
+    try:
+        gdoc.close(True)
+    except CloseVetoException:
+        pass
 
 class OpenPLMPluginInstance(object):
     
@@ -110,6 +139,8 @@ class OpenPLMPluginInstance(object):
             self.load_file(doc, doc_file["id"], path)
             if not unlock:
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
+            else:
+                self.forget(gdoc)
             return True, ""
 
     def get_data(self, url, data=None, show_errors=True, reraise=False):
@@ -212,7 +243,7 @@ class OpenPLMPluginInstance(object):
             files.extend((d, doc) for d in doc.get("files", {}).items())
         return files
    
-    def forget(self, gdoc=None, delete=True):
+    def forget(self, gdoc=None, delete=True, close_doc=False):
         gdoc = gdoc or self.desktop.getCurrentComponent()
         if gdoc and gdoc.URL in self.documents:
             doc = self.documents[gdoc.URL]["openplm_doc"]
@@ -226,6 +257,8 @@ class OpenPLMPluginInstance(object):
             self.save_conf(data)
             if delete and os.path.exists(path):
                 os.remove(path)
+            if close_doc:
+                close(gdoc, self.desktop)
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
@@ -246,6 +279,7 @@ class OpenPLMPluginInstance(object):
             return
         self.documents[document.URL] = dict(openplm_doc=doc,
             openplm_file_id=doc_file_id, openplm_path=path)
+        document.setTitle(document.getTitle() + " / %(name)s rev. %(revision)s" % doc)
         return document
 
     def check_in(self, gdoc, unlock, save=True):
@@ -263,6 +297,8 @@ class OpenPLMPluginInstance(object):
                 res = self.opener.open(request)
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+                else:
+                    self.forget(gdoc)
             if save:
                 gdoc.store()
                 func()
@@ -302,6 +338,7 @@ class OpenPLMPluginInstance(object):
             self.add_managed_file(new_doc, doc_file, new_path)
             self.check_in(gd, unlock, False)
             self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
+            return gd
         else:
             show_error("Can not revise : file not in openPLM", self.window)
 
@@ -651,6 +688,8 @@ class SearchDialog(Dialog, XItemListener,
         suffix = "all/" if self.ALL_FILES else ""
         url = "api/object/%s/files/%s" % (res["id"], suffix)
         files = PLUGIN.get_data(url)["files"]
+        if "files" in res:
+            return
         res["files"] = files
         for f in files:
             node = self.tree_model.createNode(f["filename"], False)
@@ -662,7 +701,7 @@ class SearchDialog(Dialog, XItemListener,
         while self.tree_root.getChildCount():
             self.tree_root.removeChildByIndex(0)
         for res in results:
-            text = "%(reference)s|%(type)s|%(revision)s" % res
+            text = "%(reference)s|%(type)s|%(revision)s : %(name)s" % res
             node = self.tree_model.createNode(text, self.EXPAND_FILES)
             self.tree_root.appendChild(node)
             self.nodes[node.getDisplayValue()] = res
@@ -740,8 +779,9 @@ class CheckInDialog(Dialog):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.check_in(desktop.getCurrentComponent(),
-                            self.get_value(self.unlock_button, None))
+            doc = desktop.getCurrentComponent()
+            unlock = self.get_value(self.unlock_button, None)
+            PLUGIN.check_in(doc, unlock)
             self.container.endExecute()
         except:
             traceback.print_exc()
@@ -758,6 +798,7 @@ class ReviseDialog(Dialog):
         self.doc = doc
         self.name = name
         self.revision = revision
+        self.gdoc = None
 
     def run(self):
         smgr = self.ctx.ServiceManager
@@ -792,10 +833,10 @@ class ReviseDialog(Dialog):
         try:
             desktop = self.ctx.ServiceManager.createInstanceWithContext(
                 'com.sun.star.frame.Desktop', self.ctx)
-            PLUGIN.revise(desktop.getCurrentComponent(),
+            self.container.endExecute()
+            self.gdoc = PLUGIN.revise(desktop.getCurrentComponent(),
                           self.get_value(self.revision_entry, None),
                           self.get_value(self.unlock_button, None))
-            self.container.endExecute()
         except:
             traceback.print_exc()
 
@@ -839,7 +880,7 @@ class CreateDialog(SearchDialog):
     ROW_PAD = 2
 
     def run(self):
-        
+        self.doc_created = False
         docs = PLUGIN.get_data(self.TYPES_URL)
         self.types = docs["types"]
 
@@ -934,6 +975,7 @@ class CreateDialog(SearchDialog):
                     self.container.endExecute()
                 else:
                     show_error(error, self.container.getPeer())
+                self.doc_created = b
         except:
             traceback.print_exc()
 
@@ -1001,7 +1043,7 @@ class OpenPLMForget(Job):
 
     def trigger(self, args):
         try:
-            PLUGIN.forget()
+            PLUGIN.forget(close_doc=True)
         except:
             traceback.print_exc()
 
@@ -1019,6 +1061,11 @@ class OpenPLMCheckIn(Job):
                 name = os.path.basename(path)
                 dialog = CheckInDialog(self.ctx, doc, name)
                 dialog.run() 
+                if gdoc.URL not in PLUGIN.documents:
+                    close(gdoc, self.desktop)
+            else:
+                win = gdoc.CurrentController.Frame.ContainerWindow
+                show_error("Document not stored in OpenPLM", win)
         except:
             traceback.print_exc()
 
@@ -1044,10 +1091,12 @@ class OpenPLMRevise(Job):
                 dialog = ReviseDialog(self.ctx, doc, name, revision)
                 dialog.run()
                 if gdoc.URL not in PLUGIN.documents:
-                    try:
-                        gdoc.close(True)
-                    except CloseVetoException:
-                        pass
+                    close(gdoc, self.desktop)
+                if dialog.gdoc and dialog.gdoc.URL not in PLUGIN.documents:
+                    close(dialog.gdoc, self.desktop)
+            else:
+                win = gdoc.CurrentController.Frame.ContainerWindow
+                show_error("Document not stored in OpenPLM", win)
         except:
             traceback.print_exc()
 
@@ -1079,7 +1128,9 @@ class OpenPLMCreate(Job):
                 show_error("Current file already attached to a document", win)
                 return
             dialog = CreateDialog(self.ctx)
-            dialog.run() 
+            resp = dialog.run()
+            if dialog.doc_created and gdoc.URL not in PLUGIN.documents:
+                close(gdoc, self.desktop)
         except:
             traceback.print_exc()
 
