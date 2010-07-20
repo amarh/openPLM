@@ -12,7 +12,7 @@
     <div id="Navigate">
         
         <img id="img_nav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;"
-                 src="/media/img/navigate.gif" usemap="#navigatemap" title="Navigate" alt="Navigate" />
+                 src="{{picture_path}}" usemap="#navigatemap" title="Navigate" alt="Navigate" />
         <map id="navigatemap" name="navigatemap">
             {%for map_line in map_areas%}
                 <area href="{{map_line.url}}" shape="{{map_line.shape}}" 
