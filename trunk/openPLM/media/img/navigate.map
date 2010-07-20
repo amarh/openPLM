@@ -1,7 +1,2 @@
 base referer
-rect /object/CentralUnit/CU-00101/a/navigate/0/0/100/ 123,147 200,203
-rect /object/ComputerSet/MOP-2010/a/navigate/0/0/100/ 239,115 316,171
-rect /object/Document/essaispjo/3/ 291,11 368,67
-rect /object/Document/essaispjo/4/ 338,176 415,232
-rect /object/ComputerSet/MOP-2010/b/navigate/0/0/100/ 63,44 140,100
-rect /object/ComputerSet/MOP-2010/c/navigate/0/0/100/ 122,266 199,322
+rect /object/MechanicalPart/part0077/a/navigate/0/0/100/ 11,11 88,67
