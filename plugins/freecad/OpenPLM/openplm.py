@@ -20,22 +20,14 @@ import FreeCAD, FreeCADGui
 
 connect = QtCore.QObject.connect
 
-def close(gdoc, desktop):
-    enum = desktop.getComponents().createEnumeration()
-    cpt = 0
-    while enum.hasMoreElements():
-        cpt += 1
-        enum.nextElement()
-    gdoc.setModified(False)
-    if cpt == 1:
-        name = "_default"
-        type = doc_to_type(gdoc)
-        desktop.loadComponentFromURL("private:factory/" + type, name,
-                                     CREATE | ALL, ())
-    try:
-        gdoc.close(True)
-    except CloseVetoException:
-        pass
+def main_window():
+    app = qt.qApp
+    for x in app.topLevelWidgets():
+        if type(x) == qt.QMainWindow:
+            return x
+
+def close(gdoc):
+    FreeCAD.closeDocument(gdoc.Label)
 
 class OpenPLMPluginInstance(object):
     
@@ -54,7 +46,6 @@ class OpenPLMPluginInstance(object):
                                            StreamingHTTPRedirectHandler(),
                                            urllib2.HTTPCookieProcessor())
         self.username = ""
-        self.desktop = None
         self.documents = {}
         self.disable_menuitems()
 
@@ -67,9 +58,7 @@ class OpenPLMPluginInstance(object):
         except os.error:
             pass
 
-    def set_desktop(self, desktop):
-        self.desktop = desktop
-        self.window = desktop.getCurrentFrame().ContainerWindow
+        self.window = main_window()
 
     def disable_menuitems(self):
         pass
@@ -111,9 +100,10 @@ class OpenPLMPluginInstance(object):
             except os.error:
                 # directory already exists, just ignores the exception
                 pass
-            gdoc = self.desktop.getCurrentComponent()
+            gdoc = FreeCAD.ActiveDocument
             path = os.path.join(rep, filename)
-            gdoc.storeAsURL("file://" + path, ())
+            gdoc.FileName = path
+            FreeCADGui.runCommand("Std_Save")
             doc_file = self.upload_file(doc, path)
             self.add_managed_file(doc, doc_file, path)
             self.load_file(doc, doc_file["id"], path)
@@ -206,6 +196,8 @@ class OpenPLMPluginInstance(object):
             return {}
     
     def set_server(self, url):
+        if not url.endswith("/"):
+            url += "/"
         data = self.get_conf_data()
         data["server"] = url
         type(self).SERVER = url
@@ -224,7 +216,7 @@ class OpenPLMPluginInstance(object):
         return files
    
     def forget(self, gdoc=None, delete=True, close_doc=False):
-        gdoc = gdoc or self.desktop.getCurrentComponent()
+        gdoc = gdoc or FreeCAD.ActiveDocument
         if gdoc and gdoc in self.documents:
             doc = self.documents[gdoc]["openplm_doc"]
             doc_file_id = self.documents[gdoc]["openplm_file_id"]
@@ -238,15 +230,16 @@ class OpenPLMPluginInstance(object):
             if delete and os.path.exists(path):
                 os.remove(path)
             if close_doc:
-                close(gdoc, self.desktop)
+                close(gdoc)
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
             self.load_file(doc, doc_file_id, path)
 
-    def load_file(self, doc, doc_file_id, path):
-        document = FreeCAD.openDocument(path)
-        if not document:
+    def load_file(self, doc, doc_file_id, path, gdoc=None):
+        try:
+            document = gdoc or FreeCAD.openDocument(path)
+        except IOError:
             show_error("Can not load %s" % path, self.window)
             return
         self.documents[document] = dict(openplm_doc=doc,
@@ -272,7 +265,7 @@ class OpenPLMPluginInstance(object):
                 else:
                     self.forget(gdoc)
             if save:
-                gdoc.store()
+                FreeCADGui.runCommand("Std_Save")
                 func()
             else:
                 func()
@@ -287,7 +280,7 @@ class OpenPLMPluginInstance(object):
             res = self.get_data("api/object/%s/revise/" % doc["id"],
                                 {"revision" : revision})
             new_doc = res["doc"]
-            name = os.path.basename(gdoc)
+            name = os.path.basename(gdoc.FileName)
             doc_file = None
             for f in res["files"]:
                 if f["filename"] == name:
@@ -301,16 +294,15 @@ class OpenPLMPluginInstance(object):
             except os.error:
                 # directory already exists, just ignores the exception
                 pass
-            
-            gdoc.store()
-            new_path = os.path.join(rep, name)
-            shutil.move(path, new_path)
-            self.forget(gdoc, delete=False)
-            gd = self.load_file(new_doc, doc_file["id"], new_path)
-            self.add_managed_file(new_doc, doc_file, new_path)
+    
+            self.forget(gdoc, close_doc=False)
+            path = os.path.join(rep, name)
+            gdoc.FileName = path
+            FreeCADGui.runCommand("Std_Save")
+            gd = self.load_file(new_doc, doc_file["id"], path, gdoc)
+            self.add_managed_file(new_doc, doc_file, path)
             self.check_in(gd, unlock, False)
-            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
-            return gd
+            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))        
         else:
             show_error("Can not revise : file not in openPLM", self.window)
 
@@ -444,31 +436,27 @@ class ConfigureDialog(Dialog):
     TITLE = "Conffigure"
     HEIGHT = 105
 
-    def run(self):
-        label = self.addWidget('url', 'FixedText', 5, 10, 60, 14,
-                               Label="OpenPLM server's location:")
-        self.url_entry = self.addWidget('UrlEntry', 'Edit', 90, 10, 100, 14)
-        self.url_entry.Text = PLUGIN.SERVER
+    def update_ui(self):
 
-        button = self.addWidget('configure', 'Button', 55, 85, 50, 14,
-                                Label='Configure')
-        self.container = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialog', )
-        self.container.setModel(self.dialog)
-        self.container.getControl('configure').addActionListener(self)
-        toolkit = smgr.createInstanceWithContext(
-            'com.sun.star.awt.ExtToolkit', )
-        self.container.setVisible(False)
-        self.container.createPeer(toolkit, None)
-        self.container.execute()
+        table = qt.QGridLayout()
+        label = qt.QLabel()
+        label.setText("OpenPLM server's location:")
+        self.url_entry = qt.QLineEdit()
+        self.url_entry.setText(PLUGIN.SERVER)
+        table.addWidget(label, 0, 0)
+        table.addWidget(self.url_entry, 0, 1)
+        
+        self.vbox.addLayout(table)
+        buttons = qt.QDialogButtonBox.Ok | qt.QDialogButtonBox.Cancel
+        buttons_box = qt.QDialogButtonBox(buttons, parent=self)
+        connect(buttons_box, QtCore.SIGNAL("accepted()"), self.action_cb)
+        connect(buttons_box, QtCore.SIGNAL("rejected()"), self.reject)
+        self.vbox.addWidget(buttons_box)
 
-    def actionPerformed(self, actionEvent):
-        try:
-            url = self.url_entry.Text
-            PLUGIN.set_server(url)
-            self.accept()
-        except:
-            traceback.print_exc()
+    def action_cb(self):
+        self.accept()
+        url = self.get_value(self.url_entry, None)
+        PLUGIN.set_server(url)
 
 class SearchDialog(Dialog):
 
@@ -584,8 +572,9 @@ class SearchDialog(Dialog):
         for i, res in enumerate(results):
             text = "%(reference)s|%(type)s|%(revision)s : %(name)s" % res
             node = qt.QTreeWidgetItem([text])
-            child = qt.QTreeWidgetItem(["..."])
-            node.addChild(child)
+            if self.EXPAND_FILES:
+                child = qt.QTreeWidgetItem(["..."])
+                node.addChild(child)
             node.setExpanded(False)
             self.tree.insertTopLevelItem(i, node)
             self.nodes[node] = res
@@ -630,41 +619,29 @@ class CheckInDialog(Dialog):
     WIDTH = 200
     HEIGHT = 100
 
-    def __init__(self, ctx, doc, name):
-        Dialog.__init__(self, ctx)
+    def __init__(self, doc, name):
         self.doc = doc
         self.name = name
+        Dialog.__init__(self)
 
-    def run(self):
-        
+    def update_ui(self):
         text = "%s|%s|%s" % (self.doc["reference"], self.doc["revision"],
                                        self.doc["type"])
 
-        label = self.addWidget('label', 'FixedText', 5, 10, 60, 14,
-                               Label = text)
-        self.unlock_button = self.addWidget('unlock_button', 'CheckBox',
-                                            5, 30, 100, 14, Label='Unlock ?')
+        label = qt.QLabel(text)
+        self.vbox.addWidget(label)
+        self.unlock_button = qt.QCheckBox('Unlock ?')
+        self.vbox.addWidget(self.unlock_button)
 
-        button = self.addWidget('action', 'Button', 55, 85, 50, 14,
-                                Label=self.ACTION_NAME)
-        self.container = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialog', )
-        self.container.setModel(self.dialog)
-        self.container.getControl('action').addActionListener(self)
-        toolkit = smgr.createInstanceWithContext(
-            'com.sun.star.awt.ExtToolkit', )
-        self.container.setVisible(False)
-        self.container.createPeer(toolkit, None)
-        self.container.execute()
-
-    def actionPerformed(self, actionEvent):
-        try:
-            doc = desktop.getCurrentComponent()
-            unlock = self.get_value(self.unlock_button, None)
-            PLUGIN.check_in(doc, unlock)
-            self.accept()
-        except:
-            traceback.print_exc()
+        button = qt.QPushButton(self.ACTION_NAME)
+        connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
+        self.vbox.addWidget(button)
+        
+    def action_cb(self):
+        doc = FreeCAD.ActiveDocument
+        unlock = self.get_value(self.unlock_button, None)
+        PLUGIN.check_in(doc, unlock)
+        self.accept()
 
 class ReviseDialog(Dialog):
 
@@ -673,50 +650,39 @@ class ReviseDialog(Dialog):
     WIDTH = 200
     HEIGHT = 100
 
-    def __init__(self, ctx, doc, name, revision):
-        Dialog.__init__(self, ctx)
+    def __init__(self, doc, name, revision):
         self.doc = doc
         self.name = name
         self.revision = revision
         self.gdoc = None
+        Dialog.__init__(self)
 
-    def run(self):
-        
+    def update_ui(self):
+        hbox = qt.QHBoxLayout()
         text = "%s|" % self.doc["reference"]
-        label = self.addWidget('ref', 'FixedText', 5, 10, 60, 14,
-                               Label = text)
-        self.revision_entry = self.addWidget("rev_button", "Edit", 70, 10, 60, 14,
-                                              Text=self.revision)
+        label = qt.QLabel(text)
+        hbox.addWidget(label)
+        self.revision_entry = qt.QLineEdit()
+        self.revision_entry.setText(self.revision)
+        hbox.addWidget(self.revision_entry)
         text = "|%s" % self.doc["type"]
-        label = self.addWidget('type', 'FixedText', 135, 10, 60, 14,
-                               Label=text)
-        self.unlock_button = self.addWidget('unlock_button', 'CheckBox',
-                                            5, 30, 100, 14, Label='Unlock ?')
+        label = qt.QLabel(text)
+        hbox.addWidget(label)
+        self.vbox.addLayout(hbox)
+        self.unlock_button = qt.QCheckBox('Unlock ?')
+        self.vbox.addWidget(self.unlock_button)
 
-        button = self.addWidget('action', 'Button', 55, 85, 50, 14,
-                                Label=self.ACTION_NAME)
-        text = "Warning, old revision file will be automatically unlocked!"
-        label = self.addWidget('warning', 'FixedText', 5, 45, 150, 14,
-                               Label=text)
-        self.container = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialog', )
-        self.container.setModel(self.dialog)
-        self.container.getControl('action').addActionListener(self)
-        toolkit = smgr.createInstanceWithContext(
-            'com.sun.star.awt.ExtToolkit', )
-        self.container.setVisible(False)
-        self.container.createPeer(toolkit, None)
-        self.container.execute()
-
-    def actionPerformed(self, actionEvent):
-        try:
-            self.accept()
-            self.gdoc = PLUGIN.revise(desktop.getCurrentComponent(),
+        button = qt.QPushButton(self.ACTION_NAME)
+        connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
+        self.vbox.addWidget(button)
+        
+    def action_cb(self):
+        doc = FreeCAD.ActiveDocument
+        self.gdoc = PLUGIN.revise(doc,
                           self.get_value(self.revision_entry, None),
                           self.get_value(self.unlock_button, None))
-        except:
-            traceback.print_exc()
-
+        self.accept()
+    
 class AttachToPartDialog(SearchDialog):
     TITLE = "Attach to part"
     ACTION_NAME = "Attach"
@@ -724,24 +690,20 @@ class AttachToPartDialog(SearchDialog):
     TYPES_URL = "api/parts/"
     EXPAND_FILES = False
 
-    def __init__(self, ctx, doc):
-        SearchDialog.__init__(self, ctx)
+    def __init__(self, doc):
+        SearchDialog.__init__(self)
         self.doc = doc
     
     def do_action(self, part):
         PLUGIN.attach_to_part(self.doc, part["id"])
         self.accept()
-    
-    def actionPerformed(self, actionEvent):
-        try:
-            if actionEvent.Source == self.container.getControl('search_button'):
-                self.search()
-            elif actionEvent.Source == self.container.getControl('action_button'):
-                node =  self.container.getControl('tree').getSelection()
-                doc = self.nodes[node.getDisplayValue()]
-                self.do_action(doc)
-        except:
-            traceback.print_exc()
+   
+    def action_cb(self):
+        node =  self.tree.currentItem()
+        if not node:
+            return
+        doc = self.nodes[node]
+        self.do_action(doc)
 
 class CreateDialog(SearchDialog):
 
@@ -885,7 +847,7 @@ class OpenPLMConfigure:
 
     def Activated(self):
         dialog = ConfigureDialog()
-        dialog.run()
+        dialog.exec_()
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Configure', 'ToolTip': 'Configure'} 
@@ -908,7 +870,7 @@ class OpenPLMDownload:
     
     def Activated(self):
         dialog = DownloadDialog()
-        dialog.run()
+        dialog.exec_()
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Download', 'ToolTip': 'Download'} 
@@ -929,7 +891,7 @@ FreeCADGui.addCommand('OpenPLM_Forget', OpenPLMForget())
 class OpenPLMCheckIn:
     
     def Activated(self):
-        gdoc = self.desktop.getCurrentComponent()
+        gdoc = FreeCAD.ActiveDocument
         if gdoc and gdoc in PLUGIN.documents:
             doc = PLUGIN.documents[gdoc]["openplm_doc"]
             doc_file_id = PLUGIN.documents[gdoc]["openplm_file_id"]
@@ -938,22 +900,22 @@ class OpenPLMCheckIn:
                 return
             name = os.path.basename(path)
             dialog = CheckInDialog(doc, name)
-            dialog.run() 
+            dialog.exec_() 
             if gdoc not in PLUGIN.documents:
-                close(gdoc, self.desktop)
-            else:
-                win = gdoc.CurrentController.Frame.ContainerWindow
-                show_error("Document not stored in OpenPLM", win)
+                close(gdoc)
+        else:
+            win = main_window()
+            show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Check-in', 'ToolTip': 'Check-in'} 
 
-FreeCADGui.addCommand('OpenPLMCheckIn', OpenPLMCheckIn())
+FreeCADGui.addCommand('OpenPLM_CheckIn', OpenPLMCheckIn())
 
 class OpenPLMRevise:
 
     def Activated(self):
-        gdoc = self.desktop.getCurrentComponent()
+        gdoc = FreeCAD.ActiveDocument
         if gdoc and gdoc in PLUGIN.documents:
             doc = PLUGIN.documents[gdoc]["openplm_doc"]
             doc_file_id = PLUGIN.documents[gdoc]["openplm_file_id"]
@@ -962,21 +924,19 @@ class OpenPLMRevise:
                 return
             revisable = PLUGIN.get_data("api/object/%s/isrevisable/" % doc["id"])["revisable"]
             if not revisable:
-                win = gdoc.CurrentController.Frame.ContainerWindow
+                win = main_window()
                 show_error("Document can not be revised", win)
                 return
             res = PLUGIN.get_data("api/object/%s/nextrevision/" % doc["id"])
             revision = res["revision"]
             name = os.path.basename(path)
             dialog = ReviseDialog(doc, name, revision)
-            dialog.run()
+            dialog.exec_()
             if gdoc not in PLUGIN.documents:
-                close(gdoc, self.desktop)
-                if dialog.gdoc and dialog.gdoc not in PLUGIN.documents:
-                    close(dialog.gdoc, self.desktop)
-                else:
-                    win = gdoc.CurrentController.Frame.ContainerWindow
-                    show_error("Document not stored in OpenPLM", win)
+                close(gdoc)
+        else:
+            win = main_window()
+            show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Revise', 'ToolTip': 'Revise'} 
@@ -986,26 +946,26 @@ FreeCADGui.addCommand('OpenPLM_Revise', OpenPLMRevise())
 class OpenPLMAttach:
 
     def Activated(self):
-        gdoc = self.desktop.getCurrentComponent()
+        gdoc = FreeCAD.ActiveDocument
         if gdoc and gdoc in PLUGIN.documents:
             doc = PLUGIN.documents[gdoc]["openplm_doc"]
             dialog = AttachToPartDialog(doc)
-            dialog.run()
+            dialog.exec_()
         else:
-            win = gdoc.CurrentController.Frame.ContainerWindow
+            win = main_window()
             show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Attach to a part',
                 'ToolTip': 'Attach to a part'} 
 
-FreeCADGui.addCommand('OpenPLM_Attach', OpenPLMAttach())
+FreeCADGui.addCommand('OpenPLM_AttachToPart', OpenPLMAttach())
 
 class OpenPLMCreate:
     
     def Activated(self):
-        gdoc = self.desktop.getCurrentComponent()
-        win = gdoc.CurrentController.Frame.ContainerWindow
+        gdoc = FreeCAD.ActiveDocument
+        win = main_window()
         if not gdoc:
             show_error("Need an opened file to create a document", win)
             return
@@ -1013,21 +973,15 @@ class OpenPLMCreate:
             show_error("Current file already attached to a document", win)
             return
         dialog = CreateDialog()
-        resp = dialog.run()
+        resp = dialog.exec_()
         if dialog.doc_created and gdoc not in PLUGIN.documents:
-            close(gdoc, self.desktop)
+            close(gdoc)
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Create a Document',
                 'ToolTip': 'Create a document'} 
 
 FreeCADGui.addCommand('OpenPLM_Create', OpenPLMCreate())
-
-def main_window():
-    app = qt.qApp
-    for x in app.topLevelWidgets():
-        if type(x) == qt.QMainWindow:
-            return x
 
 def build_menu():
     win = main_window()
