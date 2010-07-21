@@ -11,10 +11,9 @@ from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHand
 
 import urllib2
 
-import traceback
 
 import PyQt4.QtGui as qt
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore
 
 import FreeCAD, FreeCADGui
 
@@ -26,8 +25,12 @@ def main_window():
         if type(x) == qt.QMainWindow:
             return x
 
+def save(gdoc):
+    FreeCADGui.runCommand("Std_Save")
+    gdoc.Label = os.path.splitext(os.path.basename(gdoc.FileName))[0] or gdoc.Label
+    
 def close(gdoc):
-    FreeCAD.closeDocument(gdoc.Label)
+    FreeCAD.closeDocument(gdoc.Name)
 
 class OpenPLMPluginInstance(object):
     
@@ -103,10 +106,10 @@ class OpenPLMPluginInstance(object):
             gdoc = FreeCAD.ActiveDocument
             path = os.path.join(rep, filename)
             gdoc.FileName = path
-            FreeCADGui.runCommand("Std_Save")
+            save(gdoc)
             doc_file = self.upload_file(doc, path)
             self.add_managed_file(doc, doc_file, path)
-            self.load_file(doc, doc_file["id"], path)
+            self.load_file(doc, doc_file["id"], path, gdoc)
             if not unlock:
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
             else:
@@ -247,7 +250,7 @@ class OpenPLMPluginInstance(object):
         #document.setTitle(document.getTitle() + " / %(name)s rev. %(revision)s" % doc)
         return document
 
-    def check_in(self, gdoc, unlock, save=True):
+    def check_in(self, gdoc, unlock, save_file=True):
         if gdoc and gdoc in self.documents:
             doc = self.documents[gdoc]["openplm_doc"]
             doc_file_id = self.documents[gdoc]["openplm_file_id"]
@@ -264,8 +267,8 @@ class OpenPLMPluginInstance(object):
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
                 else:
                     self.forget(gdoc)
-            if save:
-                FreeCADGui.runCommand("Std_Save")
+            if save_file:
+                save(gdoc)
                 func()
             else:
                 func()
@@ -298,7 +301,7 @@ class OpenPLMPluginInstance(object):
             self.forget(gdoc, close_doc=False)
             path = os.path.join(rep, name)
             gdoc.FileName = path
-            FreeCADGui.runCommand("Std_Save")
+            save(gdoc)
             gd = self.load_file(new_doc, doc_file["id"], path, gdoc)
             self.add_managed_file(new_doc, doc_file, path)
             self.check_in(gd, unlock, False)
@@ -718,103 +721,82 @@ class CreateDialog(SearchDialog):
     ROW_HEIGHT = 15
     ROW_PAD = 2
 
-    def run(self):
-        self.doc_created = False
+    def update_ui(self):
+        self.doc_created = None        
         docs = PLUGIN.get_data(self.TYPES_URL)
         self.types = docs["types"]
 
-        fields = [("type", 'ListBox'),
-                 ]
-        self.fields = []
-        for i, (text, entry) in enumerate(fields): 
-            x, y, w, h = self.get_position(i, 1)
-            label = self.addWidget('%s_label' % text, 'FixedText', x, y, w, h,
-                               Label = '%s:' % text.capitalize())
-            x, y, w, h = self.get_position(i, 2)
-            widget = self.addWidget('%s_entry' % text, entry, x, y, w, h)
-            self.fields.append((text, widget))
-
-        self.type_entry = self.fields[0][1]
-        self.type_entry.StringItemList = tuple(self.types)
-        self.type_entry.SelectedItems = (self.types.index(self.TYPE),)
-        self.type_entry.Dropdown = True
-        self.type_entry.MultiSelection = False
-        
-        self.advanced_fields = []
-        self.display_fields(self.TYPE)
+        table = qt.QGridLayout()
+        self.vbox.addLayout(table)
+        self.type_entry = qt.QComboBox()
+        self.type_entry.addItems(self.types)
+        self.type_entry.setCurrentIndex(self.types.index(self.TYPE))
+        connect(self.type_entry, QtCore.SIGNAL("activated(const QString&)"),
+                self.type_entry_activate_cb)
+        self.fields = [("type", self.type_entry),
+                      ]
+        for i, (text, entry) in enumerate(self.fields):
+            label = qt.QLabel()
+            label.setText(text.capitalize()+":")
+            table.addWidget(label, i, 0)
+            table.addWidget(entry, i, 1)
        
-        row = len(self.fields) + len(self.advanced_fields)
-        x, y, w, h = self.get_position(row, 1)
-        self.filename_label = self.addWidget('filenameLabel', 'FixedText',
-                                             x, y, w, h, Label="Filename")
-        x, y, w, h = self.get_position(row, 2)
-        self.filename_entry = self.addWidget('filename', 'Edit', x, y, w, h)
-        x, y, w, h = self.get_position(row + 1, 1)
-        self.unlock_button = self.addWidget('unlock', 'CheckBox', x, y, w, h,
-                                Label="Unlock ?")
-        x, y, w, h = self.get_position(row + 2, 2)
-        self.action_button = self.addWidget('action_button', 'Button', x, y, w, h,
-                                Label=self.ACTION_NAME)
+        self.advanced_table = qt.QGridLayout()
+        self.advanced_fields = []
+        self.vbox.addLayout(self.advanced_table)
+        self.display_fields(self.TYPE)
+        
+        hbox = qt.QHBoxLayout()
+        label = qt.QLabel()
+        label.setText("Filename:")
+        hbox.addWidget(label)
+        self.filename_entry = qt.QLineEdit()
+        hbox.addWidget(self.filename_entry)
+        doc = FreeCAD.ActiveDocument
+        self.filename_entry.setText(os.path.basename(doc.FileName) or "x.fcstd")
+        self.vbox.addLayout(hbox)
+        self.unlock_button = qt.QCheckBox('Unlock ?')
+        self.vbox.addWidget(self.unlock_button)
+                
+        self.action_button = qt.QPushButton(self.ACTION_NAME)
+        connect(self.action_button, QtCore.SIGNAL("clicked()"), self.action_cb)
+        self.vbox.addWidget(self.action_button)
 
-        self.container = smgr.createInstanceWithContext(
-            'com.sun.star.awt.UnoControlDialog', )
-        self.container.setModel(self.dialog)
-        self.container.getControl('action_button').addActionListener(self)
-        self.container.getControl('type_entry').addItemListener(self)
-        toolkit = smgr.createInstanceWithContext(
-            'com.sun.star.awt.ExtToolkit', )
-        self.container.setVisible(False)
-        self.container.createPeer(toolkit, None)
-        self.container.execute()
-
+    def type_entry_activate_cb(self, typename):
+        self.display_fields(typename)
+    
     def display_fields(self, typename):
-        fields = PLUGIN.get_data("api/creation_fields/%s/" % typename)["fields"]
+        fields = self.instance.get_data("api/creation_fields/%s/" % typename)["fields"]
         temp = {}
         for field, entry in self.advanced_fields:
-            name = field["name"]
-            temp[name] = self.get_value(entry, field)
-            self.container.getControl(entry.Name).setVisible(False)
-            entry.dispose()
-            self.dialog.removeByName(entry.Name)
-            label = self.dialog.getByName("%s_label" % name)
-            self.container.getControl(label.Name).setVisible(False)
-            label.dispose()
-            self.dialog.removeByName(label.Name)
+            temp[field["name"]] = self.get_value(entry, field)
+        while self.advanced_table.count():
+            child = self.advanced_table.itemAt(0).widget()
+            self.advanced_table.removeWidget(child)
+            child.hide()
+            child.destroy()
+        self.advanced_table.invalidate()
         self.advanced_fields = []
-        row = len(self.fields)
         for i, field in enumerate(fields):
-            text, name = field["label"], field["name"]
-            x, y, w, h = self.get_position(i + row, 1)
-            label = self.addWidget('%s_label' % name, 'FixedText',
-                                   x, y, w, h, Label='%s:' % text.capitalize())
-            x, y, w, h = self.get_position(i + row, 2)
-            widget = self.field_to_widget(field, x, y, w, h)
-            if name in temp:
-                self.set_value(widget, temp[name], field)
+            text = field["label"]
+            label = qt.QLabel()
+            label.setText(text.capitalize()+":")
+            self.advanced_table.addWidget(label, i, 0)
+            widget = self.field_to_widget(field)
+            if field["name"] in temp:
+                self.set_value(widget, temp[field["name"]], field)
+            self.advanced_table.addWidget(widget, i, 1)
             self.advanced_fields.append((field, widget))
-        if hasattr(self, 'container'):
-            self.container.getPeer().invalidate(UPDATE|1)
-            x, y, w, h = self.get_position(row + i + 1, 1)
-            self.filename_label.PositionY = y
-            self.filename_entry.PositionY = y
-            x, y, w, h = self.get_position(row + i + 2, 1)
-            self.unlock_button.PositionY = y
-            x, y, w, h = self.get_position(row + i + 3, 1)
-            self.action_button.PositionY = y
 
-    def actionPerformed(self, actionEvent):
-        try:
-            if actionEvent.Source == self.container.getControl('action_button'):
-                b, error = PLUGIN.create(self.get_creation_data(),
-                              self.get_value(self.filename_entry, None),
-                              self.get_value(self.unlock_button, None))
-                if b:
-                    self.accept()
-                else:
-                    show_error(error, self.container.getPeer())
-                self.doc_created = b
-        except:
-            traceback.print_exc()
+    def action_cb(self):
+        b, error = PLUGIN.create(self.get_creation_data(),
+                                 self.get_value(self.filename_entry, None),
+                                 self.get_value(self.unlock_button, None))
+        if b:
+            self.accept()
+        else:
+            show_error(error, self)
+        self.doc_created = b
 
     def get_creation_data(self):
         data = {}
@@ -823,13 +805,6 @@ class CreateDialog(SearchDialog):
         for field, widget in self.advanced_fields:
             data[field["name"]] = self.get_value(widget, field)
         return data
-
-    def itemStateChanged(self, itemEvent):
-        try:
-            typename = self.types[self.type_entry.SelectedItems[0]]
-            self.display_fields(typename)
-        except:
-            traceback.print_exc()
 
 
 class OpenPLMLogin:
@@ -993,3 +968,4 @@ def build_menu():
         QtCore.QObject.connect(action, QtCore.SIGNAL("triggered"), cmd.Activated)
         menu.addAction(action)
     menu.show()
+
