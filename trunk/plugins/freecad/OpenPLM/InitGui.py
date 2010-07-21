@@ -154,7 +154,7 @@ class OpenPLMWorkbench (Workbench):
         """
 
     MenuText = "OpenPLM"
-    ToolTip = "The OpenPLM module is used for basic 2D CAD OpenPLMing"
+    ToolTip = "The OpenPLM module"
 
     def Initialize(self):
         self.initialized = False
@@ -162,7 +162,10 @@ class OpenPLMWorkbench (Workbench):
         import openplm
         self.cmdList = ["OpenPLM_Login"]
         self.appendMenu("OpenPLM", self.cmdList)
-        self.cmdList2 = ["OpenPLM_CheckOut"]
+        self.cmdList2 = ["OpenPLM_CheckOut", "OpenPLM_Download", "OpenPLM_Forget",
+                         "OpenPLM_CheckIn", "OpenPLM_Revise",
+                         "OpenPLM_AttachToPart", "OpenPLM_Create",
+                         "OpenPLM_Configure"]
         self.appendMenu("OpenPLM", self.cmdList2)
         FreeCAD.activeOpenPLMCommand = None # a global place to look for active draft Command
         self.intitialized = True
