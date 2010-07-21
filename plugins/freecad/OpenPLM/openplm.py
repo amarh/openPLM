@@ -49,6 +49,7 @@ class OpenPLMPluginInstance(object):
                                            StreamingHTTPRedirectHandler(),
                                            urllib2.HTTPCookieProcessor())
         self.username = ""
+        self.connected = False
         self.documents = {}
         self.disable_menuitems()
 
@@ -64,10 +65,12 @@ class OpenPLMPluginInstance(object):
         self.window = main_window()
 
     def disable_menuitems(self):
-        pass
+        self.connected = False
+        FreeCADGui.updateGui()
 
     def enable_menuitems(self):
-        pass
+        self.connected = True
+        FreeCADGui.updateGui()
 
     def login(self, username, password):
         """
@@ -674,6 +677,9 @@ class ReviseDialog(Dialog):
         self.vbox.addLayout(hbox)
         self.unlock_button = qt.QCheckBox('Unlock ?')
         self.vbox.addWidget(self.unlock_button)
+        text = "Warning: old revision file will be automatically unlocked!"
+        label = qt.QLabel(text)
+        self.vbox.addWidget(text)
 
         button = qt.QPushButton(self.ACTION_NAME)
         connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
@@ -837,6 +843,9 @@ class OpenPLMCheckOut:
     
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Check-out', 'ToolTip': 'Check-out'} 
+    
+    def IsActive(self):
+        return PLUGIN.connected
 
 FreeCADGui.addCommand('OpenPLM_CheckOut', OpenPLMCheckOut())
 
@@ -849,6 +858,9 @@ class OpenPLMDownload:
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Download', 'ToolTip': 'Download'} 
+    
+    def IsActive(self):
+        return PLUGIN.connected
 
 FreeCADGui.addCommand('OpenPLM_Download', OpenPLMDownload())
 
@@ -860,6 +872,9 @@ class OpenPLMForget:
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Forget current file',
                 'ToolTip': 'Forget and delete current file'} 
+
+    def IsActive(self):
+        return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_Forget', OpenPLMForget())
 
@@ -884,6 +899,9 @@ class OpenPLMCheckIn:
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Check-in', 'ToolTip': 'Check-in'} 
+
+    def IsActive(self):
+        return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_CheckIn', OpenPLMCheckIn())
 
@@ -915,6 +933,9 @@ class OpenPLMRevise:
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Revise', 'ToolTip': 'Revise'} 
+    
+    def IsActive(self):
+        return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_Revise', OpenPLMRevise())
 
@@ -933,6 +954,9 @@ class OpenPLMAttach:
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Attach to a part',
                 'ToolTip': 'Attach to a part'} 
+    
+    def IsActive(self):
+        return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_AttachToPart', OpenPLMAttach())
 
@@ -954,7 +978,11 @@ class OpenPLMCreate:
 
     def GetResources(self): 
         return {'Pixmap' : 'plop.png', 'MenuText': 'Create a Document',
-                'ToolTip': 'Create a document'} 
+                'ToolTip': 'Create a document'}
+    
+    def IsActive(self):
+        doc = FreeCAD.ActiveDocument
+        return PLUGIN.connected and doc and doc not in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_Create', OpenPLMCreate())
 
