@@ -160,34 +160,26 @@ class OpenPLMWorkbench (Workbench):
         self.initialized = False
         Log ('Loading OpenPLM GUI...\n')
         import openplm
-        self.cmdList = ["OpenPLM_Login"]
+        openplm.PLUGIN.workbench = self
+        self.cmdList = ["OpenPLM_Login", "Separator"]
         self.appendMenu("OpenPLM", self.cmdList)
         self.cmdList2 = ["OpenPLM_CheckOut", "OpenPLM_Download", "OpenPLM_Forget",
                          "OpenPLM_CheckIn", "OpenPLM_Revise",
-                         "OpenPLM_AttachToPart", "OpenPLM_Create",
-                         "OpenPLM_Configure"]
+                         "OpenPLM_AttachToPart", "OpenPLM_Create"]
         self.appendMenu("OpenPLM", self.cmdList2)
-        FreeCAD.activeOpenPLMCommand = None # a global place to look for active draft Command
-        self.intitialized = True
+        self.cmdList3 = ["Separator", "OpenPLM_Configure"]
+        self.appendMenu("OpenPLM", self.cmdList3)
+        self.initialized = True
  
     def Activated(self):
-        if self.initialized:
-            self.draftToolBar.draftWidget.setVisible(True)
-            self.draftToolBar.draftWidget.toggleViewAction().setVisible(True)
+        pass
 
     def Deactivated(self):
-        if self.initialized:
-            if (FreeCAD.activeOpenPLMCommand != None): FreeCAD.activeOpenPLMCommand.finish()
-            self.draftToolBar.draftWidget.setVisible(False)
-            self.draftToolBar.draftWidget.toggleViewAction().setVisible(False)
+        pass
 
     def GetClassName(self): 
         return "Gui::PythonWorkbench"
 
-
-import openplm
-
-openplm.build_menu()
 
 Gui.addWorkbench(OpenPLMWorkbench)
 Gui.activateWorkbench("OpenPLMWorkbench")
