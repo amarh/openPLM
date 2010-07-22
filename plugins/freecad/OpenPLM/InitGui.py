@@ -163,6 +163,7 @@ class OpenPLMWorkbench (Workbench):
         openplm.PLUGIN.workbench = self
         self.cmdList = ["OpenPLM_Login", "Separator"]
         self.appendMenu("OpenPLM", self.cmdList)
+
         self.cmdList2 = ["OpenPLM_CheckOut", "OpenPLM_Download", "OpenPLM_Forget",
                          "OpenPLM_CheckIn", "OpenPLM_Revise",
                          "OpenPLM_AttachToPart", "OpenPLM_Create"]

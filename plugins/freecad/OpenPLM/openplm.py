@@ -334,6 +334,7 @@ PLUGIN = OpenPLMPluginInstance()
 def show_error(message, parent):
     dialog = qt.QMessageBox()
     dialog.setText(message)
+    dialog.setWindowTitle("Error")
     dialog.setIcon(qt.QMessageBox.Warning)    
     dialog.exec_()
 
@@ -409,7 +410,6 @@ class LoginDialog(Dialog):
         label.setText('Password:')
         table.addWidget(label, 1, 0)
         self.user_entry = qt.QLineEdit(self)
-        #self.user_entry.connect("activate", self.user_entry_activate_cb)
         table.addWidget(self.user_entry, 0, 1)
         self.pw_entry = qt.QLineEdit()
         self.pw_entry.setEchoMode(qt.QLineEdit.Password)
@@ -430,6 +430,7 @@ class LoginDialog(Dialog):
             PLUGIN.login(username, password)
             self.accept()
         except ValueError, e:
+            self.user_entry.setFocus()
             show_error("Can not login: %s" % str(e), self)
 
 class ConfigureDialog(Dialog):
@@ -616,8 +617,6 @@ class CheckInDialog(Dialog):
 
     TITLE = "Check-in..."
     ACTION_NAME = "Check-in"
-    WIDTH = 200
-    HEIGHT = 100
 
     def __init__(self, doc, name):
         self.doc = doc
