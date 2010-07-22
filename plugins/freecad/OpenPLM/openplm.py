@@ -253,7 +253,8 @@ class OpenPLMPluginInstance(object):
             return
         self.documents[document] = dict(openplm_doc=doc,
             openplm_file_id=doc_file_id, openplm_path=path)
-        #document.setTitle(document.getTitle() + " / %(name)s rev. %(revision)s" % doc)
+        if " rev. " not in document.Label: 
+            document.Label = document.Label + " / %(name)s rev. %(revision)s" % doc
         return document
 
     def check_in(self, gdoc, unlock, save_file=True):
@@ -308,9 +309,9 @@ class OpenPLMPluginInstance(object):
             path = os.path.join(rep, name)
             gdoc.FileName = path
             save(gdoc)
-            gd = self.load_file(new_doc, doc_file["id"], path, gdoc)
+            self.load_file(new_doc, doc_file["id"], path, gdoc)
             self.add_managed_file(new_doc, doc_file, path)
-            self.check_in(gd, unlock, False)
+            self.check_in(gdoc, unlock, False)
             self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))        
         else:
             show_error("Can not revise : file not in openPLM", self.window)
@@ -670,7 +671,7 @@ class ReviseDialog(Dialog):
         self.vbox.addWidget(self.unlock_button)
         text = "Warning: old revision file will be automatically unlocked!"
         label = qt.QLabel(text)
-        self.vbox.addWidget(text)
+        self.vbox.addWidget(label)
 
         button = qt.QPushButton(self.ACTION_NAME)
         connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
