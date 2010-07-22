@@ -30,7 +30,10 @@ def save(gdoc):
     gdoc.Label = os.path.splitext(os.path.basename(gdoc.FileName))[0] or gdoc.Label
     
 def close(gdoc):
-    FreeCAD.closeDocument(gdoc.Name)
+    FreeCADGui.runCommand("Std_CloseActiveWindow")
+    gdoc2 = FreeCAD.ActiveDocument
+    if gdoc == gdoc2:
+        FreeCAD.closeDocument(gdoc.Name)
 
 class OpenPLMPluginInstance(object):
     
@@ -328,8 +331,9 @@ class OpenPLMPluginInstance(object):
 PLUGIN = OpenPLMPluginInstance()
 
 def show_error(message, parent):
-    dialog = qt.QErrorMessage(parent)
-    dialog.showMessage(message)
+    dialog = qt.QMessageBox()
+    dialog.setText(message)
+    dialog.setIcon(qt.QMessageBox.Warning)    
     dialog.exec_()
 
 class Dialog(qt.QDialog):
@@ -337,12 +341,6 @@ class Dialog(qt.QDialog):
     TITLE = "..."
     ACTION_NAME = "..."
 
-    WIDTH = 200
-    HEIGHT = 300
-    PAD = 5
-    ROW_HEIGHT = 15
-    ROW_PAD = 2
-    
     def __init__(self):
         qt.QDialog.__init__(self)
         self.setWindowTitle(self.TITLE)
@@ -398,11 +396,7 @@ class Dialog(qt.QDialog):
     def update_ui(self):
         pass
 
-    def actionPerformed(self, actionEvent):
-        pass
-
 class LoginDialog(Dialog):
-    HEIGHT = 105
     TITLE = 'Login'
       
     def update_ui(self):
@@ -439,8 +433,7 @@ class LoginDialog(Dialog):
 
 class ConfigureDialog(Dialog):
 
-    TITLE = "Conffigure"
-    HEIGHT = 105
+    TITLE = "Configure"
 
     def update_ui(self):
 
@@ -653,8 +646,6 @@ class ReviseDialog(Dialog):
 
     TITLE = "Revise..."
     ACTION_NAME = "Revise"
-    WIDTH = 200
-    HEIGHT = 100
 
     def __init__(self, doc, name, revision):
         self.doc = doc
@@ -720,12 +711,6 @@ class CreateDialog(SearchDialog):
     ACTION_NAME = "Create"
     TYPE = "Document"
     TYPES_URL = "api/docs/"
-
-    WIDTH = 200
-    HEIGHT = 200
-    PAD = 5
-    ROW_HEIGHT = 15
-    ROW_PAD = 2
 
     def update_ui(self):
         self.doc_created = None        
