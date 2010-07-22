@@ -4,19 +4,21 @@
 
 <!-- Manage the text displayed between title tags -->
 {% block title %}
-	{{log_in_person}} | {{object_type}} | {{object_reference}} | {{object_revision}} 
+	openPLM - {{log_in_person}} - {{object_type}} | {{object_reference}} | {{object_revision}} 
 {% endblock %}
 
 <!-- Manage the Navigate block which have an object menu, a banner and a content -->
 {% block ObjectBlock %}
     <div id="PageBanner">
 		<h2>
-		    <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/0/0/100/">
-		        <img src="/media/img/navigation2.png" title="Navigate" alt="Navigate" width="30" height="30"/>
-	        </a>
-	        <a href="../attributes/">
-		        <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
-	        </a>
+		    {% ifequal class4div 'NavigateBox4Part' %}
+		        <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
+		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
+	            </a>
+	            <a href="../attributes/">
+		            <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
+	            </a>
+            {% endifequal %}
 		    {{object_type}} | {{object_reference}} | {{object_revision}}
 	    </h2>
 	</div>

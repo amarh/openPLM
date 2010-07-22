@@ -11,25 +11,15 @@
     <br />
     <div id="Navigate">
         
-        <img id="img_nav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;"
+        <img class="img_nav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;"
                  src="{{picture_path}}" usemap="#navigatemap" title="Navigate" alt="Navigate" />
         <map id="navigatemap" name="navigatemap">
             {%for map_line in map_areas%}
                 <area href="{{map_line.url}}" shape="{{map_line.shape}}" 
-                    coords="{{map_line.1st_point}},{{map_line.2nd_point}}" />
+                    title="{{map_line.url}}" coords="{{map_line.1st_point}},{{map_line.2nd_point}}" />
             {%endfor%}
         </map>
-        <img id="img_management" src="/media/img/logo-nav2.gif" width="100" height="164"
-                usemap="#imgmap" title="Move image" alt="Move_image"/>
-        <map id="imgmap" name="imgmap">
-            <area href="../../../0/0/100/" shape="rect" coords="26, 65, 74, 100" alt="back to initial"/>
-            <area href="./left" shape="rect" coords="0, 27, 26, 138" alt="move left"/>
-            <area href="./top" shape="rect" coords="0, 0, 100, 27" alt="move up"/>
-            <area href="./right" shape="rect" coords="74, 27, 100, 138" alt="move right"/>
-            <area href="./bottom" shape="rect" coords="0, 138, 100, 165" alt="move down"/>
-            <area href="./zoom-in" shape="rect" coords="26, 27, 74', 65" alt="zoom in"/>
-            <area href="./zoom-out" shape="rect" coords="26, 100, 74, 138" alt="zoom out"/>
-        </map>
+        
     </div>
 {% endblock %}
 
