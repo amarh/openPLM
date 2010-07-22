@@ -96,12 +96,12 @@ def display_global_page(request_dict):
     elif request_dict.session:
         type_form_instance = type_form(request_dict.session)
         attributes_form_instance = attributes_form(request_dict.session)
-        request_dict.session.update(request_dict.session)
+#        request_dict.session.update(request_dict.session)
         if attributes_form_instance.is_valid():
             cls = models.get_all_plmobjects()[attributes_form_instance.cleaned_data["type"]]
             extra_attributes_form_instance = get_search_form(cls, request_dict.session)
             for field, value in attributes_form_instance.cleaned_data.items():
-                if value:
+                if value and field != "type":
                     query_dict["%s__icontains"%field]=value
             results = cls.objects.filter(**query_dict)
             query_dict = {}
@@ -109,7 +109,9 @@ def display_global_page(request_dict):
                 for field, value in extra_attributes_form_instance.cleaned_data.items():
                     if value:
                         query_dict[field]=value
+                print results
                 results = extra_attributes_form_instance.search(results)
+            request_dict.session["results"] = results
       
     context_dict.update({'results': results, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'extra_attributes_form': extra_attributes_form_instance})
 
@@ -671,7 +673,7 @@ def modify_object(request, object_type_value, object_reference_value, object_rev
 ##########################################################################################
 def display_bollox(request):
     context_dict={}
-    return render_to_response('bollox.htm', context_dict)
+    return render_to_response('Navigate2.htm', context_dict)
     
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
@@ -737,8 +739,7 @@ def checkout_file(request, object_type_value, object_reference_value, object_rev
 ###                     Manage html pages for navigate function                        ###
 ##########################################################################################    
 @login_required
-def navigate(request, object_type_value, object_reference_value, object_revision_value,\
-                 x_img_position, y_img_position, zoom):   
+def navigate(request, object_type_value, object_reference_value, object_revision_value):   
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
     obj = get_obj(object_type_value, object_reference_value, object_revision_value)
     var_dict, request_dict = display_global_page(request)
@@ -749,11 +750,19 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         class_for_div="NavigateBox4Part"
     if request.method == 'POST' and request.POST:
         filter_object_form_instance = FilterObjectForm(request.POST)
-        request.session.update(request.POST)
-    elif request.session :
+        for key, value in request.POST.items():
+            request.session[key] = value
+    elif request.session.get('Child')\
+            or request.session.get('Parents')\
+            or request.session.get('Doc')\
+            or request.session.get('Cad')\
+            or request.session.get('User') :
         filter_object_form_instance = FilterObjectForm(request.session)
     else:
-        filter_object_form_instance = FilterObjectForm(initial={'Child': True, 'Parents': False, 'Doc': False, 'Cad': False, 'User': False,})
+        data={'Child': True, 'Parents': False, 'Doc': True, 'Cad': False, 'User': False}
+        filter_object_form_instance = FilterObjectForm(data)
+        for key, value in data.items():
+            request.session[key] = value
     if not filter_object_form_instance.is_valid():
         return HttpResponse('mauvaise requete post')
     else :
@@ -770,15 +779,13 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         navigate_graph.node_attr['fontsize']='10'
         navigate_graph.node_attr['style']='filled'
         navigate_graph.edge_attr['color']='#000000'
-        edge_length = 1.2*int(zoom)/100
-        navigate_graph.edge_attr['len']=str(edge_length)
+        navigate_graph.edge_attr['len']="1.2"
         navigate_graph.node_attr['width']="0.8"
         navigate_graph.node_attr['height']="0.6"
         navigate_graph.edge_attr['arrowhead']='normal'
         def create_child_edges(object_id):
             object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
             children_list = object_item.get_children()
-            navigate_graph.edge_attr['color']='#000000'
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
             navigate_graph.node_attr['image']="media/img/part.png"
@@ -792,7 +799,7 @@ def navigate(request, object_type_value, object_reference_value, object_revision
                                                 +"\\n"+children.link.child.revision.encode('utf-8')
                     child_node.attr['URL'] = "/object/"+children.link.child.type.encode('utf-8')\
                                                 +"/"+children.link.child.reference.encode('utf-8')\
-                                                +"/"+children.link.child.revision.encode('utf-8')+"/navigate/0/0/100/"
+                                                +"/"+children.link.child.revision.encode('utf-8')+"/navigate/"
                     if filter_object_form_instance.cleaned_data['Doc'] :
                         create_document_edges(child_id)
                     create_child_edges(child_id)
@@ -801,7 +808,6 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         def create_parent_edges(object_id):
             object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
             parent_list = object_item.get_parents()
-            navigate_graph.edge_attr['color']='#000000'
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
             navigate_graph.node_attr['image']="media/img/part.png"
@@ -815,7 +821,7 @@ def navigate(request, object_type_value, object_reference_value, object_revision
                                                 +"\\n"+parent.link.parent.revision.encode('utf-8')
                     parent_node.attr['URL'] = "/object/"+parent.link.parent.type.encode('utf-8')\
                                                 +"/"+parent.link.parent.reference.encode('utf-8')\
-                                                +"/"+parent.link.parent.revision.encode('utf-8')+"/navigate/0/0/100/"
+                                                +"/"+parent.link.parent.revision.encode('utf-8')+"/navigate/"
                     if filter_object_form_instance.cleaned_data['Doc'] :
                         create_document_edges(parent_id)
                     create_parent_edges(parent_id)
@@ -824,7 +830,6 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         def create_document_edges(object_id):
             object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
             document_list = object_item.get_attached_documents()
-            navigate_graph.edge_attr['color']='#000000'
             navigate_graph.node_attr['image']='none'
             navigate_graph.node_attr['color']='#fef176'
             navigate_graph.node_attr['shape']='note'
@@ -845,15 +850,15 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         navigate_graph.add_node(part_id)
         part_node = navigate_graph.get_node(part_id)
         part_node.attr['root'] = 'true'
+        navigate_graph.node_attr['color']='#5588bb'
         part_node.attr['label'] = obj.type.encode('utf-8')\
                                     +"\\n"+obj.reference.encode('utf-8')\
                                     +"\\n"+obj.revision.encode('utf-8')
         part_node.attr['URL'] = "/object/"+obj.type.encode('utf-8')\
                                                 +"/"+obj.reference.encode('utf-8')\
-                                                +"/"+obj.revision.encode('utf-8')+"/navigate/0/0/100/"
+                                                +"/"+obj.revision.encode('utf-8')+"/navigate/"
         part_node.attr['shape']='box'
         part_node.attr['image']="media/img/part.png"
-        print filter_object_form_instance.cleaned_data['Doc']
         if filter_object_form_instance.cleaned_data['Doc'] :
             create_document_edges(part_id)
         if filter_object_form_instance.cleaned_data['Child'] :
@@ -861,52 +866,50 @@ def navigate(request, object_type_value, object_reference_value, object_revision
         if filter_object_form_instance.cleaned_data['Parents'] :
             create_parent_edges(part_id)
         navigate_graph.layout()
-    #    navigate_graph.draw('media/img/navigate.dot', format='dot', prog=layout_method)
-        picture_path= "media/navigate/navigate_"+str(request.session['_auth_user_id'])+".gif"
-        map_path= "media/navigate/navigate_"+str(request.session['_auth_user_id'])+".map"
+        picture_path = "media/navigate/" + str(obj.id)\
+                        +"-"\
+                        +str(int(filter_object_form_instance.cleaned_data['Child']))\
+                        +str(int(filter_object_form_instance.cleaned_data['Parents']))\
+                        +str(int(filter_object_form_instance.cleaned_data['Doc']))\
+                        +str(int(filter_object_form_instance.cleaned_data['Cad']))\
+                        +str(int(filter_object_form_instance.cleaned_data['User']))
+        map_path= picture_path + ".map"
+        picture_path +=".gif"
         navigate_graph.draw(picture_path, format='gif', prog='neato')
         navigate_graph.draw(map_path, format='imap', prog='neato')
         file_object = open(map_path,"rb",0)
         map_string = file_object.read()
         file_object.close()
-        map_list = map_string.split("\n") 
-        map_html=""
+        map_list = map_string.split("\n")
+        del map_list[0]
+        del map_list[-1]
         i = 0
         for map_line in map_list :
             map_line_item = map_line.split(" ")
-            if map_line_item.__len__()==4:
+            if len(map_line_item)>4:
+                for j in range(2, len(map_line_item)-2):
+                    map_line_item[1] += " " + map_line_item[j]
+                    del map_line_item[j]
+            if len(map_line_item)==4:
                 map_list[i]={'shape': map_line_item[0], 'url': map_line_item[1],\
                              '1st_point': map_line_item[2], '2nd_point': map_line_item[3]}
             i+=1
-        x_1st_point_part_node, y_1st_point_part_node = map_list[1]['1st_point'].split(",")
-        x_2nd_point_part_node, y_2nd_point_part_node = map_list[1]['2nd_point'].split(",")
+        x_1st_point_part_node, y_1st_point_part_node = map_list[0]['1st_point'].split(",")
+        x_2nd_point_part_node, y_2nd_point_part_node = map_list[0]['2nd_point'].split(",")
         x_part_node_position = (int(x_1st_point_part_node)+int(x_2nd_point_part_node))/2
         y_part_node_position = (int(y_1st_point_part_node)+int(y_2nd_point_part_node))/2
-        x_img_position_corrected = int(x_img_position) + 790/2 - int(x_part_node_position) -100
-        y_img_position_corrected = int(y_img_position) + 405/2 - int(y_part_node_position)
+        x_img_position_corrected = 790/2 - int(x_part_node_position) -100
+        y_img_position_corrected = 405/2 - int(y_part_node_position)
         context_dict.update(var_dict)
         context_dict.update({'class4div': class_for_div, 'filter_object_form': filter_object_form_instance ,\
-                            'map_areas': map_list, 'picture_path': "/"+picture_path, 'x_img_position': int(x_img_position_corrected),\
+                            'map_areas': map_list, 'picture_path': "/"+picture_path,\
+                             'x_img_position': int(x_img_position_corrected),\
                              'y_img_position': int(y_img_position_corrected)})
         navigate_graph.clear()
-        print request.session.items()
         return render_to_response('Navigate.htm', context_dict)
-
-def navigate_toward(request, object_type_value, object_reference_value, object_revision_value,\
-                 x_img_position, y_img_position, zoom, direction):
-    if direction=='left':
-        x_img_position=int(x_img_position)+100
-    if direction=='right':
-        x_img_position=int(x_img_position)-100
-    if direction=='top':
-        y_img_position=int(y_img_position)+100
-    if direction=='bottom':
-        y_img_position=int(y_img_position)-100
-    if direction=="zoom-in":
-        zoom=int(int(zoom)*1.2)
-    if direction=="zoom-out":
-        zoom=int(int(zoom)*0.8)
-    return HttpResponseRedirect("/object/%s/%s/%s/navigate/%s/%s/%s" \
-                                        % (object_type_value, object_reference_value, object_revision_value,\
-                                         x_img_position, y_img_position, zoom) )
-
+        
+        
+        
+        
+        
+        

@@ -199,7 +199,7 @@ def get_doc_cad_formset(controller, data=None):
 
 class FilterObjectForm(forms.Form):
 #    LISTE = [('neato', 'neato'),('dot', 'dot'),('twopi', 'twopi'),('circo','circo')]
-    Child = forms.BooleanField(required=False)
+    Child = forms.BooleanField(initial=True, required=False)
     Parents = forms.BooleanField(required=False)
     Doc = forms.BooleanField(required=False)
     Cad = forms.BooleanField(required=False)

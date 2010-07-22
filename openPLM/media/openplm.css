@@ -7,11 +7,18 @@
 
 body 
 {
-background-color: #aaaaaa;
+background-color: #b3b3b3;
 /*background-image: url(img/ciel_etoile111.jpg);*/
 font-family: Comic Sans MS, Verdana, Arial, sans-serif;
 text-align: center;
 margin: 5px;
+}
+
+img
+{
+border-style : none;
+float: left;
+margin: 2px;
 }
 
 .clear
@@ -21,7 +28,7 @@ clear: both;
 
 div
 {
--moz-border-radius: 1em;
+/* -moz-border-radius: 1em; */
 /* -webkit-box-shadow: 3px 3px 6px #666; */
 /* -moz-box-shadow: 3px 3px 6px #666; */
 /* box-shadow: 3px 3px 6px #666; */
@@ -31,8 +38,15 @@ div
 {
 background-color: #ffffff;	
 width: 1200px;
-filter: alpha(opacity=90);
+/* filter: alpha(opacity=90); */
 opacity: 0.90; 
+}
+
+#Footer
+{
+background: url(/media/img/footer-logo.gif) no-repeat bottom;
+height: 100px;
+width: 1200px;
 }
 
 #SearchArea, #NavigateArea
@@ -55,7 +69,8 @@ width: 800px;
 
 div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
 {
-float: top;
+-moz-border-radius: 1em;
+/* float: top; */
 background-color: #99ccff;
 margin: 8px;
 padding: 5px;
@@ -114,11 +129,7 @@ padding: 50px;
 
 div#PageBanner, div#PageLeft, div#PageCenter
 {
--moz-border-radius: 0em;
--webkit-box-shadow: 0px 0px 0px #666;
--moz-box-shadow: 0px 0px 0px #666;
-box-shadow: 0px 0px 0px #666;
-float: top;
+/* float: top; */
 }
 
 /* Definir le style de la Banniere en haut de page */
@@ -211,7 +222,7 @@ border-spacing: 0;
 table.Result
 {
 margin: 0px;
-overflow-x: top sroll;
+overflow-x: sroll;
 overflow-y: hidden;
 }
 
@@ -257,9 +268,8 @@ a.info:hover span
 {
 display: block;
 position: relative;
-top: -1em;
+top: -1.2em;
 left: 0em;
-background-color: #FFFFFF;
 }
 
 h2
@@ -270,25 +280,61 @@ line-height: 1.4;
 
 div#Navigate
 {
-border: 1px solid #000000
-width: 790px;
+border: 1px solid #000000;
+width: 770px;
 height: 405px;
 background-color: #FFFFFF;
-overflow: hidden;
+overflow: scroll;
 }
 
-img#img_nav
+.img_nav
 {
-float: top;
 position: relative;
 border-style: none;
 }
 
-img#img_management
+div#imgManagement
 {
 position: absolute;
+width: 95px;
+height: 95px;
 right: 110px;
 top: 210px;
 border-style: none;
+cursor: pointer;
 }
+
+#topControl
+{
+width: 94px;
+height: 29px;
+background: url(/media/img/nav-top.png) no-repeat;
+float: left;
+}
+
+#rightControl
+{
+width: 47px;
+height: 36px;
+background: url(/media/img/nav-right.png) no-repeat right;
+float: right;
+}
+#leftControl
+{
+width: 47px;
+height: 36px;
+right: 110px;
+top: 410px;
+background: url(/media/img/nav-left.png) no-repeat left;
+float: left;
+}
+
+#bottomControl
+{
+width: 94px;
+height: 29px;
+background: url(/media/img/nav-bottom.png) no-repeat;
+float: left;
+}
+
 
