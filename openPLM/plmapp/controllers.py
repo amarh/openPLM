@@ -732,7 +732,18 @@ class DocumentController(PLMObjectController):
         return doc_file
 
     def add_thumbnail(self, doc_file, thumbnail_file):
-        name = "%d%s" % (doc_file.id, os.path.splitext(thumbnail_file.name)[1])
+        """
+        Sets *thumnail_file* as the thumbnail of *doc_file*. *thumbnail_filef*
+        should be a :class:`~django.core.files.File` with an attribute *name*
+        (like an :class:`UploadedFile`).
+        
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.document is not self.object
+        """
+        if doc_file.document.pk != self.object.pk:
+            raise ValueError("Bad file's document")
+        basename = os.path.basename(thumbnail_file.name)
+        name = "%d%s" % (doc_file.id, os.path.splitext(basename)[1])
         if doc_file.thumbnail:
             doc_file.thumbnail.delete(save=False)
         doc_file.thumbnail = models.thumbnailfs.save(name, thumbnail_file)
@@ -822,10 +833,12 @@ class DocumentController(PLMObjectController):
                 filename=filename, size=doc_file.size, document=rev.object)
             new_doc.thumbnail = doc_file.thumbnail
             if doc_file.thumbnail:
-                thumb = "%d%s" %(new_doc.id, 
-                                 os.path.splitext(doc_file.thumbnail.path)[1])
-                shutil.copy(doc_file.thumbnail.path, thumb)
-                new_doc.thumbnail = thumb
+                ext = os.path.splitext(doc_file.thumbnail.path)[1]
+                thumb = "%d%s" %(new_doc.id, ext)
+                thumb_path = re.sub(r"/\d+_*%s$" % ext, "/" + thumb,
+                                    doc_file.thumbnail.path)
+                shutil.copy(doc_file.thumbnail.path, thumb_path)
+                new_doc.thumbnail = os.path.basename(thumb_path)
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
@@ -833,7 +846,8 @@ class DocumentController(PLMObjectController):
 
     def checkin(self, doc_file, new_file, update_attributes=True):
         """
-        Updates *doc_file* with data from *new_file*.
+        Updates *doc_file* with data from *new_file*. *doc_file*.thumbnail
+        is deleted if it is present.
         
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
