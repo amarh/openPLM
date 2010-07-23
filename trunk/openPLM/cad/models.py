@@ -16,16 +16,12 @@ def register(cls):
 
 class Design(Document):
 
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(Design)
 
 class Drawing(Design):
     
-    class Meta:
-        app_label = "plmapp"
-
     nb_pages = models.PositiveIntegerField("Number of pages", blank=True, null=True)
     format = models.CharField(max_length=10, choices=CFORMATS, default=lambda: "A4")
 
@@ -51,9 +47,6 @@ register(Drawing)
 
 class CustomerDrawing(Drawing):
 
-    class Meta:
-        app_label = "plmapp"
-
     customer = models.CharField(max_length=50, blank=True)
     
     @property
@@ -65,9 +58,6 @@ class CustomerDrawing(Drawing):
 register(CustomerDrawing)
 
 class SupplierDrawing(Drawing):
-
-    class Meta:
-        app_label = "plmapp"
 
     supplier = models.CharField(max_length=50, blank=True)
     
@@ -82,34 +72,29 @@ register(SupplierDrawing)
 
 class FMEA(Design):
 
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(FMEA)
 
 
 class Sketch(Design):
 
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(Sketch)
 
 
 class FreeCAD(Design):
 
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(FreeCAD)
 
 
 class Patent(Design):
 
-    class Meta:
-        app_label = "plmapp"
-
     expiration_date = models.DateField(null=True, blank=True)
     inventor = models.CharField(max_length=50, blank=True)
 
 register(Patent)
+

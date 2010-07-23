@@ -1,12 +1,8 @@
 from django.db import models
 from django.contrib import admin
 
-try:
-    from openPLM.plmapp.models import Part
-    from openPLM.plmapp.controllers import PartController
-except (ImportError, AttributeError):
-    from plmapp.models import Part
-    from plmapp.controllers import PartController
+from openPLM.plmapp.models import Part
+from openPLM.plmapp.controllers import PartController
 
 def register(cls):
     try:
@@ -16,9 +12,6 @@ def register(cls):
 
 # single part
 class SinglePart(Part):
-
-    class Meta:
-        app_label = "plmapp"
     
     supplier = models.CharField(max_length=200)
     tech_details = models.TextField(blank=True)
@@ -39,9 +32,6 @@ register(SinglePart)
 class MotherBoard(SinglePart):
     motherboard_type = models.CharField(max_length=200)
 
-    class Meta:
-        app_label = "plmapp"    
-    
     @property
     def attributes(self):
         attrs = list(super(MotherBoard, self).attributes)
@@ -53,9 +43,6 @@ register(MotherBoard)
 
 class RAM(SinglePart):
     size_in_mo = models.PositiveIntegerField()
-    
-    class Meta:
-        app_label = "plmapp"    
     
     @property
     def attributes(self):
@@ -69,9 +56,6 @@ register(RAM)
 class HardDisk(SinglePart):
     capacity_in_go = models.PositiveIntegerField()
     
-    class Meta:
-        app_label = "plmapp"    
-    
     @property
     def attributes(self):
         attrs = list(super(HardDisk, self).attributes)
@@ -82,16 +66,12 @@ register(HardDisk)
 
 
 class ElectronicPart(SinglePart):
-    class Meta:
-        app_label = "plmapp"    
     
     pass 
 register(ElectronicPart)
 
 
 class MechanicalPart(SinglePart):
-    class Meta:
-        app_label = "plmapp"    
     
     pass
 
@@ -100,9 +80,6 @@ register(MechanicalPart)
 
 class Mouse(SinglePart):
     number_of_buttons = models.PositiveSmallIntegerField(default=lambda: 3)
-    
-    class Meta:
-        app_label = "plmapp"    
     
     @property
     def attributes(self):
@@ -119,9 +96,6 @@ class KeyBoard(SinglePart):
               )
     keymap = models.CharField(max_length=20, choices=KEYMAPS)
     
-    class Meta:
-        app_label = "plmapp"    
-    
     @property
     def attributes(self):
         attrs = list(super(KeyBoard, self).attributes)
@@ -134,9 +108,6 @@ register(KeyBoard)
 class Screen(SinglePart):
     horizontal_resolution = models.IntegerField()
     vertical_resolution = models.IntegerField()
-    
-    class Meta:
-        app_label = "plmapp"    
     
     @property
     def attributes(self):
@@ -152,9 +123,6 @@ register(Screen)
 class Assembly(Part):
     manufacturer = models.CharField(max_length=200)
     
-    class Meta:
-        app_label = "plmapp"
-   
     @property
     def attributes(self):
         attrs = list(super(Assembly, self).attributes)
@@ -166,9 +134,6 @@ register(Assembly)
 
 class ComputerSet(Assembly):
     customer = models.CharField(max_length=200)
-    
-    class Meta:
-        app_label = "plmapp"    
     
     @property
     def attributes(self):
@@ -182,9 +147,6 @@ register(ComputerSet)
 class CentralUnit(Assembly):
     tech_characteristics = models.TextField(blank=True)
     
-    class Meta:
-        app_label = "plmapp"    
-    
     @property
     def attributes(self):
         attrs = list(super(CentralUnit, self).attributes)
@@ -197,9 +159,6 @@ register(CentralUnit)
 class OtherAssembly(Assembly):
     tech_details = models.TextField(blank=True)
 
-    class Meta:
-        app_label = "plmapp"    
-    
     @property
     def attributes(self):
         attrs = list(super(OtherAssembly, self).attributes)
@@ -211,9 +170,6 @@ register(OtherAssembly)
 # bios & os
 
 class BiosOs(Part):
-
-    class Meta:
-        app_label = "plmapp"
 
     size_in_mo = models.IntegerField()
 

@@ -1,6 +1,8 @@
 # Django settings for openPLM project.
 # sqlite version
 
+import os.path
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -38,7 +40,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -82,6 +84,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'openPLM.plmapp',
+    # you can add your application after this line
+    'openPLM.cad',
+    'openPLM.computer',
+    'openPLM.cae',
+    'openPLM.office',
 )
 
 ######################
@@ -90,6 +97,7 @@ INSTALLED_APPS = (
 
 # directory that holds documents
 DOCUMENTS_DIR = "/var/openPLM/docs"
+THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
 
 # Cookie used for session is temporary and is deleted when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

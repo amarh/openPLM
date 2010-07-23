@@ -731,6 +731,10 @@ class DocumentController(PLMObjectController):
             self.handle_added_file(doc_file)
         return doc_file
 
+    def add_thumbnail(self, doc_file, thumbnail_file):
+        name = "%d%s" % (doc_file.id, os.path.splitext(thumbnail_file.name)[1])
+        doc_file.thumbnail = models.thumbnailfs.save(name, thumbnail_file)
+
     def delete_file(self, doc_file):
         """
         Deletes *doc_file*, the file attached to *doc_file* is physically
