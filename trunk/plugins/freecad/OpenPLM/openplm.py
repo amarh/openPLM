@@ -120,6 +120,7 @@ class OpenPLMPluginInstance(object):
             if not unlock:
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
             else:
+                self.send_thumbnail(gdoc)
                 self.forget(gdoc)
             return True, ""
 
