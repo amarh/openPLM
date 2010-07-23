@@ -3,6 +3,8 @@ import shutil
 import json
 import urllib
 import webbrowser
+import zipfile
+import tempfile
 
 # poster makes it possible to send http request with files
 # sudo easy_install poster
@@ -140,6 +142,7 @@ class OpenPLMPluginInstance(object):
             if not unlock:
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
             else:
+                self.send_thumbnail(gdoc)
                 self.forget(gdoc)
             return True, ""
 
@@ -298,6 +301,7 @@ class OpenPLMPluginInstance(object):
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
                 else:
+                    self.send_thumbnail(gdoc)
                     self.forget(gdoc)
             if save:
                 gdoc.store()
@@ -306,6 +310,29 @@ class OpenPLMPluginInstance(object):
                 func()
         else:
             show_error('Can not check in : file not in openPLM', self.window)
+
+    def send_thumbnail(self, gdoc):
+        doc = self.documents[gdoc.URL]["openplm_doc"]
+        doc_file_id = self.documents[gdoc.URL]["openplm_file_id"]
+        path = self.documents[gdoc.URL]["openplm_path"]
+        try:
+            zp = zipfile.ZipFile(path, 'r')
+            image = zp.open("Thumbnails/thumbnail.png")
+            f = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            f.write(image.read())
+            f.close()
+            datagen, headers = multipart_encode({"filename": open(f.name, "rb")})
+            # Create the Request object
+            url = self.SERVER + "api/object/%s/add_thumbnail/%s/" % (doc["id"], doc_file_id)
+            request = urllib2.Request(url, datagen, headers)
+            res = self.opener.open(request)
+            image.close()
+            os.remove(f.name)
+            zp.close()
+        except KeyError:
+            zp.close()
+        except (IOError, zipfile.BadZipfile):
+            pass
 
     def revise(self, gdoc, revision, unlock):
         if gdoc and gdoc.URL in self.documents:
