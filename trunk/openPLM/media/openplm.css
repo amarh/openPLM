@@ -7,8 +7,8 @@
 
 body 
 {
-background-color: #b3b3b3;
-/*background-image: url(img/ciel_etoile111.jpg);*/
+/* background-color: #b3b3b3; */
+background: #b3b3b3 url(/media/img/openplm.png) no-repeat right top fixed;
 font-family: Comic Sans MS, Verdana, Arial, sans-serif;
 text-align: center;
 margin: 5px;
@@ -36,10 +36,10 @@ div
 
 #HomePage
 {
-background-color: #ffffff;	
+background: #ffffff url(/media/img/foot-complet.gif) no-repeat bottom right;
 width: 1200px;
 /* filter: alpha(opacity=90); */
-opacity: 0.90; 
+/* opacity: 0.90; */
 }
 
 #Footer
@@ -65,6 +65,7 @@ div#NavigateArea
 {
 float: right;
 width: 800px;
+margin-bottom: 90px;
 }
 
 div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc

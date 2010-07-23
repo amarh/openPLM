@@ -12,13 +12,8 @@
     <div id="Navigate">
         
         <img class="img_nav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;"
-                 src="{{picture_path}}" usemap="#navigatemap" title="Navigate" alt="Navigate" />
-        <map id="navigatemap" name="navigatemap">
-            {%for map_line in map_areas%}
-                <area href="{{map_line.url}}" shape="{{map_line.shape}}" 
-                    title="{{map_line.url}}" coords="{{map_line.1st_point}},{{map_line.2nd_point}}" />
-            {%endfor%}
-        </map>
+                 src="{{picture_path}}" usemap="#_anonymous_0" title="Navigate" alt="Navigate" />
+        {{map_areas|safe}}
         
     </div>
 {% endblock %}
