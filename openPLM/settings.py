@@ -45,7 +45,7 @@ MEDIA_ROOT = 'media/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -98,6 +98,7 @@ INSTALLED_APPS = (
 # directory that holds documents
 DOCUMENTS_DIR = "/var/openPLM/docs"
 THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
+THUMBNAILS_URL = MEDIA_URL + "thumbnails"
 
 # Cookie used for session is temporary and is deleted when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

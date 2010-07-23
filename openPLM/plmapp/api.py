@@ -290,3 +290,12 @@ def add_file(request, doc_id):
     df = doc.add_file(request.FILES["filename"])
     return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
 
+
+@login_json
+def add_thumbnail(request, doc_id, df_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    add_file_form_instance = forms.AddFileForm(request.POST, request.FILES)
+    df = models.DocumentFile.objects.get(id=df_id)
+    doc.add_thumbnail(df, request.FILES["filename"])
+    return {}
+

@@ -733,7 +733,10 @@ class DocumentController(PLMObjectController):
 
     def add_thumbnail(self, doc_file, thumbnail_file):
         name = "%d%s" % (doc_file.id, os.path.splitext(thumbnail_file.name)[1])
+        if doc_file.thumbnail:
+            doc_file.thumbnail.delete(save=False)
         doc_file.thumbnail = models.thumbnailfs.save(name, thumbnail_file)
+        doc_file.save()
 
     def delete_file(self, doc_file):
         """
@@ -758,6 +761,8 @@ class DocumentController(PLMObjectController):
             raise DeleteFileError("Bad path : %s" % path)
         os.chmod(path, 0700)
         os.remove(path)
+        if doc_file.thumbnail:
+            doc_file.thumbnail.delete(save=False)
         self._save_histo("File deleted", "file : %s" % doc_file.filename)
         doc_file.delete()
 
@@ -815,6 +820,12 @@ class DocumentController(PLMObjectController):
             shutil.copy(doc_file.file.path, path)
             new_doc = models.DocumentFile.objects.create(file=path,
                 filename=filename, size=doc_file.size, document=rev.object)
+            new_doc.thumbnail = doc_file.thumbnail
+            if doc_file.thumbnail:
+                thumb = "%d%s" %(new_doc.id, 
+                                 os.path.splitext(doc_file.thumbnail.path)[1])
+                shutil.copy(doc_file.thumbnail.path, thumb)
+                new_doc.thumbnail = thumb
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
@@ -848,6 +859,8 @@ class DocumentController(PLMObjectController):
         doc_file.size = new_file.size
         doc_file.file = models.docfs.save(new_file.name, new_file)
         os.chmod(doc_file.file.path, 0400)
+        if doc_file.thumbnail:
+            doc_file.thumbnail.delete(save=False)
         doc_file.save()
         self._save_histo("Check-in", doc_file.filename)
         if update_attributes:
