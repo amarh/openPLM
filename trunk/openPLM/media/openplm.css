@@ -337,4 +337,7 @@ background: url(/media/img/nav-bottom.png) no-repeat;
 float: left;
 }
 
-
+img.thumbnail
+{
+    max-height:70px;
+}

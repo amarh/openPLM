@@ -58,6 +58,7 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
         'object_reference': init_reference_value,
         'object_revision': init_revision_value,
         'object_type': init_type_value,
+        'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         }
 
 ##########################################################################################

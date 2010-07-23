@@ -44,6 +44,14 @@
 		                CHECK-IN
 		            {% endif %}
 	            </td>
+			    <td class="Content">
+                    {% if form.instance.thumbnail %}
+                    <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{form.instance.thumbnail.name}}"
+                        alt="Thumbnail"/>
+		            {% else %}
+		                No thumbnail available
+		            {% endif %}
+	            </td>
 		    </tr>
 	    {% endfor %}
 	    </table>

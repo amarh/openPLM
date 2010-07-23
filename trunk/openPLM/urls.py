@@ -64,4 +64,5 @@ urlpatterns += patterns('',
     (r'^api/object/(?P<doc_id>\d+)/unlock/(?P<df_id>\d+)/$', api.unlock),
     (r'^api/object/(?P<doc_id>\d+)/is_?locked/(?P<df_id>\d+)/$', api.is_locked),
     (r'^api/object/(?P<doc_id>\d+)/checkin/(?P<df_id>\d+)/$', api.check_in),
+    (r'^api/object/(?P<doc_id>\d+)/add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
