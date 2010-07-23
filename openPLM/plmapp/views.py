@@ -22,7 +22,9 @@ import pygraphviz as pgv
 
 from openPLM.plmapp.api import get_obj_by_id
 
-import Image
+import re
+
+# import Image
 
 ##########################################################################################
 def replace_white_spaces(Chain):
@@ -67,7 +69,6 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 
 def display_global_page(request_dict):
     """ Get a request and return a dictionnary with elements common to all pages """
-#    log_in_person="pjoulaud"
     context_dict = {'log_in_person' : request_dict.user}
     query_dict = {}
     request_dict.session['type'] = 'Part'
@@ -739,6 +740,7 @@ def checkout_file(request, object_type_value, object_reference_value, object_rev
 ##########################################################################################
 ###                     Manage html pages for navigate function                        ###
 ##########################################################################################    
+regex_pattern = re.compile(r'coords\=\"(\d{1,5}),(\d{1,5}),(\d{1,5}),(\d{1,5})')
 @login_required
 def navigate(request, object_type_value, object_reference_value, object_revision_value):   
     context_dict = init_context_dict(object_type_value, object_reference_value, object_revision_value)
@@ -875,35 +877,22 @@ def navigate(request, object_type_value, object_reference_value, object_revision
                         +str(int(filter_object_form_instance.cleaned_data['Cad']))\
                         +str(int(filter_object_form_instance.cleaned_data['User']))
         map_path= picture_path + ".map"
+        dot_path= picture_path + ".dot"
         picture_path +=".gif"
+        navigate_graph.draw(dot_path, format='dot', prog='dot')
         navigate_graph.draw(picture_path, format='gif', prog='neato')
-        navigate_graph.draw(map_path, format='imap', prog='neato')
+        navigate_graph.draw(map_path, format='cmapx', prog='neato')
         file_object = open(map_path,"rb",0)
         map_string = file_object.read()
         file_object.close()
-        map_list = map_string.split("\n")
-        del map_list[0]
-        del map_list[-1]
-        i = 0
-        for map_line in map_list :
-            map_line_item = map_line.split(" ")
-            if len(map_line_item)>4:
-                for j in range(2, len(map_line_item)-2):
-                    map_line_item[1] += " " + map_line_item[j]
-                    del map_line_item[j]
-            if len(map_line_item)==4:
-                map_list[i]={'shape': map_line_item[0], 'url': map_line_item[1],\
-                             '1st_point': map_line_item[2], '2nd_point': map_line_item[3]}
-            i+=1
-        x_1st_point_part_node, y_1st_point_part_node = map_list[0]['1st_point'].split(",")
-        x_2nd_point_part_node, y_2nd_point_part_node = map_list[0]['2nd_point'].split(",")
-        x_part_node_position = (int(x_1st_point_part_node)+int(x_2nd_point_part_node))/2
-        y_part_node_position = (int(y_1st_point_part_node)+int(y_2nd_point_part_node))/2
+        x_1st_point, y_1st_point, x_2nd_point, y_2nd_point = re.search(regex_pattern, map_string).groups()
+        x_part_node_position = (int(x_1st_point)+int(x_2nd_point))/2
+        y_part_node_position = (int(y_1st_point)+int(y_2nd_point))/2
         x_img_position_corrected = 790/2 - int(x_part_node_position) -100
         y_img_position_corrected = 405/2 - int(y_part_node_position)
         context_dict.update(var_dict)
         context_dict.update({'class4div': class_for_div, 'filter_object_form': filter_object_form_instance ,\
-                            'map_areas': map_list, 'picture_path': "/"+picture_path,\
+                            'map_areas': map_string, 'picture_path': "/"+picture_path,\
                              'x_img_position': int(x_img_position_corrected),\
                              'y_img_position': int(y_img_position_corrected)})
         navigate_graph.clear()
