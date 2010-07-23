@@ -15,9 +15,9 @@ from openPLM.plmapp.utils import *
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
 from openPLM.plmapp.lifecycle import *
-from openPLM.plmapp.customized_models.computer import *
-from openPLM.plmapp.customized_models.office import *
-from openPLM.plmapp.customized_models.design import *
+from openPLM.computer.models import *
+from openPLM.office.models import *
+from openPLM.cad.models import *
 
 class LifecycleTest(TestCase):
     def test_get_default(self):

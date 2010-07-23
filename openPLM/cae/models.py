@@ -14,37 +14,27 @@ def register(cls):
         pass
 
 class CAE(Document):
-
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(CAE)
 
 class Geometry(CAE):
-    
-    class Meta:
-        app_label = "plmapp"
+    pass    
 
 register(Geometry)
 
 class BoundaryConditions(CAE):
-
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(BoundaryConditions)
 
 class Mesh(CAE):
-
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(Mesh)
 
 class Results(CAE):
-
-    class Meta:
-        app_label = "plmapp"
+    pass
 
 register(Results)
 

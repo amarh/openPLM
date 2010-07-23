@@ -16,9 +16,6 @@ def register(cls):
 
 class OfficeDocument(Document):
 
-    class Meta:
-        app_label = "plmapp"
-
     nb_pages = models.PositiveIntegerField("Number of pages", blank=True, null=True)
     format = models.CharField(max_length=10, choices=CFORMATS, default=lambda: "A4")
 
