@@ -1,0 +1,10 @@
+<!ENTITY openplm.menu.label "OpenPLM">
+<!ENTITY openplm.login.label "Login">
+<!ENTITY openplm.login.accesskey "L">
+<!ENTITY openplmContext.label "Your Menuitem">
+<!ENTITY openplmContext.accesskey "Y">
+<!ENTITY openplmToolbarButton.label "Your Toolbar Button">
+<!ENTITY openplmToolbarButton.tooltip "This is your toolbar button!">
+<!ENTITY openplmSidebar.label "Your Sidebar">
+<!ENTITY openplmToolbar.name  "example">
+<!ENTITY openplmToolbar.label "This is an example toolbar. You can hide it under View &gt; toolbars &gt; &openplmToolbar.name;">
