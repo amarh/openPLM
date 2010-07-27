@@ -46,7 +46,7 @@ def json_view(func):
             #Come what may, we're returning JSON.
             msg = _('Internal error')+': '+str(e)
             response = {'result': 'error',
-                        'text': msg}
+                        'error': msg}
         response["api_version"] = API_VERSION
         json = simplejson.dumps(response)
         return HttpResponse(json, mimetype='application/json')

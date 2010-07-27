@@ -125,6 +125,7 @@ import shutil
 import datetime
 from collections import namedtuple
 
+import Image
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -718,6 +719,7 @@ class DocumentController(PLMObjectController):
         :return: the :class:`~openPLM.plmapp.models.DocumentFile` created.
         """
         doc_file = models.DocumentFile()
+        f.name = f.name.encode("utf-8")
         doc_file.filename = f.name
         doc_file.size = f.size
         doc_file.file = models.docfs.save(f.name, f)
@@ -748,6 +750,9 @@ class DocumentController(PLMObjectController):
             doc_file.thumbnail.delete(save=False)
         doc_file.thumbnail = models.thumbnailfs.save(name, thumbnail_file)
         doc_file.save()
+        image = Image.open(doc_file.thumbnail.path)
+        image.thumbnail((150, 150), Image.ANTIALIAS)
+        image.save(doc_file.thumbnail.path)
 
     def delete_file(self, doc_file):
         """
