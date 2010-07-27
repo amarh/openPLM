@@ -16,10 +16,10 @@
                     <menuitem id="openplm-login-menu-item"
                         label="&openplm.login.label;"
                         accesskey="&openplm.login.accesskey;"
-                        oncommand="openplm.overlay.onOpenPLMLogin(event);" />
+                        oncommand="openplm.onOpenPLMLogin(event);" />
                     <menuitem id="openplm-login-menu-item"
                         label="Download"
-                        oncommand="openplm.overlay.onOpenPLMLogin(event);" />
+                        oncommand="openplm.onOpenPLMLogin(event);" />
                 </menupopup>
             </menu>
         </menupopup>
