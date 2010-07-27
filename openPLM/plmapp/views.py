@@ -720,7 +720,7 @@ def checkin_file(request, object_type_value, object_reference_value, object_revi
 @login_required 
 def download(request, docfile_id):
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
-    name = doc_file.filename
+    name = doc_file.filename.encode("utf-8", "backslashreplace").decode("ascii", "ignore")
     base_dir = os.path.dirname(__file__)
     rep1 = os.path.join(base_dir, "..", "docs", "%s/" % docfile_id)
     rep = os.path.join("docs", "%s/" % docfile_id)
