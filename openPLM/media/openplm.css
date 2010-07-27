@@ -38,6 +38,7 @@ div
 {
 background: #ffffff url(/media/img/foot-complet.gif) no-repeat bottom right;
 width: 1200px;
+min-height: 500px;
 /* filter: alpha(opacity=90); */
 /* opacity: 0.90; */
 }
@@ -106,6 +107,7 @@ div#LoggedPersonBox
 {
 width: 374px;
 height: 30px;
+margin-bottom: 0px;
 }
 
 div#NavigateBox4Part, div#NavigateBox4Doc
@@ -122,6 +124,7 @@ background-color: #fef176;
 div#LoginBox
 {
 background-color: #99ccff;
+-moz-border-radius: 1em;
 width: 400px;
 height: 150px;
 padding: 50px;

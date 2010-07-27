@@ -70,53 +70,56 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 def display_global_page(request_dict):
     """ Get a request and return a dictionnary with elements common to all pages """
     context_dict = {'log_in_person' : request_dict.user}
-    query_dict = {}
-    request_dict.session['type'] = 'Part'
-    attributes_form_instance = attributes_form()
-    extra_attributes_form_instance = get_search_form()
-    results=[]
+    qset=[]
     if request_dict.GET and "type" in request_dict.GET:
         type_form_instance = type_form(request_dict.GET)
         attributes_form_instance = attributes_form(request_dict.GET)
         for key, value in request_dict.GET.items():
             request_dict.session[key] = value
-        if attributes_form_instance.is_valid():
-            cls = models.get_all_plmobjects()[attributes_form_instance.cleaned_data["type"]]
-            extra_attributes_form_instance = get_search_form(cls, request_dict.GET)
-            for field, value in attributes_form_instance.cleaned_data.items():
-                if value and field != "type":
-                    query_dict["%s__icontains"%field]=value
-            results = cls.objects.filter(**query_dict)
-            request_dict.session["results"] = results
-            query_dict = {}
-            if extra_attributes_form_instance.is_valid():
-                for field, value in extra_attributes_form_instance.cleaned_data.items():
-                    if value:
-                        query_dict[field]=value
-                results = extra_attributes_form_instance.search(results)
-                request_dict.session["results"] = results
-    elif request_dict.session:
+    elif request_dict.session and "type" in request_dict.session:
         type_form_instance = type_form(request_dict.session)
         attributes_form_instance = attributes_form(request_dict.session)
-#        request_dict.session.update(request_dict.session)
-        if attributes_form_instance.is_valid():
-            cls = models.get_all_plmobjects()[attributes_form_instance.cleaned_data["type"]]
-            extra_attributes_form_instance = get_search_form(cls, request_dict.session)
-            for field, value in attributes_form_instance.cleaned_data.items():
-                if value and field != "type":
-                    query_dict["%s__icontains"%field]=value
-            results = cls.objects.filter(**query_dict)
-            query_dict = {}
-            if extra_attributes_form_instance.is_valid():
-                for field, value in extra_attributes_form_instance.cleaned_data.items():
-                    if value:
-                        query_dict[field]=value
-                print results
-                results = extra_attributes_form_instance.search(results)
-            request_dict.session["results"] = results
-      
-    context_dict.update({'results': results, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'extra_attributes_form': extra_attributes_form_instance})
-
+    else:
+        type_form_instance = type_form()
+        request_dict.session['type'] = 'Part'
+        attributes_form_instance = attributes_form()
+        extra_attributes_form_instance = get_search_form()
+    if not attributes_form_instance.is_valid():
+        print "mauvaise requete get pour la recherche"
+    else:
+        cls = models.get_all_plmobjects()[attributes_form_instance.cleaned_data["type"]]
+        extra_attributes_form_instance = get_search_form(cls, request_dict.session)
+        qset = cls.objects.all()
+        for field, value in attributes_form_instance.cleaned_data.items():
+            if value and field != "type":
+                value_list = "".join(value.split())
+                value_list = value_list.split('*')
+                if len(value_list)==1:
+                    query_dict={}
+                    query_dict["%s__iexact"%field]=value_list[0]
+                    qset = qset.filter(**query_dict)
+                else :
+                    if value_list[0]:
+                        query_dict={}
+                        query_dict["%s__istartswith"%field]=value_list[0]
+                        qset = qset.filter(**query_dict)
+                    if value_list[-1]:
+                        query_dict={}
+                        query_dict["%s__iendswith"%field]=value_list[-1]
+                        qset = qset.filter(**query_dict)
+                    for value_item in value_list[1:-1]:
+                        if value_item:
+                            query_dict={}
+                            query_dict["%s__icontains"%field]=value_item
+                            qset = qset.filter(**query_dict)
+        if extra_attributes_form_instance.is_valid():
+            qset = extra_attributes_form_instance.search(qset)
+    if qset is None:
+        qset = []
+    request_dict.session["results"] = qset
+    context_dict.update({'results': qset, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'extra_attributes_form': extra_attributes_form_instance})
+    print "context_dict.items() : %s"%context_dict.items()
+    print "request_dict.session.items() : %s"%request_dict.session.items()
     return context_dict, request_dict.session
 #    return render_to_response('display_home_page.htm', context_dict)
 
@@ -146,7 +149,9 @@ def display_login_page(request):
 @login_required
 def display_home_page(request):
     now = datetime.datetime.now()
-    context_dict, SessionDictionnary= display_global_page(request)
+    context_dict = {}
+    SessionDictionnary = {}
+    (context_dict, SessionDictionnary) = display_global_page(request)
     class_for_div="NavigateBox4Part"
     context_dict.update({'class4div': class_for_div, 'current_date': now,})
     request.session.update(SessionDictionnary)
