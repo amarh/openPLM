@@ -3,6 +3,8 @@ from django.forms.models import modelform_factory, modelformset_factory
 
 import openPLM.plmapp.models as m
 
+from django.forms import ValidationError
+import re
 
 def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
@@ -34,6 +36,16 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     else:
         return Form()
 
+def integerfield_clean(value):
+    value_validated = ""
+    if value:
+        value = "".join(value.split())
+        value_validated = re.search(r'^(>|<|)(\-?\d*)$',value)
+        if value_validated:
+            return value_validated.groups()
+        else:
+            raise ValidationError("Number or \"< Number\" or \"> Number\"")
+        
 def get_search_form(cls=m.PLMObject, data=None):
     fields = set(cls.get_creation_fields())
     fields.update(set(cls.get_modification_fields()))
@@ -44,21 +56,64 @@ def get_search_form(cls=m.PLMObject, data=None):
         form_field = model_field.formfield()
         form_field.help_text = ""
         if isinstance(form_field.widget, forms.Textarea):
-            form_field.widget = forms.TextInput()
+            form_field.widget = forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
+        if isinstance(form_field.widget, forms.TextInput):
+            form_field.widget = forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
+        if isinstance(form_field, forms.fields.IntegerField) and isinstance(form_field.widget, forms.TextInput):
+            form_field.widget = forms.TextInput(attrs={'title':"Please enter a whole number. You can use < or > to enlarge your research."})
         form_field.required = False
         fields_dict[field] = form_field
-    
+        if isinstance(form_field, forms.fields.IntegerField):
+            form_field.clean = integerfield_clean
+
     def search(self, query_set=None):
         if self.is_valid():
-            query = {}
             for field in self.changed_data:
-                if isinstance(cls._meta.get_field(field),
-                              (m.models.CharField, m.models.TextField)):
-                    query[field + "__icontains"] = self.cleaned_data[field]
+                model_field = cls._meta.get_field(field)
+                form_field = model_field.formfield()
+                if isinstance(form_field, forms.fields.CharField)\
+                                and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
+                    value_list = "".join(self.cleaned_data[field].split())
+                    value_list = value_list.split('*')
+                    if len(value_list)==1:
+                        query={}
+                        query["%s__iexact"%field]=value_list[0]
+                        query_set = query_set.filter(**query)
+                    else :
+                        if value_list[0]:
+                            query={}
+                            query["%s__istartswith"%field]=value_list[0]
+                            query_set = query_set.filter(**query)
+                        if value_list[-1]:
+                            query={}
+                            query["%s__iendswith"%field]=value_list[-1]
+                            query_set = query_set.filter(**query)
+                        for value_item in value_list[1:-1]:
+                            if value_item:
+                                query={}
+                                query["%s__icontains"%field]=value_item
+                                query_set = query_set.filter(**query)
+                elif isinstance(form_field, forms.fields.IntegerField)\
+                                and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
+                    sign, value_str = self.cleaned_data[field]
+                    if not sign :
+                        query={}
+                        query[field]=value_str
+                        query_set = query_set.filter(**query)
+                    elif sign==">":
+                        query={}
+                        query["%s__gt"%field]=value_str
+                        query_set = query_set.filter(**query)
+                    if sign=="<":
+                        query={}
+                        query["%s__lt"%field]=value_str
+                        query_set = query_set.filter(**query)
                 else:
+                    query={}
                     query[field] = self.cleaned_data[field]
+                    query_set = query_set.filter(**query)
             if query_set is not None:
-                return query_set.filter(**query)
+                return query_set
             else:
                 return []
     
@@ -75,8 +130,8 @@ class type_form(forms.Form):
     type = forms.TypedChoiceField(choices=LISTE)
 
 class attributes_form(type_form):
-    reference = forms.CharField(widget=forms.TextInput(), required=False)
-    revision = forms.CharField(widget=forms.TextInput(), required=False)
+    reference = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
+    revision = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
     
 def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
     fields = cls.get_modification_fields()

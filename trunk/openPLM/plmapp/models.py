@@ -233,6 +233,9 @@ class PLMObject(models.Model):
     class Meta:
         # keys in the database
         unique_together = (('reference', 'type', 'revision'),)
+        
+    class Meta:
+        ordering = ["type", "reference", "revision"]
 
     def __unicode__(self):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
