@@ -17,9 +17,10 @@
                         label="&openplm.login.label;"
                         accesskey="&openplm.login.accesskey;"
                         oncommand="openplm.onOpenPLMLogin(event);" />
-                    <menuitem id="openplm-login-menu-item"
-                        label="Download"
-                        oncommand="openplm.onOpenPLMLogin(event);" />
+                    <menuitem id="openplm-checkin-menu-item"
+                        label="&openplm.checkin.label;"
+                        accesskey="&openplm.checkin.accesskey;"
+                        oncommand="openplm.onOpenPLMCheckIn(event);" />
                 </menupopup>
             </menu>
         </menupopup>
