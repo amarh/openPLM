@@ -2,5 +2,5 @@ content   openplm                 chrome/content/
 skin      openplm   classic/1.0   chrome/skin/
 locale    openplm   en-US         chrome/locale/en-US/
 overlay  chrome://messenger/content/messenger.xul  chrome://openplm/content/overlay.xul
-
+resource openplm modules/
 
