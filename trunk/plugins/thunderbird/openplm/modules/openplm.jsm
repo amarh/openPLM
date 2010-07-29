@@ -8,13 +8,14 @@ Components.utils.import("resource:///modules/MailUtils.js");
 Components.utils.import("resource:///modules/errUtils.js");
 var msgWindow = Components.classes["@mozilla.org/messenger/msgwindow;1"]
                           .createInstance(Components.interfaces.nsIMsgWindow);
-
+var Application = Components.classes["@mozilla.org/steel/application;1"].getService(Components.interfaces.steelIApplication);
 
 
 function Plugin(){
     this.username = "";
     this.password = "";
-    this.SERVER =  "http://localhost:8000/"; 
+    var new_url = Application.prefs.getValue("extensions.openplm.server", "http://localhost:8000/"); 
+    this.SERVER = new_url.replace(/([^\/])$/, "$1/");
     this.xrequest = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
                             .createInstance(Components.interfaces.nsIXMLHttpRequest);
     this.gFolderDisplay = null;
@@ -30,6 +31,20 @@ function Plugin(){
     this.get_docs = get_docs;
     this.search = search;
 }
+
+function changeServer(e){
+    var new_url = Application.prefs.getValue("extensions.openplm.server", "http://localhost:8000/"); 
+    OPENPLM.SERVER = new_url.replace(/([^\/])$/, "$1/");
+    if (OPENPLM.username != ""){
+        try {
+            OPENPLM.login(OPENPLM.username, OPENPLM.password);
+        }catch (ex) {
+        }    
+    }
+    return false;
+}
+Application.prefs.get("extensions.openplm.server").events.addListener("change", changeServer);
+
 
 function send_post(url, data) {
     var params = "";
@@ -141,9 +156,6 @@ function upload(url, filename) {
     dump(result);
     return result;
 }
-
-
-//var PLUGIN = new Plugin();
 
 
 // utilities

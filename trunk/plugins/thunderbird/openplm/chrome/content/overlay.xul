@@ -20,7 +20,8 @@
                     <menuitem id="openplm-checkin-menu-item"
                         label="&openplm.checkin.label;"
                         accesskey="&openplm.checkin.accesskey;"
-                        oncommand="openplm.onOpenPLMCheckIn(event);" />
+                        oncommand="openplm.onOpenPLMCheckIn(event);"
+                        disabled="true"/>
                 </menupopup>
             </menu>
         </menupopup>

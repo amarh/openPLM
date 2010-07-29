@@ -32,8 +32,10 @@ onOpenPLMLogin: function(e) {
                         if (res["result"] != "ok"){
                             user = username.value;
                             pw = password.value;
+                            document.getElementById("openplm-checkin-menu-item").disabled = true;  
                             alert(res["error"]);
                         }else{
+                            document.getElementById("openplm-checkin-menu-item").disabled = false;  
                             return;
                         }
                     }
