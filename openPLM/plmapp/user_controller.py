@@ -31,6 +31,11 @@ class UserController(object):
         self.object = obj
         self._user = user
         self.__histo = ""
+        self.creator = user
+        self.owner = user
+        self.mtime = obj.last_login
+        self.ctime = obj.date_joined
+
 
     def update_from_form(self, form):
         u"""
@@ -88,4 +93,20 @@ class UserController(object):
         #histo.details = details 
         #histo.user = self._user
         #histo.save()
+    
+    @property
+    def attributes(self):
+        u"Attributes to display in `Attributes view`"
+        return ["first_name", "last_name", "email",  "creator", "owner",
+                "ctime", "mtime"]
+
+    @property
+    def menu_items(self):
+        "menu items to choose a view"
+        return ["attributes", "lifecycle", "history"]
+
+    @classmethod
+    def excluded_creation_fields(cls):
+        "Returns fields which should not be available in a creation form"
+        return ["owner", "creator", "ctime", "mtime"]
 
