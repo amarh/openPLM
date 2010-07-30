@@ -14,6 +14,14 @@ How-to's
     
     how-tos
 
+HTTP-API
+--------
+
+.. toctree::
+    :maxdepth: 2
+
+    http-api
+
 Modules
 ---------
 .. toctree::

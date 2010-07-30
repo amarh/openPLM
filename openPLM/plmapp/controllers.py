@@ -2,7 +2,7 @@
 Introduction
 =============
 
-This module contains utilities to manage a :class:`~openPLM.plmapp.models.PLMObject`.
+This module contains utilities to manage a :class:`.PLMObject`.
 It provides a new class, :class:`PLMObjectController`, which can be used to
 modify its attributes, promote/demote/revise it...
 
@@ -64,7 +64,7 @@ to update informations from a form created with
 How to add a controller
 =======================
 
-If you add a new model which inherits from :class:`~openPLM.plmapp.models.PLMObject`
+If you add a new model which inherits from :class:`.PLMObject`
 or one of its subclasses, you may want to add your own controller.
 
 You just have to declare a class which inherits (directly or not) from 
@@ -106,13 +106,13 @@ This module defines several classes, here is a summary:
         - :class:`Parent`
     * controllers:
 
-        ========================================= ============================
-                          Type                             Controller
-        ========================================= ============================
-        :class:`~openPLM.plmapp.models.PLMObject` :class:`PLMObjectController`
-        :class:`~openPLM.plmapp.models.Part`      :class:`PartController`
-        :class:`~openPLM.plmapp.models.Document`  :class:`DocumentController`
-        ========================================= ============================
+        =================== ===============================
+              Type              Controller
+        =================== ===============================
+        :class:`.PLMObject` :class:`PLMObjectController`
+        :class:`.Part`      :class:`PartController`
+        :class:`.Document`  :class:`DocumentController`
+        =================== ===============================
     
     * functions:
         :func:`get_controller`
@@ -188,10 +188,10 @@ class PLMObjectController(object):
     :attributes:
         .. attribute:: object
 
-            The :class:`~openPLM.plmapp.models.PLMObject` managed by the controller
+            The :class:`.PLMObject` managed by the controller
 
     :param obj: managed object
-    :type obj: a subinstance of :class:`~openPLM.plmapp.models.PLMObject`
+    :type obj: a subinstance of :class:`.PLMObject`
     :param user: user who modify *obj*
     :type user: :class:`~django.contrib.auth.models.User` 
     """
@@ -206,7 +206,7 @@ class PLMObjectController(object):
     @classmethod
     def create(cls, reference, type, revision, user, data={}):
         u"""
-        This method builds a new :class:`~openPLM.plmapp.models.PLMObject` of
+        This method builds a new :class:`.PLMObject` of
         type *class_* and return a :class:`PLMObjectController` associated to
         the created object.
 
@@ -421,7 +421,7 @@ class PLMObjectController(object):
         """
         Returns a list of all revisions, ordered from less recent to most recent
         
-        :rtype: list of :class:`~openPLM.plmapp.models.PLMObject`
+        :rtype: list of :class:`.PLMObject`
         """
         return self.get_previous_revisions() + [self.object] +\
                self.get_next_revisions()
@@ -431,7 +431,7 @@ Parent = namedtuple("Parent", "level link")
 
 class PartController(PLMObjectController):
     u"""
-    Controller for :class:`~openPLM.plmapp.models.Part`.
+    Controller for :class:`.Part`.
 
     This controller adds methods to manage Parent-Child links between two
     Parts.
@@ -442,7 +442,7 @@ class PartController(PLMObjectController):
         Adds *child* to *self*.
 
         :param child: added child
-        :type child: :class:`~openPLM.plmapp.models.Part`
+        :type child: :class:`.Part`
         :param quantity: amount of *child*
         :type quantity: positive float
         :param order: order
@@ -499,7 +499,7 @@ class PartController(PLMObjectController):
         Modifies information about *child*.
 
         :param child: added child
-        :type child: :class:`~openPLM.plmapp.models.Part`
+        :type child: :class:`.Part`
         :param new_quantity: amount of *child*
         :type new_quantity: positive float
         :param new_order: order
@@ -602,7 +602,7 @@ class PartController(PLMObjectController):
 
     def attach_to_document(self, document):
         """
-        Links *document* (a :class:`~openPLM.plmapp.models.Document`) with
+        Links *document* (a :class:`.Document`) with
         :attr:`~PLMObjectController.object`.
         """
 
@@ -614,7 +614,7 @@ class PartController(PLMObjectController):
 
     def detach_document(self, document):
         """
-        Delete link between *document* (a :class:`~openPLM.plmapp.models.Document`)
+        Delete link between *document* (a :class:`.Document`)
         and :attr:`~PLMObjectController.object`.
         """
 
@@ -628,7 +628,7 @@ class PartController(PLMObjectController):
 
     def get_attached_documents(self):
         """
-        Returns all :class:`~openPLM.plmapp.models.Document` attached to
+        Returns all :class:`.Document` attached to
         :attr:`~PLMObjectController.object`.
         """
         return models.DocumentPartLink.objects.filter(part=self.object)
@@ -655,10 +655,10 @@ class PartController(PLMObjectController):
 class DocumentController(PLMObjectController):
     """
     A :class:`PLMObjectController` which manages 
-    :class:`~openPLM.plmapp.models.Document`
+    :class:`.Document`
     
     It provides methods to add or delete files, (un)lock them and attach a
-    :class:`~openPLM.plmapp.models.Document` to a :class:`~openPLM.plmapp.models.Part`.
+    :class:`.Document` to a :class:`.Part`.
     """
 
     def lock(self, doc_file):
@@ -669,7 +669,7 @@ class DocumentController(PLMObjectController):
             * :exc:`ValueError` if *doc_file*.document is not self.object
 
         :param doc_file:
-        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :type doc_file: :class:`.DocumentFile`
         """
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
@@ -692,7 +692,7 @@ class DocumentController(PLMObjectController):
               unlocked or *doc_file.locker* is not the current user
 
         :param doc_file:
-        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :type doc_file: :class:`.DocumentFile`
         """
 
         if doc_file.document.pk != self.object.pk:
@@ -716,7 +716,7 @@ class DocumentController(PLMObjectController):
         If *update_attributes* is True (the default), :meth:`handle_added_file`
         will be called with *f* as parameter.
 
-        :return: the :class:`~openPLM.plmapp.models.DocumentFile` created.
+        :return: the :class:`.DocumentFile` created.
         """
         doc_file = models.DocumentFile()
         f.name = f.name.encode("utf-8")
@@ -765,7 +765,7 @@ class DocumentController(PLMObjectController):
               locked
 
         :param doc_file:
-        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :type doc_file: :class:`.DocumentFile`
         """
 
         if doc_file.document.pk != self.object.pk:
@@ -791,13 +791,13 @@ class DocumentController(PLMObjectController):
         *doc_file*. The default implementation does nothing.
         
         :param doc_file:
-        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :type doc_file: :class:`.DocumentFile`
         """
         pass
 
     def attach_to_part(self, part):
         """
-        Links *part* (a :class:`~openPLM.plmapp.models.Part`) with
+        Links *part* (a :class:`.Part`) with
         :attr:`~PLMObjectController.object`.
         """
 
@@ -809,7 +809,7 @@ class DocumentController(PLMObjectController):
 
     def detach_part(self, part):
         """
-        Delete link between *part* (a :class:`~openPLM.plmapp.models.Part`) and
+        Delete link between *part* (a :class:`.Part`) and
         :attr:`~PLMObjectController.object`.
         """
 
@@ -823,7 +823,7 @@ class DocumentController(PLMObjectController):
 
     def get_attached_parts(self):
         """
-        Returns all :class:`~openPLM.plmapp.models.Part` attached to
+        Returns all :class:`.Part` attached to
         :attr:`~PLMObjectController.object`.
         """
         return models.DocumentPartLink.objects.filter(document=self.object)
@@ -860,7 +860,7 @@ class DocumentController(PLMObjectController):
               but *doc_file.locker* is not the current user
 
         :param doc_file:
-        :type doc_file: :class:`~openPLM.plmapp.models.DocumentFile`
+        :type doc_file: :class:`.DocumentFile`
         :param new_file: file with new data, same parameter as *f*
                          in :meth:`add_file`
         :param update_attributes: True if :meth:`handle_added_file` should be
