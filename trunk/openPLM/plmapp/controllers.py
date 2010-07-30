@@ -241,7 +241,7 @@ class PLMObjectController(object):
         obj.state = models.get_default_state(obj.lifecycle)
         obj.save()
         res = cls(obj, user)
-        # record ceation in history
+        # record creation in history
         infos = {"type" : type, "reference" : reference, "revision" : revision}
         infos.update(data)
         details = ",".join("%s : %s" % (k, v) for k, v in infos.items())
@@ -921,6 +921,4 @@ class DocumentController(PLMObjectController):
                 filename = form.cleaned_data["id"]
                 if delete:
                     self.delete_file(filename)
-
-                    
 
