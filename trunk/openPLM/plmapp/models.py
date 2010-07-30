@@ -265,6 +265,10 @@ class PLMObject(models.Model):
         "Returns fields which should not be available in a creation form"
         return ["owner", "creator", "ctime", "mtime"]
 
+    @property
+    def plmoject_url(self):
+        return "/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
+
     @classmethod
     def get_creation_fields(cls):
         """
