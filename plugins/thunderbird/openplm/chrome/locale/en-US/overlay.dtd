@@ -1,6 +1,8 @@
 <!ENTITY openplm.menu.label "OpenPLM">
 <!ENTITY openplm.login.label "Login">
 <!ENTITY openplm.login.accesskey "L">
+<!ENTITY openplm.create.label "Create a new document">
+<!ENTITY openplm.create.accesskey "n">
 <!ENTITY openplm.checkin.label "Check-in current mail">
 <!ENTITY openplm.checkin.accesskey "C">
 <!ENTITY openplmContext.label "Your Menuitem">

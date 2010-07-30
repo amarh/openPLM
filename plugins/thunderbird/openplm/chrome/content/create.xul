@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://openplm/locale/about.dtd">
+
+<dialog title="Create a new document" orient="vertical" autostretch="always"
+    onload="openplm.initCreate();sizeToContent();"
+    buttons="accept,cancel"
+    ondialogaccept="return openplm.onCreateOK();"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    id="openplm-create-dialog">
+
+    <script type="application/x-javascript"
+        src="chrome://openplm/content/overlay.js" />
+
+    <!--fake objects (for cloneNode)-->
+    <textbox id="openplm-fake-tb" hidden="true"/>
+    <menulist id="openplm-fake-ml" hidden="true">
+        <menupopup/>
+    </menulist>
+
+    <groupbox align="center" orient="horizontal">
+        <vbox>
+            <text value="Please fill creation form"/>
+            <grid>
+                <columns>
+                    <column flex="1"/>
+                    <column flex="2"/>
+                </columns>
+                <rows id="fields-list">
+                    <row>
+                        <label value="Type"/>
+                        <menulist id="document-list" 
+                            onselect="openplm.onCreateTypeChange();sizeToContent();">
+                            <menupopup>
+
+                            </menupopup>
+                        </menulist>
+                    </row>
+                        <!--placeholder for other fields-->
+                </rows>
+            </grid>
+            <separator class="thin"/>
+
+        </vbox>
+    </groupbox>
+</dialog>
