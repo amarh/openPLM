@@ -7,8 +7,10 @@ Components.utils.import("resource:///modules/attachmentChecker.js");
 Components.utils.import("resource:///modules/MailUtils.js");
 Components.utils.import("resource:///modules/errUtils.js");
 var msgWindow = Components.classes["@mozilla.org/messenger/msgwindow;1"]
-                          .createInstance(Components.interfaces.nsIMsgWindow);
+.createInstance(Components.interfaces.nsIMsgWindow);
 var Application = Components.classes["@mozilla.org/steel/application;1"].getService(Components.interfaces.steelIApplication);
+var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+.getService(Components.interfaces.nsIPromptService);
 
 
 function Plugin(){
@@ -17,7 +19,7 @@ function Plugin(){
     var new_url = Application.prefs.getValue("extensions.openplm.server", "http://localhost:8000/"); 
     this.SERVER = new_url.replace(/([^\/])$/, "$1/");
     this.xrequest = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                            .createInstance(Components.interfaces.nsIXMLHttpRequest);
+        .createInstance(Components.interfaces.nsIXMLHttpRequest);
     this.gFolderDisplay = null;
     this.messenger = null;
 
@@ -30,6 +32,8 @@ function Plugin(){
     this.upload = upload;
     this.get_docs = get_docs;
     this.search = search;
+    this.get_creation_fields = get_creation_fields;
+    this.create = create;
 }
 
 function changeServer(e){
@@ -77,6 +81,13 @@ function get_docs(){
     var url = this.SERVER + "api/docs/";
     return this.send_get(url, {})["types"];
 }
+
+function get_creation_fields(type){
+    var url = this.SERVER + "api/creation_fields/" + type + "/";
+    return this.send_get(url, {})["fields"];
+}
+
+
 
 function login(username, password){
     var url = this.SERVER + "api/login/";
@@ -131,12 +142,12 @@ function upload(url, filename) {
     sheader += "Content-disposition: form-data;name=\"filename\";filename=\"" + file.leafName + "\"\r\n";
     sheader += "Content-Type: application/octet-stream\r\n";
     sheader += "Content-Length: " + file.fileSize+"\r\n\r\n";
-     var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
-                .createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
+        .createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
 
-       converter.charset = "UTF-8";
+    converter.charset = "UTF-8";
     sheader = converter.ConvertFromUnicode(sheader);
-    
+
     hsis.setData(sheader, sheader.length);
 
     var endsis = Components.classes[STRINGIS].createInstance(nsIStringInputStream);
@@ -153,10 +164,14 @@ function upload(url, filename) {
 
     this.xrequest.send(mis);
     var result = this.xrequest.responseText;
-    dump(result);
     return result;
 }
 
+function create(data){
+    var url = this.SERVER + "api/create/";
+    var doc = this.send_post(url, data)["object"];
+    return this.checkin(doc);
+}
 
 // utilities
 function GenerateFilenameFromMsgHdr(msgHdr) {

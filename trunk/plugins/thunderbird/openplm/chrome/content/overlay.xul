@@ -17,10 +17,16 @@
                         label="&openplm.login.label;"
                         accesskey="&openplm.login.accesskey;"
                         oncommand="openplm.onOpenPLMLogin(event);" />
+                    <menuseparator/>
                     <menuitem id="openplm-checkin-menu-item"
                         label="&openplm.checkin.label;"
                         accesskey="&openplm.checkin.accesskey;"
                         oncommand="openplm.onOpenPLMCheckIn(event);"
+                        disabled="true"/>
+                    <menuitem id="openplm-create-menu-item"
+                        label="&openplm.create.label;"
+                        accesskey="&openplm.create.accesskey;"
+                        oncommand="openplm.onOpenPLMCreate(event);"
                         disabled="true"/>
                 </menupopup>
             </menu>
