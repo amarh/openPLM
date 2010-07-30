@@ -95,6 +95,10 @@ class UserController(object):
         #histo.save()
     
     @property
+    def plmoject_url(self):
+        return "/user/%s/" % self.object.username
+
+    @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
         return ["first_name", "last_name", "email",  "creator", "owner",
