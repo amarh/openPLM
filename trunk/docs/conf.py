@@ -22,6 +22,7 @@ sys.path.append(os.path.abspath('../openPLM'))
 
 from django.conf import global_settings, settings
 global_settings.DOCUMENTS_DIR = "/tmp"
+global_settings.THUMBNAILS_DIR = "/tmp"
 settings.configure()
 
 # -- General configuration -----------------------------------------------------
@@ -31,7 +32,8 @@ settings.configure()
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
               'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-              'sphinx.ext.autosummary', 'sphinx.ext.inheritance_diagram']
+              'sphinx.ext.autosummary', 'sphinx.ext.inheritance_diagram',
+              'sphinx.ext.viewcode', 'sphinx.ext.extlinks']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -207,6 +209,6 @@ latex_documents = [
 intersphinx_mapping = {'http://docs.python.org/': None,
                        'http://docs.djangoproject.com/en/dev': 'http://docs.djangoproject.com/en/dev/_objects',}
 
-autodoc_member_order = 'groupwise'
+autodoc_member_order = 'bysource'
 
 autosummary_genererate = ["models.rst", "controllers.rst"]
