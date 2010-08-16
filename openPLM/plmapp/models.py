@@ -63,12 +63,12 @@ from openPLM.plmapp.lifecycle import LifecycleList
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
-    is_superuser = models.BooleanField(default=False, blank=True)
+    is_administrator = models.BooleanField(default=False, blank=True)
     is_contributor = models.BooleanField(default=False, blank=True)
     
     @property
     def is_viewer(self):
-        return not (self.is_superuser or self.is_contributor)
+        return not (self.is_administrator or self.is_contributor)
 
     def __unicode__(self):
         return u"UserProfile<%s>" % self.user.username
