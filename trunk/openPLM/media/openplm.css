@@ -69,7 +69,8 @@ width: 800px;
 margin-bottom: 90px;
 }
 
-div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
+div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox,
+div#NavigateBox4Part, div#NavigateBox4Doc,  div#NavigateBox4User
 {
 -moz-border-radius: 1em;
 /* float: top; */
@@ -98,7 +99,7 @@ min-height: 350px;
 margin-right: 0px;
 }
 
-div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc
+div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User
 {
 float: left;
 }
@@ -110,15 +111,20 @@ height: 30px;
 margin-bottom: 0px;
 }
 
-div#NavigateBox4Part, div#NavigateBox4Doc
+div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User
 {
 width: 772px;
-min-height: 500px;
+min-height: 420px;
 }
 
 div#NavigateBox4Doc
 {
 background-color: #fef176;
+}
+
+div#NavigateBox4User
+{
+background-color: #94bd5e;
 }
 
 div#LoginBox
@@ -167,7 +173,7 @@ border-spacing: 0;
 .MenuTable td
 {
 text-align: center;
-font-size: 100%;
+font-size: 90%;
 height: 40px;
 border-bottom-style: solid;
 border-bottom-width: 1px;
@@ -175,6 +181,7 @@ border-bottom-width: 1px;
 
 .MenuTable td.CurrentPage
 {
+font-size: 100%;
 background-color: #99ccff;
 border-top-style: solid;
 border-right-style: solid;
@@ -188,6 +195,11 @@ div#NavigateBox4Doc td.CurrentPage
 background-color: #fef176;
 }
 
+div#NavigateBox4User td.CurrentPage
+{
+background-color: #94bd5e;
+}
+
 .MenuTable td:hover
 {
 background-color: #E6E6FF;
@@ -198,6 +210,11 @@ div#NavigateBox4Doc td:hover
 background-color: #fff8ba;
 }
 
+div#NavigateBox4User td:hover
+{
+background-color: #bef278;
+}
+
 .MenuTable td.CurrentPage:hover
 {
 background-color: #99ccff;
@@ -206,6 +223,11 @@ background-color: #99ccff;
 div#NavigateBox4Doc td.CurrentPage:hover
 {
 background-color: #fef176;
+}
+
+div#NavigateBox4User td.CurrentPage:hover
+{
+background-color: #94bd5e;
 }
 
 .MenuTable a
@@ -238,12 +260,12 @@ border-style: solid;
 border-color: #99ccff;
 }
 
-td.Content
+tr.Content>td.Content
 {
 background-color: #E6E6FF;
 }
 
-td.Content2	{
+tr.Content2>td.Content	{
 background-color: #AAAAAA;
 }
 

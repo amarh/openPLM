@@ -13,8 +13,8 @@
 	<b>Search for :</b>
 	<form method="get" action="." enctype="text/plain">
 		<table class="Content">
+			{{type_form.as_table}}
 			{{attributes_form.as_table}}
-			{{extra_attributes_form.as_table}}
 		</table>
 		<input type="submit" value="SEARCH !">
 	</form>
@@ -22,47 +22,53 @@
 
 {% block ResultBlock %}
 	<table class="Result">
-		<tr class="Content">
-			<th class="Content">Type</th>
-			<th class="Content">Reference</th>
-			<th class="Content">Rev.</th>
-            <th class="Content">Name</th>
-		</tr>
 		{% if results %}
 			{% for object in results %}
-				{% if forloop.counter|divisibleby:"2" %}
+				{% if forloop.first %}
 				    <tr class="Content">
-					    <td class="Content2">{{object.type|escape}}</td>
-					    <td class="Content2">
-					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
-					                {{object.reference|escape}}
-			                </a>
-		                </td>
-					    <td class="Content2">{{object.revision|escape}}</td>
-					    <td class="Content2">
-					        <a class="info">
-					            {{object.name|escape|slice:":10"}}...
-					            <span>{{object.name|escape}}</span>
-				            </a>
-					    </td>
+				    {% if object.username %}
+		                <th class="Content">Username</th>
+			            <th class="Content">First name</th>
+			            <th class="Content">e-mail.</th>
+		            {% else %}
+			            <th class="Content">Type</th>
+			            <th class="Content">Reference</th>
+			            <th class="Content">Rev.</th>
+                        <th class="Content">Name</th>
+                    {% endif %}
+            		</tr>
+		        {% endif %}
+			    {% if forloop.counter|divisibleby:"2" %}
+			        <tr class="Content2">
+		        {% else %}
+		            <tr class="Content">
+	            {% endif %}
+				        {% if object.username %}
+				            <td class="Content">
+				                <a href="{{object.plmobject_url}}">
+				                        {{object.username|escape}}
+		                        </a>
+	                        </td>
+				            <td class="Content">{{object.first_name|escape}}</td>
+				            <td class="Content">
+				                    {{object.email|escape}}...
+				            </td>
+				        {% else %}
+				            <td class="Content">{{object.type|escape}}</td>
+				            <td class="Content">
+				                <a href="{{object.plmobject_url}}">
+				                        {{object.reference|escape}}
+		                        </a>
+	                        </td>
+				            <td class="Content">{{object.revision|escape}}</td>
+				            <td class="Content">
+				                <a class="info">
+				                    {{object.name|escape|slice:":10"}}...
+				                    <span>{{object.name|escape}}</span>
+			                    </a>
+				            </td>
+				        {% endif %}
 				    </tr>
-			    {% else %}
-			        <tr class="Content">
-					    <td class="Content">{{object.type|escape}}</td>
-					    <td class="Content">
-					        <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">
-					            {{object.reference|escape}}
-				            </a>
-			            </td>
-					    <td class="Content">{{object.revision|escape}}</td>
-					    <td class="Content">
-					        <a class="info">
-					            {{object.name|escape|slice:":10"}}...
-					            <span>{{object.name|escape}}</span>
-				            </a>
-				        </td>
-				    </tr>
-			    {% endif %}
 			{% endfor %}
 		{% endif %}
 	</table>

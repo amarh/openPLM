@@ -258,7 +258,7 @@ class PLMObject(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
-        return ["attributes", "lifecycle", "revisions", "history"]
+        return ["attributes", "lifecycle", "revisions", "history", "management"]
 
     @classmethod
     def excluded_creation_fields(cls):
@@ -266,7 +266,7 @@ class PLMObject(models.Model):
         return ["owner", "creator", "ctime", "mtime"]
 
     @property
-    def plmoject_url(self):
+    def plmobject_url(self):
         return "/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
 
     @classmethod
@@ -477,6 +477,12 @@ def get_all_plmobjects():
     del res["PLMObject"]
     return res
 
+def get_all_users_and_plmobjects():
+    res = {}
+    _get_all_subclasses(User, res)
+    res.update(get_all_plmobjects())
+    return res
+
 
 # history stuff
 class History(models.Model):
@@ -651,6 +657,11 @@ def get_all_plmobjects_with_level():
     if lst: del lst[0]
     return lst
 
+def get_all_users_and_plmobjects_with_level():
+    list_of_choices = get_all_plmobjects_with_level()
+    level=">"
+    _get_all_subclasses_with_level(User, list_of_choices, level)
+    return list_of_choices
 
 # import_models should be the last function
 
@@ -681,4 +692,116 @@ def import_models(force_reload=False):
                 except StandardError, exc:
                     print "Exception in import_models", module_name, type(exc), exc
 import_models()
+
+#class PLMUser(User):
+    # key attributes
+    # reference = models.CharField(max_length=50)
+    # type = models.CharField(max_length=50)
+    # revision = models.CharField(max_length=50)
+
+    # other attributes
+    # name = models.CharField(max_length=100, blank=True,
+     #                       help_text=u"Name of the product")
+
+    # creator = models.ForeignKey(User, related_name="%(class)s_creator")
+    # owner = models.ForeignKey(User, related_name="%(class)s_owner")
+    # ctime = models.DateTimeField("date of creation", default=datetime.datetime.today,
+    #                             auto_now_add=False)
+    # mtime = models.DateTimeField("date of last modification", auto_now=True)
+
+    # state and lifecycle
+    # lifecycle = models.ForeignKey(Lifecycle, related_name="%(class)s_lifecyle",
+    #                             default=get_default_lifecycle)
+    # state = models.ForeignKey(State, related_name="%(class)s_lifecyle",
+    #                             default=get_default_state)
+
+    
+    # class Meta:
+        # keys in the database
+        # unique_together = (('reference', 'type', 'revision'),)
+        
+    # class Meta:
+    #    ordering = ["type", "reference", "revision"]
+
+    # def __unicode__(self):
+        # return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
+        #                          self.revision)
+
+    # def is_promotable(self):
+    #    u"""
+    #    Returns True if object is promotable
+
+    #    .. note::
+    #        This method is abstract and raises :exc:`NotImplementedError`.
+    #        This method must be overriden.
+    #    """
+    #    raise NotImplementedError()
+
+    
+    # @property
+    # def attributes(self):
+    #    u"Attributes to display in `Attributes view`"
+    #    return ["name",  "creator", "owner", "ctime", "mtime"]
+
+    # @property
+    # def menu_items(self):
+    #    "menu items to choose a view"
+    #    return ["attributes", "lifecycle", "revisions", "history", "management"]
+
+    # @classmethod
+    # def excluded_creation_fields(cls):
+    #    "Returns fields which should not be available in a creation form"
+    #    return ["owner", "creator", "ctime", "mtime"]
+
+    #@classmethod
+    #def get_creation_fields(cls):
+    #    """
+    #    Returns fields which should be displayed in a creation form.
+
+    #    By default, it returns :attr:`attributes` less attributes returned by
+    #    :meth:`excluded_creation_fields`
+    #    """
+    #    fields = ["username", "type", "first_name", "lifecycle", "state"]
+        #for field in cls().attributes:
+        #    if field not in cls.excluded_creation_fields():
+        #        fields.append(field)
+     #   return fields
+
+    #@classmethod
+    #def excluded_modification_fields(cls):
+    #    """
+    #    Returns fields which should not be available in a modification form
+    #    
+    #    By default, it returns :attr:`attributes` less attributes returned by
+    #    :meth:`excluded_modification_fields`
+    #    """
+    #    return ["creator", "ctime", "mtime"]
+
+    #@classmethod
+    #def get_modification_fields(cls):
+       # "Returns fields which should be displayed in a modification form"
+       # fields = []
+        #for field in cls().attributes:
+        #    if field not in cls.excluded_modification_fields():
+        #        fields.append(field)
+       # return fields
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 

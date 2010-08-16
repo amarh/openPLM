@@ -103,5 +103,8 @@ THUMBNAILS_URL = MEDIA_URL + "thumbnails"
 # Cookie used for session is temporary and is deleted when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-
+# Add user, messages and perms variables in RequestContext
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth',
+)
 

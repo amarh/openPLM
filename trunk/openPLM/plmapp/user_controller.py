@@ -95,7 +95,7 @@ class UserController(object):
         #histo.save()
     
     @property
-    def plmoject_url(self):
+    def plmobject_url(self):
         return "/user/%s/" % self.object.username
 
     @property
