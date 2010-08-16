@@ -86,7 +86,11 @@ register(Sketch)
 
 class FreeCAD(Design):
 
-    pass
+    @property
+    def menu_items(self):
+        items = list(super(Design, self).menu_items)
+        items.extend(["freecad"])
+        return items
 
 register(FreeCAD)
 

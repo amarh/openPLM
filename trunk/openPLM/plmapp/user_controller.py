@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 try:
     import openPLM.plmapp.models as models
     from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
@@ -55,11 +57,20 @@ class UserController(object):
             raise ValueError("form is invalid")
 
     def __setattr__(self, attr, value):
-        if hasattr(self, "object") and hasattr(self.object, attr) and \
+        if hasattr(self, "object"):
+            obj = object.__getattribute__(self, "object")
+            try:
+                profile = obj.get_profile()
+            except ObjectDoesNotExist:
+                profile = None
+        else:
+            obj = None
+        if obj and (hasattr(obj, attr) or hasattr(profile, attr)) and \
            not attr in self.__dict__:
-            old_value = getattr(self.object, attr)
-            setattr(self.object, attr, value)
-            field = self.object._meta.get_field(attr).verbose_name
+            obj2 = obj if hasattr(obj, attr) else profile
+            old_value = getattr(obj2, attr)
+            setattr(obj2, attr, value)
+            field = obj2._meta.get_field(attr).verbose_name
             message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                     {"field" : field, "old" : old_value, "new" : value}
             self.__histo += message + "\n"
@@ -68,9 +79,15 @@ class UserController(object):
 
     def __getattr__(self, attr):
         obj = object.__getattribute__(self, "object")
+        try:
+            profile = obj.get_profile()
+        except ObjectDoesNotExist:
+            profile = None
         if hasattr(self, "object") and hasattr(obj, attr) and \
            not attr in self.__dict__:
             return getattr(obj, attr)
+        elif profile and hasattr(profile, attr) and not attr in self.__dict__:
+            return getattr(profile, attr)
         else:
             return object.__getattribute__(self, attr)
 
@@ -80,37 +97,19 @@ class UserController(object):
         If *with_history* is False, the history is not recorded.
         """
         self.object.save()
+        try:
+            self.object.get_profile().save()
+        except ObjectDoesNotExist:
+            pass        
         if self.__histo and with_history:
             self._save_histo("Modify", self.__histo) 
             self.__histo = ""
 
     def _save_histo(self, action, details):
-        # TODO : use the correct model
-        pass
-        #histo = models.History()
-        #histo.plmobject = self.object
-        #histo.action = action
-        #histo.details = details 
-        #histo.user = self._user
-        #histo.save()
-    
-    @property
-    def plmobject_url(self):
-        return "/user/%s/" % self.object.username
-
-    @property
-    def attributes(self):
-        u"Attributes to display in `Attributes view`"
-        return ["first_name", "last_name", "email",  "creator", "owner",
-                "ctime", "mtime"]
-
-    @property
-    def menu_items(self):
-        "menu items to choose a view"
-        return ["attributes", "lifecycle", "history"]
-
-    @classmethod
-    def excluded_creation_fields(cls):
-        "Returns fields which should not be available in a creation form"
-        return ["owner", "creator", "ctime", "mtime"]
+        histo = models.UserHistory()
+        histo.plmobject = self.object
+        histo.action = action
+        histo.details = details 
+        histo.user = self._user
+        histo.save()
 
