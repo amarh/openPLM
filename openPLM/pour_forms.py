@@ -1,3 +1,4 @@
+from django import forms
 class FakeItems(object):
     def __init__(self, values):
         self.values = values
@@ -9,6 +10,6 @@ class FakeItems(object):
 Form = type("ppp", (forms.BaseForm,), {"base_fields" : FakeItems( [("e", forms.CharField()), ("a", forms.CharField()), ("t", forms.IntegerField())] )})
 
 # possible values from a list of field names
-values = [(name, fields_dict[name]) for name in sorted_list]
+# values = [(name, fields_dict[name]) for name in sorted_list]
 
 

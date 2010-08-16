@@ -45,11 +45,28 @@ def integerfield_clean(value):
             return value_validated.groups()
         else:
             raise ValidationError("Number or \"< Number\" or \"> Number\"")
-        
+
+class type_form(forms.Form):
+    LISTE = m.get_all_users_and_plmobjects_with_level()
+    type = forms.TypedChoiceField(choices=LISTE)
+
+#class attributes_form(type_form):
+    #reference = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
+    #revision = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
+
+class FakeItems(object):
+    def __init__(self, values):
+        self.values = values
+    def items(self):
+        return self.values
+
 def get_search_form(cls=m.PLMObject, data=None):
-    fields = set(cls.get_creation_fields())
-    fields.update(set(cls.get_modification_fields()))
-    fields.difference_update(("revision", "type", "reference", "lifecycle"))
+    if issubclass(cls, m.PLMObject):
+        fields = set(cls.get_creation_fields())
+        fields.update(set(cls.get_modification_fields()))
+        fields.difference_update(("type", "lifecycle"))
+    else :
+        fields = set(["username", "first_name", "last_name"])
     fields_dict = {}
     for field in fields:
         model_field = cls._meta.get_field(field)
@@ -116,23 +133,21 @@ def get_search_form(cls=m.PLMObject, data=None):
                 return query_set
             else:
                 return []
-    
+    fields_list = fields_dict.items()
+    for ref, field in fields_list:
+        if ref=='reference':
+            fields_list.remove((ref, field))
+            fields_list.insert(0, (ref, field))
+            break
+    ordered_fields_list = FakeItems(fields_list)
     Form = type("Search%sForm" % cls.__name__,
                 (forms.BaseForm,),
-                {"base_fields" : fields_dict, "search" : search}) 
+                {"base_fields" : ordered_fields_list, "search" : search}) 
     if data is not None:
         return Form(data=data, empty_permitted=True)
     else:
         return Form(empty_permitted=True)
-    
-class type_form(forms.Form):
-    LISTE = m.get_all_plmobjects_with_level()
-    type = forms.TypedChoiceField(choices=LISTE)
-
-class attributes_form(type_form):
-    reference = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
-    revision = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
-    
+       
 def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
     fields = cls.get_modification_fields()
     Form = modelform_factory(cls, fields=fields)
