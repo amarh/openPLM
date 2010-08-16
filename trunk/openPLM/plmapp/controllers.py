@@ -128,6 +128,7 @@ from collections import namedtuple
 import Image
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.fields import FieldDoesNotExist
 
 try:
     import openPLM.plmapp.models as models
@@ -268,7 +269,14 @@ class PLMObjectController(object):
             return obj
         else:
             raise ValueError("form is invalid")
-        
+
+    def get_verbose_name(self, attr_name):
+        try:
+            item = self.object._meta.get_field(attr_name).verbose_name
+        except FieldDoesNotExist:
+            item = attr_name
+        return item   
+    
     def update_from_form(self, form):
         u"""
         Updates :attr:`object` from data of *form*

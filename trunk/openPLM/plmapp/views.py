@@ -29,7 +29,6 @@ from django.template import RequestContext
 
 from django.contrib.auth.models import User
 
-from django.db.models.fields import FieldDoesNotExist
 
 ##########################################################################################
 def replace_white_spaces(Chain):
@@ -163,10 +162,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     menu_list = obj.menu_items
     object_attributes_list = []
     for attr in obj.attributes:
-        try:
-            item = obj._meta.get_field(attr).verbose_name
-        except FieldDoesNotExist:
-            item = attr
+        item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
     context_dict.update({'current_page':'attributes', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})

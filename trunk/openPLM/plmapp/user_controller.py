@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.fields import FieldDoesNotExist
 
 try:
     import openPLM.plmapp.models as models
@@ -38,6 +39,14 @@ class UserController(object):
         self.mtime = obj.last_login
         self.ctime = obj.date_joined
 
+    def get_verbose_name(self, attr_name):
+        try:
+            item = self.object._meta.get_field(attr_name).verbose_name
+        except FieldDoesNotExist:
+            names = {"mtime" : "date of last modification",
+                     "ctime" : "date of creation"}
+            item = names.get(attr_name, attr_name)
+        return item
 
     def update_from_form(self, form):
         u"""
