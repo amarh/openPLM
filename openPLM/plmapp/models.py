@@ -52,11 +52,56 @@ import hashlib
 import fnmatch
 import datetime
 from django.db import models
+from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 
 from openPLM.plmapp.lifecycle import LifecycleList
+
+# user stuff
+
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    is_superuser = models.BooleanField(default=False, blank=True)
+    is_contributor = models.BooleanField(default=False, blank=True)
+    
+    @property
+    def is_viewer(self):
+        return not (self.is_superuser or self.is_contributor)
+
+    def __unicode__(self):
+        return u"UserProfile<%s>" % self.user.username
+
+    @property
+    def plmobject_url(self):
+        return "/user/%s/" % self.object.username
+
+    @property
+    def attributes(self):
+        u"Attributes to display in `Attributes view`"
+        return ["first_name", "last_name", "email",  "creator", "owner",
+                "ctime", "mtime"]
+
+    @property
+    def menu_items(self):
+        "menu items to choose a view"
+        return ["attributes", "lifecycle", "history"]
+
+    @classmethod
+    def excluded_creation_fields(cls):
+        "Returns fields which should not be available in a creation form"
+        return ["owner", "creator", "ctime", "mtime"]
+   
+
+def add_profile(sender, instance, created, **kwargs):
+    if sender == User and created:
+        profile = UserProfile(user=instance)
+        profile.save()
+
+if __name__ != "openPLM.plmapp.models":
+    post_save.connect(add_profile, sender=User)
+
 
 # lifecycle stuff
 
@@ -485,7 +530,7 @@ def get_all_users_and_plmobjects():
 
 
 # history stuff
-class History(models.Model):
+class AbstractHistory(models.Model):
     u"""
     History model.
     This model records all events related to :class:`PLMObject`
@@ -519,7 +564,9 @@ class History(models.Model):
         ("Demote", "Demote"),
     )
     
-    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")
+    class Meta:
+        abstract = True
+
     action = models.CharField(max_length=50, choices=ACTIONS)
     details = models.TextField()
     date = models.DateTimeField(auto_now=True)
@@ -527,6 +574,12 @@ class History(models.Model):
 
     def __unicode__(self):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
+
+class History(AbstractHistory):
+    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")
+
+class UserHistory(AbstractHistory):
+    plmobject = models.ForeignKey(User, related_name="%(class)s_plmobject")
 
 # link stuff
 

@@ -1,3 +1,6 @@
+import sys
+
+from django.conf import settings
 from django.conf.urls.defaults import *
 from openPLM.plmapp.views import *
 import openPLM.plmapp.api as api
@@ -11,8 +14,8 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     (r'^bollox/', display_bollox),
-    (r'^login/', login, {'template_name': 'DisplayLoginPage.htm', }),
-    (r'^logout/', logout, {'next_page': '/login/', }),
+    (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', }),
+    (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
     (r'^object/(?P<obj_type>[^/]+)/(?P<obj_ref>[^/]+)/(?P<obj_revi>[^/]+)/$', display_object),
     (r'^object/(?P<obj_type>[^/]+)/(?P<obj_ref>[^/]+)/(?P<obj_revi>[^/]+)/attributes/$', display_object_attributes),
@@ -73,3 +76,14 @@ urlpatterns += patterns('',
     (r'^api/object/(?P<doc_id>\d+)/checkin/(?P<df_id>\d+)/$', api.check_in),
     (r'^api/object/(?P<doc_id>\d+)/add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
+
+
+# add custom application urls
+for app in settings.INSTALLED_APPS:
+    if app.startswith("openPLM"):
+        try:
+            __import__("%s.urls" % app, globals(), locals(), [], -1)
+            patterns = getattr(sys.modules["%s.urls" % app], "urlpatterns")
+            urlpatterns += patterns
+        except ImportError:
+            pass

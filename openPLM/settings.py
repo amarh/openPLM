@@ -91,6 +91,8 @@ INSTALLED_APPS = (
     'openPLM.office',
 )
 
+AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
+
 ######################
 # openPLM's settings #
 ######################
