@@ -75,7 +75,7 @@ class UserProfile(models.Model):
 
     @property
     def plmobject_url(self):
-        return "/user/%s/" % self.object.username
+        return "/user/%s/" % self.user.username
 
     @property
     def attributes(self):
@@ -86,7 +86,7 @@ class UserProfile(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
-        return ["attributes", "lifecycle", "history"]
+        return ["attributes", "lifecycle", "history", "part-doc-cad"]
 
     @classmethod
     def excluded_creation_fields(cls):
@@ -528,6 +528,11 @@ def get_all_users_and_plmobjects():
     res.update(get_all_plmobjects())
     return res
 
+def get_all_userprofiles_and_plmobjects():
+    res = {}
+    _get_all_subclasses(UserProfile, res)
+    res.update(get_all_plmobjects())
+    return res
 
 # history stuff
 class AbstractHistory(models.Model):

@@ -28,17 +28,19 @@
 		        {% for menu_item in object_menu %}
     				{% ifequal menu_item current_page%}
     				<td class="CurrentPage">
-        				<a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">
-        				    {{ menu_item|upper }}
-				        </a>
-    				</td>
     				{%else%}
     				<td>
+    				{%endifequal%}
+    				{% ifequal object_type 'User' %}
+    				    <a href="/user/{{object_reference}}/{{menu_item}}/">
+        				    {{ menu_item|upper }}
+				        </a>
+    				{% else %}
         				<a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">
         				    {{ menu_item|upper }}
 				        </a>
+			        {% endifequal %}
     				</td>
-    				{%endifequal%}
     		    {% endfor %}
 			</tr>
     	</table>
