@@ -6,6 +6,9 @@ import openPLM.plmapp.models as m
 from django.forms import ValidationError
 import re
 
+
+from django.contrib.auth.models import User
+
 def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
     Returns a creation form suitable to creates an object
@@ -276,4 +279,11 @@ class FilterObjectForm(forms.Form):
     User = forms.BooleanField(required=False)
 #    method = forms.TypedChoiceField(choices=LISTE, required=False)
     
+class OpenPLMUserChangeForm(forms.ModelForm):
+    #username = forms.RegexField(widget=forms.HiddenInput())
+    class Meta:
+        model = User
+        exclude = ('username','is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'password')
+
+
 

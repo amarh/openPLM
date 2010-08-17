@@ -43,7 +43,9 @@ urlpatterns = patterns('',
     (r'^user/(?P<obj_ref>[^/]+)/attributes/$', display_object_attributes, {'obj_type':'User', 'obj_revi':'-'}),
     (r'^user/(?P<obj_ref>[^/]+)/lifecycle/$', display_object_lifecycle, {'obj_type':'User', 'obj_revi':'-'}),
     (r'^user/(?P<obj_ref>[^/]+)/history/$', display_object_history, {'obj_type':'User', 'obj_revi':'-'}),
-
+    (r'^user/(?P<obj_ref>[^/]+)/modify/$', modify_user, {'obj_type':'User', 'obj_revi':'-'}),
+    (r'^user/(?P<obj_ref>[^/]+)/password/$', change_user_password, {'obj_type':'User', 'obj_revi':'-'}),
+    
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
