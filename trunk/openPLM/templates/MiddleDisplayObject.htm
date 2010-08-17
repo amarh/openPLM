@@ -11,8 +11,15 @@
 {% block ObjectBlock %}
     <div id="PageBanner">
 		<h2>
-		    {% ifequal class4div 'NavigateBox4Part' %}
-		        <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
+		    {% ifequal class4div 'NavigateBox4User' %}
+		        <a href="/user/{{object_reference}}/navigate/">
+		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
+	            </a>
+	            <a href="../attributes/">
+		            <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
+	            </a>
+            {% else %}
+                <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
 		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
 	            </a>
 	            <a href="../attributes/">
