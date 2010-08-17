@@ -833,7 +833,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
         if request.POST:
             modification_form_instance = get_modification_form(cls, request.POST)
             if modification_form_instance.is_valid():
-                user = models.User.objects.get(username=log_in_person)
+                user = models.User.objects.get(username=request.user)
                 current_object.update_from_form(modification_form_instance)
                 return HttpResponseRedirect("/object/%s/%s/%s/" % (current_object.type, current_object.reference, current_object.revision) )
             else:
@@ -1014,7 +1014,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
         navigate_graph.node_attr['height']="0.6"
         navigate_graph.edge_attr['arrowhead']='normal'
         def create_child_edges(object_id):
-            object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
+            object_item = get_obj_by_id(object_id, request.user)
             children_list = object_item.get_children()
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
@@ -1036,7 +1036,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
             else:
                 return
         def create_parent_edges(object_id):
-            object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
+            object_item = get_obj_by_id(object_id, request.user)
             parent_list = object_item.get_parents()
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
@@ -1058,7 +1058,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
             else :
                 return
         def create_document_edges(object_id):
-            object_item = get_obj_by_id(object_id, var_dict['log_in_person'])
+            object_item = get_obj_by_id(object_id, request.user)
             document_list = object_item.get_attached_documents()
             navigate_graph.node_attr['image']='none'
             navigate_graph.node_attr['color']='#fef176'
