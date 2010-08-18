@@ -241,7 +241,7 @@ def get_default_state(lifecycle=None):
 
 class PLMObject(models.Model):
     u"""
-    Base class for :class:`Part` and  :class:`Document`.
+    Base class for :class:`Part` and :class:`Document`.
 
     A PLMObject is identified by a triplet reference/type/revision
 
@@ -482,12 +482,12 @@ class DocumentStorage(FileSystemStorage):
         md5_value = md5.hexdigest() + "-%s" + ext
         path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
         while os.path.exists(path):
-
             path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
         return path
 
 #: :class:`DocumentStorage` instance which stores files in :const:`settings.DOCUMENTS_DIR`
 docfs = DocumentStorage(location=settings.DOCUMENTS_DIR)
+#: :class:`FileSystemStorage` instance which stores thumbnails in :const:`settings.THUMBNAILS_DIR`
 thumbnailfs = FileSystemStorage(location=settings.THUMBNAILS_DIR)
 
 class DocumentFile(models.Model):

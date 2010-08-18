@@ -1,3 +1,10 @@
+"""
+This module contains a class called :class:`UserController` which
+provides a controller for :class:`~django.contrib.auth.models.User`.
+This class is similar to :class:`.PLMObjectController` but some methods
+from :class:`.PLMObjectController` are not defined.
+"""
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
 

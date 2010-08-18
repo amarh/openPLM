@@ -33,6 +33,7 @@ Modules
     forms
     lifecycle
     models
+    user_controller
     utils
     views
 

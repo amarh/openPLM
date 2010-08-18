@@ -112,6 +112,7 @@ This module defines several classes, here is a summary:
         :class:`.PLMObject` :class:`PLMObjectController`
         :class:`.Part`      :class:`PartController`
         :class:`.Document`  :class:`DocumentController`
+        :class:`User`       :class:`.UserController`
         =================== ===============================
     
     * functions:
