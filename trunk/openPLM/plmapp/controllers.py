@@ -367,7 +367,7 @@ class PLMObjectController(object):
             user = self._user
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
-            raise PermissionError("%s is not a contributor" % self._user)
+            raise PermissionError("%s is not a contributor" % user)
 
     def promote(self):
         u"""
