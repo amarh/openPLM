@@ -3,12 +3,30 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	{% ifequal object_type 'User' %}
-	    <a href="/user/{{object_reference}}/modify/"><img src="/media/img/edit_button.png" title="EDIT" alt="EDIT" /></a>
-	    <a href="/user/{{object_reference}}/password/"><img src="/media/img/password_button.png" title="PASSWORD" alt="PASSWORD" /></a>
-	{% else %}
-	    <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/"><img src="/media/img/edit_button.png" title="EDIT" alt="EDIT" /></a>
-	{% endifequal %}
+	
+	    <table>
+	        <tr>
+	            {% ifequal object_type 'User' %}
+	                <td class="Button">
+	                    <div class="Button">
+	                        <a class="Button" href="/user/{{object_reference}}/modify/">EDIT</a>
+                        </div>
+                    </td>
+	                <td class="Button">
+	                    <div class="Button">
+	                        <a class="Button" href="/user/{{object_reference}}/password/">PASSWORD</a>
+                        </div>
+	                </td>
+                {% else %}
+                    <td class="Button">
+	                    <div class="Button">
+	                        <a class="Button" 
+	                            href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">EDIT</a>
+                        </div>
+                    </td>
+            	{% endifequal %}
+	        </tr>
+        </table>
     <br />
 	<br />
 	<table class="Content">

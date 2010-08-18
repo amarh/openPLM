@@ -367,3 +367,28 @@ img.thumbnail
 {
     max-height:70px;
 }
+
+td.Button
+{
+border-width: 0px;
+background: url(/media/img/left_button.png) no-repeat left top;
+height: 23px;
+}
+
+div.Button
+{
+background: url(/media/img/right_button.png) no-repeat right top;
+height: 23px;
+}
+
+a.Button
+{
+padding-left: 4px;
+padding-right: 4px;
+color: #000000;
+text-align: center;
+vertical-align: middle; 
+text-decoration: none;
+font-size: 90%;
+}
+
