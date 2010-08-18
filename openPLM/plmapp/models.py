@@ -175,7 +175,8 @@ class Lifecycle(models.Model):
         """
         
         lcs = LifecycleStates.objects.filter(lifecycle=self).order_by("rank")
-        return LifecycleList(self.name, *(l.state.name for l in lcs))
+        return LifecycleList(self.name, self.official_state.name,
+                             *(l.state.name for l in lcs))
 
     def __iter__(self):
         return iter(self.to_states_list())
@@ -191,7 +192,8 @@ class Lifecycle(models.Model):
         :return: a :class:`Lifecycle`
         """
         
-        lifecycle = cls(name=cycle.name)
+        lifecycle = cls(name=cycle.name,
+            official_state=State.objects.get_or_create(name=cycle.official_state)[0])
         lifecycle.save()
         for i, state_name in enumerate(cycle):
             state = State.objects.get_or_create(name=state_name)[0]
@@ -324,6 +326,17 @@ class PLMObject(models.Model):
         """
         raise NotImplementedError()
 
+    @property
+    def is_editable(self):
+        """
+        Returns True if the object is not in a non editable state
+        (for example, in an official or deprecated state
+        """
+        current_rank = LifecycleStates.objects.get(state=self.state,
+                            lifecycle=self.lifecycle).rank
+        official_rank = LifecycleStates.objects.get(state=self.lifecycle.official_state,
+                            lifecycle=self.lifecycle).rank
+        return current_rank < official_rank
     
     @property
     def attributes(self):

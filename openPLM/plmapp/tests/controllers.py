@@ -43,6 +43,7 @@ class ControllerTest(TestCase):
         self.assertEqual(obj.owner, self.user)
         self.assertEqual(obj.creator, self.user)
         PLMObjectUserLink.objects.get(plmobject=obj, user=self.user, role="owner")
+        self.failUnless(obj.is_editable)
 
     def test_create_error1(self):
         # empty reference
@@ -128,8 +129,10 @@ class ControllerTest(TestCase):
         self.assertEqual(controller.state.name, "draft")
         controller.promote()
         self.assertEqual(controller.state.name, "official")
+        self.failIf(controller.is_editable)
         controller.demote()
         self.assertEqual(controller.state.name, "draft")
+        self.failUnless(controller.is_editable)
 
     def test_revise(self):
         """

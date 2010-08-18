@@ -19,12 +19,12 @@ class LifecycleTest(TestCase):
         self.assertEqual(len(lcs), len(lc_list))
 
     def test_from_list(self):
-        cycle = LifecycleList("cycle_name", "a", "b", "c")
+        cycle = LifecycleList("cycle_name", "b", "a", "b", "c")
         lifecycle = Lifecycle.from_lifecyclelist(cycle)
         self.assertEqual(cycle.name, lifecycle.name)
 
     def test_iteration(self):
-        cycle = LifecycleList("cycle_name", "a", "b", "c")
+        cycle = LifecycleList("cycle_name", "b", "a", "b", "c")
         lifecycle = Lifecycle.from_lifecyclelist(cycle)
         for i, state in enumerate(lifecycle):
             self.assertEqual(state, cycle[i])
