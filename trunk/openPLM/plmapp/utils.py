@@ -8,14 +8,14 @@ import string
 def next_in_seq(seq, value):
     """
     Returns item next to *value* in the sequence *seq*
-    
+
     Example::
 
         >>> next_in_seq("abcd", "b")
         'c'
         >>> next_in_seq(range(5), 2)
         3
-    
+
     """
     return seq[seq.index(value) + 1]
 
@@ -23,7 +23,7 @@ def get_next_revision(revision):
     """
     Returns next revision for *revision*. For example, if *revision* represents
     an int, it returns a string of the value + 1.
-    
+
     If it can not find a new revision, it returns ""
 
     Example::
@@ -114,6 +114,8 @@ def convert(value, from_, to):
 
 def normalize_length(length):
     """
+    Converts *length* to a length in mm, formatted as ``%.1f``
+
     Example ::
 
         >>> normalize_length("29.7cm")
@@ -129,7 +131,7 @@ def normalize_length(length):
     return "%.1f" % convert(value, unit, "mm")
 
 FORMATS = {
-    ("841.0", "1189.0") : "A0",       
+    ("841.0", "1189.0") : "A0",
     ("594.0", "841.0") : "A1",
     ("420.0", "594.0") : "A2",
     ("297.0", "420.0") : "A3",
@@ -137,8 +139,8 @@ FORMATS = {
     ("148.0", "210.0") : "A5",
     ("105.0", "148.0") : "A6",
     ("74.0", "105.0") : "A7",
-    ("52.0", "74.0") : "A8",  
-    ("37.0", "52.0") : "A9", 
+    ("52.0", "74.0") : "A8",
+    ("37.0", "52.0") : "A9",
     ("26.0", "37.0") : "A10",
 }
 CFORMATS = [(x, x) for x in FORMATS.itervalues()]
@@ -146,6 +148,8 @@ CFORMATS.sort()
 CFORMATS.append(("Other", "Other"))
 def size_to_format(width_lg, height_lg):
     """
+    Converts a size to a page format
+
     Example::
 
         >>> size_to_format("29.7cm", "21cm")
@@ -157,6 +161,25 @@ def size_to_format(width_lg, height_lg):
     return FORMATS.get(size, "Other")
 
 def level_to_sign_str(level):
+    """
+    Converts a level (int, starting from 0) to a sign role
+
+    Example::
+        
+        >>> level_to_sign_str(0)
+        'sign_1st_level'
+        >>> level_to_sign_str(1)
+        'sign_2nd_level'
+        >>> level_to_sign_str(2)
+        'sign_3th_level'
+        >>> level_to_sign_str(3)
+        'sign_3rd_level'
+        >>> level_to_sign_str(4)
+        'sign_5th_level'
+        >>> level_to_sign_str(10)
+        'sign_11th_level'
+    """
+
     types = {0 : "1st", 1 : "2nd", 3 : "3rd"}
     return "sign_%s_level" % types.get(level, "%dth" % (level + 1))
 

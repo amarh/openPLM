@@ -17,12 +17,16 @@
     {
         "pk": "draft_official_deprecated", 
         "model": "plmapp.lifecycle", 
-        "fields": {}
+        "fields": {
+            "official_state":"official"
+        }
     }, 
     {
         "pk": "draft_official", 
         "model": "plmapp.lifecycle", 
-        "fields": {}
+        "fields": {
+            "official_state":"official"
+        }
     }, 
     {
         "pk": 1, 
