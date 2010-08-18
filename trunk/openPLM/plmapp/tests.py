@@ -619,7 +619,7 @@ class SearchViewTest(CommonViewTest):
         self.assertEqual(response.status_code, 200)
         # check if searchforms are present
         af = response.context["attributes_form"]
-        eaf = response.context["extra_attributes_form"]
+        eaf = response.context["type_form"]
     
     def test_session_forms(self):
         "Tests if form field are kept between two search"

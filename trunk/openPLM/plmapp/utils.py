@@ -156,6 +156,11 @@ def size_to_format(width_lg, height_lg):
     size = (normalize_length(width_lg), normalize_length(height_lg))
     return FORMATS.get(size, "Other")
 
+def level_to_sign_str(level):
+    types = {0 : "1st", 1 : "2nd", 3 : "3rd"}
+    return "sign_%s_level" % types.get(level, "%dth" % (level + 1))
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

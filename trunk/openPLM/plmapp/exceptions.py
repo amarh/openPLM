@@ -32,3 +32,8 @@ class DeleteFileError(ControllerError):
     Exception raised when an error occurs while deleting a file to a document
     """
 
+class PermissionError(ControllerError):
+    """
+    Exception raised when an user attempt to made an unauthorized action
+    """
+

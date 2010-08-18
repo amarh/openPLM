@@ -51,13 +51,14 @@ import random
 import hashlib
 import fnmatch
 import datetime
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 
 from openPLM.plmapp.lifecycle import LifecycleList
+from openPLM.plmapp.utils import level_to_sign_str
 
 # user stuff
 
@@ -76,6 +77,15 @@ class UserProfile(models.Model):
     @property
     def plmobject_url(self):
         return "/user/%s/" % self.user.username
+
+    @property
+    def rank(self):
+        if self.is_administrator:
+            return "administrator"
+        elif self.is_contributor:
+            return "contributor"
+        else:
+            return "viewer"
 
     @property
     def attributes(self):
@@ -483,6 +493,9 @@ class DocumentFile(models.Model):
                                default=lambda: None)
     document = models.ForeignKey('Document', related_name="%(class)s_doc")
 
+    def __unicode__(self):
+        return u"DocumentFile<%s, %s>" % (self.filename, self.document)
+
 class Document(PLMObject):
     """
     Model for documents
@@ -694,7 +707,95 @@ class DocumentPartLink(Link):
         unique_together = ("document", "part")
 
     def __unicode__(self):
-        return u"DocumentPartLink<%s, %s" % (self.document, self.part)
+        return u"DocumentPartLink<%s, %s>" % (self.document, self.part)
+
+ROLES = [("owner", "owner"),
+         ("notified", "notified"),]
+for i in range(10):
+    level = level_to_sign_str(i)
+    ROLES.append((level, level))
+
+class AbstractDelegationLink(Link):
+    """
+    Link between two :class:`~.django.contrib.auth.models.User` to delegate
+    his rights
+    
+    :model attributes:
+        .. attribute:: delegator
+
+            a :class:`User`
+        .. attribute:: delegatee
+
+            a :class:`User`
+    """
+
+    ACTION_NAME = "Link : delegation"
+
+    delegator = models.ForeignKey(User, related_name="%(class)s_delegator")    
+    delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")    
+    role = models.CharField(max_length=30, choices=ROLES)
+
+    class Meta:
+        unique_together = ("delegator", "delegatee", "role")
+        abstract = True
+
+    def __unicode__(self):
+        return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
+                                                self.role)
+
+class DelegationLink(AbstractDelegationLink):
+    pass
+
+class ClosureDelegationLink(AbstractDelegationLink):
+    pass
+
+class PLMObjectUserLink(Link):
+    """
+    Link between a :class:`~.django.contrib.auth.models.User` and a
+    :class:`PLMObject`
+    
+    :model attributes:
+        .. attribute:: plmobject
+
+            a :class:`PLMObject`
+        .. attribute:: user
+
+            a :class:`User`
+    """
+
+    ACTION_NAME = "Link : PLMObject-user"
+
+    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
+    user = models.ForeignKey(User, related_name="%(class)s_user")    
+    role = models.CharField(max_length=30, choices=ROLES)
+
+    class Meta:
+        unique_together = ("plmobject", "user", "role")
+
+    def __unicode__(self):
+        return u"PLMObjectUserLink<%s, %s, %s>" % (self.plmobject, self.user, self.role)
+
+
+def add_transitive_links(sender, instance, created, **kwargs):
+    if created:
+        ClosureDelegationLink.objects.get_or_create(delegator=instance.delegator,
+                                                    delegatee=instance.delegatee,
+                                                    role=instance.role)
+        qset = ClosureDelegationLink.objects.filter(delegatee=instance.delegator,
+                                     role=instance.role).only("delegator")
+        for link in qset:
+            try:
+                if instance.delegatee != link.delegator:
+                    ClosureDelegationLink.objects.create(role=instance.role,
+                        delegatee=instance.delegatee,
+                        delegator=link.delegator)
+            except IntegrityError:
+                # link already exists
+                pass
+
+if __name__ != "openPLM.plmapp.models":
+    post_save.connect(add_transitive_links, sender=DelegationLink)
+
 
 def _get_all_subclasses_with_level(base, lst, level):
     level = "=" + level
@@ -750,116 +851,4 @@ def import_models(force_reload=False):
                 except StandardError, exc:
                     print "Exception in import_models", module_name, type(exc), exc
 import_models()
-
-#class PLMUser(User):
-    # key attributes
-    # reference = models.CharField(max_length=50)
-    # type = models.CharField(max_length=50)
-    # revision = models.CharField(max_length=50)
-
-    # other attributes
-    # name = models.CharField(max_length=100, blank=True,
-     #                       help_text=u"Name of the product")
-
-    # creator = models.ForeignKey(User, related_name="%(class)s_creator")
-    # owner = models.ForeignKey(User, related_name="%(class)s_owner")
-    # ctime = models.DateTimeField("date of creation", default=datetime.datetime.today,
-    #                             auto_now_add=False)
-    # mtime = models.DateTimeField("date of last modification", auto_now=True)
-
-    # state and lifecycle
-    # lifecycle = models.ForeignKey(Lifecycle, related_name="%(class)s_lifecyle",
-    #                             default=get_default_lifecycle)
-    # state = models.ForeignKey(State, related_name="%(class)s_lifecyle",
-    #                             default=get_default_state)
-
-    
-    # class Meta:
-        # keys in the database
-        # unique_together = (('reference', 'type', 'revision'),)
-        
-    # class Meta:
-    #    ordering = ["type", "reference", "revision"]
-
-    # def __unicode__(self):
-        # return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
-        #                          self.revision)
-
-    # def is_promotable(self):
-    #    u"""
-    #    Returns True if object is promotable
-
-    #    .. note::
-    #        This method is abstract and raises :exc:`NotImplementedError`.
-    #        This method must be overriden.
-    #    """
-    #    raise NotImplementedError()
-
-    
-    # @property
-    # def attributes(self):
-    #    u"Attributes to display in `Attributes view`"
-    #    return ["name",  "creator", "owner", "ctime", "mtime"]
-
-    # @property
-    # def menu_items(self):
-    #    "menu items to choose a view"
-    #    return ["attributes", "lifecycle", "revisions", "history", "management"]
-
-    # @classmethod
-    # def excluded_creation_fields(cls):
-    #    "Returns fields which should not be available in a creation form"
-    #    return ["owner", "creator", "ctime", "mtime"]
-
-    #@classmethod
-    #def get_creation_fields(cls):
-    #    """
-    #    Returns fields which should be displayed in a creation form.
-
-    #    By default, it returns :attr:`attributes` less attributes returned by
-    #    :meth:`excluded_creation_fields`
-    #    """
-    #    fields = ["username", "type", "first_name", "lifecycle", "state"]
-        #for field in cls().attributes:
-        #    if field not in cls.excluded_creation_fields():
-        #        fields.append(field)
-     #   return fields
-
-    #@classmethod
-    #def excluded_modification_fields(cls):
-    #    """
-    #    Returns fields which should not be available in a modification form
-    #    
-    #    By default, it returns :attr:`attributes` less attributes returned by
-    #    :meth:`excluded_modification_fields`
-    #    """
-    #    return ["creator", "ctime", "mtime"]
-
-    #@classmethod
-    #def get_modification_fields(cls):
-       # "Returns fields which should be displayed in a modification form"
-       # fields = []
-        #for field in cls().attributes:
-        #    if field not in cls.excluded_modification_fields():
-        #        fields.append(field)
-       # return fields
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
