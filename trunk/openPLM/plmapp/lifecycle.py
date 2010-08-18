@@ -18,7 +18,7 @@ class LifecycleList(list):
     This class inherits from list, so you can use all list methods.
     For example::
 
-        >>> cycle = LifecycleList("MyCycle")
+        >>> cycle = LifecycleList("MyCycle", "b")
         >>> cycle.extend(["a", "b", "c"])
         >>> cycle[0]
         'a'
@@ -28,9 +28,10 @@ class LifecycleList(list):
         name of the lifecycle
 
     """
-    def __init__(self, name, *args):
+    def __init__(self, name, official_state, *args):
         super(LifecycleList, self).__init__(self)
         self.name = name
+        self.official_state = official_state
         self.extend(args)
 
     def next_state(self, state):
@@ -42,7 +43,7 @@ class LifecycleList(list):
         
         Example::
 
-            >>> cycle = LifecycleList("MyCycle", "a", "b", "c", "d")
+            >>> cycle = LifecycleList("MyCycle", "b", "a", "b", "c", "d")
             >>> cycle.next_state("b")
             'c'
             >>> cycle.next_state("d")
@@ -68,7 +69,7 @@ class LifecycleList(list):
 
         Example::
 
-            >>> cycle = LifecycleList("MyCycle", "a", "b", "c", "d")
+            >>> cycle = LifecycleList("MyCycle", "b", "a", "b", "c", "d")
             >>> cycle.previous_state("b")
             'a'
             >>> cycle.previous_state("a")
@@ -118,7 +119,7 @@ class LifecycleList(list):
 lifecycles = dict()
 for cycles in _lifecycles_list:
     name = "->".join(cycles) 
-    lifecycles[name] = LifecycleList(name, *cycles)
+    lifecycles[name] = LifecycleList(name, "official", *cycles)
 
 if __name__ == "__main__":
     import doctest
