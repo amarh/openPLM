@@ -123,6 +123,7 @@ import os
 import re
 import shutil
 import datetime
+from functools import wraps
 from collections import namedtuple
 
 import Image
@@ -133,11 +134,13 @@ from django.db.models.fields import FieldDoesNotExist
 try:
     import openPLM.plmapp.models as models
     from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError
+        AddFileError, DeleteFileError, PermissionError
+    from openPLM.plmapp.utils import level_to_sign_str
 except (ImportError, AttributeError):
     import plmapp.models as models
     from plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError
+        AddFileError, DeleteFileError, PermissionError
+    from plmapp.utils import level_to_sign_str
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
@@ -181,6 +184,18 @@ class MetaController(type):
 #: shortcut for :meth:`MetaController.get_controller`
 get_controller = MetaController.get_controller
 
+def permission_required(func=None, role="owner"):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            args[0].check_permission(role)
+            return f(*args, **kwargs)
+        wrapper.__doc__ = "Permission required: `%s`\n%s" % (role, wrapper.__doc__)
+        return wrapper
+    if func:
+        return decorator(func)
+    return decorator
+
 class PLMObjectController(object):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
@@ -194,7 +209,7 @@ class PLMObjectController(object):
     :param obj: managed object
     :type obj: a subinstance of :class:`.PLMObject`
     :param user: user who modify *obj*
-    :type user: :class:`~django.contrib.auth.models.User` 
+    :type user: :class:`~django.contrib.auth.models.User`
     """
 
     __metaclass__ = MetaController
@@ -247,6 +262,11 @@ class PLMObjectController(object):
         infos.update(data)
         details = ",".join("%s : %s" % (k, v) for k, v in infos.items())
         res._save_histo("Create", details)
+        # add links
+        models.PLMObjectUserLink.objects.create(plmobject=obj, user=user, role="owner")
+        for i in range(len(obj.lifecycle.to_states_list()) - 1):
+            models.PLMObjectUserLink.objects.create(plmobject=obj, user=user,
+                                                    role=level_to_sign_str(i))
         return res
         
     @classmethod
@@ -293,6 +313,34 @@ class PLMObjectController(object):
                 self.save()
         else:
             raise ValueError("form is invalid")
+    
+    def check_permission(self, role, raise_=True):
+        """
+        This method checks if :attr:`_user` has permissions implied by *role*.
+        For example, *role* can be *owner* or *notified*.
+
+        If the check succeed, **True** is returned. Otherwise, if *raise_* is
+        **True** (the default), an :exc:`.PermissionError` is raised and if
+        *raise_* is **False**, **False** is returned.
+        """
+
+        links = models.ClosureDelegationLink.objects.filter(delegatee=self._user,
+                                                            role=role)
+        users = [self._user] + [link.delegator for link in links]
+        qset = models.PLMObjectUserLink.objects.filter(user__in=users,
+                    plmobject=self.object, role=role)
+        if not bool(qset) and raise_:
+            raise PermissionError("action not allowed for %s" % self._user)
+        return bool(qset)
+
+    def check_contributor(self):
+        """
+        This method checks if the user is a contributor. If not, it raises
+        :exc:`PermissionError`
+        """
+        
+        if not self._user.get_profile().is_contributor():
+            raise PermissionError("%s is not a contributor" % self._user)
 
     def promote(self):
         u"""
@@ -303,6 +351,7 @@ class PLMObjectController(object):
             state = self.object.state
             lifecycle = self.object.lifecycle
             lcl = lifecycle.to_states_list()
+            self.check_permission(level_to_sign_str(lcl.index(state.name)))
             try:
                 new_state = lcl.next_state(state.name)
                 self.object.state = models.State.objects.get_or_create(name=new_state)[0]
@@ -338,7 +387,7 @@ class PLMObjectController(object):
            not attr in self.__dict__:
             old_value = getattr(self.object, attr)
             setattr(self.object, attr, value)
-            field = self.object._meta.get_field(attr).verbose_name
+            field = self.object._meta.get_field(attr).verbose_name.capitalize()
             message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                     {"field" : field, "old" : old_value, "new" : value}
             self.__histo += message + "\n"
@@ -371,6 +420,7 @@ class PLMObjectController(object):
         histo.user = self._user
         histo.save()
 
+    @permission_required(role="owner")
     def revise(self, new_revision):
         u"""
         Makes a new revision : duplicates :attr:`object`. The duplicated 
@@ -433,6 +483,52 @@ class PLMObjectController(object):
         """
         return self.get_previous_revisions() + [self.object] +\
                self.get_next_revisions()
+
+    def set_owner(self, new_owner):
+        self.owner = new_owner
+        link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
+               plmobject=self.object, role="owner")
+        link.user = new_owner
+        link.save()
+        self.save()
+
+    def add_notified(self, new_notified):
+        models.PLMObjectUserLink.objects.create(plmobject=self.object,
+            user=new_notified, role="notified")
+        # TODO : history
+
+    def remove_notified(self, notified):
+        link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+                user=notified, role="notified")
+        link.delete()
+        # TODO : history
+
+    def set_signer(self, signer, role):
+        # remove old signer
+        try:
+            link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+               role=role)
+            link.delete()
+        except ObjectDoesNotExist:
+            pass
+        # check if the role is valid
+        max_level = len(self.lifecycle.to_states_list) - 1
+        level = int(re.search(r"\d+", role).group(0))
+        if level > max_level:
+            # TODO better exception ?
+            raise PermissionError("bad role")
+        # add new signer
+        models.PLMObjectUserLink.objects.create(plmobject=self.object,
+                                                user=signer, role=role)
+        # TODO : history
+
+    def set_role(self, user, role):
+        if role == "owner":
+            self.set_owner(user)
+        elif role == "notified":
+            self.set_notified(user)
+        elif role.startswith("sign"):
+            self.set_signer(user, role)
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")

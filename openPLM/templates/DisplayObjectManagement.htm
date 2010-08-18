@@ -11,32 +11,20 @@
 	                <a href="./add/"><img src="/media/img/add_button.png" title="ADD" alt="ADD" /></a>
 	            </td>
             </tr>
-                {% for person in object_management %}
+                {% for link in object_management %}
                     <tr class="Content">
-                    {% for item in person %}
-                        <td class="Content">{{ item }}</td>
-                    {% endfor %}
-                    <td class="Content"><input type="submit" value="REPLACE"></td>
-                    {% ifequal person.3 'notified' %}
-                        <td class="Content"><input type="submit" value="DELETE"></td>
+                        {% with link.user.get_profile as profile %}
+                            <td class="Content">{{ profile.rank }}</td>
+                        {% endwith %}
+                        <td class="Content">{{ link.user.username }}</td>
+                        <td class="Content">{{ link.user.is_active|yesno:"active,inactive" }}</td>
+                        <td class="Content">{{ link.role }}</td>
+                        <td class="Content"><a href="./replace/{{link.id}}/">Replace</a></td>
+                    {% ifequal link.role 'notified' %}
+                        <td class="Content"><a href="./delete/{{link.id}}/">Delete</a></td>
                     {% endifequal %}
                     </tr>
                 {% endfor %}
-<!--	        {% for form in rel_part_formset.forms %}
-                {{ form.id }}
-                {{ form.document }}
-                {{ form.part }}
-		        <tr class="Content">
-			        <td class="Content">{{ form.delete }}</td>
-			        <td class="Content">{{ form.instance.part.type }}</td>
-			        <td class="Content">
-			            <a href="/object/{{ form.instance.part.type }}/{{ form.instance.part.reference }}/{{ form.instance.part.revision }}"/>
-			                {{ form.instance.part.reference }}
-		                </a>
-	                </td>
-			        <td class="Content">{{ form.instance.part.revision }}</td>
-		        </tr>	
-	        {% endfor %} -->
 	    </table>
     </form>
 {% endblock %}

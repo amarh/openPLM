@@ -41,7 +41,7 @@ class UserController(object):
 
     def get_verbose_name(self, attr_name):
         try:
-            item = self.object._meta.get_field(attr_name).verbose_name
+            item = unicode(self.object._meta.get_field(attr_name).verbose_name)
         except FieldDoesNotExist:
             names = {"mtime" : "date of last modification",
                      "ctime" : "date of creation"}
@@ -79,7 +79,7 @@ class UserController(object):
             obj2 = obj if hasattr(obj, attr) else profile
             old_value = getattr(obj2, attr)
             setattr(obj2, attr, value)
-            field = obj2._meta.get_field(attr).verbose_name
+            field = obj2._meta.get_field(attr).verbose_name.capitalize()
             message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                     {"field" : field, "old" : old_value, "new" : value}
             self.__histo += message + "\n"

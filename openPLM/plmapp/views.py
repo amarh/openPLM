@@ -37,7 +37,7 @@ def replace_white_spaces(Chain):
     return Chain.replace(" ","%20")
 
 ##########################################################################################
-def get_obj(obj_type, obj_ref, obj_revi):
+def get_obj(obj_type, obj_ref, obj_revi, user):
     """ Get Type, Reference and Revision and return an object """
     if obj_type=='User':
         obj = get_object_or_404(User,
@@ -58,7 +58,6 @@ def get_obj(obj_type, obj_ref, obj_revi):
                     obj = getattr(obj, c.__name__.lower())
                     find = True
         controller_cls = get_controller(obj_type)
-    user = models.User.objects.all()[0]
     return controller_cls(obj, user)
 
 ##########################################################################################
@@ -153,7 +152,7 @@ def display_home_page(request):
 @login_required
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for attributes """
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -189,7 +188,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for Lifecycle """
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -218,7 +217,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """Manage html page for revisions"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -248,7 +247,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_history(request, obj_type, obj_ref, obj_revi):
     """Manage html page for history"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
         histos = models.UserHistory.objects.filter(plmobject=obj.object).order_by('date')
@@ -275,7 +274,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_child(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for BOM and children of the part """
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -316,7 +315,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
 @login_required
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for BOM and children of the part : edition"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -349,7 +348,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
 def add_children(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for BOM and children of the part : add new link"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -385,7 +384,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_parents(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for "where is used / parents" of the part """
-    obj = get_obj( obj_type, obj_ref, obj_revi)
+    obj = get_obj( obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -424,7 +423,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for related documents and CAD of the part"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -456,7 +455,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
 def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for BOM and children of the part : add new link"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -492,7 +491,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_related_part(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for related parts of the document"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -523,7 +522,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
 def add_rel_part(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for related part of the document : add new link"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -557,7 +556,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_files(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for files contained by the document"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -591,7 +590,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 def add_file(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for file addition in the document"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -624,7 +623,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_management(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for management of part / document """
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -632,22 +631,8 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-    object_management_list = [("contributor", "pjoulaud", "active", "owner"),\
-                                ("contributor", "pcosquer", "active", "signer_1st_level"),\
-                                ("contributor", "pcosquer", "active", "signer_2nd_level"),\
-                                ("contributor", "mdurand", "active", "notified"),\
-                                ("contributor", "team_designers", "active", "notified")]
-#    if not hasattr(obj, "get_management"):
-#        # TODO
-#        raise TypeError()
-#    if request.method == "POST":
-#        formset = get_management_formset(obj, request.POST)
-#        if formset.is_valid():
-#            obj.update_management(formset)
-#            return HttpResponseRedirect(".")
-#    else:
-#        formset = get_management_formset(obj)
-#    object_management_list = obj.get_management()
+    object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
+    object_management_list = object_management_list.order_by("role")
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
     context_dict.update({'current_page':'management', 'class4div': class_for_div, 'object_menu': menu_list, 'object_management': object_management_list})
     var_dict, request_dict = display_global_page(request)
@@ -657,9 +642,11 @@ def display_management(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################
 @login_required
-def replace_management(request, obj_type, obj_ref, obj_revi):
+def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """ Manage html page for management of the part / document : edition"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    link = models.PLMObjectUserLink.objects.get(id=int(link_id))
+    assert obj.object.id == link.plmobject.id
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -667,9 +654,6 @@ def replace_management(request, obj_type, obj_ref, obj_revi):
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
-    if not hasattr(obj, "get_children"):
-        # TODO
-        raise TypeError()
     if request.method == "POST":
         if request.POST.get("action", "Undo") == "Undo":
             return HttpResponseRedirect("..")
@@ -692,7 +676,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi):
 def add_management(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for management of the part / document : add new link"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -730,7 +714,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object_part_doc_cad(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for related part, documents and CAD of a user"""
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -824,7 +808,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     else:
         cls = models.get_all_plmobjects()[obj_type]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
-    current_object = get_obj(obj_type, obj_ref, obj_revi)
+    current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(current_object, DocumentController):
         class_for_div="NavigateBox4Doc"
     else:
@@ -856,7 +840,7 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for user modification """
     now = datetime.datetime.now()
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    current_object = get_obj(obj_type, obj_ref, obj_revi)
+    current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
     class_for_div="NavigateBox4User"
     if request.method == 'POST':
         if request.POST:
@@ -880,7 +864,7 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for user password modification """
     now = datetime.datetime.now()
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    current_object = get_obj(obj_type, obj_ref, obj_revi)
+    current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
     class_for_div="NavigateBox4User"
     if request.method == 'POST':
         if request.POST:
@@ -912,7 +896,7 @@ def display_bollox(request):
 def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """ Manage html page for file checkin in the document"""
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
     elif isinstance(obj, DocumentController):
@@ -956,7 +940,7 @@ def download(request, docfile_id):
 ##########################################################################################
 @login_required 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
     if request.user == models.PLMObject.objects.get(type=obj_type, reference=obj_ref, revision=obj_revi).owner:
         obj.lock(doc_file)
@@ -969,7 +953,7 @@ regex_pattern = re.compile(r'coords\=\"(\d{1,5}),(\d{1,5}),(\d{1,5}),(\d{1,5})')
 @login_required
 def navigate(request, obj_type, obj_ref, obj_revi):   
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    obj = get_obj(obj_type, obj_ref, obj_revi)
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     if isinstance(obj, UserController):
