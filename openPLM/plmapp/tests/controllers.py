@@ -215,6 +215,16 @@ class ControllerTest(TestCase):
         PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
                                       role="notified")
 
+    def test_remove_notified(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        controller.add_notified(self.user)
+        PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
+                                      role="notified")
+        controller.remove_notified(self.user)
+        self.assertEqual(0, len(PLMObjectUserLink.objects.filter(
+            plmobject=controller.object, role="notified")))
+
     def test_set_role(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                             self.user, self.DATA)

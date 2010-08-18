@@ -509,6 +509,8 @@ class PLMObjectController(object):
         link.user = new_owner
         link.save()
         self.save()
+        # we do not need to write this event in an history since save() has
+        # already done it
 
     def add_notified(self, new_notified):
         """
@@ -522,7 +524,8 @@ class PLMObjectController(object):
         """
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
-        # TODO : history
+        details = "user: %s" % new_notified
+        self._save_histo("New notified", details) 
 
     def remove_notified(self, notified):
         """
@@ -538,6 +541,8 @@ class PLMObjectController(object):
         link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.delete()
+        details = "user: %s" % notified
+        self._save_histo("Notified removed", details) 
         # TODO : history
 
     def set_signer(self, signer, role):
@@ -554,9 +559,11 @@ class PLMObjectController(object):
         """
         self.check_contributor(signer)
         # remove old signer
+        old_signer = None
         try:
             link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
                role=role)
+            old_signer = link.user
             link.delete()
         except ObjectDoesNotExist:
             pass
@@ -569,7 +576,10 @@ class PLMObjectController(object):
         # add new signer
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
                                                 user=signer, role=role)
-        # TODO : history
+        details = "signer: %s, level : %d" % (signer, level)
+        if old_signer:
+            details += ", old signer: %s" % old_signer
+        self._save_histo("New signer", details) 
 
     def set_role(self, user, role):
         """
@@ -581,8 +591,8 @@ class PLMObjectController(object):
 
             If *role* is notified, others roles are preserved.
         
-        :raise: :exc:`.ValueError` if *role* is invalid
-        :raise: :exc:`.PremissionError` if *user* is not allowed to has role
+        :raise: :exc:`ValueError` if *role* is invalid
+        :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
         """
         if role == "owner":
