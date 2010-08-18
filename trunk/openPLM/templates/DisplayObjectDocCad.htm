@@ -5,11 +5,17 @@
 {% block content %}
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
-	    <table class="Content">
+	    <table>
 	         <tr>
-	            <td><a href="./add/"><img src="/media/img/add_button.png" title="ADD" alt="ADD" /></a></td>
+	            <td class="Button">
+                    <div class="Button">
+                        <a class="Button" href="./add/">ADD</a>
+                    </div>
+                </td>
 	            <td><input type="submit" value="DISCONNECT"></td>
 	        </tr>
+        </table>
+        <table class="Content">
 	        {% for form in doc_cad_formset.forms %}
                     {{ form.id }}
                     {{ form.part }}
