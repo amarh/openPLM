@@ -8,8 +8,8 @@ Models for openPLM
 
 This module contains openPLM's main models.
 
-There are 4 kinds of models:
-
+There are 5 kinds of models:
+    * :class:`UserProfile`
     * Lifecycle related models :
         - :class:`Lifecycle`
         - :class:`State`
@@ -17,7 +17,9 @@ There are 4 kinds of models:
         - there are some functions that may be useful:
             - :func:`get_default_lifecycle`
             - :func:`get_default_state`
-    * :class:`History` model
+    * History models:
+        - :class:`History` model
+        - :class:`UserHistory` model
     * PLMObject models:
         - :class:`PLMObject` is the base class
         - :class:`Part`
@@ -33,6 +35,12 @@ There are 4 kinds of models:
         - :class:`RevisionLink`
         - :class:`ParentChildLink`
         - :class:`DocumentPartLink`
+        - Delegation links:
+            - :class:`AbstractDelegationLink`
+            - :class:`DelegationLink`
+            - :class:`ClosureDelegationLink`
+            - :func:`add_transitive_links`
+        - :class:`PLMObjectUserLink`
 
 
 Inheritance diagram
@@ -63,12 +71,21 @@ from openPLM.plmapp.utils import level_to_sign_str
 # user stuff
 
 class UserProfile(models.Model):
+    """
+    Profile for a :class:`~django.contrib.auth.models.User`
+    """
     user = models.ForeignKey(User, unique=True)
+    #: True if user is an administrator
     is_administrator = models.BooleanField(default=False, blank=True)
+    #: True if user is a contributor
     is_contributor = models.BooleanField(default=False, blank=True)
     
     @property
     def is_viewer(self):
+        u"""
+        True if user is just a viewer, i.e: not an adminstrator and not a
+        contributor.
+        """
         return not (self.is_administrator or self.is_contributor)
 
     def __unicode__(self):
@@ -80,6 +97,7 @@ class UserProfile(models.Model):
 
     @property
     def rank(self):
+        u""" Rank of the user: "adminstrator", "contributor" or "viewer" """
         if self.is_administrator:
             return "administrator"
         elif self.is_contributor:
@@ -105,6 +123,7 @@ class UserProfile(models.Model):
    
 
 def add_profile(sender, instance, created, **kwargs):
+    """ function called when an user is created to add his profile """
     if sender == User and created:
         profile = UserProfile(user=instance)
         profile.save()
@@ -143,6 +162,7 @@ class Lifecycle(models.Model):
 
     """
     name = models.CharField(max_length=50, primary_key=True)
+    official_state = models.ForeignKey(State, related_name="official_state")
 
     # XXX description field ?
 
@@ -709,6 +729,9 @@ class DocumentPartLink(Link):
     def __unicode__(self):
         return u"DocumentPartLink<%s, %s>" % (self.document, self.part)
 
+
+# abstraction stuff
+
 ROLES = [("owner", "owner"),
          ("notified", "notified"),]
 for i in range(10):
@@ -718,15 +741,18 @@ for i in range(10):
 class AbstractDelegationLink(Link):
     """
     Link between two :class:`~.django.contrib.auth.models.User` to delegate
-    his rights
+    his rights (abstract class)
     
     :model attributes:
         .. attribute:: delegator
 
-            a :class:`User`
+            :class:`~django.contrib.auth.models.User` who gives his role
         .. attribute:: delegatee
 
-            a :class:`User`
+            :class:`~django.contrib.auth.models.User` who receives the role
+        .. attribute:: role
+            
+            right that is delegated
     """
 
     ACTION_NAME = "Link : delegation"
@@ -744,9 +770,15 @@ class AbstractDelegationLink(Link):
                                                 self.role)
 
 class DelegationLink(AbstractDelegationLink):
+    """
+    This models contains direct delegation links
+    """
     pass
 
 class ClosureDelegationLink(AbstractDelegationLink):
+    """
+    This model contains the transitive closure of :class:`DelegationLink`
+    """
     pass
 
 class PLMObjectUserLink(Link):
@@ -761,6 +793,9 @@ class PLMObjectUserLink(Link):
         .. attribute:: user
 
             a :class:`User`
+        .. attribute:: role
+            
+            role of *user* for *plmobject* (like `owner` or `notified`)
     """
 
     ACTION_NAME = "Link : PLMObject-user"
@@ -777,6 +812,10 @@ class PLMObjectUserLink(Link):
 
 
 def add_transitive_links(sender, instance, created, **kwargs):
+    """
+    Function called when a :class:`DelegationLink` is created to update
+    the :class:`ClosureDelegationLink` table
+    """
     if created:
         ClosureDelegationLink.objects.get_or_create(delegator=instance.delegator,
                                                     delegatee=instance.delegatee,
