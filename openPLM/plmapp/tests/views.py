@@ -27,6 +27,8 @@ class CommonViewTest(TestCase):
         self.user = User(username="user")
         self.user.set_password("password")
         self.user.save()
+        self.user.get_profile().is_contributor = True
+        self.user.get_profile().save()
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
         self.controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                                  self.user, self.DATA)

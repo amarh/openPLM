@@ -109,7 +109,7 @@ def add_profile(sender, instance, created, **kwargs):
         profile = UserProfile(user=instance)
         profile.save()
 
-if __name__ != "openPLM.plmapp.models":
+if __name__ == "openPLM.plmapp.models":
     post_save.connect(add_profile, sender=User)
 
 
@@ -793,7 +793,7 @@ def add_transitive_links(sender, instance, created, **kwargs):
                 # link already exists
                 pass
 
-if __name__ != "openPLM.plmapp.models":
+if __name__ == "openPLM.plmapp.models":
     post_save.connect(add_transitive_links, sender=DelegationLink)
 
 
