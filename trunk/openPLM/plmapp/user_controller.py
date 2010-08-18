@@ -84,10 +84,7 @@ class UserController(object):
     def __setattr__(self, attr, value):
         if hasattr(self, "object"):
             obj = object.__getattribute__(self, "object")
-            try:
-                profile = obj.get_profile()
-            except ObjectDoesNotExist:
-                profile = None
+            profile = obj.get_profile()
         else:
             obj = None
         if obj and (hasattr(obj, attr) or hasattr(profile, attr)) and \
@@ -104,14 +101,11 @@ class UserController(object):
 
     def __getattr__(self, attr):
         obj = object.__getattribute__(self, "object")
-        try:
-            profile = obj.get_profile()
-        except ObjectDoesNotExist:
-            profile = None
+        profile = obj.get_profile()
         if hasattr(self, "object") and hasattr(obj, attr) and \
            not attr in self.__dict__:
             return getattr(obj, attr)
-        elif profile and hasattr(profile, attr) and not attr in self.__dict__:
+        elif hasattr(profile, attr) and not attr in self.__dict__:
             return getattr(profile, attr)
         else:
             return object.__getattribute__(self, attr)
@@ -122,10 +116,7 @@ class UserController(object):
         If *with_history* is False, the history is not recorded.
         """
         self.object.save()
-        try:
-            self.object.get_profile().save()
-        except ObjectDoesNotExist:
-            pass        
+        self.object.get_profile().save()
         if self.__histo and with_history:
             self._save_histo("Modify", self.__histo) 
             self.__histo = ""
