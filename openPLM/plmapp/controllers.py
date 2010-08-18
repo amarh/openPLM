@@ -512,7 +512,7 @@ class PLMObjectController(object):
         except ObjectDoesNotExist:
             pass
         # check if the role is valid
-        max_level = len(self.lifecycle.to_states_list) - 1
+        max_level = len(self.lifecycle.to_states_list()) - 1
         level = int(re.search(r"\d+", role).group(0))
         if level > max_level:
             # TODO better exception ?
@@ -526,7 +526,7 @@ class PLMObjectController(object):
         if role == "owner":
             self.set_owner(user)
         elif role == "notified":
-            self.set_notified(user)
+            self.add_notified(user)
         elif role.startswith("sign"):
             self.set_signer(user, role)
 
