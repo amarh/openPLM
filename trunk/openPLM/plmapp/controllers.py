@@ -237,6 +237,10 @@ class PLMObjectController(object):
         :rtype: :class:`PLMObjectController`
         """
         
+        profile = user.get_profile()
+        if not (profile.is_contributor or profile.is_administrator):
+            raise PermissionError("%s is not a contributor" % user)
+
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
         try:
@@ -485,9 +489,12 @@ class PLMObjectController(object):
                self.get_next_revisions()
 
     def set_owner(self, new_owner):
+        profile = new_owner.get_profile()
+        if not (profile.is_contributor or profile.is_administrator):
+            raise PermissionError("%s is not a contributor" % new_owner)
         self.owner = new_owner
         link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
-               plmobject=self.object, role="owner")
+               plmobject=self.object, role="owner")[0]
         link.user = new_owner
         link.save()
         self.save()

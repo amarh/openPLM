@@ -29,6 +29,8 @@ class ControllerTest(TestCase):
         self.user = User(username="user")
         self.user.set_password("password")
         self.user.save()
+        self.user.get_profile().is_contributor = True
+        self.user.get_profile().save()
 
     def test_create(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
@@ -36,6 +38,11 @@ class ControllerTest(TestCase):
         self.assertEqual(controller.name, "")
         self.assertEqual(controller.type, self.TYPE)
         self.assertEqual(type(controller.object), get_all_plmobjects()[self.TYPE])
+        obj = get_all_plmobjects()[self.TYPE].objects.get(reference=controller.reference,
+                revision=controller.revision, type=controller.type)
+        self.assertEqual(obj.owner, self.user)
+        self.assertEqual(obj.creator, self.user)
+        PLMObjectUserLink.objects.get(plmobject=obj, user=self.user, role="owner")
 
     def test_create_error1(self):
         # empty reference
@@ -140,6 +147,18 @@ class ControllerTest(TestCase):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                             self.user, self.DATA)
         self.assertRaises(RevisionError, controller.revise, "a")
+
+    def test_set_owner(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        
+        user = User(username="user2")
+        user.set_password("password")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        controller.set_owner(user)
+        self.assertEqual(controller.owner, user)
 
 
 class PartControllerTest(ControllerTest):
