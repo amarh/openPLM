@@ -186,6 +186,12 @@ class MetaController(type):
 get_controller = MetaController.get_controller
 
 def permission_required(func=None, role="owner"):
+    """
+    Decorator for methods of :class:`PLMObjectController` which
+    raises :exc:`.PermissionError` if :attr:`PLMObjectController._user`
+    has not the role *role*
+    """
+
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -206,10 +212,13 @@ class PLMObjectController(object):
         .. attribute:: object
 
             The :class:`.PLMObject` managed by the controller
+        .. attribute:: _user
+
+            :class:`~django.contrib.auth.models.User` who modifies ``object``
 
     :param obj: managed object
     :type obj: a subinstance of :class:`.PLMObject`
-    :param user: user who modify *obj*
+    :param user: user who modifies *obj*
     :type user: :class:`~django.contrib.auth.models.User`
     """
 
@@ -296,6 +305,14 @@ class PLMObjectController(object):
             raise ValueError("form is invalid")
 
     def get_verbose_name(self, attr_name):
+        """
+        Returns a verbose name for *attr_name*.
+
+        Example::
+
+            >>> ctrl.get_verbose_name("ctime")
+            u'date of creation'
+        """
         try:
             item = self.object._meta.get_field(attr_name).verbose_name
         except FieldDoesNotExist:
@@ -504,9 +521,9 @@ class PLMObjectController(object):
         """
 
         self.check_contributor(new_owner)
-        self.owner = new_owner
         link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
                plmobject=self.object, role="owner")[0]
+        self.owner = new_owner
         link.user = new_owner
         link.save()
         self.save()

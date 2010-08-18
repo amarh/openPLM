@@ -47,6 +47,15 @@ class UserController(object):
         self.ctime = obj.date_joined
 
     def get_verbose_name(self, attr_name):
+        """
+        Returns a verbose name for *attr_name*.
+
+        Example::
+
+            >>> ctrl.get_verbose_name("ctime")
+            u'date of creation'
+        """
+
         try:
             item = unicode(self.object._meta.get_field(attr_name).verbose_name)
         except FieldDoesNotExist:
