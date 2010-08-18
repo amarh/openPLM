@@ -337,13 +337,18 @@ class PLMObjectController(object):
             raise PermissionError("action not allowed for %s" % self._user)
         return bool(qset)
 
-    def check_contributor(self):
+    def check_contributor(self, user=None):
         """
-        This method checks if the user is a contributor. If not, it raises
-        :exc:`PermissionError`
+        This method checks if *user* is a contributor. If not, it raises
+        :exc:`.PermissionError`.
+
+        If *user* is None (the default), :attr:`_user` is used.
         """
         
-        if not self._user.get_profile().is_contributor():
+        if not user:
+            user = self._user
+        profile = user.get_profile()
+        if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % self._user)
 
     def promote(self):
@@ -489,9 +494,15 @@ class PLMObjectController(object):
                self.get_next_revisions()
 
     def set_owner(self, new_owner):
-        profile = new_owner.get_profile()
-        if not (profile.is_contributor or profile.is_administrator):
-            raise PermissionError("%s is not a contributor" % new_owner)
+        """
+        Sets *new_owner* as current owner.
+        
+        :param new_owner: the new owner
+        :type new_owner: :class:`~django.contrib.auth.models.User`
+        :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
+        """
+
+        self.check_contributor(new_owner)
         self.owner = new_owner
         link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
                plmobject=self.object, role="owner")[0]
@@ -500,17 +511,48 @@ class PLMObjectController(object):
         self.save()
 
     def add_notified(self, new_notified):
+        """
+        Adds *new_notified* to the list of users notified when :attr:`object`
+        changes.
+        
+        :param new_notified: the new user who would be notified
+        :type new_notified: :class:`~django.contrib.auth.models.User`
+        :raise: :exc:`IntegrityError` if *new_notified* is already notified
+            when :attr:`object` changes
+        """
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
         # TODO : history
 
     def remove_notified(self, notified):
+        """
+        Removes *notified* to the list of users notified when :attr:`object`
+        changes.
+        
+        :param notified: the user who would be no more notified
+        :type notified: :class:`~django.contrib.auth.models.User`
+        :raise: :exc:`ObjectDoesNotExist` if *notified* is not notified
+            when :attr:`object` changes
+        """
+
         link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.delete()
         # TODO : history
 
     def set_signer(self, signer, role):
+        """
+        Sets *signer* as current signer for *role*. *role* must be a valid
+        sign role (see :func:`.level_to_sign_str` to get a role from a
+        sign level (int))
+        
+        :param signer: the new signer
+        :type signer: :class:`~django.contrib.auth.models.User`
+        :param str role: the sign role
+        :raise: :exc:`.PermissionError` if *signer* is not a contributor
+        :raise: :exc:`.PermissionError` if *role* is invalid (level to high)
+        """
+        self.check_contributor(signer)
         # remove old signer
         try:
             link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
@@ -530,12 +572,27 @@ class PLMObjectController(object):
         # TODO : history
 
     def set_role(self, user, role):
+        """
+        Sets role *role* (like `owner` or `notified`) for *user*
+
+        .. note::
+            If *role* is `owner` or a sign role, the old user who had
+            this role will lose it.
+
+            If *role* is notified, others roles are preserved.
+        
+        :raise: :exc:`.ValueError` if *role* is invalid
+        :raise: :exc:`.PremissionError` if *user* is not allowed to has role
+            *role*
+        """
         if role == "owner":
             self.set_owner(user)
         elif role == "notified":
             self.add_notified(user)
         elif role.startswith("sign"):
             self.set_signer(user, role)
+        else:
+            raise ValueError("bad value for role")
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")

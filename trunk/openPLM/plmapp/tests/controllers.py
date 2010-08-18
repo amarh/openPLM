@@ -72,12 +72,21 @@ class ControllerTest(TestCase):
                                             self.user, self.DATA)
         self.assertRaises(ValueError, fail)
     
-    def test_create_error(self):
+    def test_create_error5(self):
         # bad type : PLMObject
         def fail():
             controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
                                             self.user, self.DATA)
         self.assertRaises(ValueError, fail)
+    
+    def test_create_error6(self):
+        """Create error test : user is not a contributor"""
+        self.user.get_profile().is_contributor = False
+        self.user.get_profile().save()
+        def fail():
+            controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
+                                            self.user, self.DATA)
+        self.assertRaises(PermissionError, fail)
 
     def test_keys(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
@@ -151,14 +160,77 @@ class ControllerTest(TestCase):
     def test_set_owner(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                             self.user, self.DATA)
-        
         user = User(username="user2")
-        user.set_password("password")
         user.save()
         user.get_profile().is_contributor = True
         user.get_profile().save()
         controller.set_owner(user)
         self.assertEqual(controller.owner, user)
+
+    def test_set_owner_error(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        self.assertRaises(PermissionError, controller.set_owner, user)
+
+    def test_set_sign1(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        controller.set_signer(user, level_to_sign_str(0))
+        link = PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+                                             plmobject=controller.object)
+        self.assertEqual(user, link.user)
+
+    def test_set_sign_error1(self):
+        """Test sign error : bad level"""
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        self.assertRaises(PermissionError, controller.set_role, user,
+                          level_to_sign_str(1664))
+
+    def test_set_sign_error2(self):
+        """Test sign error : user is not a contributor"""    
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        self.assertRaises(PermissionError, controller.set_role, user,
+                          level_to_sign_str(0))
+
+    def test_add_notified(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        controller.add_notified(user)
+        PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
+                                      role="notified")
+
+    def test_set_role(self):
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        user = User(username="user2")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        controller.set_role(user, "owner")
+        self.assertEqual(controller.owner, user)
+        controller.set_role(user, "notified")
+        PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
+                                      role="notified")
+        controller.set_role(user, level_to_sign_str(0))
+        link = PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+                                             plmobject=controller.object)
+        self.assertEqual(user, link.user)
 
 
 class PartControllerTest(ControllerTest):
