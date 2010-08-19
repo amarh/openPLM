@@ -6,3 +6,5 @@ List of how-to's
     :maxdepth: 2
 
     ht_add_models
+    ht_add_models2
+
