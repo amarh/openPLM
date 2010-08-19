@@ -2,6 +2,7 @@ from openPLM.plmapp.tests.filehandlers import *
 from openPLM.plmapp.tests.controllers import *
 from openPLM.plmapp.tests.lifecycle import *
 from openPLM.plmapp.tests.views import *
+#from openPLM.plmapp.tests.closure import *
 
 def get_doctest(module_name):
     test_dict={}
