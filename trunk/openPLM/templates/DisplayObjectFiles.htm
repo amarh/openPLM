@@ -6,15 +6,22 @@
     
     <form method="POST" action="">
         {{ file_formset.management_form }}
-	    <table class="Content">
+	    <table>
 	        <tr>
 		        <td></td>
 		        <td>
 		            {% if is_owner %}
-		                <a href="./add/">ADD</a></td>
-	                {% endif %}
+                        <div class="ButtonLeft">
+                            <div class="Button">
+                                <a class="Button" href="./add/">ADD</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
 	    	    <td><input type="submit" value="DELETE"></td>
     	    </tr>
+	    </table>
+	    <table class="Content">
 		    <tr class="Content">
 		        {% for form in file_formset.forms %}
                 {{ form.id }}
@@ -29,17 +36,31 @@
 		        </td>
 			    <td class="Content">{{form.instance.filename}}</td>
 			    <td class="Content">{{form.instance.size}}</td>
-			    <td class="Content"><a href="/file/{{form.instance.id}}/">DOWNLOAD</a></td>
+			    <td class="Content">
+			        <div class="ButtonLeft">
+                        <div class="Button">
+                            <a class="Button" href="/file/{{form.instance.id}}/">DOWNLOAD</a>
+                        </div>
+                    </div>
+                </td>
 			    <td class="Content">
 			        {% if is_owner %}
-			            <a href="./checkout/{{form.instance.id}}/">CHECK-OUT</a>
+			            <div class="ButtonLeft">
+                            <div class="Button">
+			                    <a class="Button" href="./checkout/{{form.instance.id}}/">CHECK-OUT</a>
+		                    </div>
+	                    </div>
 		            {% else %}
 		                CHECK-OUT
 		            {% endif %}
 		            </td>
 			    <td class="Content">
 			        {% if is_owner %}
-			            <a href="./checkin/{{form.instance.id}}/">CHECK-IN</a>
+			            <div class="ButtonLeft">
+                            <div class="Button">
+			                    <a class="Button" href="./checkin/{{form.instance.id}}/">CHECK-IN</a>
+		                    </div>
+	                    </div>
 		            {% else %}
 		                CHECK-IN
 		            {% endif %}

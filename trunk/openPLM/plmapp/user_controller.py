@@ -60,7 +60,8 @@ class UserController(object):
             item = unicode(self.object._meta.get_field(attr_name).verbose_name)
         except FieldDoesNotExist:
             names = {"mtime" : "date of last modification",
-                     "ctime" : "date of creation"}
+                     "ctime" : "date of creation",
+                     "rank" : "role in PLM"}
             item = names.get(attr_name, attr_name)
         return item
 
@@ -128,4 +129,11 @@ class UserController(object):
         histo.details = details 
         histo.user = self._user
         histo.save()
+        
+    def get_object_user_links(self):
+        """
+        Returns all :class:`.Part` attached to
+        :attr:`~PLMObjectController.object`.
+        """
+        return models.PLMObjectUserLink.objects.filter(user=self.object).order_by("plmobject")
 

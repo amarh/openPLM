@@ -6,9 +6,11 @@
 <!--        {{ rel_part_formset.management_form }} -->
 	    <table class="Content">
 	        <tr>
-	            <td class="Button">
-                    <div class="Button">
-                        <a class="Button" href="./add/">ADD</a>
+	            <td class="Content">
+                    <div class="ButtonLeft">
+                        <div class="Button">
+                            <a class="Button" href="./add/">ADD</a>
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -21,15 +23,19 @@
                         <td class="Content">{{ link.user.username }}</td>
                         <td class="Content">{{ link.user.is_active|yesno:"active,inactive" }}</td>
                         <td class="Content">{{ link.role }}</td>
-                        <td class="Button">
-                            <div class="Button">
-                                <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                        <td class="Content">
+                            <div class="ButtonLeft">
+                                <div class="Button">
+                                    <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                                </div>
                             </div>
                         </td>
                     {% ifequal link.role 'notified' %}
-                        <td class="Button">
-                            <div class="Button">
-                                <a class="Button" href="./delete/{{link.id}}/">DELETE</a>
+                        <td class="Content">
+                            <div class="ButtonLeft">
+                                <div class="Button">
+                                    <a class="Button" href="./delete/{{link.id}}/">DELETE</a>
+                                </div>
                             </div>
                         </td>
                     {% endifequal %}

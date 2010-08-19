@@ -114,7 +114,7 @@ class UserProfile(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
-        return ["attributes", "lifecycle", "history", "part-doc-cad"]
+        return ["attributes", "history", "parts-doc-cad", "doc-cad"]
 
     @classmethod
     def excluded_creation_fields(cls):
