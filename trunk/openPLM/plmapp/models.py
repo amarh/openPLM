@@ -59,6 +59,8 @@ import random
 import hashlib
 import fnmatch
 import datetime
+
+import kjbuckets
 from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.conf import settings
@@ -767,6 +769,16 @@ class AbstractDelegationLink(Link):
     def __unicode__(self):
         return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
                                                 self.role)
+    
+    @classmethod
+    def get_delegators(cls, user, role):
+        """
+        Returns the list of user's id of the delegators of *user* for the role
+        *role*.
+        """
+        links = cls.objects.filter(role=role).values_list("delegatee", "delegator")
+        gr = kjbuckets.kjGraph(tuple(links))
+        return gr.reachable(user.id).items()
 
 class DelegationLink(AbstractDelegationLink):
     """
@@ -830,6 +842,25 @@ def add_transitive_links(sender, instance, created, **kwargs):
             except IntegrityError:
                 # link already exists
                 pass
+
+def rebuild_closure():
+    for link in ClosureDelegationLink.objects.all():
+        link.delete()
+    links = DelegationLink.objects.all()
+    roles = links.values_list('role', flat=True).distinct()
+    results = {}
+    links = list(links)
+    for role in roles:        
+        links2 = [(x.delegator, x.delegatee) for x in links if x.role == role]
+        gr = kjbuckets.kjGraph(links2)
+        closure = gr.tclosure()
+        results[role] = (closure.items())
+    for role, results2 in results.iteritems():
+        for delegator, delegatee in results2:
+            if delegator != delegatee:
+                c = ClosureDelegationLink(delegator=delegator,
+                                delegatee=delegatee, role=role)
+                c.save()
 
 if __name__ == "openPLM.plmapp.models":
     post_save.connect(add_transitive_links, sender=DelegationLink)

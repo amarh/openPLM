@@ -355,9 +355,8 @@ class PLMObjectController(object):
         *raise_* is **False**, **False** is returned.
         """
 
-        links = models.ClosureDelegationLink.objects.filter(delegatee=self._user,
-                                                            role=role)
-        users = [self._user] + [link.delegator for link in links]
+        users = [self._user.id]
+        users.extend(models.DelegationLink.get_delegators(self._user, role))
         qset = models.PLMObjectUserLink.objects.filter(user__in=users,
                     plmobject=self.object, role=role)
         if not bool(qset) and raise_:
