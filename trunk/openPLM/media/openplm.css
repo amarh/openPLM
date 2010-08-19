@@ -372,13 +372,15 @@ td.Button
 {
 border-width: 0px;
 background: url(/media/img/left_button.png) no-repeat left top;
-height: 23px;
+height: 25px;
 }
 
 div.Button
 {
+margin-top: -2px;
 background: url(/media/img/right_button.png) no-repeat right top;
-height: 23px;
+height: 25px;
+text-align: center;
 }
 
 a.Button
