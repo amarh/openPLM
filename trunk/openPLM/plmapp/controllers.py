@@ -146,6 +146,12 @@ except (ImportError, AttributeError):
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
 class MetaController(type):
+    """
+    Metaclass used to register a controller and get a controller associated
+    to a type (see :meth:`get_controller`).
+
+    See `how-to-add-a-controller`_ for more explanations.
+    """
     #: dict<type_name(str) : Controller(like :class:`PLMObjectController`)>
     controllers_dict = {}
 
@@ -168,6 +174,9 @@ class MetaController(type):
         """
         Returns the a controller (subclass of :class:`PLMObjectController`) 
         associated to *type_name* (a string).
+
+        For example, ``get_controller("Part")`` will return the class 
+        :class:`.PartController`.
         """
         if type_name in cls.controllers_dict:
             return cls.controllers_dict[type_name]
