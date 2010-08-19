@@ -1,5 +1,5 @@
 ===================================================
-How to add a model (single file)
+How to add a model (django application)
 ===================================================
 
 This document describes how to add a model to openPLM.
@@ -10,17 +10,38 @@ Requirements
 * Python
 * Django models
 
-Add a file
-=====================
+Create a new application
+=========================
 
-The first step is simple: just add a :file:`.py` file in ``openPLM/plmapp/customized_models``
-directory. In this how-to, we will call it :file:`bicycle.py`. The name of the file
+The first step is simple: just run the command :command:`./manage.py startapp app_name`
+in the :file:`openPLM` directory (replace *app_name* by the name of your new application).
+In this how-to, we will call it *bicycle*. The name of the application
 must be a `valid Python module name <http://docs.python.org/reference/lexical_analysis.html#identifiers>`_.
+
+Then you must registered your application: edit the variable :const:`INSTALLED_APPS`
+in the :file:`openPLM/settings.py` and add your application
+(:samp:`'openPLM.{app_name}'`).
+
+For example::
+
+    INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'django.contrib.admin',
+        'openPLM.plmapp',
+        # you can add your application after this line
+        'openPLM.bicycle',
+    )
+
+.. note::
+    The application must be added after ``'openPLM.plmapp'``.
 
 Imports
 ====================
 
-Now you can edit your file, and add some useful imports
+Now you can edit the file :file:`openPLM/{app_name}/models.py`, and add some useful imports
 
 .. literalinclude:: code/bicycle.py
     :linenos:
@@ -43,15 +64,6 @@ In our case, we call it **Bicycle**:
     :end-before: bicycle fields
     :linenos:
 
-
-As you can see, this class contains another class called **Meta**. This is a 
-mechanism from Django to customize some model options such as ordering option.
-Here, we set ``app_label`` to ``"plmapp"`` so that our model can be managed by
-Django.
-
-.. seealso::
-    
-    The Django documentation for `Meta options <http://docs.djangoproject.com/en/1.2/topics/db/models/#id3>`_
 
 Custom fields
 ======================
@@ -157,9 +169,8 @@ The complete class Bicycle
 syncdb
 ======================
 
-register
-manage.py sql plmapp
-manage.py syncdb
+:command:`./manage.py sql app_name`
+:command:`./manage.py syncdb`
 
 Controller
 =======================
