@@ -739,7 +739,7 @@ for i in range(10):
     level = level_to_sign_str(i)
     ROLES.append((level, level))
 
-class AbstractDelegationLink(Link):
+class DelegationLink(Link):
     """
     Link between two :class:`~.django.contrib.auth.models.User` to delegate
     his rights (abstract class)
@@ -764,7 +764,6 @@ class AbstractDelegationLink(Link):
 
     class Meta:
         unique_together = ("delegator", "delegatee", "role")
-        abstract = True
 
     def __unicode__(self):
         return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
@@ -780,17 +779,6 @@ class AbstractDelegationLink(Link):
         gr = kjbuckets.kjGraph(tuple(links))
         return gr.reachable(user.id).items()
 
-class DelegationLink(AbstractDelegationLink):
-    """
-    This models contains direct delegation links
-    """
-    pass
-
-class ClosureDelegationLink(AbstractDelegationLink):
-    """
-    This model contains the transitive closure of :class:`DelegationLink`
-    """
-    pass
 
 class PLMObjectUserLink(Link):
     """
@@ -820,50 +808,6 @@ class PLMObjectUserLink(Link):
 
     def __unicode__(self):
         return u"PLMObjectUserLink<%s, %s, %s>" % (self.plmobject, self.user, self.role)
-
-
-def add_transitive_links(sender, instance, created, **kwargs):
-    """
-    Function called when a :class:`DelegationLink` is created to update
-    the :class:`ClosureDelegationLink` table
-    """
-    if created:
-        ClosureDelegationLink.objects.get_or_create(delegator=instance.delegator,
-                                                    delegatee=instance.delegatee,
-                                                    role=instance.role)
-        qset = ClosureDelegationLink.objects.filter(delegatee=instance.delegator,
-                                     role=instance.role).only("delegator")
-        for link in qset:
-            try:
-                if instance.delegatee != link.delegator:
-                    ClosureDelegationLink.objects.create(role=instance.role,
-                        delegatee=instance.delegatee,
-                        delegator=link.delegator)
-            except IntegrityError:
-                # link already exists
-                pass
-
-def rebuild_closure():
-    for link in ClosureDelegationLink.objects.all():
-        link.delete()
-    links = DelegationLink.objects.all()
-    roles = links.values_list('role', flat=True).distinct()
-    results = {}
-    links = list(links)
-    for role in roles:        
-        links2 = [(x.delegator, x.delegatee) for x in links if x.role == role]
-        gr = kjbuckets.kjGraph(links2)
-        closure = gr.tclosure()
-        results[role] = (closure.items())
-    for role, results2 in results.iteritems():
-        for delegator, delegatee in results2:
-            if delegator != delegatee:
-                c = ClosureDelegationLink(delegator=delegator,
-                                delegatee=delegatee, role=role)
-                c.save()
-
-if __name__ == "openPLM.plmapp.models":
-    post_save.connect(add_transitive_links, sender=DelegationLink)
 
 
 def _get_all_subclasses_with_level(base, lst, level):
