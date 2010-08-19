@@ -1,14 +1,33 @@
+"""
+This module contains a class that can be used to simplify the usage of
+:class:`.Lifecycle` and :class:`.LifecycleStates`.
+
+.. seealso::
+
+    :meth:`.Lifecycle.to_states_list`
+        Method to convert a :class:`.Lifecycle` into a :class:`LifecycleList`
+
+    :meth:`.Lifecycle.from_lifecyclelist`.
+        Method to convert a :class:`LifecycleList` into a :class:`.Lifecycle` 
+
+Example::
+
+    _lifecycles_list = [
+        ("draft", "official", "deprecated"),
+        ("draft", "official"),
+    ]
+
+    lifecycles = dict()
+    for cycles in _lifecycles_list:
+        name = "->".join(cycles) 
+        lifecycles[name] = LifecycleList(name, "official", *cycles)
+"""
+
 try:
     import pygraphviz as pgv
 except ImportError:
     print "ImportError : Please install pygraphviz."
     print "It's used to generate graphes from lifecycle"
-
-_lifecycles_list = [
-    ("draft", "official", "deprecated"),
-    ("draft", "official"),
-]
-
 
 
 class LifecycleList(list):
@@ -16,6 +35,7 @@ class LifecycleList(list):
     Object which represents a lifecycle as a list of string.
 
     This class inherits from list, so you can use all list methods.
+
     For example::
 
         >>> cycle = LifecycleList("MyCycle", "b")
@@ -26,7 +46,9 @@ class LifecycleList(list):
     .. attribute:: name
 
         name of the lifecycle
-
+    .. attribute:: official_state
+        
+        name of the official state (must be in the list of states)
     """
     def __init__(self, name, official_state, *args):
         super(LifecycleList, self).__init__(self)
@@ -114,12 +136,6 @@ class LifecycleList(list):
             node = graph.get_node(current_state)
             node.attr["fillcolor"] = current_color
         graph.draw(path=output_path, format="png", prog="dot")
-
-
-lifecycles = dict()
-for cycles in _lifecycles_list:
-    name = "->".join(cycles) 
-    lifecycles[name] = LifecycleList(name, "official", *cycles)
 
 if __name__ == "__main__":
     import doctest

@@ -1,3 +1,9 @@
+"""
+This modules contains all stuff related to the api
+
+.. seealso:: The public api :mod:`http_api`,
+"""
+
 import traceback
 import sys
 
@@ -15,11 +21,23 @@ from openPLM.plmapp.controllers import PLMObjectController, get_controller, Docu
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
 
+#: Version of the API (value: ``'1.0'``)
 API_VERSION = "1.0"
+#: Decorator whichs requires that the user is login
 api_login_required = user_passes_test(lambda u: u.is_authenticated(), 
                                       login_url="/api/needlogin/")
 
 def json_view(func):
+    """
+    Decorator which converts the result from *func* into a json response.
+    
+    The result from *func* must be serializable by :mod:`django.utils.simple_json`
+    
+    This decorator automatically adds a ``result`` field to the response if it
+    was not present. Its value is ``'ok'`` if no exception was raised, and else,
+    it is ``'error'``. In that case, a field ``'error'`` is had with a short
+    message describing the exception.
+    """
     def wrap(request, *a, **kw):
         response = None
         try:
@@ -52,32 +70,9 @@ def json_view(func):
         return HttpResponse(json, mimetype='application/json')
     return wrap
 
-
+#: decorator which requires a login user and converts returned value into a json response
 login_json = lambda f: api_login_required(json_view(f))
 
-
-def replace_white_spaces(Chain):
-    """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
-    return Chain.replace(" ","%20")
-
-def get_obj(object_type_value, object_reference_value, object_revision_value):
-    """ Get Type, Reference and Revision and return an object """
-    obj = get_object_or_404(models.PLMObject, type=object_type_value,
-                            reference=object_reference_value,
-                            revision=object_revision_value)
-    # guess what kind of PLMObject (Part, Document) obj is
-    cls = models.PLMObject
-    find = True
-    while find:
-        find = False
-        for c in cls.__subclasses__():
-            if hasattr(obj, c.__name__.lower()):
-                cls  = c
-                obj = getattr(obj, c.__name__.lower())
-                find = True
-    user = models.User.objects.all()[0]
-    controller_cls = get_controller(object_type_value)
-    return controller_cls(obj, user)
 
 def get_obj_by_id(obj_id, user):
     obj = models.PLMObject.objects.get(id=obj_id)
