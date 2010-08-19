@@ -499,8 +499,6 @@ class SearchDialog(Dialog):
         self.name_entry = qt.QLineEdit()
         self.rev_entry = qt.QLineEdit()
         self.fields = [("type", self.type_entry),
-                       ("reference", self.name_entry),
-                       ("revision", self.rev_entry),
                       ]
         for i, (text, entry) in enumerate(self.fields):
             label = qt.QLabel()

@@ -104,15 +104,12 @@ def get_all_parts(request):
 def search(request):
         
     if request.GET and "type" in request.GET:
-        attributes_form = forms.attributes_form(request.GET)
+        attributes_form = forms.type_form(request.GET)
         if attributes_form.is_valid():
             query_dict = {}
             cls = models.get_all_plmobjects()[attributes_form.cleaned_data["type"]]
             extra_attributes_form = forms.get_search_form(cls, request.GET)
-            for field, value in attributes_form.cleaned_data.items():
-                if value and field != "type":
-                    query_dict["%s__icontains"%field]=value
-            results = cls.objects.filter(**query_dict)
+            results = cls.objects.all()
             if extra_attributes_form.is_valid():
                 results = extra_attributes_form.search(results)
                 objects = []
@@ -179,7 +176,7 @@ def field_to_type(field):
 
 def get_fields_from_form(form):
     fields = []
-    for field_name, field in form.fields.iteritems():
+    for field_name, field in form.fields.items():
         data = dict(name=field_name, label=field.label, initial=field.initial)
         if callable(field.initial):
             data["initial"] = field.initial()
