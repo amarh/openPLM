@@ -169,4 +169,21 @@ class UserController(object):
         for r in roles:
             models.DelegationLink.objects.get_or_create(delegator=self.object,
                         delegatee=user, role=r)
+        details = "%(delegator)s delegates the role %(role)s to %(delegatee)s"
+        details = details % dict(role=role, delegator=self.object,
+                                 delegatee=user)
+        self._save_histo(models.DelegationLink.ACTION_NAME, details)
+
+    def remove_delegation(self, delegation_link):
+        """
+        Removes a delegation (*delegation_link*). The delegator must be 
+        :attr:`object`, otherwise a :exc:`ValueError` is raised.
+        """
+        if delegation_link.delegator != self.object:
+            raise ValueError("%s is not the delegator of %s" % (self.object, ValueError))
+        details = "%(delegator)s removes his delegation for the role %(role)s to %(delegatee)s"
+        details = details % dict(role=delegation_link.role, delegator=self.object,
+                                 delegatee=delegation_link.delegatee)
+        self._save_histo(models.DelegationLink.ACTION_NAME, details)
+        delegation_link.delete()
 
