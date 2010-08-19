@@ -3,14 +3,16 @@
 <!-- Manage html display in the Content div which correspond to the "management" menu -->
 
 {% block content %}
-    <form method="post" action="">	
 <!--        {{ rel_part_formset.management_form }} -->
 	    <table class="Content">
 	        <tr>
-	            <td>
-	                <a href="./add/"><img src="/media/img/add_button.png" title="ADD" alt="ADD" /></a>
-	            </td>
+	            <td class="Button">
+                    <div class="Button">
+                        <a class="Button" href="./add/">ADD</a>
+                    </div>
+                </td>
             </tr>
+        
                 {% for link in object_management %}
                     <tr class="Content">
                         {% with link.user.get_profile as profile %}
@@ -19,14 +21,21 @@
                         <td class="Content">{{ link.user.username }}</td>
                         <td class="Content">{{ link.user.is_active|yesno:"active,inactive" }}</td>
                         <td class="Content">{{ link.role }}</td>
-                        <td class="Content"><a href="./replace/{{link.id}}/">Replace</a></td>
+                        <td class="Button">
+                            <div class="Button">
+                                <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                            </div>
+                        </td>
                     {% ifequal link.role 'notified' %}
-                        <td class="Content"><a href="./delete/{{link.id}}/">Delete</a></td>
+                        <td class="Button">
+                            <div class="Button">
+                                <a class="Button" href="./delete/{{link.id}}/">DELETE</a>
+                            </div>
+                        </td>
                     {% endifequal %}
                     </tr>
                 {% endfor %}
 	    </table>
-    </form>
 {% endblock %}
 
 

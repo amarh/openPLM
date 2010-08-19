@@ -109,7 +109,7 @@ def display_global_page(request_dict):
     else :
         request_dict.session["results"] = qset
     print "type_form.type : %s" % type_form_instance.data
-    context_dict.update({'results': qset, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance})
+    context_dict.update({'results': qset, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'class4search_div': 'DisplayHomePage.htm',})
     return context_dict, request_dict.session
 
 ##########################################################################################
@@ -373,11 +373,11 @@ def add_children(request, obj_type, obj_ref, obj_revi):
                                         % (obj_type, obj_ref, obj_revi) )
         else:
             add_child_form_instance = add_child_form(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
             return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         add_child_form_instance = add_child_form()
-        context_dict.update({'current_page':'BOM-child', 'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+        context_dict.update({'current_page':'BOM-child', 'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
         return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################    
@@ -478,11 +478,11 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
                                         % (obj_type, obj_ref, obj_revi) )
         else:
             add_doc_cad_form_instance = AddDocCadForm(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
+            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
             return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         add_doc_cad_form_instance = AddDocCadForm()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
         return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
     
 #############################################################################################
@@ -545,11 +545,11 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
                                         % (obj_type, obj_ref, obj_revi) )
         else:
             add_rel_part_form_instance = add_rel_part_form(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
             return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         add_rel_part_form_instance = AddRelPartForm()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
         return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -610,11 +610,11 @@ def add_file(request, obj_type, obj_ref, obj_revi):
                                         % (obj_type, obj_ref, obj_revi) )
         else:
             add_file_form_instance = AddFileForm(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
             return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         add_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': False, 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
@@ -643,7 +643,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
 ##########################################################################################
 @login_required
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
-    """ Manage html page for management of the part / document : edition"""
+    """ Manage html page for management of the part / document : replace owner/signers/notified users"""
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
     assert obj.object.id == link.plmobject.id
@@ -655,27 +655,38 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
     if request.method == "POST":
-        if request.POST.get("action", "Undo") == "Undo":
-            return HttpResponseRedirect("..")
-        formset = get_children_formset(obj, request.POST)
-        if formset.is_valid():
-            obj.update_children(formset)
-            return HttpResponseRedirect("..")
+#        if request.POST.get("action", "Undo") == "Undo":
+#            return HttpResponseRedirect("/home/")
+        replace_management_form_instance = replace_management_form(request.POST)
+        if replace_management_form_instance.is_valid():
+            if replace_management_form_instance.cleaned_data["type"]=="User":
+                user_obj = get_obj(\
+                                    replace_management_form_instance.cleaned_data["type"],\
+                                    replace_management_form_instance.cleaned_data["username"],\
+                                    "-",\
+                                    request.user)
+                obj.set_role(user_obj.object, link.role)
+                obj.remove_notified(link.user)
+                return HttpResponseRedirect("../..")
+            else:
+                return HttpResponseRedirect("../..")
+        else:
+            replace_management_form_instance = replace_management_form(request.POST)
     else:
-        formset = get_children_formset(obj)
+        replace_management_form_instance = replace_management_form()
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    context_dict.update({'current_page':'BOM-child', 'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
-                                 'children_formset': formset, })
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
-    return render_to_response('DisplayObjectChildEdit.htm', context_dict, context_instance=RequestContext(request))
+    context_dict.update({'current_page':'management', 'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
+                                 'replace_management_form': replace_management_form_instance,
+                                 'class4search_div': 'DisplayHomePage4Addition.htm',})
+    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
 @login_required
 def add_management(request, obj_type, obj_ref, obj_revi):
-    """ Manage html page for management of the part / document : add new link"""
-    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
+    """ Manage html page for management of the part / document : add notified users"""
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
@@ -684,29 +695,42 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     else:
         class_for_div="NavigateBox4Part"
     menu_list = obj.menu_items
+    if request.method == "POST":
+#        if request.POST.get("action", "Undo") == "Undo":
+#            return HttpResponseRedirect("/home/")
+        add_management_form_instance = replace_management_form(request.POST)
+        if add_management_form_instance.is_valid():
+            if add_management_form_instance.cleaned_data["type"]=="User":
+                user_obj = get_obj(\
+                                    add_management_form_instance.cleaned_data["type"],\
+                                    add_management_form_instance.cleaned_data["username"],\
+                                    "-",\
+                                    request.user)
+                obj.set_role(user_obj.object, "notified")
+                return HttpResponseRedirect("..")
+            else:
+                return HttpResponseRedirect("..")
+        else:
+            add_management_form_instance = replace_management_form(request.POST)
+    else:
+        add_management_form_instance = replace_management_form()
+    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
-    if request.POST:
-        add_child_form_instance = add_child_form(request.POST)
-        if add_child_form_instance.is_valid():
-            child_obj = get_obj(add_child_form_instance.cleaned_data["type"], \
-                        add_child_form_instance.cleaned_data["reference"], \
-                        add_child_form_instance.cleaned_data["revision"])
-            obj.add_child(child_obj, \
-                            add_child_form_instance.cleaned_data["quantity"], \
-                            add_child_form_instance.cleaned_data["order"])
-            context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/BOM-child/" \
-                                        % (obj_type, obj_ref, obj_revi) )
-        else:
-            add_child_form_instance = add_child_form(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
-            return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
-    else:
-        add_child_form_instance = add_child_form()
-        context_dict.update({'current_page':'BOM-child', 'class4search_div': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
-        return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
+    context_dict.update({'current_page':'management', 'class4div': class_for_div, 'object_menu': menu_list, 'obj' : obj,
+                                 'replace_management_form': add_management_form_instance,
+                                 'class4search_div': 'DisplayHomePage4Addition.htm',})
+    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+
+##########################################################################################    
+@login_required
+def delete_management(request, obj_type, obj_ref, obj_revi, link_id):
+    """ Manage html page for management of the part / document : delete notified users"""
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    link = models.PLMObjectUserLink.objects.get(id=int(link_id))
+    obj.remove_notified(link.user)
+    return HttpResponseRedirect("../..")
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
@@ -916,12 +940,12 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
                                         % (obj_type, obj_ref, obj_revi) )
         else:
             checkin_file_form_instance = AddFileForm(request.POST)
-            context_dict.update({'class4search_div': True, 'class4div': class_for_div, \
+            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, \
                                  'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
             return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         checkin_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': True, 'class4div': class_for_div, \
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, \
                             'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 

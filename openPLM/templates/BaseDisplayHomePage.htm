@@ -22,11 +22,11 @@
 			<div id="SearchBox">
 				{% block SearchBlock %}{% endblock %}
 			</div>
-			{% if class4search_div %}
+			{% ifequal class4search_div 'DisplayHomePage4Addition.htm'%}
 			    <div id="ResultBox4Search">
 			{% else %}
 			    <div id="ResultBox">
-			{% endif %}
+			{% endifequal %}
 				{% block ResultBlock %}{% endblock %}
 			</div>
 		</div>
