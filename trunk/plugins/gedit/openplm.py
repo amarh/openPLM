@@ -621,8 +621,6 @@ class SearchDialog(gtk.Dialog):
         self.name_entry = gtk.Entry()
         self.rev_entry = gtk.Entry()
         self.fields = [("type", self.type_entry),
-                       ("reference", self.name_entry),
-                       ("revision", self.rev_entry),
                       ]
         for i, (text, entry) in enumerate(self.fields): 
             table.attach(gtk.Label(_(text.capitalize()+":")), 0, 1, i, i+1)

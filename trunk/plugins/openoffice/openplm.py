@@ -602,8 +602,6 @@ class SearchDialog(Dialog, XItemListener,
         smgr = self.ctx.ServiceManager
         
         fields = [("type", 'ListBox'),
-                  ("reference", 'Edit'),
-                  ("revision", 'Edit'),
                  ]
         self.fields = []
         for i, (text, entry) in enumerate(fields): 
