@@ -1,3 +1,4 @@
+from openPLM.plmapp.tests.filehandlers import *
 from openPLM.plmapp.tests.controllers import *
 from openPLM.plmapp.tests.lifecycle import *
 from openPLM.plmapp.tests.views import *
