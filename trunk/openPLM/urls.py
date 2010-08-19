@@ -62,7 +62,7 @@ urlpatterns = patterns('',
 
 )
 
-
+api_url = r'^api/object/(?P<doc_id>\d+)/'
 urlpatterns += patterns('',
     (r'^api/login/', api.api_login),
     (r'^api/needlogin/', api.need_login),
@@ -74,17 +74,17 @@ urlpatterns += patterns('',
     (r'^api/create/$', api.create),
     (r'^api/search_fields/(?P<typename>[\w_]+)/$', api.get_advanced_search_fields),
     (r'^api/creation_fields/(?P<typename>[\w_]+)/$', api.get_creation_fields),
-    (r'^api/object/(?P<doc_id>\d+)/files/(?P<all_files>all/)?$', api.get_files),
-    (r'^api/object/(?P<doc_id>\d+)/revise/$', api.revise),
-    (r'^api/object/(?P<doc_id>\d+)/add_file/$', api.add_file),
-    (r'^api/object/(?P<doc_id>\d+)/attach_to_part/(?P<part_id>\d+)/$', api.attach_to_part),
-    (r'^api/object/(?P<doc_id>\d+)/next_?revision/$', api.next_revision),
-    (r'^api/object/(?P<doc_id>\d+)/is_?revisable/$', api.is_revisable),
-    (r'^api/object/(?P<doc_id>\d+)/(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
-    (r'^api/object/(?P<doc_id>\d+)/unlock/(?P<df_id>\d+)/$', api.unlock),
-    (r'^api/object/(?P<doc_id>\d+)/is_?locked/(?P<df_id>\d+)/$', api.is_locked),
-    (r'^api/object/(?P<doc_id>\d+)/checkin/(?P<df_id>\d+)/$', api.check_in),
-    (r'^api/object/(?P<doc_id>\d+)/add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
+    (api_url + r'files/(?P<all_files>all/)?$', api.get_files),
+    (api_url + r'revise/$', api.revise),
+    (api_url + r'add_file/$', api.add_file),
+    (api_url + r'attach_to_part/(?P<part_id>\d+)/$', api.attach_to_part),
+    (api_url + r'next_?revision/$', api.next_revision),
+    (api_url + r'is_?revisable/$', api.is_revisable),
+    (api_url + r'(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
+    (api_url + r'unlock/(?P<df_id>\d+)/$', api.unlock),
+    (api_url + r'is_?locked/(?P<df_id>\d+)/$', api.is_locked),
+    (api_url + r'checkin/(?P<df_id>\d+)/$', api.check_in),
+    (api_url + r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
 
 
