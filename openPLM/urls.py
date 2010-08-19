@@ -6,7 +6,6 @@ from openPLM.plmapp.views import *
 import openPLM.plmapp.api as api
 from django.contrib.auth.views import login, logout
 
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
@@ -62,6 +61,7 @@ urlpatterns = patterns('',
 
 )
 
+# urls related to the api
 api_url = r'^api/object/(?P<doc_id>\d+)/'
 urlpatterns += patterns('',
     (r'^api/login/', api.api_login),
@@ -97,3 +97,4 @@ for app in settings.INSTALLED_APPS:
             urlpatterns += patterns
         except ImportError:
             pass
+

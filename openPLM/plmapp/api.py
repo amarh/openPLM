@@ -70,7 +70,7 @@ def json_view(func):
         return HttpResponse(json, mimetype='application/json')
     return wrap
 
-#: decorator which requires a login user and converts returned value into a json response
+#: Decorator which requires a login user and converts returned value into a json response
 login_json = lambda f: api_login_required(json_view(f))
 
 
