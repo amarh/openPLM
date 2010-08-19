@@ -11,11 +11,11 @@ from django.db.models.fields import FieldDoesNotExist
 try:
     import openPLM.plmapp.models as models
     from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError
+        AddFileError, DeleteFileError, PermissionError
 except (ImportError, AttributeError):
     import plmapp.models as models
     from plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError
+        AddFileError, DeleteFileError, PermissionError
 
 class UserController(object):
     u"""
@@ -33,7 +33,7 @@ class UserController(object):
     :type user: :class:`~django.contrib.auth.models.User` 
 
     .. note::
-        This class does not inherit from :class:`PLMObjectController`.
+        This class does not inherit from :class:`.PLMObjectController`.
 
     """
 
@@ -132,8 +132,41 @@ class UserController(object):
         
     def get_object_user_links(self):
         """
-        Returns all :class:`.Part` attached to
-        :attr:`~PLMObjectController.object`.
+        Returns all :class:`.Part` attached to :attr:`object`.
         """
         return models.PLMObjectUserLink.objects.filter(user=self.object).order_by("plmobject")
+
+    def delegate(self, user, role):
+        """
+        Delegates role *role* to *user*.
+        
+        Possible values for *role* are:
+            ``'notified``
+                valid for all users
+            ``'owner'``
+                valid only for contributors and administrators
+            :samp:``'sign_{x}_level'``
+                valid only for contributors and administrators
+            ``'sign*'``
+                valid only for contributors and administrators, means all sign
+                roles that :attr:`object` has.
+        
+        :raise: :exc:`.PermissionError` if *user* can not have the role *role*
+        :raise: :exc:`ValueError` if *user* is :attr:`object`
+        """
+        if user == self.object:
+            raise ValueError("Bad delegatee (self)")
+        if user.get_profile().is_viewer and role != 'notified':
+            raise PermissionError("%s can not have role %s" % (user, role))
+        if self.object.get_profile().is_viewer and role != 'notified':
+            raise PermissionError("%s can not have role %s" % (self.object, role))
+        if role == "sign*":
+            qset = models.PLMObjectUserLink.objects.filter(user=self.object,
+                        role__startswith="sign_").only("role")
+            roles = set(link.role for link in qset)
+        else:
+            roles = [role]
+        for r in roles:
+            models.DelegationLink.objects.get_or_create(delegator=self.object,
+                        delegatee=user, role=r)
 
