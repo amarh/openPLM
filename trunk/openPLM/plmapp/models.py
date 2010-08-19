@@ -408,20 +408,6 @@ class Part(PLMObject):
         return True
 
 
-class PlasticPart(Part):
-
-    mass = models.PositiveIntegerField(blank=True, null=True)
-
-    @property
-    def attributes(self):
-        attrs = list(super(PlasticPart, self).attributes)
-        attrs.extend(["mass"])
-        return attrs
-
-class RedPlasticPart(PlasticPart):
-    pass
-
-
 def _get_all_subclasses(base, d):
     if base.__name__ not in d:
         d[base.__name__] = base
@@ -884,14 +870,20 @@ def import_models(force_reload=False):
     MODELS_DIR = "customized_models"
     IMPORT_ROOT = "openPLM.plmapp.%s" % MODELS_DIR
     if __name__ != "openPLM.plmapp.models":
+        # this avoids to import models twice
         return
     if force_reload or not hasattr(import_models, "done"):
         import_models.done = True
         models_dir = os.path.join(os.path.split(__file__)[0], MODELS_DIR)
+        # we browse recursively models_dir
         for root, dirs, files in os.walk(models_dir):
+            # we only look at python files
             for module in sorted(fnmatch.filter(files, "*.py")):
                 if module == "__init__.py":
+                    # these files are empty
                     continue
+                # import_name should respect the format
+                # 'openPLM.plmapp.customized_models.{module_name}'
                 module_name = os.path.splitext(os.path.basename(module))[0]
                 import_dir = root.split(MODELS_DIR, 1)[-1].replace(os.path.sep, ".")
                 import_name = "%s.%s.%s" % (IMPORT_ROOT, import_dir, module_name)

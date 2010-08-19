@@ -1,3 +1,11 @@
+"""
+This modules contains exceptions that may be raised by a controller
+:class:`.PLMObjectController` and :class:`.UserController`.
+
+All exceptions defined here derive from :exc:`ControllerError`
+(except of course :exc:`ControllerError`)
+"""
+
 class ControllerError(StandardError):
     """
     Base class of exceptions raised by a

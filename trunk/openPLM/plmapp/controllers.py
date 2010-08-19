@@ -410,6 +410,8 @@ class PLMObjectController(object):
             pass
 
     def __setattr__(self, attr, value):
+        # we override this method to make it to modify *object* directly
+        # if we modify *object*, we records the modification in **__histo*
         if hasattr(self, "object") and hasattr(self.object, attr) and \
            not attr in self.__dict__:
             old_value = getattr(self.object, attr)
@@ -422,6 +424,7 @@ class PLMObjectController(object):
             super(PLMObjectController, self).__setattr__(attr, value)
 
     def __getattr__(self, attr):
+        # we override this method to get attributes from *object* directly
         obj = object.__getattribute__(self, "object")
         if hasattr(self, "object") and hasattr(obj, attr) and \
            not attr in self.__dict__:
