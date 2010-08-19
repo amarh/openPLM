@@ -164,12 +164,14 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     for attr in obj.attributes:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
+    if isinstance(obj, UserController):
+        item = obj.get_verbose_name('rank')
+        object_attributes_list.append((item, getattr(obj, 'rank')))
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
     context_dict.update({'current_page':'attributes', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': object_attributes_list})
     var_dict, request_dict = display_global_page(request)
     request.session.update(request_dict)
     context_dict.update(var_dict)
-    print "permissions : %s" % request.user.get_all_permissions()
     request.user.message_set.create(message="coucou c est nous")
     return render_to_response('DisplayObject.htm', context_dict, context_instance=RequestContext(request))
 
@@ -538,7 +540,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
         if add_rel_part_form_instance.is_valid():
             part_obj = get_obj(add_rel_part_form_instance.cleaned_data["type"], \
                         add_rel_part_form_instance.cleaned_data["reference"], \
-                        add_rel_part_form_instance.cleaned_data["revision"])
+                        add_rel_part_form_instance.cleaned_data["revision"], request.user)
             obj.attach_to_part(part_obj)
             context_dict.update({'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
             return HttpResponseRedirect("/object/%s/%s/%s/parts/" \
@@ -908,6 +910,29 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     context_dict.update({'class4div': class_for_div, 'modification_form': modification_form_instance})
     return render_to_response('DisplayObject4PasswordModification.htm', context_dict, context_instance=RequestContext(request))
 
+#############################################################################################
+@login_required
+def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
+    """ Manage html page for related parts of the document"""
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    if isinstance(obj, UserController):
+        class_for_div="NavigateBox4User"
+    elif isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    if not hasattr(obj, "get_object_user_links"):
+        # TODO
+        raise TypeError()
+    object_user_link_list = obj.get_object_user_links()
+    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
+    context_dict.update({'current_page':'parts-doc-cad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_user_link': object_user_link_list})
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    return render_to_response('DisplayObjectRelPLMObject.htm', context_dict, context_instance=RequestContext(request))
+    
 ##########################################################################################
 def display_bollox(request):
     context_dict={}
