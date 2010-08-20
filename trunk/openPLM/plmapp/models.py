@@ -164,7 +164,7 @@ class Lifecycle(models.Model):
 
     """
     name = models.CharField(max_length=50, primary_key=True)
-    official_state = models.ForeignKey(State, related_name="official_state")
+    official_state = models.ForeignKey(State)
 
     # XXX description field ?
 
@@ -209,8 +209,8 @@ class LifecycleStates(models.Model):
     
     The link is made with a field *rank* to order the states.
     """
-    lifecycle = models.ForeignKey(Lifecycle, related_name="lifecycle")
-    state = models.ForeignKey(State, related_name="State")
+    lifecycle = models.ForeignKey(Lifecycle)
+    state = models.ForeignKey(State)
     rank = models.PositiveSmallIntegerField()
 
     class Meta:
@@ -318,6 +318,13 @@ class PLMObject(models.Model):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
                                   self.revision)
 
+    def _is_promotable(self):
+        """
+        Returns True if the object's state is the last state of its lifecyle
+        """
+        lcl = self.lifecycle.to_states_list()
+        return lcl[-1] != self.state.name
+
     def is_promotable(self):
         u"""
         Returns True if object is promotable
@@ -406,7 +413,22 @@ class Part(PLMObject):
         return items
 
     def is_promotable(self):
-        # TODO check parent/child links
+        """
+        Returns True if the object is promotable. A part is promotable
+        if there is a next state in its lifecycle and if its childs which
+        have the same lifecycle are in a state as mature as the object's state.  
+        """
+        if not self._is_promotable():
+            return False
+        childs = self.parentchildlink_parent.filter(end_time__exact=None).only("child")
+        lcs = LifecycleStates.objects.filter(lifecycle=self.lifecycle)
+        rank = lcs.get(state=self.state).rank
+        for link in childs:
+            child = link.child
+            if child.lifecycle == self.lifecycle:
+                rank_c = lcs.get(state=child.state).rank
+                if rank_c < rank:
+                    return False
         return True
 
 
@@ -510,9 +532,8 @@ class DocumentFile(models.Model):
                                  blank=True, null=True)
     locked = models.BooleanField(default=lambda: False)
     locker = models.ForeignKey(User, null=True, blank=True,
-                               related_name="%(class)s_locker",
                                default=lambda: None)
-    document = models.ForeignKey('Document', related_name="%(class)s_doc")
+    document = models.ForeignKey('Document')
 
     def __unicode__(self):
         return u"DocumentFile<%s, %s>" % (self.filename, self.document)
@@ -525,11 +546,17 @@ class Document(PLMObject):
     @property
     def files(self):
         "Queryset of all :class:`DocumentFile` linked to self"
-        return DocumentFile.objects.filter(document__id=self.id)
+        return self.documentfile_set.all()
 
     def is_promotable(self):
-        # TODO check file
-        return True
+        """
+        Returns True if the object is promotable. A documentt is promotable
+        if there is a next state in its lifecycle and if it has at least
+        one file and if none of its files are locked.
+        """
+        if not self._is_promotable():
+            return False
+        return bool(self.files) and not bool(self.files.filter(locked=True))
 
     @property
     def menu_items(self):
@@ -615,10 +642,10 @@ class AbstractHistory(models.Model):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
 
 class History(AbstractHistory):
-    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")
+    plmobject = models.ForeignKey(PLMObject)
 
 class UserHistory(AbstractHistory):
-    plmobject = models.ForeignKey(User, related_name="%(class)s_plmobject")
+    plmobject = models.ForeignKey(User)
 
 # link stuff
 
