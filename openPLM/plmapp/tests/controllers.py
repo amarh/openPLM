@@ -565,6 +565,8 @@ class DocumentControllerTest(ControllerTest):
         user.set_password("password")
         user.save()
         controller = self.CONTROLLER(self.controller.object, user)
+        PLMObjectUserLink.objects.create(user=user, role="owner",
+                                         plmobject=controller.object)
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
         self.assertRaises(UnlockError, controller.checkin, d,
