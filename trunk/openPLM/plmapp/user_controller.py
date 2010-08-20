@@ -5,7 +5,6 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
 
 try:
@@ -83,6 +82,9 @@ class UserController(object):
             raise ValueError("form is invalid")
 
     def __setattr__(self, attr, value):
+        # we override this method to make it to modify *object* directly
+        # (or its profile)
+        # if we modify *object*, we records the modification in **__histo*
         if hasattr(self, "object"):
             obj = object.__getattribute__(self, "object")
             profile = obj.get_profile()
@@ -93,6 +95,8 @@ class UserController(object):
             obj2 = obj if hasattr(obj, attr) else profile
             old_value = getattr(obj2, attr)
             setattr(obj2, attr, value)
+            # since x.verbose_name is a proxy methods, we need to get a real
+            # unicode object (with capitalize)
             field = obj2._meta.get_field(attr).verbose_name.capitalize()
             message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                     {"field" : field, "old" : old_value, "new" : value}
@@ -101,6 +105,8 @@ class UserController(object):
             super(UserController, self).__setattr__(attr, value)
 
     def __getattr__(self, attr):
+        # we override this method to get attributes from *object* directly
+        # (or its profile)
         obj = object.__getattribute__(self, "object")
         profile = obj.get_profile()
         if hasattr(self, "object") and hasattr(obj, attr) and \
@@ -123,18 +129,18 @@ class UserController(object):
             self.__histo = ""
 
     def _save_histo(self, action, details):
-        histo = models.UserHistory()
-        histo.plmobject = self.object
-        histo.action = action
-        histo.details = details 
-        histo.user = self._user
-        histo.save()
-        
+        """
+        Records *action* with details *details* made by :attr:`_user` in
+        on :attr:`object` in the user histories table.
+        """
+        models.UserHistory.objects.create(plmobject=self.object, action=action,
+                                     details=details, user=self._user)
+
     def get_object_user_links(self):
         """
         Returns all :class:`.Part` attached to :attr:`object`.
         """
-        return models.PLMObjectUserLink.objects.filter(user=self.object).order_by("plmobject")
+        return self.plmobjectuserlink_user.order_by("plmobject")
 
     def delegate(self, user, role):
         """
@@ -189,6 +195,7 @@ class UserController(object):
         
     def get_user_delegation_links(self):
         """
-        Returns all :class:`.Part` attached to :attr:`object`.
+        Returns all delegatees of :attr:`object`.
         """
-        return models.DelegationLink.objects.filter(delegator=self.object).order_by("role")
+        return self.delegationlink_delegator.order_by("role")
+
