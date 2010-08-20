@@ -135,12 +135,12 @@ from django.db.models.fields import FieldDoesNotExist
 try:
     import openPLM.plmapp.models as models
     from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError, PermissionError
+        AddFileError, DeleteFileError, PermissionError, PromotionError
     from openPLM.plmapp.utils import level_to_sign_str
 except (ImportError, AttributeError):
     import plmapp.models as models
     from plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError, PermissionError
+        AddFileError, DeleteFileError, PermissionError, PromotionError
     from plmapp.utils import level_to_sign_str
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
@@ -368,8 +368,8 @@ class PLMObjectController(object):
         else:
             users = [self._user.id]
             users.extend(models.DelegationLink.get_delegators(self._user, role))
-            qset = models.PLMObjectUserLink.objects.filter(user__in=users,
-                        plmobject=self.object, role=role)
+            qset = self.plmobjectuserlink_plmobject.filter(user__in=users,
+                                                          role=role)
             ok = bool(qset)
             self.__permissions[role] = ok
         if not ok and raise_:
@@ -394,6 +394,9 @@ class PLMObjectController(object):
         u"""
         Promotes :attr:`object` in his lifecycle and writes his promotion in
         the history
+        
+        :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
+        :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
         if self.object.is_promotable():
             state = self.object.state
@@ -407,15 +410,18 @@ class PLMObjectController(object):
                 self._save_histo("Promote",
                                  "change state from %(first)s to %(second)s" % \
                                      {"first" :state.name, "second" : new_state})
-
             except IndexError:
                 # FIXME raises it ?
                 pass
+        else:
+            raise PromotionError()
 
     def demote(self):
         u"""
         Demotes :attr:`object` in his lifecycle and writes his demotion in the
         history
+        
+        :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
         state = self.object.state
         lifecycle = self.object.lifecycle
@@ -1068,7 +1074,7 @@ class DocumentController(PLMObjectController):
 
         if isinstance(part, PLMObjectController):
             part = part.object
-        models.DocumentPartLink.objects.create(document=self.object, part=part)
+        self.documentpartlink_document.create(part=part)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (part, self.object))
 
@@ -1091,7 +1097,7 @@ class DocumentController(PLMObjectController):
         Returns all :class:`.Part` attached to
         :attr:`~PLMObjectController.object`.
         """
-        return models.DocumentPartLink.objects.filter(document=self.object)
+        return self.object.documentpartlink_document.all()
 
     def revise(self, new_revision):
         rev = super(DocumentController, self).revise(new_revision)

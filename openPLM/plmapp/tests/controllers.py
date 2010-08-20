@@ -363,6 +363,28 @@ class PartControllerTest(ControllerTest):
         parents = [(lvl, lk.parent.pk) for lvl, lk in self.controller3.get_parents(date=date)]
         self.assertEqual(parents, [])
 
+    def test_is_promotable1(self):
+        self.failUnless(self.controller.is_promotable())
+
+    def test_is_promotable2(self):
+        self.controller.promote()
+        self.failUnless(self.controller.is_promotable())
+    
+    def test_is_promotable3(self):
+        self.controller.add_child(self.controller2, 10, 15)
+        self.failUnless(self.controller.is_promotable())
+        
+    def test_is_promotable4(self):
+        self.controller2.promote()
+        self.controller.add_child(self.controller2, 10, 15)
+        self.failUnless(self.controller.is_promotable())
+
+    def test_is_promotable5(self):
+        self.controller.promote()
+        self.controller.add_child(self.controller2, 10, 15)
+        self.failIf(self.controller.is_promotable())
+
+
 class HardDiskControllerTest(PartControllerTest):
     TYPE = "HardDisk"
     CONTROLLER = SinglePartController
@@ -389,6 +411,16 @@ class DocumentControllerTest(ControllerTest):
         d = self.controller.add_file(self.get_file())
         self.assertEqual(d.locked, False)
         self.assertEqual(d.locker, None)
+
+    def test_promote(self):
+        self.controller.add_file(self.get_file())
+        self.assertEqual(self.controller.state.name, "draft")
+        self.controller.promote()
+        self.assertEqual(self.controller.state.name, "official")
+        self.failIf(self.controller.is_editable)
+        self.controller.demote()
+        self.assertEqual(self.controller.state.name, "draft")
+        self.failUnless(self.controller.is_editable)
 
     def test_lock(self):
         d = self.controller.add_file(self.get_file())

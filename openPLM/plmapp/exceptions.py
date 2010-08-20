@@ -45,3 +45,8 @@ class PermissionError(ControllerError):
     Exception raised when an user attempt to made an unauthorized action
     """
 
+class PromotionError(ControllerError):
+    """
+    Exception raised when an user attempt to promote anon-promotable object
+    """
+
