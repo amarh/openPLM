@@ -288,4 +288,5 @@ class OpenPLMUserChangeForm(forms.ModelForm):
 class replace_management_form(forms.Form):
     type = forms.CharField()
     username = forms.CharField()
+    
 

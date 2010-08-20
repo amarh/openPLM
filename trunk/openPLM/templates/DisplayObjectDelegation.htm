@@ -1,0 +1,91 @@
+{% extends "MiddleDisplayObject.htm" %}
+
+<!-- Manage html display in the Content div which correspond to the "attributes" menu -->
+
+{% block content %}
+    <br />
+	START DELEGATE : 
+	<table>
+	    <tr>
+	        <td>
+                <div class="ButtonLeft">
+                    <div class="Button">
+                        <a class="Button" 
+                            href="./delegate/owner/">
+                            OWNERSHIP
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="ButtonLeft">
+                    <div class="Button">
+                        <a class="Button" 
+                            href="./delegate/sign/1/">
+                            SIGNATURE 1st LEVEL
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="ButtonLeft">
+                    <div class="Button">
+                        <a class="Button" 
+                            href="./delegate/sign/2/">
+                            SIGNATURE 2nd LEVEL
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="ButtonLeft">
+                    <div class="Button">
+                        <a class="Button" 
+                            href="./delegate/sign/all">
+                            ALL SIGNATURES
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="ButtonLeft">
+                    <div class="Button">
+                        <a class="Button" 
+                            href="./delegate/notified/">
+                            NOTIFICATIONS
+                        </a>
+                    </div>
+                </div>
+            </td>
+	    </tr>
+	</table>
+	<br />
+	</table>
+	    <table class="Content">
+	        <tr class="Content">
+                <th class="Content"> USERNAME </th>
+                <th class="Content"> FIRST NAME </th>
+                <th class="Content"> LAST NAME </th>
+                <th class="Content"> ROLE </th>
+	        </tr>
+	        {% for link in user_delegation_link %}
+	        	<form method="post" action="">
+		            <tr class="Content">
+			            <td class="Content">{{link.delegatee.username}}</td>
+			            <td class="Content">{{link.delegatee.first_name}}</td>
+			            <td class="Content">{{link.delegatee.last_name}}</td>
+			            <td class="Content">{{link.role}}</td>
+			            <td class="Content">
+			                    <input type="hidden" name="link_id" value="{{link.id}}" />
+			                    <input type="submit" value="STOP DELEGATION">
+		                </td>
+		            </tr>
+            	</form>
+	        {% endfor %}
+	    </table>
+	{% for message in messages %}
+	{{message}}<br>
+	{% endfor %}
+{% endblock %}
+
+
