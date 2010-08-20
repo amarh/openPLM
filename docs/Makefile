@@ -78,7 +78,7 @@ changes:
 	@echo "The overview file is in $(BUILDDIR)/changes."
 
 coverage:
-	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
+	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
 	@echo
 	@echo "The overview file is in $(BUILDDIR)/coverage."
 

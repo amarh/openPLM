@@ -33,6 +33,7 @@ Modules
     filehandlers
     forms
     lifecycle
+    mail
     models
     user_controller
     utils

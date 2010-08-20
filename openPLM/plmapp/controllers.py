@@ -134,11 +134,13 @@ from django.db.models.fields import FieldDoesNotExist
 
 try:
     import openPLM.plmapp.models as models
+    from openPLM.plmapp.mail import send_mail
     from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
         AddFileError, DeleteFileError, PermissionError, PromotionError
     from openPLM.plmapp.utils import level_to_sign_str
 except (ImportError, AttributeError):
     import plmapp.models as models
+    from plmapp.mail import send_mail
     from plmapp.exceptions import RevisionError, LockError, UnlockError, \
         AddFileError, DeleteFileError, PermissionError, PromotionError
     from plmapp.utils import level_to_sign_str
@@ -403,9 +405,11 @@ class PLMObjectController(object):
                 new_state = lcl.next_state(state.name)
                 self.object.state = models.State.objects.get_or_create(name=new_state)[0]
                 self.object.save()
-                self._save_histo("Promote",
-                                 "change state from %(first)s to %(second)s" % \
-                                     {"first" :state.name, "second" : new_state})
+                details = "change state from %(first)s to %(second)s" % \
+                                     {"first" :state.name, "second" : new_state}
+                blacklist = send_mail(self.object, "sign_", "Promote",
+                                      details, self._user)
+                self._save_histo("Promote", details, blacklist)
             except IndexError:
                 # FIXME raises it ?
                 pass
@@ -427,8 +431,10 @@ class PLMObjectController(object):
             self.check_permission(level_to_sign_str(lcl.index(new_state)))
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
-            self._save_histo("Demote", "change state from %(first)s to %(second)s" % \
-                    {"first" :state.name, "second" : new_state})
+            details = "change state from %(first)s to %(second)s" % \
+                    {"first" :state.name, "second" : new_state}
+            blacklist = send_mail(self.object, "sign_", "Demote", details, self._user)
+            self._save_histo("Demote", details, blacklist)
         except IndexError:
             # FIXME raises it ?
             pass
@@ -466,13 +472,17 @@ class PLMObjectController(object):
             self._save_histo("Modify", self.__histo) 
             self.__histo = ""
 
-    def _save_histo(self, action, details):
+    def _save_histo(self, action, details, blacklist=()):
         """
         Records *action* with details *details* made by :attr:`_user` in
         on :attr:`object` in the histories table.
+
+        *blacklist*, if given, should be a list of email whose no mail should
+        be sent (empty by default).
         """
         models.History.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
+        send_mail(self.object, "notified", action, details, self._user, blacklist)
 
     @permission_required(role="owner")
     def revise(self, new_revision):
@@ -1084,6 +1094,7 @@ class DocumentController(PLMObjectController):
         return self.object.documentpartlink_document.all()
 
     def revise(self, new_revision):
+        # same as PLMObjectController + duplicate files (and their thumbnails)
         rev = super(DocumentController, self).revise(new_revision)
         for doc_file in self.object.files.all():
             filename = doc_file.filename
