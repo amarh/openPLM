@@ -795,10 +795,8 @@ def create_object(request):
 @login_required
 def modify_object(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for part modification """
-#    log_in_person="pjoulaud"
     now = datetime.datetime.now()
     context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-#    context_dict.update({'log_in_person' : log_in_person})
     if obj_type=='User':
         cls = models.get_all_plmobjects()['UserProfile']
     else:
@@ -813,9 +811,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
         if request.POST:
             modification_form_instance = get_modification_form(cls, request.POST)
             if modification_form_instance.is_valid():
-                user = models.User.objects.get(username=request.user)
                 current_object.update_from_form(modification_form_instance)
-                return HttpResponseRedirect("/object/%s/%s/%s/" % (current_object.type, current_object.reference, current_object.revision) )
+                return HttpResponseRedirect(current_object.plmobject_url)
             else:
                 pass
         else:
