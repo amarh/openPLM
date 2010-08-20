@@ -1,0 +1,115 @@
+{% extends "BaseDisplayHomePage.htm" %}
+
+<!-- Manage html display of the home page when we want to add/replace a link -->
+
+{% block LoggedPersonBlock %}
+    <p><a href="/logout/">
+        <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
+    </a>
+    {{user}} | {{current_date|date:"l j F Y, G:i"}}</p>
+{% endblock %}
+
+{% block SearchBlock %}
+	<b>Search for :</b>
+	<form method="get" action="." enctype="text/plain">
+		<table class="Content">
+			{{type_form.as_table}}
+			{{attributes_form.as_table}}
+		</table>
+		<input type="submit" value="SEARCH !">
+	</form>
+{% endblock %}
+
+{% block ResultBlock %}
+	Results for link creation :
+	<table class="Result">
+		{% if results %}
+			{% for object in results %}
+				<form method="post" action="." enctype="multipart/form-data">
+				{% if forloop.first %}
+				    <tr class="Content">
+				    {% if object.username %}
+		                <th class="Content">Username</th>
+			            <th class="Content">First name</th>
+			            <th class="Content">e-mail.</th>
+			            <th>Add</th>
+		            {% else %}
+			            <th class="Content">Type</th>
+			            <th class="Content">Reference</th>
+			            <th class="Content">Rev.</th>
+                        <th class="Content">Name</th>
+                        <th>Add</th>
+                    {% endif %}
+            		</tr>
+		        {% endif %}
+			    {% if forloop.counter|divisibleby:"2" %}
+			        <tr class="Content2">
+		        {% else %}
+		            <tr class="Content">
+	            {% endif %}
+		        {% if object.username %}
+		            <td class="Content">
+		                <a href="{{object.plmobject_url}}">
+		                        {{object.username|escape}}
+                        </a>
+                        <input type="hidden" name="type" value="User">
+                        <input type="hidden" name="username" value="{{object.username|escape}}">
+                    </td>
+		            <td class="Content">
+		                {{object.first_name|escape}}
+	                </td>
+		            <td class="Content">
+		                    {{object.email|escape}}...
+		            </td>
+		            <td class="Content">
+			            <input type="submit" value="ADD">
+		            </td>
+		        {% else %}
+		            <td class="Content">
+		                {{object.type|escape}}
+		                <input type="hidden" name="type" value="{{object.type|escape}}">
+	                </td>
+		            <td class="Content">
+		                <a href="{{object.plmobject_url}}">
+		                        {{object.reference|escape}}
+                        </a>
+                        <input type="hidden" name="reference" value="{{object.reference|escape}}">
+                    </td>
+		            <td class="Content">
+		                {{object.revision|escape}}
+		                <input type="hidden" name="revision" value="{{object.revision|escape}}">
+	                </td>
+		            <td class="Content">
+		                <a class="info">
+		                    {{object.name|escape|slice:":10"}}...
+		                    <span>{{object.name|escape}}</span>
+	                    </a>
+		            </td>
+		            <td class="Content">
+			            <input type="submit" value="ADD">
+		            </td>
+		        {% endif %}
+			    </tr>
+			    </form>
+			{% endfor %}
+		{% endif %}
+	</table>
+{% endblock %}
+
+{% block CreationBlock %}
+	<form method="get" action="/object/create/" enctype="text/plain">
+		<table class="Content">
+			<tr>
+				{% for attribute in type_form %}
+					<th>{{attribute.label_tag}}</th>
+					<td>{{attribute}}</td>
+				{% endfor %}
+				<td><input type="submit" value="CREATE !"></td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}
+
+
+
+

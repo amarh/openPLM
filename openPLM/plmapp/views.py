@@ -9,6 +9,7 @@ from django.conf import settings
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
 from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.utils import level_to_sign_str
 
 from django.db.models import Q
 from django.http import HttpResponseRedirect, QueryDict, HttpResponse, HttpResponsePermanentRedirect
@@ -473,7 +474,8 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
         if add_doc_cad_form_instance.is_valid():
             doc_cad_obj = get_obj(add_doc_cad_form_instance.cleaned_data["type"], \
                         add_doc_cad_form_instance.cleaned_data["reference"], \
-                        add_doc_cad_form_instance.cleaned_data["revision"])
+                        add_doc_cad_form_instance.cleaned_data["revision"],\
+                        request.user)
             obj.attach_to_document(doc_cad_obj)
             context_dict.update({'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
             return HttpResponseRedirect("/object/%s/%s/%s/doc-cad/" \
@@ -734,38 +736,6 @@ def delete_management(request, obj_type, obj_ref, obj_revi, link_id):
     obj.remove_notified(link.user)
     return HttpResponseRedirect("../..")
 
-#############################################################################################
-###         All functions which manage the different html pages specific to user          ###
-#############################################################################################
-@login_required
-def display_object_part_doc_cad(request, obj_type, obj_ref, obj_revi):
-    """ Manage html page for related part, documents and CAD of a user"""
-    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
-    if isinstance(obj, UserController):
-        class_for_div="NavigateBox4User"
-    elif isinstance(obj, DocumentController):
-        class_for_div="NavigateBox4Doc"
-    else:
-        class_for_div="NavigateBox4Part"
-    menu_list = obj.menu_items
-    if not hasattr(obj, "get_attached_documents"):
-        # TODO
-        raise TypeError()
-    if request.method == "POST":
-        formset = get_doc_cad_formset(obj, request.POST)
-        if formset.is_valid():
-            obj.update_doc_cad(formset)
-            return HttpResponseRedirect(".")
-    else:
-        formset = get_doc_cad_formset(obj)
-    object_doc_cad_list = obj.get_attached_documents()
-    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
-    context_dict.update({'current_page':'doc-cad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
-    var_dict, request_dict = display_global_page(request)
-    request.session.update(request_dict)
-    context_dict.update(var_dict)
-    return render_to_response('DisplayObjectDocCad.htm', context_dict, context_instance=RequestContext(request))
-
 ##########################################################################################
 ###             Manage html pages for part / document creation and modification                     ###
 ##########################################################################################
@@ -932,7 +902,148 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     request.session.update(request_dict)
     context_dict.update(var_dict)
     return render_to_response('DisplayObjectRelPLMObject.htm', context_dict, context_instance=RequestContext(request))
+
+#############################################################################################
+@login_required
+def display_delegation(request, obj_type, obj_ref, obj_revi):
+    """ Manage html page for related parts of the document"""
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    if isinstance(obj, UserController):
+        class_for_div="NavigateBox4User"
+    elif isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    if not hasattr(obj, "get_user_delegation_links"):
+        # TODO
+        raise TypeError()
+    if request.method == "POST":
+        selected_link_id = request.POST.get('link_id')
+        obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
+    user_delegation_link_list = obj.get_user_delegation_links()
+    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
+    context_dict.update({'current_page':'delegation', 'class4div': class_for_div, 'object_menu': menu_list, 'user_delegation_link': user_delegation_link_list})
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    return render_to_response('DisplayObjectDelegation.htm', context_dict, context_instance=RequestContext(request))
+
+
+##########################################################################################    
+@login_required
+def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
+    """ Manage html page for role delegation"""
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    if isinstance(obj, UserController):
+        class_for_div="NavigateBox4User"
+    elif isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    if request.method == "POST":
+#        if request.POST.get("action", "Undo") == "Undo":
+#            return HttpResponseRedirect("/home/")
+        delegation_form_instance = replace_management_form(request.POST)
+        if delegation_form_instance.is_valid():
+            if delegation_form_instance.cleaned_data["type"]=="User":
+                user_obj = get_obj(\
+                                    delegation_form_instance.cleaned_data["type"],\
+                                    delegation_form_instance.cleaned_data["username"],\
+                                    "-",\
+                                    request.user)
+                if role=="notified" or role=="owner":
+                    obj.delegate(user_obj.object, role)
+                    return HttpResponseRedirect("../..")
+                elif role=="sign":
+                    if sign_level=="all":
+                        obj.delegate(user_obj.object, "sign*")
+                        return HttpResponseRedirect("../../..")
+                    elif sign_level.isdigit():
+                        obj.delegate(user_obj.object, level_to_sign_str(int(sign_level)-1))
+                        return HttpResponseRedirect("../../..")
+                    else:
+                        delegation_form_instance = replace_management_form(request.POST)
+                else:
+                     delegation_form_instance = replace_management_form(request.POST)
+            else:
+                delegation_form_instance = replace_management_form(request.POST)
+        else:
+            delegation_form_instance = replace_management_form(request.POST)
+    else:
+        delegation_form_instance = replace_management_form()
+    action_message_string="Select a user for your \"%s\" role delegation :" % role
+    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    context_dict.update({'current_page':'delegation', 'class4div': class_for_div,
+                                 'object_menu': menu_list, 'obj' : obj,
+                                 'replace_management_form': delegation_form_instance,
+                                 'class4search_div': 'DisplayHomePage4Addition.htm',
+                                 'action_message': action_message_string})
+    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
     
+##########################################################################################    
+@login_required
+def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
+    """ Manage html page for role delegation"""
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    if isinstance(obj, UserController):
+        class_for_div="NavigateBox4User"
+    elif isinstance(obj, DocumentController):
+        class_for_div="NavigateBox4Doc"
+    else:
+        class_for_div="NavigateBox4Part"
+    menu_list = obj.menu_items
+    if request.method == "POST":
+#        if request.POST.get("action", "Undo") == "Undo":
+#            return HttpResponseRedirect("/home/")
+        delegation_form_instance = replace_management_form(request.POST)
+        if delegation_form_instance.is_valid():
+            if delegation_form_instance.cleaned_data["type"]=="User":
+                user_obj = get_obj(\
+                                    add_management_form_instance.cleaned_data["type"],\
+                                    add_management_form_instance.cleaned_data["username"],\
+                                    "-",\
+                                    request.user)
+                if role=="notified":
+                    obj.set_role(user_obj.object, "notified")
+                    return HttpResponseRedirect("..")
+                elif role=="owner":
+                    return HttpResponseRedirect("..")
+                    pass
+                elif role=="sign":
+                    if sign_level=="all":
+                        return HttpResponseRedirect("..")
+                        pass
+                    elif sign_level.is_digit():
+                        return HttpResponseRedirect("../..")
+                        pass
+                    else:
+                        delegation_form_instance = replace_management_form(request.POST)
+                else:
+                     delegation_form_instance = replace_management_form(request.POST)
+            else:
+                delegation_form_instance = replace_management_form(request.POST)
+        else:
+            delegation_form_instance = replace_management_form(request.POST)
+    else:
+        delegation_form_instance = replace_management_form()
+    action_message_string="Select the user you no longer want for your \"%s\" role delegation :" % role
+    context_dict = init_context_dict(obj_type, obj_ref, obj_revi)
+    var_dict, request_dict = display_global_page(request)
+    request.session.update(request_dict)
+    context_dict.update(var_dict)
+    context_dict.update({'current_page':'parts-doc-cad', 'class4div': class_for_div,
+                                 'object_menu': menu_list, 'obj' : obj,
+                                 'replace_management_form': delegation_form_instance,
+                                 'class4search_div': 'DisplayHomePage4Addition.htm',
+                                 'action_message': action_message_string})
+    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+    
+
 ##########################################################################################
 def display_bollox(request):
     context_dict={}

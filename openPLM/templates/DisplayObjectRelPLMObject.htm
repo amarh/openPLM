@@ -6,16 +6,21 @@
     <br />
 	<br />
 	<table class="Content">
-	{% for link in object_user_link %}
-		<tr class="Content">
-			<td class="Content">{{link.plmobject.type}}</td>
-			<td class="Content">{{link.plmobject.reference}}</td>
-			<td class="Content">{{link.plmobject.revision}}</td>
-			<td class="Content">{{link.role}}</td>
-		</tr>
-	{% endfor %}
+	    <tr class="Content">
+            <th class="Content"> TYPE </th>
+            <th class="Content"> REFERENCE </th>
+            <th class="Content"> REVISION </th>
+            <th class="Content"> ROLE </th>
+	    </tr>
+	    {% for link in object_user_link %}
+		    <tr class="Content">
+			    <td class="Content">{{link.plmobject.type}}</td>
+			    <td class="Content">{{link.plmobject.reference}}</td>
+			    <td class="Content">{{link.plmobject.revision}}</td>
+			    <td class="Content">{{link.role}}</td>
+		    </tr>
+	    {% endfor %}
 	</table>
-	</form>
 	{% for message in messages %}
 	{{message}}<br>
 	{% endfor %}

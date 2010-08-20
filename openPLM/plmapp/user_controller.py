@@ -186,4 +186,9 @@ class UserController(object):
                                  delegatee=delegation_link.delegatee)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
         delegation_link.delete()
-
+        
+    def get_user_delegation_links(self):
+        """
+        Returns all :class:`.Part` attached to :attr:`object`.
+        """
+        return models.DelegationLink.objects.filter(delegator=self.object).order_by("role")

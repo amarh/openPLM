@@ -49,6 +49,15 @@ urlpatterns = patterns('',
     (user_url + r'attributes/$', display_object_attributes, user_dict),
     (user_url + r'history/$', display_object_history, user_dict),
     (user_url + r'parts-doc-cad/$', display_related_plmobject, user_dict),
+    (user_url + r'delegation/$', display_delegation, user_dict),
+    (user_url + r'delegation/delegate/(?P<role>[^/]+)/$', delegate,\
+                    {'obj_type':'User', 'obj_revi':'-', 'sign_level':'none'}),
+    (user_url + r'delegation/delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', delegate,\
+                    {'obj_type':'User', 'obj_revi':'-'}),
+    (user_url + r'delegation/stop_delegate/(?P<role>[^/]+)/$', stop_delegate,\
+                    {'obj_type':'User', 'obj_revi':'-', 'sign_level':'none'}),
+    (user_url + r'delegation/stop_delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', stop_delegate,\
+                    {'obj_type':'User', 'obj_revi':'-'}),
     (user_url + r'modify/$', modify_user, user_dict),
     (user_url + r'password/$', change_user_password, user_dict),
     (user_url + r'navigate/$', navigate, user_dict),
