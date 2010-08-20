@@ -18,6 +18,7 @@ There are 5 kinds of models:
             - :func:`get_default_lifecycle`
             - :func:`get_default_state`
     * History models:
+        - :class:`AbstractHistory` model
         - :class:`History` model
         - :class:`UserHistory` model
     * PLMObject models:
@@ -61,7 +62,7 @@ import fnmatch
 import datetime
 
 import kjbuckets
-from django.db import models, IntegrityError
+from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -388,7 +389,7 @@ class PLMObject(models.Model):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_modification_fields`
         """
-        return ["creator", "ctime", "mtime"]
+        return ["creator", "owner", "ctime", "mtime"]
 
     @classmethod
     def get_modification_fields(cls):
@@ -646,6 +647,7 @@ class History(AbstractHistory):
 
 class UserHistory(AbstractHistory):
     plmobject = models.ForeignKey(User)
+
 
 # link stuff
 

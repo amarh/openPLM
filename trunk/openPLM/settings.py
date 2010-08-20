@@ -93,6 +93,9 @@ INSTALLED_APPS = (
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
 
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
 ######################
 # openPLM's settings #
 ######################
@@ -109,4 +112,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',
 )
+
+EMAIL_OPENPLM = "no-reply@openplm.example.com",
 
