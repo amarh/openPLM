@@ -270,15 +270,29 @@ def get_doc_cad_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
-class FilterObjectForm(forms.Form):
-#    LISTE = [('neato', 'neato'),('dot', 'dot'),('twopi', 'twopi'),('circo','circo')]
-    Child = forms.BooleanField(initial=True, required=False)
-    Parents = forms.BooleanField(required=False)
-    Doc = forms.BooleanField(required=False)
-    Cad = forms.BooleanField(required=False)
-    User = forms.BooleanField(required=False)
-#    method = forms.TypedChoiceField(choices=LISTE, required=False)
-    
+class FilterObjectForm4Part(forms.Form):
+    child = forms.BooleanField(initial=True, required=False)
+    parents = forms.BooleanField(required=False)
+    doc = forms.BooleanField(required=False)
+    cad = forms.BooleanField(required=False)
+    owner = forms.BooleanField(required=False)
+    signer = forms.BooleanField(required=False)
+    notified = forms.BooleanField(required=False)
+    data={'Child': True, 'Parents': False, 'Doc': True, 'Cad': False, 'User': False}
+
+class FilterObjectForm4Doc(forms.Form):
+    part = forms.BooleanField(initial=True, required=False)
+    owner = forms.BooleanField(required=False)
+    signer = forms.BooleanField(required=False)
+    notified = forms.BooleanField(required=False)
+    data={'Part': True, 'Owner': True, 'Signer': False, 'Notified': False}
+
+class FilterObjectForm4User(forms.Form):
+    owned = forms.BooleanField(required=False)
+    to_sign = forms.BooleanField(required=False)
+    request_notification_from = forms.BooleanField(required=False)
+    data={'Part': True, 'Doc': True, 'Cad': False}
+
 class OpenPLMUserChangeForm(forms.ModelForm):
     #username = forms.RegexField(widget=forms.HiddenInput())
     class Meta:
