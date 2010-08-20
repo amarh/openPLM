@@ -236,7 +236,10 @@ class PLMObjectController(object):
     def __init__(self, obj, user):
         self.object = obj
         self._user = user
+        # variable to store attribute changes
         self.__histo = ""
+        # cache for permissions (dict(role->bool)) 
+        self.__permissions = {}
 
     @classmethod
     def create(cls, reference, type, revision, user, data={}):
@@ -353,15 +356,25 @@ class PLMObjectController(object):
         If the check succeed, **True** is returned. Otherwise, if *raise_* is
         **True** (the default), an :exc:`.PermissionError` is raised and if
         *raise_* is **False**, **False** is returned.
-        """
 
-        users = [self._user.id]
-        users.extend(models.DelegationLink.get_delegators(self._user, role))
-        qset = models.PLMObjectUserLink.objects.filter(user__in=users,
-                    plmobject=self.object, role=role)
-        if not bool(qset) and raise_:
+        .. admonition:: Implementation details
+
+            This method keeps a cache, so that you dont have to worry about
+            multiple calls to this method.
+        """
+        
+        if role in self.__permissions:
+            ok = self.__permissions[role]
+        else:
+            users = [self._user.id]
+            users.extend(models.DelegationLink.get_delegators(self._user, role))
+            qset = models.PLMObjectUserLink.objects.filter(user__in=users,
+                        plmobject=self.object, role=role)
+            ok = bool(qset)
+            self.__permissions[role] = ok
+        if not ok and raise_:
             raise PermissionError("action not allowed for %s" % self._user)
-        return bool(qset)
+        return ok
 
     def check_contributor(self, user=None):
         """
@@ -409,6 +422,7 @@ class PLMObjectController(object):
         lcl = lifecycle.to_states_list()
         try:
             new_state = lcl.previous_state(state.name)
+            self.check_permission(level_to_sign_str(lcl.index(new_state)))
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
             self._save_histo("Demote", "change state from %(first)s to %(second)s" % \
@@ -484,10 +498,13 @@ class PLMObjectController(object):
         models.RevisionLink.objects.create(old=self.object, new=new_controller.object)
         return new_controller
 
-    def is_revisable(self):
+    def is_revisable(self, check_user=True):
         """
         Returns True if :attr:`object` is revisable : if :meth:`revise` can be
-        called safely
+        called safely.
+
+        If *check_user* is True (the default), it also checks if :attr:`_user` is
+        the *owner* of :attr:`object`.
         """
         # objects.get fails if a link does not exist
         # we can revise if any links exist
@@ -495,7 +512,7 @@ class PLMObjectController(object):
             models.RevisionLink.objects.get(old=self.object.pk)
             return False
         except ObjectDoesNotExist:
-            return True 
+            return self.check_permission("owner", False)
     
     def get_previous_revisions(self):
         try:
@@ -572,7 +589,6 @@ class PLMObjectController(object):
         link.delete()
         details = "user: %s" % notified
         self._save_histo("Notified removed", details) 
-        # TODO : history
 
     def set_signer(self, signer, role):
         """
@@ -655,10 +671,13 @@ class PartController(PLMObjectController):
         :param order: order
         :type order: positive int
         
-        Raises :exc:`ValueError` if *child* is already a child or a parent.
-        Raises :exc:`ValueError` if *quantity* or *order* are negative.
+        :raises: :exc:`ValueError` if *child* is already a child or a parent.
+        :aises: :exc:`ValueError` if *quantity* or *order* are negative.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
 
+        self.check_permission("owner")
         if isinstance(child, PLMObjectController):
             child = child.object
         # check if child is not a parent
@@ -691,8 +710,12 @@ class PartController(PLMObjectController):
 
         .. note::
             The link is not destroyed: its end_time is set to now.
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
 
+        self.check_permission("owner")
         if isinstance(child, PLMObjectController):
             child = child.object
         link = models.ParentChildLink.objects.get(parent=self.object, 
@@ -711,7 +734,12 @@ class PartController(PLMObjectController):
         :type new_quantity: positive float
         :param new_order: order
         :type new_order: positive int
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
+        
+        self.check_permission("owner")
         if isinstance(child, PLMObjectController):
             child = child.object
         if new_order < 0 or new_quantity < 0:
@@ -785,7 +813,12 @@ class PartController(PLMObjectController):
         :param formset:
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyChildForm`
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
+
+        self.check_permission("owner")
         if formset.is_valid():
             for form in formset.forms:
                 parent = form.cleaned_data["parent"]
@@ -811,8 +844,12 @@ class PartController(PLMObjectController):
         """
         Links *document* (a :class:`.Document`) with
         :attr:`~PLMObjectController.object`.
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
-
+        
+        self.check_permission("owner")
         if isinstance(document, PLMObjectController):
             document = document.object
         models.DocumentPartLink.objects.create(part=self.object, document=document)
@@ -823,8 +860,12 @@ class PartController(PLMObjectController):
         """
         Delete link between *document* (a :class:`.Document`)
         and :attr:`~PLMObjectController.object`.
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
 
+        self.check_permission("owner")
         if isinstance(document, PLMObjectController):
             document = document.object
         link = models.DocumentPartLink.objects.get(document=document,
@@ -847,7 +888,12 @@ class PartController(PLMObjectController):
         :param formset:
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyChildForm`
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
         """
+        
+        self.check_permission("owner")
         if formset.is_valid():
             for form in formset.forms:
                 part = form.cleaned_data["part"]
@@ -874,10 +920,13 @@ class DocumentController(PLMObjectController):
         
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
         """
+        self.check_permission("owner")
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.locked:
@@ -924,7 +973,10 @@ class DocumentController(PLMObjectController):
         will be called with *f* as parameter.
 
         :return: the :class:`.DocumentFile` created.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
         """
+        self.check_permission("owner")
         doc_file = models.DocumentFile()
         f.name = f.name.encode("utf-8")
         doc_file.filename = f.name
@@ -948,7 +1000,10 @@ class DocumentController(PLMObjectController):
         
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
         """
+        self.check_permission("owner")
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         basename = os.path.basename(thumbnail_file.name)
@@ -970,11 +1025,14 @@ class DocumentController(PLMObjectController):
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`plmapp.exceptions.DeleteFileError` if *doc_file* is
               locked
+            * :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
 
-        :param doc_file:
+        :param doc_file: the file to be deleted
         :type doc_file: :class:`.DocumentFile`
         """
 
+        self.check_permission("owner")
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.locked:
@@ -1065,6 +1123,8 @@ class DocumentController(PLMObjectController):
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`plmapp.exceptions.UnlockError` if *doc_file* is locked
               but *doc_file.locker* is not the current user
+            * :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
@@ -1073,6 +1133,7 @@ class DocumentController(PLMObjectController):
         :param update_attributes: True if :meth:`handle_added_file` should be
                                   called
         """
+        self.check_permission("owner")
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.filename != new_file.name:
@@ -1118,7 +1179,11 @@ class DocumentController(PLMObjectController):
         :param formset:
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyFileForm`
+        :raise: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
         """
+        
+        self.check_permission("owner")
         if formset.is_valid():
             for form in formset.forms:
                 document = form.cleaned_data["document"]
