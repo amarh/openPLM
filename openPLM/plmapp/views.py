@@ -7,7 +7,7 @@ from mimetypes import guess_type
 from django.conf import settings
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
+from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController, PartController
 from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.utils import level_to_sign_str
 
@@ -1115,24 +1115,42 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     request.session.update(request_dict)
     if isinstance(obj, UserController):
         class_for_div="NavigateBox4User"
+        FilterObjectFormFunction = FilterObjectForm4User
+        first_node_color = '#94bd5e'
+        first_node_label = obj.user.username.encode('utf-8')
+        first_node_url = "/user/"+obj.user.username.encode('utf-8')+"/navigate/"
     elif isinstance(obj, DocumentController):
         class_for_div="NavigateBox4Doc"
+        FilterObjectFormFunction = FilterObjectForm4Doc
+        first_node_color = '#fef176'
+        first_node_label = obj.type.encode('utf-8')\
+                            +"\\n"+obj.reference.encode('utf-8')\
+                            +"\\n"+obj.revision.encode('utf-8')
+        first_node_url = "/object/"+obj.type.encode('utf-8')\
+                            +"/"+obj.reference.encode('utf-8')\
+                            +"/"+obj.revision.encode('utf-8')+"/navigate/"
     else:
         class_for_div="NavigateBox4Part"
+        FilterObjectFormFunction = FilterObjectForm4Part
+        first_node_color = '#5588bb'
+        first_node_label = obj.type.encode('utf-8')\
+                            +"\\n"+obj.reference.encode('utf-8')\
+                            +"\\n"+obj.revision.encode('utf-8')
+        first_node_url = "/object/"+obj.type.encode('utf-8')\
+                            +"/"+obj.reference.encode('utf-8')\
+                            +"/"+obj.revision.encode('utf-8')+"/navigate/"
+    session_bool = False
+    for field in FilterObjectFormFunction.base_fields.keys():
+        session_bool = session_bool or request.session.get(field)
     if request.method == 'POST' and request.POST:
-        filter_object_form_instance = FilterObjectForm(request.POST)
+        filter_object_form_instance = FilterObjectFormFunction(request.POST)
         for key, value in request.POST.items():
             request.session[key] = value
-    elif request.session.get('Child')\
-            or request.session.get('Parents')\
-            or request.session.get('Doc')\
-            or request.session.get('Cad')\
-            or request.session.get('User') :
-        filter_object_form_instance = FilterObjectForm(request.session)
+    elif session_bool :
+        filter_object_form_instance = FilterObjectFormFunction(request.session)
     else:
-        data={'Child': True, 'Parents': False, 'Doc': True, 'Cad': False, 'User': False}
-        filter_object_form_instance = FilterObjectForm(data)
-        for key, value in data.items():
+        filter_object_form_instance = FilterObjectFormFunction(FilterObjectFormFunction.data)
+        for key, value in FilterObjectFormFunction.data.items():
             request.session[key] = value
     if not filter_object_form_instance.is_valid():
         return HttpResponse('mauvaise requete post')
@@ -1154,96 +1172,135 @@ def navigate(request, obj_type, obj_ref, obj_revi):
         navigate_graph.node_attr['width']="0.8"
         navigate_graph.node_attr['height']="0.6"
         navigate_graph.edge_attr['arrowhead']='normal'
-        def create_child_edges(object_id):
+        def create_child_edges(object_id, arg):
             object_item = get_obj_by_id(object_id, request.user)
             children_list = object_item.get_children()
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
             navigate_graph.node_attr['image']="media/img/part.png"
-            if children_list:
-                for children in children_list:
-                    child_id = children.link.child.id
-                    navigate_graph.add_edge(object_id, child_id)
-                    child_node = navigate_graph.get_node(child_id)
-                    child_node.attr['label'] = children.link.child.type.encode('utf-8')\
-                                                +"\\n"+children.link.child.reference.encode('utf-8')\
-                                                +"\\n"+children.link.child.revision.encode('utf-8')
-                    child_node.attr['URL'] = "/object/"+children.link.child.type.encode('utf-8')\
-                                                +"/"+children.link.child.reference.encode('utf-8')\
-                                                +"/"+children.link.child.revision.encode('utf-8')+"/navigate/"
-                    if filter_object_form_instance.cleaned_data['Doc'] :
-                        create_document_edges(child_id)
-                    create_child_edges(child_id)
-            else:
-                return
-        def create_parent_edges(object_id):
+            for children in children_list:
+                child_id = children.link.child.id
+                navigate_graph.add_edge(object_id, child_id)
+                child_node = navigate_graph.get_node(child_id)
+                child_node.attr['label'] = children.link.child.type.encode('utf-8')\
+                                            +"\\n"+children.link.child.reference.encode('utf-8')\
+                                            +"\\n"+children.link.child.revision.encode('utf-8')
+                child_node.attr['URL'] = "/object/"+children.link.child.type.encode('utf-8')\
+                                            +"/"+children.link.child.reference.encode('utf-8')\
+                                            +"/"+children.link.child.revision.encode('utf-8')+"/navigate/"
+                if filter_object_form_instance.cleaned_data.get('doc') :
+                    create_doc_edges(child_id, 'none')
+                create_child_edges(child_id, arg)
+        def create_parents_edges(object_id, arg):
             object_item = get_obj_by_id(object_id, request.user)
             parent_list = object_item.get_parents()
             navigate_graph.node_attr['color']='#99ccff'
             navigate_graph.node_attr['shape']='none'
             navigate_graph.node_attr['image']="media/img/part.png"
-            if parent_list:
-                for parent in parent_list:
-                    parent_id = parent.link.parent.id
-                    navigate_graph.add_edge(parent_id, object_id)
-                    parent_node = navigate_graph.get_node(parent_id)
-                    parent_node.attr['label'] = parent.link.parent.type.encode('utf-8')\
-                                                +"\\n"+parent.link.parent.reference.encode('utf-8')\
-                                                +"\\n"+parent.link.parent.revision.encode('utf-8')
-                    parent_node.attr['URL'] = "/object/"+parent.link.parent.type.encode('utf-8')\
-                                                +"/"+parent.link.parent.reference.encode('utf-8')\
-                                                +"/"+parent.link.parent.revision.encode('utf-8')+"/navigate/"
-                    if filter_object_form_instance.cleaned_data['Doc'] :
-                        create_document_edges(parent_id)
-                    create_parent_edges(parent_id)
-            else :
-                return
-        def create_document_edges(object_id):
+            for parent in parent_list:
+                parent_id = parent.link.parent.id
+                navigate_graph.add_edge(parent_id, object_id)
+                parent_node = navigate_graph.get_node(parent_id)
+                parent_node.attr['label'] = parent.link.parent.type.encode('utf-8')\
+                                            +"\\n"+parent.link.parent.reference.encode('utf-8')\
+                                            +"\\n"+parent.link.parent.revision.encode('utf-8')
+                parent_node.attr['URL'] = "/object/"+parent.link.parent.type.encode('utf-8')\
+                                            +"/"+parent.link.parent.reference.encode('utf-8')\
+                                            +"/"+parent.link.parent.revision.encode('utf-8')+"/navigate/"
+                if filter_object_form_instance.cleaned_data['doc'] :
+                    create_doc_edges(parent_id, 'none')
+                create_parents_edges(parent_id, 'none')
+        def create_part_edges(object_id, arg):
+            object_item = get_obj_by_id(object_id, request.user)
+            part_list = object_item.get_attached_parts()
+            navigate_graph.node_attr['color']='#99ccff'
+            navigate_graph.node_attr['shape']='none'
+            navigate_graph.node_attr['image']="media/img/part.png"
+            for link in part_list:
+                part_id = link.part_id
+                navigate_graph.add_edge(object_id, part_id)
+                part_node = navigate_graph.get_node(part_id)
+                part_node.attr['label'] = link.part.type.encode('utf-8')\
+                                            +"\\n"+link.part.reference.encode('utf-8')\
+                                            +"\\n"+link.part.revision.encode('utf-8')
+                part_node.attr['URL'] = "/object/"+link.part.type.encode('utf-8')\
+                                            +"/"+link.part.reference.encode('utf-8')\
+                                            +"/"+link.part.revision.encode('utf-8')+"/navigate/"
+        def create_doc_edges(object_id, arg):
             object_item = get_obj_by_id(object_id, request.user)
             document_list = object_item.get_attached_documents()
             navigate_graph.node_attr['image']='none'
             navigate_graph.node_attr['color']='#fef176'
             navigate_graph.node_attr['shape']='note'
-            if document_list:
-                for document_item in document_list:
-                    document_id = document_item.document.id
-                    navigate_graph.add_edge(object_id, document_id)
-                    document_node = navigate_graph.get_node(document_id)
-                    document_node.attr['label'] = document_item.document.type.encode('utf-8')\
-                                                +"\\n"+document_item.document.reference.encode('utf-8')\
-                                                +"\\n"+document_item.document.revision.encode('utf-8')
-                    document_node.attr['URL'] = "/object/"+document_item.document.type.encode('utf-8')\
-                                                +"/"+document_item.document.reference.encode('utf-8')\
-                                                +"/"+document_item.document.revision.encode('utf-8')+"/"
-            else :
-                return
+            for document_item in document_list:
+                document_id = document_item.document.id
+                navigate_graph.add_edge(object_id, document_id)
+                document_node = navigate_graph.get_node(document_id)
+                document_node.attr['label'] = document_item.document.type.encode('utf-8')\
+                                            +"\\n"+document_item.document.reference.encode('utf-8')\
+                                            +"\\n"+document_item.document.revision.encode('utf-8')
+                document_node.attr['URL'] = "/object/"+document_item.document.type.encode('utf-8')\
+                                            +"/"+document_item.document.reference.encode('utf-8')\
+                                            +"/"+document_item.document.revision.encode('utf-8')\
+                                            +"/navigate/"
+        def create_user_edges(object_id, required_role):
+            object_item = get_obj_by_id(object_id, request.user)
+            user_list = object_item.plmobjectuserlink_plmobject.filter(role__istartswith=required_role)
+            navigate_graph.node_attr['image']='none'
+            navigate_graph.node_attr['color']='#94bd5e'
+            navigate_graph.node_attr['shape']='note'
+            for user_item in user_list:
+                user_id = str(user_item.role)+str(user_item.user.id)
+                navigate_graph.add_edge(user_id, object_id)
+                user_node = navigate_graph.get_node(user_id)
+                user_node.attr['label'] = user_item.user.username.encode('utf-8')\
+                                            +"\\n"+user_item.role.encode('utf-8')
+                user_node.attr['URL'] = "/user/"+user_item.user.username.encode('utf-8')+"/navigate/"
+        def create_object_edges(object_id, required_role):
+            object_item = User.objects.get(pk=object_id)
+            part_doc_list = object_item.plmobjectuserlink_user.filter(role__istartswith=required_role)
+            for part_doc_item in part_doc_list:
+                part_doc_id = str(part_doc_item.role)+str(part_doc_item.plmobject_id)
+                navigate_graph.add_edge(object_id, part_doc_id)
+                part_doc_node = navigate_graph.get_node(part_doc_id)
+                if hasattr(part_doc_item.plmobject, 'document'):
+                    part_doc_node.attr.update(image='none', color='#fef176', shape='note')
+                else:
+                    part_doc_node.attr.update(image="media/img/part.png", color='#99ccff', shape='none')
+                part_doc_node.attr['label'] = part_doc_item.plmobject.type.encode('utf-8')\
+                                            +"\\n"+part_doc_item.plmobject.reference.encode('utf-8')\
+                                            +"\\n"+part_doc_item.plmobject.revision.encode('utf-8')
+                part_doc_node.attr['URL'] = "/object/"+part_doc_item.plmobject.type.encode('utf-8')\
+                                            +"/"+part_doc_item.plmobject.reference.encode('utf-8')\
+                                            +"/"+part_doc_item.plmobject.revision.encode('utf-8')+"/navigate/"
         part_id = obj.id
         navigate_graph.add_node(part_id)
         part_node = navigate_graph.get_node(part_id)
         part_node.attr['root'] = 'true'
-        navigate_graph.node_attr['color']='#5588bb'
-        part_node.attr['label'] = obj.type.encode('utf-8')\
-                                    +"\\n"+obj.reference.encode('utf-8')\
-                                    +"\\n"+obj.revision.encode('utf-8')
-        part_node.attr['URL'] = "/object/"+obj.type.encode('utf-8')\
-                                                +"/"+obj.reference.encode('utf-8')\
-                                                +"/"+obj.revision.encode('utf-8')+"/navigate/"
+        navigate_graph.node_attr['color'] = first_node_color
+        part_node.attr['label'] = first_node_label
+        part_node.attr['URL'] = first_node_url
         part_node.attr['shape']='box'
-        part_node.attr['image']="media/img/part.png"
-        if filter_object_form_instance.cleaned_data['Doc'] :
-            create_document_edges(part_id)
-        if filter_object_form_instance.cleaned_data['Child'] :
-            create_child_edges(part_id)
-        if filter_object_form_instance.cleaned_data['Parents'] :
-            create_parent_edges(part_id)
+        if isinstance(obj, PartController):
+            part_node.attr['image']="media/img/part.png"
+        picture_path = "media/navigate/" + str(obj.id)+"-"
+        functions_dic = {'child':(create_child_edges, 'none'),
+                         'parents':(create_parents_edges, 'none'),
+                         'doc':(create_doc_edges, 'none'),
+                         'cad':(create_doc_edges, 'none'),
+                         'owner':(create_user_edges, 'owner'),
+                         'signer':(create_user_edges, 'sign'),
+                         'notified':(create_user_edges, 'notified'),
+                         'part': (create_part_edges, 'none'),
+                         'owned':(create_object_edges, 'owner'),
+                         'to_sign':(create_object_edges, 'sign'),
+                         'request_notification_from':(create_object_edges, 'notified'),}
+        for field in FilterObjectFormFunction.base_fields.keys():
+            if filter_object_form_instance.cleaned_data[field] : 
+                function, argument = functions_dic[field]
+                function(part_id, argument)
+            picture_path+=str(int(filter_object_form_instance.cleaned_data[field]))
         navigate_graph.layout()
-        picture_path = "media/navigate/" + str(obj.id)\
-                        +"-"\
-                        +str(int(filter_object_form_instance.cleaned_data['Child']))\
-                        +str(int(filter_object_form_instance.cleaned_data['Parents']))\
-                        +str(int(filter_object_form_instance.cleaned_data['Doc']))\
-                        +str(int(filter_object_form_instance.cleaned_data['Cad']))\
-                        +str(int(filter_object_form_instance.cleaned_data['User']))
         map_path= picture_path + ".map"
         dot_path= picture_path + ".dot"
         picture_path +=".gif"
