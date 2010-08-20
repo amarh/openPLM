@@ -270,12 +270,8 @@ class PLMObjectController(object):
         except KeyError:
             raise ValueError("Incorrect type")
         # create an object
-        obj = class_()
-        obj.reference = reference
-        obj.type = type
-        obj.revision = revision
-        obj.owner = user
-        obj.creator = user
+        obj = class_(reference=reference, type=type, revision=revision,
+                     owner=user, creator=user)
         if data:
             for key, value in data.iteritems():
                 if key not in ["reference", "type", "revision"]:
@@ -471,12 +467,12 @@ class PLMObjectController(object):
             self.__histo = ""
 
     def _save_histo(self, action, details):
-        histo = models.History()
-        histo.plmobject = self.object
-        histo.action = action
-        histo.details = details 
-        histo.user = self._user
-        histo.save()
+        """
+        Records *action* with details *details* made by :attr:`_user` in
+        on :attr:`object` in the histories table.
+        """
+        models.History.objects.create(plmobject=self.object, action=action,
+                                     details=details, user=self._user)
 
     @permission_required(role="owner")
     def revise(self, new_revision):
@@ -497,8 +493,8 @@ class PLMObjectController(object):
             if attr not in ("reference", "type", "revision"):
                 data[attr] = getattr(self.object, attr)
         data["state"] = models.get_default_state(self.lifecycle)
-        new_controller = self.create(self.reference, self.type, new_revision, self._user,
-                                     data)
+        new_controller = self.create(self.reference, self.type, new_revision, 
+                                     self._user, data)
         details = "old : %s, new : %s" % (self.object, new_controller.object)
         self._save_histo(models.RevisionLink.ACTION_NAME, details) 
         models.RevisionLink.objects.create(old=self.object, new=new_controller.object)
@@ -724,8 +720,7 @@ class PartController(PLMObjectController):
         self.check_permission("owner")
         if isinstance(child, PLMObjectController):
             child = child.object
-        link = models.ParentChildLink.objects.get(parent=self.object, 
-                                                  child=child, end_time=None)
+        link = self.parentchildlink_parent.get(child=child, end_time=None)
         link.end_time = datetime.datetime.today()
         link.save()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
@@ -778,11 +773,9 @@ class PartController(PLMObjectController):
         if max_level != -1 and current_level > max_level:
             return []
         if not date:
-            links = models.ParentChildLink.objects.filter(parent=self.object,
-                        end_time__exact=None)
+            links = self.parentchildlink_parent.filter(end_time__exact=None)
         else:
-            links = models.ParentChildLink.objects.filter(parent=self.object,
-                         ctime__lt=date).exclude(end_time__lt=date)
+            links = self.parentchildlink_parent.filter(ctime__lt=date).exclude(end_time__lt=date)
         res = []
         for link in links.order_by("order", "child__reference"):
             res.append(Child(current_level, link))
@@ -800,11 +793,9 @@ class PartController(PLMObjectController):
         if max_level != -1 and current_level > max_level:
             return []
         if not date:
-            links = models.ParentChildLink.objects.filter(child=self.object,
-                        end_time__exact=None)
+            links = self.parentchildlink_child.filter(end_time__exact=None)
         else:
-            links = models.ParentChildLink.objects.filter(child=self.object,
-                         ctime__lt=date).exclude(end_time__lt=date)
+            links = self.parentchildlink_child.filter(ctime__lt=date).exclude(end_time__lt=date)
         res = []
         for link in links:
             res.append(Parent(current_level, link))
@@ -858,7 +849,7 @@ class PartController(PLMObjectController):
         self.check_permission("owner")
         if isinstance(document, PLMObjectController):
             document = document.object
-        models.DocumentPartLink.objects.create(part=self.object, document=document)
+        self.documentpartlink_part.create(document=document)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (self.object, document))
 
@@ -874,8 +865,7 @@ class PartController(PLMObjectController):
         self.check_permission("owner")
         if isinstance(document, PLMObjectController):
             document = document.object
-        link = models.DocumentPartLink.objects.get(document=document,
-                                                   part=self.object)
+        link = self.documentpartlink_part.get(document=document)
         link.delete()
         self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
                          "Part : %s - Document : %s" % (self.object, document))
@@ -885,7 +875,7 @@ class PartController(PLMObjectController):
         Returns all :class:`.Document` attached to
         :attr:`~PLMObjectController.object`.
         """
-        return models.DocumentPartLink.objects.filter(part=self.object)
+        return self.documentpartlink_part.all()
         
     def update_doc_cad(self, formset):
         u"""
@@ -963,7 +953,6 @@ class DocumentController(PLMObjectController):
             raise UnlockError("File already unlocked")
         if doc_file.locker != self._user:
             raise UnlockError("Bad user")
-
         doc_file.locked = False
         doc_file.locker = None
         doc_file.save()
@@ -983,13 +972,9 @@ class DocumentController(PLMObjectController):
               :attr:`object`
         """
         self.check_permission("owner")
-        doc_file = models.DocumentFile()
         f.name = f.name.encode("utf-8")
-        doc_file.filename = f.name
-        doc_file.size = f.size
-        doc_file.file = models.docfs.save(f.name, f)
-        doc_file.document = self.object
-        doc_file.save()
+        doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
+                        file=models.docfs.save(f.name, f), document=self.object)
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
@@ -1086,8 +1071,7 @@ class DocumentController(PLMObjectController):
 
         if isinstance(part, PLMObjectController):
             part = part.object
-        link = models.DocumentPartLink.objects.get(document=self.object,
-                                                   part=part)
+        link = self.documentpartlink_document.get(part=part)
         link.delete()
         self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
                          "Part : %s - Document : %s" % (part, self.object))
@@ -1176,7 +1160,6 @@ class DocumentController(PLMObjectController):
                 part = form.cleaned_data["part"]
                 if delete:
                     self.detach_part(part)
-
 
     def update_file(self, formset):
         u"""
