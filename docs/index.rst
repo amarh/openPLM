@@ -22,6 +22,14 @@ HTTP-API
 
     http-api
 
+Settings
+--------
+
+.. toctree::
+    :maxdepth: 2
+    
+    settings
+
 Modules
 ---------
 .. toctree::
