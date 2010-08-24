@@ -214,6 +214,7 @@ def permission_required(func=None, role="owner"):
         return decorator(func)
     return decorator
 
+_rx_bad_ref = re.compile(r"[?/#]|\.\.")
 class PLMObjectController(object):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
@@ -267,6 +268,8 @@ class PLMObjectController(object):
 
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
+        if _rx_bad_ref.search(reference) or _rx_bad_ref.search(revision):
+            raise ValueError("Reference or revision contains a '/' or a '..'")
         try:
             class_ = models.get_all_plmobjects()[type]
         except KeyError:
@@ -493,7 +496,8 @@ class PLMObjectController(object):
         Returns a controller of the new object.
         """
         
-        if not new_revision or new_revision == self.revision:
+        if not new_revision or new_revision == self.revision or \
+           _rx_bad_ref.search(new_revision):
             raise RevisionError("Bad value for new_revision")
         if models.RevisionLink.objects.filter(old=self.object.pk):
             raise RevisionError("a revision already exists for %s" % self.object)
