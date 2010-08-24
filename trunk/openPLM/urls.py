@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     (r'^bollox/', display_bollox),
-    (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', }),
+    (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),

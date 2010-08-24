@@ -118,14 +118,17 @@ def display_global_page(request_dict):
 ##########################################################################################
 
 def display_login_page(request):
+    print "display login page"
     if request.method == 'POST':
         if request.POST:
             username_value = request.POST.cleaned_data['username']
             password_value = request.POST.cleaned_data['password']
             user = auth.authenticate(username=username_value, password=password_value)
+            print "user value "
             if user is not None and user.is_active:
                 auth.login(request, user)
-                return HttpResponseRedirect("/home/")
+                print "redirection"
+                return HttpResponseRedirect("/user/admin/navigate/")
             else:
                 return HttpResponse('Mauvais login, mauvais mot de passe ou compte inactif')
         else:
@@ -138,14 +141,15 @@ def display_login_page(request):
 ##########################################################################################
 @login_required
 def display_home_page(request):
-    now = datetime.datetime.now()
-    context_dict = {}
-    SessionDictionnary = {}
-    (context_dict, SessionDictionnary) = display_global_page(request)
-    class_for_div="NavigateBox4Part"
-    context_dict.update({'class4div': class_for_div, 'current_date': now,})
-    request.session.update(SessionDictionnary)
-    return render_to_response('DisplayHomePage.htm', context_dict, context_instance=RequestContext(request))
+#    now = datetime.datetime.now()
+#    context_dict = {}
+#    SessionDictionnary = {}
+#    (context_dict, SessionDictionnary) = display_global_page(request)
+#    class_for_div="NavigateBox4Part"
+#    context_dict.update({'class4div': class_for_div, 'current_date': now,})
+#    request.session.update(SessionDictionnary)
+#    return render_to_response('DisplayHomePage.htm', context_dict, context_instance=RequestContext(request))
+    return HttpResponseRedirect("/user/%s/navigate/" % request.user)
 
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###

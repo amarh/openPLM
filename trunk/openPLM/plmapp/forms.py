@@ -291,7 +291,7 @@ class FilterObjectForm4User(forms.Form):
     owned = forms.BooleanField(required=False)
     to_sign = forms.BooleanField(required=False)
     request_notification_from = forms.BooleanField(required=False)
-    data={'Part': True, 'Doc': True, 'Cad': False}
+    data={'owned': True, 'to_sign': False, 'request_notification_from': False}
 
 class OpenPLMUserChangeForm(forms.ModelForm):
     #username = forms.RegexField(widget=forms.HiddenInput())
