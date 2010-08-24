@@ -67,6 +67,7 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.utils.encoding import iri_to_uri
 
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str
@@ -96,7 +97,7 @@ class UserProfile(models.Model):
 
     @property
     def plmobject_url(self):
-        return "/user/%s/" % self.user.username
+        return iri_to_uri("/user/%s/" % self.user.username)
 
     @property
     def rank(self):
@@ -365,8 +366,9 @@ class PLMObject(models.Model):
 
     @property
     def plmobject_url(self):
-        return "/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
-
+        url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
+        return iri_to_uri(url)
+    
     @classmethod
     def get_creation_fields(cls):
         """

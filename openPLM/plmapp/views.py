@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from django.contrib.auth.forms import PasswordChangeForm
+from django.utils.encoding import iri_to_uri
 
 import pygraphviz as pgv
 
@@ -184,12 +185,11 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
 @login_required
 def display_object(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for attributes """
-    if not obj_type=='User':
-        return HttpResponsePermanentRedirect("/object/%s/%s/%s/attributes/" \
-                                                % (obj_type, obj_ref, obj_revi) )
+    if obj_type != 'User':
+        url = u"/object/%s/%s/%s/attributes/" % (obj_type, obj_ref, obj_revi) 
     else:
-        return HttpResponsePermanentRedirect("/user/%s/attributes/" \
-                                                % obj_ref )
+        url = u"/user/%s/attributes/" % obj_ref
+    return HttpResponsePermanentRedirect(iri_to_uri(url))
 
 ##########################################################################################
 @login_required
@@ -371,13 +371,13 @@ def add_children(request, obj_type, obj_ref, obj_revi):
         if add_child_form_instance.is_valid():
             child_obj = get_obj(add_child_form_instance.cleaned_data["type"], \
                         add_child_form_instance.cleaned_data["reference"], \
-                        add_child_form_instance.cleaned_data["revision"])
+                        add_child_form_instance.cleaned_data["revision"],
+                        request.user)
             obj.add_child(child_obj, \
                             add_child_form_instance.cleaned_data["quantity"], \
                             add_child_form_instance.cleaned_data["order"])
             context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/BOM-child/" \
-                                        % (obj_type, obj_ref, obj_revi) )
+            return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
         else:
             add_child_form_instance = add_child_form(request.POST)
             context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
@@ -482,8 +482,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
                         request.user)
             obj.attach_to_document(doc_cad_obj)
             context_dict.update({'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/doc-cad/" \
-                                        % (obj_type, obj_ref, obj_revi) )
+            return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
         else:
             add_doc_cad_form_instance = AddDocCadForm(request.POST)
             context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
@@ -549,8 +548,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
                         add_rel_part_form_instance.cleaned_data["revision"], request.user)
             obj.attach_to_part(part_obj)
             context_dict.update({'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/parts/" \
-                                        % (obj_type, obj_ref, obj_revi) )
+            return HttpResponseRedirect(obj.plmobject_url + "parts/")
         else:
             add_rel_part_form_instance = add_rel_part_form(request.POST)
             context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
@@ -614,8 +612,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
         if add_file_form_instance.is_valid():
             obj.add_file(request.FILES["filename"])
             context_dict.update({'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
-            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
-                                        % (obj_type, obj_ref, obj_revi) )
+            return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             add_file_form_instance = AddFileForm(request.POST)
             context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
@@ -791,7 +788,7 @@ def create_object(request):
                     user = request.user
                     controller_cls = get_controller(type_name)
                     controller = PLMObjectController.create_from_form(creation_form_instance, user)
-                    return HttpResponseRedirect("/object/%s/%s/%s/" % (controller.type, controller.reference, controller.revision) )
+                    return HttpResponseRedirect(controller.plmobject_url)
     context_dict.update({'class4div': class_for_div, 'creation_form': creation_form_instance, 'object_type': type_form_instance.cleaned_data["type"], 'non_modifyable_attributes': non_modifyable_attributes_list })
     return render_to_response('DisplayObject4creation.htm', context_dict, context_instance=RequestContext(request))
 
@@ -1073,8 +1070,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
         if checkin_file_form_instance.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
             context_dict.update({'object_menu': menu_list, })
-            return HttpResponseRedirect("/object/%s/%s/%s/files/" \
-                                        % (obj_type, obj_ref, obj_revi) )
+            return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             checkin_file_form_instance = AddFileForm(request.POST)
             context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, \

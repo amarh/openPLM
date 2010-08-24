@@ -9,7 +9,7 @@ from django.contrib.auth.views import login, logout
 from django.contrib import admin
 admin.autodiscover()
 
-object_url = r'^object/(?P<obj_type>[^/]+)/(?P<obj_ref>[^/]+)/(?P<obj_revi>[^/]+)/'
+object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>[^?#/]+)/(?P<obj_revi>[^?#/]+)/'
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
 urlpatterns = patterns('',
