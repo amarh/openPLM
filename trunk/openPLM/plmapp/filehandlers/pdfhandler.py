@@ -9,6 +9,14 @@ from pyPdf import PdfFileReader
 warnings.simplefilter('default', DeprecationWarning)
 
 class PDFHandler(FileHandler):
+    """
+    This :class:`.FileHandler` can parse opendocument (``".odt"``) files.
+
+    :attributes:
+        .. attribute:: nb_pages
+            
+            number of pages of the file
+    """
 
     def __init__(self, path, filename):
         super(PDFHandler, self).__init__(path, filename)

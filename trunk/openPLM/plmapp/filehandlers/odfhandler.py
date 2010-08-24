@@ -8,6 +8,17 @@ from odf.style import PageLayoutProperties
 
 
 class ODFHandler(FileHandler):
+    """
+    This :class:`.FileHandler` can parse opendocument (``".odt"``) files.
+
+    :attributes:
+        .. attribute:: nb_pages
+            
+            number of pages of the file
+        .. attribute:: format
+
+            format of the file (``"A0"`` to ``"A4"`` or ``"Other"``)
+    """
 
     def __init__(self, path, filename):
         super(ODFHandler, self).__init__(path, filename)

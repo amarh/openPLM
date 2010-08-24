@@ -11,3 +11,5 @@
     :maxdepth: 2
 
     filehandlers_base
+    filehandlers_odf
+    filehandlers_pdf
