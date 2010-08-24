@@ -100,9 +100,10 @@ EMAIL_PORT = 1025
 # openPLM's settings #
 ######################
 
-# directory that holds documents
+#: directory that stores documents
 DOCUMENTS_DIR = "/var/openPLM/docs"
 THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
+#: directory that stores thumbnails
 THUMBNAILS_URL = MEDIA_URL + "thumbnails"
 
 # Cookie used for session is temporary and is deleted when browser is closed
@@ -113,5 +114,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',
 )
 
+#: expeditor's mail used when sending notification emails
 EMAIL_OPENPLM = "no-reply@openplm.example.com",
 
