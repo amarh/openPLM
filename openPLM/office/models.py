@@ -34,7 +34,7 @@ class OfficeDocumentController(DocumentController):
             if handler.is_valid():
                 self.nb_pages = handler.nb_pages
                 self.format = handler.format
-        self.save()
+                self.save()
 
 register(OfficeDocument)
 
