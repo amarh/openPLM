@@ -4,7 +4,7 @@ import plmapp.views as pviews
 
 def freecad(request, type_value, reference_value, revision_value):
     """ Manage html page for attributes """
-    obj = pviews.get_obj(type_value, reference_value, revision_value)
+    obj = pviews.get_obj(type_value, reference_value, revision_value, request.user)
     class_for_div="NavigateBox4Doc"
     menu_list = obj.menu_items
     attributes_list = []

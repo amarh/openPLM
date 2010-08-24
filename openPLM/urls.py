@@ -1,6 +1,12 @@
 import sys
 
 from django.conf import settings
+
+# add custom application urls
+for app in settings.INSTALLED_APPS:
+    if app.startswith("openPLM"):
+    	__import__("%s.models" % app, globals(), locals(), [], -1)
+
 from django.conf.urls.defaults import *
 from openPLM.plmapp.views import *
 import openPLM.plmapp.api as api

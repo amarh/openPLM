@@ -99,9 +99,7 @@ def display_global_page(request_dict):
         request_dict.session['type'] = 'Part'
         cls = models.get_all_users_and_plmobjects()['Part']
         attributes_form_instance = get_search_form(cls)
-    if not attributes_form_instance.is_valid():
-        print "mauvaise requete get pour la recherche"
-    else:
+    if attributes_form_instance.is_valid():
         qset = cls.objects.all()
         qset = attributes_form_instance.search(qset)[:30]
     if qset is None:
@@ -110,7 +108,6 @@ def display_global_page(request_dict):
         qset = (UserController(u, request_dict.user) for u in qset)
     else :
         request_dict.session["results"] = qset
-    print "type_form.type : %s" % type_form_instance.data
     context_dict.update({'results': qset, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'class4search_div': 'DisplayHomePage.htm',})
     return context_dict, request_dict.session
 
@@ -119,16 +116,13 @@ def display_global_page(request_dict):
 ##########################################################################################
 
 def display_login_page(request):
-    print "display login page"
     if request.method == 'POST':
         if request.POST:
             username_value = request.POST.cleaned_data['username']
             password_value = request.POST.cleaned_data['password']
             user = auth.authenticate(username=username_value, password=password_value)
-            print "user value "
             if user is not None and user.is_active:
                 auth.login(request, user)
-                print "redirection"
                 return HttpResponseRedirect("/user/admin/navigate/")
             else:
                 return HttpResponse('Mauvais login, mauvais mot de passe ou compte inactif')
@@ -1281,8 +1275,9 @@ def navigate(request, obj_type, obj_ref, obj_revi):
         part_node.attr['label'] = first_node_label
         part_node.attr['URL'] = first_node_url
         part_node.attr['shape']='box'
+        basedir = os.path.dirname(__file__)
         if isinstance(obj, PartController):
-            part_node.attr['image']="media/img/part.png"
+            part_node.attr['image'] = os.path.join(basedir, "..", "media/img/part.png")
         picture_path = "media/navigate/" + str(obj.id)+"-"
         functions_dic = {'child':(create_child_edges, 'none'),
                          'parents':(create_parents_edges, 'none'),
@@ -1301,11 +1296,13 @@ def navigate(request, obj_type, obj_ref, obj_revi):
                 function(part_id, argument)
             picture_path+=str(int(filter_object_form_instance.cleaned_data[field]))
         navigate_graph.layout()
-        map_path= picture_path + ".map"
-        dot_path= picture_path + ".dot"
+        picture_path2 = os.path.join(basedir, "..", picture_path)
+        map_path= picture_path2 + ".map"
+        dot_path= picture_path2 + ".dot"
         picture_path +=".gif"
+        picture_path2 +=".gif"
         navigate_graph.draw(dot_path, format='dot', prog='dot')
-        navigate_graph.draw(picture_path, format='gif', prog='neato')
+        navigate_graph.draw(picture_path2, format='gif', prog='neato')
         navigate_graph.draw(map_path, format='cmapx', prog='neato')
         file_object = open(map_path,"rb",0)
         map_string = file_object.read()
