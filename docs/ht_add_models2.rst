@@ -1,8 +1,24 @@
+.. _how-to-app:
+
 ===================================================
 How to add a model (django application)
 ===================================================
 
 This document describes how to add a model to openPLM.
+
+.. note::
+
+    You should not use your production environment for development purpose.
+    It's recommanded to initiate a development environment:
+        
+        #. copy openPLM's directory in another place
+        #. use the :file:`settings.py.sqlite` as settings file (rename it
+           :file:`settings.py`)
+        #. run :command:`./manage.py sql all`
+        #. run :command:`./manage.py syncdb` (this should ask you if you want to 
+           create a superuser, accept it)
+        #. edit the superuser profile (model UserProfile in the plmapp section)
+           and set him as an administrator and a contributor
 
 Requirements
 =============
@@ -47,10 +63,16 @@ Now you can edit the file :file:`openPLM/{app_name}/models.py`, and add some use
     :linenos:
     :end-before: end of imports
 
-.. todo::
-    explain import
+First, we import :mod:`~django.db.models` and :mod:`~django.contrib.admin`.
+We need *models* to define our models, and we need *admin* to register our
+model and make it available on the admin interface.
  
+Next, we import some classes and functions from :mod:`openPLM.plmapp`:
 
+    * :class:`.Part` is the base class for models which describe a part;
+    * :class:`.PartController` is the base class for part's controller; 
+    * :func:`.get_next_revision` is an utility function.
+    
 First class
 =====================
 
@@ -128,7 +150,7 @@ displayed, you can override the method
 
 .. literalinclude:: code/bicycle.py
     :start-after: bicycle properties
-    :end-before: get_excluded_creation_fields
+    :end-before: excluded_creation_fields
     :linenos:
 
 :attr:`attributes` is a read-only :func:`property`. This property is a list
@@ -144,18 +166,18 @@ Other methods that can be overridden
 There are other methods that can be overridden to select attributes displayed
 in creation/modification forms.
 
-These methods are listed in :class:`~openPLM.plmapp.models.PLMObject`.
+These methods are listed in :class:`.PLMObject`.
 
 Here, we will excluded *details* from a creation form:
 
 .. literalinclude:: code/bicycle.py
-    :start-after: get_excluded_creation_fields
+    :start-after: excluded_creation_fields
     :end-before: end Bicycle 
     :linenos:
 
-This code is similar to :ref:`the attributes property <prop-attr>`. Nevertheless,
-:meth:`~openPLM.plmapp.models.PLMObject.get_excluded_creation_fields` is a
-:func:`classmethod` since we do not have a :class:`PLMObject` when we build a
+This code is similar to :ref:`the attributes property <prop-attr>`.
+Nevertheless, :meth:`.PLMObject.excluded_creation_fields` is a
+:func:`classmethod` since we do not have a :class:`.PLMObject` when we build a
 creation form.
 
 The complete class Bicycle
@@ -165,22 +187,68 @@ The complete class Bicycle
     :pyobject: Bicycle
     :linenos:
 
+The admin interface
+=====================
+
+To make our model available on the admin interface, we just have to add this line:
+
+.. literalinclude:: code/bicycle.py
+    :start-after: end Bicycle
+    :end-before: class BicycleController
+    :linenos:
 
 syncdb
 ======================
 
-:command:`./manage.py sql app_name`
-:command:`./manage.py syncdb`
+Now you can test your model. Run the following commands:
+
+    #. :command:`manage.py sql app_name`
+    #. :command:`manage.py syncdb`
+
+The last command should output::
+
+   Installing json fixture 'initial_data' from absolute path.
+   Installed 10 object(s) from 1 fixture(s)
+
+Then you can run the server with the :command:`./manage.py runserver localhost:8000`.
+Open the url http://localhost:8000/home/ and try to create a bicycle.
+
 
 Controller
 =======================
 
-See :mod:`~plmapp.controllers` and :ref:`how-to-add-a-controller` for details
-about controllers.
+The model describes only which data should be stored on the database and
+which attributes should be displayed/editable. You can change *how* the
+objects are manipulated by redefining the :class:`.PLMObjectController`
+of your model.
+
+In this tutorial, we will change the behaviour when a bicycle is revised.
+Here is the code.
 
 .. literalinclude:: code/bicycle.py
     :pyobject: BicycleController
     :linenos:
+
+As you can see, we create a class called *BicycleController* which inherits
+from :class:`.PartController`. A *PartController* is a controller which manages
+some specifities of the parts like their children. Since *Bicycle* inherits
+from :class:`.Part`, our controller inherits from *PartController*.
+If you name a controller like :samp:`{model}Controller`, it will be associated
+to the model named *model*.
+
+In our case, we just override the method :meth:`.PartController.revise` by
+adding a detail if the user forget a revision (for example, *c* instead of
+*b*). Of course, you can write what you want and, for example, not take
+care of *new_revision*.
+
+.. seealso::
+
+    mod:`controllers` and :ref:`how-to-add-a-controller` for more
+    details about controllers.
+
+
+Views and urls
+===============
 
 
 Tests
@@ -189,7 +257,7 @@ Tests
 Alltogether
 ===============
 
-:download:`Plain text <./code/bicycle.py>`
+The complete file is accessible :download:`here <./code/bicycle.py>`.
 
 .. literalinclude:: code/bicycle.py
     :linenos:

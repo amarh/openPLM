@@ -1,5 +1,3 @@
-import os
-
 from django.db import models
 from django.contrib import admin
 
@@ -26,12 +24,14 @@ class Bicycle(Part):
         attrs.extend(["nb_wheels", "color", "details"])
         return attrs
 
-    # get_excluded_creation_fields
+    # excluded_creation_fields
     @classmethod
-    def get_excluded_creation_fields(cls):
-        return super(Bicycle, cls).get_excluded_creation_fields() + ["details"]
+    def excluded_creation_fields(cls):
+        return super(Bicycle, cls).excluded_creation_fields() + ["details"]
 
 # end Bicycle
+
+admin.site.register(Bicycle)
 
 # class BicycleController
 class BicycleController(PartController):
