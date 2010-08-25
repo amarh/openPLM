@@ -31,6 +31,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 html:
+	cd code && tar -pczf bicycle.tar.gz bicycle/*.py && cd ..
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
