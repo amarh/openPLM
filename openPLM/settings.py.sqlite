@@ -1,6 +1,8 @@
 # Django settings for openPLM project.
 # sqlite version
 
+import os.path
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -38,17 +40,17 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/templates'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '0ham7d#fh669-xi@wxf1wcpbhn6tbbegtv_cml()_wcboyw&u&'
@@ -82,4 +84,36 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'openPLM.plmapp',
+    # you can add your application after this line
+    'openPLM.cad',
+    'openPLM.computer',
+    'openPLM.cae',
+    'openPLM.office',
 )
+
+AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
+######################
+# openPLM's settings #
+######################
+
+#: directory that stores documents
+DOCUMENTS_DIR = "/var/openPLM/docs"
+THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
+#: directory that stores thumbnails
+THUMBNAILS_URL = MEDIA_URL + "thumbnails"
+
+# Cookie used for session is temporary and is deleted when browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Add user, messages and perms variables in RequestContext
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth',
+)
+
+#: expeditor's mail used when sending notification emails
+EMAIL_OPENPLM = "no-reply@openplm.example.com",
+
