@@ -59,7 +59,7 @@ Imports
 
 Now you can edit the file :file:`openPLM/{app_name}/models.py`, and add some useful imports
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :linenos:
     :end-before: end of imports
 
@@ -81,7 +81,7 @@ name displayed in the *type* field in search/creation pages.
 
 In our case, we call it **Bicycle**:
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :start-after: class Bicycle
     :end-before: bicycle fields
     :linenos:
@@ -96,7 +96,7 @@ Adding fields
 Now, we can add fields to our models. A field describe which data would be
 saved in the database.
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :start-after: class Bicycle
     :end-before: bicycle properties 
     :linenos:
@@ -148,7 +148,7 @@ displayed, you can override the method
 
 .. _prop-attr:
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :start-after: bicycle properties
     :end-before: excluded_creation_fields
     :linenos:
@@ -170,7 +170,7 @@ These methods are listed in :class:`.PLMObject`.
 
 Here, we will excluded *details* from a creation form:
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :start-after: excluded_creation_fields
     :end-before: end Bicycle 
     :linenos:
@@ -183,7 +183,7 @@ creation form.
 The complete class Bicycle
 ===============================
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :pyobject: Bicycle
     :linenos:
 
@@ -192,7 +192,7 @@ The admin interface
 
 To make our model available on the admin interface, we just have to add this line:
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :start-after: end Bicycle
     :end-before: class BicycleController
     :linenos:
@@ -225,7 +225,7 @@ of your model.
 In this tutorial, we will change the behaviour when a bicycle is revised.
 Here is the code.
 
-.. literalinclude:: code/bicycle.py
+.. literalinclude:: code/bicycle/models.py
     :pyobject: BicycleController
     :linenos:
 
@@ -257,8 +257,10 @@ Tests
 Alltogether
 ===============
 
-The complete file is accessible :download:`here <./code/bicycle.py>`.
+The complete app is accessible :download:`here <./code/bicycle.tar.gz>`.
 
-.. literalinclude:: code/bicycle.py
+models.py:
+
+.. literalinclude:: code/bicycle/models.py
     :linenos:
 
