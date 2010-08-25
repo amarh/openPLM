@@ -39,7 +39,7 @@ class CommonViewTest(TestCase):
 class ViewTest(CommonViewTest):
 
     def test_home(self):
-        response = self.client.get("/home/")
+        response = self.client.get("/home/", follow=True)
         self.assertEqual(response.status_code, 200)
         
     def test_create(self):
@@ -100,14 +100,14 @@ class ViewTest(CommonViewTest):
 class SearchViewTest(CommonViewTest):
 
     def search(self, request):
-        response = self.client.get("/home/", request) 
+        response = self.client.get("/user/user/attributes/", request) 
         self.assertEqual(response.status_code, 200)
         results = list(response.context["results"])
         results.sort(key=lambda r:r.pk)
         return results
 
     def test_forms(self):
-        response = self.client.get("/home/")
+        response = self.client.get("/user/user/attributes/")
         self.assertEqual(response.status_code, 200)
         # check if searchforms are present
         af = response.context["attributes_form"]
@@ -115,10 +115,10 @@ class SearchViewTest(CommonViewTest):
     
     def test_session_forms(self):
         "Tests if form field are kept between two search"
-        response = self.client.get("/home/", {"type" : "Part",
+        response = self.client.get("/user/user/attributes/", {"type" : "Part",
                                 "revision" : "c", "name" : "a name"})
         self.assertEqual(response.status_code, 200)
-        response = self.client.get("/home/")
+        response = self.client.get("/user/user/attributes/")
         self.assertEqual(response.status_code, 200)
         af = response.context["attributes_form"]
         self.assertEqual(af.data["revision"], "c")
