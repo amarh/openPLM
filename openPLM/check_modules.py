@@ -56,7 +56,7 @@ except ImportError:
     not_installed.append("pyPdf")
 
 try:
-    import pyPdf
+    import Image
     installed.append("Image")
 except ImportError:
     print "PIL is not installed, see http://www.pythonware.com/products/pil/"
