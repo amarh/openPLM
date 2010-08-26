@@ -12,7 +12,8 @@ from mimetypes import guess_type
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db.models import Q
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse, HttpResponsePermanentRedirect
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse,\
+                        HttpResponsePermanentRedirect, HttpResponseForbidden
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -23,6 +24,7 @@ from django.utils.encoding import iri_to_uri
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController, PartController
 from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.api import get_obj_by_id
@@ -549,12 +551,17 @@ def add_management(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################    
 @login_required
-def delete_management(request, obj_type, obj_ref, obj_revi, link_id):
+def delete_management(request, obj_type, obj_ref, obj_revi):
     """ Manage html page for management of the part / document : delete notified users"""
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
-    link = models.PLMObjectUserLink.objects.get(id=int(link_id))
-    obj.remove_notified(link.user)
-    return HttpResponseRedirect("../..")
+    if request.method == "POST":
+        try:
+            link_id = request.POST["link_id"]
+            link = models.PLMObjectUserLink.objects.get(id=int(link_id))
+            obj.remove_notified(link.user)
+        except (KeyError, ValueError, ControllerError):
+            return HttpResponseForbidden()
+    return HttpResponseRedirect("../")
 
 ##########################################################################################
 ###             Manage html pages for part / document creation and modification                     ###

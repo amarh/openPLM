@@ -31,12 +31,11 @@
                             </div>
                         </td>
                     {% ifequal link.role 'notified' %}
-                        <td class="Content">
-                            <div class="ButtonLeft">
-                                <div class="Button">
-                                    <a class="Button" href="./delete/{{link.id}}/">DELETE</a>
-                                </div>
-                            </div>
+                    <td class="Content">
+                        <form action="./delete/" method="POST">
+                            <input name="link_id" type="hidden" value="{{link.id}}"/>
+                            <input name="action" type="submit" value="Delete"/>
+                        </form>
                         </td>
                     {% endifequal %}
                     </tr>

@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     (object_url + r'management/$', display_management),
     (object_url + r'management/add/$', add_management),
     (object_url + r'management/replace/(?P<link_id>\d+)/$', replace_management),
-    (object_url + r'management/delete/(?P<link_id>\d+)/$', delete_management),
+    (object_url + r'management/delete/$', delete_management),
     (object_url + r'navigate/$', navigate),
 
     (user_url + r'$', display_object, user_dict),
