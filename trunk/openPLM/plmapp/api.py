@@ -15,7 +15,7 @@ from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.csrf.middleware import csrf_exempt
 
 import openPLM.plmapp.models as models
@@ -64,16 +64,31 @@ def json_view(func):
                 )
             mail_admins(subject, message, fail_silently=True)
             #Come what may, we're returning JSON.
-            msg = _('Internal error')+': '+str(e)
-            response = {'result': 'error',
-                        'error': msg}
+            msg = _('Internal error') + ': ' + str(e)
+            response = {'result' : 'error', 'error' : msg}
         response["api_version"] = API_VERSION
         json = simplejson.dumps(response)
         return HttpResponse(json, mimetype='application/json')
     return wrap
 
-#: Decorator which requires a login user and converts returned value into a json response
-login_json = lambda f: csrf_exempt(api_login_required(json_view(f)))
+def login_json(func):
+    """
+    Decorator which requires a login user and converts returned value into
+    a json response.
+
+    This also checks if the user agent is ``"openplm"`` and, if not,
+    returns a 403 HTTP RESPONSE.
+    """
+   
+    json_func = json_view(func)
+    @api_login_required
+    @csrf_exempt
+    @functools.wraps(func)
+    def wrapper(request, *args, **kwargs):
+        if request.META["HTTP_USER_AGENT"] != "openplm":
+            return HttpResponseForbidden()
+        return json_func(request, *args, **kwargs)
+    return wrapper
 
 
 def get_obj_by_id(obj_id, user):

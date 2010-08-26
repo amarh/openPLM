@@ -52,6 +52,7 @@ class OpenPLMPluginInstance(object):
         self.opener = urllib2.build_opener(StreamingHTTPHandler(),
                                            StreamingHTTPRedirectHandler(),
                                            urllib2.HTTPCookieProcessor())
+        self.opener.addheaders = [('User-agent', 'openplm')]
         self.username = ""
         self.connected = False
         self.documents = {}
