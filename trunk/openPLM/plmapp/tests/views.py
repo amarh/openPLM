@@ -1,14 +1,8 @@
 """
 This module contains some tests for openPLM.
 """
-import os
-import datetime
-from django.conf import settings
-from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.core.files.base import ContentFile
-from django.core.files import File
 
 from openPLM.plmapp.utils import *
 from openPLM.plmapp.models import *
