@@ -35,8 +35,8 @@ In this how-to, we will call it *bicycle*. The name of the application
 must be a `valid Python module name <http://docs.python.org/reference/lexical_analysis.html#identifiers>`_.
 
 Then you must registered your application: edit the variable :const:`INSTALLED_APPS`
-in the :file:`openPLM/settings.py` and add your application
-(:samp:`'openPLM.{app_name}'`).
+in the file :file:`openPLM/settings.py` and add your application
+(:samp:`'openPLM.{app_name}'`). Do the same things for  :file:`openPLM/settings_tests.py` 
 
 For example::
 
@@ -250,17 +250,69 @@ care of *new_revision*.
 Views and urls
 ===============
 
+You can add a tab in the object view by overriding the property
+:attr:`.PLMObject.menu_items` with something like this:
+
+.. code-block:: python
+
+    @property
+    def menu_items(self):
+        items = list(super(Bicycle, self).menu_items)
+        items.extend(["mytab1", "mytab2"])
+        return items
+
+You have to associate this tabs to views. First, you must add a file
+called :file:`urls.py` in your application directory (DO NOT modify
+the file :file:`openPLM/urls.py`). In this file, you should define
+a variable *urlpatterns*.
+
+In this tutorial, we will not add a tab but we will change the page which
+displays the attributes.
+
+Our *urls.py* looks like this:
+
+.. literalinclude:: code/bicycle/urls.py
+    :linenos:
+
+To understand this few lines, you can read `the django documentation about
+urls <http://docs.djangoproject.com/en/1.2/topics/http/urls/>`_. Here, we say
+that an url identifying the page attributes of an object of type Bicycle should
+be handle by the function *attibutes* from the module *view* of the application
+*bicycle*.
+
+Now, we can edit the file :file:`bicycle/views.py` and write the function
+*attributes*:
+
+.. literalinclude:: code/bicycle/views.py
+    :linenos:
+
+This code was taken from :file:`plmapp/views.py` and slighty modified.
+Here, you can write what you want, but you may need to read the source of
+*plmapp* and inspect the templates.
 
 Tests
 ======================
+
+If you write your own controllers or your own views, you can test them. 
+You can modify the file :file:`tests.py` in your application directory.
+
+You can check if your models and controllers pass the standart tests by
+writting something like this:
+
+.. literalinclude:: code/bicycle/tests.py
+    :linenos:
+
+You can run the tests with the command ``./manage.py test app_name
+--settings=settings_tests``.
+
+.. seealso::
+    
+    The django documentation about tests: `<http://docs.djangoproject.com/en/1.2/topics/testing/>`_ .
+
 
 Alltogether
 ===============
 
 The complete app is accessible :download:`here <./code/bicycle.tar.gz>`.
 
-models.py:
-
-.. literalinclude:: code/bicycle/models.py
-    :linenos:
 
