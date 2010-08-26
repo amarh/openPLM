@@ -14,6 +14,14 @@ How-to's
     
     how-tos
 
+Cookbook
+---------
+
+.. toctree::
+    :maxdepth: 2
+    
+    cookbook
+
 HTTP-API
 --------
 
