@@ -55,6 +55,13 @@ except ImportError:
     print "pyPdf is not installed, see http://pybrary.net/pyPdf/"
     not_installed.append("pyPdf")
 
+try:
+    import pyPdf
+    installed.append("Image")
+except ImportError:
+    print "PIL is not installed, see http://www.pythonware.com/products/pil/"
+    not_installed.append("PIL")
+
 if not_installed:
     print "Error: %s are not installed" % (", ".join(not_installed))
 else:

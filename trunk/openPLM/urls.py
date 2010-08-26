@@ -15,10 +15,21 @@ from django.contrib.auth.views import login, logout
 from django.contrib import admin
 admin.autodiscover()
 
+urlpatterns = patterns('')
+# add custom application urls
+for app in settings.INSTALLED_APPS:
+    if app.startswith("openPLM"):
+        try:
+            __import__("%s.urls" % app, globals(), locals(), [], -1)
+            mod_patterns = getattr(sys.modules["%s.urls" % app], "urlpatterns")
+            urlpatterns += mod_patterns
+        except ImportError:
+            pass
+
 object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\s\r\v\f]+'}
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
-urlpatterns = patterns('',
+urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     (r'^bollox/', display_bollox),
@@ -71,7 +82,7 @@ urlpatterns = patterns('',
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
-    (r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
+    #(r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
 
 )
 
@@ -101,14 +112,4 @@ urlpatterns += patterns('',
     (api_url + r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
 
-
-# add custom application urls
-for app in settings.INSTALLED_APPS:
-    if app.startswith("openPLM"):
-        try:
-            __import__("%s.urls" % app, globals(), locals(), [], -1)
-            patterns = getattr(sys.modules["%s.urls" % app], "urlpatterns")
-            urlpatterns += patterns
-        except ImportError:
-            pass
 

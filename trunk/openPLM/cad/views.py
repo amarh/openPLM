@@ -1,20 +1,20 @@
-from django.shortcuts import render_to_response, get_object_or_404
-import plmapp.views as pviews
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
+import openPLM.plmapp.views as pviews
 
 
-def freecad(request, type_value, reference_value, revision_value):
+def freecad(request, obj_ref, obj_revi):
     """ Manage html page for attributes """
-    obj = pviews.get_obj(type_value, reference_value, revision_value, request.user)
-    class_for_div="NavigateBox4Doc"
+    obj_type = "FreeCAD"
+    obj, context_dict, request_dict = pviews.display_global_page(request, obj_type, obj_ref, obj_revi)
     menu_list = obj.menu_items
-    attributes_list = []
+    object_attributes_list = []
     for attr in obj.attributes:
-        item = obj._meta.get_field(attr).verbose_name
-        attributes_list.append((item, getattr(obj, attr)))
-    context_dict = pviews.init_context_dict(type_value, reference_value, revision_value)
-    context_dict.update({'current_page':'freecad', 'class4div': class_for_div, 'object_menu': menu_list, 'object_attributes': attributes_list})
-    var_dict, request_dict = pviews.display_global_page(request)
+        item = obj.get_verbose_name(attr) + ":"
+        object_attributes_list.append((item, getattr(obj, attr)))
+    context_dict.update({'current_page':'attributes', 'object_menu': menu_list, 'object_attributes': object_attributes_list})
     request.session.update(request_dict)
-    context_dict.update(var_dict)
-    return render_to_response('DisplayObject.htm', context_dict)
+    return render_to_response('DisplayObject.htm', context_dict,
+                              context_instance=RequestContext(request))
 
