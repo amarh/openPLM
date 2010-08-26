@@ -14,6 +14,13 @@ How to make a query
 You just have to make a POST or GET request to the server. All valid urls
 are described above.
 
+.. warning::
+
+    You must set the user-agent to 'openplm', this is to prevent a CSRF attack.
+    If an user click on a link related to the api, he will receive a 403
+    forbidden response. Moreover, a XMLHttpRequest object can not set the
+    user agent if the script was launched from another domain.
+
 
 Returned value
 ==============

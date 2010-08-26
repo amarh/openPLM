@@ -56,6 +56,7 @@ function send_post(url, data) {
         params += key + "=" + escape(data[key]) + "&";
     }
     this.xrequest.open("POST", url, false);
+    this.xrequest.setRequestHeader('User-Agent', 'openplm');
     this.xrequest.send(params);
     var result = this.xrequest.responseText;
     return JSON.parse(result);
@@ -67,6 +68,7 @@ function send_get(url, data) {
         params += key + "=" + escape(data[key]) + "&";
     }
     this.xrequest.open("GET", url + "?"+params, false);
+    this.xrequest.setRequestHeader('User-Agent', 'openplm');
     this.xrequest.send();
     var result = this.xrequest.responseText;
     return JSON.parse(result);
