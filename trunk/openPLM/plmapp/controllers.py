@@ -214,7 +214,7 @@ def permission_required(func=None, role="owner"):
         return decorator(func)
     return decorator
 
-_rx_bad_ref = re.compile(r"[?/#]|\.\.")
+_rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class PLMObjectController(object):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
