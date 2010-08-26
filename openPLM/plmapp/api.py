@@ -8,18 +8,18 @@ import functools
 import traceback
 import sys
 
-
-from django.shortcuts import render_to_response, get_object_or_404
+import django.forms
+from django.shortcuts import get_object_or_404
 from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse
-import django.forms
+from django.http import HttpResponse
+from django.contrib.csrf.middleware import csrf_exempt
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
+from openPLM.plmapp.controllers import get_controller
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
 
@@ -73,7 +73,7 @@ def json_view(func):
     return wrap
 
 #: Decorator which requires a login user and converts returned value into a json response
-login_json = lambda f: api_login_required(json_view(f))
+login_json = lambda f: csrf_exempt(api_login_required(json_view(f)))
 
 
 def get_obj_by_id(obj_id, user):
@@ -87,7 +87,7 @@ def get_obj_by_id(obj_id, user):
     :return: a subinstance of a :class:`.PLMObjectController`
     """
 
-    obj = models.PLMObject.objects.get(id=obj_id)
+    obj = get_object_or_404(models.PLMObject, id=obj_id)
     obj = models.get_all_plmobjects()[obj.type].objects.get(id=obj_id)
     return get_controller(obj.type)(obj, user)
 
