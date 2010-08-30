@@ -347,7 +347,7 @@ class PLMObject(models.Model):
     @property
     def is_editable(self):
         """
-        Returns True if the object is not in a non editable state
+        True if the object is not in a non editable state
         (for example, in an official or deprecated state
         """
         current_rank = LifecycleStates.objects.get(state=self.state,
@@ -373,6 +373,7 @@ class PLMObject(models.Model):
         rank = LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
         return level_to_sign_str(rank - 1) 
+    
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
@@ -380,7 +381,7 @@ class PLMObject(models.Model):
 
     @property
     def menu_items(self):
-        "menu items to choose a view"
+        "Menu items to choose a view"
         return [ugettext_noop("attributes"), ugettext_noop("lifecycle"),
                 ugettext_noop("revisions"), ugettext_noop("history"),
                 ugettext_noop("management")]

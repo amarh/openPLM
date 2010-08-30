@@ -7,7 +7,7 @@
     
     <form method="POST" action="">
         {{ file_formset.management_form }}
-		{% if is_owner %}
+		{% if is_owner and obj.is_editable %}
 	    <table>
 	        <tr>
 		        <td></td>
@@ -45,7 +45,7 @@
                     </div>
                 </td>
 			    <td class="Content">
-			        {% if is_owner  %}
+			        {% if is_owner and obj.is_editable %}
 			            <div class="ButtonLeft">
                             <div class="Button">
                                 {% if form.instance.locked %}
@@ -55,8 +55,8 @@
                                 {% endif %}
 		                    </div>
 	                    </div>
-		            {% else %}
-		                You are not the owner
+                        {% else %}
+                        {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
 		            {% endif %}
 	            </td>
 			    <td class="Content">
@@ -64,7 +64,7 @@
                     <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{form.instance.thumbnail.name}}"
                         alt="Thumbnail"/>
 		            {% else %}
-		                No thumbnail available
+                    {% trans "No thumbnail available" %}
 		            {% endif %}
 	            </td>
 		    </tr>

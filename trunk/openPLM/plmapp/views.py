@@ -708,7 +708,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     menu_list = obj.menu_items
 
     if not hasattr(obj, "files"):
-        # TODO
         raise TypeError()
     if request.method == "POST":
         formset = get_file_formset(obj, request.POST)
@@ -717,7 +716,8 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
-    context_dict.update({'current_page':'files', 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
+    context_dict.update({'current_page':'files', 'object_menu': menu_list,
+                         'file_formset': formset})
     request.session.update(request_dict)
     return render_to_response('DisplayObjectFiles.htm', context_dict, context_instance=RequestContext(request))
 
@@ -801,7 +801,8 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
-    assert obj.object.id == link.plmobject.id
+    if obj.object.id != link.plmobject.id:
+        raise ValueError("Bad link id")
     menu_list = obj.menu_items
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
@@ -991,6 +992,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     else:
         cls = models.get_all_plmobjects()[obj_type]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
+    if not current_object.is_editable:
+        raise ControllerError("object is not editable")
     if request.method == 'POST':
         if request.POST:
             modification_form_instance = get_modification_form(cls, request.POST)

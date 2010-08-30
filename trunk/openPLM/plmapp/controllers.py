@@ -390,6 +390,13 @@ class PLMObjectController(object):
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
+    
+    def check_editable(self):
+        """
+        Raises a :exc:`.PermissionError` if :attr:`object` is not editable.
+        """
+        if not self.object.is_editable:
+            raise PermissionError("The object is not editable")
 
     def promote(self):
         u"""
@@ -692,9 +699,11 @@ class PartController(PLMObjectController):
         :aises: :exc:`ValueError` if *quantity* or *order* are negative.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
         self.check_permission("owner")
+        self.check_editable()
         if isinstance(child, PLMObjectController):
             child = child.object
         # check if child is not a parent
@@ -730,9 +739,11 @@ class PartController(PLMObjectController):
         
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
         self.check_permission("owner")
+        self.check_editable()
         if isinstance(child, PLMObjectController):
             child = child.object
         link = self.parentchildlink_parent.get(child=child, end_time=None)
@@ -753,9 +764,11 @@ class PartController(PLMObjectController):
         
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
         
         self.check_permission("owner")
+        self.check_editable()
         if isinstance(child, PLMObjectController):
             child = child.object
         if new_order < 0 or new_quantity < 0:
@@ -828,9 +841,11 @@ class PartController(PLMObjectController):
         
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
         self.check_permission("owner")
+        self.check_editable()
         if formset.is_valid():
             for form in formset.forms:
                 parent = form.cleaned_data["parent"]
@@ -933,11 +948,13 @@ class DocumentController(PLMObjectController):
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+            * :exc:`.PermissionError` if :attr:`object` is not editable.
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
         """
         self.check_permission("owner")
+        self.check_editable()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.locked:
@@ -985,8 +1002,10 @@ class DocumentController(PLMObjectController):
         :return: the :class:`.DocumentFile` created.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
         self.check_permission("owner")
+        self.check_editable()
         f.name = f.name.encode("utf-8")
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
                         file=models.docfs.save(f.name, f), document=self.object)
@@ -1008,8 +1027,10 @@ class DocumentController(PLMObjectController):
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+            * :exc:`.PermissionError` if :attr:`object` is not editable.
         """
         self.check_permission("owner")
+        self.check_editable()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         basename = os.path.basename(thumbnail_file.name)
@@ -1033,12 +1054,14 @@ class DocumentController(PLMObjectController):
               locked
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+            * :exc:`.PermissionError` if :attr:`object` is not editable.
 
         :param doc_file: the file to be deleted
         :type doc_file: :class:`.DocumentFile`
         """
 
         self.check_permission("owner")
+        self.check_editable()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.locked:
@@ -1131,6 +1154,7 @@ class DocumentController(PLMObjectController):
               but *doc_file.locker* is not the current user
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+            * :exc:`.PermissionError` if :attr:`object` is not editable.
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
@@ -1140,6 +1164,7 @@ class DocumentController(PLMObjectController):
                                   called
         """
         self.check_permission("owner")
+        self.check_editable()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.filename != new_file.name:
@@ -1184,11 +1209,13 @@ class DocumentController(PLMObjectController):
         :param formset:
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyFileForm`
-        :raise: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
         
         self.check_permission("owner")
+        self.check_editable()
         if formset.is_valid():
             for form in formset.forms:
                 document = form.cleaned_data["document"]
