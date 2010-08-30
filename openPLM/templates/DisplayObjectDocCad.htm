@@ -6,6 +6,7 @@
 {% block content %}
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
+        {% if is_owner %}
 	    <table>
 	         <tr>
 	            <td>
@@ -20,13 +21,16 @@
                 {% endif %}
 	        </tr>
         </table>
+        {% endif %}
         <table class="Content">
 	        {% for form in doc_cad_formset.forms %}
                     {{ form.id }}
                     {{ form.part }}
                     {{ form.document }}
-		        <tr class="Content">
-			        <td class="Content">{{ form.delete }}</td>
+                    <tr class="Content">
+                        {% if is_owner %}
+                        <td class="Content">{{ form.delete }}</td>
+                        {% endif %}
 			            <td class="Content">{{ form.instance.document.type }}</td>
 			            <td class="Content">
                             <a href="{{ form.instance.document.plmobject_url }}"/>
@@ -34,7 +38,9 @@
 		                    </a>
 	                    </td>
 			            <td class="Content">{{ form.instance.document.revision }}</td>
-		        </tr>	
+                    </tr>
+            {% empty %}
+            <tr> {% trans "There are no document attached to this part" %}</tr>
 	        {% endfor %}
 	    </table>
     </form>

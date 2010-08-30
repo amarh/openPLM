@@ -6,6 +6,7 @@
 {% block content %}
 <!--        {{ rel_part_formset.management_form }} -->
 	    <table class="Content">
+        {% if is_owner %}
 	        <tr>
 	            <td class="Content">
                     <div class="ButtonLeft">
@@ -15,6 +16,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
         
                 {% for link in object_management %}
                     <tr class="Content">
@@ -24,21 +26,25 @@
                         <td class="Content">{{ link.user.username }}</td>
                         <td class="Content">{{ link.user.is_active|yesno:_("active,inactive") }}</td>
                         <td class="Content">{{ link.role }}</td>
-                        <td class="Content">
-                            <div class="ButtonLeft">
-                                <div class="Button">
-                                    <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                        {% if is_owner %}
+                            <td class="Content">
+                                <div class="ButtonLeft">
+                                    <div class="Button">
+                                        <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    {% ifequal link.role 'notified' %}
+                            </td>
+                            {% endif %}
+                    {% if is_owner %}
+                    {% ifequal link.role 'notified'%}
                     <td class="Content">
                         <form action="./delete/" method="POST">
                             <input name="link_id" type="hidden" value="{{link.id}}"/>
                             <input name="action" type="submit" value="Delete"/>
                         </form>
                         </td>
-                    {% endifequal %}
+                        {% endifequal %}
+                        {% endif %}
                     </tr>
                 {% endfor %}
 	    </table>
