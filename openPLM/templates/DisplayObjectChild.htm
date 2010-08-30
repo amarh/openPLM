@@ -4,7 +4,7 @@
 <!-- Manage html display in the Content div which correspond to the "children" menu -->
 
 {% block content %}
-    {% if is_owner %}
+    {% if is_owner and obj.is_editable %}
     <table>
         <tr>
             <td>

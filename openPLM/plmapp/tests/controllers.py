@@ -380,8 +380,8 @@ class PartControllerTest(ControllerTest):
         self.failUnless(self.controller.is_promotable())
 
     def test_is_promotable5(self):
-        self.controller.promote()
         self.controller.add_child(self.controller2, 10, 15)
+        self.controller.promote()
         self.failIf(self.controller.is_promotable())
 
 
