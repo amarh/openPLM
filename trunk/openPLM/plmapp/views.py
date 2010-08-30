@@ -26,12 +26,14 @@ import datetime
 import pygraphviz as pgv
 from operator import attrgetter
 from mimetypes import guess_type
+from functools import wraps
 
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponseRedirect, QueryDict, HttpResponse,\
-                        HttpResponsePermanentRedirect, HttpResponseForbidden
+                        HttpResponsePermanentRedirect, HttpResponseForbidden, \
+                        HttpResponseServerError, Http404
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -39,6 +41,7 @@ from django.template import RequestContext
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 
+from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController, PartController
 from openPLM.plmapp.user_controller import UserController
@@ -48,10 +51,35 @@ from openPLM.plmapp.forms import *
 from openPLM.plmapp.api import get_obj_by_id
 
 
-##########################################################################################
-def replace_white_spaces(Chain):
-    """ Replace all whitespace characteres by %20 in order to be compatible with an URL"""
-    return Chain.replace(" ","%20")
+def handle_errors(func):
+    """
+    Decorators which ensures that the user is connected and handles exceptions
+    raised by a controller.
+
+    If an exception of type :exc:`.django.http.Http404` is raised, the exception
+    is re-raised.
+    
+    If an exception of type :exc:`.ControllerError` is raised, a
+    :class:`.django.http.HttpResponse` is returned with an explanation message.
+
+    If :attr:`settings.DEBUG` is False and another exception is raised,
+    a :class:`.django.http.HttpResponseServerError` is returned.
+    """
+    @wraps(func)
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        try:
+            return func(request, *args, **kwargs)
+        except (ControllerError, ValueError) as exc:
+            return render_to_response("error.html", {"message" : str(exc)})
+        except Http404:
+            raise
+        except StandardError:
+            if settings.DEBUG:
+                raise
+            return HttpResponseServerError()
+    return wrapper
+
 
 ##########################################################################################
 def get_obj(obj_type, obj_ref, obj_revi, user):
@@ -193,7 +221,7 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
 ##########################################################################################
 ###                    Function which manage the html home page                        ###
 ##########################################################################################
-@login_required
+@handle_errors
 def display_home_page(request):
     """
     Once the user is logged in, redirection to his/her own user object with :func:navigate
@@ -203,7 +231,7 @@ def display_home_page(request):
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###
 #############################################################################################
-@login_required
+@handle_errors
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays attributes of the selected object.
@@ -232,7 +260,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObject.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays attributes of the selected object.
@@ -246,7 +274,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
     return HttpResponsePermanentRedirect(iri_to_uri(url))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays lifecycle of the selected object.
@@ -278,7 +306,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectLifecycle.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays all revisions of (objects having :class:`RevisionLink` with)
@@ -312,7 +340,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectRevisions.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_object_history(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the history of (:class:`History` with) the selected object.
@@ -345,7 +373,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
 #############################################################################################
-@login_required
+@handle_errors
 def display_object_child(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the chidren of (:class:`ParentChildLink` with) the selected object.
@@ -389,7 +417,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectChild.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which edits the chidren of (:class:`ParentChildLink` with) the selected object.
@@ -426,7 +454,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectChildEdit.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def add_children(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for chidren creation of (:class:`ParentChildLink` creation with) the selected object.
@@ -466,7 +494,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
         return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################    
-@login_required
+@handle_errors
 def display_object_parents(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the parent of (:class:`ParentChildLink` with) the selected object.
@@ -507,7 +535,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectParents.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the related documents and CAD of (:class:`DocumentPartLink` with) the selected object.
@@ -541,7 +569,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
 
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some documents or CAD.
@@ -581,7 +609,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###      All functions which manage the different html pages specific to documents        ###
 #############################################################################################
-@login_required
+@handle_errors
 def display_related_part(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the related part of (:class:`DocumentPartLink` with) the selected object.
@@ -614,7 +642,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectRelPart.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def add_rel_part(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some parts.
@@ -652,7 +680,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
         return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def display_files(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the files (:class:`DocumentFile`) uploaded in the selected object.
@@ -688,7 +716,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectFiles.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
@@ -724,7 +752,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###    All functions which manage the different html pages specific to part and document  ###
 #############################################################################################
-@login_required
+@handle_errors
 def display_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the Users who manage the selected object (:class:`PLMObjectUserLink`).
@@ -748,7 +776,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectManagement.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
@@ -796,7 +824,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def add_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the addition of a "notification" link (:class:`PLMObjectUserLink`) between some Users and the selected object.
@@ -839,7 +867,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def delete_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the deletion of a "notification" link (:class:`PLMObjectUserLink`) between some Users and the selected object.
@@ -892,7 +920,7 @@ def create_non_modifyable_attributes_list(Classe=models.PLMObject):
     return non_modifyable_attributes_list
 
 ##########################################################################################
-@login_required
+@handle_errors
 def create_object(request):
     """
     Manage html page for the creation of an instance of `models.PLMObject` subclass.
@@ -936,7 +964,7 @@ def create_object(request):
     return render_to_response('DisplayObject4creation.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required
+@handle_errors
 def modify_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected object.
@@ -976,7 +1004,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
 #############################################################################################
-@login_required
+@handle_errors
 def modify_user(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User`.
@@ -1009,7 +1037,7 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObject4modification.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################
-@login_required
+@handle_errors
 def change_user_password(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User` password.
@@ -1043,7 +1071,7 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObject4PasswordModification.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
-@login_required
+@handle_errors
 def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the related parts and related documents of (:class:`PLMObjectUserLink` with) the selected :class:`~django.contrib.auth.models.User`.
@@ -1069,7 +1097,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     return render_to_response('DisplayObjectRelPLMObject.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
-@login_required
+@handle_errors
 def display_delegation(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
@@ -1099,7 +1127,7 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
 
 
 ##########################################################################################    
-@login_required
+@handle_errors
 def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     """
     Manage html page for delegations modification of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
@@ -1161,7 +1189,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################    
-@login_required
+@handle_errors
 def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     """
     Manage html page to stop delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
@@ -1228,7 +1256,7 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
 ##########################################################################################    
-@login_required
+@handle_errors
 def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
     Manage html page for the files (:class:`DocumentFile`) checkin in the selected object.
@@ -1265,7 +1293,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
-@login_required 
+@handle_errors 
 def download(request, docfile_id):
     """
     Manage html page for the files (:class:`DocumentFile`) download in the selected object.
@@ -1286,7 +1314,7 @@ def download(request, docfile_id):
     return response
     
 ##########################################################################################
-@login_required 
+@handle_errors 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
     """
     Manage html page for the files (:class:`DocumentFile`) checkout from the selected object.
@@ -1312,8 +1340,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 ###                     Manage html pages for navigate function                        ###
 ##########################################################################################    
 regex_pattern = re.compile(r'coords\=\"(\d{1,5}),(\d{1,5}),(\d{1,5}),(\d{1,5})')
-@login_required
-    
+@handle_errors
 def navigate(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays a graphical picture the different links
