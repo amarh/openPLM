@@ -11,13 +11,13 @@ from openPLM.plmapp.controllers import rx_bad_ref
 def _clean_reference(self):
     data = self.cleaned_data["reference"]
     if rx_bad_ref.search(data):
-        raise ValidationError("bad reference")
+        raise ValidationError("Bad reference: '#', '?', '/' and '..' are not allowed")
     return re.sub("\s+", " ", data.strip(" "))
 
 def _clean_revision(self):
     data = self.cleaned_data["revision"]
     if rx_bad_ref.search(data):
-        raise ValidationError("bad revision")
+        raise ValidationError("Bad revision: '#', '?', '/' and '..' are not allowed")
     return re.sub("\s+", " ", data.strip(" "))
 
 def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
