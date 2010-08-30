@@ -312,7 +312,7 @@ def get_fields_from_form(form):
     """
     fields = []
     for field_name, field in form.fields.items():
-        data = dict(name=field_name, label=field.label, initial=field.initial)
+        data = dict(name=field_name, label=field.label.capitalize(), initial=field.initial)
         if callable(field.initial):
             data["initial"] = field.initial()
             if hasattr(data["initial"], "pk"):
