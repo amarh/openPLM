@@ -5,10 +5,17 @@
 
 {% block LoggedPersonBlock %}
     {% get_current_language as LANGUAGE_CODE %}
-    <p><a href="/logout/">
+    <table>
+    <tr>
+    <td>
+    <a href="/logout/">
         <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
     </a>
+    </td>
+    <td>
     <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j F Y, G:i"}}
+    </td>
+    <td>
     <form action="/i18n/setlang/" method="post">
         <select name="language">
 
@@ -18,8 +25,9 @@
         </select>
         <input type="submit" value="Go" />
     </form>
-
-    </p>
+    </td>
+    </tr>
+    </table>
 {% endblock %}
 
 {% block SearchBlock %}
