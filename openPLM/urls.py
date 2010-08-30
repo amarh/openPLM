@@ -32,7 +32,7 @@ user_dict = {'obj_type':'User', 'obj_revi':'-'}
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
 
-    (r'^bollox/', display_bollox),
+    (r'^(?:accounts/)?$', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
