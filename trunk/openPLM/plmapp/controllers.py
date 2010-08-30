@@ -214,7 +214,7 @@ def permission_required(func=None, role="owner"):
         return decorator(func)
     return decorator
 
-_rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
+rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class PLMObjectController(object):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
@@ -268,7 +268,7 @@ class PLMObjectController(object):
 
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
-        if _rx_bad_ref.search(reference) or _rx_bad_ref.search(revision):
+        if rx_bad_ref.search(reference) or rx_bad_ref.search(revision):
             raise ValueError("Reference or revision contains a '/' or a '..'")
         try:
             class_ = models.get_all_plmobjects()[type]
@@ -450,9 +450,10 @@ class PLMObjectController(object):
             old_value = getattr(self.object, attr)
             setattr(self.object, attr, value)
             field = self.object._meta.get_field(attr).verbose_name.capitalize()
-            message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
-                    {"field" : field, "old" : old_value, "new" : value}
-            self.__histo += message + "\n"
+            if old_value != value:
+                message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
+                        {"field" : field, "old" : old_value, "new" : value}
+                self.__histo += message + "\n"
         else:
             super(PLMObjectController, self).__setattr__(attr, value)
 
@@ -497,7 +498,7 @@ class PLMObjectController(object):
         """
         
         if not new_revision or new_revision == self.revision or \
-           _rx_bad_ref.search(new_revision):
+           rx_bad_ref.search(new_revision):
             raise RevisionError("Bad value for new_revision")
         if models.RevisionLink.objects.filter(old=self.object.pk):
             raise RevisionError("a revision already exists for %s" % self.object)

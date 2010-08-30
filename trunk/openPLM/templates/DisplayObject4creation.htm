@@ -1,4 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
@@ -21,16 +22,26 @@
 			{% endfor%}
 			<form method="post" action="." >	
 			<tr class="Content">
-				<th><label for="id_type">&nbsp</label></th>
+				<th><label for="id_type">&nbsp;</label></th>
 				<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
 			</tr>
-			{% for attribute in creation_form %}
+            {% for attribute in creation_form.visible_fields %}
+                        {# Include the hidden fields in the form #}
+                  {% if forloop.first %}
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                  {% endif %}
+
 				<tr class="Content">
 					<th>{{attribute.label_tag}}</th><td>{{attribute}}</td><td>{{ attribute.errors }}</td>
 				</tr>
 			{% endfor %}
-			<tr class="Content">
-				<td>&nbsp</td><td><input type="submit" value="CREATE" /></td>
+            <tr class="Content">
+                {% for error in creation_form.non_field_errors %}
+                <tr> {{ error }} </tr>
+                {% endfor %}
+				<td>&nbsp;</td><td><input type="submit" value="CREATE" /></td>
 			</tr>
 			</form>
 		</table>

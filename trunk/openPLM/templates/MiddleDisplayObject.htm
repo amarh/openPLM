@@ -1,4 +1,5 @@
 {% extends class4search_div %}
+{% load i18n %}
 
 <!-- Middle page between the BaseDisplayObject.htm and the pages which correspond to each menu -->
 
@@ -10,7 +11,8 @@
 <!-- Manage the Navigate block which have an object menu, a banner and a content -->
 {% block ObjectBlock %}
     <div id="PageBanner">
-		<h2>
+        <h2>
+            {% if not creation_form %}
 		    {% ifequal class4div 'NavigateBox4User' %}
 		        <a href="/user/{{object_reference}}/navigate/">
 		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
@@ -25,7 +27,8 @@
 	            <a href="../attributes/">
 		            <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
 	            </a>
-            {% endifequal %}
+                {% endifequal %}
+                {% endif %}
 		    {{object_type}} | {{object_reference}} | {{object_revision}}
 	    </h2>
 	</div>
@@ -40,11 +43,11 @@
     				{%endifequal%}
     				{% ifequal object_type 'User' %}
     				    <a href="/user/{{object_reference}}/{{menu_item}}/">
-        				    {{ menu_item|upper }}
+                        {% filter upper %}{% trans menu_item %}{% endfilter%}
 				        </a>
     				{% else %}
-        				<a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">
-        				    {{ menu_item|upper }}
+                    <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">
+                        {% filter upper %}{% trans menu_item %}{% endfilter%}
 				        </a>
 			        {% endifequal %}
     				</td>

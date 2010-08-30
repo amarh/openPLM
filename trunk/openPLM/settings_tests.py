@@ -1,3 +1,4 @@
+#-!- coding:utf-8 -!-
 # Django settings for openPLM project.
 # sqlite version
 
@@ -30,7 +31,7 @@ TIME_ZONE = 'Europe/Paris'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-en'
+LANGUAGE_CODE = 'en/en'
 
 SITE_ID = 1
 
@@ -65,7 +66,14 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+)
+
+ugettext = lambda s: s
+LANGUAGES = (
+      ('fr', u'Français'),
+      ('en', 'English'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
@@ -94,7 +102,7 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
 
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 6666
+EMAIL_PORT = 1025
 
 ######################
 # openPLM's settings #

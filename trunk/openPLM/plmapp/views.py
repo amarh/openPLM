@@ -1,3 +1,4 @@
+#-!- coding:utf-8 -!-
 """
 Introduction
 =============
@@ -91,13 +92,14 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
     """
     Initiate the context dictionnary we used to transfer parameters to html pages.
     Get type, reference and revision of an object and return a dictionnary with them
-    plus current time and :attr:`settings.THUMBNAILS_URL` the begining of the URL to
-    get thumbnail of a file.
+    plus current time, :attr:`settings.THUMBNAILS_URL` the begining of the URL to
+    get thumbnail of a file and :attr:`settings.LANGUAGES`.
     
     Example::
     
         >>> init_context_dict('BiosOs','BI-0044','1.4.3')
-        {'THUMBNAILS_URL': '/media/thumbnails',
+        {'LANGUAGES': (('fr', u'Fran\xc3\xa7ais'), ('en', 'English')),
+         'THUMBNAILS_URL': '/media/thumbnails',
          'current_date': datetime.datetime(2010, 8, 27, 11, 34, 21, 639171),
          'object_reference': 'BI-0044',
          'object_revision': '1.4.3',
@@ -118,6 +120,7 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
         'object_revision': init_revision_value,
         'object_type': init_type_value,
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
+        'LANGUAGES' : settings.LANGUAGES,
         }
 
 ##########################################################################################
@@ -644,7 +647,8 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
             return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         add_rel_part_form_instance = AddRelPartForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm',
+                             'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
         return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -1257,8 +1261,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
             return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
         checkin_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm',\
-                            'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
+        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm',                             'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -1302,9 +1305,8 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
     """
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
-    if request.user == models.PLMObject.objects.get(type=obj_type, reference=obj_ref, revision=obj_revi).owner:
-        obj.lock(doc_file)
-        return download(request, docfile_id)
+    obj.lock(doc_file)
+    return download(request, docfile_id)
 
 ##########################################################################################
 ###                     Manage html pages for navigate function                        ###

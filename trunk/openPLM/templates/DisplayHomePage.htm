@@ -1,16 +1,29 @@
 {% extends "BaseDisplayHomePage.htm" %}
+{% load i18n %}
 
 <!-- Manage html display of the home page -->
 
 {% block LoggedPersonBlock %}
+    {% get_current_language as LANGUAGE_CODE %}
     <p><a href="/logout/">
         <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
     </a>
-    {{user}} | {{current_date|date:"l j F Y, G:i"}}</p>
+    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j F Y, G:i"}}
+    <form action="/i18n/setlang/" method="post">
+        <select name="language">
+
+            {% for lang in LANGUAGES %}
+            <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >{{ lang.1 }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Go" />
+    </form>
+
+    </p>
 {% endblock %}
 
 {% block SearchBlock %}
-	<b>Search for :</b>
+<b>{% trans "Search for :" %}</b>
 	<form method="get" action="." enctype="text/plain">
 		<table class="Content">
 			{{type_form.as_table}}
@@ -27,14 +40,14 @@
 				{% if forloop.first %}
 				    <tr class="Content">
 				    {% if object.username %}
-		                <th class="Content">Username</th>
-			            <th class="Content">First name</th>
-			            <th class="Content">e-mail.</th>
+                    <th class="Content">{% trans "Username" %}</th>
+                    <th class="Content">{% trans "First name" %}</th>
+                    <th class="Content">{% trans "e-mail." %}</th>
 		            {% else %}
-			            <th class="Content">Type</th>
-			            <th class="Content">Reference</th>
-			            <th class="Content">Rev.</th>
-                        <th class="Content">Name</th>
+                    <th class="Content">{% trans "Type" %}</th>
+                    <th class="Content">{% trans "Reference" %}</th>
+                    <th class="Content">{% trans "Rev." %}</th>
+                    <th class="Content">{% trans "Name" %}</th>
                     {% endif %}
             		</tr>
 		        {% endif %}

@@ -68,9 +68,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import iri_to_uri
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str
+
 
 # user stuff
 
@@ -103,11 +106,11 @@ class UserProfile(models.Model):
     def rank(self):
         u""" Rank of the user: "adminstrator", "contributor" or "viewer" """
         if self.is_administrator:
-            return "administrator"
+            return _("administrator")
         elif self.is_contributor:
-            return "contributor"
+            return _("contributor")
         else:
-            return "viewer"
+            return _("viewer")
 
     @property
     def attributes(self):
@@ -290,25 +293,29 @@ class PLMObject(models.Model):
     """
 
     # key attributes
-    reference = models.CharField(max_length=50)
-    type = models.CharField(max_length=50)
-    revision = models.CharField(max_length=50)
+    reference = models.CharField(_("reference"), max_length=50)
+    type = models.CharField(_("type"), max_length=50)
+    revision = models.CharField(_("revision"), max_length=50)
 
     # other attributes
-    name = models.CharField(max_length=100, blank=True,
-                            help_text=u"Name of the product")
+    name = models.CharField(_("name"), max_length=100, blank=True,
+                            help_text=_(u"Name of the product"))
 
-    creator = models.ForeignKey(User, related_name="%(class)s_creator")
-    owner = models.ForeignKey(User, related_name="%(class)s_owner")
-    ctime = models.DateTimeField("date of creation", default=datetime.datetime.today,
+    creator = models.ForeignKey(User, verbose_name=_("creator"), 
+                                related_name="%(class)s_creator")
+    owner = models.ForeignKey(User, verbose_name=_("owner"), 
+                              related_name="%(class)s_owner")
+    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
-    mtime = models.DateTimeField("date of last modification", auto_now=True)
+    mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 
     # state and lifecycle
-    lifecycle = models.ForeignKey(Lifecycle, related_name="%(class)s_lifecyle",
-                                 default=get_default_lifecycle)
-    state = models.ForeignKey(State, related_name="%(class)s_lifecyle",
-                                 default=get_default_state)
+    lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"), 
+                                  related_name="%(class)s_lifecyle",
+                                  default=get_default_lifecycle)
+    state = models.ForeignKey(State, verbose_name=_("state"),
+                              related_name="%(class)s_lifecyle",
+                              default=get_default_state)
 
     
     class Meta:
@@ -357,12 +364,14 @@ class PLMObject(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
-        return ["attributes", "lifecycle", "revisions", "history", "management"]
+        return [ugettext_noop("attributes"), ugettext_noop("lifecycle"),
+                ugettext_noop("revisions"), ugettext_noop("history"),
+                ugettext_noop("management")]
 
     @classmethod
     def excluded_creation_fields(cls):
         "Returns fields which should not be available in a creation form"
-        return ["owner", "creator", "ctime", "mtime"]
+        return ["owner", "creator", "ctime", "mtime", "state"]
 
     @property
     def plmobject_url(self):
@@ -377,7 +386,7 @@ class PLMObject(models.Model):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_creation_fields`
         """
-        fields = ["reference", "type", "revision", "lifecycle", "state"]
+        fields = ["reference", "type", "revision", "lifecycle"]
         for field in cls().attributes:
             if field not in cls.excluded_creation_fields():
                 fields.append(field)
@@ -412,7 +421,8 @@ class Part(PLMObject):
     @property
     def menu_items(self):
         items = list(super(Part, self).menu_items)
-        items.extend(["BOM-child", "parents", "doc-cad"])
+        items.extend([ugettext_noop("BOM-child"), ugettext_noop("parents"), 
+                      ugettext_noop("doc-cad")])
         return items
 
     def is_promotable(self):
@@ -564,7 +574,7 @@ class Document(PLMObject):
     @property
     def menu_items(self):
         items = list(super(Document, self).menu_items)
-        items.extend(["parts", "files"])
+        items.extend([ugettext_noop("parts"), ugettext_noop("files")])
         return items
 
 

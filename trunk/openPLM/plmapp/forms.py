@@ -1,13 +1,24 @@
-from django import forms
-from django.forms.models import modelform_factory, modelformset_factory
-
-import openPLM.plmapp.models as m
-
-from django.forms import ValidationError
 import re
 
-
+from django import forms
+from django.forms.models import modelform_factory, modelformset_factory
 from django.contrib.auth.models import User
+from django.forms import ValidationError
+
+import openPLM.plmapp.models as m
+from openPLM.plmapp.controllers import rx_bad_ref
+
+def _clean_reference(self):
+    data = self.cleaned_data["reference"]
+    if rx_bad_ref.search(data):
+        raise ValidationError("bad reference")
+    return re.sub("\s+", " ", data.strip(" "))
+
+def _clean_revision(self):
+    data = self.cleaned_data["revision"]
+    if rx_bad_ref.search(data):
+        raise ValidationError("bad revision")
+    return re.sub("\s+", " ", data.strip(" "))
 
 def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
@@ -23,7 +34,17 @@ def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     """
 
     fields = cls.get_creation_fields()
-    Form = modelform_factory(cls, fields=fields, exclude=('type', 'state')) 
+    Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
+    Form.clean_reference = _clean_reference
+    Form.clean_revision = _clean_revision
+    def _clean(self):
+        cleaned_data = self.cleaned_data
+        ref = cleaned_data.get("reference", "")
+        rev = cleaned_data.get("revision", "")
+        if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
+            raise ValidationError("An object with the same type,reference and revision already exists")
+        return cleaned_data
+    Form.clean = _clean
     if data:
         return Form(data=data, empty_permitted=empty_allowed)
     else:
@@ -199,6 +220,8 @@ def get_children_formset(controller, data=None):
 
 class AddRevisionForm(forms.Form):
     revision = forms.CharField()
+    
+    clean_revision = _clean_revision
     
 class AddRelPartForm(forms.Form):
     type = forms.CharField()

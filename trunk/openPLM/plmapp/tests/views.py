@@ -53,12 +53,13 @@ class ViewTest(CommonViewTest):
         response = self.client.get(self.base_url + "attributes/")
         self.assertEqual(response.status_code,  200)
         self.failUnless(response.context["object_attributes"])
-        attributes = dict(response.context["object_attributes"])
+        attributes = dict((x.capitalize(), y) for (x,y) in 
+                          response.context["object_attributes"])
         # name : empty value
-        self.assertEqual(attributes["name"], "")
+        self.assertEqual(attributes["Name"], "")
         # owner and creator : self.user
-        self.assertEqual(attributes["owner"], self.user)
-        self.assertEqual(attributes["creator"], self.user)
+        self.assertEqual(attributes["Owner"], self.user)
+        self.assertEqual(attributes["Creator"], self.user)
 
     def test_lifecycle(self):
         response = self.client.get(self.base_url + "lifecycle/")
