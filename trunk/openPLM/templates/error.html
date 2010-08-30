@@ -1,0 +1,12 @@
+{% extends "BaseDisplayObject.htm" %}
+{% load i18n %}
+
+{% block content %}
+<div id="HomePage">
+    <div>
+        <p>Error : </p>
+        <p>{{ message }}</p>
+        <p><a href="javascript:back();">go back</a> </p>
+    </div>
+</div>
+{% endblock %}
