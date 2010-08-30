@@ -356,6 +356,23 @@ class PLMObject(models.Model):
                             lifecycle=self.lifecycle).rank
         return current_rank < official_rank
     
+    def get_current_sign_level(self):
+        """
+        Returns the current sign level that an user must have to promote this
+        object.
+        """
+        rank = LifecycleStates.objects.get(state=self.state,
+                            lifecycle=self.lifecycle).rank
+        return level_to_sign_str(rank) 
+    
+    def get_previous_sign_level(self):
+        """
+        Returns the current sign level that an user must have to demote this
+        object.
+        """
+        rank = LifecycleStates.objects.get(state=self.state,
+                            lifecycle=self.lifecycle).rank
+        return level_to_sign_str(rank - 1) 
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"

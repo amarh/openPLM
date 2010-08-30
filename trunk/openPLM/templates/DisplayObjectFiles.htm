@@ -7,21 +7,21 @@
     
     <form method="POST" action="">
         {{ file_formset.management_form }}
+		{% if is_owner %}
 	    <table>
 	        <tr>
 		        <td></td>
 		        <td>
-		            {% if is_owner %}
                         <div class="ButtonLeft">
                             <div class="Button">
                                 <a class="Button" href="./add/">ADD</a>
                             </div>
                         </div>
-                    {% endif %}
                 </td>
 	    	    <td><input type="submit" value="DELETE"></td>
     	    </tr>
 	    </table>
+        {% endif %}
 	    <table class="Content">
 		    <tr class="Content">
 		        {% for form in file_formset.forms %}

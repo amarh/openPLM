@@ -22,7 +22,8 @@
                             </div>
                         </div>
 	                </td>
-                {% else %}
+                    {% else %}
+                    {% if is_owner %}
                     <td>
 	                    <div class="ButtonLeft">
 	                        <div class="Button">
@@ -33,6 +34,7 @@
                             </div>
                         </div>
                     </td>
+                    {% endif %}
             	{% endifequal %}
 	        </tr>
         </table>

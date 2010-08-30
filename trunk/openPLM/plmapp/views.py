@@ -214,7 +214,12 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
         qset = (UserController(u, request_dict.user) for u in qset)
     else :
         request_dict.session["results"] = qset
-    context_dict.update({'results': qset, 'type_form': type_form_instance, 'attributes_form': attributes_form_instance, 'class4search_div': 'DisplayHomePage.htm', 'class4div': class_for_div})
+    context_dict.update({'results' : qset, 'type_form' : type_form_instance,
+                         'attributes_form' : attributes_form_instance,
+                         'class4search_div' : 'DisplayHomePage.htm',
+                         'class4div' : class_for_div, 'obj' : selected_object})
+    if isinstance(selected_object, PLMObjectController):
+        context_dict["is_owner"] = selected_object.check_permission("owner", False)
     return selected_object, context_dict, request_dict.session
 
 
@@ -301,7 +306,11 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     object_lifecycle_list = []
     for st in lifecycle:
         object_lifecycle_list.append((st, st == state))
-    context_dict.update({'current_page':'lifecycle', 'object_menu': menu_list, 'object_lifecycle': object_lifecycle_list})
+    is_signer = obj.check_permission(obj.get_current_sign_level(), False)
+    is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
+    context_dict.update({'current_page':'lifecycle', 'object_menu': menu_list,
+                         'object_lifecycle': object_lifecycle_list,
+                         'is_signer' : is_signer, 'is_signer_dm' : is_signer_dm})
     request.session.update(request_dict)
     return render_to_response('DisplayObjectLifecycle.htm', context_dict, context_instance=RequestContext(request))
 
@@ -708,10 +717,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
-    is_owner_bool = (request.user == models.PLMObject.objects.get(type=obj_type, \
-                                        reference=obj_ref, revision=obj_revi).owner)
-    object_files_list = obj.files
-    context_dict.update({'is_owner':is_owner_bool, 'current_page':'files', 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
+    context_dict.update({'current_page':'files', 'object_menu': menu_list, 'object_files': object_files_list, 'file_formset': formset})
     request.session.update(request_dict)
     return render_to_response('DisplayObjectFiles.htm', context_dict, context_instance=RequestContext(request))
 

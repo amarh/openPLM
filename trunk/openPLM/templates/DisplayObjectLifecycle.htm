@@ -4,13 +4,16 @@
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
-
     <form action="" method="POST">
+    {% if is_signer_dm %}
         <input name="action" type="submit" value="DEMOTE"/>
+        {% endif %}
+        {% if is_signer and obj.is_promotable %}
         <input name="action" type="submit" value="PROMOTE"/>
-        </form>
-        <br>
-    	<br>
+        {% endif %}
+    </form>
+        <br/>
+    	<br/>
     	<table class="Content">
     		<tr class="Content">
     		{% for status, is_current_state in object_lifecycle %}
