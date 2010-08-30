@@ -1,5 +1,5 @@
 #! /usr/bin/env sh
 
 # run this script to generate/update translation files
-django-admin makemessages -l fr -e html,htm
-django-admin compilemessages
+/usr/local/bin/django-admin.py makemessages -l fr -e html,htm
+/usr/local/bin/django-admin.py compilemessages

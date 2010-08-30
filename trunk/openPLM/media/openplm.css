@@ -70,7 +70,7 @@ margin-bottom: 90px;
 }
 
 div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox,
-div#NavigateBox4Part, div#NavigateBox4Doc,  div#NavigateBox4User
+div#NavigateBox4Part, div#NavigateBox4Doc,  div#NavigateBox4User, div#CreationBox
 {
 -moz-border-radius: 1em;
 /* float: top; */
@@ -99,14 +99,21 @@ min-height: 350px;
 margin-right: 0px;
 }
 
-div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User
+div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User, div#CreationBox
 {
 float: left;
 }
 
 div#LoggedPersonBox
 {
-width: 374px;
+width: 454px;
+height: 30px;
+margin-bottom: 0px;
+}
+
+div#CreationBox
+{
+width: 294px;
 height: 30px;
 margin-bottom: 0px;
 }
