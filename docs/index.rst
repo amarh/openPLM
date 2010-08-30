@@ -6,6 +6,14 @@
 Welcome to openPLM's documentation!
 ===================================
 
+Tutorials
+----------
+
+.. toctree::
+    :maxdepth: 2
+    
+    tutorials
+
 How-to's
 ----------
 
