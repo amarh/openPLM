@@ -98,9 +98,10 @@ class UserController(object):
             # since x.verbose_name is a proxy methods, we need to get a real
             # unicode object (with capitalize)
             field = obj2._meta.get_field(attr).verbose_name.capitalize()
-            message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
-                    {"field" : field, "old" : old_value, "new" : value}
-            self.__histo += message + "\n"
+            if old_value != value:
+                message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
+                        {"field" : field, "old" : old_value, "new" : value}
+                self.__histo += message + "\n"
         else:
             super(UserController, self).__setattr__(attr, value)
 

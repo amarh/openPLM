@@ -1,4 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
 
@@ -14,7 +15,9 @@
                         </div>
                     </div>
                 </td>
-	            <td><input type="submit" value="DISCONNECT"></td>
+                {% if doc_cad_formset.forms %}
+                <td><input type="submit" value="DISCONNECT"></td>
+                {% endif %}
 	        </tr>
         </table>
         <table class="Content">
@@ -26,7 +29,7 @@
 			        <td class="Content">{{ form.delete }}</td>
 			            <td class="Content">{{ form.instance.document.type }}</td>
 			            <td class="Content">
-			                <a href="/object/{{ form.instance.document.type }}/{{ form.instance.document.reference }}/{{ form.instance.document.revision }}"/>
+                            <a href="{{ form.instance.document.plmobject_url }}"/>
 			                    {{ form.instance.document.reference }}
 		                    </a>
 	                    </td>

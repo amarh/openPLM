@@ -1,0 +1,154 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-08-30 15:07+0200\n"
+"PO-Revision-Date: 2010-08-27 09:41+0100\n"
+"Last-Translator: Pierre Cosquer <pcosquer@openplm.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plmapp/api.py:67
+msgid "Internal error"
+msgstr "Erreur interne"
+
+#: plmapp/models.py:109
+msgid "administrator"
+msgstr "administrateur"
+
+#: plmapp/models.py:111
+msgid "contributor"
+msgstr "contributeur"
+
+#: plmapp/models.py:113
+msgid "viewer"
+msgstr "lecteur"
+
+#: plmapp/models.py:296
+msgid "reference"
+msgstr "Référence"
+
+#: plmapp/models.py:297
+#, fuzzy
+msgid "type"
+msgstr "Type"
+
+#: plmapp/models.py:298
+msgid "revision"
+msgstr ""
+
+#: plmapp/models.py:301
+#, fuzzy
+msgid "name"
+msgstr "Nom"
+
+#: plmapp/models.py:302
+msgid "Name of the product"
+msgstr "Nom du produit"
+
+#: plmapp/models.py:304
+msgid "creator"
+msgstr ""
+
+#: plmapp/models.py:306
+msgid "owner"
+msgstr ""
+
+#: plmapp/models.py:308
+msgid "date of creation"
+msgstr "date de création"
+
+#: plmapp/models.py:310
+msgid "date of last modification"
+msgstr "date de la dernière modification"
+
+#: plmapp/models.py:313 plmapp/models.py:367
+msgid "lifecycle"
+msgstr ""
+
+#: plmapp/models.py:316
+msgid "state"
+msgstr ""
+
+#: plmapp/models.py:367
+msgid "attributes"
+msgstr "attributs"
+
+#: plmapp/models.py:368
+msgid "revisions"
+msgstr ""
+
+#: plmapp/models.py:368
+msgid "history"
+msgstr ""
+
+#: plmapp/models.py:369
+msgid "management"
+msgstr ""
+
+#: plmapp/models.py:424
+msgid "BOM-child"
+msgstr ""
+
+#: plmapp/models.py:424
+msgid "parents"
+msgstr ""
+
+#: plmapp/models.py:425
+msgid "doc-cad"
+msgstr ""
+
+#: plmapp/models.py:577
+msgid "parts"
+msgstr ""
+
+#: plmapp/models.py:577
+msgid "files"
+msgstr ""
+
+#: templates/404.html:22
+msgid "Error 404: page not found"
+msgstr ""
+
+#: templates/DisplayHomePage.htm:26
+msgid "Search for :"
+msgstr "Recherche pour:"
+
+#: templates/DisplayHomePage.htm:43
+msgid "Username"
+msgstr "Identifiant"
+
+#: templates/DisplayHomePage.htm:44
+msgid "First name"
+msgstr "Prénom"
+
+#: templates/DisplayHomePage.htm:45
+msgid "e-mail."
+msgstr "e-mail."
+
+#: templates/DisplayHomePage.htm:47
+msgid "Type"
+msgstr "Type"
+
+#: templates/DisplayHomePage.htm:48
+msgid "Reference"
+msgstr "Référence"
+
+#: templates/DisplayHomePage.htm:49
+msgid "Rev."
+msgstr "Rév."
+
+#: templates/DisplayHomePage.htm:50
+msgid "Name"
+msgstr "Nom"
+
+#: templates/DisplayObjectManagement.htm:25
+msgid "active,inactive"
+msgstr "actif,inactif"

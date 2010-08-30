@@ -2,7 +2,7 @@ import sys
 
 from django.conf import settings
 
-# add custom application urls
+# import custom application models
 for app in settings.INSTALLED_APPS:
     if app.startswith("openPLM"):
     	__import__("%s.models" % app, globals(), locals(), [], -1)
@@ -26,11 +26,12 @@ for app in settings.INSTALLED_APPS:
         except ImportError:
             pass
 
-object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\s\r\v\f]+'}
+object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
+    (r'^i18n/', include('django.conf.urls.i18n')),
 
     (r'^(?:accounts/)?$', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
@@ -53,8 +54,8 @@ urlpatterns += patterns('',
     (object_url + r'parts/add/$', add_rel_part),
     (object_url + r'files/$', display_files),
     (object_url + r'files/add/$', add_file),
-    (object_url + r'files/checkin/([^/]+)/$', checkin_file),
-    (object_url + r'files/checkout/([^/]+)/$', checkout_file),
+    (object_url + r'files/checkin/(?P<file_id_value>[^/]+)/$', checkin_file),
+    (object_url + r'files/checkout/(?P<docfile_id>[^/]+)/$', checkout_file),
     (object_url + r'modify/$', modify_object),
     (object_url + r'management/$', display_management),
     (object_url + r'management/add/$', add_management),

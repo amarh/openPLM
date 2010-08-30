@@ -1,4 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
@@ -40,7 +41,8 @@
 	<table class="Content">
 	{% for description,attribute in object_attributes %}
 		<tr class="Content">
-			<td class="Content">{{description}}</td><td class="Content">{{attribute}}</td>
+            <td class="Content">{{description}}</td>
+            <td class="Content">{{attribute|linebreaks}}</td>
 		</tr>
 	{% endfor %}
 	</table>
