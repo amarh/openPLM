@@ -140,14 +140,14 @@ class NavigationGraph(object):
         user_list = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
         for user_item in user_list:
             user = UserController(user_item.user, None) 
-            user_id = user_item.role + str(user_item.user.id)
+            user_id = str(user_item.role) + str(user_item.user.id)
             self.graph.add_edge(user_id, obj.id)
             self._set_node_attributes(user, user_id, user_item.role)
 
     def _create_object_edges(self, obj, role):
         part_doc_list = obj.plmobjectuserlink_user.filter(role__istartswith=role)
         for part_doc_item in part_doc_list:
-            part_doc_id = part_doc_item.role + str(part_doc_item.plmobject_id)
+            part_doc_id = str(part_doc_item.role) + str(part_doc_item.plmobject_id)
             self.graph.add_edge("User%d" % obj.id, part_doc_id)
             if hasattr(part_doc_item.plmobject, 'document'):
                 part_doc = DocumentController(part_doc_item.plmobject, None)
