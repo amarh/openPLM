@@ -59,6 +59,7 @@ Modules
     lifecycle
     mail
     models
+    navigate
     user_controller
     utils
     views
