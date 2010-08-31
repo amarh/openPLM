@@ -1,3 +1,8 @@
+"""
+This module provides :class:`NavigationGraph` which is used to generate
+the navigation's graph in :func:`~plmapp.views.navigate`.
+"""
+
 import os
 import warnings
 import cStringIO as StringIO
@@ -11,8 +16,25 @@ from openPLM.plmapp.user_controller import UserController
 basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
 
 class NavigationGraph(object):
+    """
+    This object can be used to generate a naviation's graph from an
+    object.
 
-    GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2', size='16.28, 8.88',
+    By default, the graph contains one node: the object given as argument.
+    You can change this behaviour with :meth`set_options`
+
+    Usage::
+
+        graph = NavigationGraph(a_part_controller)
+        graph.set_options({'child' : True, "parents" : True })
+        graph.create_edges()
+        map_str, picture_url = graph.render()
+
+    :param obj: root of the graph
+    :type obj: :class:`.PLMObjectController` or :class:`.UserController`
+    """
+
+    GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2',# size='16.28, 8.88',
                             center='true', ranksep='1.2', pad='0.1')
     NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='10',
                            style='filled', width='1.0', height='0.6')
@@ -38,47 +60,91 @@ class NavigationGraph(object):
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
     
     def set_options(self, options):
+        """
+        Sets which kind of edges should be inserted.
+
+        Options is a dictionary(*option_name* -> boolean)
+
+        If the root is a :class:`.PartController`, valid options are:
+
+            ========== ======================================================
+             Name       Description
+            ========== ======================================================
+             child      If True, adds recursively all children of the root
+             parents    If True, adds recursively all parents of the root
+             doc        If True, adds documents attached to the parts
+             cad        Not yet implemented
+             owner      If True, adds the owner of the root
+             signer     If True, adds the signers of the root
+             notified   If True, adds the notified of the root
+            ========== ======================================================
+
+        If the root is a :class:`.DocumentController`, valid options are:
+
+            ========== ======================================================
+             Name       Description
+            ========== ======================================================
+             parts      If True, adds parts attached to the root
+             owner      If True, adds the owner of the root
+             signer     If True, adds the signers of the root
+             notified   If True, adds the notified of the root
+            ========== ======================================================
+
+        If the root is a :class:`.UserController`, valid options are:
+
+            ========================== ======================================
+             Name                          Description
+            ========================== ======================================
+             owned                     If True, adds all plmobjects owned by
+                                       the root
+             to_sign                   If True, adds all plmobjects signed by
+                                       the root
+             request_notification_from If True, adds all plmobjects which
+                                       notifies the root
+            ========================== ======================================
+
+        """
         self.options.update(options)
         
-    def create_child_edges(self, obj, *args):
+    def _create_child_edges(self, obj, *args):
         for child_l in obj.get_children():
             child = PartController(child_l.link.child, None)
             self.graph.add_edge(obj.id, child.id)
-            self.set_node_attributes(child)
+            self._set_node_attributes(child)
             if self.options['doc']:
-               self.create_doc_edges(child)
-            self.create_child_edges(child)
+               self._create_doc_edges(child)
+            self._create_child_edges(child)
     
-    def create_parents_edges(self, obj, *args):
+    def _create_parents_edges(self, obj, *args):
         for parent_l in obj.get_parents():
             parent = PartController(parent_l.link.parent, None)
             self.graph.add_edge(parent.id, obj.id)
-            self.set_node_attributes(parent)
+            self._set_node_attributes(parent)
             if self.options['doc']:
-                self.create_doc_edges(parent)
-            self.create_parents_edges(parent)
+                self._create_doc_edges(parent)
+            self._create_parents_edges(parent)
    
-    def create_part_edges(self, obj, *args):
+    def _create_part_edges(self, obj, *args):
         for link in obj.get_attached_parts():
             part = PartController(link.part, None)
             self.graph.add_edge(obj.id, part.id)
-            self.set_node_attributes(part)
+            self._set_node_attributes(part)
     
-    def create_doc_edges(self, obj, *args):
+    def _create_doc_edges(self, obj, *args):
         for document_item in obj.get_attached_documents():
             document = DocumentController(document_item.document, None)
             self.graph.add_edge(obj.id, document.id)
-            self.set_node_attributes(document)
+            self._set_node_attributes(document)
 
-    def create_user_edges(self, obj, role):
+    def _create_user_edges(self, obj, role):
         user_list = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
         for user_item in user_list:
             user = UserController(user_item.user, None) 
             user_id = user_item.role + str(user_item.user.id)
             self.graph.add_edge(user_id, obj.id)
-            self.set_node_attributes(user, user_id, user_item.role)
+            self._set_node_attributes(user, user_id, user_item.role)
 
-    def create_object_edges(self, obj, role):
+    def _create_object_edges(self, obj, role):
         part_doc_list = obj.plmobjectuserlink_user.filter(role__istartswith=role)
         for part_doc_item in part_doc_list:
             part_doc_id = part_doc_item.role + str(part_doc_item.plmobject_id)
@@ -87,35 +153,38 @@ class NavigationGraph(object):
                 part_doc = DocumentController(part_doc_item.plmobject, None)
             else:
                 part_doc = PartController(part_doc_item.plmobject, None)
-            self.set_node_attributes(part_doc, part_doc_id)
+            self._set_node_attributes(part_doc, part_doc_id)
 
     def create_edges(self):
+        """
+        Builds the graph (adds all edges and nodes that respected the options)
+        """
         if isinstance(self.object, UserController):
             id_ = "User%d" % self.object.id
         else:
             id_ = self.object.id
         self.graph.add_node(id_)
         node = self.graph.get_node(id_)
-        self.set_node_attributes(self.object, id_)
+        self._set_node_attributes(self.object, id_)
         color = node.attr["color"]
         node.attr.update(color="#444444", fillcolor=color, shape="box", root="true")
-        functions_dic = {'child':(self.create_child_edges, None),
-                         'parents':(self.create_parents_edges, None),
-                         'doc':(self.create_doc_edges, None),
-                         'cad':(self.create_doc_edges, None),
-                         'owner':(self.create_user_edges, 'owner'),
-                         'signer':(self.create_user_edges, 'sign'),
-                         'notified':(self.create_user_edges, 'notified'),
-                         'part': (self.create_part_edges, None),
-                         'owned':(self.create_object_edges, 'owner'),
-                         'to_sign':(self.create_object_edges, 'sign'),
-                         'request_notification_from':(self.create_object_edges, 'notified'),}
+        functions_dic = {'child':(self._create_child_edges, None),
+                         'parents':(self._create_parents_edges, None),
+                         'doc':(self._create_doc_edges, None),
+                         'cad':(self._create_doc_edges, None),
+                         'owner':(self._create_user_edges, 'owner'),
+                         'signer':(self._create_user_edges, 'sign'),
+                         'notified':(self._create_user_edges, 'notified'),
+                         'part': (self._create_part_edges, None),
+                         'owned':(self._create_object_edges, 'owner'),
+                         'to_sign':(self._create_object_edges, 'sign'),
+                         'request_notification_from':(self._create_object_edges, 'notified'),}
         for field, value in self.options.items():
             if value: 
                 function, argument = functions_dic[field]
                 function(self.object, argument)
 
-    def set_node_attributes(self, obj, obj_id=None, extra_label=""):
+    def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
         node = self.graph.get_node(obj_id or obj.id)
         type_ = type(obj)
         if issubclass(type_, PartController):
@@ -133,6 +202,11 @@ class NavigationGraph(object):
         node.attr["label"] += "\\n" + extra_label.encode("utf-8")
        
     def render(self):
+        """
+        Renders an image of the graph
+
+        :returns: a tuple (image map data, url of the image)
+        """
         warnings.simplefilter('ignore', RuntimeWarning)
         picture_path = "media/navigate/" + str(self.object.id) + "-"
         for opt in self.options_list:
