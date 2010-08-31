@@ -34,11 +34,13 @@ class NavigationGraph(object):
     :type obj: :class:`.PLMObjectController` or :class:`.UserController`
     """
 
-    GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2',# size='16.28, 8.88',
-                            center='true', ranksep='1.2', pad='0.1')
+    GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2', mindist=".5", center='true',
+                            ranksep='1.2', pad='0.1', mode="ipsep",
+                            overlap="false", splines="false", sep="+.1,.1",
+                            nodesep=".2", outputorder="edgesfirst")
     NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='10',
                            style='filled', width='1.0', height='0.6')
-    EDGE_ATTRIBUTES = dict(color='#000000', len='1.5', arrowhead='normal')
+    EDGE_ATTRIBUTES = dict(color='#000000', minlen="1.5", len="1.5", arrowhead='normal')
     TYPE_TO_ATTRIBUTES = {UserController : dict(color='#94bd5e',
                             image=os.path.join(basedir, "user.png")),
                           PartController : dict(color='#99ccff',
@@ -140,7 +142,7 @@ class NavigationGraph(object):
         user_list = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
         for user_item in user_list:
             user = UserController(user_item.user, None) 
-            user_id = str(user_item.role) + str(user_item.user.id)
+            user_id = user_item.role + str(user_item.user.id)
             self.graph.add_edge(user_id, obj.id)
             self._set_node_attributes(user, user_id, user_item.role)
 
@@ -211,7 +213,7 @@ class NavigationGraph(object):
         picture_path = "media/navigate/" + str(self.object.id) + "-"
         for opt in self.options_list:
             picture_path += str(int(self.options[opt]))
-        self.graph.layout()
+        self.graph.layout(prog="neato")
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
         map_path= picture_path2 + ".map"
         picture_path += ".gif"
