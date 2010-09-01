@@ -920,11 +920,9 @@ def create_non_modifyable_attributes_list(current_obj, current_user, Classe=mode
     :return: list
     """
     non_modifyable_fields_list = Classe.excluded_creation_fields()
-    print "non_modifyable_fields_list : %s" % non_modifyable_fields_list
     non_modifyable_attributes_list=[]
     if current_obj=='create':
         for field in non_modifyable_fields_list:
-            print "field : %s" % field
             if field=='ctime' or field=='mtime':
                 non_modifyable_attributes_list.append(('datetime', field, datetime.datetime.now()))
             elif field=='owner' or field=='creator':
@@ -933,16 +931,13 @@ def create_non_modifyable_attributes_list(current_obj, current_user, Classe=mode
                 non_modifyable_attributes_list.append(('State', field, models.get_default_state()))
     else:
         for field in non_modifyable_fields_list:
-            print "field : %s" % field
             field_value = getattr(current_obj.object, field)
-            print "type : %s" % type(field_value)
             if type(field_value).__name__=='datetime':
                 non_modifyable_attributes_list.append(('datetime', field, field_value))
             elif type(field_value).__name__=='User':
                 non_modifyable_attributes_list.append(('User', field, field_value.username))
             elif type(field_value).__name__=='State':
                 non_modifyable_attributes_list.append(('State', field, field_value.name))
-    print "non_modifyable_attributes_list : %s" % non_modifyable_attributes_list
     return non_modifyable_attributes_list
 
 ##########################################################################################
