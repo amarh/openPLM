@@ -540,16 +540,16 @@ class LoginDialog(Dialog):
 class ConfigureDialog(Dialog):
 
     TITLE = "Conffigure"
-    HEIGHT = 105
+    HEIGHT = 70
 
     def run(self):
         smgr = self.ctx.ServiceManager
-        label = self.addWidget('url', 'FixedText', 5, 10, 60, 14,
+        label = self.addWidget('url', 'FixedText', 5, 10, 80, 14,
                                Label="OpenPLM server's location:")
         self.url_entry = self.addWidget('UrlEntry', 'Edit', 90, 10, 100, 14)
         self.url_entry.Text = PLUGIN.SERVER
 
-        button = self.addWidget('configure', 'Button', 55, 85, 50, 14,
+        button = self.addWidget('configure', 'Button', 85, 40, 50, 14,
                                 Label='Configure')
         self.container = smgr.createInstanceWithContext(
             'com.sun.star.awt.UnoControlDialog', self.ctx)
