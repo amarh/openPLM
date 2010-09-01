@@ -352,6 +352,7 @@ def get_creation_fields(request, typename):
         return {"result" : "error", "fields" : []}
     return {"fields" : get_fields_from_form(form)}
 
+@csrf_exempt
 @json_view
 def api_login(request):
     """
