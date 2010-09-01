@@ -6,6 +6,7 @@ from :class:`.PLMObjectController` are not defined.
 """
 
 from django.db.models.fields import FieldDoesNotExist
+from django.utils.translation import ugettext_lazy as _
 
 try:
     import openPLM.plmapp.models as models
@@ -58,9 +59,11 @@ class UserController(object):
         try:
             item = unicode(self.object._meta.get_field(attr_name).verbose_name)
         except FieldDoesNotExist:
-            names = {"mtime" : "date of last modification",
-                     "ctime" : "date of creation",
-                     "rank" : "role in PLM"}
+            names = {"mtime" : _("date of last modification"),
+                     "ctime" : _("date of creation"),
+                     "rank" : _("role in PLM"),
+                     "creator" : _("creator"),
+                     "owner" : _("owner")}
             item = names.get(attr_name, attr_name)
         return item
 

@@ -5,9 +5,9 @@
 
 {% block content %}
 	<form method="post" action="." >
-	    Display : 
+	    {% trans "Display :" %}
 	    {{filter_object_form}}
-        <input type="submit" value="FILTER">
+        <input type="submit" value={% trans "FILTER" %}>
     </form>
     <br />
     <div id="Navigate">

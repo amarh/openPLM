@@ -6,7 +6,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
 	<link rel="stylesheet" type="text/css" href="/media/openplm.css" />
-	<title>openPLM LOGIN PAGE</title>
+	<title>{% trans "openPLM LOGIN PAGE" %}</title>
 	<meta name="Author" content="philippe.joulaud" />
 	<meta name="Classification" content="" />
 	<meta name="Description" content="" />
@@ -18,20 +18,20 @@
 	<div id="HomePage" >
 		<br />
 		<div id="LoginBox">
-		    <h1>OpenPLM connexion :</h1>
+		    <h1>{% trans "OpenPLM connexion :" %}</h1>
 		    <form action="{% url django.contrib.auth.views.login %}" method="post">
 		        <table>
 		            <tr>
-		                <td>Login : </td>
+		                <td>{% trans "Login :" %}</td>
 		                <td><input type="text" name="username" value=""/></td>
 		            </tr>
 		            <tr>
-		                <td>Password : </td>
+		                <td>{% trans "Password :" %} </td>
 		                <td><input type="password" name="password" value=""/></td>
 		            </tr>
 		            <tr>
 		                <td></td>
-		                <td><input type="submit" value="LOGIN"/></td>
+		                <td><input type="submit" value={% trans "LOGIN" %} /></td>
 		            </tr>
 		        </table>
 		        <input type="hidden" name="next" value="/home/">

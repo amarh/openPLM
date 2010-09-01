@@ -11,7 +11,7 @@
 	            <td class="Content">
                     <div class="ButtonLeft">
                         <div class="Button">
-                            <a class="Button" href="./add/">ADD</a>
+                            <a class="Button" href="./add/">{% trans "ADD" %}</a>
                         </div>
                     </div>
                 </td>
@@ -30,7 +30,7 @@
                             <td class="Content">
                                 <div class="ButtonLeft">
                                     <div class="Button">
-                                        <a class="Button" href="./replace/{{link.id}}/">REPLACE</a>
+                                        <a class="Button" href="./replace/{{link.id}}/">{% trans "REPLACE" %}</a>
                                     </div>
                                 </div>
                             </td>
@@ -40,7 +40,7 @@
                     <td class="Content">
                         <form action="./delete/" method="POST">
                             <input name="link_id" type="hidden" value="{{link.id}}"/>
-                            <input name="action" type="submit" value="Delete"/>
+                            <input name="action" type="submit" value={% trans "Delete" %}/>
                         </form>
                         </td>
                         {% endifequal %}

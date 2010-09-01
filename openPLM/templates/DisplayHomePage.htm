@@ -13,7 +13,7 @@
     </a>
     </td>
     <td>
-    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j F Y, G:i"}}
+    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j N Y, G:i"}}
     </td>
     <td>
     <form action="/i18n/setlang/" method="post">
@@ -23,7 +23,7 @@
             <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >{{ lang.1 }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="Go" />
+        <input type="submit" value={% trans "Go" %} />
     </form>
     </td>
     </tr>
@@ -37,7 +37,7 @@
 			{{type_form.as_table}}
 			{{attributes_form.as_table}}
 		</table>
-		<input type="submit" value="SEARCH !">
+		<input type="submit" value={% trans "SEARCH !" %}>
 	</form>
 {% endblock %}
 
@@ -103,7 +103,7 @@
 					<th>{{attribute.label_tag}}</th>
 					<td>{{attribute}}</td>
 				{% endfor %}
-				<td><input type="submit" value="CREATE !"></td>
+				<td><input type="submit" value={% trans "CREATE !" %}></td>
 			</tr>
 		</table>
 	</form>

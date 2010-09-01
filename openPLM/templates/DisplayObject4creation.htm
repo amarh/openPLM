@@ -4,19 +4,18 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	<h3>OBJECT CREATION:</h3>
+	<h3>{% trans "OBJECT CREATION:" %}</h3>
 		<table class="Content">
 			<tr class="Content">
-				<th>Type</th><td>{{ object_type }}</td>
+				<th>{% trans "Type" %}</th><td>{{ object_type }}</td>
 			</tr>
-			{% for field, type_of_attribute in non_modifyable_attributes %}
+			{% for type, field, value in non_modifyable_attributes %}
 				<tr class="Content">
-					<th>{{field}}</th>
-					{% ifequal type_of_attribute 'Person' %}
-					<td>{{log_in_person}}</td>
-					{% endifequal %}
-					{% ifequal type_of_attribute 'Date' %}
-					<td>{{ current_date|date:"l j F Y, G:i" }}</td>
+					<th>{% trans field %}</th>
+					{% ifequal type 'datetime' %}
+					    <td>{{ value|date:"l j F Y, G:i" }}</td>
+					{% else %}
+					    <td>{{value}}</td>
 					{% endifequal %}
 				</tr>
 			{% endfor%}
@@ -41,7 +40,7 @@
                 {% for error in creation_form.non_field_errors %}
                 <tr> {{ error }} </tr>
                 {% endfor %}
-				<td>&nbsp;</td><td><input type="submit" value="CREATE" /></td>
+				<td>&nbsp;</td><td><input type="submit" value={% trans "CREATE" %} /></td>
 			</tr>
 			</form>
 		</table>

@@ -12,12 +12,12 @@
 	            <td>
                     <div class="ButtonLeft">
                         <div class="Button">
-                            <a class="Button" href="./add/">ADD</a>
+                            <a class="Button" href="./add/">{% trans "ADD" %}</a>
                         </div>
                     </div>
                 </td>
                 {% if doc_cad_formset.forms %}
-                <td><input type="submit" value="DISCONNECT"></td>
+                <td><input type="submit" value={% trans "DISCONNECT" %}></td>
                 {% endif %}
 	        </tr>
         </table>

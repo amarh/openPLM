@@ -6,13 +6,15 @@
 {% block content %}
 
 <br/>
-{{action_message}}
+{% trans "Select a user for your delegation as : " %}{{role}}
+<br/>
+<br/>
 <form method="POST" action="">
     <table class="Content">
         {{replace_management_form}}
     </table>
-    <input type="submit" value="Validate" name="action"/>
-    <input type="submit" value="Undo" name="action"/>
+    <input type="submit" value={% trans "Validate" %} name="action"/>
+    <input type="submit" value={% trans "Undo" %} name="action"/>
 </form>
 {% endblock %}
 

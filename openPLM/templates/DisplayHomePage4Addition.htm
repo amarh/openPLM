@@ -4,10 +4,30 @@
 <!-- Manage html display of the home page when we want to add/replace a link -->
 
 {% block LoggedPersonBlock %}
-    <p><a href="/logout/">
+    {% get_current_language as LANGUAGE_CODE %}
+    <table>
+    <tr>
+    <td>
+    <a href="/logout/">
         <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
     </a>
-    {{user}} | {{current_date|date:"l j F Y, G:i"}}</p>
+    </td>
+    <td>
+    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j N Y, G:i"}}
+    </td>
+    <td>
+    <form action="/i18n/setlang/" method="post">
+        <select name="language">
+
+            {% for lang in LANGUAGES %}
+            <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >{{ lang.1 }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value={% trans "Go" %} />
+    </form>
+    </td>
+    </tr>
+    </table>
 {% endblock %}
 
 {% block SearchBlock %}
@@ -17,7 +37,7 @@
 			{{type_form.as_table}}
 			{{attributes_form.as_table}}
 		</table>
-		<input type="submit" value="SEARCH !">
+		<input type="submit" value={% trans "SEARCH !" %}>
 	</form>
 {% endblock %}
 
@@ -30,16 +50,16 @@
 				{% if forloop.first %}
 				    <tr class="Content">
 				    {% if object.username %}
-		                <th class="Content">Username</th>
-			            <th class="Content">First name</th>
-			            <th class="Content">e-mail.</th>
-			            <th>Add</th>
+		                <th class="Content">{% trans "Username" %}</th>
+			            <th class="Content">{% trans "First name" %}</th>
+			            <th class="Content">{% trans "e-mail" %}</th>
+			            <th>{% trans "ADD" %}</th>
 		            {% else %}
-			            <th class="Content">Type</th>
-			            <th class="Content">Reference</th>
-			            <th class="Content">Rev.</th>
-                        <th class="Content">Name</th>
-                        <th>Add</th>
+			            <th class="Content">{% trans "Type" %}</th>
+			            <th class="Content">{% trans "Reference" %}</th>
+			            <th class="Content">{% trans "Rev." %}</th>
+                        <th class="Content">{% trans "Name" %}</th>
+                        <th>{% trans "ADD" %}</th>
                     {% endif %}
             		</tr>
 		        {% endif %}
@@ -63,7 +83,7 @@
 		                    {{object.email|escape}}...
 		            </td>
 		            <td class="Content">
-			            <input type="submit" value="ADD">
+			            <input type="submit" value={% trans "ADD" %}>
 		            </td>
 		        {% else %}
 		            <td class="Content">
@@ -87,7 +107,7 @@
 	                    </a>
 		            </td>
 		            <td class="Content">
-			            <input type="submit" value="ADD">
+			            <input type="submit" value={% trans "ADD" %}>
 		            </td>
 		        {% endif %}
 			    </tr>
@@ -105,7 +125,7 @@
 					<th>{{attribute.label_tag}}</th>
 					<td>{{attribute}}</td>
 				{% endfor %}
-				<td><input type="submit" value="CREATE !"></td>
+				<td><input type="submit" value={% trans "CREATE !" %}></td>
 			</tr>
 		</table>
 	</form>

@@ -10,14 +10,14 @@
     {{ children_formset.management_form }}
     <table class="Content">
         <tr>
-            <th class="Content"> Order </th>
-            <th class="Content"> Quantity </th>
+            <th class="Content">{% trans "Order" %}</th>
+            <th class="Content">{% trans "Quantity" %} </th>
             <th class="Content"> {{ obj.reference }} </th>
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
             <th class="Content"> {{ obj.name }} </th>
             <th class="Content"> {{ obj.state.name }} </th>
-            <th class="Content"> Delete ? </th>
+            <th class="Content"> {% trans "Delete ?" %} </th>
         </tr>
         {% for form in children_formset.forms %}
         {{ form.id }}
@@ -41,8 +41,8 @@
         {% endfor %}
 
     </table>
-    <input type="submit" value="Validate" name="action"/>
-    <input type="submit" value="Undo" name="action"/>
+    <input type="submit" value={% trans "Validate" %} name="action"/>
+    <input type="submit" value={% trans "Undo" %} name="action"/>
 </form>
 {% endblock %}
 
