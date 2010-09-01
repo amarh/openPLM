@@ -418,7 +418,7 @@ class PLMObject(models.Model):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_modification_fields`
         """
-        return ["creator", "owner", "ctime", "mtime"]
+        return [ugettext_noop("creator"), ugettext_noop("owner"), ugettext_noop("ctime"), ugettext_noop("mtime")]
 
     @classmethod
     def get_modification_fields(cls):

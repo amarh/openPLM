@@ -40,6 +40,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
+from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
@@ -902,7 +903,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 ##########################################################################################
 ###             Manage html pages for part / document creation and modification                     ###
 ##########################################################################################
-def create_non_modifyable_attributes_list(Classe=models.PLMObject):
+def create_non_modifyable_attributes_list(current_obj, current_user, Classe=models.PLMObject):
     """
     Create a list of object's attributes we can't modify' and set them a value
     
@@ -919,11 +920,29 @@ def create_non_modifyable_attributes_list(Classe=models.PLMObject):
     :return: list
     """
     non_modifyable_fields_list = Classe.excluded_creation_fields()
+    print "non_modifyable_fields_list : %s" % non_modifyable_fields_list
     non_modifyable_attributes_list=[]
-    non_modifyable_attributes_list.append((non_modifyable_fields_list[0], 'Person'))
-    non_modifyable_attributes_list.append((non_modifyable_fields_list[1], 'Person'))
-    non_modifyable_attributes_list.append((non_modifyable_fields_list[2], 'Date'))
-    non_modifyable_attributes_list.append((non_modifyable_fields_list[3], 'Date'))
+    if current_obj=='create':
+        for field in non_modifyable_fields_list:
+            print "field : %s" % field
+            if field=='ctime' or field=='mtime':
+                non_modifyable_attributes_list.append(('datetime', field, datetime.datetime.now()))
+            elif field=='owner' or field=='creator':
+                non_modifyable_attributes_list.append(('User', field, current_user.username))
+            elif field=='state':
+                non_modifyable_attributes_list.append(('State', field, models.get_default_state()))
+    else:
+        for field in non_modifyable_fields_list:
+            print "field : %s" % field
+            field_value = getattr(current_obj.object, field)
+            print "type : %s" % type(field_value)
+            if type(field_value).__name__=='datetime':
+                non_modifyable_attributes_list.append(('datetime', field, field_value))
+            elif type(field_value).__name__=='User':
+                non_modifyable_attributes_list.append(('User', field, field_value.username))
+            elif type(field_value).__name__=='State':
+                non_modifyable_attributes_list.append(('State', field, field_value.name))
+    print "non_modifyable_attributes_list : %s" % non_modifyable_attributes_list
     return non_modifyable_attributes_list
 
 ##########################################################################################
@@ -949,7 +968,7 @@ def create_object(request):
                 else:
                     class_for_div="NavigateBox4Part"
                 creation_form_instance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
-                non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
+                non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
     elif request.method == 'POST':
         if request.POST:
             type_form_instance = type_form(request.POST)
@@ -960,7 +979,7 @@ def create_object(request):
                     class_for_div="NavigateBox4Doc"
                 else:
                     class_for_div="NavigateBox4Part"
-                non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
+                non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
                 creation_form_instance = get_creation_form(cls, request.POST)
                 if creation_form_instance.is_valid():
                     user = request.user
@@ -991,7 +1010,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
         cls = models.get_all_plmobjects()['UserProfile']
     else:
         cls = models.get_all_plmobjects()[obj_type]
-    non_modifyable_attributes_list = create_non_modifyable_attributes_list(cls)
+    non_modifyable_attributes_list = create_non_modifyable_attributes_list(current_object, request.user, cls)
     if not current_object.is_editable:
         raise ControllerError("object is not editable")
     if request.method == 'POST':
@@ -1188,13 +1207,19 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
             delegation_form_instance = replace_management_form(request.POST)
     else:
         delegation_form_instance = replace_management_form()
-    action_message_string="Select a user for your \"%s\" role delegation :" % role
+    if role=='sign':
+        if sign_level.isdigit():
+            role=_("signer level")+" "+str(sign_level)
+        else:
+            role=_("signer all levels")
+    elif role=="notified":
+        role=_("notified")
     request.session.update(request_dict)
     context_dict.update({'current_page':'delegation',
                                  'object_menu': menu_list, 'obj' : obj,
                                  'replace_management_form': delegation_form_instance,
                                  'class4search_div': 'DisplayHomePage4Addition.htm',
-                                 'action_message': action_message_string})
+                                 'role': role})
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################    

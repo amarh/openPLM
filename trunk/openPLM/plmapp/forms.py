@@ -4,6 +4,7 @@ from django import forms
 from django.forms.models import modelform_factory, modelformset_factory
 from django.contrib.auth.models import User
 from django.forms import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref
@@ -294,26 +295,26 @@ def get_doc_cad_formset(controller, data=None):
     return formset
 
 class FilterObjectForm4Part(forms.Form):
-    child = forms.BooleanField(initial=True, required=False)
-    parents = forms.BooleanField(required=False)
-    doc = forms.BooleanField(required=False)
-    cad = forms.BooleanField(required=False)
-    owner = forms.BooleanField(required=False)
-    signer = forms.BooleanField(required=False)
-    notified = forms.BooleanField(required=False)
+    child = forms.BooleanField(initial=True, required=False, label=_("child"))
+    parents = forms.BooleanField(required=False, label=_("parents"))
+    doc = forms.BooleanField(required=False, label=_("doc"))
+    cad = forms.BooleanField(required=False, label=_("cad"))
+    owner = forms.BooleanField(required=False, label=_("owner"))
+    signer = forms.BooleanField(required=False, label=_("signer"))
+    notified = forms.BooleanField(required=False, label=_("notified"))
     data={'Child': True, 'Parents': False, 'Doc': True, 'Cad': False, 'User': False}
 
 class FilterObjectForm4Doc(forms.Form):
-    part = forms.BooleanField(initial=True, required=False)
-    owner = forms.BooleanField(required=False)
-    signer = forms.BooleanField(required=False)
-    notified = forms.BooleanField(required=False)
+    part = forms.BooleanField(initial=True, required=False, label=_("part"))
+    owner = forms.BooleanField(required=False, label=_("owner"))
+    signer = forms.BooleanField(required=False, label=_("signer"))
+    notified = forms.BooleanField(required=False, label=_("notified"))
     data={'Part': True, 'Owner': True, 'Signer': False, 'Notified': False}
 
 class FilterObjectForm4User(forms.Form):
-    owned = forms.BooleanField(required=False)
-    to_sign = forms.BooleanField(required=False)
-    request_notification_from = forms.BooleanField(required=False)
+    owned = forms.BooleanField(required=False, label=_("owned"))
+    to_sign = forms.BooleanField(required=False, label=_("to sign"))
+    request_notification_from = forms.BooleanField(required=False, label=_("request notification from"))
     data={'owned': True, 'to_sign': False, 'request_notification_from': False}
 
 class OpenPLMUserChangeForm(forms.ModelForm):
@@ -323,7 +324,7 @@ class OpenPLMUserChangeForm(forms.ModelForm):
         exclude = ('username','is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'password')
 
 class replace_management_form(forms.Form):
-    type = forms.CharField()
-    username = forms.CharField()
+    type = forms.CharField(label=_("Type"))
+    username = forms.CharField(label=_("Username"))
     
 

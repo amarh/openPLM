@@ -14,11 +14,11 @@
 		        <td>
                         <div class="ButtonLeft">
                             <div class="Button">
-                                <a class="Button" href="./add/">ADD</a>
+                                <a class="Button" href="./add/">{% trans "ADD" %}</a>
                             </div>
                         </div>
                 </td>
-	    	    <td><input type="submit" value="DELETE"></td>
+	    	    <td><input type="submit" value={% trans "DELETE" %}></td>
     	    </tr>
 	    </table>
         {% endif %}
@@ -40,7 +40,7 @@
 			    <td class="Content">
 			        <div class="ButtonLeft">
                         <div class="Button">
-                            <a class="Button" href="/file/{{form.instance.id}}/">DOWNLOAD</a>
+                            <a class="Button" href="/file/{{form.instance.id}}/">{% trans "DOWNLOAD" %}</a>
                         </div>
                     </div>
                 </td>
@@ -49,9 +49,9 @@
 			            <div class="ButtonLeft">
                             <div class="Button">
                                 {% if form.instance.locked %}
-			                    <a class="Button" href="./checkin/{{form.instance.id}}/">CHECK-IN</a>
+			                    <a class="Button" href="./checkin/{{form.instance.id}}/">{% trans "CHECK-IN" %}</a>
                                 {% else %}
-			                    <a class="Button" href="./checkout/{{form.instance.id}}/">CHECK-OUT</a>
+			                    <a class="Button" href="./checkout/{{form.instance.id}}/">{% trans "CHECK-OUT" %}</a>
                                 {% endif %}
 		                    </div>
 	                    </div>

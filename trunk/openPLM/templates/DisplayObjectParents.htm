@@ -6,9 +6,9 @@
 {% block content %}
 
     <form method="GET" action="">
-        Display :
+        {% trans "Display :" %}
         {{ display_form.as_p }}
-        <input type="submit" value="GO !"><br/>
+        <input type="submit" value={% trans "GO !" %}><br/>
     </form>
 	<br/>
 	<table class="Content">

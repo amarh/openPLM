@@ -5,7 +5,7 @@
 
 {% block content %}
     <br />
-	START DELEGATE : 
+	{% trans "START DELEGATE :" %}
 	<table>
 	    <tr>
 	        <td>
@@ -13,7 +13,7 @@
                     <div class="Button">
                         <a class="Button" 
                             href="./delegate/owner/">
-                            OWNERSHIP
+                            {% trans "OWNERSHIP" %}
                         </a>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                     <div class="Button">
                         <a class="Button" 
                             href="./delegate/sign/1/">
-                            SIGNATURE 1st LEVEL
+                            {% trans "SIGNATURE 1st LEVEL" %}
                         </a>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                     <div class="Button">
                         <a class="Button" 
                             href="./delegate/sign/2/">
-                            SIGNATURE 2nd LEVEL
+                            {% trans "SIGNATURE 2nd LEVEL" %}
                         </a>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                     <div class="Button">
                         <a class="Button" 
                             href="./delegate/sign/all">
-                            ALL SIGNATURES
+                            {% trans "ALL SIGNATURES" %}
                         </a>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     <div class="Button">
                         <a class="Button" 
                             href="./delegate/notified/">
-                            NOTIFICATIONS
+                            {% trans "NOTIFICATIONS" %}
                         </a>
                     </div>
                 </div>
@@ -64,10 +64,10 @@
 	</table>
 	    <table class="Content">
 	        <tr class="Content">
-                <th class="Content"> USERNAME </th>
-                <th class="Content"> FIRST NAME </th>
-                <th class="Content"> LAST NAME </th>
-                <th class="Content"> ROLE </th>
+                <th class="Content"> {% trans "Username" %} </th>
+                <th class="Content"> {% trans "First Name" %} </th>
+                <th class="Content"> {% trans "Last Name" %} </th>
+                <th class="Content"> {% trans "Role" %} </th>
 	        </tr>
 	        {% for link in user_delegation_link %}
 	        	<form method="post" action="">
@@ -78,7 +78,7 @@
 			            <td class="Content">{{link.role}}</td>
 			            <td class="Content">
 			                    <input type="hidden" name="link_id" value="{{link.id}}" />
-			                    <input type="submit" value="STOP DELEGATION">
+			                    <input type="submit" value={% trans "STOP DELEGATION" %}>
 		                </td>
 		            </tr>
             	</form>

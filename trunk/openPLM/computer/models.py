@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 
 from openPLM.plmapp.models import Part
 from openPLM.plmapp.controllers import PartController
@@ -19,7 +21,7 @@ class SinglePart(Part):
     @property
     def attributes(self):
         attrs = list(super(SinglePart, self).attributes)
-        attrs.extend(["supplier", "tech_details"])
+        attrs.extend([ugettext_noop("supplier"), ugettext_noop("tech_details")])
         return attrs
 
 class SinglePartController(PartController):

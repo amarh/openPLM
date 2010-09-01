@@ -8,10 +8,10 @@
 {% if add_revision_form and is_owner %}
     <form method="POST" action="">
         {{add_revision_form}}
-        <input type="submit" value="NEW">
+        <input type="submit" value={% trans "NEW" %}>
     </form>
 {% else %}
-You can not revise this object since a revision already exist.
+{% trans "You can not revise this object since a revision already exist." %}
 {% endif %}
 <br/>
 <br/>
