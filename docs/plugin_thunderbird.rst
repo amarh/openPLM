@@ -1,5 +1,5 @@
 ============================
-Plugin for Thunderbid
+Plugin for Thunderbird
 ============================
 
 
@@ -24,7 +24,7 @@ Build
     You can skip this step, download this :download:`file <download/openplm.xpi>`.
     Note that this file may not be up to date.
 
-Just go in the :file:`plugins/thunderbird` directory and run the command :command:`./install.sh`.
+Just go in the :file:`plugins/thunderbird` directory and run the command :command:`./build.sh`.
 This shoul create a file named :file:`openplm.xpi`. 
 
 
