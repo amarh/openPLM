@@ -15,11 +15,15 @@ Dependances
 -------------
 
 Of course, you need OpenOffice, this plugin has been test with the version 3.2.
-You also need to have a valid Python environment (version 2.6) with the libraty
+You also need to have a valid Python environment (version 2.6) with the library
 Poster (available `here <http://atlee.ca/software/poster/#download>`_).
 
 Build
 -------------
+
+.. note::
+    You can skip this step, download this :download:`file <download/openplm.oxt>`.
+    Note that this file may not be up to date.
 
 You just have to made an archive (a zip file) of 3 files, the archive must have
 the extension ``.oxt``:
