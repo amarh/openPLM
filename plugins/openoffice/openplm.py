@@ -573,6 +573,7 @@ class SearchDialog(Dialog, XItemListener,
                    XTreeExpansionListener, XSelectionChangeListener):
 
     TITLE = "Search"
+    SEARCH_SUFFIX = ""
     ACTION_NAME = "..."
     TYPE = "Document"
     TYPES_URL = "api/docs/"
@@ -744,7 +745,7 @@ class SearchDialog(Dialog, XItemListener,
             if value:
                 data[field["name"]] = value
         get = urllib.urlencode(data)
-        self.display_results(PLUGIN.get_data("api/search/?%s" % get)["objects"])
+        self.display_results(PLUGIN.get_data("api/search/%s?%s" % (self.SEARCH_SUFFIX, get))["objects"])
 
     def do_action(self, doc, doc_file):
         print doc, doc_file
@@ -869,6 +870,7 @@ class ReviseDialog(Dialog):
 class AttachToPartDialog(SearchDialog):
     TITLE = "Attach to part"
     ACTION_NAME = "Attach"
+    SEARCH_SUFFIX = "false/"
     TYPE = "Part"
     TYPES_URL = "api/parts/"
     EXPAND_FILES = False

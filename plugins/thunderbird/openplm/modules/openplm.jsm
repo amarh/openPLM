@@ -75,7 +75,7 @@ function send_get(url, data) {
 }
 
 function search(query){
-    var url = this.SERVER + "api/search/";
+    var url = this.SERVER + "api/search/true/false/";
     return this.send_get(url, query)["objects"];
 }
 

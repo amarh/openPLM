@@ -601,6 +601,7 @@ class ReviseDialog(gtk.Dialog):
 class SearchDialog(gtk.Dialog):
     TITLE = _("Search")
     ACTION_NAME = _("...")
+    SEARCH_SUFFIX = ""
     TYPE = "Document"
     TYPES_URL = "api/docs/"
     ALL_FILES = False
@@ -715,7 +716,7 @@ class SearchDialog(gtk.Dialog):
             if value:
                 data[field["name"]] = value
         get = urllib.urlencode(data)
-        self.display_results(self.instance.get_data("api/search/?%s" % get)["objects"])
+        self.display_results(self.instance.get_data("api/search/%s?%s" % (self.SEARCH_SUFFIX, get))["objects"])
 
     def do_action(self, button, doc, doc_file):
         pass
@@ -743,6 +744,7 @@ class AttachToPartDialog(SearchDialog):
     TITLE = _("Attach to part")
     ACTION_NAME = _("Attach")
     TYPE = "Part"
+    SEARCH_SUFFIX = "false/"
     TYPES_URL = "api/parts/"
 
     def do_action(self, button, part):

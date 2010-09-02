@@ -250,10 +250,22 @@ General queries
     
     Query used to perform a search on the objects stored on the server
     
-    :url: :samp:`{server}/api/search/`
+    Possible values for *editable_only* are:
+
+        * *true* (the default) to return only editable objects
+        * *false* to return all objects
+
+    Possible values for *with_file_only* are:
+
+        * *true* (the default) to return only documents with at least one file
+        * *false* to return all documents
+
+    :url: :samp:`{server}/api/search/[{editable_only}/[{with_file_only}/]]`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.search`
+    
+
     :get params:
         type
             (required) a valid type (see :func:`types` to get a list of types)

@@ -147,9 +147,13 @@ def get_all_parts(request):
     return {"types" : sorted(models.get_all_parts().keys())}
 
 @login_json
-def search(request):
+def search(request, editable_only="true", with_file_only="true"):
     """
     Returns all objects matching a query.
+
+    :param editable_only: if ``"true"`` (the default), returns only editable objects
+    :param with_file_only: if ``"true"`` (the default), returns only documents with 
+                           at least one file
 
     :implements: :func:`http_api.search`
     """
@@ -164,7 +168,11 @@ def search(request):
                 results = extra_attributes_form.search(results)
                 objects = []
                 for res in results:
-                    objects.append(object_to_dict(res))
+                    if editable_only == "false" or res.is_editable:
+                        if with_file_only == "true" and hasattr(res, "files") \
+                           and not bool(res.files):
+                            continue
+                        objects.append(object_to_dict(res))
                 return {"objects" : objects} 
     return {"result": "error"}
 
