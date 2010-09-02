@@ -43,7 +43,7 @@ There are two ways to install this plugin:
 With the command line
 ~~~~~~~~~~~~~~~~~~~~~
 
-You just have to install the plugin with the following:
+You just have to install the plugin with the following command:
 
 ``unopkg add -f -v openplm.oxt``
 
