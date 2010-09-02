@@ -1075,6 +1075,8 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
+    if request.user.username=='test':
+        return HttpResponseRedirect("/user/%s/attributes/" % request.user)
     current_object, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     class_for_div="NavigateBox4User"
     if request.method == 'POST':
