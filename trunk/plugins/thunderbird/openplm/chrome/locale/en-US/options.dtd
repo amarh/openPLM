@@ -1,4 +1,4 @@
 <!ENTITY prefwindow.title "OpenPLM preferences">
 <!ENTITY pane1.title "OpenPLM preferences">
-<!ENTITY server.label "A String Preference">
+<!ENTITY server.label "OpenPLM server's location">
 <!ENTITY server.accesskey "S">

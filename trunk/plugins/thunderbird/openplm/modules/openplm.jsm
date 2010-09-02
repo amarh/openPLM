@@ -162,6 +162,7 @@ function upload(url, filename) {
     // Send
     this.xrequest.open('POST', url, false); /* synchronous! */
     this.xrequest.setRequestHeader("Content-Length", mis.available());
+    this.xrequest.setRequestHeader('User-Agent', 'openplm');
     this.xrequest.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
 
     this.xrequest.send(mis);
