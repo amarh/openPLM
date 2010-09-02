@@ -1003,9 +1003,13 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
+        :raises: :exc:`ValueError` if the file size is superior to
+                 :attr:`settings.MAX_FILE_SIZE`
         """
         self.check_permission("owner")
         self.check_editable()
+        if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
+            raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         f.name = f.name.encode("utf-8")
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
                         file=models.docfs.save(f.name, f), document=self.object)
@@ -1019,12 +1023,14 @@ class DocumentController(PLMObjectController):
 
     def add_thumbnail(self, doc_file, thumbnail_file):
         """
-        Sets *thumnail_file* as the thumbnail of *doc_file*. *thumbnail_filef*
+        Sets *thumnail_file* as the thumbnail of *doc_file*. *thumbnail_file*
         should be a :class:`~django.core.files.File` with an attribute *name*
         (like an :class:`UploadedFile`).
         
         :exceptions raised:
-            * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`ValueError` if *doc_file*.document is not self.objec
+            * :exc:`ValueError` if the file size is superior to
+              :attr:`settings.MAX_FILE_SIZE`
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
             * :exc:`.PermissionError` if :attr:`object` is not editable.
@@ -1033,6 +1039,8 @@ class DocumentController(PLMObjectController):
         self.check_editable()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
+        if settings.MAX_FILE_SIZE != -1 and thumbnail_file.size > settings.MAX_FILE_SIZE:
+            raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         basename = os.path.basename(thumbnail_file.name)
         name = "%d%s" % (doc_file.id, os.path.splitext(basename)[1])
         if doc_file.thumbnail:
@@ -1150,6 +1158,8 @@ class DocumentController(PLMObjectController):
         
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
+            * :exc:`ValueError` if the file size is superior to
+              :attr:`settings.MAX_FILE_SIZE`
             * :exc:`plmapp.exceptions.UnlockError` if *doc_file* is locked
               but *doc_file.locker* is not the current user
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
@@ -1169,6 +1179,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("Bad file's document")
         if doc_file.filename != new_file.name:
             raise ValueError("Checkin document and document already in plm have different names")
+        if settings.MAX_FILE_SIZE != -1 and new_file.size > settings.MAX_FILE_SIZE:
+            raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         if doc_file.locked:
             self.unlock(doc_file)   
         os.chmod(doc_file.file.path, 0700)
