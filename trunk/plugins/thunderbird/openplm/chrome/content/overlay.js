@@ -28,18 +28,19 @@ onOpenPLMLogin: function(e) {
                         if (result == false){
                             return;
                         }
-                        var res = OPENPLM.login(username.value, password.value);
-                        if (res["result"] != "ok"){
+                        try{
+                            var res = OPENPLM.login(username.value, password.value);
+                            document.getElementById("openplm-checkin-menu-item").disabled = false;  
+                            document.getElementById("openplm-create-menu-item").disabled = false;  
+                            return;
+                        }catch (er){
                             user = username.value;
                             pw = password.value;
                             document.getElementById("openplm-checkin-menu-item").disabled = true;  
                             document.getElementById("openplm-create-menu-item").disabled = true;  
-                            alert(res["error"]);
-                        }else{
-                            document.getElementById("openplm-checkin-menu-item").disabled = false;  
-                            document.getElementById("openplm-create-menu-item").disabled = false;  
-                            return;
+                            alert(er);
                         }
+
                     }
                 },
 
@@ -57,28 +58,31 @@ search: function(e){
             var ref = document.getElementById("openplm-reference").value;
             var rev = document.getElementById("openplm-revision").value;
             var type = document.getElementById("document-list").value;
+            try {
+                var docs = OPENPLM.search({"reference" : ref, "revision": rev, "type" : type});
+                var theList = document.getElementById('result-list');
+                while (theList.getRowCount() > 0){
+                    theList.removeItemAt(0);
+                }
+                for (var i = 0; i < docs.length; i++)
+                {
+                    var columns = ["type", "reference", "revision", "name",  "id"];
+                    var row = document.createElement('listitem');
+                    columns.forEach(
+                            function(col){
+                            var cell = document.createElement('listcell');
+                            cell.setAttribute('label', docs[i][col]);
+                            if (col == "id"){
+                            cell.setAttribute('hidden', true);
+                            }
+                            row.appendChild(cell);
+                            });
+                    row.setAttribute("value", docs[i]["id"]);
 
-            var docs = OPENPLM.search({"reference" : ref, "revision": rev, "type" : type});
-            var theList = document.getElementById('result-list');
-            while (theList.getRowCount() > 0){
-                theList.removeItemAt(0);
-            }
-            for (var i = 0; i < docs.length; i++)
-            {
-                var columns = ["type", "reference", "revision", "name",  "id"];
-                var row = document.createElement('listitem');
-                columns.forEach(
-                        function(col){
-                        var cell = document.createElement('listcell');
-                        cell.setAttribute('label', docs[i][col]);
-                        if (col == "id"){
-                        cell.setAttribute('hidden', true);
-                        }
-                        row.appendChild(cell);
-                        });
-                row.setAttribute("value", docs[i]["id"]);
-
-                theList.appendChild(row);
+                    theList.appendChild(row);
+                }
+            } catch (er){
+                alert("Error :" + er);
             }
             document.documentElement.getButton("accept").disabled = true;  
 
@@ -109,11 +113,15 @@ onOpenPLMCheckIn: function(e) {
                               params); 
 
                       if (params.out) {
-                          var success = OPENPLM.checkin({"id" : params.out.id});
-                          if (success){
-                              alert("Mails have been successfully checked-in");
+                          try {
+                              var success = OPENPLM.checkin({"id" : params.out.id});
+                              if (success){
+                                  alert("Mails have been successfully checked-in");
+                              }
+                          }catch (er){
+                              alert("Error :" + er);
                           }
-                      }
+                      } 
                   },
 
 onOpenPLMCreate: function(e) {
@@ -125,10 +133,16 @@ onOpenPLMCreate: function(e) {
                              params); 
 
                      if (params.out) {
-                         var success = OPENPLM.create(params.out);
-                         if (success){
-                             alert("Document has been successfully created");
+                         try {
+                             var success = OPENPLM.create(params.out);
+                             if (success){
+                                 alert("Document has been successfully created");
+                             }
+                         }catch (er){
+                             alert("Error : " + er);
                          }
+
+
                      }
                  },
 
@@ -137,7 +151,11 @@ onCreateTypeChange: function(e){
                         var theList = document.getElementById('document-list');
                         var rows = document.getElementById('fields-list');
                         var type = theList.selectedItem.value;
-                        var fields = OPENPLM.get_creation_fields(type);
+                        try {
+                            var fields = OPENPLM.get_creation_fields(type);
+                        } catch (er){
+                            alert("Error :" + er);
+                        }
                         var temp = {}; 
                         while (rows.childElementCount > 1){
                             var child = rows.lastChild.lastChild;
@@ -177,20 +195,20 @@ onCheckInOK: function(e){
              },
 
 onCreateOK: function(e){
-                 var data = {};
-                 var theList = document.getElementById('document-list');
-                        var rows = document.getElementById('fields-list');
-                        var type = theList.selectedItem.value;
-                        data["type"] = type;
-                        for (i=1; i < rows.childElementCount; i++){
-                            var child = rows.children[i].lastChild;
-                            var value = openplm.getWidgetValue(child);
-                            data[child.getUserData("field")["name"]] = value;
-                        }
-                 window.arguments[0].out = data;
-                 return true;
+                var data = {};
+                var theList = document.getElementById('document-list');
+                var rows = document.getElementById('fields-list');
+                var type = theList.selectedItem.value;
+                data["type"] = type;
+                for (i=1; i < rows.childElementCount; i++){
+                    var child = rows.children[i].lastChild;
+                    var value = openplm.getWidgetValue(child);
+                    data[child.getUserData("field")["name"]] = value;
+                }
+                window.arguments[0].out = data;
+                return true;
 
-             },
+            },
 
 createWidget: function(field){
                   var convert = {"int" : "textbox",
