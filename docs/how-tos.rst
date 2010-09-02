@@ -4,7 +4,7 @@ List of how-to's
 
 .. toctree::
     :maxdepth: 2
+    :glob:
 
-    ht_add_models
-    ht_add_models2
+    ht_*
 

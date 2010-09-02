@@ -6,71 +6,20 @@
 Welcome to openPLM's documentation!
 ===================================
 
-Tutorials
-----------
+Table of contents:
 
 .. toctree::
     :maxdepth: 2
-    
+    :numbered:   
+
     tutorials
-
-How-to's
-----------
-
-.. toctree::
-    :maxdepth: 2
-    
     how-tos
-
-Plugins
-----------
-
-.. toctree::
-    :maxdepth: 2
-    
     plugins
-
-Cookbook
----------
-
-.. toctree::
-    :maxdepth: 2
-    
     cookbook
-
-HTTP-API
---------
-
-.. toctree::
-    :maxdepth: 2
-
     http-api
-
-Settings
---------
-
-.. toctree::
-    :maxdepth: 2
-    
     settings
+    modules
 
-Modules
----------
-.. toctree::
-    :maxdepth: 2
-   
-    api
-    controllers
-    exceptions
-    filehandlers
-    forms
-    lifecycle
-    mail
-    models
-    navigate
-    user_controller
-    utils
-    views
 
 Indices and tables
 ==================
