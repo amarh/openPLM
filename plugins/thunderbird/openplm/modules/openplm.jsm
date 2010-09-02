@@ -57,9 +57,18 @@ function send_post(url, data) {
     }
     this.xrequest.open("POST", url, false);
     this.xrequest.setRequestHeader('User-Agent', 'openplm');
-    this.xrequest.send(params);
-    var result = this.xrequest.responseText;
-    return JSON.parse(result);
+    var result;
+    try {
+        this.xrequest.send(params);
+        var result_json = this.xrequest.responseText;
+        result = JSON.parse(result_json);
+    }catch (er){
+        throw "can not open " + url;
+    }
+    if (result["result"] != "ok"){
+        throw result["error"];
+    }
+    return result;
 }
 
 function send_get(url, data) {
@@ -69,9 +78,19 @@ function send_get(url, data) {
     }
     this.xrequest.open("GET", url + "?"+params, false);
     this.xrequest.setRequestHeader('User-Agent', 'openplm');
-    this.xrequest.send();
-    var result = this.xrequest.responseText;
-    return JSON.parse(result);
+    var result;
+    try {
+        this.xrequest.send();
+        var result_json = this.xrequest.responseText;
+        result = JSON.parse(result_json);
+    }catch (er){
+        throw "can not open " + url;
+    }
+
+    if (result["result"] != "ok"){
+        throw result["error"];
+    }
+    return result;
 }
 
 function search(query){
