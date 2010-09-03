@@ -1006,8 +1006,6 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     else:
         cls = models.get_all_plmobjects()[obj_type]
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(current_object, request.user, cls)
-    if not current_object.is_editable:
-        raise ControllerError("object is not editable")
     if request.method == 'POST':
         if request.POST:
             modification_form_instance = get_modification_form(cls, request.POST)
