@@ -265,7 +265,6 @@ class PLMObjectController(object):
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
-
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
         if rx_bad_ref.search(reference) or rx_bad_ref.search(revision):
@@ -336,8 +335,14 @@ class PLMObjectController(object):
         u"""
         Updates :attr:`object` from data of *form*
         
-        This method raises :exc:`ValueError` if *form* is invalid.
+        :raises: :exc:`ValueError` if *form* is invalid.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
+        
+        self.check_permission("owner")
+        self.check_editable()
         if form.is_valid():
             need_save = False
             for key, value in form.cleaned_data.iteritems():

@@ -245,6 +245,18 @@ class ControllerTest(TestCase):
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
+    def test_promote_error(self):
+        """
+        Tests that a :exc:`.PromotionError` is raised when 
+        :meth:`.PLMObject.is_promotable` returns False.
+        """
+        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+                                            self.user, self.DATA)
+        # fake function so that is_promotable returns False
+        def always_false():
+            return False
+        controller.object.is_promotable = always_false
+        self.assertRaises(PromotionError, controller.promote)
 
 class PartControllerTest(ControllerTest):
     TYPE = "Part"
@@ -504,7 +516,16 @@ class DocumentControllerTest(ControllerTest):
         for i, f2 in enumerate(files):
             self.assertEqual(f2.filename, "temp%d.txt" % i)
             self.assertEqual(f2.file.read(), "data%d" % i)
-  
+ 
+    def test_add_file_error1(self):
+        """
+        test add_file : file too big
+        """
+        f = self.get_file("temp.txt", "x" * 500)
+        old, settings.MAX_FILE_SIZE = settings.MAX_FILE_SIZE, 400
+        self.assertRaises(ValueError, self.controller.add_file, f)
+        settings.MAX_FILE_SIZE = old
+
     def test_delete_file(self):
         self.controller.add_file(self.get_file())
         f2 = self.controller.files.all()[0]
