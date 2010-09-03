@@ -61,6 +61,14 @@ class ViewTest(CommonViewTest):
         self.assertEqual(attributes["Owner"], self.user)
         self.assertEqual(attributes["Creator"], self.user)
 
+    def test_edit_attributes(self):
+        data = self.DATA.copy()
+        data.update(type=self.TYPE, name="new_name")
+        response = self.client.post(self.base_url + "modify/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
+        self.assertEqual(obj.name, data["name"])
+
     def test_lifecycle(self):
         response = self.client.get(self.base_url + "lifecycle/")
         self.assertEqual(response.status_code, 200)
@@ -182,4 +190,39 @@ class HardDiskViewTest(ViewTest):
         self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
         self.assertEqual(attributes["supplier"], self.DATA["supplier"])
         self.assertEqual(attributes["tech details"], "")
+
+class MechantUserViewTest(TestCase):
+    """
+    Tests when an user try an unauthorized action
+    """
+
+    TYPE = "Part"
+    CONTROLLER = PartController
+    DATA = {}
+    
+    def setUp(self):
+        owner = User(username="owner")
+        owner.set_password("password")
+        owner.save()
+        owner.get_profile().is_contributor = True
+        owner.get_profile().save()
+        self.user = User(username="user")
+        self.user.set_password("password")
+        self.user.save()
+        self.user.get_profile().is_contributor = True
+        self.user.get_profile().save()
+        self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
+        self.controller = self.CONTROLLER.create("Part1", "Part", "a", owner)
+        self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
+                                              self.controller.reference,
+                                              self.controller.revision)
+    
+    def test_edit_attributes(self):
+        data = self.DATA.copy()
+        data.update(type=self.TYPE, name="new_name")
+        response = self.client.post(self.base_url + "modify/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
+        self.assertEqual(obj.name, '')
+        self.assertEqual(response.template[0].name, "error.html")
 
