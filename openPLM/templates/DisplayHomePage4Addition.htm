@@ -1,5 +1,6 @@
 {% extends "BaseDisplayHomePage.htm" %}
 {% load i18n %}
+{% load plmapp_tags %}
 
 <!-- Manage html display of the home page when we want to add/replace a link -->
 
@@ -47,7 +48,14 @@
 		{% if results %}
 			{% for object in results %}
 				<form method="post" action="." enctype="multipart/form-data">
-				{% if forloop.first %}
+                    {% if forloop.first %}
+                    {% if not object.username %}                
+                        <col width="30%"/>
+                        <col width="30%"/>
+                        <col width="20%"/>
+                        <col width="20%"/>
+                    {% endif %}
+
 				    <tr class="Content">
 				    {% if object.username %}
 		                <th class="Content">{% trans "Username" %}</th>
@@ -58,7 +66,6 @@
 			            <th class="Content">{% trans "Type" %}</th>
 			            <th class="Content">{% trans "Reference" %}</th>
 			            <th class="Content">{% trans "Rev." %}</th>
-                        <th class="Content">{% trans "Name" %}</th>
                         <th>{% trans "ADD" %}</th>
                     {% endif %}
             		</tr>
@@ -86,32 +93,31 @@
 			            <input type="submit" value={% trans "ADD" %}>
 		            </td>
 		        {% else %}
-		            <td class="Content">
-		                {{object.type|escape}}
+                <td class="Content">
+
+                    {{object.type|escape}}
 		                <input type="hidden" name="type" value="{{object.type|escape}}">
 	                </td>
 		            <td class="Content">
-		                <a href="{{object.plmobject_url}}">
+		                <a class="tooltip" href="{{object.plmobject_url}}">
 		                        {{object.reference|escape}}
-                        </a>
+                                <em><span></span>{{object.name}}</em></a>
                         <input type="hidden" name="reference" value="{{object.reference|escape}}">
                     </td>
 		            <td class="Content">
 		                {{object.revision|escape}}
 		                <input type="hidden" name="revision" value="{{object.revision|escape}}">
 	                </td>
-		            <td class="Content">
-		                <a class="info">
-		                    {{object.name|escape|slice:":10"}}...
-		                    <span>{{object.name|escape}}</span>
-	                    </a>
-		            </td>
+      
 		            <td class="Content">
 			            <input type="submit" value={% trans "ADD" %}>
 		            </td>
 		        {% endif %}
 			    </tr>
-			    </form>
+            </form>
+             {% empty %}
+            <tr>{% trans "No result matching given query" %}</tr>
+
 			{% endfor %}
 		{% endif %}
 	</table>

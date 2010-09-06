@@ -1,5 +1,6 @@
 {% extends "BaseDisplayHomePage.htm" %}
 {% load i18n %}
+{% load plmapp_tags %}
 
 <!-- Manage html display of the home page -->
 
@@ -44,14 +45,20 @@
 {% block ResultBlock %}
 	<table class="Result">
 		{% if results %}
-			{% for object in results %}
-				{% if forloop.first %}
+            {% for object in results %}
+                {% if forloop.first %}
+                    {% if not object.username %}                
+                        <col width="30%"/>
+                        <col width="30%"/>
+                        <col width="10%"/>
+                        <col width="30%"/>
+                    {% endif %}
 				    <tr class="Content">
 				    {% if object.username %}
                     <th class="Content">{% trans "Username" %}</th>
                     <th class="Content">{% trans "First name" %}</th>
                     <th class="Content">{% trans "e-mail." %}</th>
-		            {% else %}
+                    {% else %}
                     <th class="Content">{% trans "Type" %}</th>
                     <th class="Content">{% trans "Reference" %}</th>
                     <th class="Content">{% trans "Rev." %}</th>
@@ -72,24 +79,26 @@
 	                        </td>
 				            <td class="Content">{{object.first_name|escape}}</td>
 				            <td class="Content">
-				                    {{object.email|escape}}...
+				                    {{object.email|escape}}
 				            </td>
 				        {% else %}
 				            <td class="Content">{{object.type|escape}}</td>
-				            <td class="Content">
+				            <td class="Content reference">
 				                <a href="{{object.plmobject_url}}">
 				                        {{object.reference|escape}}
 		                        </a>
 	                        </td>
 				            <td class="Content">{{object.revision|escape}}</td>
-				            <td class="Content">
-				                <a class="info">
-				                    {{object.name|escape|slice:":10"}}...
-				                    <span>{{object.name|escape}}</span>
-			                    </a>
+                            <td class="Content">
+                                <span class="info">
+                                    <span class="small">{{object.name|trunc:10}}</span>
+                                    <span class="long">{{object.name}}</span>
+                                </span>
 				            </td>
 				        {% endif %}
-				    </tr>
+                    </tr>
+            {% empty %}
+            <tr>{% trans "No result matching given query" %}</tr>
 			{% endfor %}
 		{% endif %}
 	</table>
