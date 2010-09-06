@@ -1323,7 +1323,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
 
 ##########################################################################################
 @handle_errors 
-def download(request, docfile_id):
+def download(request, docfile_id, filename=""):
     """
     Manage html page for the files (:class:`DocumentFile`) download in the selected object.
     It computes a context dictionnary based on
@@ -1339,9 +1339,10 @@ def download(request, docfile_id):
     if not mimetype:
         mimetype = 'application/octet-stream'
     response = HttpResponse(file(doc_file.file.path), mimetype=mimetype)
-    response['Content-Disposition'] = 'attachment; filename="%s"' % name
+    if not filename:
+        response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
-    
+ 
 ##########################################################################################
 @handle_errors 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):

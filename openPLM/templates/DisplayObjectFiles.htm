@@ -27,20 +27,22 @@
 		        {% for form in file_formset.forms %}
                 {{ form.id }}
                 {{ form.document }}
+                {% with form.instance as instance %}
 			    <td class="Content">{{ form.delete }}</td>
 			    <td class="Content">
-			        {% if form.instance.locked %}
+			        {% if instance.locked %}
 			            <img src="/media/img/verrou_ferme.gif" title="Lock" alt="Lock" width="20" height="20"/>
 		            {% else %}
 		                <img src="/media/img/verrou_ouvert.jpg" title="Unlock" alt="Unlock" width="20" height="20"/>
 		            {% endif %}
 		        </td>
-			    <td class="Content">{{form.instance.filename}}</td>
-			    <td class="Content">{{form.instance.size}}</td>
+                <td class="Content">
+                    <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
+			    <td class="Content">{{instance.size}}</td>
 			    <td class="Content">
 			        <div class="ButtonLeft">
                         <div class="Button">
-                            <a class="Button" href="/file/{{form.instance.id}}/">{% trans "DOWNLOAD" %}</a>
+                            <a class="Button" href="/file/{{instance.id}}/">{% trans "DOWNLOAD" %}</a>
                         </div>
                     </div>
                 </td>
@@ -48,10 +50,10 @@
 			        {% if is_owner and obj.is_editable %}
 			            <div class="ButtonLeft">
                             <div class="Button">
-                                {% if form.instance.locked %}
-			                    <a class="Button" href="./checkin/{{form.instance.id}}/">{% trans "CHECK-IN" %}</a>
+                                {% if instance.locked %}
+			                    <a class="Button" href="./checkin/{{instance.id}}/">{% trans "CHECK-IN" %}</a>
                                 {% else %}
-			                    <a class="Button" href="./checkout/{{form.instance.id}}/">{% trans "CHECK-OUT" %}</a>
+			                    <a class="Button" href="./checkout/{{instance.id}}/">{% trans "CHECK-OUT" %}</a>
                                 {% endif %}
 		                    </div>
 	                    </div>
@@ -60,14 +62,15 @@
 		            {% endif %}
 	            </td>
 			    <td class="Content">
-                    {% if form.instance.thumbnail %}
-                    <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{form.instance.thumbnail.name}}"
+                    {% if instance.thumbnail %}
+                    <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{instance.thumbnail.name}}"
                         alt="Thumbnail"/>
 		            {% else %}
                     {% trans "No thumbnail available" %}
 		            {% endif %}
 	            </td>
-		    </tr>
+            </tr>
+            {% endwith %}
 	    {% endfor %}
 	    </table>
     </form>
