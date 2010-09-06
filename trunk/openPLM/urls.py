@@ -83,6 +83,7 @@ urlpatterns += patterns('',
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
+    (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
     #(r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
 
 )
