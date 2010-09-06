@@ -257,6 +257,7 @@ table.Result
 margin: 0px;
 overflow-x: sroll;
 overflow-y: hidden;
+table-layout: fixed;
 }
 
 th.Content, td.Content, td.Content2
@@ -265,6 +266,10 @@ padding: 3px;
 border-width: 1px;
 border-style: solid;
 border-color: #99ccff;
+}
+
+td.reference {
+    word-wrap:break-word;
 }
 
 tr.Content>td.Content
@@ -292,18 +297,28 @@ text-indent: 0px;
 }
 
 
-a.info span
+span.info span.long
+{
+display: none;
+text-wrap: normal;
+}
+
+span.info span.small
+{
+    display: block;
+    white-space: Nowrap;
+}
+
+span.info:hover span.long
+{
+display: block;
+}
+
+span.info:hover span.small
 {
 display: none;
 }
 
-a.info:hover span
-{
-display: block;
-position: relative;
-top: -1.2em;
-left: 0em;
-}
 
 h2
 {
@@ -401,5 +416,41 @@ color: #000000;
 text-align: center;
 text-decoration: none;
 font-size: 90%;
+}
+
+
+/* tooltip in result/Add */
+a.tooltip em {
+    display:none;
+}
+a.tooltip:hover {
+    border: 0;
+    position: relative;
+    z-index: 500;
+    text-decoration:none;
+}
+
+a.tooltip:hover em {
+    font-style: normal;
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    padding: 5px;
+    color: #000;
+    border: 1px solid #bbb;
+    background: #ffc;
+    width:170px;
+}
+
+a.tooltip:hover em span {
+    position: absolute;
+    top: -7px;
+    left: 15px;
+    height: 7px;
+    width: 11px;
+    margin:0;
+    padding: 0;
+    border: 0;
 }
 
