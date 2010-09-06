@@ -39,6 +39,8 @@ urlpatterns += patterns('',
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),
     
+    (r'ajax/search/$', ajax_search_form),
+    
     (object_url + r'$', display_object),
     (object_url + r'attributes/$', display_object_attributes),
     (object_url + r'lifecycle/$', display_object_lifecycle),

@@ -1430,4 +1430,20 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     return render_to_response('Navigate.htm', context_dict, 
                               context_instance=RequestContext(request))
     
+@login_required
+def ajax_search_form(request):
+    """
+    Simple view which returns the html of a search form with the data
+    of :attr:`request.GET` as initial values.
+    
+    The request must contains a get parameter *type* with a valid type,
+    otherwise, a :class:`.HttpResponseForbidden` is returned.
+    """
+    tf = type_form(request.GET)
+    if tf.is_valid():
+        cls = models.get_all_users_and_plmobjects()[tf.cleaned_data["type"]]
+        form = get_search_form(cls, request.GET)
+        return HttpResponse(form.as_table())
+    else:
+        return HttpResponseForbidden()
 
