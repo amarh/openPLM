@@ -75,9 +75,10 @@ class type_form(forms.Form):
     LISTE = m.get_all_users_and_plmobjects_with_level()
     type = forms.TypedChoiceField(choices=LISTE)
 
-#class attributes_form(type_form):
-    #reference = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
-    #revision = forms.CharField(widget=forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research", 'value':"*"}), required=False)
+class TypeSearchForm(type_form):
+    def __init__(self, *args, **kwargs):
+        super(TypeSearchForm, self).__init__(*args, **kwargs)
+        self.fields['type'].widget.attrs['onChange'] = 'update_form();'
 
 class FakeItems(object):
     def __init__(self, values):
