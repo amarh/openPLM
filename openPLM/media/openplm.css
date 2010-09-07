@@ -9,7 +9,7 @@ body
 {
 /* background-color: #b3b3b3; */
 background: #b3b3b3 url(/media/img/openplm.png) no-repeat right top fixed;
-font-family: Comic Sans MS, Verdana, Arial, sans-serif;
+font-family: Arial, sans-serif, Comic Sans MS, Verdana;
 text-align: center;
 margin: 5px;
 }
