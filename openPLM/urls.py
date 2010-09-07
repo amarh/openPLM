@@ -40,6 +40,7 @@ urlpatterns += patterns('',
     (r'^object/create/$', create_object),
     
     (r'ajax/search/$', ajax_search_form),
+    (r'ajax/complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
     
     (object_url + r'$', display_object),
     (object_url + r'attributes/$', display_object_attributes),

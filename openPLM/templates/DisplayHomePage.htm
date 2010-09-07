@@ -44,7 +44,6 @@
 
 {% block ResultBlock %}
 	<table class="Result">
-		{% if results %}
             {% for object in results %}
                 {% if forloop.first %}
                     {% if not object.username %}                
@@ -100,7 +99,6 @@
             {% empty %}
             <tr>{% trans "No result matching given query" %}</tr>
 			{% endfor %}
-		{% endif %}
 	</table>
 {% endblock %}
 
