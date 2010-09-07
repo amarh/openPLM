@@ -41,6 +41,8 @@ from django.template import RequestContext
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
+from django.utils.simplejson import JSONEncoder
+from django.views.decorators.cache import cache_page
 
 from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
@@ -1446,4 +1448,31 @@ def ajax_search_form(request):
         return HttpResponse(form.as_table())
     else:
         return HttpResponseForbidden()
+
+@login_required
+@cache_page(60 * 60)
+def ajax_autocomplete(request, obj_type, field):
+    """
+    Simple ajax view for JQquery.UI.autocomplete. This returns the possible
+    completions (in JSON format) for *field*. The request must contains
+    a get parameter named *term* which should be the string used to filter
+    the results. *obj_type* must be a valid typename.
+
+    :param str obj_type: a valid typename (like ``"part"``)
+    :param str field: a valid field (like ``"name"``)
+    """
+    if not request.GET.get('term'):
+       return HttpResponse(mimetype='text/plain')
+    term = request.GET.get('term')
+    limit = 50
+    try:
+        cls = models.get_all_users_and_plmobjects()[obj_type]
+    except KeyError:
+        return HttpResponseForbidden()
+    if field not in cls._meta.get_all_field_names():
+        return HttpResponseForbidden()
+    results = cls.objects.filter(**{"%s__icontains" % field : term})
+    results = results.values_list(field, flat=True).order_by(field).distinct()
+    json = JSONEncoder().encode(list(results[:limit]))  
+    return HttpResponse(json, mimetype='application/json')
 

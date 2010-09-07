@@ -224,5 +224,5 @@ class MechantUserViewTest(TestCase):
         self.assertEqual(response.status_code,  200)
         obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, '')
-        self.assertEqual(response.template[0].name, "error.html")
+        self.assertEqual(response.template.name, "error.html")
 

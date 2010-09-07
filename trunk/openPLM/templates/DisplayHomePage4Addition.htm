@@ -45,7 +45,6 @@
 {% block ResultBlock %}
 	Results for link creation :
 	<table class="Result">
-		{% if results %}
 			{% for object in results %}
 				<form method="post" action="." enctype="multipart/form-data">
                     {% if forloop.first %}
@@ -117,9 +116,7 @@
             </form>
              {% empty %}
             <tr>{% trans "No result matching given query" %}</tr>
-
 			{% endfor %}
-		{% endif %}
 	</table>
 {% endblock %}
 
