@@ -36,11 +36,7 @@ There are 5 kinds of models:
         - :class:`RevisionLink`
         - :class:`ParentChildLink`
         - :class:`DocumentPartLink`
-        - Delegation links:
-            - :class:`AbstractDelegationLink`
-            - :class:`DelegationLink`
-            - :class:`ClosureDelegationLink`
-            - :func:`add_transitive_links`
+        - :class:`DelegationLink`
         - :class:`PLMObjectUserLink`
 
 
