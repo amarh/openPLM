@@ -823,7 +823,8 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                                     "-",\
                                     request.user)
                 obj.set_role(user_obj.object, link.role)
-                obj.remove_notified(link.user)
+                if link.role=='notified':
+                    obj.remove_notified(link.user)
                 return HttpResponseRedirect("../..")
             else:
                 return HttpResponseRedirect("../..")
