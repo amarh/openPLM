@@ -4,6 +4,7 @@ This module contains some functions which may be useful.
 
 import re
 import string
+from functools import wraps
 
 def next_in_seq(seq, value):
     """
@@ -153,7 +154,7 @@ def size_to_format(width_lg, height_lg):
     Example::
 
         >>> size_to_format("29.7cm", "21cm")
-        'Others'
+        'Other'
         >>> size_to_format("21cm", "29.7cm")
         'A4'
     """
@@ -182,6 +183,17 @@ def level_to_sign_str(level):
 
     types = {0 : "1st", 1 : "2nd", 3 : "3rd"}
     return "sign_%s_level" % types.get(level, "%dth" % (level + 1))
+
+def memoize_noarg(func):
+    """
+    Decorator which memoize result of *func*. *func* must not take arguments
+    """
+    @wraps(func)
+    def wrapper():
+        if not hasattr(wrapper, "_result"):
+            wrapper._result = func()
+        return wrapper._result
+    return wrapper
 
 
 if __name__ == "__main__":
