@@ -282,7 +282,12 @@ def get_doc_cad_formset(controller, data=None):
         formset = Formset(data=data)
     return formset
 
-class FilterObjectForm4Part(forms.Form):
+
+class FilterForm(forms.Form):
+    only_search_results = forms.BooleanField(initial=False,
+                required=False, label=_("only search results"))
+
+class FilterObjectForm4Part(FilterForm):
     child = forms.BooleanField(initial=True, required=False, label=_("child"))
     parents = forms.BooleanField(required=False, label=_("parents"))
     doc = forms.BooleanField(required=False, label=_("doc"))
@@ -290,20 +295,17 @@ class FilterObjectForm4Part(forms.Form):
     owner = forms.BooleanField(required=False, label=_("owner"))
     signer = forms.BooleanField(required=False, label=_("signer"))
     notified = forms.BooleanField(required=False, label=_("notified"))
-    data={'Child': True, 'Parents': False, 'Doc': True, 'Cad': False, 'User': False}
 
-class FilterObjectForm4Doc(forms.Form):
+class FilterObjectForm4Doc(FilterForm):
     part = forms.BooleanField(initial=True, required=False, label=_("part"))
-    owner = forms.BooleanField(required=False, label=_("owner"))
+    owner = forms.BooleanField(initial=True, required=False, label=_("owner"))
     signer = forms.BooleanField(required=False, label=_("signer"))
     notified = forms.BooleanField(required=False, label=_("notified"))
-    data={'Part': True, 'Owner': True, 'Signer': False, 'Notified': False}
 
-class FilterObjectForm4User(forms.Form):
-    owned = forms.BooleanField(required=False, label=_("owned"))
+class FilterObjectForm4User(FilterForm):
+    owned = forms.BooleanField(initial=True, required=False, label=_("owned"))
     to_sign = forms.BooleanField(required=False, label=_("to sign"))
     request_notification_from = forms.BooleanField(required=False, label=_("request notification from"))
-    data={'owned': True, 'to_sign': False, 'request_notification_from': False}
 
 class OpenPLMUserChangeForm(forms.ModelForm):
     #username = forms.RegexField(widget=forms.HiddenInput())

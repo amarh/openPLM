@@ -190,15 +190,16 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
         class_for_div="NavigateBox4Doc"
     else:
         class_for_div="NavigateBox4Part"
-    qset=[]
+    qset = []
     # Builds, update and treat Search form
+    search_need = "results" not in request_dict.session
     if request_dict.GET and "type" in request_dict.GET:
         type_form_instance = type_form(request_dict.GET)
         if type_form_instance.is_valid():
             cls = models.get_all_users_and_plmobjects()[type_form_instance.cleaned_data["type"]]
         attributes_form_instance = get_search_form(cls, request_dict.GET)
-        for key, value in request_dict.GET.items():
-            request_dict.session[key] = value
+        request_dict.session.update(request_dict.GET.items())
+        search_need = True
     elif request_dict.session and "type" in request_dict.session:
         type_form_instance = type_form(request_dict.session)
         cls = models.get_all_users_and_plmobjects()[request_dict.session["type"]]
@@ -206,17 +207,20 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
     else:
         type_form_instance = type_form()
         request_dict.session['type'] = 'Part'
-        cls = models.get_all_users_and_plmobjects()['Part']
-        attributes_form_instance = get_search_form(cls)
+        attributes_form_instance = get_search_form(models.Part)
     if attributes_form_instance.is_valid():
-        qset = cls.objects.all()
-        qset = attributes_form_instance.search(qset)[:30]
-    if qset is None:
-        qset = []
-    if issubclass(cls, User):
-        qset = (UserController(u, request_dict.user) for u in qset)
-    else :
-        request_dict.session["results"] = qset
+        if search_need:
+            qset = cls.objects.all()
+            qset = attributes_form_instance.search(qset)[:30]
+            if qset is None:
+                qset = []
+            if issubclass(cls, User):
+                qset = [UserController(u, request_dict.user) for u in qset]
+            request_dict.session["results"] = qset
+        else:
+            qset = request_dict.session["results"] 
+    else:
+        qset = request_dict.session.get("results", [])
     context_dict.update({'results' : qset, 'type_form' : type_form_instance,
                          'attributes_form' : attributes_form_instance,
                          'class4search_div' : 'DisplayHomePage.htm',
@@ -1404,18 +1408,17 @@ def navigate(request, obj_type, obj_ref, obj_revi):
         session_bool = session_bool or request.session.get(field)
     if request.method == 'POST' and request.POST:
         form = FilterObjectFormFunction(request.POST)
-        for key, value in request.POST.items():
-            request.session[key] = value
+        if form.is_valid():
+            request.session.update(form.cleaned_data)
     elif session_bool:
         form = FilterObjectFormFunction(request.session)
     else:
-        form = FilterObjectFormFunction(FilterObjectFormFunction.data)
-        for key, value in FilterObjectFormFunction.data.items():
-            request.session[key] = value
+        form = FilterObjectFormFunction()
+        request.session.update((k, bool(v.initial)) for k,v in form.base_fields.items())
     if not form.is_valid():
         return HttpResponse('mauvaise requete post')
     
-    graph = NavigationGraph(obj)
+    graph = NavigationGraph(obj, context_dict["results"])
     graph.set_options(form.cleaned_data)
     graph.create_edges()
     map_string, picture_path = graph.render()
