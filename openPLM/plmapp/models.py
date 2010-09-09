@@ -68,7 +68,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 
 from openPLM.plmapp.lifecycle import LifecycleList
-from openPLM.plmapp.utils import level_to_sign_str
+from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 
 
 # user stuff
@@ -465,6 +465,7 @@ def _get_all_subclasses(base, d):
     for part in base.__subclasses__():
         _get_all_subclasses(part, d)
 
+@memoize_noarg
 def get_all_parts():
     u"""
     Returns a dict<part_name, part_class> of all available :class:`Part` classes
@@ -592,6 +593,7 @@ class Document(PLMObject):
         return items
 
 
+@memoize_noarg
 def get_all_documents():
     u"""
     Returns a dict<doc_name, doc_class> of all available :class:`Document` classes
@@ -600,6 +602,7 @@ def get_all_documents():
     _get_all_subclasses(Document, res)
     return res
 
+@memoize_noarg
 def get_all_plmobjects():
     u"""
     Returns a dict<name, class> of all available :class:`PLMObject` subclasses
@@ -610,12 +613,14 @@ def get_all_plmobjects():
     del res["PLMObject"]
     return res
 
+@memoize_noarg
 def get_all_users_and_plmobjects():
     res = {}
     _get_all_subclasses(User, res)
     res.update(get_all_plmobjects())
     return res
 
+@memoize_noarg
 def get_all_userprofiles_and_plmobjects():
     res = {}
     _get_all_subclasses(UserProfile, res)
@@ -872,6 +877,7 @@ def _get_all_subclasses_with_level(base, lst, level):
     for part in base.__subclasses__():
         _get_all_subclasses_with_level(part, lst, level)
 
+@memoize_noarg
 def get_all_plmobjects_with_level():
     u"""
     Returns a list<name, class> of all available :class:`PLMObject` subclasses
@@ -884,6 +890,7 @@ def get_all_plmobjects_with_level():
     if lst: del lst[0]
     return lst
 
+@memoize_noarg
 def get_all_users_and_plmobjects_with_level():
     list_of_choices = get_all_plmobjects_with_level()
     level=">"
