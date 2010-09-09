@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-01 15:27+0200\n"
+"POT-Creation-Date: 2010-09-09 14:04+0200\n"
 "PO-Revision-Date: 2010-08-27 09:41+0100\n"
 "Last-Translator: Pierre Cosquer <pcosquer@openplm.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,155 +27,172 @@ msgstr "détail technique"
 msgid "Internal error"
 msgstr "Erreur interne"
 
-#: plmapp/forms.py:298
+#: plmapp/forms.py:16
+msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
+msgstr ""
+
+#: plmapp/forms.py:22
+msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
+msgstr ""
+
+#: plmapp/forms.py:48
+#, fuzzy
+msgid "An object with the same type, reference and revision already exists"
+msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+
+#: plmapp/forms.py:291
+msgid "only search results"
+msgstr ""
+
+#: plmapp/forms.py:294
 msgid "child"
 msgstr "enfants"
 
-#: plmapp/forms.py:299 plmapp/models.py:442
+#: plmapp/forms.py:295 plmapp/models.py:438
 msgid "parents"
 msgstr "parents"
 
-#: plmapp/forms.py:300
+#: plmapp/forms.py:296
 msgid "doc"
 msgstr "doc"
 
-#: plmapp/forms.py:301
+#: plmapp/forms.py:297
 msgid "cad"
 msgstr "cao"
 
-#: plmapp/forms.py:302 plmapp/forms.py:309 plmapp/models.py:306
-#: plmapp/models.py:421 plmapp/user_controller.py:66
+#: plmapp/forms.py:298 plmapp/forms.py:304 plmapp/models.py:302
+#: plmapp/models.py:417 plmapp/user_controller.py:66
 msgid "owner"
 msgstr "propriétaire"
 
-#: plmapp/forms.py:303 plmapp/forms.py:310
+#: plmapp/forms.py:299 plmapp/forms.py:305
 msgid "signer"
 msgstr "signataire"
 
-#: plmapp/forms.py:304 plmapp/forms.py:311 plmapp/views.py:1216
+#: plmapp/forms.py:300 plmapp/forms.py:306 plmapp/views.py:1217
 msgid "notified"
 msgstr "notifié"
 
-#: plmapp/forms.py:308
+#: plmapp/forms.py:303
 msgid "part"
 msgstr "part"
 
-#: plmapp/forms.py:315
+#: plmapp/forms.py:309
 msgid "owned"
 msgstr "dont on est propriétaire"
 
-#: plmapp/forms.py:316
+#: plmapp/forms.py:310
 msgid "to sign"
 msgstr "à signer"
 
-#: plmapp/forms.py:317
+#: plmapp/forms.py:311
 msgid "request notification from"
 msgstr "dont on a demandé à être notifié"
 
-#: plmapp/forms.py:327 templates/DisplayHomePage.htm:55
-#: templates/DisplayHomePage4Addition.htm:58
-#: templates/DisplayObject4PasswordModification.htm:10
+#: plmapp/forms.py:320 templates/DisplayHomePage.htm:61
+#: templates/DisplayHomePage4Addition.htm:65
+#: templates/DisplayObject4PasswordModification.htm:11
 #: templates/DisplayObject4creation.htm:10
 #: templates/DisplayObject4modification.htm:10
 #: templates/DisplayObjectRelPLMObject.htm:11
 msgid "Type"
 msgstr "Type"
 
-#: plmapp/forms.py:328 templates/DisplayHomePage.htm:51
-#: templates/DisplayHomePage4Addition.htm:53
+#: plmapp/forms.py:321 templates/DisplayHomePage.htm:57
+#: templates/DisplayHomePage4Addition.htm:60
 #: templates/DisplayObjectDelegation.htm:67
 msgid "Username"
 msgstr "Identifiant"
 
-#: plmapp/models.py:109
+#: plmapp/models.py:105
 msgid "administrator"
 msgstr "administrateur"
 
-#: plmapp/models.py:111
+#: plmapp/models.py:107
 msgid "contributor"
 msgstr "contributeur"
 
-#: plmapp/models.py:113
+#: plmapp/models.py:109
 msgid "viewer"
 msgstr "lecteur"
 
-#: plmapp/models.py:296
+#: plmapp/models.py:292
 msgid "reference"
 msgstr "référence"
 
-#: plmapp/models.py:297
+#: plmapp/models.py:293
 msgid "type"
 msgstr "type"
 
-#: plmapp/models.py:298
+#: plmapp/models.py:294
 msgid "revision"
 msgstr "révision"
 
-#: plmapp/models.py:301
+#: plmapp/models.py:297
 msgid "name"
 msgstr "nom"
 
-#: plmapp/models.py:302
+#: plmapp/models.py:298
 msgid "Name of the product"
 msgstr "Nom du produit"
 
-#: plmapp/models.py:304 plmapp/models.py:421 plmapp/user_controller.py:65
+#: plmapp/models.py:300 plmapp/models.py:417 plmapp/user_controller.py:65
 msgid "creator"
 msgstr "créateur"
 
-#: plmapp/models.py:308 plmapp/user_controller.py:63
+#: plmapp/models.py:304 plmapp/user_controller.py:63
 msgid "date of creation"
 msgstr "date de création"
 
-#: plmapp/models.py:310 plmapp/user_controller.py:62
+#: plmapp/models.py:306 plmapp/user_controller.py:62
 msgid "date of last modification"
 msgstr "date de la dernière modification"
 
-#: plmapp/models.py:313 plmapp/models.py:385
+#: plmapp/models.py:309 plmapp/models.py:381
 msgid "lifecycle"
 msgstr "cycle de vie"
 
-#: plmapp/models.py:316
+#: plmapp/models.py:312
 msgid "state"
 msgstr "état"
 
-#: plmapp/models.py:385
+#: plmapp/models.py:381
 msgid "attributes"
 msgstr "attributs"
 
-#: plmapp/models.py:386
+#: plmapp/models.py:382
 msgid "revisions"
 msgstr "révisions"
 
-#: plmapp/models.py:386
+#: plmapp/models.py:382
 msgid "history"
 msgstr "historique"
 
-#: plmapp/models.py:387
+#: plmapp/models.py:383
 msgid "management"
 msgstr "gestion"
 
-#: plmapp/models.py:421
+#: plmapp/models.py:417
 msgid "ctime"
 msgstr "date de création"
 
-#: plmapp/models.py:421
+#: plmapp/models.py:417
 msgid "mtime"
 msgstr "date de modification"
 
-#: plmapp/models.py:442
+#: plmapp/models.py:438
 msgid "BOM-child"
 msgstr "nomenclature"
 
-#: plmapp/models.py:443
+#: plmapp/models.py:439
 msgid "doc-cad"
 msgstr "doc-cao"
 
-#: plmapp/models.py:595
+#: plmapp/models.py:591
 msgid "parts"
 msgstr "parts"
 
-#: plmapp/models.py:595
+#: plmapp/models.py:591
 msgid "files"
 msgstr "fichiers"
 
@@ -183,15 +200,15 @@ msgstr "fichiers"
 msgid "role in PLM"
 msgstr "rôle dans le PLM"
 
-#: plmapp/views.py:1212
+#: plmapp/views.py:1213
 msgid "signer level"
 msgstr "signataire niveau"
 
-#: plmapp/views.py:1214
+#: plmapp/views.py:1215
 msgid "signer all levels"
 msgstr "signataire tous niveaux"
 
-#: templates/404.html:22
+#: templates/404.html:20
 msgid "Error 404: page not found"
 msgstr "Erreur 404: page non trouvée"
 
@@ -215,52 +232,57 @@ msgstr "Défaire"
 msgid "Add new file / Check-in file :"
 msgstr "Ajouter nouveau fichier / Check-in fichier :"
 
-#: templates/DisplayHomePage.htm:26 templates/DisplayHomePage4Addition.htm:26
+#: templates/DisplayHomePage.htm:27 templates/DisplayHomePage4Addition.htm:27
 msgid "Go"
 msgstr "Go"
 
-#: templates/DisplayHomePage.htm:34
+#: templates/DisplayHomePage.htm:35
 msgid "Search for :"
 msgstr "Recherche pour:"
 
-#: templates/DisplayHomePage.htm:40 templates/DisplayHomePage4Addition.htm:40
+#: templates/DisplayHomePage.htm:41 templates/DisplayHomePage4Addition.htm:41
 msgid "SEARCH !"
 msgstr "RECHERCHER !"
 
-#: templates/DisplayHomePage.htm:52 templates/DisplayHomePage4Addition.htm:54
+#: templates/DisplayHomePage.htm:58 templates/DisplayHomePage4Addition.htm:61
 msgid "First name"
 msgstr "Prénom"
 
-#: templates/DisplayHomePage.htm:53
+#: templates/DisplayHomePage.htm:59
 msgid "e-mail."
 msgstr "e-mail."
 
-#: templates/DisplayHomePage.htm:56 templates/DisplayHomePage4Addition.htm:59
+#: templates/DisplayHomePage.htm:62 templates/DisplayHomePage4Addition.htm:66
 #: templates/DisplayObjectRelPLMObject.htm:12
 msgid "Reference"
 msgstr "Référence"
 
-#: templates/DisplayHomePage.htm:57 templates/DisplayHomePage4Addition.htm:60
+#: templates/DisplayHomePage.htm:63 templates/DisplayHomePage4Addition.htm:67
 msgid "Rev."
 msgstr "Rév."
 
-#: templates/DisplayHomePage.htm:58 templates/DisplayHomePage4Addition.htm:61
+#: templates/DisplayHomePage.htm:64
 msgid "Name"
 msgstr "Nom"
 
-#: templates/DisplayHomePage.htm:106
-#: templates/DisplayHomePage4Addition.htm:128
+#: templates/DisplayHomePage.htm:100
+#: templates/DisplayHomePage4Addition.htm:118
+msgid "No result matching given query"
+msgstr ""
+
+#: templates/DisplayHomePage.htm:113
+#: templates/DisplayHomePage4Addition.htm:131
 msgid "CREATE !"
 msgstr "CREER !"
 
-#: templates/DisplayHomePage4Addition.htm:55
+#: templates/DisplayHomePage4Addition.htm:62
 msgid "e-mail"
 msgstr "e-mail"
 
-#: templates/DisplayHomePage4Addition.htm:56
-#: templates/DisplayHomePage4Addition.htm:62
-#: templates/DisplayHomePage4Addition.htm:86
-#: templates/DisplayHomePage4Addition.htm:110
+#: templates/DisplayHomePage4Addition.htm:63
+#: templates/DisplayHomePage4Addition.htm:68
+#: templates/DisplayHomePage4Addition.htm:92
+#: templates/DisplayHomePage4Addition.htm:112
 #: templates/DisplayObjectChild.htm:13 templates/DisplayObjectDocCad.htm:15
 #: templates/DisplayObjectFiles.htm:17
 #: templates/DisplayObjectManagement.htm:14
@@ -268,7 +290,7 @@ msgstr "e-mail"
 msgid "ADD"
 msgstr "AJOUTER"
 
-#: templates/DisplayLoginPage.htm:9
+#: templates/DisplayLoginPage.htm:9 templates/error.html:9
 msgid "openPLM LOGIN PAGE"
 msgstr "PAGE D'ACCES à OpenPLM"
 
@@ -301,7 +323,7 @@ msgstr "MOT DE PASSE"
 msgid "PASSWORD MODIFICATION:"
 msgstr "MODIFICATION MOT DE PASSE"
 
-#: templates/DisplayObject4PasswordModification.htm:15
+#: templates/DisplayObject4PasswordModification.htm:16
 msgid "CHANGE PASSWORD"
 msgstr "CHANGER MOT DE PASSE"
 
@@ -403,19 +425,19 @@ msgstr "Il n'y a pas de document attaché à cette part"
 msgid "DELETE"
 msgstr "DETRUIRE"
 
-#: templates/DisplayObjectFiles.htm:43
+#: templates/DisplayObjectFiles.htm:45
 msgid "DOWNLOAD"
 msgstr "TELECHARGER"
 
-#: templates/DisplayObjectFiles.htm:52
+#: templates/DisplayObjectFiles.htm:54
 msgid "CHECK-IN"
 msgstr "CHECK-IN"
 
-#: templates/DisplayObjectFiles.htm:54
+#: templates/DisplayObjectFiles.htm:56
 msgid "CHECK-OUT"
 msgstr "CHECK-OUT"
 
-#: templates/DisplayObjectFiles.htm:67
+#: templates/DisplayObjectFiles.htm:69
 msgid "No thumbnail available"
 msgstr "Aucun aperçu disponible"
 
@@ -455,11 +477,11 @@ msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà
 msgid "FILTER"
 msgstr "FILTRER"
 
-#: templates/error.html:7
+#: templates/error.html:21
 msgid "Error :"
 msgstr "Erreur :"
 
-#: templates/error.html:9
+#: templates/error.html:23
 msgid "go back"
 msgstr "revenir en arrière"
 

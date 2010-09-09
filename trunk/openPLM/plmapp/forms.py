@@ -13,13 +13,13 @@ from openPLM.plmapp.widgets import JQueryAutoComplete
 def _clean_reference(self):
     data = self.cleaned_data["reference"]
     if rx_bad_ref.search(data):
-        raise ValidationError("Bad reference: '#', '?', '/' and '..' are not allowed")
+        raise ValidationError(_("Bad reference: '#', '?', '/' and '..' are not allowed"))
     return re.sub("\s+", " ", data.strip(" "))
 
 def _clean_revision(self):
     data = self.cleaned_data["revision"]
     if rx_bad_ref.search(data):
-        raise ValidationError("Bad revision: '#', '?', '/' and '..' are not allowed")
+        raise ValidationError(_("Bad revision: '#', '?', '/' and '..' are not allowed"))
     return re.sub("\s+", " ", data.strip(" "))
 
 def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
@@ -34,33 +34,40 @@ def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
 
     If *initial* is provided, it will be used to fill the form.
     """
-
-    fields = cls.get_creation_fields()
-    Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
-    Form.clean_reference = _clean_reference
-    Form.clean_revision = _clean_revision
-    def _clean(self):
-        cleaned_data = self.cleaned_data
-        ref = cleaned_data.get("reference", "")
-        rev = cleaned_data.get("revision", "")
-        if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
-            raise ValidationError("An object with the same type,reference and revision already exists")
-        return cleaned_data
-    Form.clean = _clean
+    Form = get_creation_form.cache.get(cls)
+    if Form is None:
+        fields = cls.get_creation_fields()
+        Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
+        Form.clean_reference = _clean_reference
+        Form.clean_revision = _clean_revision
+        def _clean(self):
+            cleaned_data = self.cleaned_data
+            ref = cleaned_data.get("reference", "")
+            rev = cleaned_data.get("revision", "")
+            if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
+                raise ValidationError(_("An object with the same type, reference and revision already exists"))
+            return cleaned_data
+        Form.clean = _clean
+        get_creation_form.cache[cls] = Form
     if data:
         return Form(data=data, empty_permitted=empty_allowed)
     else:
         return Form()
+get_creation_form.cache = {}
         
 def get_modification_form(cls=m.PLMObject, data=None, instance=None):
-    fields = cls.get_modification_fields()
-    Form = modelform_factory(cls, fields=fields)
+    Form = get_modification_form.cache.get(cls)
+    if Form is None:
+        fields = cls.get_modification_fields()
+        Form = modelform_factory(cls, fields=fields)
+        get_modification_form.cache[cls] = Form
     if data:
         return Form(data)
     elif instance:
         return Form(instance=instance)
     else:
         return Form()
+get_modification_form.cache = {}
 
 def integerfield_clean(value):
     if value:
@@ -88,89 +95,83 @@ class FakeItems(object):
         return self.values
 
 def get_search_form(cls=m.PLMObject, data=None):
-    if issubclass(cls, m.PLMObject):
-        fields = set(cls.get_creation_fields())
-        fields.update(set(cls.get_modification_fields()))
-        fields.difference_update(("type", "lifecycle"))
-    else :
-        fields = set(["username", "first_name", "last_name"])
-    fields_dict = {}
-    for field in fields:
-        model_field = cls._meta.get_field(field)
-        form_field = model_field.formfield()
-        form_field.help_text = ""
-        if isinstance(form_field.widget, forms.Textarea):
-            form_field.widget = forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
-        if isinstance(form_field.widget, forms.TextInput):
-            source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
-            form_field.widget = JQueryAutoComplete(source,
-                attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
-        if isinstance(form_field, forms.fields.IntegerField) and isinstance(form_field.widget, forms.TextInput):
-            form_field.widget = forms.TextInput(attrs={'title':"Please enter a whole number. You can use < or > to enlarge your research."})
-        form_field.required = False
-        fields_dict[field] = form_field
-        if isinstance(form_field, forms.fields.IntegerField):
-            form_field.clean = integerfield_clean
+    Form = get_search_form.cache.get(cls)
+    if Form is None:
+        if issubclass(cls, m.PLMObject):
+            fields = set(cls.get_creation_fields())
+            fields.update(set(cls.get_modification_fields()))
+            fields.difference_update(("type", "lifecycle"))
+        else :
+            fields = set(["username", "first_name", "last_name"])
+        fields_dict = {}
+        for field in fields:
+            model_field = cls._meta.get_field(field)
+            form_field = model_field.formfield()
+            form_field.help_text = ""
+            if isinstance(form_field.widget, forms.Textarea):
+                form_field.widget = forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
+            if isinstance(form_field.widget, forms.TextInput):
+                source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
+                form_field.widget = JQueryAutoComplete(source,
+                    attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
+            if isinstance(form_field, forms.fields.IntegerField) and isinstance(form_field.widget, forms.TextInput):
+                form_field.widget = forms.TextInput(attrs={'title':"Please enter a whole number. You can use < or > to enlarge your research."})
+            form_field.required = False
+            fields_dict[field] = form_field
+            if isinstance(form_field, forms.fields.IntegerField):
+                form_field.clean = integerfield_clean
 
-    def search(self, query_set=None):
-        if self.is_valid():
-            query = {}
-            for field in self.changed_data:
-                model_field = cls._meta.get_field(field)
-                form_field = model_field.formfield()
-                value =  self.cleaned_data[field]
-                if value is None or (isinstance(value, basestring) and value.isspace()):
-                    continue
-                if isinstance(form_field, forms.fields.CharField)\
-                                and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
-                    value_list = re.split(r"\s*\*\s*", value)
-                    if len(value_list)==1:
-                        query["%s__iexact"%field]=value_list[0]
-                    else :
-                        if value_list[0]:
-                            query["%s__istartswith"%field]=value_list[0]
-                        if value_list[-1]:
-                            query["%s__iendswith"%field]=value_list[-1]
-                        for value_item in value_list[1:-1]:
-                            if value_item:
-                                query["%s__icontains"%field]=value_item
-                elif isinstance(form_field, forms.fields.IntegerField)\
-                                and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
-                    sign, value_str = self.cleaned_data[field]
-                    cr = "%s__%s" %(field, {"" : "exact", ">" : "gt", "<" : "lt"}[sign])
-                    query[cr]= int(value_str)
+        def search(self, query_set=None):
+            if self.is_valid():
+                query = {}
+                for field in self.changed_data:
+                    model_field = cls._meta.get_field(field)
+                    form_field = model_field.formfield()
+                    value =  self.cleaned_data[field]
+                    if value is None or (isinstance(value, basestring) and value.isspace()):
+                        continue
+                    if isinstance(form_field, forms.fields.CharField)\
+                                    and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
+                        value_list = re.split(r"\s*\*\s*", value)
+                        if len(value_list)==1:
+                            query["%s__iexact"%field]=value_list[0]
+                        else :
+                            if value_list[0]:
+                                query["%s__istartswith"%field]=value_list[0]
+                            if value_list[-1]:
+                                query["%s__iendswith"%field]=value_list[-1]
+                            for value_item in value_list[1:-1]:
+                                if value_item:
+                                    query["%s__icontains"%field]=value_item
+                    elif isinstance(form_field, forms.fields.IntegerField)\
+                                    and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
+                        sign, value_str = self.cleaned_data[field]
+                        cr = "%s__%s" %(field, {"" : "exact", ">" : "gt", "<" : "lt"}[sign])
+                        query[cr]= int(value_str)
+                    else:
+                        query[field] = self.cleaned_data[field]
+                    query_set = query_set.filter(**query)
+                if query_set is not None:
+                    return query_set
                 else:
-                    query[field] = self.cleaned_data[field]
-                query_set = query_set.filter(**query)
-            if query_set is not None:
-                return query_set
-            else:
-                return []
-    fields_list = fields_dict.items()
-    for ref, field in fields_list:
-        if ref=='reference':
-            fields_list.remove((ref, field))
-            fields_list.insert(0, (ref, field))
-            break
-    ordered_fields_list = FakeItems(fields_list)
-    Form = type("Search%sForm" % cls.__name__,
-                (forms.BaseForm,),
-                {"base_fields" : ordered_fields_list, "search" : search}) 
+                    return []
+        fields_list = fields_dict.items()
+        for ref, field in fields_list:
+            if ref=='reference':
+                fields_list.remove((ref, field))
+                fields_list.insert(0, (ref, field))
+                break
+        ordered_fields_list = FakeItems(fields_list)
+        Form = type("Search%sForm" % cls.__name__,
+                    (forms.BaseForm,),
+                    {"base_fields" : ordered_fields_list, "search" : search})
+        get_search_form.cache[cls] = Form
     if data is not None:
         return Form(data=data, empty_permitted=True)
     else:
         return Form(empty_permitted=True)
-       
-def get_attr_search_form(cls=m.PLMObject, data=None, instance=None):
-    fields = cls.get_modification_fields()
-    Form = modelform_factory(cls, fields=fields)
-    if data:
-        return Form(data)
-    elif instance:
-        return Form(instance=instance)
-    else:
-        return Form()
-        
+get_search_form.cache = {}    
+      
 class add_child_form(forms.Form):
     type = forms.CharField()
     reference = forms.CharField()
@@ -197,19 +198,19 @@ class ModifyChildForm(forms.ModelForm):
         model = m.ParentChildLink
         fields = ["order", "quantity", "child", "parent"]
 
+ChildrenFormset = modelformset_factory(m.ParentChildLink,
+                                       form=ModifyChildForm, extra=0)
 def get_children_formset(controller, data=None):
-    Formset = modelformset_factory(m.ParentChildLink, form=ModifyChildForm, extra=0)
     if data is None:
         queryset = m.ParentChildLink.objects.filter(parent=controller,
                                                     end_time__exact=None)
-        formset = Formset(queryset=queryset)
+        formset = ChildrenFormset(queryset=queryset)
     else:
-        formset = Formset(data=data)
+        formset = ChildrenFormset(data=data)
     return formset
 
 class AddRevisionForm(forms.Form):
     revision = forms.CharField()
-    
     clean_revision = _clean_revision
     
 class AddRelPartForm(forms.Form):
@@ -227,13 +228,14 @@ class ModifyRelPartForm(forms.ModelForm):
         model = m.DocumentPartLink
         fields = ["document", "part"]
         
+RelPartFormset = modelformset_factory(m.DocumentPartLink,
+                                      form=ModifyRelPartForm, extra=0)
 def get_rel_part_formset(controller, data=None):
-    Formset = modelformset_factory(m.DocumentPartLink, form=ModifyRelPartForm, extra=0)
     if data is None:
         queryset = controller.get_attached_parts()
-        formset = Formset(queryset=queryset)
+        formset = RelPartFormset(queryset=queryset)
     else:
-        formset = Formset(data=data)
+        formset = RelPartFormset(data=data)
     return formset
 
 class AddFileForm(forms.Form):
@@ -247,16 +249,14 @@ class ModifyFileForm(forms.ModelForm):
         model = m.DocumentFile
         fields = ["document"]
         
+FileFormset = modelformset_factory(m.DocumentFile, form=ModifyFileForm, extra=0)
 def get_file_formset(controller, data=None):
-    Formset = modelformset_factory(m.DocumentFile, form=ModifyFileForm, extra=0)
     if data is None:
         queryset = controller.files
-        formset = Formset(queryset=queryset)
+        formset = FileFormset(queryset=queryset)
     else:
-        formset = Formset(data=data)
+        formset = FileFormset(data=data)
     return formset
-
-
 
 class AddDocCadForm(forms.Form):
     type = forms.CharField()
@@ -273,13 +273,14 @@ class ModifyDocCadForm(forms.ModelForm):
         model = m.DocumentPartLink
         fields = ["part", "document"]
         
+DocCadFormset = modelformset_factory(m.DocumentPartLink,
+                                     form=ModifyDocCadForm, extra=0)
 def get_doc_cad_formset(controller, data=None):
-    Formset = modelformset_factory(m.DocumentPartLink, form=ModifyDocCadForm, extra=0)
     if data is None:
         queryset = controller.get_attached_documents()
-        formset = Formset(queryset=queryset)
+        formset = DocCadFormset(queryset=queryset)
     else:
-        formset = Formset(data=data)
+        formset = DocCadFormset(data=data)
     return formset
 
 
