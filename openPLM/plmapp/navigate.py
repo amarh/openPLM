@@ -8,12 +8,16 @@ import warnings
 import cStringIO as StringIO
 
 import pygraphviz as pgv
+from django.db.models.query import QuerySet
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
 from openPLM.plmapp.user_controller import UserController
 
 basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
+
+# just a shortcut
+OSR = "only_search_results"
 
 class NavigationGraph(object):
     """
@@ -32,6 +36,11 @@ class NavigationGraph(object):
 
     :param obj: root of the graph
     :type obj: :class:`.PLMObjectController` or :class:`.UserController`
+    :param results: if the option *only_search_results* is set, only objects in
+                    results are displayed
+
+    .. warning::
+        *results* must not be a QuerySet if it contains users.
     """
 
     GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2', mindist=".5", center='true',
@@ -48,11 +57,17 @@ class NavigationGraph(object):
                           DocumentController : dict(color='#fef176',
                             image=os.path.join(basedir, "document.png"))}
                            
-    def __init__(self, obj):
+    def __init__(self, obj, results=()):
         self.object = obj
+        self.results = [r.id for r in results]
+        # a PLMObject and an user may have the same id, so we add a variable
+        # which tell if results contains users
+        self.users_result = False
+        if results:
+            self.users_result = hasattr(results[0], "username")
         self.options_list = ("child", "parents", "doc", "cad", "owner", "signer",
                              "notified", "part", "owned", "to_sign",
-                              "request_notification_from")
+                             "request_notification_from", OSR) 
         self.options = dict.fromkeys(self.options_list, False)
     
         self.graph = pgv.AGraph()
@@ -66,6 +81,8 @@ class NavigationGraph(object):
         Sets which kind of edges should be inserted.
 
         Options is a dictionary(*option_name* -> boolean)
+
+        The option *only_search_results* enables results filtering.
 
         If the root is a :class:`.PartController`, valid options are:
 
@@ -109,7 +126,11 @@ class NavigationGraph(object):
         self.options.update(options)
         
     def _create_child_edges(self, obj, *args):
+        if self.options[OSR] and self.users_result:
+            return
         for child_l in obj.get_children():
+            if self.options[OSR] and child_l.link.child.id not in self.results:
+                continue
             child = PartController(child_l.link.child, None)
             self.graph.add_edge(obj.id, child.id)
             self._set_node_attributes(child)
@@ -118,7 +139,11 @@ class NavigationGraph(object):
             self._create_child_edges(child)
     
     def _create_parents_edges(self, obj, *args):
+        if self.options[OSR] and self.users_result:
+            return
         for parent_l in obj.get_parents():
+            if self.options[OSR] and parent_l.link.parent.id not in self.results:
+                continue
             parent = PartController(parent_l.link.parent, None)
             self.graph.add_edge(parent.id, obj.id)
             self._set_node_attributes(parent)
@@ -127,28 +152,44 @@ class NavigationGraph(object):
             self._create_parents_edges(parent)
    
     def _create_part_edges(self, obj, *args):
+        if self.options[OSR] and self.users_result:
+            return
         for link in obj.get_attached_parts():
+            if self.options[OSR] and link.part.id not in self.results:
+                continue
             part = PartController(link.part, None)
             self.graph.add_edge(obj.id, part.id)
             self._set_node_attributes(part)
     
     def _create_doc_edges(self, obj, *args):
+        if self.options[OSR] and self.users_result:
+            return
         for document_item in obj.get_attached_documents():
+            if self.options[OSR] and document_item.document.id not in self.results:
+                continue
             document = DocumentController(document_item.document, None)
             self.graph.add_edge(obj.id, document.id)
             self._set_node_attributes(document)
 
     def _create_user_edges(self, obj, role):
+        if self.options[OSR] and not self.users_result:
+            return
         user_list = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
         for user_item in user_list:
+            if self.options[OSR] and user_item.user.id not in self.results:
+                continue
             user = UserController(user_item.user, None) 
             user_id = user_item.role + str(user_item.user.id)
             self.graph.add_edge(user_id, obj.id)
             self._set_node_attributes(user, user_id, user_item.role)
 
     def _create_object_edges(self, obj, role):
+        if self.options[OSR] and self.users_result:
+            return
         part_doc_list = obj.plmobjectuserlink_user.filter(role__istartswith=role)
         for part_doc_item in part_doc_list:
+            if self.options[OSR] and part_doc_item.plmobject.id not in self.results:
+                continue
             part_doc_id = str(part_doc_item.role) + str(part_doc_item.plmobject_id)
             self.graph.add_edge("User%d" % obj.id, part_doc_id)
             if hasattr(part_doc_item.plmobject, 'document'):
@@ -180,7 +221,8 @@ class NavigationGraph(object):
                          'part': (self._create_part_edges, None),
                          'owned':(self._create_object_edges, 'owner'),
                          'to_sign':(self._create_object_edges, 'sign'),
-                         'request_notification_from':(self._create_object_edges, 'notified'),}
+                         'request_notification_from':(self._create_object_edges, 'notified'),
+                         OSR : (lambda *args: None, None), }
         for field, value in self.options.items():
             if value: 
                 function, argument = functions_dic[field]
