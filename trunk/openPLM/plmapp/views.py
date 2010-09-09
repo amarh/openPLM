@@ -1414,8 +1414,9 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     elif session_bool:
         form = FilterObjectFormFunction(request.session)
     else:
-        form = FilterObjectFormFunction()
-        request.session.update((k, bool(v.initial)) for k,v in form.base_fields.items())
+        initial = dict((k, bool(v.initial)) for k,v in FilterObjectFormFunction.base_fields.items())
+        form = FilterObjectFormFunction(initial)
+        request.session.update(initial)
     if not form.is_valid():
         return HttpResponse('mauvaise requete post')
     
