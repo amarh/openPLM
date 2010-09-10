@@ -55,8 +55,7 @@
 				    <tr class="Content">
 				    {% if object.username %}
                     <th class="Content">{% trans "Username" %}</th>
-                    <th class="Content">{% trans "First name" %}</th>
-                    <th class="Content">{% trans "e-mail." %}</th>
+                    <th class="Content">{% trans "Last name" %}</th>
                     {% else %}
                     <th class="Content">{% trans "Type" %}</th>
                     <th class="Content">{% trans "Reference" %}</th>
@@ -76,10 +75,7 @@
 				                        {{object.username|escape}}
 		                        </a>
 	                        </td>
-				            <td class="Content">{{object.first_name|escape}}</td>
-				            <td class="Content">
-				                    {{object.email|escape}}
-				            </td>
+				            <td class="Content">{{object.last_name|escape}}</td>
 				        {% else %}
 				            <td class="Content">{{object.type|escape}}</td>
 				            <td class="Content reference">
