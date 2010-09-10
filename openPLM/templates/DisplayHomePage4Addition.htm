@@ -58,8 +58,7 @@
 				    <tr class="Content">
 				    {% if object.username %}
 		                <th class="Content">{% trans "Username" %}</th>
-			            <th class="Content">{% trans "First name" %}</th>
-			            <th class="Content">{% trans "e-mail" %}</th>
+			            <th class="Content">{% trans "Last name" %}</th>
 			            <th>{% trans "ADD" %}</th>
 		            {% else %}
 			            <th class="Content">{% trans "Type" %}</th>
@@ -83,11 +82,8 @@
                         <input type="hidden" name="username" value="{{object.username|escape}}">
                     </td>
 		            <td class="Content">
-		                {{object.first_name|escape}}
+		                {{object.last_name|escape}}
 	                </td>
-		            <td class="Content">
-		                    {{object.email|escape}}...
-		            </td>
 		            <td class="Content">
 			            <input type="submit" value={% trans "ADD" %}>
 		            </td>
