@@ -172,6 +172,10 @@ def search(request, editable_only="true", with_file_only="true"):
                         if with_file_only == "true" and hasattr(res, "files") \
                            and not bool(res.files):
                             continue
+                        if editable_only == "true":
+                            obj = models.DocumentController(res.id, request.user)
+                            if not obj.check_permission("owner", False):
+                                continue
                         objects.append(object_to_dict(res))
                 return {"objects" : objects} 
     return {"result": "error"}
