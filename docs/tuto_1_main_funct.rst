@@ -66,14 +66,13 @@ LOGGED-IN USER AREA
 Contains:
 
 * Icon to log out OpenPLM : |logout|
+    .. |logout| image:: images/logout.png
 
 * Username of the logged in User
 
 * Current date and time
 
 * Language preference
-
-.. |logout| image:: images/logout.png
 
 
 CREATE AREA
@@ -88,26 +87,27 @@ DATA DISPLAY AREA - MENU LIKE
 Contains :
 
 * Icon to switch to "navigate" display : |navigate|
+    .. |navigate| image:: images/navigate.png
 
 * Icon to switch to "menu" display : |menu|
+    .. |menu| image:: images/menu.png
 
 * current PLMObject type, reference and revision.
 
 * Displays a menu to access different data related to the current PLMObject (attributes, history, revisions, ...).
 
-.. |navigate| image:: images/navigate.png
-.. |menu| image:: images/menu.png
 
 DATA DISPLAY AREA - NAVIGATE LIKE
 ========================================================
 Contains :
 
 * Icon to switch to "navigate" display : |navigate|
+    .. |navigate| image:: images/navigate.png
 
 * Icon to switch to "menu" display : |menu|
+    .. |menu| image:: images/menu.png
 
 * current PLMObject type, reference and revision.
 
 * Displays a picture with PLMObjects linked to current PLMObject. You can click on them and navigate from PLMObject to others.
-
 
