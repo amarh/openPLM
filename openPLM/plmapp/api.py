@@ -19,7 +19,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.csrf.middleware import csrf_exempt
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import get_controller
+from openPLM.plmapp.controllers import get_controller, DocumentController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
 
@@ -173,8 +173,9 @@ def search(request, editable_only="true", with_file_only="true"):
                            and not bool(res.files):
                             continue
                         if editable_only == "true":
-                            obj = models.DocumentController(res.id, request.user)
+                            obj = DocumentController(res, request.user)
                             if not obj.check_permission("owner", False):
+                                print res
                                 continue
                         objects.append(object_to_dict(res))
                 return {"objects" : objects} 
