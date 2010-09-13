@@ -762,6 +762,7 @@ class DownloadDialog(SearchDialog):
     TITLE = "Download..."
     ACTION_NAME = "Download"
     ALL_FILES = True
+    SEARCH_SUFFIX = "false/true/"
 
     def do_action(self, doc, doc_file):
         PLUGIN.download(doc, doc_file)

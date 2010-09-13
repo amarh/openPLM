@@ -623,6 +623,7 @@ class CheckOutDialog(SearchDialog):
 class DownloadDialog(SearchDialog):
     TITLE = "Download..."
     ACTION_NAME = "Download"
+    SEARCH_SUFFIX = "false/true/"
     ALL_FILES = True
 
     def do_action(self, doc, doc_file):
