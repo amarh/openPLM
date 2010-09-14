@@ -86,7 +86,7 @@ class OpenPLMPluginInstance(object):
             type(self).SERVER = data["server"]
 
         try:
-            os.makedirs(self.OPENPLM_DIR, 0700)
+            os.makedirs(self.PLUGIN_DIR, 0700)
         except os.error:
             pass
 

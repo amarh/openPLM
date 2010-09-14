@@ -178,7 +178,7 @@ class OpenPLMPluginInstance(object):
         self.update()
 
         try:
-            os.makedirs(self.OPENPLM_DIR, 0700)
+            os.makedirs(self.PLUGIN_DIR, 0700)
         except os.error:
             pass
 
