@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import json
 import urllib
@@ -10,6 +11,7 @@ import tempfile
 # sudo easy_install poster
 from poster.encode import multipart_encode
 from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHandler
+
 
 import urllib2
 
@@ -64,7 +66,7 @@ class OpenPLMPluginInstance(object):
     #: location of openPLM server
     SERVER = "http://localhost:8000/"
     #: OpenPLM main directory
-    OPENPLM_DIR = os.path.expanduser("~/.openplm")
+    OPENPLM_DIR = os.path.join(os.path.expanduser("~"), ".openplm")
     #: directory where files are stored
     PLUGIN_DIR = os.path.join(OPENPLM_DIR, "openoffice")
     #: gedit plugin configuration file
@@ -136,7 +138,7 @@ class OpenPLMPluginInstance(object):
                 pass
             gdoc = self.desktop.getCurrentComponent()
             path = os.path.join(rep, filename)
-            gdoc.storeAsURL("file://" + path, ())
+            gdoc.storeAsURL(unohelper.systemPathToFileUrl(path), ())
             doc_file = self.upload_file(doc, path)
             self.add_managed_file(doc, doc_file, path)
             self.load_file(doc, doc_file["id"], path)
@@ -144,7 +146,7 @@ class OpenPLMPluginInstance(object):
                 self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
             else:
                 self.send_thumbnail(gdoc)
-                self.forget(gdoc)
+                self.forget(gdoc, False)
             return True, ""
 
     def get_data(self, url, data=None, show_errors=True, reraise=False):
@@ -225,8 +227,9 @@ class OpenPLMPluginInstance(object):
                 except ValueError:
                     # empty/bad config file
                     return {}
-        except IOError:
+        except IOError as e:
             # file does not exist
+            show_error(e, self.window)
             return {}
     
     def set_server(self, url):
@@ -256,27 +259,27 @@ class OpenPLMPluginInstance(object):
             del self.documents[gdoc.URL]
             data = self.get_conf_data()
             del data["documents"][str(doc["id"])]["files"][str(doc_file_id)]
-            if not  data["documents"][str(doc["id"])]["files"]:
+            if not data["documents"][str(doc["id"])]["files"]:
                 del data["documents"][str(doc["id"])]
             self.save_conf(data)
-            if delete and os.path.exists(path):
-                os.remove(path)
             if close_doc:
                 close(gdoc, self.desktop)
+            if delete and os.path.exists(path):
+                os.remove(path)
 
     def load_managed_files(self):
         for (doc_file_id, path), doc in self.get_managed_files():
             self.load_file(doc, doc_file_id, path)
 
     def load_file(self, doc, doc_file_id, path):
-        document = self.desktop.loadComponentFromURL("file://" + path,
+        document = self.desktop.loadComponentFromURL(unohelper.systemPathToFileUrl(path),
                                                      "_default", 0, ())
         if not document:
             # document may be a simple text file
             op1 = PropertyValue()
             op1.Name = 'InteractionHandler'
             op1.Value = self.smgr.createInstance("com.sun.star.task.InteractionHandler") 
-            document = self.desktop.loadComponentFromURL("file://" + path,
+            document = self.desktop.loadComponentFromURL(unohelper.systemPathToFileUrl(path),
                 "_default", 0, (op1,))
         if not document:
             show_error("Can not load %s" % path, self.window)
@@ -303,7 +306,7 @@ class OpenPLMPluginInstance(object):
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
                 else:
                     self.send_thumbnail(gdoc)
-                    self.forget(gdoc)
+                    self.forget(gdoc, False)
             if save:
                 gdoc.store()
                 func()
@@ -360,7 +363,7 @@ class OpenPLMPluginInstance(object):
             
             gdoc.store()
             new_path = os.path.join(rep, name)
-            shutil.move(path, new_path)
+            shutil.copy(path, new_path)
             self.forget(gdoc, delete=False)
             gd = self.load_file(new_doc, doc_file["id"], new_path)
             self.add_managed_file(new_doc, doc_file, new_path)
@@ -1092,6 +1095,10 @@ class OpenPLMCheckIn(Job):
                 dialog.run() 
                 if gdoc.URL not in PLUGIN.documents:
                     close(gdoc, self.desktop)
+                    try:
+                        os.remove(path)
+                    except os.error:
+                        pass
             else:
                 win = gdoc.CurrentController.Frame.ContainerWindow
                 show_error("Document not stored in OpenPLM", win)
@@ -1120,9 +1127,19 @@ class OpenPLMRevise(Job):
                 dialog = ReviseDialog(self.ctx, doc, name, revision)
                 dialog.run()
                 if gdoc.URL not in PLUGIN.documents:
+                    path = unohelper.fileUrlToSystemPath(gdoc.URL)
                     close(gdoc, self.desktop)
+                    try:
+                        os.remove(path)
+                    except os.error:
+                        pass
                 if dialog.gdoc and dialog.gdoc.URL not in PLUGIN.documents:
+                    path = unohelper.fileUrlToSystemPath(dialog.gdoc.URL)
                     close(dialog.gdoc, self.desktop)
+                    try:
+                        os.remove(path)
+                    except os.error:
+                        pass
             else:
                 win = gdoc.CurrentController.Frame.ContainerWindow
                 show_error("Document not stored in OpenPLM", win)
@@ -1159,7 +1176,12 @@ class OpenPLMCreate(Job):
             dialog = CreateDialog(self.ctx)
             resp = dialog.run()
             if dialog.doc_created and gdoc.URL not in PLUGIN.documents:
+                path = unohelper.fileUrlToSystemPath(gdoc.URL)
                 close(gdoc, self.desktop)
+                try:
+                    os.remove(path)
+                except os.error:
+                    pass
         except:
             traceback.print_exc()
 
