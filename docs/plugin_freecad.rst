@@ -26,6 +26,9 @@ Just go in the :file:`plugins/freecad` directory and run the command :command:`.
 Launch FreeCAD, if the plugin has been successfully installed, a new workbench
 named *OpenPLM* is available.
 
+.. warning::
+    This will only install the plugin for the current user.
+
 Usage
 =====
 

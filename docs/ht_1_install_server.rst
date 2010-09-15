@@ -40,6 +40,7 @@ Check applications are ok
         root@openplm-demo:~# service apache2 status
         
         Apache is running (pid 5315).
+    
     For Python : ::
     
         root@openplm-demo:~# python

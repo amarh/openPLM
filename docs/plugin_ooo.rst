@@ -28,7 +28,14 @@ Build
 You just have to made an archive (a zip file) of 3 files, the archive must have
 the extension ``.oxt``:
 
-``zip openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py`` 
+    - if you have a valid poster installation:
+
+        ``zip openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py`` 
+    
+    - else (this should work on Windows for example):
+        
+        ``zip openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py pythonpath/*/*`` 
+
 
 This will create a file called :file:`openplm.oxt` that you can install.
 
