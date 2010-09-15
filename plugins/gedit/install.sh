@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# plop
 if [ ! -e ~/.gnome2/gedit ]; then
     mkdir ~/.gnome2/gedit
 fi
