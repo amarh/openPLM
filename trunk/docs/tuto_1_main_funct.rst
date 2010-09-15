@@ -102,10 +102,8 @@ DATA DISPLAY AREA - NAVIGATE LIKE
 Contains :
 
 * Icon to switch to "navigate" display : |navigate|
-    .. |navigate| image:: images/navigate.png
 
 * Icon to switch to "menu" display : |menu|
-    .. |menu| image:: images/menu.png
 
 * current PLMObject type, reference and revision.
 
