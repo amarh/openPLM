@@ -220,7 +220,34 @@ function GenerateFilenameFromMsgHdr(msgHdr) {
     return filename;
 
 }
+function GenerateValidFilename(filename, extension)
+{
+  if (filename) // we have a title; let's see if it's usable
+  {
+    // clean up the filename to make it usable and
+    // then trim whitespace from beginning and end
+    filename = validateFileName(filename).trim();
+    if (filename.length > 0)
+      return filename + extension;
+  }
+  return null;
+}
 
+function validateFileName(aFileName)
+{
+    var re = /[\/]+/g;
+    aFileName = aFileName.replace(re, "_");
+
+    re = /[\\\/\|]+/g;
+    aFileName.replace(re, "_");
+    aFileName = aFileName.replace(/[\"]+/g, "_");
+    aFileName = aFileName.replace(/[\*\:\?]+/g, " ");
+    aFileName = aFileName.replace(/[\<]+/g, " ");
+    aFileName = aFileName.replace(/[\>]+/g, " ");
+    re = /[\:\/]+/g;
+  
+  return aFileName.replace(re, "_");
+}
 function save_messages(){
     var nb = OPENPLM.gFolderDisplay.selectedCount;
     var paths = new Array(nb);
@@ -241,7 +268,7 @@ function save_messages(){
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
             getService(Components.interfaces.nsIProperties).
             get("TmpD", Components.interfaces.nsIFile);
-        file.append(GenerateFilenameFromMsgHdr(messages[i])+".eml");
+        file.append(GenerateValidFilename(GenerateFilenameFromMsgHdr(messages[i]), ".eml"));
         file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0600);
         try {
             MsgService.streamMessage(MessageURI, MsgStream, msgWindow, null, false, null);
