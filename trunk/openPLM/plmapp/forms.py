@@ -107,6 +107,10 @@ class type_form(forms.Form):
     LISTE = m.get_all_users_and_plmobjects_with_level()
     type = forms.TypedChoiceField(choices=LISTE)
 
+class type_form_without_user(forms.Form):
+    LISTE_WO_USER = m.get_all_plmobjects_with_level()
+    type = forms.TypedChoiceField(choices=LISTE_WO_USER)
+
 class TypeSearchForm(type_form):
     def __init__(self, *args, **kwargs):
         super(TypeSearchForm, self).__init__(*args, **kwargs)

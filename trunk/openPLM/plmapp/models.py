@@ -916,7 +916,7 @@ def get_all_plmobjects_with_level():
 
 @memoize_noarg
 def get_all_users_and_plmobjects_with_level():
-    list_of_choices = get_all_plmobjects_with_level()
+    list_of_choices = list(get_all_plmobjects_with_level())
     level=">"
     _get_all_subclasses_with_level(User, list_of_choices, level)
     return list_of_choices

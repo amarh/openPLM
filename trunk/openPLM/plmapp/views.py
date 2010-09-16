@@ -220,6 +220,7 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
     search_need = "results" not in request_dict.session
     if request_dict.GET and "type" in request_dict.GET:
         type_form_instance = type_form(request_dict.GET)
+        type_form_instance4creation = type_form_without_user(request_dict.GET)
         if type_form_instance.is_valid():
             cls = models.get_all_users_and_plmobjects()[type_form_instance.cleaned_data["type"]]
         attributes_form_instance = get_search_form(cls, request_dict.GET)
@@ -227,10 +228,12 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
         search_need = True
     elif request_dict.session and "type" in request_dict.session:
         type_form_instance = type_form(request_dict.session)
+        type_form_instance4creation = type_form_without_user(request_dict.session)
         cls = models.get_all_users_and_plmobjects()[request_dict.session["type"]]
         attributes_form_instance = get_search_form(cls, request_dict.session)
     else:
         type_form_instance = type_form()
+        type_form_instance4creation = type_form_without_user()
         request_dict.session['type'] = 'Part'
         attributes_form_instance = get_search_form(models.Part)
     if attributes_form_instance.is_valid():
@@ -247,6 +250,7 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
     else:
         qset = request_dict.session.get("results", [])
     context_dict.update({'results' : qset, 'type_form' : type_form_instance,
+                         'type_form4creation' : type_form_instance4creation,
                          'attributes_form' : attributes_form_instance,
                          'class4search_div' : 'DisplayHomePage.htm',
                          'class4div' : class_for_div, 'obj' : selected_object})
