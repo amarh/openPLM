@@ -42,5 +42,9 @@ $(document).ready(function(){
         "top": "-=100px"
       }, "fast");
     });
-  });
 
+  $(".img_nav").draggable({
+      cursor: 'move'
+      });
+
+  });
