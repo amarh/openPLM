@@ -276,7 +276,8 @@ class NavigationGraph(object):
         :returns: a tuple (image map data, url of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
-        picture_path = "media/navigate/" + str(self.object.id) + "-"
+        t = "p" if isinstance(self.object, PLMObjectController) else "u"
+        picture_path = "media/navigate/" + t + str(self.object.id) + "-"
         for opt in self.options_list:
             picture_path += str(int(self.options[opt]))
         self.graph.layout(prog="neato")
