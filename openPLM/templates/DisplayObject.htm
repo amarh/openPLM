@@ -4,54 +4,31 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	
-	    <table>
-	        <tr>
-	            {% ifequal object_type 'User' %}
-	                <td>
-	                    <div class="ButtonLeft">
-	                        <div class="Button">
-	                            <a class="Button" href="/user/{{object_reference}}/modify/">{% trans "EDIT" %}</a>
-                            </div>
-                        </div>
-                    </td>
-	                <td>
-	                    <div class="ButtonLeft">
-	                        <div class="Button">
-	                            <a class="Button" href="/user/{{object_reference}}/password/">{% trans "PASSWORD" %}</a>
-                            </div>
-                        </div>
-	                </td>
-                    {% else %}
-                    {% if is_owner and obj.is_editable %}
-                    <td>
-	                    <div class="ButtonLeft">
-	                        <div class="Button">
-	                            <a class="Button" 
-	                                href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
-	                                {% trans "EDIT" %}
-                                </a>
-                            </div>
-                        </div>
-                    </td>
-                    {% endif %}
-            	{% endifequal %}
-	        </tr>
-        </table>
-    <br />
-	<br />
+    {% ifequal object_type 'User' %}
+        <span class="ButtonLeft">
+            <a class="Button" href="/user/{{object_reference}}/modify/">{% trans "EDIT" %}</a>
+        </span>
+        <span class="ButtonLeft">
+            <a class="Button" href="/user/{{object_reference}}/password/">{% trans "PASSWORD" %}</a>
+        </span>
+    {% else %}
+        {% if is_owner and obj.is_editable %}
+            <span class="ButtonLeft">
+                <a class="Button" 
+                    href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
+                    {% trans "EDIT" %}
+                </a>
+            </span>
+        {% endif %}
+	{% endifequal %}
 	<table class="Content">
-	{% for description,attribute in object_attributes %}
-		<tr class="Content">
-            <td class="Content">{{description}}</td>
-            <td class="Content">{{attribute|linebreaks}}</td>
-		</tr>
-	{% endfor %}
+	    {% for description,attribute in object_attributes %}
+		    <tr class="Content">
+                <td class="Content">{{description}}</td>
+                <td class="Content">{{attribute|linebreaks}}</td>
+		    </tr>
+	    {% endfor %}
 	</table>
-	</form>
-	{% for message in messages %}
-	{{message}}<br>
-	{% endfor %}
 {% endblock %}
 
 

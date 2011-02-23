@@ -7,40 +7,32 @@
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
         {% if is_owner %}
-	    <table>
-	         <tr>
-	            <td>
-                    <div class="ButtonLeft">
-                        <div class="Button">
-                            <a class="Button" href="./add/">{% trans "ADD" %}</a>
-                        </div>
-                    </div>
-                </td>
-                {% if doc_cad_formset.forms %}
-                <td><input type="submit" value={% trans "DISCONNECT" %}></td>
-                {% endif %}
-	        </tr>
-        </table>
+            <span class="ButtonLeft">
+                <a class="Button" href="./add/">{% trans "ADD" %}</a>
+            </span>
+            {% if doc_cad_formset.forms %}
+                <input type="submit" value={% trans "DISCONNECT" %}>
+            {% endif %}
         {% endif %}
-        <table class="Content">
+        <table class="Result">
 	        {% for form in doc_cad_formset.forms %}
-                    {{ form.id }}
-                    {{ form.part }}
-                    {{ form.document }}
-                    <tr class="Content">
-                        {% if is_owner %}
-                        <td class="Content">{{ form.delete }}</td>
-                        {% endif %}
-			            <td class="Content">{{ form.instance.document.type }}</td>
-			            <td class="Content">
-                            <a href="{{ form.instance.document.plmobject_url }}"/>
-			                    {{ form.instance.document.reference }}
-		                    </a>
-	                    </td>
-			            <td class="Content">{{ form.instance.document.revision }}</td>
-                    </tr>
-            {% empty %}
-            <tr> {% trans "There are no document attached to this part" %}</tr>
+                {{ form.id }}
+                {{ form.part }}
+                {{ form.document }}
+                <tr class="Content">
+                    {% if is_owner %}
+                        <td class="Content"  style="width:50px; text-align:center">{{ form.delete }}</td>
+                    {% endif %}
+		            <td class="Content">{{ form.instance.document.type }}</td>
+		            <td class="Content">
+                        <a href="{{ form.instance.document.plmobject_url }}"/>
+		                    {{ form.instance.document.reference }}
+	                    </a>
+                    </td>
+		            <td class="Content">{{ form.instance.document.revision }}</td>
+                </tr>
+                {% empty %}
+                <tr><td>{% trans "There are no document attached to this part" %}</td></tr>
 	        {% endfor %}
 	    </table>
     </form>

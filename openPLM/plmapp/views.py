@@ -210,11 +210,11 @@ def display_global_page(request_dict, type_value='-', reference_value='-', revis
         selected_object = get_obj(type_value, reference_value, revision_value, request_dict.user)
     # Defines a variable for background color selection
     if isinstance(selected_object, UserController):
-        class_for_div="NavigateBox4User"
+        class_for_div="ActiveBox4User"
     elif isinstance(selected_object, DocumentController):
-        class_for_div="NavigateBox4Doc"
+        class_for_div="ActiveBox4Doc"
     else:
-        class_for_div="NavigateBox4Part"
+        class_for_div="ActiveBox4Part"
     qset = []
     # Builds, update and treat Search form
     search_need = "results" not in request_dict.session
@@ -995,9 +995,9 @@ def create_object(request):
             if type_form_instance.is_valid():
                 cls = models.get_all_userprofiles_and_plmobjects()[type_form_instance.cleaned_data["type"]]
                 if issubclass(cls, models.Document):
-                    class_for_div="NavigateBox4Doc"
+                    class_for_div="ActiveBox4Doc"
                 else:
-                    class_for_div="NavigateBox4Part"
+                    class_for_div="ActiveBox4Part"
                 creation_form_instance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
                 non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
     elif request.method == 'POST':
@@ -1007,9 +1007,9 @@ def create_object(request):
                 type_name = type_form_instance.cleaned_data["type"]
                 cls = models.get_all_userprofiles_and_plmobjects()[type_name]
                 if issubclass(cls, models.Document):
-                    class_for_div="NavigateBox4Doc"
+                    class_for_div="ActiveBox4Doc"
                 else:
-                    class_for_div="NavigateBox4Part"
+                    class_for_div="ActiveBox4Part"
                 non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
                 creation_form_instance = get_creation_form(cls, request.POST)
                 if creation_form_instance.is_valid():
@@ -1078,7 +1078,7 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     """
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
-    class_for_div="NavigateBox4User"
+    class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
             modification_form_instance = OpenPLMUserChangeForm(request.POST)
@@ -1112,7 +1112,7 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
     current_object, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
-    class_for_div="NavigateBox4User"
+    class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
             modification_form_instance = PasswordChangeForm(current_object, request.POST)
@@ -1408,7 +1408,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 regex_pattern = re.compile(r'coords\=\"(\d{1,5}),(\d{1,5}),(\d{1,5}),(\d{1,5})')
 
 @handle_errors
-def navigate(request, obj_type, obj_ref, obj_revi):
+def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
     """
     Manage html page which displays a graphical picture the different links
     between :class:`~django.contrib.auth.models.User` and  :class:`.models.PLMObject`.
@@ -1457,12 +1457,13 @@ def navigate(request, obj_type, obj_ref, obj_revi):
                     re.search(regex_pattern, map_string).groups())
     x_part_node_position = (x_1st_point + x_2nd_point) // 2
     y_part_node_position = (y_1st_point + y_2nd_point) // 2
-    x_img_position_corrected = 790 // 2 - x_part_node_position - 100
-    y_img_position_corrected = 405 // 2 - y_part_node_position
+    x_img_position_corrected = 1172 // 2 - x_part_node_position
+    y_img_position_corrected = 500 // 2 - y_part_node_position
     context_dict.update({'filter_object_form': form,
                          'map_areas': map_string, 'picture_path': "/"+picture_path,
                          'x_img_position': x_img_position_corrected,
-                         'y_img_position': y_img_position_corrected})
+                         'y_img_position': y_img_position_corrected,
+                         'navigate_bool': navigate_bool})
     return render_to_response('Navigate.htm', context_dict, 
                               context_instance=RequestContext(request))
     

@@ -1,20 +1,22 @@
 {% extends "MiddleDisplayObject.htm" %}
 {% load i18n %}
 
-<!-- Manage html display in the Content div which correspond to the "children" menu + "add new"-->
+<!-- Manage html display in the Content div which correspond to the "management" menu + "delegate"-->
 
 {% block content %}
-
-<br/>
 {% trans "Select a user for your delegation as : " %}{{role}}
-<br/>
-<br/>
 <form method="POST" action="">
     <table class="Content">
         {{replace_management_form}}
+        <tr>
+            <td>
+            </td>
+            <td>
+                <input type="submit" value={% trans "Validate" %} name="action"/>
+                <input type="submit" value={% trans "Undo" %} name="action"/>
+            </td>
+        </tr>
     </table>
-    <input type="submit" value={% trans "Validate" %} name="action"/>
-    <input type="submit" value={% trans "Undo" %} name="action"/>
 </form>
 {% endblock %}
 

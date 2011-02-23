@@ -1,13 +1,14 @@
-/* Definir le style de la page entière */
-
-*   {
-    padding: 0px;
-    margin: 0px;
-    }
+/* *************************************************************************************** */
+/*                                  GENERAL STYLE                                          */
+/* *************************************************************************************** */
+*
+{
+padding: 0px;
+margin: 0px;
+}
 
 body 
 {
-/* background-color: #b3b3b3; */
 background: #b3b3b3 url(/media/img/openplm.png) no-repeat right top fixed;
 font-family: Arial, sans-serif, Comic Sans MS, Verdana;
 text-align: center;
@@ -21,251 +22,325 @@ float: left;
 margin: 2px;
 }
 
+img.thumbnail
+{
+max-height:70px;
+}
+
+h2
+{
+font-size: 30px;
+line-height: 1.4;
+}
+
 .clear
 {
 clear: both;
 }
 
-div
+hr
 {
-/* -moz-border-radius: 1em; */
-/* -webkit-box-shadow: 3px 3px 6px #666; */
-/* -moz-box-shadow: 3px 3px 6px #666; */
-/* box-shadow: 3px 3px 6px #666; */
+margin-top: 10px;
+margin-bottom: 10px;
 }
 
-#HomePage
+ul
+{
+display: inline;
+text-indent: 0px;
+}
+	
+li
+{
+display: inline;
+list-style-type: none;
+text-indent: 0px;
+}
+
+/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
+span.ButtonLeft
+{
+display: inline-block;
+height: 20px;
+border: 1px groove #999999;
+background: #cccccc url(/media/img/button.png) repeat-x;
+-moz-border-radius: 1px;
+text-align: center;
+}
+
+span.ButtonLeft:hover
+{
+background: #f8b57d;
+}
+
+/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
+a.Button
+{
+padding-left: 5px;
+padding-right: 5px;
+color: #000000;
+text-decoration: none;
+font-size: 90%;
+cursor: default;
+}
+
+/* GLOBAL PAGE */
+div#Page
 {
 background: #ffffff url(/media/img/foot-complet.gif) no-repeat bottom right;
 width: 1200px;
+margin: auto;
 min-height: 500px;
-/* filter: alpha(opacity=90); */
-/* opacity: 0.90; */
 }
 
-#Footer
+/* *************************************************************************************** */
+/*                          STYLE FOR THE MAIN BOXES                                       */
+/* *************************************************************************************** */
+/* FOR ALL BOXES */
+div#DisplayBox, div#CreationBox, div#SearchBox, div#SearchBox4Search, div#LoggedPersonBox,
+div#ActiveBox, div#LoginBox
 {
-background: url(/media/img/footer-logo.gif) no-repeat bottom;
-height: 100px;
-width: 1200px;
-}
-
-#SearchArea, #NavigateArea
-{
-min-height: 500px;
-border-style: none;
-}
-
-div#SearchArea
-{
-float: left;
-width: 400px;
-}
-
-div#NavigateArea
-{
-float: right;
-width: 800px;
-margin-bottom: 90px;
-}
-
-div#SearchBox, div#ResultBox, div#ResultBox4Search, div#LoggedPersonBox,
-div#NavigateBox4Part, div#NavigateBox4Doc,  div#NavigateBox4User, div#CreationBox
-{
--moz-border-radius: 1em;
-/* float: top; */
-background-color: #99ccff;
+-moz-border-radius: 5px;
+-moz-box-shadow: 5px 5px 10px #999999;
+/*background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #b5c5ff 100%);*/
+border: 0px outset;
+background-color: #b5c5ff;
 margin: 8px;
 padding: 5px;
+text-align: left;
 }
 
-div#SearchBox
-{
-min-height: 180px;
-margin-right: 0px;
-}
-
-div#ResultBox
-{
-min-height: 200px;
-margin-right: 0px;
-/*overflow: scroll;*/
-}
-
-div#ResultBox4Search
-{
-background-color: #ff4848;		
-min-height: 350px;
-margin-right: 0px;
-}
-
-div#LoggedPersonBox, div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User, div#CreationBox
-{
-float: left;
-}
-
-div#LoggedPersonBox
-{
-width: 454px;
-height: 30px;
-margin-bottom: 0px;
-}
-
-div#CreationBox
-{
-width: 294px;
-height: 30px;
-margin-bottom: 0px;
-}
-
-div#NavigateBox4Part, div#NavigateBox4Doc, div#NavigateBox4User
-{
-width: 772px;
-min-height: 420px;
-}
-
-div#NavigateBox4Doc
-{
-background-color: #fef176;
-}
-
-div#NavigateBox4User
-{
-background-color: #94bd5e;
-}
-
+/* BOX WE FIND IN THE LOGIN PAGE */
 div#LoginBox
 {
-background-color: #99ccff;
--moz-border-radius: 1em;
-width: 400px;
-height: 150px;
+display: inline-block;
+vertical-align: middle;
+line-height: 30px;
+margin: auto;
 padding: 50px;
+text-align: center;
 }
 
-
-div#PageBanner, div#PageLeft, div#PageCenter
+/* BOX WHERE WE FIND DIFFERENT BUTTONS FOR PAGE DISPLAY (SHOW/HIDE BOXES & NAVIGATE/STUDY) */
+div#DisplayBox
 {
-/* float: top; */
+display: table-cell;
+height: 30px;
+float: left;
+width: 380px;
+margin-right: 0px;
+margin-bottom: 0px;
+vertical-align: middle;
+line-height: 30px;
 }
 
-/* Definir le style de la Banniere en haut de page */
-div#PageBanner
+/* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
+div#CreationBox, div#SearchBox, div#SearchBox4Search
+{
+display: none;
+float: left;
+width: 380px;
+margin-right: 0px;
+}
+
+div#SearchBox, div#SearchBox4Search
+{
+min-height: 200px;
+}
+
+/* WHEN WE CONNECT AN OBJECT TO ANOTHER, WE CHANGE THE STYLE OF THE SEARCHBOX (NO LONGER USED) */
+/*div#SearchBox4Search
+{
+background-color: #ff4848;
+} */
+
+/* BOX WHICH DISPLAY INFO ABOUT LOGGED-IN USER, LANGUAGE, TIME, ... */
+div#LoggedPersonBox
+{
+float: right;
+width: 768px;
+text-align: left;
+height: 30px;
+margin-bottom: 0px;
+}
+
+/* MAIN BIG ACTIVE BOX */
+div#ActiveBox
+{
+width: 1168px;
+float: right;
+min-height: 420px;
+margin-bottom: 110px;
+padding: 5px;
+background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #b5c5ff 100%);
+}
+
+/* *************************************************************************************** */
+/*                          STYLE FOR BUTTONS IN DISPLAYBOX                                */
+/* *************************************************************************************** */
+/* FOR ALL BUTTONS */
+li#FindButton, li#CreateButton, li#NavigateButtonOff, li#NavigateButtonOn,
+li#StudyButtonOn, li#StudyButtonOff, li#QuitButton
+{
+border: 2px outset;
+padding: 3px;
+margin-right: 10px;
+-moz-border-radius: 5px;
+background-color: #CCCCCC;
+cursor: pointer;
+}
+
+/* STYLE FOR LINKS IS DESACTIVED */
+li#StudyButtonOn a, li#StudyButtonOff a, li#NavigateButtonOff a,
+li#NavigateButtonOn a, li#QuitButton a
+{
+text-decoration: none;
+color: #000000;
+}
+
+/* BUTTON TO SWITCH TO STUDY MODE DISPLAY */
+li#StudyButtonOn, li#StudyButtonOff
+{
+-moz-border-radius-topleft: 0px;
+-moz-border-radius-bottomleft: 0px;
+}
+
+/* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
+li#NavigateButtonOff, li#NavigateButtonOn
+{
+-moz-border-radius-topright: 0px;
+-moz-border-radius-bottomright: 0px;
+margin-right: -3px;
+}
+
+/* WHEN BUTTON IS ON */
+li#NavigateButtonOn, li#StudyButtonOn
+{
+border: 2px inset;
+background-color: #777777;
+}
+
+#SetLangForm
+{
+display: inline;
+}
+
+/* NO LONGER USED */
+/* div.ToggleDisplayDiv
+{
+background-color: #ffffff;
+text-align: left;
+margin: 0px;
+margin-bottom: 10px;
+height: 24px;
+}
+*/
+
+/* *************************************************************************************** */
+/*                              STYLE INSIDE THE ACTIVEBOX                                 */
+/* *************************************************************************************** */
+/* AREA WHERE TYPE-REFERENCE-REVISION IS DISPLAYED */
+div#ReferenceArea
 {
 border-bottom: 7px solid #CCCCCC;
 text-align: left;
-font-size: 175%;
 font-weight: lighter;
 }
 
-/* Definir le style de la partie Gauche de la page */
-div#PageLeft
-{
-background-color: #CCCCCC;
-}
-
-/* Definir le style de la partie Centrale de la page */
-div#PageCenter
+/* ACTIVE AREA */
+div#ActiveArea
 {
 text-align: left;
-padding-top: 10px;
 }
 
-table.MenuTable
+/* FOR THE MENU OF THE CURRENT OBJECT */
+ul#MenuList
 {
-width: 100%;
-border-spacing: 0;
-}
-
-.MenuTable td
-{
-text-align: center;
+display: block;
+text-indent: 10px;
+text-align: left;
 font-size: 90%;
-height: 40px;
+margin-bottom: 10px;
+}
+
+ul#MenuList li
+{
+display: table-cell;
+text-align: center;
+padding: 5px;
 border-bottom-style: solid;
 border-bottom-width: 1px;
+white-space:nowrap;
 }
 
-.MenuTable td.CurrentPage
+ul#MenuList li.CurrentPage
 {
-font-size: 100%;
-background-color: #99ccff;
 border-top-style: solid;
 border-right-style: solid;
 border-left-style: solid;
 border-bottom-style: none;
 border-width: 1px;
+padding-left: 4px;
+padding-right: 4px;
 }
 
-div#NavigateBox4Doc td.CurrentPage
+ul#MenuList li:not(.CurrentPage)
 {
-background-color: #fef176;
+background-color : #cccccc;
 }
 
-div#NavigateBox4User td.CurrentPage
+ul#MenuList li:hover
 {
-background-color: #94bd5e;
+border-width: 1px;
+border-top-style: solid;
+border-right-style: solid;
+border-left-style: solid;
+border-bottom-style: none;
+padding-left: 4px;
+padding-right: 4px;
 }
 
-.MenuTable td:hover
+/* STYLE FOR LINKS IS DESACTIVED */
+ul#MenuList li a
 {
-background-color: #E6E6FF;
-}
-
-div#NavigateBox4Doc td:hover
-{
-background-color: #fff8ba;
-}
-
-div#NavigateBox4User td:hover
-{
-background-color: #bef278;
-}
-
-.MenuTable td.CurrentPage:hover
-{
-background-color: #99ccff;
-}
-
-div#NavigateBox4Doc td.CurrentPage:hover
-{
-background-color: #fef176;
-}
-
-div#NavigateBox4User td.CurrentPage:hover
-{
-background-color: #94bd5e;
-}
-
-.MenuTable a
-{
-height: 40px;
-display: block;
-line-height: 2.5;
 text-decoration: none;
-color: black;
+color: #000000;
 }
 
+/* *************************************************************************************** */
+/*                   STYLE FOR THE TABLES USED IN THE SEARCHBOX & ACTIVEBOX                */
+/* *************************************************************************************** */
 table.Content, table.Result
 {
 width: 100%;
+margin-top: 10px;
 border-spacing: 0;
 }
 
 table.Result
 {
-margin: 0px;
 overflow-x: sroll;
 overflow-y: hidden;
 table-layout: fixed;
 }
 
-th.Content, td.Content, td.Content2
+th.Content, td.Content
 {
 padding: 3px;
 border-width: 1px;
 border-style: solid;
-border-color: #99ccff;
+border-color: #b5c5ff;
+}
+
+table.Content th
+{
+text-align: right;
+padding-right: 10px;
+}
+
+table.Content td
+{
+text-align: left;
 }
 
 td.reference {
@@ -281,22 +356,8 @@ tr.Content2>td.Content	{
 background-color: #AAAAAA;
 }
 
-ul
-{
-display: inline;
-padding: 0px;
-text-indent: 0px;
-}
-	
-li
-{
-display: inline;
-list-style-type: none;
-padding: 0px;
-text-indent: 0px;
-}
-
-
+/* TRICK TO DISPLAY CORRECTLY LONG NAMES IN THE RESULTS TABLE */
+/* FULL NAME IS DISPLAYED ONLY IF MOUSE IS OVER IT */
 span.info span.long
 {
 display: none;
@@ -319,107 +380,8 @@ span.info:hover span.small
 display: none;
 }
 
-
-h2
-{
-font-size: 30px;
-line-height: 1.4;
-}
-
-div#Navigate
-{
-border: 1px solid #000000;
-width: 770px;
-height: 405px;
-background-color: #FFFFFF;
-overflow: scroll;
-}
-
-.img_nav
-{
-position: relative;
-border-style: none;
-}
-
-div#imgManagement
-{
-position: absolute;
-width: 95px;
-height: 95px;
-right: 110px;
-top: 210px;
-border-style: none;
-cursor: pointer;
-}
-
-#topControl
-{
-width: 94px;
-height: 29px;
-background: url(/media/img/nav-top.png) no-repeat;
-float: left;
-}
-
-#rightControl
-{
-width: 47px;
-height: 36px;
-background: url(/media/img/nav-right.png) no-repeat right;
-float: right;
-}
-#leftControl
-{
-width: 47px;
-height: 36px;
-right: 110px;
-top: 410px;
-background: url(/media/img/nav-left.png) no-repeat left;
-float: left;
-}
-
-#bottomControl
-{
-width: 94px;
-height: 29px;
-background: url(/media/img/nav-bottom.png) no-repeat;
-float: left;
-}
-
-img.thumbnail
-{
-    max-height:70px;
-}
-
-div.ButtonLeft
-{
-
-background: url(/media/img/left_button.png) no-repeat left top;
-height: 25px;
-text-align: center;
-width: 100%;
-}
-
-div.Button
-{
-background: url(/media/img/right_button.png) no-repeat right top;
-height: 25px;
-}
-
-a.Button
-{
-padding-top: 5px;
-margin-left: 5px;
-margin-right: 5px;
-display: block;
-height: 100%;
-color: #000000;
-text-align: center;
-text-decoration: none;
-font-size: 90%;
-}
-
-
-/* tooltip in result/Add */
+/* TRICK TO DISPLAY CORRECTLY LONG NAMES IN THE RESULTS TABLE WHEN WE CONNECT AN OBJECT TO ANOTHER */
+/* FULL NAME IS DISPLAYED IN A TOOLTIP WHEN MOUSE IS OVER THE REFERENCE */
 a.tooltip em {
     display:none;
 }
@@ -454,3 +416,113 @@ a.tooltip:hover em span {
     border: 0;
 }
 
+/* *************************************************************************************** */
+/*              STYLE FOR ELEMENTS WHEN WE ARE IN NAVIGATE MODE DISPLAY                    */
+/* *************************************************************************************** */
+
+div#Navigate
+{
+position: relative;
+width: 99.8%;
+-moz-border-radius: 5px;
+border: 1px solid #000000;
+height: 500px;
+background-color: #FFFFFF;
+overflow: scroll;
+}
+
+img#ImgNav
+{
+position: absolute;
+z-index: 1;
+border-style: none;
+cursor: crosshair;
+}
+
+/* BUTTONS WE USE TO SLIDE THE NAVIGATE IMAGE UP/DOWN/LEFT/RIGHT */
+div#imgManagement
+{
+position: absolute;
+left: 10px;
+top: 10px;
+width: 95px;
+height: 95px;
+border-style: none;
+cursor: pointer;
+opacity:0.8;
+filter:alpha(opacity=20);
+z-index: 5;
+}
+
+#topControl
+{
+width: 94px;
+height: 29px;
+background: url(/media/img/nav-top.png) no-repeat;
+float: left;
+filter:alpha(opacity=20);
+}
+
+#rightControl
+{
+width: 47px;
+height: 36px;
+background: url(/media/img/nav-right.png) no-repeat right;
+float: right;
+}
+#leftControl
+{
+width: 47px;
+height: 36px;
+right: 110px;
+top: 410px;
+background: url(/media/img/nav-left.png) no-repeat left;
+float: left;
+}
+
+#bottomControl
+{
+width: 94px;
+height: 29px;
+background: url(/media/img/nav-bottom.png) no-repeat;
+float: left;
+}
+
+/* DISPLAY A BOX IN THE NAVIGATEAREA FOR FILTER OPTIONS */
+div#FilterNav
+{
+position: absolute;
+right: 10px;
+top: 10px;
+z-index: 3;
+padding: 3px;
+width: 250px;
+text-align: left;
+background-color: #555555;
+opacity:0.8;
+filter:alpha(opacity=80);
+-moz-border-radius: 5px;
+}
+
+div#FilterNav ul
+{
+display: none;
+text-indent: 0px;
+}
+
+div#FilterNav ul>li
+{
+display: block;
+text-indent: 0px;
+background-color: #dddddd;
+text-align: right;
+opacity:0.8;
+filter:alpha(opacity=80);
+font-size: 75%;
+padding: 5px;
+}
+
+div#FilterNav:hover ul
+{
+display: block;
+}

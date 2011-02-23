@@ -4,26 +4,25 @@
 <!-- Manage html display in the Content div which correspond to the "revisions" menu -->
 
 {% block content %}
-
-{% if add_revision_form and is_owner %}
-    <form method="POST" action="">
-        {{add_revision_form}}
-        <input type="submit" value={% trans "NEW" %}>
-    </form>
-{% else %}
-{% trans "You can not revise this object since a revision already exist." %}
-{% endif %}
-<br/>
-<br/>
-<table class="Content">
-    {% for object in revisions %}
-    <tr class="Content">
-        <td class="Content"><a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference}}</a></td>
-        <td class="Content">{{object.revision}}</td>
-        <td class="Content">{{object.type}}</td>
-        <td class="Content">{{object.state.name}}</td>
-    </tr>	
-    {% endfor %}
-</table>
+    {% if add_revision_form and is_owner %}
+        <form method="POST" action="">
+            {{add_revision_form}}
+            <input type="submit" value={% trans "NEW" %}>
+        </form>
+    {% else %}
+        {% trans "You can not revise this object since a revision already exist." %}
+    {% endif %}
+    <table class="Content">
+        {% for object in revisions %}
+            <tr class="Content">
+                <td class="Content">
+                    <a href="/object/{{object.type}}/{{object.reference}}/{{object.revision}}/">{{object.reference}}</a>
+                </td>
+                <td class="Content">{{object.revision}}</td>
+                <td class="Content">{{object.type}}</td>
+                <td class="Content">{{object.state.name}}</td>
+            </tr>	
+        {% endfor %}
+    </table>
 {% endblock %}
 

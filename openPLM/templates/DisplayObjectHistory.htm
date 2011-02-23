@@ -4,14 +4,20 @@
 <!-- Manage html display in the Content div which correspond to the "history" menu -->
 
 {% block content %}
-<br>
-	<br>
 	<table class="Content">
-	{% for date, action, details in object_history %}
-		<tr class="Content">
-			<td class="Content">{{date}}</td><td class="Content">{{action}}</td><td class="Content">{{ details|linebreaks }}</td>
-		</tr>
-	{% endfor %}
+	    {% for date, action, details in object_history %}
+		    <tr class="Content">
+			    <td class="Content">
+			        {{date}}
+		        </td>
+		        <td class="Content">
+		            {{action}}
+	            </td>
+	            <td class="Content">
+	                {{ details|linebreaks }}
+                </td>
+		    </tr>
+	    {% endfor %}
 	</table>
 {% endblock %}
 

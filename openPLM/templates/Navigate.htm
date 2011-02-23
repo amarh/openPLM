@@ -4,18 +4,27 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	<form method="post" action="." >
-	    {% trans "Display :" %}
-	    {{filter_object_form}}
-        <input type="submit" value={% trans "FILTER" %}>
-    </form>
-    <br />
-    <div id="Navigate" >
-        
-        <img class="img_nav" style="left:{{x_img_position}}px; top:{{y_img_position}}px "
+    <div id="Navigate">
+        <div id="imgManagement">
+            <span class="imgManagement" id="topControl"></span>
+            <span class="imgManagement" id="leftControl"></span>
+            <span class="imgManagement" id="rightControl"></span>
+            <span class="imgManagement" id="bottomControl"></span>
+        </div>
+        <img id="ImgNav" style="left:{{x_img_position}}px; top:{{y_img_position}}px"
                  src="{{picture_path}}" usemap="#_anonymous_0" title="Navigate" alt="Navigate" />
         {{map_areas|safe}}
         
+        
+        <div id="FilterNav">
+            {% trans "Display :" %}
+	        <form method="post" action="." >
+	            <ul id="FilterNav">
+	            {{filter_object_form.as_ul}}
+	            <li><input type="submit" value={% trans "FILTER" %}></li>
+	            </ul>
+            </form>
+        </div>
     </div>
 {% endblock %}
 

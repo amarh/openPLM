@@ -5,38 +5,25 @@
 
 {% block content %}
     {% if is_owner and obj.is_editable %}
-    <table>
-        <tr>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" href="./add/">{% trans "ADD" %}</a>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" href="./edit/">{% trans "EDIT" %}</a>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
+        <span class="ButtonLeft">
+                <a class="Button" href="./add/">{% trans "ADD" %}</a>
+        </span>
+        <span class="ButtonLeft">
+                <a class="Button" href="./edit/">{% trans "EDIT" %}</a>
+        </span>
     {% endif %}
     <form method="GET" action="">
-        {% trans "Display :" %}<br />
+        {% trans "Display :" %}
         <ul>
-        {{display_form.as_ul}}
+            {{display_form.as_ul}}
         </ul>
-        <input type="submit" value={% trans "GO !" %}><br/>
+        <input type="submit" value={% trans "GO !" %}>
     </form>
-	<br/>
-    <table class="Content">
+    <table class="Result">
         <tr>
-            <th class="Content"> </th>
-            <th class="Content"> {% trans "Ord." %} </th>
-            <th class="Content"> {% trans "Qty" %}</th>
+            <th class="Content" style="width:50px"> </th>
+            <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
+            <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
             <th class="Content"> {{ obj.reference }} </th>
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
@@ -44,21 +31,20 @@
             <th class="Content"> {{ obj.state.name }} </th>
         </tr>
         {% for level, link in children %}
-        <tr class="Content"> 
-            <td class="Content" style="width:50px">{{ level|safe}} ↳</td>
-            <td class="Content"> {{ link.order }} </td>
-            <td class="Content"> {{ link.quantity }} </td>
-            <td class="Content"> 
-                <a href="/object/{{link.child.type}}/{{link.child.reference}}/{{link.child.revision}}/">
-                    {{ link.child.reference }}
-                </a>
-            </td>
-            <td class="Content"> {{ link.child.revision }} </td>
-            <td class="Content"> {{ link.child.type }} </td>
-            <td class="Content"> {{ link.child.name }} </td>
-            <td class="Content"> {{ link.child.state.name }} </td>
-        </tr>
-
+            <tr class="Content"> 
+                <td class="Content">{{ level|safe}} ↳</td>
+                <td class="Content"> {{ link.order }} </td>
+                <td class="Content"> {{ link.quantity }} </td>
+                <td class="Content"> 
+                    <a href="/object/{{link.child.type}}/{{link.child.reference}}/{{link.child.revision}}/">
+                        {{ link.child.reference }}
+                    </a>
+                </td>
+                <td class="Content"> {{ link.child.revision }} </td>
+                <td class="Content"> {{ link.child.type }} </td>
+                <td class="Content"> {{ link.child.name }} </td>
+                <td class="Content"> {{ link.child.state.name }} </td>
+            </tr>
         {% endfor %}
 	</table>
 {% endblock %}

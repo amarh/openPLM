@@ -6,42 +6,29 @@
 
 {% block LoggedPersonBlock %}
     {% get_current_language as LANGUAGE_CODE %}
-    <table>
-    <tr>
-    <td>
-    <a href="/logout/">
-        <img src="/media/img/exit.png" title="Exit" alt="Exit" width="30" height="30"/>
-    </a>
-    </td>
-    <td>
-    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"l j N Y, G:i"}}
-    </td>
-    <td>
-    <form action="/i18n/setlang/" method="post">
+    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"D j N Y, G:i"}}
+    <form id="SetLangForm" action="/i18n/setlang/" method="post">
         <select name="language">
 
             {% for lang in LANGUAGES %}
-            <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >{{ lang.1 }}</option>
+                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                    {{ lang.1 }}
+                </option>
             {% endfor %}
         </select>
         <input type="submit" value={% trans "Go" %} />
     </form>
-    </td>
-    </tr>
-    </table>
 {% endblock %}
-
 {% block SearchBlock %}
-	<b>Search for :</b>
 	<form id="search_form" method="get" action="." enctype="text/plain">
-		<table class="Content" id="search_table">
+        <table class="Content" id="search_table">
 			{{type_form.as_table}}
 			{{attributes_form.as_table}}
+		<tr>
 		</table>
-		<input type="submit" value={% trans "SEARCH !" %}>
+        <div style="text-align:center"><input type="submit" value={% trans "SEARCH !" %}></div>
 	</form>
 {% endblock %}
-
 {% block ResultBlock %}
 	Results for link creation :
 	<table class="Result">
@@ -54,7 +41,6 @@
                         <col width="20%"/>
                         <col width="20%"/>
                     {% endif %}
-
 				    <tr class="Content">
 				    {% if object.username %}
 		                <th class="Content">{% trans "Username" %}</th>
@@ -115,18 +101,14 @@
 			{% endfor %}
 	</table>
 {% endblock %}
-
 {% block CreationBlock %}
 	<form method="get" action="/object/create/" enctype="text/plain">
-		<table class="Content">
-			<tr>
-				{% for attribute in type_form %}
-					<th>{{attribute.label_tag}}</th>
-					<td>{{attribute}}</td>
-				{% endfor %}
-				<td><input type="submit" value={% trans "CREATE !" %}></td>
-			</tr>
-		</table>
+		<ul>
+		    {{type_form4creation.as_ul}}
+            <li>
+                <input type="submit" value={% trans "CREATE !" %}>
+            </li>
+        </ul>
 	</form>
 {% endblock %}
 
