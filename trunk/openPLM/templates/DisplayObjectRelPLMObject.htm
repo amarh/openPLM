@@ -4,9 +4,7 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-    <br />
-	<br />
-	<table class="Content">
+	<table class="Result">
 	    <tr class="Content">
             <th class="Content"> {% trans "Type" %} </th>
             <th class="Content"> {% trans "Reference" %} </th>
@@ -16,15 +14,16 @@
 	    {% for link in object_user_link %}
 		    <tr class="Content">
 			    <td class="Content">{{link.plmobject.type}}</td>
-			    <td class="Content">{{link.plmobject.reference}}</td>
+			    <td class="Content">
+			        <a href={{link.plmobject.plmobject_url}}>
+			            {{link.plmobject.reference}}
+			        </a>
+		        </td>
 			    <td class="Content">{{link.plmobject.revision}}</td>
 			    <td class="Content">{{link.role}}</td>
 		    </tr>
 	    {% endfor %}
 	</table>
-	{% for message in messages %}
-	{{message}}<br>
-	{% endfor %}
 {% endblock %}
 
 

@@ -1,52 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 {% load i18n %}
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
-	<link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
+    <meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
     <link type="text/css" href="/media/css/smoothness/jquery-ui-1.8.4.custom.css" rel="Stylesheet" /> 
-	<title>{% block title %} {% endblock %}</title>
-	<META name="Robots" content="none">
-	<meta name="Author" content="philippe.joulaud pierre.cosquer" />
-	<meta name="Classification" content="" />
-	<meta name="Description" content="" />
-	<meta name="keywords" content="" />
-	<script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
+    <title>{% block title %} {% endblock %}</title>
+    <META name="Robots" content="none">
+    <meta name="Author" content="philippe.joulaud pierre.cosquer" />
+    <meta name="Classification" content="" />
+    <meta name="Description" content="" />
+    <meta name="keywords" content="" />
+    <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="/media/js/jquery-ui-1.8.4.custom.min.js"></script>
-	<script type="text/javascript" src="/media/js/navigate.js"></script>
-	<script type="text/javascript" src="/media/js/search_form.js"></script>
-
+    <script type="text/javascript" src="/media/js/navigate.js"></script>
+    <script type="text/javascript" src="/media/js/search_form.js"></script>
+    <script type="text/javascript" src="/media/js/display.js"></script>
 </head>
-
-<body>
-<center>
-	<div id="HomePage" >
-		<div id="SearchArea">
-			<div id="SearchBox">
-				{% block SearchBlock %}{% endblock %}
-			</div>
-			{% ifequal class4search_div 'DisplayHomePage4Addition.htm'%}
-			    <div id="ResultBox4Search">
-			{% else %}
-			    <div id="ResultBox">
-			{% endifequal %}
-				{% block ResultBlock %}{% endblock %}
-			</div>
-		</div>
-		<div id="NavigateArea">
-			<div id="LoggedPersonBox">
-				{% block LoggedPersonBlock %}{% endblock %}
-			</div>
-			<div id="CreationBox">
-				{% block CreationBlock %}{% endblock %}
-			</div>
-			<div id={{class4div}}>
-				{% block ObjectBlock %}{% endblock %}
-			</div>
-		</div>
-		<br class="clear" />
+<body onload="InitShowDiv()">
+    <div id="Page">
+            <div id="DisplayBox">
+                <ul>
+                    <li id="FindButton" onclick="showHide('FindButton', 'SearchBox', 'CreationBox', 'ActiveBox', 'ImgNav')">
+                        FIND
+                    </li>
+                    <li id="CreateButton" onclick="showHide('CreateButton', 'CreationBox', 'SearchBox', 'ActiveBox', 'ImgNav')">
+                        CREATE
+                    </li>
+                    {% if not creation_form %}
+                        {% if navigate_bool %}
+                            <li id="NavigateButtonOn">
+                        {% else %}
+                        <li id="NavigateButtonOff">
+                        {% endif %}
+                        {% ifequal class4div 'ActiveBox4User' %}
+                            <a href="/user/{{object_reference}}/navigate/">
+                        {% else %}
+                            <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
+                        {% endifequal %}
+                        NAVIGATE
+                        </a>
+                        </li>
+                        {% if navigate_bool %}
+                            <li id="StudyButtonOff">
+                        {% else %}
+                            <li id="StudyButtonOn">
+                        {% endif %}
+                            <a href="../attributes/">
+                                STUDY
+                            </a>
+                        </li>
+                        {% endif %}
+                    <li id="QuitButton">
+                        <a href="/logout/">
+                            EXIT
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="LoggedPersonBox">
+                {% block LoggedPersonBlock %}{% endblock %}
+            </div>
+            <div id="CreationBox">
+                Create object :
+                    {% block CreationBlock %}{% endblock %}
+            </div>
+            {% ifequal class4div 'ActiveBox4Part' %}
+                <div id="ActiveBox">
+            {% endifequal %}
+            {% ifequal class4div 'ActiveBox4User' %}
+                <div id="ActiveBox" style="background:#c7dec5;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #c7dec5 100%)">
+            {% endifequal %}
+            {% ifequal class4div 'ActiveBox4Doc' %}
+                <div id="ActiveBox" style="background:#ffffc6;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #ffffc6 100%)">
+            {% endifequal %}
+                {% block ObjectBlock %}{% endblock %}
+                </div>
+            {% ifequal class4search_div 'DisplayHomePage4Addition.htm'%}
+                <div id="SearchBox" style="background:#ff4848">
+            {% else %}
+                <div id="SearchBox">
+            {% endifequal %}
+                Search object :
+                {% block SearchBlock %}{% endblock %}
+                <hr>
+                {% block ResultBlock %}{% endblock %}
+            </div>
+        <br class="clear" />
     </div>
-</center>
 </body>
 </html>

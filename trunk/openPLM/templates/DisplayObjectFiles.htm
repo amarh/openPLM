@@ -4,23 +4,13 @@
 <!-- Manage html display in the Content div which correspond to the "files" menu -->
 
 {% block content %}
-    
     <form method="POST" action="">
         {{ file_formset.management_form }}
 		{% if is_owner and obj.is_editable %}
-	    <table>
-	        <tr>
-		        <td></td>
-		        <td>
-                        <div class="ButtonLeft">
-                            <div class="Button">
-                                <a class="Button" href="./add/">{% trans "ADD" %}</a>
-                            </div>
-                        </div>
-                </td>
-	    	    <td><input type="submit" value={% trans "DELETE" %}></td>
-    	    </tr>
-	    </table>
+            <span class="ButtonLeft">
+                <a class="Button" href="./add/">{% trans "ADD" %}</a>
+            </span>
+            <input type="submit" value={% trans "DELETE" %}>
         {% endif %}
 	    <table class="Content">
 		    <tr class="Content">
@@ -28,49 +18,49 @@
                 {{ form.id }}
                 {{ form.document }}
                 {% with form.instance as instance %}
-			    <td class="Content">{{ form.delete }}</td>
-			    <td class="Content">
-			        {% if instance.locked %}
-			            <img src="/media/img/verrou_ferme.gif" title="Lock" alt="Lock" width="20" height="20"/>
-		            {% else %}
-		                <img src="/media/img/verrou_ouvert.jpg" title="Unlock" alt="Unlock" width="20" height="20"/>
-		            {% endif %}
-		        </td>
-                <td class="Content">
-                    <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
-			    <td class="Content">{{instance.size}}</td>
-			    <td class="Content">
-			        <div class="ButtonLeft">
-                        <div class="Button">
+			        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+			        <td class="Content" style="width:50px; text-align:center">
+			            {% if instance.locked %}
+			                <img src="/media/img/verrou_ferme.gif" title="Lock" alt="Lock" width="20" height="20"/>
+		                {% else %}
+		                    <img src="/media/img/verrou_ouvert.jpg" title="Unlock" alt="Unlock" width="20" height="20"/>
+		                {% endif %}
+		            </td>
+                    <td class="Content">
+                        <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
+			        <td class="Content">{{instance.size}}</td>
+			        <td class="Content">
+			            <span class="ButtonLeft">
                             <a class="Button" href="/file/{{instance.id}}/">{% trans "DOWNLOAD" %}</a>
-                        </div>
-                    </div>
-                </td>
-			    <td class="Content">
-			        {% if is_owner and obj.is_editable %}
-			            <div class="ButtonLeft">
-                            <div class="Button">
+                        </span>
+                    </td>
+			        <td class="Content">
+			            {% if is_owner and obj.is_editable %}
+			                <span class="ButtonLeft">
                                 {% if instance.locked %}
-			                    <a class="Button" href="./checkin/{{instance.id}}/">{% trans "CHECK-IN" %}</a>
+		                            <a id="LockLink" class="Button" href="./checkin/{{instance.id}}/">
+		                                {% trans "CHECK-IN" %}
+	                                </a>
                                 {% else %}
-			                    <a class="Button" href="./checkout/{{instance.id}}/">{% trans "CHECK-OUT" %}</a>
+		                            <a id="UnlockLink" class="Button" href="./checkout/{{instance.id}}/">
+		                                {% trans "CHECK-OUT" %}
+	                                </a>
                                 {% endif %}
-		                    </div>
-	                    </div>
+	                        </span>
                         {% else %}
-                        {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
-		            {% endif %}
-	            </td>
-			    <td class="Content">
-                    {% if instance.thumbnail %}
-                    <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{instance.thumbnail.name}}"
-                        alt="Thumbnail"/>
-		            {% else %}
-                    {% trans "No thumbnail available" %}
-		            {% endif %}
-	            </td>
+                            {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
+		                {% endif %}
+	                </td>
+			        <td class="Content">
+                        {% if instance.thumbnail %}
+                            <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{instance.thumbnail.name}}"
+                                alt="Thumbnail"/>
+		                {% else %}
+                            {% trans "No thumbnail available" %}
+		                {% endif %}
+	                </td>
+                {% endwith %}
             </tr>
-            {% endwith %}
 	    {% endfor %}
 	    </table>
     </form>

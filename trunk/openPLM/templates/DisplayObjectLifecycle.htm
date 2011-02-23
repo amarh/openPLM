@@ -12,15 +12,19 @@
         <input name="action" type="submit" value="PROMOTE"/>
         {% endif %}
     </form>
-        <br/>
-    	<br/>
     	<table class="Content">
     		<tr class="Content">
     		{% for status, is_current_state in object_lifecycle %}
-    			<td class="Content" align="center"
-    				{% if is_current_state %} style="background-color:#0808fa" {% else %} style="background-color:#7a7af8" {% endif %}>
+    			<td class="Content"
+    				{% if is_current_state %}
+    				    style="text-align:center; background-color:#0808fa"
+    				{% else %}
+    				    style="text-align:center; background-color:#7a7af8"
+				    {% endif %}>
     				{{status|upper}}</td>
-    				{% if not forloop.last %}<td align="center">===&gt;</td>{% endif %}
+    				{% if not forloop.last %}
+    				    <td style="text-align:center">===&gt;</td>
+				    {% endif %}
     		{% endfor %}
     		</tr>
     	</table>

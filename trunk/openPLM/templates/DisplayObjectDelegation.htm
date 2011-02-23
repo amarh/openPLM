@@ -4,89 +4,59 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-    <br />
 	{% trans "START DELEGATE :" %}
-	<table>
-	    <tr>
-	        <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" 
-                            href="./delegate/owner/">
-                            {% trans "OWNERSHIP" %}
-                        </a>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" 
-                            href="./delegate/sign/1/">
-                            {% trans "SIGNATURE 1st LEVEL" %}
-                        </a>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" 
-                            href="./delegate/sign/2/">
-                            {% trans "SIGNATURE 2nd LEVEL" %}
-                        </a>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" 
-                            href="./delegate/sign/all">
-                            {% trans "ALL SIGNATURES" %}
-                        </a>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="ButtonLeft">
-                    <div class="Button">
-                        <a class="Button" 
-                            href="./delegate/notified/">
-                            {% trans "NOTIFICATIONS" %}
-                        </a>
-                    </div>
-                </div>
-            </td>
-	    </tr>
-	</table>
-	<br />
-	</table>
-	    <table class="Content">
-	        <tr class="Content">
-                <th class="Content"> {% trans "Username" %} </th>
-                <th class="Content"> {% trans "First Name" %} </th>
-                <th class="Content"> {% trans "Last Name" %} </th>
-                <th class="Content"> {% trans "Role" %} </th>
-	        </tr>
-	        {% for link in user_delegation_link %}
-	        	<form method="post" action="">
-		            <tr class="Content">
-			            <td class="Content">{{link.delegatee.username}}</td>
-			            <td class="Content">{{link.delegatee.first_name}}</td>
-			            <td class="Content">{{link.delegatee.last_name}}</td>
-			            <td class="Content">{{link.role}}</td>
-			            <td class="Content">
-			                    <input type="hidden" name="link_id" value="{{link.id}}" />
-			                    <input type="submit" value={% trans "STOP DELEGATION" %}>
-		                </td>
-		            </tr>
-            	</form>
-	        {% endfor %}
-	    </table>
-	{% for message in messages %}
-	{{message}}<br>
-	{% endfor %}
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/owner/">
+                {% trans "OWNERSHIP" %}
+            </a>
+    </span>
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/sign/1/">
+                {% trans "SIGNATURE 1st LEVEL" %}
+            </a>
+    </span>
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/sign/2/">
+                {% trans "SIGNATURE 2nd LEVEL" %}
+            </a>
+    </span>
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/sign/all">
+                {% trans "ALL SIGNATURES" %}
+            </a>
+    </span>
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/notified/">
+                {% trans "NOTIFICATIONS" %}
+            </a>
+    </span>
+    <table class="Result">
+        <tr class="Content">
+            <th class="Content"> {% trans "Username" %} </th>
+            <th class="Content"> {% trans "First Name" %} </th>
+            <th class="Content"> {% trans "Last Name" %} </th>
+            <th class="Content"> {% trans "Role" %} </th>
+        </tr>
+        {% for link in user_delegation_link %}
+        	<form method="post" action="">
+	            <tr class="Content">
+		            <td class="Content">{{link.delegatee.username}}</td>
+		            <td class="Content">{{link.delegatee.first_name}}</td>
+		            <td class="Content">{{link.delegatee.last_name}}</td>
+		            <td class="Content">{{link.role}}</td>
+		            <td class="Content">
+		                    <input type="hidden" name="link_id" value="{{link.id}}" />
+		                    <input type="submit" value={% trans "STOP DELEGATION" %}>
+	                </td>
+	            </tr>
+        	</form>
+        {% endfor %}
+    </table>
 {% endblock %}
 
 

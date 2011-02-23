@@ -14,33 +14,27 @@
 </head>
 
 <body>
-<center>
-	<div id="HomePage" >
-		<br />
-		<div id="LoginBox">
-		    <h1>{% trans "OpenPLM connexion :" %}</h1>
-		    <form action="{% url django.contrib.auth.views.login %}" method="post">
-		        <table>
-		            <tr>
-		                <td>{% trans "Login :" %}</td>
-		                <td><input type="text" name="username" value=""/></td>
-		            </tr>
-		            <tr>
-		                <td>{% trans "Password :" %} </td>
-		                <td><input type="password" name="password" value=""/></td>
-		            </tr>
-		            <tr>
-		                <td></td>
-		                <td><input type="submit" value={% trans "LOGIN" %} /></td>
-		            </tr>
-		        </table>
-		        <input type="hidden" name="next" value="/home/">
-	        </form>
-    		<br class="clear" />
-		</div>
-		<br class="clear" />
+<div id="Page" style="line-height:600px" >
+	<div id="LoginBox">
+	    <h1>{% trans "openPLM connexion :" %}</h1>
+	    <form action="{% url django.contrib.auth.views.login %}" method="post">
+	        <table style="display:inline-block">
+	            <tr>
+	                <td>{% trans "Login :" %}</td>
+	                <td><input type="text" name="username" value=""/></td>
+	            </tr>
+	            <tr>
+	                <td>{% trans "Password :" %} </td>
+	                <td><input type="password" name="password" value=""/></td>
+	            </tr>
+	            <tr>
+	                <td></td>
+	                <td><input type="submit" value={% trans "LOGIN" %} /></td>
+	            </tr>
+	        </table>
+	        <input type="hidden" name="next" value="/home/">
+        </form>
 	</div>
-
-</center>
+</div>
 </body>
 </html>

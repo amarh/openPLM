@@ -71,14 +71,14 @@ class NavigationGraph(object):
                             ranksep='1.2', pad='0.1', mode="ipsep",
                             overlap="false", splines="false", sep="+.1,.1",
                             nodesep=".2", outputorder="edgesfirst")
-    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='10',
+    NODE_ATTRIBUTES = dict(shape='Mrecord', fixedsize='true', fontsize='10',
                            style='filled', width='1.0', height='0.6')
     EDGE_ATTRIBUTES = dict(color='#000000', minlen="1.5", len="1.5", arrowhead='normal')
-    TYPE_TO_ATTRIBUTES = {UserController : dict(color='#94bd5e',
+    TYPE_TO_ATTRIBUTES = {UserController : dict(color='#c7dec5',
                             image=os.path.join(basedir, "user.png")),
-                          PartController : dict(color='#99ccff',
+                          PartController : dict(color='#b5c5ff',
                             image=os.path.join(basedir, "part.png")),
-                          DocumentController : dict(color='#fef176',
+                          DocumentController : dict(color='#ffffc6',
                             image=os.path.join(basedir, "document.png"))}
                            
     def __init__(self, obj, results=()):
@@ -280,7 +280,7 @@ class NavigationGraph(object):
         picture_path = "media/navigate/" + t + str(self.object.id) + "-"
         for opt in self.options_list:
             picture_path += str(int(self.options[opt]))
-        self.graph.layout(prog="neato")
+        self.graph.layout(prog="twopi")
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
         map_path= picture_path2 + ".map"
         picture_path += ".gif"

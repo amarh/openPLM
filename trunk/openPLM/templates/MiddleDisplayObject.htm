@@ -5,60 +5,39 @@
 
 <!-- Manage the text displayed between title tags -->
 {% block title %}
-	openPLM - {{log_in_person}} - {{object_type}} | {{object_reference}} | {{object_revision}}
+	openPLM - {{user}} - {{object_type}} | {{object_reference}} | {{object_revision}}
 {% endblock %}
 
 <!-- Manage the Navigate block which have an object menu, a banner and a content -->
 {% block ObjectBlock %}
-    <div id="PageBanner">
+    <div id="ReferenceArea">
         <h2>
-            {% if not creation_form %}
-		    {% ifequal class4div 'NavigateBox4User' %}
-		        <a href="/user/{{object_reference}}/navigate/">
-		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
-	            </a>
-	            <a href="../attributes/">
-		            <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
-	            </a>
-            {% else %}
-                <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
-		            <img src="/media/img/nav.png" title="Navigate" alt="Navigate" width="30" height="30"/>
-	            </a>
-	            <a href="../attributes/">
-		            <img src="/media/img/navigation2.png" title="Attributes" alt="Attributes" width="30" height="30"/>
-	            </a>
-                {% endifequal %}
-                {% endif %}
 		    {{object_type}} | {{object_reference}} | {{object_revision}}
 	    </h2>
 	</div>
-    <div id="PageLeft">
-    	<table class="MenuTable">
-	        <tr>
-		        {% for menu_item in object_menu %}
-    				{% ifequal menu_item current_page%}
-    				<td class="CurrentPage">
-    				{%else%}
-    				<td>
-    				{%endifequal%}
-    				{% ifequal object_type 'User' %}
-    				    <a href="/user/{{object_reference}}/{{menu_item}}/">
+	<div id="ActiveArea">
+        {% if object_menu %}
+	        <ul id="MenuList">
+                {% for menu_item in object_menu %}
+			        {% ifequal menu_item current_page%}
+			        <li class="CurrentPage">
+			        {%else%}
+			        <li>
+			        {%endifequal%}
+			        {% ifequal object_type 'User' %}
+			            <a href="/user/{{object_reference}}/{{menu_item}}/">
                         {% filter upper %}{% trans menu_item %}{% endfilter%}
-				        </a>
-    				{% else %}
+		                </a>
+			        {% else %}
                     <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/{{menu_item}}/">
                         {% filter upper %}{% trans menu_item %}{% endfilter%}
-				        </a>
-			        {% endifequal %}
-    				</td>
-    		    {% endfor %}
-			</tr>
-    	</table>
-    </div>
-	
-	<div id="PageCenter">
-		{% block content %}{% endblock %}
-		
+		                </a>
+	                {% endifequal %}
+			        </li>
+	            {% endfor %}
+	            <li style="width:100%"></li>
+    	    </ul>
+        {% endif %}
+		{% block content %}{% endblock %}	
 	</div>
-
 {% endblock %}

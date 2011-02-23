@@ -5,37 +5,37 @@
 
 {% block content %}
 	<h3>{% trans "OBJECT MODIFICATION:" %}</h3>
-		<table class="Content">
+	<table class="Content">
+		<tr class="Content">
+			<th>{% trans "Type" %}</th>
+			<td>{{ object_type }}</td>
+		</tr>
+		{% for type, field, value in non_modifyable_attributes %}
 			<tr class="Content">
-				<th>{% trans "Type" %}</th><td>{{ object_type }}</td>
+				<th>{% trans field %} </th>
+				{% ifequal type 'datetime' %}
+				    <td>{{ value|date:"l j F Y, G:i" }}</td>
+			    {% else %}
+			        <td>{{value}}</td>
+				{% endifequal %}
 			</tr>
-			{% for type, field, value in non_modifyable_attributes %}
-				<tr class="Content">
-					<th>{% trans field %} </th>
-					{% ifequal type 'datetime' %}
-					    <td>{{ value|date:"l j F Y, G:i" }}</td>
-				    {% else %}
-				        <td>{{value}}</td>
-					{% endifequal %}
-				</tr>
-			{% endfor%}
-			<form method="post" action="." >	
+		{% endfor%}
+		<form method="post" action="." >	
+		<tr class="Content">
+			<th><label for="id_type">&nbsp;</label></th>
+			<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
+		</tr>
+		{% for attribute in modification_form %}
 			<tr class="Content">
-				<th><label for="id_type">&nbsp;</label></th>
-				<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
+				<th>{{attribute.label_tag}}</th>
+				<td>{{attribute}}</td><td>{{ attribute.errors }}</td>
 			</tr>
-			{% for attribute in modification_form %}
-				<tr class="Content">
-					<th>{{attribute.label_tag}}</th><td>{{attribute}}</td><td>{{ attribute.errors }}</td>
-				</tr>
-			{% endfor %}
-			<tr class="Content">
-				<td>&nbsp;</td><td><input type="submit" value="{% trans "MODIFY" %}" /></td>
-			</tr>
-			</form>
-		</table>
-					
-	
+		{% endfor %}
+		<tr class="Content">
+			<td></td><td><input type="submit" value="{% trans "MODIFY" %}" /></td>
+		</tr>
+		</form>
+	</table>
 {% endblock %}
 
 

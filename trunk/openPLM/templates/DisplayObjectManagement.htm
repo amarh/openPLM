@@ -5,49 +5,40 @@
 
 {% block content %}
 <!--        {{ rel_part_formset.management_form }} -->
-	    <table class="Content">
-        {% if is_owner %}
-	        <tr>
-	            <td class="Content">
-                    <div class="ButtonLeft">
-                        <div class="Button">
-                            <a class="Button" href="./add/">{% trans "ADD" %}</a>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {% endif %}
-        
-                {% for link in object_management %}
-                    <tr class="Content">
-                        {% with link.user.get_profile as profile %}
-                            <td class="Content">{{ profile.rank }}</td>
-                        {% endwith %}
-                        <td class="Content">{{ link.user.username }}</td>
-                        <td class="Content">{{ link.user.is_active|yesno:_("active,inactive") }}</td>
-                        <td class="Content">{{ link.role }}</td>
-                        {% if is_owner %}
-                            <td class="Content">
-                                <div class="ButtonLeft">
-                                    <div class="Button">
-                                        <a class="Button" href="./replace/{{link.id}}/">{% trans "REPLACE" %}</a>
-                                    </div>
-                                </div>
-                            </td>
-                            {% endif %}
-                    {% if is_owner %}
-                    {% ifequal link.role 'notified'%}
+    {% if is_owner %}
+        <span class="ButtonLeft">
+            <a class="Button" href="./add/">{% trans "ADD" %}</a>
+        </span>
+    {% endif %}
+    <table class="Content">
+        {% for link in object_management %}
+            <tr class="Content">
+                {% with link.user.get_profile as profile %}
+                    <td class="Content">{{ profile.rank }}</td>
+                {% endwith %}
+                <td class="Content">{{ link.user.username }}</td>
+                <td class="Content">{{ link.user.is_active|yesno:_("active,inactive") }}</td>
+                <td class="Content">{{ link.role }}</td>
+                {% if is_owner %}
                     <td class="Content">
-                        <form action="./delete/" method="POST">
-                            <input name="link_id" type="hidden" value="{{link.id}}"/>
-                            <input name="action" type="submit" value={% trans "Delete" %} />
-                        </form>
+                        <span class="ButtonLeft">
+                            <a class="Button" href="./replace/{{link.id}}/">{% trans "REPLACE" %}</a>
+                        </span>
+                    </td>
+                {% endif %}
+                {% if is_owner %}
+                    {% ifequal link.role 'notified'%}
+                        <td class="Content">
+                            <form action="./delete/" method="POST">
+                                <input name="link_id" type="hidden" value="{{link.id}}"/>
+                                <input name="action" type="submit" value={% trans "Delete" %} />
+                            </form>
                         </td>
-                        {% endifequal %}
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-	    </table>
+                    {% endifequal %}
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}
 
 

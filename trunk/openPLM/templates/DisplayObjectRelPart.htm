@@ -7,22 +7,12 @@
     <form method="post" action="">	
         {{ rel_part_formset.management_form }}
         {% if is_owner %}
-	    <table>
-	        <tr>
-	            <td>
-                    <div class="ButtonLeft">
-                        <div class="Button">
-                            <a class="Button" href="./add/">{% trans "ADD" %}</a>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    {% if rel_part_formset.forms %}
-	                <input type="submit" value={% trans "DISCONNECT" %}>
-                    {% endif %}
-                </td>
-            </tr>
-        </table>
+            <span class="ButtonLeft">
+                <a class="Button" href="./add/">{% trans "ADD" %}</a>
+            </span>
+            {% if rel_part_formset.forms %}
+                <input type="submit" value={% trans "DISCONNECT" %}>
+            {% endif %}
         {% endif %}
         <table class="Content">
 	        {% for form in rel_part_formset.forms %}
@@ -31,7 +21,7 @@
                 {{ form.part }}
                 <tr class="Content">
                     {% if is_owner %}
-                    <td class="Content">{{ form.delete }}</td>
+                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
                     {% endif %}
 			        <td class="Content">{{ form.instance.part.type }}</td>
 			        <td class="Content">
@@ -42,7 +32,11 @@
 			        <td class="Content">{{ form.instance.part.revision }}</td>
                 </tr>
             {% empty %}
-            <tr>{% trans "There are no parts attached to this document" %} </tr>
+                <tr>
+                    <td>
+                        {% trans "There are no parts attached to this document" %}
+                    </td>
+                </tr>
 	        {% endfor %}
 	    </table>
     </form>

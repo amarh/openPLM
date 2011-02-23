@@ -7,10 +7,11 @@
 
     <form method="GET" action="">
         {% trans "Display :" %}
-        {{ display_form.as_p }}
+        <ul>
+            {{ display_form.as_ul }}
+        </ul>
         <input type="submit" value={% trans "GO !" %}><br/>
     </form>
-	<br/>
 	<table class="Content">
         <tr>
             <th class="Content"> </th>
@@ -34,7 +35,6 @@
             <td class="Content"> {{ link.parent.state.name }} </td>
         </tr>
         {% endfor %}
-    
 	</table>
 {% endblock %}
 

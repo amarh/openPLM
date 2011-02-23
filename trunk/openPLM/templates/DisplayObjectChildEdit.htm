@@ -4,8 +4,6 @@
 <!-- Manage html display in the Content div which correspond to the "children" menu -->
 
 {% block content %}
-
-<br/>
 <form method="POST" action="">
     {{ children_formset.management_form }}
     <table class="Content">
@@ -20,26 +18,24 @@
             <th class="Content"> {% trans "Delete ?" %} </th>
         </tr>
         {% for form in children_formset.forms %}
-        {{ form.id }}
-        {{ form.parent }}
-        {{ form.child }}
-        <tr class="Content"> 
-            <td class="Content"> {{ form.order }} </td>
-            <td class="Content"> {{ form.quantity }} </td>
-            <td class="Content"> 
-                <a href="{{form.instance.child.plmobject_url}}">
-                    {{ form.instance.child.reference }}
-                </a>
-            </td>
-            <td class="Content"> {{ form.instance.child.revision }} </td>
-            <td class="Content"> {{ form.instance.child.type }} </td>
-            <td class="Content"> {{ form.instance.child.name }} </td>
-            <td class="Content"> {{ form.instance.child.state.name }} </td>
-            <td class="Content"> {{ form.delete }} </td>
-        </tr>
-
+            {{ form.id }}
+            {{ form.parent }}
+            {{ form.child }}
+            <tr class="Content"> 
+                <td class="Content"> {{ form.order }} </td>
+                <td class="Content"> {{ form.quantity }} </td>
+                <td class="Content"> 
+                    <a href="{{form.instance.child.plmobject_url}}">
+                        {{ form.instance.child.reference }}
+                    </a>
+                </td>
+                <td class="Content"> {{ form.instance.child.revision }} </td>
+                <td class="Content"> {{ form.instance.child.type }} </td>
+                <td class="Content"> {{ form.instance.child.name }} </td>
+                <td class="Content"> {{ form.instance.child.state.name }} </td>
+                <td class="Content"> {{ form.delete }} </td>
+            </tr>
         {% endfor %}
-
     </table>
     <input type="submit" value={% trans "Validate" %} name="action"/>
     <input type="submit" value={% trans "Undo" %} name="action"/>

@@ -4,14 +4,17 @@
 <!-- Manage html display in the Content div which correspond to the "children" menu + "add new"-->
 
 {% block content %}
-
-<br/>
 <form method="POST" action="">
     <table class="Content">
         {{add_child_form}}
+        <tr>
+            <td></td>
+            <td>
+            <input type="submit" value={% trans "Validate" %} name="action"/>
+            <input type="submit" value={% trans "Undo" %} name="action"/>
+            </td>
+        </tr>
     </table>
-    <input type="submit" value={% trans "Validate" %} name="action"/>
-    <input type="submit" value={% trans "Undo" %} name="action"/>
 </form>
 {% endblock %}
 
