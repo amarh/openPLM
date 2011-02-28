@@ -23,10 +23,10 @@
             <div id="DisplayBox">
                 <ul>
                     <li id="FindButton" onclick="showHide('FindButton', 'SearchBox', 'CreationBox', 'ActiveBox', 'ImgNav')">
-                        FIND
+                        {% trans "FIND" %}
                     </li>
                     <li id="CreateButton" onclick="showHide('CreateButton', 'CreationBox', 'SearchBox', 'ActiveBox', 'ImgNav')">
-                        CREATE
+                        {% trans "CREATE" %}
                     </li>
                     {% if not creation_form %}
                         {% if navigate_bool %}
@@ -39,7 +39,7 @@
                         {% else %}
                             <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
                         {% endifequal %}
-                        NAVIGATE
+                        {% trans "NAVIGATE" %}
                         </a>
                         </li>
                         {% if navigate_bool %}
@@ -48,13 +48,13 @@
                             <li id="StudyButtonOn">
                         {% endif %}
                             <a href="../attributes/">
-                                STUDY
+                                {% trans "STUDY" %}
                             </a>
                         </li>
                         {% endif %}
                     <li id="QuitButton">
                         <a href="/logout/">
-                            EXIT
+                            {% trans "EXIT" %}
                         </a>
                     </li>
                 </ul>
