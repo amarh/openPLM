@@ -32,7 +32,6 @@ import warnings
 import cStringIO as StringIO
 
 import pygraphviz as pgv
-from django.db.models.query import QuerySet
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
@@ -42,6 +41,24 @@ basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
 
 # just a shortcut
 OSR = "only_search_results"
+
+class FrozenAGraph(pgv.AGraph):
+    '''
+    A frozen AGraph
+
+    :param data: representation of the graph in dot format
+    '''
+
+    def __init__(self, data):
+        pgv.AGraph.__init__(self, data)
+        self.data = data
+
+    def write(self, path):
+        if hasattr(path, "write"):
+            path.write(self.data)
+        else:
+            with file(path, "w") as f:
+                f.write(self.data)
 
 class NavigationGraph(object):
     """
@@ -268,7 +285,8 @@ class NavigationGraph(object):
         else:
             node.attr["label"] = obj.username.encode("utf-8")
         node.attr["label"] += "\\n" + extra_label.encode("utf-8")
-       
+        node.attr["tooltip"] = node.attr["label"].replace("\\n", " ")
+
     def render(self):
         """
         Renders an image of the graph
@@ -276,6 +294,17 @@ class NavigationGraph(object):
         :returns: a tuple (image map data, url of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
+        
+        # rebuild a frozen graph with sorted edges to avoid random output
+        edges = self.graph.edges()
+        self.graph.remove_edges_from(edges)
+        s = str(self.graph) 
+        s = s[:s.rfind("}")]
+        edges.sort()
+        s += "\n".join("%s -- %s;" % (a,b) for a, b in edges) + "}\n"
+        self.graph.close()
+        self.graph = FrozenAGraph(s)
+
         t = "p" if isinstance(self.object, PLMObjectController) else "u"
         picture_path = "media/navigate/" + t + str(self.object.id) + "-"
         for opt in self.options_list:
