@@ -30,6 +30,7 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 import os
 import warnings
 import cStringIO as StringIO
+import xml.etree.cElementTree as ET
 
 import pygraphviz as pgv
 
@@ -110,13 +111,11 @@ class NavigationGraph(object):
                              "notified", "part", "owned", "to_sign",
                              "request_notification_from", OSR) 
         self.options = dict.fromkeys(self.options_list, False)
-    
         self.graph = pgv.AGraph()
-        self.graph.clear()
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
-    
+
     def set_options(self, options):
         """
         Sets which kind of edges should be inserted.
@@ -265,7 +264,7 @@ class NavigationGraph(object):
                          'request_notification_from':(self._create_object_edges, 'notified'),
                          OSR : (lambda *args: None, None), }
         for field, value in self.options.items():
-            if value: 
+            if value:
                 function, argument = functions_dic[field]
                 function(self.object, argument)
 
@@ -287,6 +286,23 @@ class NavigationGraph(object):
         node.attr["label"] += "\\n" + extra_label.encode("utf-8")
         node.attr["tooltip"] = node.attr["label"].replace("\\n", " ")
 
+
+    def convert_map(self, map_string):
+        elements = []
+        for area in ET.fromstring(map_string).findall("area"):
+            left, top, x2, y2 = map(int, area.get("coords").split(","))
+            width = x2 - left
+            height = y2 - top
+            style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
+            div = ET.Element("div", id="Nav-%s" % area.get("id"), style=style)
+            div.set("class", "node")
+            a = ET.SubElement(div, "a", href=area.get("href")) 
+            ET.SubElement(a, "span")
+            elements.append(div)
+
+        s = "\n".join(ET.tostring(div) for div in elements)
+        return s
+
     def render(self):
         """
         Renders an image of the graph
@@ -294,7 +310,6 @@ class NavigationGraph(object):
         :returns: a tuple (image map data, url of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
-        
         # rebuild a frozen graph with sorted edges to avoid random output
         edges = self.graph.edges()
         self.graph.remove_edges_from(edges)
@@ -321,5 +336,5 @@ class NavigationGraph(object):
         map_string = s.read()
         self.graph.clear()
         warnings.simplefilter('default', RuntimeWarning)
-        return map_string, picture_path
+        return self.convert_map(map_string), picture_path
 
