@@ -285,13 +285,13 @@
                                 if (id.substr(0,12) == 'NavigateBox4') alert('detecte : '+id.substr(0,12));
                                 }
                          }
-                    if (document.getElementById('ImgNav') && document.getElementById('NavigateBox').style.width == '768px')
+                    if (document.getElementById('DivNav') && document.getElementById('NavigateBox').style.width == '768px')
                         {
-                        var imgNavElement = document.getElementById('ImgNav')
-                        var currentLeftPosition = Number(imgNavElement.style.left.substr(0, imgNavElement.style.left.indexOf('px')));
+                        var divNavElement = document.getElementById('DivNav')
+                        var currentLeftPosition = Number(divNavElement.style.left.substr(0, divNavElement.style.left.indexOf('px')));
                         var newLeftPosition = String(currentLeftPosition-1172+768)+"px";
                         // alert('currentLeftPosition : '+currentLeftPosition+' newLeftPosition : '+newLeftPosition);
-                        imgNavElement.style.left = newLeftPosition;
+                        divNavElement.style.left = newLeftPosition;
                         }
                         // Et renvoie le même cookie pour prolongation de sa durée de vie dès le chargement de la page
                     //:SetCoockie (SetNomCookie(), cookie_showDiv);
