@@ -11,7 +11,7 @@ $(document).ready(function(){
   $('#rightControl')
     .bind('click', function(){
       // Move slideInner using left attribute for position
-      $('#ImgNav').animate({
+      $('#DivNav').animate({
         "left": "-=100px"
       }, "fast");
     });
@@ -20,7 +20,7 @@ $(document).ready(function(){
   $('#leftControl')
     .bind('click', function(){
       // Move slideInner using left attribute for position
-      $('#ImgNav').animate({
+      $('#DivNav').animate({
         "left": "+=100px"
       }, "fast");
     });
@@ -29,7 +29,7 @@ $(document).ready(function(){
   $('#topControl')
     .bind('click', function(){
       // Move slideInner using top attribute for position
-      $('#ImgNav').animate({
+      $('#DivNav').animate({
         "top": "+=100px"
       }, "fast");
     });
@@ -38,12 +38,12 @@ $(document).ready(function(){
   $('#bottomControl')
     .bind('click', function(){
       // Move slideInner using left attribute for position
-      $('#ImgNav').animate({
+      $('#DivNav').animate({
         "top": "-=100px"
       }, "fast");
     });
 
-  $("#ImgNav").draggable({
+  $("#DivNav").draggable({
       cursor: 'crosshair'
       });
 

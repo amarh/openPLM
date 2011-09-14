@@ -1405,7 +1405,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 ##########################################################################################
 ###                     Manage html pages for navigate function                        ###
 ##########################################################################################    
-regex_pattern = re.compile(r'coords\=\"(\d{1,5}),(\d{1,5}),(\d{1,5}),(\d{1,5})')
+regex_pattern = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
 
 @handle_errors
 def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
@@ -1453,10 +1453,10 @@ def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
     graph.set_options(form.cleaned_data)
     graph.create_edges()
     map_string, picture_path = graph.render()
-    x_1st_point, y_1st_point, x_2nd_point, y_2nd_point = map(int,
+    top, left, w, h = map(int,
                     re.search(regex_pattern, map_string).groups())
-    x_part_node_position = (x_1st_point + x_2nd_point) // 2
-    y_part_node_position = (y_1st_point + y_2nd_point) // 2
+    x_part_node_position = (2 * left + w) // 2
+    y_part_node_position = (2 * top + h) // 2
     x_img_position_corrected = 1172 // 2 - x_part_node_position
     y_img_position_corrected = 500 // 2 - y_part_node_position
     context_dict.update({'filter_object_form': form,
