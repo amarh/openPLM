@@ -11,17 +11,19 @@
             <span class="imgManagement" id="rightControl"></span>
             <span class="imgManagement" id="bottomControl"></span>
         </div>
-        <img id="ImgNav" style="left:{{x_img_position}}px; top:{{y_img_position}}px"
-                 src="{{picture_path}}" usemap="#_anonymous_0" title="Navigate" alt="Navigate" />
-        {{map_areas|safe}}
-        
+        <div id="DivNav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;">
+            <img id="ImgNav" src="{{picture_path}}" title="Navigate" alt="Navigate" />
+
+            {{map_areas|safe}}
+
+        </div>
         
         <div id="FilterNav">
             {% trans "Display :" %}
 	        <form method="post" action="." >
 	            <ul id="FilterNav">
 	            {{filter_object_form.as_ul}}
-	            <li><input type="submit" value={% trans "FILTER" %}></li>
+	            <li><input type="submit" value="{% trans "FILTER" %}"/></li>
 	            </ul>
             </form>
         </div>
