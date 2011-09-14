@@ -16,7 +16,7 @@
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value={% trans "Go" %} />
+        <input type="submit" value="{% trans "Go" %}" />
     </form>
 {% endblock %}
 
@@ -25,9 +25,8 @@
         <table class="Content" id="search_table">
 			{{type_form.as_table}}
 			{{attributes_form.as_table}}
-		<tr>
 		</table>
-        <div style="text-align:center"><input type="submit" value={% trans "SEARCH !" %}></div>
+        <div style="text-align:center"><input type="submit" value="{% trans "SEARCH !" %}"/></div>
 	</form>
 {% endblock %}
 
@@ -92,7 +91,7 @@
 		<ul>
 		    {{type_form4creation.as_ul}}
             <li>
-                <input type="submit" value={% trans "CREATE !" %}>
+                <input type="submit" value="{% trans "CREATE !" %}"/>
             </li>
         </ul>
 	</form>

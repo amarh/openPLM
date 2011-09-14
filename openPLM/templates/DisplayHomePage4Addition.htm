@@ -16,7 +16,7 @@
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value={% trans "Go" %} />
+        <input type="submit" value="{% trans "Go" %}" />
     </form>
 {% endblock %}
 {% block SearchBlock %}
@@ -26,7 +26,7 @@
 			{{attributes_form.as_table}}
 		<tr>
 		</table>
-        <div style="text-align:center"><input type="submit" value={% trans "SEARCH !" %}></div>
+        <div style="text-align:center"><input type="submit" value="{% trans "SEARCH !" %}"/></div>
 	</form>
 {% endblock %}
 {% block ResultBlock %}
@@ -64,34 +64,34 @@
 		                <a href="{{object.plmobject_url}}">
 		                        {{object.username|escape}}
                         </a>
-                        <input type="hidden" name="type" value="User">
-                        <input type="hidden" name="username" value="{{object.username|escape}}">
+                        <input type="hidden" name="type" value="User"/>
+                        <input type="hidden" name="username" value="{{object.username|escape}}"/>
                     </td>
 		            <td class="Content">
 		                {{object.last_name|escape}}
 	                </td>
 		            <td class="Content">
-			            <input type="submit" value={% trans "ADD" %}>
+			            <input type="submit" value="{% trans "ADD" %}"/>
 		            </td>
 		        {% else %}
                 <td class="Content">
 
                     {{object.type|escape}}
-		                <input type="hidden" name="type" value="{{object.type|escape}}">
+		                <input type="hidden" name="type" value="{{object.type|escape}}"/>
 	                </td>
 		            <td class="Content">
 		                <a class="tooltip" href="{{object.plmobject_url}}">
 		                        {{object.reference|escape}}
                                 <em><span></span>{{object.name}}</em></a>
-                        <input type="hidden" name="reference" value="{{object.reference|escape}}">
+                        <input type="hidden" name="reference" value="{{object.reference|escape}}"/>
                     </td>
 		            <td class="Content">
 		                {{object.revision|escape}}
-		                <input type="hidden" name="revision" value="{{object.revision|escape}}">
+		                <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
 	                </td>
       
 		            <td class="Content">
-			            <input type="submit" value={% trans "ADD" %}>
+			            <input type="submit" value="{% trans "ADD" %}"/>
 		            </td>
 		        {% endif %}
 			    </tr>
@@ -106,7 +106,7 @@
 		<ul>
 		    {{type_form4creation.as_ul}}
             <li>
-                <input type="submit" value={% trans "CREATE !" %}>
+                <input type="submit" value="{% trans "CREATE !" %}"/>
             </li>
         </ul>
 	</form>
