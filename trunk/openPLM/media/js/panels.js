@@ -11,13 +11,13 @@ function show_left_panel(){
 function show_create_box(){
     $("#CreationBox").show();
     show_left_panel();
-    $.cookie("create_box", true);
+    $.cookie("create_box", "true", { path: '/' });
 }
 
 function show_search_box(){
     $("#SearchBox").show();
     show_left_panel();
-    $.cookie("search_box", true);
+    $.cookie("search_box", "true", { path: '/' });
 }
 
 function hide_create_box(){
@@ -25,7 +25,7 @@ function hide_create_box(){
     if ($("#SearchBox").is(":hidden")){
         hide_left_panel();
     }
-    $.cookie("create_box", false);
+    $.cookie("create_box", "false", { path: '/' });
 }
 
 function hide_search_box(){
@@ -33,7 +33,7 @@ function hide_search_box(){
     if ($("#CreationBox").is(":hidden")){
         hide_left_panel();
     }
-    $.cookie("search_box", false);
+    $.cookie("search_box", "false", { path: '/' });
 }
 
 function toggle_create_box(){
@@ -60,10 +60,13 @@ function toggle_search_box(){
 
 $(function (){
 
-    var search = $.cookie("search_box");
-    var create = $.cookie("create_box");
-    $("#FindButton").button({disable: !search}).click(toggle_search_box);
-    $("#CreationButton").button({disable: !create}).click(toggle_create_box);
+    var search = $.cookie("search_box") === "true";
+    var create = $.cookie("create_box") === "true";
+
+    $("#FindButton").attr("checked", search);
+    $("#CreationButton").attr("checked", create);
+    $("#FindButton").button().click(toggle_search_box);
+    $("#CreationButton").button().click(toggle_create_box);
 
     if (search){
         show_search_box();
@@ -77,6 +80,5 @@ $(function (){
     else{
         hide_create_box();
     }
-
 
 });
