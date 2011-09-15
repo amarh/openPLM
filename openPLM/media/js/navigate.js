@@ -98,4 +98,13 @@ cursor: 'crosshair'
                 primary: 'ui-icon-close'
                 },
             text: false}).click(hide_thumbnails_panel);
+
+        var config = {    
+             over: function(){
+                 if ($("#navThumbnails").is(":visible"))
+                       $(this).click();}, // function = onMouseOver callback (REQUIRED)    
+             timeout: 500, // number = milliseconds delay before onMouseOut    
+             out: function(){} // function = onMouseOut callback (REQUIRED)    
+        };
+        $(".node_thumbnails").hoverIntent(config);
 });
