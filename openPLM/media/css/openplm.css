@@ -656,7 +656,7 @@ display: block;
 }
 
 li.ui-button:hover {
-    background: url("images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
+    background: url("/media/css/smoothness/images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
     color: #212121;
     font-weight: normal;
 }
