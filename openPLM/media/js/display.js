@@ -133,7 +133,7 @@
         var buttonBackground = (document.getElementById(id1).style.display == 'block' ) ? '#CCCCCC' : '#777777';
         //nouvelle valeur pour l'element id
         document.getElementById(id1).style.display = showHide;
-        document.getElementById(id3).style.width = widthDiv;
+        //document.getElementById(id3).style.width = widthDiv;
         document.getElementById(button).style.border = buttonBorder;
         document.getElementById(button).style.background = buttonBackground;
         var toMoveImg = document.getElementById(picture);
@@ -259,7 +259,7 @@
                                         affiche_id.style.display = tab_cook_showDiv[index];
                                         break;
                                     case 'width':
-                                        affiche_id.style.width = tab_cook_showDiv[index];
+                                        //affiche_id.style.width = tab_cook_showDiv[index];
                                         break;
                                     case 'border':
                                         affiche_id.style.border = tab_cook_showDiv[index];
