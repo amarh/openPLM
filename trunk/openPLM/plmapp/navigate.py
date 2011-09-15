@@ -88,7 +88,8 @@ class NavigationGraph(object):
     GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2', mindist=".5", center='true',
                             ranksep='1.2', pad='0.1', mode="ipsep",
                             overlap="false", splines="false", sep="+.1,.1",
-                            nodesep=".2", outputorder="edgesfirst")
+                            nodesep=".2", outputorder="edgesfirst",
+                            bgcolor="transparent")
     NODE_ATTRIBUTES = dict(shape='Mrecord', fixedsize='true', fontsize='10',
                            style='filled', width='1.0', height='0.6')
     EDGE_ATTRIBUTES = dict(color='#000000', minlen="1.5", len="1.5", arrowhead='normal')
@@ -304,7 +305,7 @@ class NavigationGraph(object):
             if url != "None":
                 thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
                         title="Display thumbnails")
-                thumbnails.set("class", "node_thumbnails")
+                thumbnails.set("class", "node_thumbnails ui-button ui-widget ui-state-default ui-corner-all")
                 thumbnails.set("onclick", "display_thumbnails('%s', '%s');" % (id_, url))
             a = ET.SubElement(div, "a", href=area.get("href")) 
             ET.SubElement(a, "span")
@@ -337,10 +338,10 @@ class NavigationGraph(object):
         self.graph.layout(prog="twopi")
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
         map_path= picture_path2 + ".map"
-        picture_path += ".gif"
-        picture_path2 += ".gif"
+        picture_path += ".png"
+        picture_path2 += ".png"
         s = StringIO.StringIO()
-        self.graph.draw(picture_path2, format='gif', prog='neato')
+        self.graph.draw(picture_path2, format='png', prog='neato')
         self.graph.draw(s, format='cmapx', prog='neato')
         s.seek(0)
         map_string = s.read()

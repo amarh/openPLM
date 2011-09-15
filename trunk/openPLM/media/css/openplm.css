@@ -495,6 +495,8 @@ width: 99.8%;
 border: 1px solid #000000;
 height: 500px;
 background-color: #FFFFFF;
+
+background-image: -moz-radial-gradient(50% 50% 45deg, #E5E5E5 0%, #eef 100%);
 overflow: scroll;
 }
 
