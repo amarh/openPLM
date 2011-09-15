@@ -198,7 +198,7 @@ width: 380px;
 margin-right: 0px;
 margin-bottom: 0px;
 vertical-align: middle;
-line-height: 30px;
+/*line-height: 30px;*/
 font-size: 14px;
 text-align: center;
 }
@@ -645,3 +645,19 @@ div#FilterNav:hover ul
 {
 display: block;
 }
+
+.ui-button {
+    border: 1px solid #aaa !important;
+}
+
+.ui-button-text {
+    padding:0.4em 0.4em !important;
+    line-height: 1.0 !important
+}
+
+li.ui-button:hover {
+    background: url("images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
+    color: #212121;
+    font-weight: normal;
+}
+

@@ -4,8 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="content-type" content="text/html" charset="ISO-8859-1"/>
-    <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
     <link type="text/css" href="/media/css/smoothness/jquery-ui-1.8.4.custom.css" rel="Stylesheet" /> 
+    <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
     <title>{% block title %} {% endblock %}</title>
     <meta name="Robots" content="none"/>
     <meta name="Author" content="philippe.joulaud pierre.cosquer" />
@@ -42,9 +42,9 @@
 
                     {% if not creation_form %}
                         {% if navigate_bool %}
-                            <li class="ui-button ui-button-text-only ui-widget ui-state-focus ui-state-active  ui-corner-left" id="NavigateButtonOn">
+                            <li class="ui-button ui-button-text ui-button-text-only ui-widget ui-state-focus ui-state-active  ui-corner-left" id="NavigateButtonOn">
                         {% else %}
-                        <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-left" id="NavigateButtonOff">
+                        <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-left" id="NavigateButtonOff">
                         {% endif %}
                         {% ifequal class4div 'ActiveBox4User' %}
                             <a href="/user/{{object_reference}}/navigate/">
@@ -55,16 +55,16 @@
                         </a>
                         </li>
                         {% if navigate_bool %}
-                            <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-right"  id="StudyButtonOff">
+                            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-right"  id="StudyButtonOff">
                         {% else %}
-                            <li class="ui-button ui-button-text-only ui-widget ui-state-focus ui-state-active ui-corner-right"  id="StudyButtonOn">
+                            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-focus ui-state-active ui-corner-right"  id="StudyButtonOn">
                         {% endif %}
                             <a href="../attributes/">
                                 {% trans "STUDY" %}
                             </a>
                         </li>
                         {% endif %}
-                    <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="QuitButton">
+                    <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="QuitButton">
                         <a href="/logout/">
                             {% trans "EXIT" %}
                         </a>
