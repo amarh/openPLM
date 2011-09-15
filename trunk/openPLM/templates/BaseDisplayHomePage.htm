@@ -14,25 +14,39 @@
     <meta name="keywords" content="" />
     <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="/media/js/jquery-ui-1.8.4.custom.min.js"></script>
+    <script type="text/javascript" src="/media/js/jquery.cookie.js"></script>
     <script type="text/javascript" src="/media/js/navigate.js"></script>
     <script type="text/javascript" src="/media/js/search_form.js"></script>
     <script type="text/javascript" src="/media/js/display.js"></script>
+    <script type="text/javascript" src="/media/js/panels.js"></script>
+
+    {% block scripts %} {% endblock %}
+
 </head>
-<body onload="InitShowDiv()">
-    <div id="Page">
+<!--<body onload="InitShowDiv()">-->
+<body>
+  
+
+    <div class="main-box" id="Page">
+        <div class="top-box">
             <div id="DisplayBox">
-                <ul>
-                    <li id="FindButton" onclick="showHide('FindButton', 'SearchBox', 'CreationBox', 'ActiveBox', 'DivNav')">
+                <input type="checkbox" id="FindButton" />
+                <label for="FindButton">
                         {% trans "FIND" %}
-                    </li>
-                    <li id="CreateButton" onclick="showHide('CreateButton', 'CreationBox', 'SearchBox', 'ActiveBox', 'DivNav')">
+                </label>
+
+                <input type="checkbox" id="CreationButton" />
+                <label for="CreationButton">
                         {% trans "CREATE" %}
-                    </li>
+                </label>
+
+                  <ul>
+
                     {% if not creation_form %}
                         {% if navigate_bool %}
-                            <li id="NavigateButtonOn">
+                            <li class="ui-button ui-button-text-only ui-widget ui-state-focus ui-state-active  ui-corner-left" id="NavigateButtonOn">
                         {% else %}
-                        <li id="NavigateButtonOff">
+                        <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-left" id="NavigateButtonOff">
                         {% endif %}
                         {% ifequal class4div 'ActiveBox4User' %}
                             <a href="/user/{{object_reference}}/navigate/">
@@ -43,16 +57,16 @@
                         </a>
                         </li>
                         {% if navigate_bool %}
-                            <li id="StudyButtonOff">
+                            <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-right"  id="StudyButtonOff">
                         {% else %}
-                            <li id="StudyButtonOn">
+                            <li class="ui-button ui-button-text-only ui-widget ui-state-focus ui-state-active ui-corner-right"  id="StudyButtonOn">
                         {% endif %}
                             <a href="../attributes/">
                                 {% trans "STUDY" %}
                             </a>
                         </li>
                         {% endif %}
-                    <li id="QuitButton">
+                    <li class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="QuitButton">
                         <a href="/logout/">
                             {% trans "EXIT" %}
                         </a>
@@ -62,21 +76,19 @@
             <div id="LoggedPersonBox">
                 {% block LoggedPersonBlock %}{% endblock %}
             </div>
+        </div>
+
+
+
+    <div class="content-box clearfix">
+
+        <div class="left-col">
+
             <div id="CreationBox">
                 Create object :
-                    {% block CreationBlock %}{% endblock %}
+                {% block CreationBlock %}{% endblock %}
             </div>
-            {% ifequal class4div 'ActiveBox4Part' %}
-                <div id="ActiveBox">
-            {% endifequal %}
-            {% ifequal class4div 'ActiveBox4User' %}
-                <div id="ActiveBox" style="background:#c7dec5;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #c7dec5 100%)">
-            {% endifequal %}
-            {% ifequal class4div 'ActiveBox4Doc' %}
-                <div id="ActiveBox" style="background:#ffffc6;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #ffffc6 100%)">
-            {% endifequal %}
-                {% block ObjectBlock %}{% endblock %}
-                </div>
+
             {% ifequal class4search_div 'DisplayHomePage4Addition.htm'%}
                 <div id="SearchBox" style="background:#ff4848">
             {% else %}
@@ -87,7 +99,34 @@
                 <hr/>
                 {% block ResultBlock %}{% endblock %}
             </div>
-        <br class="clear" />
+
+
+      </div>
+         <div class="center-col heightfix">
+
+            {% ifequal class4div 'ActiveBox4Part' %}
+                <div id="ActiveBox">
+            {% endifequal %}
+            {% ifequal class4div 'ActiveBox4User' %}
+                <div id="ActiveBox" style="background:#c7dec5;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #c7dec5 100%)">
+            {% endifequal %}
+            {% ifequal class4div 'ActiveBox4Doc' %}
+                <div id="ActiveBox" style="background:#ffffc6;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #ffffc6 100%)">
+            {% endifequal %}
+                {% block ObjectBlock %}{% endblock %}
+            </div>
+
+        </div>
+
+    </div>
+            
+
+            <!--<br class="clear" />-->
+
+  <div class="bottom-box">
+
+  </div>
+
     </div>
 </body>
 </html>

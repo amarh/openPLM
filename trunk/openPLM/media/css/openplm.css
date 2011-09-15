@@ -57,6 +57,73 @@ list-style-type: none;
 text-indent: 0px;
 }
 
+
+div.main-box {
+position:relative;
+text-align:left;
+overflow:hidden;
+width:80%;
+}
+div.top-box {
+}
+div.bottom-box {
+}
+div.center-box {
+position:relative;
+margin-left:300px;
+margin-top:60px;
+}
+div.reset-box {
+position:relative;
+width:100%;
+left:100%;
+margin-left:-300px;
+} 
+div.right-box {
+position:relative;
+width:100%;
+margin-left:-22%;
+}
+div.content-box {
+position:relative;
+width:100%;
+margin-top:60px;
+}
+div.left-col {
+float:left;
+width:300px;
+}
+div.right-col {
+float:right;
+width:22%;
+}
+div.center-col {
+margin-left:330px;
+}
+* html div.center-col {
+height:1%;
+margin:0;
+}
+* html div.left-col {
+margin-right:-3px;
+}
+* html div.right-col {
+margin-left:-3px;
+}
+.clearfix:after {
+content: "."; 
+display: block;
+height: 0px;
+clear: both; 
+visibility: hidden;
+}
+.heightfix:before {
+content:'.';
+display:block;
+visibility:hidden;
+height:0;
+}
+
 /* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
 span.ButtonLeft
 {
@@ -140,8 +207,8 @@ text-align: center;
 div#CreationBox, div#SearchBox, div#SearchBox4Search
 {
 display: none;
-float: left;
-width: 380px;
+/*float: left;*/
+width: 100%;
 margin-right: 0px;
 }
 
@@ -169,8 +236,6 @@ margin-bottom: 0px;
 /* MAIN BIG ACTIVE BOX */
 div#ActiveBox
 {
-width: 1168px;
-float: right;
 min-height: 420px;
 margin-bottom: 110px;
 padding: 5px;
@@ -181,46 +246,46 @@ background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #
 /*                          STYLE FOR BUTTONS IN DISPLAYBOX                                */
 /* *************************************************************************************** */
 /* FOR ALL BUTTONS */
-li#FindButton, li#CreateButton, li#NavigateButtonOff, li#NavigateButtonOn,
-li#StudyButtonOn, li#StudyButtonOff, li#QuitButton
-{
-border: 2px outset;
-padding: 3px;
-margin-right: 10px;
--moz-border-radius: 5px;
-background-color: #CCCCCC;
-cursor: pointer;
-}
+/*li#FindButton, li#CreateButton, li#NavigateButtonOff, li#NavigateButtonOn,*/
+/*li#StudyButtonOn, li#StudyButtonOff, li#QuitButton*/
+/*{*/
+/*border: 2px outset;*/
+/*padding: 3px;*/
+/*margin-right: 10px;*/
+/*-moz-border-radius: 5px;*/
+/*background-color: #CCCCCC;*/
+/*cursor: pointer;*/
+/*}*/
 
 /* STYLE FOR LINKS IS DESACTIVED */
-li#StudyButtonOn a, li#StudyButtonOff a, li#NavigateButtonOff a,
-li#NavigateButtonOn a, li#QuitButton a
-{
-text-decoration: none;
-color: #000000;
-}
+/*li#StudyButtonOn a, li#StudyButtonOff a, li#NavigateButtonOff a,*/
+/*li#NavigateButtonOn a, li#QuitButton a*/
+/*{*/
+/*text-decoration: none;*/
+/*color: #000000;*/
+/*}*/
 
 /* BUTTON TO SWITCH TO STUDY MODE DISPLAY */
-li#StudyButtonOn, li#StudyButtonOff
-{
--moz-border-radius-topleft: 0px;
--moz-border-radius-bottomleft: 0px;
-}
+/*li#StudyButtonOn, li#StudyButtonOff*/
+/*{*/
+/*-moz-border-radius-topleft: 0px;*/
+/*-moz-border-radius-bottomleft: 0px;*/
+/*}*/
 
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
 li#NavigateButtonOff, li#NavigateButtonOn
 {
--moz-border-radius-topright: 0px;
--moz-border-radius-bottomright: 0px;
-margin-right: -3px;
+/*-moz-border-radius-topright: 0px;*/
+/*-moz-border-radius-bottomright: 0px;*/
+margin-right: -5px;
 }
 
 /* WHEN BUTTON IS ON */
-li#NavigateButtonOn, li#StudyButtonOn
-{
-border: 2px inset;
-background-color: #777777;
-}
+/*li#NavigateButtonOn, li#StudyButtonOn*/
+/*{*/
+/*border: 2px inset;*/
+/*background-color: #777777;*/
+/*}*/
 
 #SetLangForm
 {
@@ -433,6 +498,22 @@ background-color: #FFFFFF;
 overflow: scroll;
 }
 
+div#navThumbnails {
+    overflow: scroll;
+    width: 180px;
+    display:none;
+    float:right;
+    height: 500px;
+    z-index:70;
+    position:absolute;
+    right:0px;
+}
+
+div#navThumbnailus > img{
+    width: 180px;
+}
+
+
 div#DivNav {
 position: absolute;
 }
@@ -446,6 +527,13 @@ div.node > a > span {
     text-decoration:none;
 }
 
+img.node_thumbnails {
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    display:none;
+    z-index:50;
+}
 
 img#ImgNav
 {
