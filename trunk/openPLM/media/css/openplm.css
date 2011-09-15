@@ -498,8 +498,17 @@ background-color: #FFFFFF;
 overflow: scroll;
 }
 
+#closeThumbnails {
+    float: right;
+}
+
+#navThumbnailsBar {
+    border-bottom: 1px solid #ccc;
+    background-color: #dbb;
+    padding: 3px;
+}
+
 div#navThumbnails {
-    overflow: scroll;
     width: 180px;
     display:none;
     float:right;
@@ -507,10 +516,14 @@ div#navThumbnails {
     z-index:70;
     position:absolute;
     right:0px;
+    border-left: 1px solid #ccc;
+    background: rgba(200, 230, 230, 0.7);
 }
 
-div#navThumbnailus > img{
-    width: 180px;
+div#thumbnailsList img{
+    border-bottom: 1px solid #ccc;
+    max-width: 160px;
+    max-height: 160px;
 }
 
 

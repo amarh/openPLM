@@ -67,7 +67,8 @@ urlpatterns += patterns('',
     
     (r'ajax/search/$', ajax_search_form),
     (r'ajax/complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
-    
+    (r'ajax/thumbnails/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_thumbnails),
+
     (object_url + r'$', display_object),
     (object_url + r'attributes/$', display_object_attributes),
     (object_url + r'lifecycle/$', display_object_lifecycle),

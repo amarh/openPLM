@@ -284,8 +284,11 @@ class NavigationGraph(object):
         else:
             node.attr["label"] = obj.username.encode("utf-8")
         node.attr["label"] += "\\n" + extra_label.encode("utf-8")
-        node.attr["tooltip"] = node.attr["label"].replace("\\n", " ")
-
+        if type_ == DocumentController:
+            path = "/".join((obj.type.encode('utf-8'),                                                   obj.reference.encode('utf-8'), obj.revision.encode('utf-8')))
+            node.attr["tooltip"] = "/ajax/thumbnails/" + path
+        else:
+            node.attr["tooltip"] = "None"
 
     def convert_map(self, map_string):
         elements = []
@@ -294,8 +297,15 @@ class NavigationGraph(object):
             width = x2 - left
             height = y2 - top
             style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
-            div = ET.Element("div", id="Nav-%s" % area.get("id"), style=style)
+            id_ = "Nav-%s" % area.get("id")
+            div = ET.Element("div", id=id_, style=style)
             div.set("class", "node")
+            url = area.get("title")
+            if url != "None":
+                thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
+                        title="Display thumbnails")
+                thumbnails.set("class", "node_thumbnails")
+                thumbnails.set("onclick", "display_thumbnails('%s', '%s');" % (id_, url))
             a = ET.SubElement(div, "a", href=area.get("href")) 
             ET.SubElement(a, "span")
             elements.append(div)

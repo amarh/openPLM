@@ -1511,3 +1511,28 @@ def ajax_autocomplete(request, obj_type, field):
     json = JSONEncoder().encode(list(results[:limit]))  
     return HttpResponse(json, mimetype='application/json')
 
+@login_required
+def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
+    """
+    
+    :param request: :class:`django.http.QueryDict`
+    :param obj_type: :attr:`.PLMObject.type`
+    :type obj_type: str
+    :param obj_ref: :attr:`.PLMObject.reference`
+    :type obj_ref: str
+    :param obj_revi: :attr:`.PLMObject.revision`
+    :type obj_revi: str
+    """
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    files = []
+    doc = "|".join((obj_type, obj_ref, obj_revi))
+    for f in obj.files:
+        if f.thumbnail:
+            img = "/media/thumbnails/%s" % f.thumbnail 
+        else:
+            img = "/media/img/image-missing.png"
+        files.append((f.filename, "/file/%d/" % f.id, img))
+    json = JSONEncoder().encode(dict(files=files, doc=doc))
+    return HttpResponse(json, mimetype='application/json')
+
+
