@@ -1514,7 +1514,8 @@ def ajax_autocomplete(request, obj_type, field):
 @login_required
 def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     """
-    
+    Ajax view to get files and thumbnails of a document.
+
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :attr:`.PLMObject.type`
     :type obj_type: str

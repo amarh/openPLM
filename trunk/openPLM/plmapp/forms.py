@@ -315,6 +315,10 @@ def get_doc_cad_formset(controller, data=None):
 class FilterForm(forms.Form):
     only_search_results = forms.BooleanField(initial=False,
                 required=False, label=_("only search results"))
+    prog = forms.ChoiceField(choices=(("twopi", _("Radial")),
+                                      ("dot", _("Vertical"))),
+                             required=False, initial="twopi",
+                             label=_("layout"))
 
 class FilterObjectForm4Part(FilterForm):
     child = forms.BooleanField(initial=True, required=False, label=_("child"))
