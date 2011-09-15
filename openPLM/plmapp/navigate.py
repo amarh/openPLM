@@ -112,6 +112,7 @@ class NavigationGraph(object):
                              "notified", "part", "owned", "to_sign",
                              "request_notification_from", OSR) 
         self.options = dict.fromkeys(self.options_list, False)
+        self.options["prog"] = "twopi"
         self.graph = pgv.AGraph()
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
@@ -263,7 +264,8 @@ class NavigationGraph(object):
                          'owned':(self._create_object_edges, 'owner'),
                          'to_sign':(self._create_object_edges, 'sign'),
                          'request_notification_from':(self._create_object_edges, 'notified'),
-                         OSR : (lambda *args: None, None), }
+                         OSR : (lambda *args: None, None),
+                         "prog": (lambda *args: None, None)}
         for field, value in self.options.items():
             if value:
                 function, argument = functions_dic[field]
@@ -335,14 +337,15 @@ class NavigationGraph(object):
         picture_path = "media/navigate/" + t + str(self.object.id) + "-"
         for opt in self.options_list:
             picture_path += str(int(self.options[opt]))
-        self.graph.layout(prog="twopi")
+        prog = self.options.get("prog") or "twopi"
+        self.graph.layout(prog=prog)
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
         map_path= picture_path2 + ".map"
         picture_path += ".png"
         picture_path2 += ".png"
         s = StringIO.StringIO()
-        self.graph.draw(picture_path2, format='png', prog='neato')
-        self.graph.draw(s, format='cmapx', prog='neato')
+        self.graph.draw(picture_path2, format='png', prog=prog)
+        self.graph.draw(s, format='cmapx', prog=prog)
         s.seek(0)
         map_string = s.read()
         self.graph.clear()
