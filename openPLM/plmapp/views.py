@@ -45,21 +45,17 @@ Finaly we have :func:`navigate` which draw a picture with a central object and i
 
 """
 
-import os
 import re
 import datetime
-import pygraphviz as pgv
 from operator import attrgetter
 from mimetypes import guess_type
 from functools import wraps
 
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
-from django.db.models import Q
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse,\
+from django.http import HttpResponseRedirect, HttpResponse,\
                         HttpResponsePermanentRedirect, HttpResponseForbidden, \
                         HttpResponseServerError, Http404
-from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -71,11 +67,10 @@ from django.views.decorators.cache import cache_page
 
 from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController, PartController
+from openPLM.plmapp.controllers import PLMObjectController, get_controller, DocumentController
 from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
-from openPLM.plmapp.api import get_obj_by_id
 from openPLM.plmapp.navigate import NavigationGraph
 
 
@@ -144,7 +139,7 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
     return controller_cls(obj, user)
 
 ##########################################################################################
-def init_context_dict(init_type_value, init_reference_value, init_revision_value):
+def init_context_dict(init_type_, init_reference, init_revision):
     """
     Initiate the context dictionnary we used to transfer parameters to html pages.
     Get type, reference and revision of an object and return a dictionnary with them
@@ -161,20 +156,20 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
          'object_revision': '1.4.3',
          'object_type': 'BiosOs'}
     
-    :param init_type_value: type of the object
-    :type init_type_value: str
-    :param init_reference_value: reference of the object
-    :type init_reference_value: str
-    :param init_revision_value: revision of the object
-    :type init_revision_value: str
+    :param init_type_: type of the object
+    :type init_type_: str
+    :param init_reference: reference of the object
+    :type init_reference: str
+    :param init_revision: revision of the object
+    :type init_revision: str
     :return: a dictionnary
     """
     now = datetime.datetime.now()
     return {
         'current_date': now,
-        'object_reference': init_reference_value,
-        'object_revision': init_revision_value,
-        'object_type': init_type_value,
+        'object_reference': init_reference,
+        'object_revision': init_revision,
+        'object_type': init_type_,
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         'LANGUAGES' : settings.LANGUAGES,
         }
@@ -183,31 +178,31 @@ def init_context_dict(init_type_value, init_reference_value, init_revision_value
 ###   Manage html code for Search and Results function and other global parameters     ###
 ##########################################################################################
 
-def display_global_page(request_dict, type_value='-', reference_value='-', revision_value='-'):
+def display_global_page(request_dict, type_='-', reference='-', revision='-'):
     """
     Get a request and return a controller, a context dictionnary with elements common to all pages
     (search form, search data, search results, ...) and another dictionnary to update the
     request.session dictionnary.
     
     :param request_dict: :class:`django.http.QueryDict`
-    :param type_value: :attr:`.PLMObject.type`
-    :type type_value: str
-    :param reference_value: :attr:`.PLMObject.reference`
-    :type reference_value: str
-    :param revision_value: :attr:`.PLMObject.revision`
-    :type revision_value: str
+    :param type_: :attr:`.PLMObject.type`
+    :type type_: str
+    :param reference: :attr:`.PLMObject.reference`
+    :type reference: str
+    :param revision: :attr:`.PLMObject.revision`
+    :type revision: str
     :return: a :class:`PLMObjectController` or a :class:`UserController`
     :return: context_dict
     :type context_dict: dic
     :return: request_dict.session
     :type request_dict.session: dic
     """
-    context_dict = init_context_dict(type_value, reference_value, revision_value)
+    context_dict = init_context_dict(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
-    if type_value=='-' and reference_value=='-' and revision_value=='-':
+    if type_ == reference == revision == '-':
         selected_object = request_dict.user
     else:
-        selected_object = get_obj(type_value, reference_value, revision_value, request_dict.user)
+        selected_object = get_obj(type_, reference, revision, request_dict.user)
     # Defines a variable for background color selection
     if isinstance(selected_object, UserController):
         class_for_div="ActiveBox4User"
@@ -1407,14 +1402,19 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 ##########################################################################################    
 regex_pattern = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
 
+
+def get_navigate_data(request, obj_type, obj_ref, obj_revi):
+
+    pass
+
 @handle_errors
-def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
+def navigate(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays a graphical picture the different links
     between :class:`~django.contrib.auth.models.User` and  :class:`.models.PLMObject`.
     This function uses Graphviz (http://graphviz.org/).
     Some filters let user defines which type of links he/she wants to display.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
@@ -1428,23 +1428,21 @@ def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     if isinstance(obj, UserController):
-        FilterObjectFormFunction = FilterObjectForm4User
+        filterForm = FilterObjectForm4User
     elif isinstance(obj, DocumentController):
-        FilterObjectFormFunction = FilterObjectForm4Doc
+        filterForm = FilterObjectForm4Doc
     else:
-        FilterObjectFormFunction = FilterObjectForm4Part
-    session_bool = False
-    for field in FilterObjectFormFunction.base_fields.keys():
-        session_bool = session_bool or request.session.get(field)
+        filterForm = FilterObjectForm4Part
+    has_session = any(field in request.session for field in filterForm.base_fields)
     if request.method == 'POST' and request.POST:
-        form = FilterObjectFormFunction(request.POST)
+        form = filterForm(request.POST)
         if form.is_valid():
             request.session.update(form.cleaned_data)
-    elif session_bool:
-        form = FilterObjectFormFunction(request.session)
+    elif has_session:
+        form = filterForm(request.session)
     else:
-        initial = dict((k, bool(v.initial)) for k,v in FilterObjectFormFunction.base_fields.items())
-        form = FilterObjectFormFunction(initial)
+        initial = dict((k, v.initial) for k, v in filterForm.base_fields.items())
+        form = filterForm(initial)
         request.session.update(initial)
     if not form.is_valid():
         return HttpResponse('mauvaise requete post')
@@ -1463,7 +1461,7 @@ def navigate(request, obj_type, obj_ref, obj_revi, navigate_bool):
                          'map_areas': map_string, 'picture_path': "/"+picture_path,
                          'x_img_position': x_img_position_corrected,
                          'y_img_position': y_img_position_corrected,
-                         'navigate_bool': navigate_bool})
+                         'navigate_bool': True})
     return render_to_response('Navigate.htm', context_dict, 
                               context_instance=RequestContext(request))
     
@@ -1513,6 +1511,32 @@ def ajax_autocomplete(request, obj_type, field):
 
 @login_required
 def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
+    """
+    Ajax view to get files and thumbnails of a document.
+
+    :param request: :class:`django.http.QueryDict`
+    :param obj_type: :attr:`.PLMObject.type`
+    :type obj_type: str
+    :param obj_ref: :attr:`.PLMObject.reference`
+    :type obj_ref: str
+    :param obj_revi: :attr:`.PLMObject.revision`
+    :type obj_revi: str
+    """
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    files = []
+    doc = "|".join((obj_type, obj_ref, obj_revi))
+    for f in obj.files:
+        if f.thumbnail:
+            img = "/media/thumbnails/%s" % f.thumbnail 
+        else:
+            img = "/media/img/image-missing.png"
+        files.append((f.filename, "/file/%d/" % f.id, img))
+    json = JSONEncoder().encode(dict(files=files, doc=doc))
+    return HttpResponse(json, mimetype='application/json')
+
+
+@login_required
+def ajax_show_docs(request, obj_type, obj_ref, obj_revi):
     """
     Ajax view to get files and thumbnails of a document.
 
