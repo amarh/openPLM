@@ -35,6 +35,13 @@ function display_thumbnails(node_id, ajax_url){
     });
 }
 
+function display_docs(doc_parts){
+    $("#id_doc_parts").attr("value", doc_parts);
+    $("#id_update").attr("value", "on");
+    $("#FilterNav").find("form").submit();
+}
+
+
 $(document).ready(function(){
 
         // Supprime la scrollbar en JS
@@ -86,10 +93,12 @@ cursor: 'crosshair'
         $("div.node").mouseenter(
         function () {
             $(this).find(".node_thumbnails").show();
+            $(this).find(".node_show_docs").show();
         }); 
         $("div.node").mouseleave(
         function () {
             $(this).find(".node_thumbnails").hide();
+            $(this).find(".node_show_docs").hide();
         }
         );
 

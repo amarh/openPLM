@@ -1400,7 +1400,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 ##########################################################################################
 ###                     Manage html pages for navigate function                        ###
 ##########################################################################################    
-regex_pattern = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
+coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
 
 
 def get_navigate_data(request, obj_type, obj_ref, obj_revi):
@@ -1427,32 +1427,35 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     """
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
-    if isinstance(obj, UserController):
-        filterForm = FilterObjectForm4User
-    elif isinstance(obj, DocumentController):
-        filterForm = FilterObjectForm4Doc
-    else:
-        filterForm = FilterObjectForm4Part
-    has_session = any(field in request.session for field in filterForm.base_fields)
+    FilterForm = get_navigate_form(obj)
+    has_session = any(field in request.session for field in FilterForm.base_fields)
     if request.method == 'POST' and request.POST:
-        form = filterForm(request.POST)
+        form = FilterForm(request.POST)
         if form.is_valid():
             request.session.update(form.cleaned_data)
     elif has_session:
-        form = filterForm(request.session)
+        request.session.update(dict(doc_parts = ""))
+        form = FilterForm(request.session)
     else:
-        initial = dict((k, v.initial) for k, v in filterForm.base_fields.items())
-        form = filterForm(initial)
+        initial = dict((k, v.initial) for k, v in FilterForm.base_fields.items())
+        form = FilterForm(initial)
         request.session.update(initial)
     if not form.is_valid():
-        return HttpResponse('mauvaise requete post')
+        return HttpResponse('Bad post request')
     
     graph = NavigationGraph(obj, context_dict["results"])
-    graph.set_options(form.cleaned_data)
+    options = form.cleaned_data
+    if options["update"]:
+        options["doc_parts"] = [int(o)
+                                for o in options["doc_parts"].split("#")
+                                if o.isnumeric()]
+    else:
+        options["doc_parts"] = []
+        request.session.update(dict(doc_parts = ""))
+    graph.set_options(options)
     graph.create_edges()
     map_string, picture_path = graph.render()
-    top, left, w, h = map(int,
-                    re.search(regex_pattern, map_string).groups())
+    top, left, w, h = map(int, re.search(coords_rx, map_string).groups())
     x_part_node_position = (2 * left + w) // 2
     y_part_node_position = (2 * top + h) // 2
     x_img_position_corrected = 1172 // 2 - x_part_node_position

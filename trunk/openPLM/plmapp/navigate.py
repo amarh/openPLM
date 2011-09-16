@@ -43,6 +43,13 @@ basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
 # just a shortcut
 OSR = "only_search_results"
 
+def encode(s):
+    return s.encode("utf-8")
+
+def get_path(obj):
+    return "/".join(map(encode, (obj.type, obj.reference, obj.revision)))
+
+
 class FrozenAGraph(pgv.AGraph):
     '''
     A frozen AGraph
@@ -113,6 +120,7 @@ class NavigationGraph(object):
                              "request_notification_from", OSR) 
         self.options = dict.fromkeys(self.options_list, False)
         self.options["prog"] = "twopi"
+        self.options["doc_parts"] = []
         self.graph = pgv.AGraph()
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
@@ -176,7 +184,7 @@ class NavigationGraph(object):
             child = PartController(child_l.link.child, None)
             self.graph.add_edge(obj.id, child.id)
             self._set_node_attributes(child)
-            if self.options['doc']:
+            if self.options['doc'] or child.id in self.options["doc_parts"]:
                self._create_doc_edges(child)
             self._create_child_edges(child)
     
@@ -189,7 +197,7 @@ class NavigationGraph(object):
             parent = PartController(parent_l.link.parent, None)
             self.graph.add_edge(parent.id, obj.id)
             self._set_node_attributes(parent)
-            if self.options['doc']:
+            if self.options['doc'] or parent.id in self.options["doc_parts"]:
                 self._create_doc_edges(parent)
             self._create_parents_edges(parent)
    
@@ -264,10 +272,10 @@ class NavigationGraph(object):
                          'owned':(self._create_object_edges, 'owner'),
                          'to_sign':(self._create_object_edges, 'sign'),
                          'request_notification_from':(self._create_object_edges, 'notified'),
-                         OSR : (lambda *args: None, None),
-                         "prog": (lambda *args: None, None)}
+                         }
+        self.options["doc"] = self.options["doc"] or self.object.id in self.options["doc_parts"]
         for field, value in self.options.items():
-            if value:
+            if value and field in functions_dic:
                 function, argument = functions_dic[field]
                 function(self.object, argument)
 
@@ -280,21 +288,21 @@ class NavigationGraph(object):
             type_ = DocumentController
         node.attr.update(self.TYPE_TO_ATTRIBUTES[type_])
         node.attr["URL"] = obj.plmobject_url + "navigate/"
+        node.attr["tooltip"] = "None"
         if isinstance(obj, PLMObjectController):
-            node.attr['label'] = "%s\\n%s\\n%s" % (obj.type.encode('utf-8'),
-                                                   obj.reference.encode('utf-8'),
-                                                   obj.revision.encode('utf-8'))
+            node.attr['label'] = get_path(obj).replace("/", "\\n")
+            if type_ == DocumentController:
+                node.attr["tooltip"] = "/ajax/thumbnails/" + get_path(obj)
+            elif type_ == PartController and not self.options["doc"]:
+                s = "+" if  not obj.id in self.options["doc_parts"] else "-"
+                node.attr["tooltip"] = s + str(obj.id)
         else:
-            node.attr["label"] = obj.username.encode("utf-8")
-        node.attr["label"] += "\\n" + extra_label.encode("utf-8")
-        if type_ == DocumentController:
-            path = "/".join((obj.type.encode('utf-8'),                                                   obj.reference.encode('utf-8'), obj.revision.encode('utf-8')))
-            node.attr["tooltip"] = "/ajax/thumbnails/" + path
-        else:
-            node.attr["tooltip"] = "None"
+            node.attr["label"] = encode(obj.username)
+        node.attr["label"] += "\\n" + encode(extra_label)
 
     def convert_map(self, map_string):
         elements = []
+        doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         for area in ET.fromstring(map_string).findall("area"):
             left, top, x2, y2 = map(int, area.get("coords").split(","))
             width = x2 - left
@@ -304,11 +312,25 @@ class NavigationGraph(object):
             div = ET.Element("div", id=id_, style=style)
             div.set("class", "node")
             url = area.get("title")
-            if url != "None":
+            if url.startswith("/ajax/thumbnails/"):
                 thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
                         title="Display thumbnails")
                 thumbnails.set("class", "node_thumbnails ui-button ui-widget ui-state-default ui-corner-all")
                 thumbnails.set("onclick", "display_thumbnails('%s', '%s');" % (id_, url))
+            elif url != "None":
+                if url[0] == "+":
+                    parts = doc_parts + "#" + url[1:]
+                    img = "/media/img/add.png"
+                else:
+                    s = set(self.options["doc_parts"])
+                    img = "/media/img/remove.png"
+                    s.remove(int(url[1:]))
+                    parts = "#".join(str(o) for o in s)
+                show_doc = ET.SubElement(div, "img", src=img,
+                        title="Show related documents")
+                show_doc.set("class", "node_show_docs ui-button ui-widget ui-state-default ui-corner-all")
+                show_doc.set("onclick", "display_docs('%s');" % (parts))
+                
             a = ET.SubElement(div, "a", href=area.get("href")) 
             ET.SubElement(a, "span")
             elements.append(div)
