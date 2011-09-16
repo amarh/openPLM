@@ -29,6 +29,7 @@ from openPLM.plmapp.utils import size_to_format
 from odf.opendocument import load
 from odf.meta import DocumentStatistic
 from odf.style import PageLayoutProperties
+from odf.namespaces import FONS, METANS
 
 
 class ODFHandler(FileHandler):
@@ -50,9 +51,9 @@ class ODFHandler(FileHandler):
             doc = load(path)
             stat = doc.getElementsByType(DocumentStatistic)[0]
             page = doc.getElementsByType(PageLayoutProperties)[0]
-            self.nb_pages = int(stat.attributes["meta:page-count"])
-            w = page.attributes['fo:page-width']
-            h = page.attributes['fo:page-height']
+            self.nb_pages = int(stat.getAttrNS(METANS, "page-count"))
+            w = page.getAttrNS(FONS, 'page-width')
+            h = page.getAttrNS(FONS, 'page-height')
             self.format = size_to_format(w, h)
             self._set_valid()
         except Exception, e:
