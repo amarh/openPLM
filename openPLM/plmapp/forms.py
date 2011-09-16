@@ -31,7 +31,8 @@ from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as m
-from openPLM.plmapp.controllers import rx_bad_ref
+from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
+from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
 
 def _clean_reference(self):
@@ -312,15 +313,20 @@ def get_doc_cad_formset(controller, data=None):
     return formset
 
 
-class FilterForm(forms.Form):
+class NavigateFilterForm(forms.Form):
     only_search_results = forms.BooleanField(initial=False,
                 required=False, label=_("only search results"))
-    prog = forms.ChoiceField(choices=(("twopi", _("Radial")),
-                                      ("dot", _("Vertical"))),
+    prog = forms.ChoiceField(choices=(("twopi", _("Radial 1")),
+                                      ("neato", _("Radial 2")),
+                                      ("dot", _("Hierarchical"))),
                              required=False, initial="twopi",
                              label=_("layout"))
+    doc_parts = forms.CharField(initial="", required="",
+                                widget=forms.HiddenInput())
+    update = forms.BooleanField(initial=False, required=False,
+           widget=forms.HiddenInput() )
 
-class FilterObjectForm4Part(FilterForm):
+class PartNavigateFilterForm(NavigateFilterForm):
     child = forms.BooleanField(initial=True, required=False, label=_("child"))
     parents = forms.BooleanField(required=False, label=_("parents"))
     doc = forms.BooleanField(required=False, label=_("doc"))
@@ -329,16 +335,26 @@ class FilterObjectForm4Part(FilterForm):
     signer = forms.BooleanField(required=False, label=_("signer"))
     notified = forms.BooleanField(required=False, label=_("notified"))
 
-class FilterObjectForm4Doc(FilterForm):
+class DocNavigateFilterForm(NavigateFilterForm):
     part = forms.BooleanField(initial=True, required=False, label=_("part"))
     owner = forms.BooleanField(initial=True, required=False, label=_("owner"))
     signer = forms.BooleanField(required=False, label=_("signer"))
     notified = forms.BooleanField(required=False, label=_("notified"))
 
-class FilterObjectForm4User(FilterForm):
+class UserNavigateFilterForm(NavigateFilterForm):
     owned = forms.BooleanField(initial=True, required=False, label=_("owned"))
     to_sign = forms.BooleanField(required=False, label=_("to sign"))
     request_notification_from = forms.BooleanField(required=False, label=_("request notification from"))
+
+def get_navigate_form(obj):
+    if isinstance(obj, UserController):
+        cls = UserNavigateFilterForm
+    elif isinstance(obj, DocumentController):
+        cls = DocNavigateFilterForm
+    else:
+        cls = PartNavigateFilterForm
+    return cls
+
 
 class OpenPLMUserChangeForm(forms.ModelForm):
     #username = forms.RegexField(widget=forms.HiddenInput())

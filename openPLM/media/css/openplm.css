@@ -542,7 +542,7 @@ div.node > a > span {
     text-decoration:none;
 }
 
-img.node_thumbnails {
+img.node_thumbnails, img.node_show_docs {
     position:absolute;
     right: 0;
     bottom: 0;

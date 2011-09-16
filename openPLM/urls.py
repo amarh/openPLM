@@ -53,8 +53,6 @@ for app in settings.INSTALLED_APPS:
 object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
-user_dict_nav = user_dict.copy()
-user_dict_nav.update({'navigate_bool': True})
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -68,6 +66,7 @@ urlpatterns += patterns('',
     (r'ajax/search/$', ajax_search_form),
     (r'ajax/complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
     (r'ajax/thumbnails/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_thumbnails),
+    (r'ajax/show_docs/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_show_docs),
 
     (object_url + r'$', display_object),
     (object_url + r'attributes/$', display_object_attributes),
@@ -91,7 +90,7 @@ urlpatterns += patterns('',
     (object_url + r'management/add/$', add_management),
     (object_url + r'management/replace/(?P<link_id>\d+)/$', replace_management),
     (object_url + r'management/delete/$', delete_management),
-    (object_url + r'navigate/$', navigate, {'navigate_bool' : True}),
+    (object_url + r'navigate/$', navigate),
 
     (user_url + r'$', display_object, user_dict),
     (user_url + r'attributes/$', display_object_attributes, user_dict),
@@ -108,7 +107,7 @@ urlpatterns += patterns('',
                     {'obj_type':'User', 'obj_revi':'-'}),
     (user_url + r'modify/$', modify_user, user_dict),
     (user_url + r'password/$', change_user_password, user_dict),
-    (user_url + r'navigate/$', navigate, user_dict_nav),
+    (user_url + r'navigate/$', navigate, user_dict),
     
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
