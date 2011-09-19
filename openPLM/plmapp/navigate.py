@@ -47,7 +47,10 @@ def encode(s):
     return s.encode("utf-8")
 
 def get_path(obj):
-    return "/".join(map(encode, (obj.type, obj.reference, obj.revision)))
+    if hasattr(obj, "type"):
+        return "/".join(map(encode, (obj.type, obj.reference, obj.revision)))
+    else:
+        return obj.username
 
 
 class FrozenAGraph(pgv.AGraph):
@@ -273,11 +276,12 @@ class NavigationGraph(object):
                          'to_sign':(self._create_object_edges, 'sign'),
                          'request_notification_from':(self._create_object_edges, 'notified'),
                          }
-        self.options["doc"] = self.options["doc"] or self.object.id in self.options["doc_parts"]
         for field, value in self.options.items():
             if value and field in functions_dic:
                 function, argument = functions_dic[field]
                 function(self.object, argument)
+        if not self.options["doc"] and self.object.id in self.options["doc_parts"]:
+            self._create_doc_edges(self.object, None)
 
     def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
         node = self.graph.get_node(obj_id or obj.id)
@@ -294,15 +298,17 @@ class NavigationGraph(object):
             if type_ == DocumentController:
                 node.attr["tooltip"] = "/ajax/thumbnails/" + get_path(obj)
             elif type_ == PartController and not self.options["doc"]:
-                s = "+" if  not obj.id in self.options["doc_parts"] else "-"
+                s = "+" if obj.id not in self.options["doc_parts"] else "-"
                 node.attr["tooltip"] = s + str(obj.id)
         else:
             node.attr["label"] = encode(obj.username)
         node.attr["label"] += "\\n" + encode(extra_label)
+        node.attr["id"] = obj_id or obj.id
 
     def convert_map(self, map_string):
         elements = []
         doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
+        ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
             left, top, x2, y2 = map(int, area.get("coords").split(","))
             width = x2 - left
@@ -329,8 +335,7 @@ class NavigationGraph(object):
                 show_doc = ET.SubElement(div, "img", src=img,
                         title="Show related documents")
                 show_doc.set("class", "node_show_docs ui-button ui-widget ui-state-default ui-corner-all")
-                show_doc.set("onclick", "display_docs('%s');" % (parts))
-                
+                show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
             a = ET.SubElement(div, "a", href=area.get("href")) 
             ET.SubElement(a, "span")
             elements.append(div)
