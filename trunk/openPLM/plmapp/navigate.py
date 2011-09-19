@@ -124,7 +124,7 @@ class NavigationGraph(object):
         self.options = dict.fromkeys(self.options_list, False)
         self.options["prog"] = "twopi"
         self.options["doc_parts"] = []
-        self.graph = pgv.AGraph()
+        self.graph = pgv.AGraph(directed=True)
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
@@ -353,10 +353,10 @@ class NavigationGraph(object):
         # rebuild a frozen graph with sorted edges to avoid random output
         edges = self.graph.edges()
         self.graph.remove_edges_from(edges)
-        s = str(self.graph) 
+        s = str(self.graph)
         s = s[:s.rfind("}")]
         edges.sort()
-        s += "\n".join("%s -- %s;" % (a,b) for a, b in edges) + "}\n"
+        s += "\n".join("%s -> %s;" % (a,b) for a, b in edges) + "}\n"
         self.graph.close()
         self.graph = FrozenAGraph(s)
 
