@@ -35,12 +35,66 @@ function display_thumbnails(node_id, ajax_url){
     });
 }
 
-function display_docs(doc_parts){
-    $("#id_doc_parts").attr("value", doc_parts);
-    $("#id_update").attr("value", "on");
-    $("#FilterNav").find("form").submit();
+function update_nav(focus_node_id, data){
+    var offset = $(focus_node_id).offset();
+    var date = new Date();
+    var divNav = $("#DivNav");
+    $("#ImgNav").attr("src", data["img"] + '?v=' + date.getTime());
+    $("#ImgNav").load(
+         function() {
+            $("div.node").remove();
+            divNav.append(data.divs);
+            var submit = $("#FilterNav").find("li").last().clone();
+            $("#FilterNavUl").html(data.form);
+            $("#FilterNavUl").append(submit);
+            var new_offset = $(focus_node_id).offset();
+            var delta_top = new_offset.top - offset.top;
+            var delta_left = new_offset.left - offset.left;
+            divNav.css({
+                left: '-=' + delta_left+"px",
+                top: '-=' + delta_top + "px"});
+            init();
+    });
 }
 
+function display_docs(node_id, ajax_url, doc_parts){
+    $("#id_doc_parts").attr("value", doc_parts);
+    $("#id_update").attr("value", "on");
+    $.post(ajax_url,
+           $("#FilterNav").find("form").serialize(),
+           function(data) {update_nav("#" + node_id, data);});
+}
+
+
+function init(){
+        $("div.node").mouseenter(
+        function () {
+            $(this).find(".node_thumbnails").show();
+            $(this).find(".node_show_docs").show();
+        }); 
+        $("div.node").mouseleave(
+        function () {
+            $(this).find(".node_thumbnails").hide();
+            $(this).find(".node_show_docs").hide();
+        }
+        );
+
+        $("#closeThumbnails").button({
+            icons : {
+                primary: 'ui-icon-close'
+                },
+            text: false}).click(hide_thumbnails_panel);
+
+        var config = {    
+             over: function(){
+                 if ($("#navThumbnails").is(":visible"))
+                       $(this).click();}, // function = onMouseOver callback (REQUIRED)    
+             timeout: 500, // number = milliseconds delay before onMouseOut    
+             out: function(){} // function = onMouseOut callback (REQUIRED)    
+        };
+        $(".node_thumbnails").hoverIntent(config);
+
+}
 
 $(document).ready(function(){
 
@@ -90,30 +144,6 @@ $(document).ready(function(){
         $("#DivNav").draggable({
 cursor: 'crosshair'
 });
-        $("div.node").mouseenter(
-        function () {
-            $(this).find(".node_thumbnails").show();
-            $(this).find(".node_show_docs").show();
-        }); 
-        $("div.node").mouseleave(
-        function () {
-            $(this).find(".node_thumbnails").hide();
-            $(this).find(".node_show_docs").hide();
-        }
-        );
 
-        $("#closeThumbnails").button({
-            icons : {
-                primary: 'ui-icon-close'
-                },
-            text: false}).click(hide_thumbnails_panel);
-
-        var config = {    
-             over: function(){
-                 if ($("#navThumbnails").is(":visible"))
-                       $(this).click();}, // function = onMouseOver callback (REQUIRED)    
-             timeout: 500, // number = milliseconds delay before onMouseOut    
-             out: function(){} // function = onMouseOut callback (REQUIRED)    
-        };
-        $(".node_thumbnails").hoverIntent(config);
+    init();
 });

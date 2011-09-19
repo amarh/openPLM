@@ -1404,27 +1404,6 @@ coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;'
 
 
 def get_navigate_data(request, obj_type, obj_ref, obj_revi):
-
-    pass
-
-@handle_errors
-def navigate(request, obj_type, obj_ref, obj_revi):
-    """
-    Manage html page which displays a graphical picture the different links
-    between :class:`~django.contrib.auth.models.User` and  :class:`.models.PLMObject`.
-    This function uses Graphviz (http://graphviz.org/).
-    Some filters let user defines which type of links he/she wants to display.
-    It computes a context dictionary based on
-    
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
-    """
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     FilterForm = get_navigate_form(obj)
@@ -1442,7 +1421,6 @@ def navigate(request, obj_type, obj_ref, obj_revi):
         request.session.update(initial)
     if not form.is_valid():
         return HttpResponse('Bad post request')
-    
     graph = NavigationGraph(obj, context_dict["results"])
     options = form.cleaned_data
     if options["update"]:
@@ -1465,7 +1443,28 @@ def navigate(request, obj_type, obj_ref, obj_revi):
                          'x_img_position': x_img_position_corrected,
                          'y_img_position': y_img_position_corrected,
                          'navigate_bool': True})
-    return render_to_response('Navigate.htm', context_dict, 
+    return context_dict
+
+@handle_errors
+def navigate(request, obj_type, obj_ref, obj_revi):
+    """
+    Manage html page which displays a graphical picture the different links
+    between :class:`~django.contrib.auth.models.User` and  :class:`.models.PLMObject`.
+    This function uses Graphviz (http://graphviz.org/).
+    Some filters let user defines which type of links he/she wants to display.
+    It computes a context dictionary based on
+    
+    :param request: :class:`django.http.QueryDict`
+    :param obj_type: :class:`~django.contrib.auth.models.User`
+    :type obj_type: str
+    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
+    :type obj_ref: str
+    :param obj_revi: "-"
+    :type obj_revi: str
+    :return: a :class:`django.http.HttpResponse`
+    """
+    context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
+    return render_to_response('Navigate.htm', context, 
                               context_instance=RequestContext(request))
     
 @login_required
@@ -1539,28 +1538,14 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
 
 
 @login_required
-def ajax_show_docs(request, obj_type, obj_ref, obj_revi):
-    """
-    Ajax view to get files and thumbnails of a document.
-
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    """
-    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
-    files = []
-    doc = "|".join((obj_type, obj_ref, obj_revi))
-    for f in obj.files:
-        if f.thumbnail:
-            img = "/media/thumbnails/%s" % f.thumbnail 
-        else:
-            img = "/media/img/image-missing.png"
-        files.append((f.filename, "/file/%d/" % f.id, img))
-    json = JSONEncoder().encode(dict(files=files, doc=doc))
+def ajax_navigate(request, obj_type, obj_ref, obj_revi):
+    context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
+    data = {}
+    data["img"] = context["picture_path"]
+    data["divs"] = context["map_areas"]
+    data["left"] = context["x_img_position"]
+    data["top"] = context["y_img_position"]
+    data["form"] = context["filter_object_form"].as_ul()
+    json = JSONEncoder().encode(data)
     return HttpResponse(json, mimetype='application/json')
-
 
