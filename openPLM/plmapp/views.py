@@ -214,27 +214,27 @@ def display_global_page(request_dict, type_='-', reference='-', revision='-'):
     # Builds, update and treat Search form
     search_need = "results" not in request_dict.session
     if request_dict.GET and "type" in request_dict.GET:
-        type_form_instance = type_form(request_dict.GET)
-        type_form_instance4creation = type_form_without_user(request_dict.GET)
-        if type_form_instance.is_valid():
-            cls = models.get_all_users_and_plmobjects()[type_form_instance.cleaned_data["type"]]
-        attributes_form_instance = get_search_form(cls, request_dict.GET)
+        type_form = TypeForm(request_dict.GET)
+        type_form4creation = TypeFormWithoutUser(request_dict.GET)
+        if type_form.is_valid():
+            cls = models.get_all_users_and_plmobjects()[type_form.cleaned_data["type"]]
+        attributes_form = get_search_form(cls, request_dict.GET)
         request_dict.session.update(request_dict.GET.items())
         search_need = True
     elif request_dict.session and "type" in request_dict.session:
-        type_form_instance = type_form(request_dict.session)
-        type_form_instance4creation = type_form_without_user(request_dict.session)
+        type_form = TypeForm(request_dict.session)
+        type_form4creation = TypeFormWithoutUser(request_dict.session)
         cls = models.get_all_users_and_plmobjects()[request_dict.session["type"]]
-        attributes_form_instance = get_search_form(cls, request_dict.session)
+        attributes_form = get_search_form(cls, request_dict.session)
     else:
-        type_form_instance = type_form()
-        type_form_instance4creation = type_form_without_user()
+        type_form = TypeForm()
+        type_form4creation = TypeFormWithoutUser()
         request_dict.session['type'] = 'Part'
-        attributes_form_instance = get_search_form(models.Part)
-    if attributes_form_instance.is_valid():
+        attributes_form = get_search_form(models.Part)
+    if attributes_form.is_valid():
         if search_need:
             qset = cls.objects.all()
-            qset = attributes_form_instance.search(qset)[:30]
+            qset = attributes_form.search(qset)[:30]
             if qset is None:
                 qset = []
             if issubclass(cls, User):
@@ -244,10 +244,10 @@ def display_global_page(request_dict, type_='-', reference='-', revision='-'):
             qset = request_dict.session["results"] 
     else:
         qset = request_dict.session.get("results", [])
-    context_dict.update({'results' : qset, 'type_form' : type_form_instance,
-                         'type_form4creation' : type_form_instance4creation,
-                         'attributes_form' : attributes_form_instance,
-                         'class4search_div' : 'DisplayHomePage.htm',
+    context_dict.update({'results' : qset, 'type_form' : type_form,
+                         'type_form4creation' : type_form4creation,
+                         'attributes_form' : attributes_form,
+                         'link_creation' : False,
                          'class4div' : class_for_div, 'obj' : selected_object})
     if isinstance(selected_object, PLMObjectController):
         context_dict["is_owner"] = selected_object.check_permission("owner", False)
@@ -513,24 +513,24 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     request.session.update(request_dict)
     menu_list = obj.menu_items
     if request.POST:
-        add_child_form_instance = add_child_form(request.POST)
-        if add_child_form_instance.is_valid():
-            child_obj = get_obj(add_child_form_instance.cleaned_data["type"], \
-                        add_child_form_instance.cleaned_data["reference"], \
-                        add_child_form_instance.cleaned_data["revision"],
+        add_child_form = AddChildForm(request.POST)
+        if add_child_form.is_valid():
+            child_obj = get_obj(add_child_form.cleaned_data["type"], \
+                        add_child_form.cleaned_data["reference"], \
+                        add_child_form.cleaned_data["revision"],
                         request.user)
             obj.add_child(child_obj, \
-                            add_child_form_instance.cleaned_data["quantity"], \
-                            add_child_form_instance.cleaned_data["order"])
-            context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+                            add_child_form.cleaned_data["quantity"], \
+                            add_child_form.cleaned_data["order"])
+            context_dict.update({'object_menu': menu_list, 'add_child_form': add_child_form, })
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
         else:
-            add_child_form_instance = add_child_form(request.POST)
-            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+            add_child_form = AddChildForm(request.POST)
+            context_dict.update({'link_creation': True, 'object_menu': menu_list, 'add_child_form': add_child_form, })
             return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
-        add_child_form_instance = add_child_form()
-        context_dict.update({'current_page':'BOM-child', 'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_child_form': add_child_form_instance, })
+        add_child_form = AddChildForm()
+        context_dict.update({'current_page':'BOM-child', 'link_creation': True, 'object_menu': menu_list, 'add_child_form': add_child_form, })
         return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################    
@@ -628,22 +628,22 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     menu_list = obj.menu_items
     request.session.update(request_dict)
     if request.POST:
-        add_doc_cad_form_instance = AddDocCadForm(request.POST)
-        if add_doc_cad_form_instance.is_valid():
-            doc_cad_obj = get_obj(add_doc_cad_form_instance.cleaned_data["type"], \
-                        add_doc_cad_form_instance.cleaned_data["reference"], \
-                        add_doc_cad_form_instance.cleaned_data["revision"],\
+        add_doc_cad_form = AddDocCadForm(request.POST)
+        if add_doc_cad_form.is_valid():
+            doc_cad_obj = get_obj(add_doc_cad_form.cleaned_data["type"], \
+                        add_doc_cad_form.cleaned_data["reference"], \
+                        add_doc_cad_form.cleaned_data["revision"],\
                         request.user)
             obj.attach_to_document(doc_cad_obj)
-            context_dict.update({'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
+            context_dict.update({'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form, })
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
         else:
-            add_doc_cad_form_instance = AddDocCadForm(request.POST)
-            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
+            add_doc_cad_form = AddDocCadForm(request.POST)
+            context_dict.update({'link_creation': True, 'class4div': class_for_div, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form, })
             return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
-        add_doc_cad_form_instance = AddDocCadForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form_instance, })
+        add_doc_cad_form = AddDocCadForm()
+        context_dict.update({'link_creation': True, 'object_menu': menu_list, 'add_doc_cad_form': add_doc_cad_form, })
         return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
     
 #############################################################################################
@@ -701,22 +701,22 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     menu_list = obj.menu_items
     request.session.update(request_dict)
     if request.POST:
-        add_rel_part_form_instance = AddRelPartForm(request.POST)
-        if add_rel_part_form_instance.is_valid():
-            part_obj = get_obj(add_rel_part_form_instance.cleaned_data["type"], \
-                        add_rel_part_form_instance.cleaned_data["reference"], \
-                        add_rel_part_form_instance.cleaned_data["revision"], request.user)
+        add_rel_part_form = AddRelPartForm(request.POST)
+        if add_rel_part_form.is_valid():
+            part_obj = get_obj(add_rel_part_form.cleaned_data["type"], \
+                        add_rel_part_form.cleaned_data["reference"], \
+                        add_rel_part_form.cleaned_data["revision"], request.user)
             obj.attach_to_part(part_obj)
-            context_dict.update({'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+            context_dict.update({'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
         else:
-            add_rel_part_form_instance = add_rel_part_form(request.POST)
-            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+            add_rel_part_form = add_rel_part_form(request.POST)
+            context_dict.update({'link_creation': True, 'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form, })
             return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
-        add_rel_part_form_instance = AddRelPartForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm',
-                             'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form_instance, })
+        add_rel_part_form = AddRelPartForm()
+        context_dict.update({'link_creation': True,
+                             'object_menu': menu_list, 'add_rel_part_form': add_rel_part_form, })
         return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -772,18 +772,18 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     menu_list = obj.menu_items
     request.session.update(request_dict)
     if request.POST:
-        add_file_form_instance = AddFileForm(request.POST, request.FILES)
-        if add_file_form_instance.is_valid():
+        add_file_form = AddFileForm(request.POST, request.FILES)
+        if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
-            context_dict.update({'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            context_dict.update({'object_menu': menu_list, 'add_file_form': add_file_form, })
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
-            add_file_form_instance = AddFileForm(request.POST)
-            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            add_file_form = AddFileForm(request.POST)
+            context_dict.update({'link_creation': True, 'object_menu': menu_list, 'add_file_form': add_file_form, })
             return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
-        add_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+        add_file_form = AddFileForm()
+        context_dict.update({'link_creation': True, 'object_menu': menu_list, 'add_file_form': add_file_form, })
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
@@ -838,12 +838,12 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
 #            return HttpResponseRedirect("/home/")
-        replace_management_form_instance = replace_management_form(request.POST)
-        if replace_management_form_instance.is_valid():
-            if replace_management_form_instance.cleaned_data["type"]=="User":
+        replace_management_form = ReplaceManagementForm(request.POST)
+        if replace_management_form.is_valid():
+            if replace_management_form.cleaned_data["type"]=="User":
                 user_obj = get_obj(\
-                                    replace_management_form_instance.cleaned_data["type"],\
-                                    replace_management_form_instance.cleaned_data["username"],\
+                                    replace_management_form.cleaned_data["type"],\
+                                    replace_management_form.cleaned_data["username"],\
                                     "-",\
                                     request.user)
                 obj.set_role(user_obj.object, link.role)
@@ -853,13 +853,13 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
             else:
                 return HttpResponseRedirect("../..")
         else:
-            replace_management_form_instance = replace_management_form(request.POST)
+            replace_management_form = ReplaceManagementForm(request.POST)
     else:
-        replace_management_form_instance = replace_management_form()
+        replace_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
     context_dict.update({'current_page':'management', 'object_menu': menu_list, 'obj' : obj,
-                                 'replace_management_form': replace_management_form_instance,
-                                 'class4search_div': 'DisplayHomePage4Addition.htm',})
+                                 'replace_management_form': replace_management_form,
+                                 'link_creation': True,})
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
@@ -883,12 +883,12 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
 #            return HttpResponseRedirect("/home/")
-        add_management_form_instance = replace_management_form(request.POST)
-        if add_management_form_instance.is_valid():
-            if add_management_form_instance.cleaned_data["type"]=="User":
+        add_management_form = ReplaceManagementForm(request.POST)
+        if add_management_form.is_valid():
+            if add_management_form.cleaned_data["type"]=="User":
                 user_obj = get_obj(\
-                                    add_management_form_instance.cleaned_data["type"],\
-                                    add_management_form_instance.cleaned_data["username"],\
+                                    add_management_form.cleaned_data["type"],\
+                                    add_management_form.cleaned_data["username"],\
                                     "-",\
                                     request.user)
                 obj.set_role(user_obj.object, "notified")
@@ -896,13 +896,13 @@ def add_management(request, obj_type, obj_ref, obj_revi):
             else:
                 return HttpResponseRedirect("..")
         else:
-            add_management_form_instance = replace_management_form(request.POST)
+            add_management_form = ReplaceManagementForm(request.POST)
     else:
-        add_management_form_instance = replace_management_form()
+        add_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
     context_dict.update({'current_page':'management', 'object_menu': menu_list, 'obj' : obj,
-                                 'replace_management_form': add_management_form_instance,
-                                 'class4search_div': 'DisplayHomePage4Addition.htm',})
+                                 'replace_management_form': add_management_form,
+                                 'link_creation': True,})
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################    
@@ -986,33 +986,33 @@ def create_object(request):
     request.session.update(request_dict)
     if request.method == 'GET':
         if request.GET:
-            type_form_instance = type_form(request.GET)
-            if type_form_instance.is_valid():
-                cls = models.get_all_userprofiles_and_plmobjects()[type_form_instance.cleaned_data["type"]]
+            type_form = TypeForm(request.GET)
+            if type_form.is_valid():
+                cls = models.get_all_userprofiles_and_plmobjects()[type_form.cleaned_data["type"]]
                 if issubclass(cls, models.Document):
                     class_for_div="ActiveBox4Doc"
                 else:
                     class_for_div="ActiveBox4Part"
-                creation_form_instance = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
+                creation_form = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
                 non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
     elif request.method == 'POST':
         if request.POST:
-            type_form_instance = type_form(request.POST)
-            if type_form_instance.is_valid():
-                type_name = type_form_instance.cleaned_data["type"]
+            type_form = TypeForm(request.POST)
+            if type_form.is_valid():
+                type_name = type_form.cleaned_data["type"]
                 cls = models.get_all_userprofiles_and_plmobjects()[type_name]
                 if issubclass(cls, models.Document):
                     class_for_div="ActiveBox4Doc"
                 else:
                     class_for_div="ActiveBox4Part"
                 non_modifyable_attributes_list = create_non_modifyable_attributes_list('create', request.user, cls)
-                creation_form_instance = get_creation_form(cls, request.POST)
-                if creation_form_instance.is_valid():
+                creation_form = get_creation_form(cls, request.POST)
+                if creation_form.is_valid():
                     user = request.user
                     controller_cls = get_controller(type_name)
-                    controller = PLMObjectController.create_from_form(creation_form_instance, user)
+                    controller = PLMObjectController.create_from_form(creation_form, user)
                     return HttpResponseRedirect(controller.plmobject_url)
-    context_dict.update({'class4div': class_for_div, 'creation_form': creation_form_instance, 'object_type': type_form_instance.cleaned_data["type"], 'non_modifyable_attributes': non_modifyable_attributes_list })
+    context_dict.update({'class4div': class_for_div, 'creation_form': creation_form, 'object_type': type_form.cleaned_data["type"], 'non_modifyable_attributes': non_modifyable_attributes_list })
     return render_to_response('DisplayObject4creation.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -1039,18 +1039,18 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     non_modifyable_attributes_list = create_non_modifyable_attributes_list(current_object, request.user, cls)
     if request.method == 'POST':
         if request.POST:
-            modification_form_instance = get_modification_form(cls, request.POST)
-            if modification_form_instance.is_valid():
-                current_object.update_from_form(modification_form_instance)
+            modification_form = get_modification_form(cls, request.POST)
+            if modification_form.is_valid():
+                current_object.update_from_form(modification_form)
                 return HttpResponseRedirect(current_object.plmobject_url)
             else:
                 pass
         else:
-            modification_form_instance = get_modification_form(cls, instance = current_object.object)
+            modification_form = get_modification_form(cls, instance = current_object.object)
     else:
-        modification_form_instance = get_modification_form(cls, instance = current_object.object)
+        modification_form = get_modification_form(cls, instance = current_object.object)
     request.session.update(request_dict)
-    context_dict.update({'modification_form': modification_form_instance, 'non_modifyable_attributes': non_modifyable_attributes_list})
+    context_dict.update({'modification_form': modification_form, 'non_modifyable_attributes': non_modifyable_attributes_list})
     return render_to_response('DisplayObject4modification.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
@@ -1076,16 +1076,16 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
-            modification_form_instance = OpenPLMUserChangeForm(request.POST)
-            if modification_form_instance.is_valid():
-                current_object.update_from_form(modification_form_instance)
+            modification_form = OpenPLMUserChangeForm(request.POST)
+            if modification_form.is_valid():
+                current_object.update_from_form(modification_form)
                 return HttpResponseRedirect("/user/%s/" % current_object.username)
             else:
-                modification_form_instance = OpenPLMUserChangeForm(request.POST)
+                modification_form = OpenPLMUserChangeForm(request.POST)
     else:
-        modification_form_instance = OpenPLMUserChangeForm(instance=current_object.object)
+        modification_form = OpenPLMUserChangeForm(instance=current_object.object)
     request.session.update(request_dict)
-    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form_instance})
+    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form})
     return render_to_response('DisplayObject4modification.htm', context_dict, context_instance=RequestContext(request))
     
 ##########################################################################################
@@ -1110,18 +1110,18 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
-            modification_form_instance = PasswordChangeForm(current_object, request.POST)
-            if modification_form_instance.is_valid():
-                current_object.set_password(modification_form_instance.cleaned_data['new_password2'])
+            modification_form = PasswordChangeForm(current_object, request.POST)
+            if modification_form.is_valid():
+                current_object.set_password(modification_form.cleaned_data['new_password2'])
                 current_object.save()
                 return HttpResponseRedirect("/user/%s/" % current_object.username)
             else:
                 #assert False
-                modification_form_instance = PasswordChangeForm(current_object, request.POST)
+                modification_form = PasswordChangeForm(current_object, request.POST)
     else:
-        modification_form_instance = PasswordChangeForm(current_object)
+        modification_form = PasswordChangeForm(current_object)
     request.session.update(request_dict)
-    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form_instance})
+    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form})
     return render_to_response('DisplayObject4PasswordModification.htm', context_dict, context_instance=RequestContext(request))
 
 #############################################################################################
@@ -1205,12 +1205,12 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
 #            return HttpResponseRedirect("/home/")
-        delegation_form_instance = replace_management_form(request.POST)
-        if delegation_form_instance.is_valid():
-            if delegation_form_instance.cleaned_data["type"]=="User":
+        delegation_form = ReplaceManagementForm(request.POST)
+        if delegation_form.is_valid():
+            if delegation_form.cleaned_data["type"]=="User":
                 user_obj = get_obj(\
-                                    delegation_form_instance.cleaned_data["type"],\
-                                    delegation_form_instance.cleaned_data["username"],\
+                                    delegation_form.cleaned_data["type"],\
+                                    delegation_form.cleaned_data["username"],\
                                     "-",\
                                     request.user)
                 if role=="notified" or role=="owner":
@@ -1224,15 +1224,15 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
                         obj.delegate(user_obj.object, level_to_sign_str(int(sign_level)-1))
                         return HttpResponseRedirect("../../..")
                     else:
-                        delegation_form_instance = replace_management_form(request.POST)
+                        delegation_form = ReplaceManagementForm(request.POST)
                 else:
-                     delegation_form_instance = replace_management_form(request.POST)
+                     delegation_form = ReplaceManagementForm(request.POST)
             else:
-                delegation_form_instance = replace_management_form(request.POST)
+                delegation_form = ReplaceManagementForm(request.POST)
         else:
-            delegation_form_instance = replace_management_form(request.POST)
+            delegation_form = ReplaceManagementForm(request.POST)
     else:
-        delegation_form_instance = replace_management_form()
+        delegation_form = ReplaceManagementForm()
     if role=='sign':
         if sign_level.isdigit():
             role=_("signer level")+" "+str(sign_level)
@@ -1243,8 +1243,8 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     request.session.update(request_dict)
     context_dict.update({'current_page':'delegation',
                                  'object_menu': menu_list, 'obj' : obj,
-                                 'replace_management_form': delegation_form_instance,
-                                 'class4search_div': 'DisplayHomePage4Addition.htm',
+                                 'replace_management_form': delegation_form,
+                                 'link_creation': True,
                                  'role': role})
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
     
@@ -1271,14 +1271,12 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
     menu_list = obj.menu_items
     if request.method == "POST":
-#        if request.POST.get("action", "Undo") == "Undo":
-#            return HttpResponseRedirect("/home/")
-        delegation_form_instance = replace_management_form(request.POST)
-        if delegation_form_instance.is_valid():
-            if delegation_form_instance.cleaned_data["type"]=="User":
+        delegation_form = ReplaceManagementForm(request.POST)
+        if delegation_form.is_valid():
+            if delegation_form.cleaned_data["type"]=="User":
                 user_obj = get_obj(\
-                                    add_management_form_instance.cleaned_data["type"],\
-                                    add_management_form_instance.cleaned_data["username"],\
+                                    add_management_form.cleaned_data["type"],\
+                                    add_management_form.cleaned_data["username"],\
                                     "-",\
                                     request.user)
                 if role=="notified":
@@ -1286,30 +1284,20 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
                     return HttpResponseRedirect("..")
                 elif role=="owner":
                     return HttpResponseRedirect("..")
-                    pass
                 elif role=="sign":
                     if sign_level=="all":
                         return HttpResponseRedirect("..")
-                        pass
                     elif sign_level.is_digit():
                         return HttpResponseRedirect("../..")
-                        pass
-                    else:
-                        delegation_form_instance = replace_management_form(request.POST)
-                else:
-                     delegation_form_instance = replace_management_form(request.POST)
-            else:
-                delegation_form_instance = replace_management_form(request.POST)
-        else:
-            delegation_form_instance = replace_management_form(request.POST)
+        delegation_form = ReplaceManagementForm(request.POST)
     else:
-        delegation_form_instance = replace_management_form()
+        delegation_form = ReplaceManagementForm()
     action_message_string="Select the user you no longer want for your \"%s\" role delegation :" % role
     request.session.update(request_dict)
     context_dict.update({'current_page':'parts-doc-cad',
                                  'object_menu': menu_list, 'obj' : obj,
-                                 'replace_management_form': delegation_form_instance,
-                                 'class4search_div': 'DisplayHomePage4Addition.htm',
+                                 'replace_management_form': delegation_form,
+                                 'link_creation': True,
                                  'action_message': action_message_string})
     return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
     
@@ -1337,19 +1325,19 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     menu_list = obj.menu_items
     request.session.update(request_dict)
     if request.POST :
-        checkin_file_form_instance = AddFileForm(request.POST, request.FILES)
-        if checkin_file_form_instance.is_valid():
+        checkin_file_form = AddFileForm(request.POST, request.FILES)
+        if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
             context_dict.update({'object_menu': menu_list, })
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
-            checkin_file_form_instance = AddFileForm(request.POST)
-            context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm', \
-                                 'object_menu': menu_list, 'add_file_form': add_file_form_instance, })
+            checkin_file_form = AddFileForm(request.POST)
+            context_dict.update({'link_creation': True, \
+                                 'object_menu': menu_list, 'add_file_form': add_file_form, })
             return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
     else:
-        checkin_file_form_instance = AddFileForm()
-        context_dict.update({'class4search_div': 'DisplayHomePage4Addition.htm',                             'object_menu': menu_list, 'add_file_form': checkin_file_form_instance, })
+        checkin_file_form = AddFileForm()
+        context_dict.update({'link_creation': True,                             'object_menu': menu_list, 'add_file_form': checkin_file_form, })
         return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
 
 ##########################################################################################
@@ -1476,7 +1464,7 @@ def ajax_search_form(request):
     The request must contains a get parameter *type* with a valid type,
     otherwise, a :class:`.HttpResponseForbidden` is returned.
     """
-    tf = type_form(request.GET)
+    tf = TypeForm(request.GET)
     if tf.is_valid():
         cls = models.get_all_users_and_plmobjects()[tf.cleaned_data["type"]]
         form = get_search_form(cls, request.GET)

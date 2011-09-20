@@ -104,15 +104,15 @@ def integerfield_clean(value):
             raise ValidationError("Number or \"< Number\" or \"> Number\"")
     return None
 
-class type_form(forms.Form):
+class TypeForm(forms.Form):
     LISTE = m.get_all_users_and_plmobjects_with_level()
     type = forms.TypedChoiceField(choices=LISTE)
 
-class type_form_without_user(forms.Form):
+class TypeFormWithoutUser(forms.Form):
     LISTE_WO_USER = m.get_all_plmobjects_with_level()
     type = forms.TypedChoiceField(choices=LISTE_WO_USER)
 
-class TypeSearchForm(type_form):
+class TypeSearchForm(TypeForm):
     def __init__(self, *args, **kwargs):
         super(TypeSearchForm, self).__init__(*args, **kwargs)
         self.fields['type'].widget.attrs['onChange'] = 'update_form();'
@@ -201,7 +201,7 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
 get_search_form.cache = {}    
       
-class add_child_form(forms.Form):
+class AddChildForm(forms.Form):
     type = forms.CharField()
     reference = forms.CharField()
     revision = forms.CharField()
@@ -362,7 +362,7 @@ class OpenPLMUserChangeForm(forms.ModelForm):
         model = User
         exclude = ('username','is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'password')
 
-class replace_management_form(forms.Form):
+class ReplaceManagementForm(forms.Form):
     type = forms.CharField(label=_("Type"))
     username = forms.CharField(label=_("Username"))
     
