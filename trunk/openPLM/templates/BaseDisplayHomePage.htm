@@ -87,11 +87,11 @@
                 {% block CreationBlock %}{% endblock %}
             </div>
 
-            {% ifequal class4search_div 'DisplayHomePage4Addition.htm'%}
+            {% if link_creation %}
                 <div id="SearchBox" style="background:#ff4848">
             {% else %}
                 <div id="SearchBox">
-            {% endifequal %}
+            {% endif %}
                 Search object :
                 {% block SearchBlock %}{% endblock %}
                 <hr/>

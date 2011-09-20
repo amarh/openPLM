@@ -31,32 +31,36 @@
 {% endblock %}
 
 {% block ResultBlock %}
+    {% if link_creation %}
+	    Results for link creation :
+    {% endif %}
 	<table class="Result">
             {% for object in results %}
                 {% if forloop.first %}
                     {% if not object.username %}                
                         <col width="30%"/>
                         <col width="30%"/>
-                        <col width="10%"/>
-                        <col width="30%"/>
+                        <col width="20%"/>
+                        <col width="20%"/>
                     {% endif %}
 				    <tr class="Content">
-				    {% if object.username %}
-                    <th class="Content">{% trans "Username" %}</th>
-                    <th class="Content">{% trans "Last name" %}</th>
-                    {% else %}
-                    <th class="Content">{% trans "Type" %}</th>
-                    <th class="Content">{% trans "Reference" %}</th>
-                    <th class="Content">{% trans "Rev." %}</th>
-                    <th class="Content">{% trans "Name" %}</th>
-                    {% endif %}
-            		</tr>
-		        {% endif %}
-			    {% if forloop.counter|divisibleby:"2" %}
-			        <tr class="Content2">
-		        {% else %}
-		            <tr class="Content">
-	            {% endif %}
+                        {% if object.username %}
+                        <th class="Content">{% trans "Username" %}</th>
+                        <th class="Content">{% trans "Last name" %}</th>
+                        {% else %}
+                        <th class="Content">{% trans "Type" %}</th>
+                        <th class="Content">{% trans "Reference" %}</th>
+                        <th class="Content">{% trans "Rev." %}</th>
+                        {% endif %}
+                        {% if link_creation %}
+                            <th>{% trans "ADD" %}</th>
+                        {% else %}
+                            <th class="Content">{% trans "Name" %}</th>
+                        {% endif %}
+                    </tr>
+                {% endif %}
+
+			    <tr class="{% cycle 'Content' 'Content2' as rowcolors %}">
 				        {% if object.username %}
 				            <td class="Content">
 				                <a href="{{object.plmobject_url}}">
@@ -71,14 +75,36 @@
 				                        {{object.reference|escape}}
 		                        </a>
 	                        </td>
-				            <td class="Content">{{object.revision|escape}}</td>
+                            <td class="Content">{{object.revision|escape}}</td>
+                            {% if not link_creation %}
                             <td class="Content">
                                 <span class="info">
                                     <span class="small">{{object.name|trunc:10}}</span>
                                     <span class="long">{{object.name}}</span>
                                 </span>
-				            </td>
-				        {% endif %}
+                            </td>
+                            {% endif %}
+                            {% endif %}
+                            {% if link_creation %}
+
+				            <form method="post" action="." enctype="multipart/form-data">
+                                {% if object.username %}
+                        <input type="hidden" name="type" value="User"/>
+                        <input type="hidden" name="username" value="{{object.username|escape}}"/>
+                                
+                                {% else %}
+		                <input type="hidden" name="type" value="{{object.type|escape}}"/>
+                        <input type="hidden" name="reference" value="{{object.reference|escape}}"/>
+		                <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
+
+                                {% endif %}
+
+                                <td class="Content">
+                            <input type="submit" value="{% trans "ADD" %}"/>
+                        </td>
+                    </form>
+                        {% endif %}
+		            </td>
                     </tr>
             {% empty %}
             <tr>{% trans "No result matching given query" %}</tr>

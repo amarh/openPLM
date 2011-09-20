@@ -182,7 +182,7 @@ def search(request, editable_only="true", with_file_only="true"):
     :implements: :func:`http_api.search`
     """
     if request.GET and "type" in request.GET:
-        attributes_form = forms.type_form(request.GET)
+        attributes_form = forms.TypeForm(request.GET)
         if attributes_form.is_valid():
             query_dict = {}
             cls = models.get_all_plmobjects()[attributes_form.cleaned_data["type"]]
@@ -513,7 +513,7 @@ def add_file(request, doc_id):
                       see :ref:`http-api-file`.
     """
     doc = get_obj_by_id(doc_id, request.user)
-    add_file_form_instance = forms.AddFileForm(request.POST, request.FILES)
+    form = forms.AddFileForm(request.POST, request.FILES)
     df = doc.add_file(request.FILES["filename"])
     return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
 
@@ -533,7 +533,7 @@ def add_thumbnail(request, doc_id, df_id):
     """
 
     doc = get_obj_by_id(doc_id, request.user)
-    add_file_form_instance = forms.AddFileForm(request.POST, request.FILES)
+    form = forms.AddFileForm(request.POST, request.FILES)
     df = models.DocumentFile.objects.get(id=df_id)
     doc.add_thumbnail(df, request.FILES["filename"])
     return {}
