@@ -145,5 +145,53 @@ $(document).ready(function(){
 cursor: 'crosshair'
 });
 
-    init();
+
+        // double click mode
+        var divNav = $("#DivNav");
+        var navigate = $("#Navigate");
+        var OFFSET = 100;
+        var timeout = null;
+        var move = false;
+        function clear_move_event(){
+            if (timeout != null ){
+                window.clearTimeout(timeout);
+                timeout = null;
+            }
+        }
+        navigate.mousemove(function (e){
+            if (move){
+                var center_x = navigate.offset().left + navigate.width() / 2; 
+                var center_y = navigate.offset().top + navigate.height() / 2;
+                var vx = (center_x - e.pageX);
+                var vy = (center_y - e.pageY);
+                clear_move_event();
+                if ((Math.abs(vx) > OFFSET || Math.abs(vy) > OFFSET)){
+                    var f = function(count){
+                        if (count > 0){
+                            divNav.css({left: '+=' + (vx * 0.03)  + "px",
+                                top: "+=" + (vy  * 0.03) + "px"});
+                            timeout = window.setTimeout(f, 20, count-1);
+                        }
+                        };
+                    f(40);
+                    }
+                }
+            }
+        );
+
+        navigate.dblclick(function(evt){
+            clear_move_event();
+            if (evt.button == 0){
+                move = ! move;
+            }
+            else {
+                move = false;
+            }
+
+        });
+        navigate.mouseleave(function (){
+                clear_move_event();
+                } );
+
+        init();
 });
