@@ -262,6 +262,7 @@ class NavigationGraph(object):
         self.graph.add_node(id_)
         node = self.graph.get_node(id_)
         self._set_node_attributes(self.object, id_)
+        self.main_node = node.attr["id"]
         color = node.attr["color"]
         node.attr.update(color="#444444", fillcolor=color, shape="box", root="true")
         functions_dic = {'child':(self._create_child_edges, None),
@@ -303,7 +304,8 @@ class NavigationGraph(object):
         else:
             node.attr["label"] = encode(obj.username)
         node.attr["label"] += "\\n" + encode(extra_label)
-        node.attr["id"] = obj_id or obj.id
+        t = type_.__name__.replace("Controller", "")
+        node.attr["id"] = ":".join((str(obj_id or obj.id), t, str(obj.id)))
 
     def convert_map(self, map_string):
         elements = []
@@ -316,7 +318,7 @@ class NavigationGraph(object):
             style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
             id_ = "Nav-%s" % area.get("id")
             div = ET.Element("div", id=id_, style=style)
-            div.set("class", "node")
+            div.set("class", "node" + " main_node" * (self.main_node == area.get("id")))
             url = area.get("title")
             if url.startswith("/ajax/thumbnails/"):
                 thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",

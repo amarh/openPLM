@@ -84,10 +84,9 @@
                                 </span>
                             </td>
                             {% endif %}
-                            {% endif %}
-                            {% if link_creation %}
+                        {% endif %}
 
-				            <form method="post" action="." enctype="multipart/form-data">
+				        <form method="post" action="." enctype="multipart/form-data">
                                 {% if object.username %}
                         <input type="hidden" name="type" value="User"/>
                         <input type="hidden" name="username" value="{{object.username|escape}}"/>
@@ -98,13 +97,13 @@
 		                <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
 
                                 {% endif %}
+                            {% if link_creation %}
 
                                 <td class="Content">
                             <input type="submit" value="{% trans "ADD" %}"/>
                         </td>
-                    </form>
                         {% endif %}
-		            </td>
+                        </form>
                     </tr>
             {% empty %}
             <tr>{% trans "No result matching given query" %}</tr>

@@ -66,11 +66,46 @@ function display_docs(node_id, ajax_url, doc_parts){
 }
 
 
+function show_add_child(part, form_child){
+	var id = part.attr("id").split(":");
+    var type = id.slice(-2, -1);
+    var id = id.slice(-1);
+    $.get("/ajax/add_child/" + id + "/",
+        form_child.serialize(),
+        function (data){
+            $("#navAddForm").dialog("option", "buttons", {
+                Ok: function() {
+                    $.post("/ajax/add_child/"+id+"/",
+                        $("#navAddForm>form").serialize(),
+                        function (result){
+                            if (result.result == "ok"){
+                                $("#navAddForm").dialog("close");
+                                location.reload();
+                            }
+                            else if (result.error == "invalid form") {
+                                $("#navAddForm>form>table").html(result.form);
+
+                            }
+                        });
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                }
+                
+            });
+            $("#navAddForm>form>table").html(data.form);
+            $("#navAddForm").dialog("open");
+        }
+    );
+}
+
 function init(){
         $("div.node").mouseenter(
         function () {
-            $(this).find(".node_thumbnails").show();
-            $(this).find(".node_show_docs").show();
+            if (! ($(this).hasClass("drop_active") || $(this).hasClass("drop_hover"))){
+                $(this).find(".node_thumbnails").show();
+                $(this).find(".node_show_docs").show();
+            }
         }); 
         $("div.node").mouseleave(
         function () {
@@ -94,16 +129,23 @@ function init(){
         };
         $(".node_thumbnails").hoverIntent(config);
 
+        // add stuff
+        // TODO : documents, check if selected part can be added
+        $("div.main_node").droppable({
+			accept: "tr.Content",
+			activeClass: "drop_active",
+			hoverClass: "drop_hover",
+			drop: function( event, ui ) {
+                show_add_child($(this), $("form", ui.draggable));
+			}
+		});
+
 }
 
 $(document).ready(function(){
 
         // Supprime la scrollbar en JS
         $('#Navigate').css('overflow', 'hidden');
-
-        // Insert les images de navigation
-        //    $('#Navigate')
-        //    .append('<div id="imgManagement"><span class="imgManagement" id="topControl"></span><span class="imgManagement" id="leftControl"></span><span class="imgManagement" id="rightControl"></span><span class="imgManagement" id="bottomControl"></span></div>');
 
         // crée un écouteur pour l'évènement de type clic sur les div qui ont l' id #rightControl
         $('#rightControl')
@@ -192,6 +234,18 @@ cursor: 'crosshair'
         navigate.mouseleave(function (){
                 clear_move_event();
                 } );
+
+        // add on drag and drop
+        $("tr.Content").add("tr.Content2").css("z-index", "99");
+        $("tr.Content").add("tr.Content2").draggable({ helper: 'clone' });
+        $("#navAddForm").dialog({
+                autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+			close: function() {
+			}
+		});
 
         init();
 });

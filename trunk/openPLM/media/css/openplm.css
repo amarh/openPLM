@@ -542,6 +542,15 @@ div.node > a > span {
     text-decoration:none;
 }
 
+div.drop_active{
+    border: 1px solid red;
+}
+
+div.drop_hover {
+    background: rgba(200,100,100,0.5);
+}
+
+
 img.node_thumbnails, img.node_show_docs {
     position:absolute;
     right: 0;
