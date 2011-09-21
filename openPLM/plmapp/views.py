@@ -1374,7 +1374,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         form = FilterForm(initial)
         request.session.update(initial)
     if not form.is_valid():
-        return HttpResponse('Bad post request')
+        raise ValueError("Invalid form")
     graph = NavigationGraph(obj, context_dict["results"])
     options = form.cleaned_data
     if options["update"]:
