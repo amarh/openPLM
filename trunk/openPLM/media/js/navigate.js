@@ -65,6 +65,27 @@ function display_docs(node_id, ajax_url, doc_parts){
            function(data) {update_nav("#" + node_id, data);});
 }
 
+function can_add_child(part, form_child, cache){
+    var form = form_child.serialize();
+    if (form in cache){
+        return cache[form];
+    }
+    var id = part.attr("id").split(":");
+    var type = id.slice(-2, -1);
+    var id = id.slice(-1);
+    var can = false;
+    $.ajaxSetup({async : false});
+
+    $.get("/ajax/can_add_child/" + id + "/",
+        form,
+        function (result){
+            can = result.can_add;
+        }
+        );
+    $.ajaxSetup({async : true});
+    cache[form] = can;
+    return can;
+}
 
 function show_add_child(part, form_child){
 	var id = part.attr("id").split(":");
@@ -131,8 +152,15 @@ function init(){
 
         // add stuff
         // TODO : documents, check if selected part can be added
+        var cache = new Object();
         $("div.main_node").droppable({
-			accept: "tr.Content",
+			accept: 
+                function (child_tr){
+                    if (child_tr.is("tr.Content, tr.Content2")){
+                        return can_add_child($(this), $("form", child_tr), cache);
+                     }
+                    return false;
+                },
 			activeClass: "drop_active",
 			hoverClass: "drop_hover",
 			drop: function( event, ui ) {
