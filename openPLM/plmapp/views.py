@@ -105,7 +105,7 @@ def handle_errors(func):
     return wrapper
 
 
-def init_context_dict(init_type_, init_reference, init_revision):
+def init_ctx(init_type_, init_reference, init_revision):
     """
     Initiate the context dictionnary we used to transfer parameters to html pages.
     Get type, reference and revision of an object and return a dictionnary with them
@@ -114,7 +114,7 @@ def init_context_dict(init_type_, init_reference, init_revision):
     
     Example::
     
-        >>> init_context_dict('BiosOs','BI-0044','1.4.3')
+        >>> init_ctx('BiosOs','BI-0044','1.4.3')
         {'LANGUAGES': (('fr', u'Fran\xc3\xa7ais'), ('en', 'English')),
          'THUMBNAILS_URL': '/media/thumbnails',
          'current_date': datetime.datetime(2010, 8, 27, 11, 34, 21, 639171),
@@ -158,12 +158,12 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
     :param revision: :attr:`.PLMObject.revision`
     :type revision: str
     :return: a :class:`PLMObjectController` or a :class:`UserController`
-    :return: context_dict
-    :type context_dict: dic
+    :return: ctx
+    :type ctx: dic
     :return: request_dict.session
     :type request_dict.session: dic
     """
-    context_dict = init_context_dict(type_, reference, revision)
+    ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
     if type_ == reference == revision == '-':
         selected_object = request_dict.user
@@ -210,7 +210,7 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
             qset = request_dict.session["results"] 
     else:
         qset = request_dict.session.get("results", [])
-    context_dict.update({'results' : qset, 'type_form' : type_form,
+    ctx.update({'results' : qset, 'type_form' : type_form,
                          'type_form4creation' : type_form4creation,
                          'attributes_form' : attributes_form,
                          'link_creation' : False,
@@ -218,10 +218,10 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
                          'obj' : selected_object,
                          })
     if hasattr(selected_object, "menu_items"):
-        context_dict['object_menu'] = selected_object.menu_items
+        ctx['object_menu'] = selected_object.menu_items
     if isinstance(selected_object, PLMObjectController):
-        context_dict["is_owner"] = selected_object.check_permission("owner", False)
-    return selected_object, context_dict, request_dict.session
+        ctx["is_owner"] = selected_object.check_permission("owner", False)
+    return selected_object, ctx, request_dict.session
 
 
 ##########################################################################################
@@ -252,7 +252,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_attributes_list = []
     for attr in obj.attributes:
@@ -261,10 +261,10 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     if isinstance(obj, UserController):
         item = obj.get_verbose_name('rank')
         object_attributes_list.append((item, getattr(obj, 'rank')))
-    context_dict.update({'current_page' : 'attributes',
+    ctx.update({'current_page' : 'attributes',
                          'object_attributes': object_attributes_list})
     request.session.update(request_dict)
-    return render_to_response('DisplayObject.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObject.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -296,7 +296,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         if request.POST["action"] == "DEMOTE":
             obj.demote()
@@ -310,12 +310,12 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
         object_lifecycle_list.append((st, st == state))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
-    context_dict.update({'current_page':'lifecycle', 
+    ctx.update({'current_page':'lifecycle', 
                          'object_lifecycle': object_lifecycle_list,
                          'is_signer' : is_signer, 
                          'is_signer_dm' : is_signer_dm})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectLifecycle.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectLifecycle.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -334,7 +334,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if obj.is_revisable():
         if request.method == "POST" and request.POST:
@@ -346,11 +346,11 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     else:
         add_form = None
     revisions = obj.get_all_revisions()
-    context_dict.update({'current_page' : 'revisions',
+    ctx.update({'current_page' : 'revisions',
                          'revisions' : revisions,
                          'add_revision_form' : add_form})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectRevisions.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectRevisions.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -368,7 +368,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if isinstance(obj, UserController):
         histos = models.UserHistory.objects
     else: 
@@ -377,10 +377,10 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     object_history_list = []
     for histo in histos:
         object_history_list.append((histo.date, histo.action, histo.details))
-    context_dict.update({'current_page' : 'history', 
+    ctx.update({'current_page' : 'history', 
                          'object_history' : object_history_list})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectHistory.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectHistory.htm', ctx, context_instance=RequestContext(request))
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
@@ -400,7 +400,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -423,10 +423,10 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     # convert level to html space
     children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
 
-    context_dict.update({'current_page':'BOM-child', 'obj' : obj,
+    ctx.update({'current_page':'BOM-child', 'obj' : obj,
                                  'children': children, "display_form" : display_form})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectChild.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectChild.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -446,7 +446,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -460,10 +460,10 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect("..")
     else:
         formset = get_children_formset(obj)
-    context_dict.update({'current_page':'BOM-child', 'obj' : obj,
+    ctx.update({'current_page':'BOM-child', 'obj' : obj,
                                  'children_formset': formset, })
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectChildEdit.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectChildEdit.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
 @handle_errors
@@ -481,7 +481,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     
     if request.POST:
@@ -494,16 +494,16 @@ def add_children(request, obj_type, obj_ref, obj_revi):
             obj.add_child(child_obj, \
                             add_child_form.cleaned_data["quantity"], \
                             add_child_form.cleaned_data["order"])
-            context_dict.update({'add_child_form': add_child_form, })
+            ctx.update({'add_child_form': add_child_form, })
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
         else:
             add_child_form = AddChildForm(request.POST)
-            context_dict.update({'link_creation': True, 'add_child_form': add_child_form, })
-            return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
+            ctx.update({'link_creation': True, 'add_child_form': add_child_form, })
+            return render_to_response('DisplayObjectChildAdd.htm', ctx, context_instance=RequestContext(request))
     else:
         add_child_form = AddChildForm()
-        context_dict.update({'current_page':'BOM-child', 'link_creation': True, 'add_child_form': add_child_form, })
-        return render_to_response('DisplayObjectChildAdd.htm', context_dict, context_instance=RequestContext(request))
+        ctx.update({'current_page':'BOM-child', 'link_creation': True, 'add_child_form': add_child_form, })
+        return render_to_response('DisplayObjectChildAdd.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################    
 @handle_errors
@@ -521,7 +521,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_parents"):
         # TODO
@@ -541,10 +541,10 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     if level == "last" and parents:
         maximum = max(parents, key=attrgetter("level")).level
         parents = (c for c in parents if c.level == maximum)
-    context_dict.update({'current_page':'parents', 'parents' :  parents,
+    ctx.update({'current_page':'parents', 'parents' :  parents,
                                  'display_form' : display_form, 'obj': obj})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectParents.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectParents.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -562,7 +562,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_documents"):
         # TODO
@@ -575,9 +575,9 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     else:
         formset = get_doc_cad_formset(obj)
     object_doc_cad_list = obj.get_attached_documents()
-    context_dict.update({'current_page':'doc-cad', 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
+    ctx.update({'current_page':'doc-cad', 'object_doc_cad': object_doc_cad_list, 'doc_cad_formset': formset})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectDocCad.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectDocCad.htm', ctx, context_instance=RequestContext(request))
 
 
 ##########################################################################################    
@@ -596,7 +596,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
@@ -607,16 +607,16 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
                         add_doc_cad_form.cleaned_data["revision"],\
                         request.user)
             obj.attach_to_document(doc_cad_obj)
-            context_dict.update({'add_doc_cad_form': add_doc_cad_form, })
+            ctx.update({'add_doc_cad_form': add_doc_cad_form, })
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
         else:
             add_doc_cad_form = AddDocCadForm(request.POST)
-            context_dict.update({'link_creation': True, 'class4div': class_for_div, 'add_doc_cad_form': add_doc_cad_form, })
-            return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
+            ctx.update({'link_creation': True, 'class4div': class_for_div, 'add_doc_cad_form': add_doc_cad_form, })
+            return render_to_response('DisplayDocCadAdd.htm', ctx, context_instance=RequestContext(request))
     else:
         add_doc_cad_form = AddDocCadForm()
-        context_dict.update({'link_creation': True, 'add_doc_cad_form': add_doc_cad_form, })
-        return render_to_response('DisplayDocCadAdd.htm', context_dict, context_instance=RequestContext(request))
+        ctx.update({'link_creation': True, 'add_doc_cad_form': add_doc_cad_form, })
+        return render_to_response('DisplayDocCadAdd.htm', ctx, context_instance=RequestContext(request))
     
 #############################################################################################
 ###      All functions which manage the different html pages specific to documents        ###
@@ -636,7 +636,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_parts"):
         # TODO
@@ -649,9 +649,9 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     else:
         formset = get_rel_part_formset(obj)
     object_rel_part_list = obj.get_attached_parts()
-    context_dict.update({'current_page':'parts', 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
+    ctx.update({'current_page':'parts', 'object_rel_part': object_rel_part_list, 'rel_part_formset': formset})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectRelPart.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectRelPart.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
 @handle_errors
@@ -669,7 +669,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
@@ -679,17 +679,17 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
                         add_rel_part_form.cleaned_data["reference"], \
                         add_rel_part_form.cleaned_data["revision"], request.user)
             obj.attach_to_part(part_obj)
-            context_dict.update({'add_rel_part_form': add_rel_part_form, })
+            ctx.update({'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
         else:
             add_rel_part_form = add_rel_part_form(request.POST)
-            context_dict.update({'link_creation': True, 'add_rel_part_form': add_rel_part_form, })
-            return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
+            ctx.update({'link_creation': True, 'add_rel_part_form': add_rel_part_form, })
+            return render_to_response('DisplayRelPartAdd.htm', ctx, context_instance=RequestContext(request))
     else:
         add_rel_part_form = AddRelPartForm()
-        context_dict.update({'link_creation': True,
+        ctx.update({'link_creation': True,
                              'add_rel_part_form': add_rel_part_form, })
-        return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
+        return render_to_response('DisplayRelPartAdd.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -707,7 +707,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
 
     if not hasattr(obj, "files"):
@@ -719,10 +719,10 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
-    context_dict.update({'current_page':'files', 
+    ctx.update({'current_page':'files', 
                          'file_formset': formset})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectFiles.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectFiles.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -740,23 +740,23 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
         add_file_form = AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
-            context_dict.update({'add_file_form': add_file_form, })
+            ctx.update({'add_file_form': add_file_form, })
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             add_file_form = AddFileForm(request.POST)
-            context_dict.update({'link_creation': True, 'add_file_form': add_file_form, })
-            return render_to_response('DisplayRelPartAdd.htm', context_dict, context_instance=RequestContext(request))
+            ctx.update({'link_creation': True, 'add_file_form': add_file_form, })
+            return render_to_response('DisplayRelPartAdd.htm', ctx, context_instance=RequestContext(request))
     else:
         add_file_form = AddFileForm()
-        context_dict.update({'link_creation': True, 'add_file_form': add_file_form, })
-        return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
+        ctx.update({'link_creation': True, 'add_file_form': add_file_form, })
+        return render_to_response('DisplayFileAdd.htm', ctx, context_instance=RequestContext(request))
 
 #############################################################################################
 ###    All functions which manage the different html pages specific to part and document  ###
@@ -776,13 +776,13 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
     object_management_list = object_management_list.order_by("role")
-    context_dict.update({'current_page':'management', 'object_management': object_management_list})
+    ctx.update({'current_page':'management', 'object_management': object_management_list})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectManagement.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectManagement.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -802,7 +802,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     :type link_id: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
     if obj.object.id != link.plmobject.id:
         raise ValueError("Bad link id")
@@ -829,10 +829,10 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     else:
         replace_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
-    context_dict.update({'current_page':'management', 'obj' : obj,
+    ctx.update({'current_page':'management', 'obj' : obj,
                                  'replace_management_form': replace_management_form,
                                  'link_creation': True,})
-    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
 @handle_errors
@@ -850,7 +850,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
@@ -872,10 +872,10 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     else:
         add_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
-    context_dict.update({'current_page':'management', 'obj' : obj,
+    ctx.update({'current_page':'management', 'obj' : obj,
                                  'replace_management_form': add_management_form,
                                  'link_creation': True,})
-    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
 @handle_errors
@@ -953,8 +953,8 @@ def create_object(request):
     :param request: :class:`django.http.QueryDict`
     :return: a :class:`django.http.HttpResponse`
     """
-#    context_dict, request_dict = get_generic_data(request)
-    obj, context_dict, request_dict = get_generic_data(request)
+#    ctx, request_dict = get_generic_data(request)
+    obj, ctx, request_dict = get_generic_data(request)
     request.session.update(request_dict)
     if request.method == 'GET':
         if request.GET:
@@ -984,8 +984,8 @@ def create_object(request):
                     controller_cls = get_controller(type_name)
                     controller = PLMObjectController.create_from_form(creation_form, user)
                     return HttpResponseRedirect(controller.plmobject_url)
-    context_dict.update({'class4div': class_for_div, 'creation_form': creation_form, 'object_type': type_form.cleaned_data["type"], 'non_modifyable_attributes': non_modifyable_attributes_list })
-    return render_to_response('DisplayObject4creation.htm', context_dict, context_instance=RequestContext(request))
+    ctx.update({'class4div': class_for_div, 'creation_form': creation_form, 'object_type': type_form.cleaned_data["type"], 'non_modifyable_attributes': non_modifyable_attributes_list })
+    return render_to_response('DisplayObject4creation.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors
@@ -1003,7 +1003,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    current_object, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    current_object, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if obj_type=='User':
         cls = models.get_all_plmobjects()['UserProfile']
     else:
@@ -1022,8 +1022,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     else:
         modification_form = get_modification_form(cls, instance = current_object.object)
     request.session.update(request_dict)
-    context_dict.update({'modification_form': modification_form, 'non_modifyable_attributes': non_modifyable_attributes_list})
-    return render_to_response('DisplayObject4modification.htm', context_dict, context_instance=RequestContext(request))
+    ctx.update({'modification_form': modification_form, 'non_modifyable_attributes': non_modifyable_attributes_list})
+    return render_to_response('DisplayObject4modification.htm', ctx, context_instance=RequestContext(request))
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
@@ -1043,7 +1043,7 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
@@ -1057,8 +1057,8 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     else:
         modification_form = OpenPLMUserChangeForm(instance=current_object.object)
     request.session.update(request_dict)
-    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form})
-    return render_to_response('DisplayObject4modification.htm', context_dict, context_instance=RequestContext(request))
+    ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
+    return render_to_response('DisplayObject4modification.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################
 @handle_errors
@@ -1078,7 +1078,7 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     """
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
-    current_object, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    current_object, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
@@ -1093,8 +1093,8 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     else:
         modification_form = PasswordChangeForm(current_object)
     request.session.update(request_dict)
-    context_dict.update({'class4div': class_for_div, 'modification_form': modification_form})
-    return render_to_response('DisplayObject4PasswordModification.htm', context_dict, context_instance=RequestContext(request))
+    ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
+    return render_to_response('DisplayObject4PasswordModification.htm', ctx, context_instance=RequestContext(request))
 
 #############################################################################################
 @handle_errors
@@ -1112,15 +1112,15 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_object_user_links"):
         # TODO
         raise TypeError()
     object_user_link_list = obj.get_object_user_links()
-    context_dict.update({'current_page':'parts-doc-cad', 'object_user_link': object_user_link_list})
+    ctx.update({'current_page':'parts-doc-cad', 'object_user_link': object_user_link_list})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectRelPLMObject.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectRelPLMObject.htm', ctx, context_instance=RequestContext(request))
 
 #############################################################################################
 @handle_errors
@@ -1138,7 +1138,7 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_user_delegation_links"):
         # TODO
@@ -1147,9 +1147,9 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
         selected_link_id = request.POST.get('link_id')
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
     user_delegation_link_list = obj.get_user_delegation_links()
-    context_dict.update({'current_page':'delegation', 'user_delegation_link': user_delegation_link_list})
+    ctx.update({'current_page':'delegation', 'user_delegation_link': user_delegation_link_list})
     request.session.update(request_dict)
-    return render_to_response('DisplayObjectDelegation.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectDelegation.htm', ctx, context_instance=RequestContext(request))
 
 
 ##########################################################################################    
@@ -1172,7 +1172,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
@@ -1202,12 +1202,12 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     elif role == "notified":
         role = _("notified")
     request.session.update(request_dict)
-    context_dict.update({'current_page':'delegation',
+    ctx.update({'current_page':'delegation',
                          'obj' : obj,
                          'replace_management_form': delegation_form,
                          'link_creation': True,
                          'role': role})
-    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################    
 @handle_errors
@@ -1229,7 +1229,7 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
@@ -1255,12 +1255,12 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
         delegation_form = ReplaceManagementForm()
     action_message_string="Select the user you no longer want for your \"%s\" role delegation :" % role
     request.session.update(request_dict)
-    context_dict.update({'current_page':'parts-doc-cad',
+    ctx.update({'current_page':'parts-doc-cad',
                                  'obj' : obj,
                                  'replace_management_form': delegation_form,
                                  'link_creation': True,
                                  'action_message': action_message_string})
-    return render_to_response('DisplayObjectManagementReplace.htm', context_dict, context_instance=RequestContext(request))
+    return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
@@ -1282,24 +1282,24 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     :type file_id_value: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST :
         checkin_file_form = AddFileForm(request.POST, request.FILES)
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
-            context_dict.update({})
+            ctx.update({})
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             checkin_file_form = AddFileForm(request.POST)
-            context_dict.update({'link_creation': True, \
+            ctx.update({'link_creation': True, \
                                  'add_file_form': add_file_form, })
-            return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
+            return render_to_response('DisplayFileAdd.htm', ctx, context_instance=RequestContext(request))
     else:
         checkin_file_form = AddFileForm()
-        context_dict.update({'link_creation': True,                             'add_file_form': checkin_file_form, })
-        return render_to_response('DisplayFileAdd.htm', context_dict, context_instance=RequestContext(request))
+        ctx.update({'link_creation': True,                             'add_file_form': checkin_file_form, })
+        return render_to_response('DisplayFileAdd.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors 
@@ -1353,7 +1353,7 @@ coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;'
 
 
 def get_navigate_data(request, obj_type, obj_ref, obj_revi):
-    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     FilterForm = get_navigate_form(obj)
     has_session = any(field in request.session for field in FilterForm.base_fields)
@@ -1370,7 +1370,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         request.session.update(initial)
     if not form.is_valid():
         raise ValueError("Invalid form")
-    graph = NavigationGraph(obj, context_dict["results"])
+    graph = NavigationGraph(obj, ctx["results"])
     options = form.cleaned_data
     if options["update"]:
         options["doc_parts"] = [int(o)
@@ -1387,12 +1387,12 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     y_part_node_position = (2 * top + h) // 2
     x_img_position_corrected = 1172 // 2 - x_part_node_position
     y_img_position_corrected = 500 // 2 - y_part_node_position
-    context_dict.update({'filter_object_form': form,
+    ctx.update({'filter_object_form': form,
                          'map_areas': map_string, 'picture_path': "/"+picture_path,
                          'x_img_position': x_img_position_corrected,
                          'y_img_position': y_img_position_corrected,
                          'navigate_bool': True})
-    return context_dict
+    return ctx
 
 @handle_errors
 def navigate(request, obj_type, obj_ref, obj_revi):
