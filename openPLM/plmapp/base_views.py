@@ -27,9 +27,8 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
     :type obj_revi: str
     :return: a :class:`PLMObjectController` or a :class:`UserController`
     """
-    if obj_type=='User':
-        obj = get_object_or_404(User,
-                                username=obj_ref)
+    if obj_type == 'User':
+        obj = get_object_or_404(User, username=obj_ref)
         controller_cls = UserController
     else:
         obj = get_object_or_404(models.PLMObject, type=obj_type,
