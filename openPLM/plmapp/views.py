@@ -52,7 +52,7 @@ from mimetypes import guess_type
 from functools import wraps
 
 from django.conf import settings
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse,\
                         HttpResponsePermanentRedirect, HttpResponseForbidden, \
                         HttpResponseServerError, Http404
@@ -72,6 +72,7 @@ from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.navigate import NavigationGraph
+from openPLM.plmapp.base_views import get_obj, get_obj_by_id, json_view
 
 
 def handle_errors(func):
@@ -104,41 +105,6 @@ def handle_errors(func):
     return wrapper
 
 
-##########################################################################################
-def get_obj(obj_type, obj_ref, obj_revi, user):
-    """
-    Get type, reference and revision of an object and return the related controller
-    
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`PLMObjectController` or a :class:`UserController`
-    """
-    if obj_type=='User':
-        obj = get_object_or_404(User,
-                                username=obj_ref)
-        controller_cls = UserController
-    else:
-        obj = get_object_or_404(models.PLMObject, type=obj_type,
-                                reference=obj_ref,
-                                revision=obj_revi)
-        # guess what kind of PLMObject (Part, Document) obj is
-        cls = models.PLMObject
-        find = True
-        while find:
-            find = False
-            for c in cls.__subclasses__():
-                if hasattr(obj, c.__name__.lower()):
-                    cls  = c
-                    obj = getattr(obj, c.__name__.lower())
-                    find = True
-        controller_cls = get_controller(obj_type)
-    return controller_cls(obj, user)
-
-##########################################################################################
 def init_context_dict(init_type_, init_reference, init_revision):
     """
     Initiate the context dictionnary we used to transfer parameters to html pages.
@@ -1500,6 +1466,7 @@ def ajax_autocomplete(request, obj_type, field):
     return HttpResponse(json, mimetype='application/json')
 
 @login_required
+@json_view
 def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     """
     Ajax view to get files and thumbnails of a document.
@@ -1521,19 +1488,52 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
         else:
             img = "/media/img/image-missing.png"
         files.append((f.filename, "/file/%d/" % f.id, img))
-    json = JSONEncoder().encode(dict(files=files, doc=doc))
-    return HttpResponse(json, mimetype='application/json')
+    return dict(files=files, doc=doc)
 
 
 @login_required
+@json_view
 def ajax_navigate(request, obj_type, obj_ref, obj_revi):
     context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
+    data = {
+            "img" : context["picture_path"],
+            "divs" : context["map_areas"],
+            "left" : context["x_img_position"],
+            "top" : context["y_img_position"],
+            "form" : context["filter_object_form"].as_ul(),
+            }
+    return data
+
+@login_required
+@json_view
+def ajax_add_child(request, part_id):
+    part = get_obj_by_id(part_id, request.user)
     data = {}
-    data["img"] = context["picture_path"]
-    data["divs"] = context["map_areas"]
-    data["left"] = context["x_img_position"]
-    data["top"] = context["y_img_position"]
-    data["form"] = context["filter_object_form"].as_ul()
-    json = JSONEncoder().encode(data)
-    return HttpResponse(json, mimetype='application/json')
+    if request.GET:
+        form = AddChildForm(initial=request.GET)
+    else:
+        form = AddChildForm(request.POST)
+        if form.is_valid():
+            child = get_obj(form.cleaned_data["type"],
+                                form.cleaned_data["reference"],
+                                form.cleaned_data["revision"],
+                                request.user)
+            part.add_child(child, form.cleaned_data["quantity"], 
+                           form.cleaned_data["order"])
+            return {"result" : "ok"}
+        else:
+            data["result"] = "error"
+            data["error"] = "invalid form"
+    for field in ("type", "reference", "revision"):
+        form.fields[field].widget.attrs['readonly'] = 'on' 
+    data.update({
+            "parent" : {
+                "id" : part.id,
+                "type" : part.type,
+                "reference" : part.reference,
+                "revision" : part.revision,
+                },
+            "form" : form.as_table()
+           })
+    return data
 

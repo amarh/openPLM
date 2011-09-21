@@ -29,23 +29,18 @@ This modules contains all stuff related to the api
 """
 
 import functools
-import traceback
-import sys
 
 import django.forms
-from django.shortcuts import get_object_or_404
-from django.utils import simplejson
-from django.core.mail import mail_admins
-from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponseForbidden
 from django.contrib.csrf.middleware import csrf_exempt
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller, DocumentController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
+from openPLM.plmapp.base_views import json_view, get_obj_by_id
 
 #: Version of the API (value: ``'1.0'``)
 API_VERSION = "1.0"
@@ -53,47 +48,10 @@ API_VERSION = "1.0"
 api_login_required = user_passes_test(lambda u: u.is_authenticated(), 
                                       login_url="/api/needlogin/")
 
-def json_view(func):
-    """
-    Decorator which converts the result from *func* into a json response.
-    
-    The result from *func* must be serializable by :mod:`django.utils.simple_json`
-    
-    This decorator automatically adds a ``result`` field to the response if it
-    was not present. Its value is ``'ok'`` if no exception was raised, and else,
-    it is ``'error'``. In that case, a field ``'error'`` is had with a short
-    message describing the exception.
-    """
-    @functools.wraps(func)
-    def wrap(request, *a, **kw):
-        response = None
-        try:
-            response = dict(func(request, *a, **kw))
-            if 'result' not in response:
-                response['result'] = 'ok'
-        except KeyboardInterrupt:
-            # Allow keyboard interrupts through for debugging.
-            raise
-        except Exception, e:
-            #Mail the admins with the error
-            exc_info = sys.exc_info()
-            subject = 'JSON view error: %s' % request.path
-            try:
-                request_repr = repr(request)
-            except:
-                request_repr = 'Request repr() unavailable'
-            message = 'Traceback:\n%s\n\nRequest:\n%s' % (
-                '\n'.join(traceback.format_exception(*exc_info)),
-                request_repr,
-                )
-            mail_admins(subject, message, fail_silently=True)
-            #Come what may, we're returning JSON.
-            msg = _('Internal error') + ': ' + str(e)
-            response = {'result' : 'error', 'error' : msg}
-        response["api_version"] = API_VERSION
-        json = simplejson.dumps(response)
-        return HttpResponse(json, mimetype='application/json')
-    return wrap
+@json_view
+def need_login(request):
+    """ Helper function for :func:`api_login_required` """
+    return {'result' : 'error', 'error' : 'user must be login'}
 
 def login_json(func):
     """
@@ -104,7 +62,7 @@ def login_json(func):
     returns a 403 HTTP RESPONSE.
     """
    
-    json_func = json_view(func)
+    json_func = json_view(func, API_VERSION)
     @api_login_required
     @csrf_exempt
     @functools.wraps(func)
@@ -114,34 +72,6 @@ def login_json(func):
         return json_func(request, *args, **kwargs)
     return wrapper
 
-
-def get_obj_by_id(obj_id, user):
-    u"""
-    Returns an adequate controller for the object identify by *obj_id*.
-    The returned controller is instanciate with *user* as the user
-    who modify the object.
-
-    :param obj_id: id of a :class:`.PLMObject`
-    :param user: a :class:`.django.contrib.auth.models.User`
-    :return: a subinstance of a :class:`.PLMObjectController`
-    """
-
-    obj = get_object_or_404(models.PLMObject, id=obj_id)
-    obj = models.get_all_plmobjects()[obj.type].objects.get(id=obj_id)
-    return get_controller(obj.type)(obj, user)
-
-def object_to_dict(plmobject):
-    """
-    Returns a dictionary representing *plmobject*. The returned dictionary
-    respects the format described in :ref`http-api-object`
-    """
-    return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
-                revision=plmobject.revision, reference=plmobject.reference)
-
-@json_view
-def need_login(request):
-    """ Helper function for :func:`api_login_required` """
-    return {'result' : 'error', 'error' : 'user must be login'}
 
 @login_json
 def get_all_types(request):

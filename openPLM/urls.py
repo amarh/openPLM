@@ -67,6 +67,7 @@ urlpatterns += patterns('',
     (r'ajax/complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
     (r'ajax/thumbnails/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/?$' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_thumbnails),
     (r'ajax/navigate/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/?$' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_navigate),
+    (r'ajax/add_child/(?P<part_id>\d+)/?', ajax_add_child),
 
     (object_url + r'$', display_object),
     (object_url + r'attributes/$', display_object_attributes),

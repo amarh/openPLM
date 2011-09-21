@@ -208,6 +208,7 @@ class AddChildForm(forms.Form):
     quantity = forms.FloatField()
     order = forms.IntegerField()
 
+
 class DisplayChildrenForm(forms.Form):
     LEVELS = (("all", "All levels",),
               ("first", "First level",),
