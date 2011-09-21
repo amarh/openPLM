@@ -1532,3 +1532,21 @@ def ajax_add_child(request, part_id):
            })
     return data
 
+@login_required
+@json_view
+def ajax_can_add_child(request, part_id):
+    part = get_obj_by_id(part_id, request.user)
+    data = {"can_add" : False}
+    if request.GET:
+        form = AddRelPartForm(request.GET)
+        if form.is_valid():
+             child = get_obj(form.cleaned_data["type"],
+                                form.cleaned_data["reference"],
+                                form.cleaned_data["revision"],
+                                request.user)
+             try:
+                 part.check_add_child(child)
+                 data["can_add"] = True
+             except StandardError:
+                 pass
+    return data

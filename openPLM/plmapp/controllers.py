@@ -728,12 +728,18 @@ class PartController(PLMObjectController):
         """
         self.check_permission("owner")
         self.check_editable()
+        if not hasattr(child, "part"):
+            raise ValueError("Can not add child: not a Part")
         # check if child is not a parent
-        if child == self.object:
-            raise ValueError("Can not add child : child is current object")
+        if child.id == self.object.id:
+            raise ValueError("Can not add child: child is current object")
         parents = (p.link.parent.pk for p in self.get_parents(-1))
         if child.pk in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
+                                (child, self.object))
+        link = self.parentchildlink_parent.filter(child=child, end_time=None)
+        if link:
+            raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
 
 
