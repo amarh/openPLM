@@ -713,6 +713,30 @@ class PartController(PLMObjectController):
     Parts.
     """
 
+    def check_add_child(self, child):
+        """
+        Checks if *child"* can be added to *self*.
+        If *child* can not be added, an exception is raised.
+        
+        :param child: child to be added
+        :type child: :class:`.Part`
+        
+        :raises: :exc:`ValueError` if *child* is already a child or a parent.
+        :raises: :exc:`ValueError` if *quantity* or *order* are negative.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.    
+        """
+        self.check_permission("owner")
+        self.check_editable()
+        # check if child is not a parent
+        if child == self.object:
+            raise ValueError("Can not add child : child is current object")
+        parents = (p.link.parent.pk for p in self.get_parents(-1))
+        if child.pk in parents:
+            raise ValueError("Can not add child %s to %s, it is a parent" %
+                                (child, self.object))
+
+
     def add_child(self, child, quantity, order):
         """
         Adds *child* to *self*.
@@ -725,23 +749,15 @@ class PartController(PLMObjectController):
         :type order: positive int
         
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
-        :aises: :exc:`ValueError` if *quantity* or *order* are negative.
+        :raises: :exc:`ValueError` if *quantity* or *order* are negative.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
-        self.check_permission("owner")
-        self.check_editable()
         if isinstance(child, PLMObjectController):
             child = child.object
-        # check if child is not a parent
-        if child == self.object:
-            raise ValueError("Can not add child : child is current object")
-        parents = (p.link.parent.pk for p in self.get_parents(-1))
-        if child.pk in parents:
-            raise ValueError("Can not add child %s to %s, it is a parent" %
-                                (child, self.object))
+        self.check_add_child(child)
         # check if child is not already a direct child
         if child.pk in (c.link.child.pk for c in self.get_children(1)):
             raise ValueError("%s is already a child of %s" % (child, self.object))
