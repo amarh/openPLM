@@ -144,7 +144,7 @@ def init_context_dict(init_type_, init_reference, init_revision):
 ###   Manage html code for Search and Results function and other global parameters     ###
 ##########################################################################################
 
-def display_global_page(request_dict, type_='-', reference='-', revision='-'):
+def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
     """
     Get a request and return a controller, a context dictionnary with elements common to all pages
     (search form, search data, search results, ...) and another dictionnary to update the
@@ -252,7 +252,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_attributes_list = []
     for attr in obj.attributes:
@@ -296,7 +296,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         if request.POST["action"] == "DEMOTE":
             obj.demote()
@@ -334,7 +334,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if obj.is_revisable():
         if request.method == "POST" and request.POST:
@@ -368,7 +368,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if isinstance(obj, UserController):
         histos = models.UserHistory.objects
     else: 
@@ -400,7 +400,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -446,7 +446,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -481,7 +481,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     
     if request.POST:
@@ -521,7 +521,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_parents"):
         # TODO
@@ -562,7 +562,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_documents"):
         # TODO
@@ -596,7 +596,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
@@ -636,7 +636,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_parts"):
         # TODO
@@ -669,7 +669,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
@@ -707,7 +707,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
 
     if not hasattr(obj, "files"):
@@ -740,7 +740,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST:
@@ -776,7 +776,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
     object_management_list = object_management_list.order_by("role")
@@ -802,7 +802,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     :type link_id: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
     if obj.object.id != link.plmobject.id:
         raise ValueError("Bad link id")
@@ -850,7 +850,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
 #        if request.POST.get("action", "Undo") == "Undo":
@@ -953,8 +953,8 @@ def create_object(request):
     :param request: :class:`django.http.QueryDict`
     :return: a :class:`django.http.HttpResponse`
     """
-#    context_dict, request_dict = display_global_page(request)
-    obj, context_dict, request_dict = display_global_page(request)
+#    context_dict, request_dict = get_generic_data(request)
+    obj, context_dict, request_dict = get_generic_data(request)
     request.session.update(request_dict)
     if request.method == 'GET':
         if request.GET:
@@ -1003,7 +1003,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    current_object, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    current_object, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if obj_type=='User':
         cls = models.get_all_plmobjects()['UserProfile']
     else:
@@ -1043,7 +1043,7 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
@@ -1078,7 +1078,7 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     """
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
-    current_object, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    current_object, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
@@ -1112,7 +1112,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_object_user_links"):
         # TODO
@@ -1138,7 +1138,7 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_user_delegation_links"):
         # TODO
@@ -1172,7 +1172,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
@@ -1229,7 +1229,7 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
@@ -1282,7 +1282,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     :type file_id_value: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
     if request.POST :
@@ -1353,7 +1353,7 @@ coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;'
 
 
 def get_navigate_data(request, obj_type, obj_ref, obj_revi):
-    obj, context_dict, request_dict = display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
     FilterForm = get_navigate_form(obj)
     has_session = any(field in request.session for field in FilterForm.base_fields)
