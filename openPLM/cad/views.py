@@ -31,7 +31,7 @@ import openPLM.plmapp.views as pviews
 def freecad(request, obj_ref, obj_revi):
     """ Manage html page for attributes """
     obj_type = "FreeCAD"
-    obj, context_dict, request_dict = pviews.display_global_page(request, obj_type, obj_ref, obj_revi)
+    obj, context_dict, request_dict = pviews.get_generic_data(request, obj_type, obj_ref, obj_revi)
     object_attributes_list = []
     for attr in obj.attributes:
         item = obj.get_verbose_name(attr) + ":"
