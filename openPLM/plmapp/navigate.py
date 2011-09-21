@@ -109,7 +109,9 @@ class NavigationGraph(object):
                             image=os.path.join(basedir, "part.png")),
                           DocumentController : dict(color='#ffffc6',
                             image=os.path.join(basedir, "document.png"))}
-                           
+    
+    BUTTON_CLASS = " ui-button ui-widget ui-state-default ui-corner-all "
+
     def __init__(self, obj, results=()):
         self.object = obj
         self.results = [r.id for r in results]
@@ -323,7 +325,7 @@ class NavigationGraph(object):
             if url.startswith("/ajax/thumbnails/"):
                 thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
                         title="Display thumbnails")
-                thumbnails.set("class", "node_thumbnails ui-button ui-widget ui-state-default ui-corner-all")
+                thumbnails.set("class", "node_thumbnails" + self.BUTTON_CLASS)
                 thumbnails.set("onclick", "display_thumbnails('%s', '%s');" % (id_, url))
             elif url != "None":
                 if url[0] == "+":
@@ -336,7 +338,7 @@ class NavigationGraph(object):
                     parts = "#".join(str(o) for o in s)
                 show_doc = ET.SubElement(div, "img", src=img,
                         title="Show related documents")
-                show_doc.set("class", "node_show_docs ui-button ui-widget ui-state-default ui-corner-all")
+                show_doc.set("class", "node_show_docs" + self.BUTTON_CLASS)
                 show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
             a = ET.SubElement(div, "a", href=area.get("href")) 
             ET.SubElement(a, "span")
