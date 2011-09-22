@@ -307,6 +307,7 @@ class PLMObject(models.Model):
             Current :class:`State` of the object
 
     .. note::
+
         This class is abstract, to create a PLMObject, see :class:`Part` and
         :class:`Document`.
 

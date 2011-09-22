@@ -1,19 +1,8 @@
 ========================================================
-:mod:`views` --- Views
+:mod:`ajax` --- Ajax views
 ========================================================
 
-Views
----------
-
-.. toctree::
-    :maxdepth: 2
-   
-    views_main
-    ajax
-    api
-
-
-.. automodule:: plmapp.views
+.. automodule:: plmapp.views.ajax
     :members:
     :undoc-members:
     :show-inheritance:

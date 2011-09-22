@@ -1,19 +1,8 @@
 ========================================================
-:mod:`views` --- Views
+:mod:`base_views` --- Functions common to all views
 ========================================================
 
-Views
----------
-
-.. toctree::
-    :maxdepth: 2
-   
-    views_main
-    ajax
-    api
-
-
-.. automodule:: plmapp.views
+.. automodule:: plmapp.base_views
     :members:
     :undoc-members:
     :show-inheritance:
