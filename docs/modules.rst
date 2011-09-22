@@ -5,8 +5,8 @@ Modules
 
 .. toctree::
     :maxdepth: 2
-   
-    api
+    
+    base_views
     controllers
     exceptions
     filehandlers
