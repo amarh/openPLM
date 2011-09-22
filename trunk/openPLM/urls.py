@@ -33,7 +33,7 @@ for app in settings.INSTALLED_APPS:
 
 from django.conf.urls.defaults import include, patterns
 from openPLM.plmapp.views import *
-import openPLM.plmapp.api as api
+import openPLM.plmapp.views.api as api
 from django.contrib.auth.views import login, logout
 
 from django.contrib import admin
