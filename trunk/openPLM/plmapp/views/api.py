@@ -40,7 +40,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller, DocumentController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
-from openPLM.plmapp.base_views import json_view, get_obj_by_id
+from openPLM.plmapp.base_views import json_view, get_obj_by_id, object_to_dict
 
 #: Version of the API (value: ``'1.0'``)
 API_VERSION = "1.0"
