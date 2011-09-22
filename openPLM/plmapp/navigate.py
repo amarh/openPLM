@@ -43,12 +43,9 @@ basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
 # just a shortcut
 OSR = "only_search_results"
 
-def encode(s):
-    return s.encode("utf-8")
-
 def get_path(obj):
     if hasattr(obj, "type"):
-        return "/".join(map(encode, (obj.type, obj.reference, obj.revision)))
+        return "/".join((obj.type, obj.reference, obj.revision))
     else:
         return obj.username
 
@@ -66,7 +63,7 @@ class FrozenAGraph(pgv.AGraph):
 
     def write(self, path):
         if hasattr(path, "write"):
-            path.write(self.data)
+            path.write(self.data.encode("utf-8"))
         else:
             with file(path, "w") as f:
                 f.write(self.data)
@@ -304,8 +301,8 @@ class NavigationGraph(object):
                 s = "+" if obj.id not in self.options["doc_parts"] else "-"
                 node.attr["tooltip"] = s + str(obj.id)
         else:
-            node.attr["label"] = encode(obj.username)
-        node.attr["label"] += "\\n" + encode(extra_label)
+            node.attr["label"] = obj.username
+        node.attr["label"] += "\\n" + extra_label
         t = type_.__name__.replace("Controller", "")
         node.attr["id"] = "_".join((str(obj_id or obj.id), t, str(obj.id)))
 
@@ -357,10 +354,10 @@ class NavigationGraph(object):
         # rebuild a frozen graph with sorted edges to avoid random output
         edges = self.graph.edges()
         self.graph.remove_edges_from(edges)
-        s = str(self.graph)
+        s = unicode(self.graph)
         s = s[:s.rfind("}")]
         edges.sort()
-        s += "\n".join("%s -> %s;" % (a,b) for a, b in edges) + "}\n"
+        s += "\n".join(u"%s -> %s;" % (a,b) for a, b in edges) + "}\n"
         self.graph.close()
         self.graph = FrozenAGraph(s)
 
