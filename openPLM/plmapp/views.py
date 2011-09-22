@@ -211,13 +211,14 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
             qset = request_dict.session["results"] 
     else:
         qset = request_dict.session.get("results", [])
-    ctx.update({'results' : qset, 'type_form' : type_form,
-                         'type_form4creation' : type_form4creation,
-                         'attributes_form' : attributes_form,
-                         'link_creation' : False,
-                         'class4div' : class_for_div,
-                         'obj' : selected_object,
-                         })
+    ctx.update({'results' : qset, 
+                'type_form' : type_form,
+                'type_form4creation' : type_form4creation,
+                'attributes_form' : attributes_form,
+                'link_creation' : False,
+                'class4div' : class_for_div,
+                'obj' : selected_object,
+              })
     if hasattr(selected_object, "menu_items"):
         ctx['object_menu'] = selected_object.menu_items
     if isinstance(selected_object, PLMObjectController):
@@ -424,8 +425,9 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     # convert level to html space
     children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
 
-    ctx.update({'current_page':'BOM-child', 'obj' : obj,
-                                 'children': children, "display_form" : display_form})
+    ctx.update({'current_page':'BOM-child',
+                'children': children,
+                "display_form" : display_form})
     request.session.update(request_dict)
     return render_to_response('DisplayObjectChild.htm', ctx, context_instance=RequestContext(request))
 
@@ -461,8 +463,8 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect("..")
     else:
         formset = get_children_formset(obj)
-    ctx.update({'current_page':'BOM-child', 'obj' : obj,
-                                 'children_formset': formset, })
+    ctx.update({'current_page':'BOM-child',
+                'children_formset': formset, })
     request.session.update(request_dict)
     return render_to_response('DisplayObjectChildEdit.htm', ctx, context_instance=RequestContext(request))
 
@@ -539,8 +541,9 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     if level == "last" and parents:
         maximum = max(parents, key=attrgetter("level")).level
         parents = (c for c in parents if c.level == maximum)
-    ctx.update({'current_page':'parents', 'parents' :  parents,
-                                 'display_form' : display_form, 'obj': obj})
+    ctx.update({'current_page':'parents',
+                'parents' :  parents,
+                'display_form' : display_form, })
     request.session.update(request_dict)
     return render_to_response('DisplayObjectParents.htm', ctx, context_instance=RequestContext(request))
 
@@ -804,10 +807,10 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
 #            return HttpResponseRedirect("/home/")
         replace_management_form = ReplaceManagementForm(request.POST)
         if replace_management_form.is_valid():
-            if replace_management_form.cleaned_data["type"]=="User":
+            if replace_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(replace_management_form, request.user)
                 obj.set_role(user_obj.object, link.role)
-                if link.role=='notified':
+                if link.role == 'notified':
                     obj.remove_notified(link.user)
                 return HttpResponseRedirect("../..")
             else:
@@ -817,9 +820,9 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     else:
         replace_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
-    ctx.update({'current_page':'management', 'obj' : obj,
-                                 'replace_management_form': replace_management_form,
-                                 'link_creation': True,})
+    ctx.update({'current_page':'management', 
+                'replace_management_form': replace_management_form,
+                'link_creation': True,})
     return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
@@ -841,8 +844,6 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
-#        if request.POST.get("action", "Undo") == "Undo":
-#            return HttpResponseRedirect("/home/")
         add_management_form = ReplaceManagementForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"]=="User":
@@ -856,9 +857,9 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     else:
         add_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
-    ctx.update({'current_page':'management', 'obj' : obj,
-                                 'replace_management_form': add_management_form,
-                                 'link_creation': True,})
+    ctx.update({'current_page':'management', 
+                'replace_management_form': add_management_form,
+                'link_creation': True,})
     return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
 
 ##########################################################################################    
@@ -1184,10 +1185,9 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
         role = _("notified")
     request.session.update(request_dict)
     ctx.update({'current_page':'delegation',
-                         'obj' : obj,
-                         'replace_management_form': delegation_form,
-                         'link_creation': True,
-                         'role': role})
+                'replace_management_form': delegation_form,
+                'link_creation': True,
+                'role': role})
     return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################    
@@ -1215,28 +1215,26 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
         if delegation_form.is_valid():
-            if delegation_form.cleaned_data["type"]=="User":
+            if delegation_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(delegation_form, request.user)
-                if role=="notified":
+                if role == "notified":
                     obj.set_role(user_obj.object, "notified")
                     return HttpResponseRedirect("..")
-                elif role=="owner":
+                elif role == "owner":
                     return HttpResponseRedirect("..")
-                elif role=="sign":
-                    if sign_level=="all":
+                elif role == "sign":
+                    if sign_level == "all":
                         return HttpResponseRedirect("..")
                     elif sign_level.is_digit():
                         return HttpResponseRedirect("../..")
-        delegation_form = ReplaceManagementForm(request.POST)
     else:
         delegation_form = ReplaceManagementForm()
     action_message_string="Select the user you no longer want for your \"%s\" role delegation :" % role
     request.session.update(request_dict)
     ctx.update({'current_page':'parts-doc-cad',
-                                 'obj' : obj,
-                                 'replace_management_form': delegation_form,
-                                 'link_creation': True,
-                                 'action_message': action_message_string})
+                'replace_management_form': delegation_form,
+                'link_creation': True,
+                'action_message': action_message_string})
     return render_to_response('DisplayObjectManagementReplace.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################
@@ -1266,17 +1264,17 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
         checkin_file_form = AddFileForm(request.POST, request.FILES)
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
-            ctx.update({})
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             checkin_file_form = AddFileForm(request.POST)
-            ctx.update({'link_creation': True, \
-                                 'add_file_form': add_file_form, })
-            return render_to_response('DisplayFileAdd.htm', ctx, context_instance=RequestContext(request))
+            ctx.update({'link_creation': True, 
+                        'add_file_form': add_file_form, })
     else:
         checkin_file_form = AddFileForm()
-        ctx.update({'link_creation': True,                             'add_file_form': checkin_file_form, })
-        return render_to_response('DisplayFileAdd.htm', ctx, context_instance=RequestContext(request))
+        ctx.update({'link_creation' : True,
+                    'add_file_form' : checkin_file_form, })
+    return render_to_response('DisplayFileAdd.htm', ctx,
+            context_instance=RequestContext(request))
 
 ##########################################################################################
 @handle_errors 
