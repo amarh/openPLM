@@ -1014,7 +1014,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 ###         All functions which manage the different html pages specific to user          ###
 #############################################################################################
 @handle_errors
-def modify_user(request, obj_type, obj_ref, obj_revi):
+def modify_user(request, obj_ref):
     """
     Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
@@ -1028,26 +1028,25 @@ def modify_user(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    current_object = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
             modification_form = OpenPLMUserChangeForm(request.POST)
             if modification_form.is_valid():
-                current_object.update_from_form(modification_form)
-                return HttpResponseRedirect("/user/%s/" % current_object.username)
+                obj.cupdate_from_form(modification_form)
+                return HttpResponseRedirect("/user/%s/" % obj.username)
             else:
                 modification_form = OpenPLMUserChangeForm(request.POST)
     else:
-        modification_form = OpenPLMUserChangeForm(instance=current_object.object)
+        modification_form = OpenPLMUserChangeForm(instance=obj.object)
     request.session.update(request_dict)
     ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
     return render_to_response('DisplayObject4modification.htm', ctx, context_instance=RequestContext(request))
     
 ##########################################################################################
 @handle_errors
-def change_user_password(request, obj_type, obj_ref, obj_revi):
+def change_user_password(request, obj_ref):
     """
     Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User` password.
     It computes a context dictionnary based on
@@ -1063,20 +1062,19 @@ def change_user_password(request, obj_type, obj_ref, obj_revi):
     """
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
-    current_object, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     class_for_div="ActiveBox4User"
     if request.method == 'POST':
         if request.POST:
-            modification_form = PasswordChangeForm(current_object, request.POST)
+            modification_form = PasswordChangeForm(obj, request.POST)
             if modification_form.is_valid():
-                current_object.set_password(modification_form.cleaned_data['new_password2'])
-                current_object.save()
-                return HttpResponseRedirect("/user/%s/" % current_object.username)
+                obj.set_password(modification_form.cleaned_data['new_password2'])
+                obj.save()
+                return HttpResponseRedirect("/user/%s/" % obj.username)
             else:
-                #assert False
-                modification_form = PasswordChangeForm(current_object, request.POST)
+                modification_form = PasswordChangeForm(obj, request.POST)
     else:
-        modification_form = PasswordChangeForm(current_object)
+        modification_form = PasswordChangeForm(obj)
     request.session.update(request_dict)
     ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
     return render_to_response('DisplayObject4PasswordModification.htm', ctx, context_instance=RequestContext(request))
@@ -1109,7 +1107,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
 
 #############################################################################################
 @handle_errors
-def display_delegation(request, obj_type, obj_ref, obj_revi):
+def display_delegation(request, obj_ref):
     """
     Manage html page which displays the delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
@@ -1123,7 +1121,7 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     
     if not hasattr(obj, "get_user_delegation_links"):
         # TODO
@@ -1139,7 +1137,7 @@ def display_delegation(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################    
 @handle_errors
-def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
+def delegate(request, obj_ref, role, sign_level):
     """
     Manage html page for delegations modification of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
@@ -1157,7 +1155,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
@@ -1192,7 +1190,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     
 ##########################################################################################    
 @handle_errors
-def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
+def stop_delegate(request, obj_ref, role, sign_level):
     """
     Manage html page to stop delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
@@ -1210,7 +1208,7 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
         delegation_form = ReplaceManagementForm(request.POST)
