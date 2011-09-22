@@ -31,7 +31,7 @@ for app in settings.INSTALLED_APPS:
     if app.startswith("openPLM"):
     	__import__("%s.models" % app, globals(), locals(), [], -1)
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import include, patterns
 from openPLM.plmapp.views import *
 import openPLM.plmapp.api as api
 from django.contrib.auth.views import login, logout
@@ -50,7 +50,17 @@ for app in settings.INSTALLED_APPS:
         except ImportError:
             pass
 
-object_url = r'^object/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}
+def patterns2(view_prefix, url_prefix, *urls):
+    urls2 = []
+    for u in urls:
+        u2 = list(u)
+        u2[0] = url_prefix + u2[0]
+        urls2.append(tuple(u2))
+    return patterns(view_prefix, *urls2)
+
+object_pattern = '(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}
+
+object_url = r'^object/' + object_pattern
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
 urlpatterns += patterns('',
@@ -62,93 +72,103 @@ urlpatterns += patterns('',
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),
-    
-    (r'ajax/search/$', ajax_search_form),
-    (r'ajax/complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
-    (r'ajax/thumbnails/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/?$' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_thumbnails),
-    (r'ajax/navigate/(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/?$' % {'x' : r'[^/?#\t\r\v\f]+'}, ajax_navigate),
-    (r'ajax/add_child/(?P<part_id>\d+)/?', ajax_add_child),
-    (r'ajax/can_add_child/(?P<part_id>\d+)/?', ajax_can_add_child),
-    (r'ajax/attach/(?P<plmobject_id>\d+)/?', ajax_attach),
-    (r'ajax/can_attach/(?P<plmobject_id>\d+)/?', ajax_can_attach),
+    )
 
-    (object_url + r'$', display_object),
-    (object_url + r'attributes/$', display_object_attributes),
-    (object_url + r'lifecycle/$', display_object_lifecycle),
-    (object_url + r'revisions/$', display_object_revisions),
-    (object_url + r'history/$', display_object_history),
-    (object_url + r'BOM-child/$', display_object_child),
-    (object_url + r'BOM-child/edit/$', edit_children),
-    (object_url + r'BOM-child/add/$', add_children),
-    (object_url + r'parents/$', display_object_parents),
-    (object_url + r'doc-cad/$', display_object_doc_cad),
-    (object_url + r'doc-cad/add/$', add_doc_cad),
-    (object_url + r'parts/$', display_related_part),
-    (object_url + r'parts/add/$', add_rel_part),
-    (object_url + r'files/$', display_files),
-    (object_url + r'files/add/$', add_file),
-    (object_url + r'files/checkin/(?P<file_id_value>[^/]+)/$', checkin_file),
-    (object_url + r'files/checkout/(?P<docfile_id>[^/]+)/$', checkout_file),
-    (object_url + r'modify/$', modify_object),
-    (object_url + r'management/$', display_management),
-    (object_url + r'management/add/$', add_management),
-    (object_url + r'management/replace/(?P<link_id>\d+)/$', replace_management),
-    (object_url + r'management/delete/$', delete_management),
-    (object_url + r'navigate/$', navigate),
+urlpatterns += patterns2('', 'ajax/', 
+    (r'search/$', ajax_search_form),
+    (r'complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
+    (r'thumbnails/%s?$' % object_pattern, ajax_thumbnails),
+    (r'navigate/%s?$' % object_pattern, ajax_navigate),
+    (r'add_child/(?P<part_id>\d+)/?', ajax_add_child),
+    (r'can_add_child/(?P<part_id>\d+)/?', ajax_can_add_child),
+    (r'attach/(?P<plmobject_id>\d+)/?', ajax_attach),
+    (r'can_attach/(?P<plmobject_id>\d+)/?', ajax_can_attach),
+)
 
-    (user_url + r'$', display_object, user_dict),
-    (user_url + r'attributes/$', display_object_attributes, user_dict),
-    (user_url + r'history/$', display_object_history, user_dict),
-    (user_url + r'parts-doc-cad/$', display_related_plmobject, user_dict),
-    (user_url + r'delegation/$', display_delegation, user_dict),
-    (user_url + r'delegation/delegate/(?P<role>[^/]+)/$', delegate,\
-                    {'obj_type':'User', 'obj_revi':'-', 'sign_level':'none'}),
-    (user_url + r'delegation/delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', delegate,\
-                    {'obj_type':'User', 'obj_revi':'-'}),
-    (user_url + r'delegation/stop_delegate/(?P<role>[^/]+)/$', stop_delegate,\
-                    {'obj_type':'User', 'obj_revi':'-', 'sign_level':'none'}),
-    (user_url + r'delegation/stop_delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', stop_delegate,\
-                    {'obj_type':'User', 'obj_revi':'-'}),
-    (user_url + r'modify/$', modify_user, user_dict),
-    (user_url + r'password/$', change_user_password, user_dict),
-    (user_url + r'navigate/$', navigate, user_dict),
-    
+urlpatterns += patterns2('', object_url,
+    (r'$', display_object),
+    (r'attributes/$', display_object_attributes),
+    (r'lifecycle/$', display_object_lifecycle),
+    (r'revisions/$', display_object_revisions),
+    (r'history/$', display_object_history),
+    (r'BOM-child/$', display_object_child),
+    (r'BOM-child/edit/$', edit_children),
+    (r'BOM-child/add/$', add_children),
+    (r'parents/$', display_object_parents),
+    (r'doc-cad/$', display_object_doc_cad),
+    (r'doc-cad/add/$', add_doc_cad),
+    (r'parts/$', display_related_part),
+    (r'parts/add/$', add_rel_part),
+    (r'files/$', display_files),
+    (r'files/add/$', add_file),
+    (r'files/checkin/(?P<file_id_value>[^/]+)/$', checkin_file),
+    (r'files/checkout/(?P<docfile_id>[^/]+)/$', checkout_file),
+    (r'modify/$', modify_object),
+    (r'management/$', display_management),
+    (r'management/add/$', add_management),
+    (r'management/replace/(?P<link_id>\d+)/$', replace_management),
+    (r'management/delete/$', delete_management),
+    (r'navigate/$', navigate),
+)
+
+
+urlpatterns += patterns2('', user_url, 
+    (r'$', display_object, user_dict),
+    (r'attributes/$', display_object_attributes, user_dict),
+    (r'history/$', display_object_history, user_dict),
+    (r'parts-doc-cad/$', display_related_plmobject, user_dict),
+    (r'delegation/$', display_delegation),
+    (r'delegation/delegate/(?P<role>[^/]+)/$', delegate,
+                    {'sign_level':'none'}),
+    (r'delegation/delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', delegate),
+    (r'delegation/stop_delegate/(?P<role>[^/]+)/$', stop_delegate,\
+                    {'sign_level':'none'}),
+    (r'delegation/stop_delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$',
+                    stop_delegate),
+    (r'modify/$', modify_user),
+    (r'password/$', change_user_password),
+    (r'navigate/$', navigate, user_dict),
+)
+
+urlpatterns += patterns('',
 	# In order to take into account the css file
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'media/'}),    
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
     (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
-    #(r'^docs/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : 'docs/'}),    
-
 )
 
 # urls related to the api
 api_url = r'^api/object/(?P<doc_id>\d+)/'
-urlpatterns += patterns('',
-    (r'^api/login/', api.api_login),
-    (r'^api/needlogin/', api.need_login),
-    (r'^api/testlogin/', api.test_login),
-    (r'^api/types/$', api.get_all_types),
-    (r'^api/parts/$', api.get_all_parts),
-    (r'^api/doc(?:ument)?s/$', api.get_all_docs),
-    (r'^api/search/$', api.search),
-    (r'^api/search/(?P<editable_only>true|false)/$', api.search),
-    (r'^api/search/(?P<editable_only>true|false)/(?P<with_file_only>true|false)/$',
+urlpatterns += patterns('api/',
+    (r'^login/', api.api_login),
+    (r'^needlogin/', api.need_login),
+    (r'^testlogin/', api.test_login),
+    (r'^types/$', api.get_all_types),
+    (r'^parts/$', api.get_all_parts),
+    (r'^doc(?:ument)?s/$', api.get_all_docs),
+    (r'^search/$', api.search),
+    (r'^search/(?P<editable_only>true|false)/$', api.search),
+    (r'^search/(?P<editable_only>true|false)/(?P<with_file_only>true|false)/$',
      api.search),
-    (r'^api/create/$', api.create),
-    (r'^api/search_fields/(?P<typename>[\w_]+)/$', api.get_search_fields),
-    (r'^api/creation_fields/(?P<typename>[\w_]+)/$', api.get_creation_fields),
-    (api_url + r'files/$', api.get_files),
-    (api_url + r'files/(?P<all_files>all)/$', api.get_files),
-    (api_url + r'revise/$', api.revise),
-    (api_url + r'add_file/$', api.add_file),
-    (api_url + r'attach_to_part/(?P<part_id>\d+)/$', api.attach_to_part),
-    (api_url + r'next_?revision/$', api.next_revision),
-    (api_url + r'is_?revisable/$', api.is_revisable),
-    (api_url + r'(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
-    (api_url + r'unlock/(?P<df_id>\d+)/$', api.unlock),
-    (api_url + r'is_?locked/(?P<df_id>\d+)/$', api.is_locked),
-    (api_url + r'checkin/(?P<df_id>\d+)/$', api.check_in),
-    (api_url + r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
+    (r'^create/$', api.create),
+    (r'^search_fields/(?P<typename>[\w_]+)/$', api.get_search_fields),
+    (r'^creation_fields/(?P<typename>[\w_]+)/$', api.get_creation_fields),
+    )
+
+urlpatterns += patterns(api_url,
+    (r'files/$', api.get_files),
+    (r'files/(?P<all_files>all)/$', api.get_files),
+    (r'revise/$', api.revise),
+    (r'add_file/$', api.add_file),
+    (r'attach_to_part/(?P<part_id>\d+)/$', api.attach_to_part),
+    (r'next_?revision/$', api.next_revision),
+    (r'is_?revisable/$', api.is_revisable),
+    (r'(?:lock|checkout)/(?P<df_id>\d+)/$', api.check_out),
+    (r'unlock/(?P<df_id>\d+)/$', api.unlock),
+    (r'is_?locked/(?P<df_id>\d+)/$', api.is_locked),
+    (r'checkin/(?P<df_id>\d+)/$', api.check_in),
+    (r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
 
 
