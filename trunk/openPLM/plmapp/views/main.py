@@ -173,8 +173,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays all revisions of (objects having :class:`RevisionLink` with)
-    the selected object.
+    Manage html page which displays all revisions of the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -208,7 +207,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_history(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the history of (:class:`History` with) the selected object.
+    Manage html page which displays the history of the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -238,7 +237,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_child(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the chidren of (:class:`ParentChildLink` with) the selected object.
+    Manage html page which displays the chidren of the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -283,7 +282,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which edits the chidren of (:class:`ParentChildLink` with) the selected object.
+    Manage html page which edits the chidren of the selected object.
     Possibility to modify the `.ParentChildLink.order`, the `.ParentChildLink.quantity` and to
     desactivate the `.ParentChildLink`
     It computes a context dictionnary based on
@@ -320,7 +319,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def add_children(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for chidren creation of (:class:`ParentChildLink` creation with) the selected object.
+    Manage html page for chidren creation of the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -356,7 +355,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_parents(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the parent of (:class:`ParentChildLink` with) the selected object.
+    Manage html page which displays the parent of the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -398,7 +397,8 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the related documents and CAD of (:class:`DocumentPartLink` with) the selected object.
+    Manage html page which displays the related documents and CAD of 
+    the selected object.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -731,9 +731,9 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     return HttpResponseRedirect("../")
 
 ##########################################################################################
-###             Manage html pages for part / document creation and modification                     ###
+###    Manage html pages for part / document creation and modification                 ###
 ##########################################################################################
-def get_non_modifyable_attributes_list(current_obj, current_user, Classe=models.PLMObject):
+def get_non_modifyable_attributes_list(current_obj, current_user, cls=models.PLMObject):
     """
     Create a list of object's attributes we can't modify' and set them a value
     
@@ -746,10 +746,10 @@ def get_non_modifyable_attributes_list(current_obj, current_user, Classe=models.
          ('ctime', 'Date'),
          ('mtime', 'Date')]
     
-    :param Classe: :class: instance of `models.PLMObject`
+    :param cls: :class: instance of `models.PLMObject`
     :return: list
     """
-    non_modifyable_fields_list = Classe.excluded_creation_fields()
+    non_modifyable_fields_list = cls.excluded_creation_fields()
     non_modifyable_attributes_list=[]
     if current_obj == 'create':
         for field in non_modifyable_fields_list:
@@ -862,7 +862,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def modify_user(request, obj_ref):
     """
-    Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User`.
+    Manage html page for the modification of the selected
+    :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -876,12 +877,11 @@ def modify_user(request, obj_ref):
     """
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     class_for_div="ActiveBox4User"
-    if request.method == 'POST':
-        if request.POST:
-            modification_form = OpenPLMUserChangeForm(request.POST)
-            if modification_form.is_valid():
-                obj.cupdate_from_form(modification_form)
-                return HttpResponseRedirect("/user/%s/" % obj.username)
+    if request.method == 'POST' and request.POST:
+        modification_form = OpenPLMUserChangeForm(request.POST)
+        if modification_form.is_valid():
+            obj.cupdate_from_form(modification_form)
+            return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = OpenPLMUserChangeForm(instance=obj.object)
     request.session.update(request_dict)
@@ -892,7 +892,8 @@ def modify_user(request, obj_ref):
 @handle_errors
 def change_user_password(request, obj_ref):
     """
-    Manage html page for the modification of the selected :class:`~django.contrib.auth.models.User` password.
+    Manage html page for the modification of the selected
+    :class:`~django.contrib.auth.models.User` password.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -909,15 +910,16 @@ def change_user_password(request, obj_ref):
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
-            modification_form = PasswordChangeForm(obj, request.POST)
-            if modification_form.is_valid():
-                obj.set_password(modification_form.cleaned_data['new_password2'])
-                obj.save()
-                return HttpResponseRedirect("/user/%s/" % obj.username)
+        modification_form = PasswordChangeForm(obj, request.POST)
+        if modification_form.is_valid():
+            obj.set_password(modification_form.cleaned_data['new_password2'])
+            obj.save()
+            return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = PasswordChangeForm(obj)
     request.session.update(request_dict)
-    ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
+    ctx.update({'class4div': class_for_div,
+                'modification_form': modification_form})
     return r2r('DisplayObject4PasswordModification.htm', ctx, request)
 
 #############################################################################################
@@ -950,7 +952,8 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_delegation(request, obj_ref):
     """
-    Manage html page which displays the delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
+    Manage html page which displays the delegations of the selected 
+    :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -980,7 +983,8 @@ def display_delegation(request, obj_ref):
 @handle_errors
 def delegate(request, obj_ref, role, sign_level):
     """
-    Manage html page for delegations modification of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
+    Manage html page for delegations modification of the selected
+    :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
@@ -1099,10 +1103,11 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     request.session.update(request_dict)
-    if request.POST :
+    if request.POST:
         checkin_file_form = AddFileForm(request.POST, request.FILES)
         if checkin_file_form.is_valid():
-            obj.checkin(models.DocumentFile.objects.get(id=file_id_value), request.FILES["filename"])
+            obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
+                        request.FILES["filename"])
             return HttpResponseRedirect(obj.plmobject_url + "files/")
         else:
             checkin_file_form = AddFileForm(request.POST)
