@@ -35,6 +35,16 @@ from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
 
+class PLMObjectForm(forms.Form):
+    u"""
+    A formulaire that identifies a :class:`PLMObject`.
+    """
+
+    type = forms.CharField()
+    reference = forms.CharField()
+    revision = forms.CharField()
+
+
 def _clean_reference(self):
     data = self.cleaned_data["reference"]
     if rx_bad_ref.search(data):
@@ -201,10 +211,7 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
 get_search_form.cache = {}    
       
-class AddChildForm(forms.Form):
-    type = forms.CharField()
-    reference = forms.CharField()
-    revision = forms.CharField()
+class AddChildForm(PLMObjectForm):
     quantity = forms.FloatField()
     order = forms.IntegerField()
 
@@ -243,10 +250,8 @@ class AddRevisionForm(forms.Form):
     revision = forms.CharField()
     clean_revision = _clean_revision
     
-class AddRelPartForm(forms.Form):
-    type = forms.CharField()
-    reference = forms.CharField()
-    revision = forms.CharField()
+class AddRelPartForm(PLMObjectForm):
+    pass
     
 class ModifyRelPartForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
@@ -288,10 +293,8 @@ def get_file_formset(controller, data=None):
         formset = FileFormset(data=data)
     return formset
 
-class AddDocCadForm(forms.Form):
-    type = forms.CharField()
-    reference = forms.CharField()
-    revision = forms.CharField()
+class AddDocCadForm(PLMObjectForm):
+    pass
     
 class ModifyDocCadForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)

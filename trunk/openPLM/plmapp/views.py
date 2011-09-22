@@ -72,7 +72,8 @@ from openPLM.plmapp.user_controller import UserController
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.navigate import NavigationGraph
-from openPLM.plmapp.base_views import get_obj, get_obj_by_id, json_view
+from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
+        json_view
 
 
 def handle_errors(func):
@@ -487,13 +488,10 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     if request.POST:
         add_child_form = AddChildForm(request.POST)
         if add_child_form.is_valid():
-            child_obj = get_obj(add_child_form.cleaned_data["type"], \
-                        add_child_form.cleaned_data["reference"], \
-                        add_child_form.cleaned_data["revision"],
-                        request.user)
-            obj.add_child(child_obj, \
-                            add_child_form.cleaned_data["quantity"], \
-                            add_child_form.cleaned_data["order"])
+            child_obj = get_obj_from_form(add_child_form, request.user)
+            obj.add_child(child_obj,
+                          add_child_form.cleaned_data["quantity"],
+                          add_child_form.cleaned_data["order"])
             ctx.update({'add_child_form': add_child_form, })
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
         else:
@@ -602,10 +600,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     if request.POST:
         add_doc_cad_form = AddDocCadForm(request.POST)
         if add_doc_cad_form.is_valid():
-            doc_cad_obj = get_obj(add_doc_cad_form.cleaned_data["type"], \
-                        add_doc_cad_form.cleaned_data["reference"], \
-                        add_doc_cad_form.cleaned_data["revision"],\
-                        request.user)
+            doc_cad_obj = get_obj_from_form(add_doc_cad_form, request.user)
             obj.attach_to_document(doc_cad_obj)
             ctx.update({'add_doc_cad_form': add_doc_cad_form, })
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
@@ -675,9 +670,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     if request.POST:
         add_rel_part_form = AddRelPartForm(request.POST)
         if add_rel_part_form.is_valid():
-            part_obj = get_obj(add_rel_part_form.cleaned_data["type"], \
-                        add_rel_part_form.cleaned_data["reference"], \
-                        add_rel_part_form.cleaned_data["revision"], request.user)
+            part_obj = get_obj_from_form(add_rel_part_form, request.user)
             obj.attach_to_part(part_obj)
             ctx.update({'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
@@ -708,7 +701,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
 
     if not hasattr(obj, "files"):
         raise TypeError()
@@ -813,11 +805,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         replace_management_form = ReplaceManagementForm(request.POST)
         if replace_management_form.is_valid():
             if replace_management_form.cleaned_data["type"]=="User":
-                user_obj = get_obj(\
-                                    replace_management_form.cleaned_data["type"],\
-                                    replace_management_form.cleaned_data["username"],\
-                                    "-",\
-                                    request.user)
+                user_obj = get_obj_from_form(replace_management_form, request.user)
                 obj.set_role(user_obj.object, link.role)
                 if link.role=='notified':
                     obj.remove_notified(link.user)
@@ -858,11 +846,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
         add_management_form = ReplaceManagementForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"]=="User":
-                user_obj = get_obj(\
-                                    add_management_form.cleaned_data["type"],\
-                                    add_management_form.cleaned_data["username"],\
-                                    "-",\
-                                    request.user)
+                user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, "notified")
                 return HttpResponseRedirect("..")
             else:
@@ -1178,10 +1162,7 @@ def delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
         delegation_form = ReplaceManagementForm(request.POST)
         if delegation_form.is_valid():
             if delegation_form.cleaned_data["type"] == "User":
-                user_obj = get_obj("User",
-                                   delegation_form.cleaned_data["username"],
-                                   "-",
-                                   request.user)
+                user_obj = get_obj_from_form(delegation_form, request.user)
                 if role == "notified" or role == "owner":
                     obj.delegate(user_obj.object, role)
                     return HttpResponseRedirect("../..")
@@ -1235,11 +1216,7 @@ def stop_delegate(request, obj_type, obj_ref, obj_revi, role, sign_level):
         delegation_form = ReplaceManagementForm(request.POST)
         if delegation_form.is_valid():
             if delegation_form.cleaned_data["type"]=="User":
-                user_obj = get_obj(\
-                                    add_management_form.cleaned_data["type"],\
-                                    add_management_form.cleaned_data["username"],\
-                                    "-",\
-                                    request.user)
+                user_obj = get_obj_from_form(delegation_form, request.user)
                 if role=="notified":
                     obj.set_role(user_obj.object, "notified")
                     return HttpResponseRedirect("..")
@@ -1509,10 +1486,7 @@ def ajax_add_child(request, part_id):
     else:
         form = AddChildForm(request.POST)
         if form.is_valid():
-            child = get_obj(form.cleaned_data["type"],
-                                form.cleaned_data["reference"],
-                                form.cleaned_data["revision"],
-                                request.user)
+            child = get_obj_from_form(form, request.user)
             part.add_child(child, form.cleaned_data["quantity"], 
                            form.cleaned_data["order"])
             return {"result" : "ok"}
@@ -1540,10 +1514,7 @@ def ajax_can_add_child(request, part_id):
     if hasattr(part, "part") and request.GET:
         form = AddRelPartForm(request.GET)
         if form.is_valid():
-            child = get_obj(form.cleaned_data["type"],
-                                form.cleaned_data["reference"],
-                                form.cleaned_data["revision"],
-                                request.user)
+            child = get_obj_from_form(form, request.user)
             try:
                 part.check_add_child(child)
                 data["can_add"] = True
@@ -1561,10 +1532,7 @@ def ajax_attach(request, plmobject_id):
     else:
         form = AddRelPartForm(request.POST)
         if form.is_valid():
-            attached = get_obj(form.cleaned_data["type"],
-                                form.cleaned_data["reference"],
-                                form.cleaned_data["revision"],
-                                request.user)
+            attached = get_obj_from_form(form, request.user)
             if hasattr(plmobject, "attach_to_document"):
                 plmobject.attach_to_document(attached)
             elif hasattr(plmobject, "attach_to_part"):
@@ -1594,10 +1562,7 @@ def ajax_can_attach(request, plmobject_id):
     if isinstance(plmobject, PLMObjectController) and request.GET:
         form = AddRelPartForm(request.GET)
         if form.is_valid():
-            attached = get_obj(form.cleaned_data["type"],
-                                form.cleaned_data["reference"],
-                                form.cleaned_data["revision"],
-                                request.user)
+            attached = get_obj_from_form(form, request.user)
             
             if hasattr(plmobject, "is_document_attached"):
                 data["can_attach"] = not (hasattr(attached, "part") or \
