@@ -18,4 +18,5 @@ Modules
     user_controller
     utils
     views
+    widgets
 
