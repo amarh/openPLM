@@ -222,15 +222,13 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if isinstance(obj, UserController):
-        histos = models.UserHistory.objects
+        history = models.UserHistory.objects
     else: 
-        histos = models.History.objects
-    histos = histos.filter(plmobject=obj.object).order_by('date')
-    object_history_list = []
-    for histo in histos:
-        object_history_list.append((histo.date, histo.action, histo.details))
+        history = models.History.objects
+    history = history.filter(plmobject=obj.object).order_by('date')
+    history = history.values_list('date', 'action', 'details')
     ctx.update({'current_page' : 'history', 
-                'object_history' : object_history_list})
+                'object_history' : history})
     request.session.update(request_dict)
     return r2r('DisplayObjectHistory.htm', ctx, request)
 
