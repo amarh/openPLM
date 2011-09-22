@@ -1537,16 +1537,73 @@ def ajax_add_child(request, part_id):
 def ajax_can_add_child(request, part_id):
     part = get_obj_by_id(part_id, request.user)
     data = {"can_add" : False}
-    if request.GET:
+    if hasattr(part, "part") and request.GET:
         form = AddRelPartForm(request.GET)
         if form.is_valid():
-             child = get_obj(form.cleaned_data["type"],
+            child = get_obj(form.cleaned_data["type"],
                                 form.cleaned_data["reference"],
                                 form.cleaned_data["revision"],
                                 request.user)
-             try:
-                 part.check_add_child(child)
-                 data["can_add"] = True
-             except StandardError:
-                 pass
+            try:
+                part.check_add_child(child)
+                data["can_add"] = True
+            except StandardError:
+                pass
     return data
+
+@login_required
+@json_view
+def ajax_attach(request, plmobject_id):
+    plmobject = get_obj_by_id(plmobject_id, request.user)
+    data = {}
+    if request.GET:
+        form = AddRelPartForm(initial=request.GET)
+    else:
+        form = AddRelPartForm(request.POST)
+        if form.is_valid():
+            attached = get_obj(form.cleaned_data["type"],
+                                form.cleaned_data["reference"],
+                                form.cleaned_data["revision"],
+                                request.user)
+            if hasattr(plmobject, "attach_to_document"):
+                plmobject.attach_to_document(attached)
+            elif hasattr(plmobject, "attach_to_part"):
+                plmobject.attach_to_part(attached)
+            return {"result" : "ok"}
+        else:
+            data["result"] = "error"
+            data["error"] = "invalid form"
+    for field in ("type", "reference", "revision"):
+        form.fields[field].widget.attrs['readonly'] = 'on' 
+    data.update({
+            "plmobject" : {
+                "id" : plmobject.id,
+                "type" : plmobject.type,
+                "reference" : plmobject.reference,
+                "revision" : plmobject.revision,
+                },
+            "form" : form.as_table()
+           })
+    return data
+
+@login_required
+@json_view
+def ajax_can_attach(request, plmobject_id):
+    plmobject = get_obj_by_id(plmobject_id, request.user)
+    data = {"can_attach" : False}
+    if isinstance(plmobject, PLMObjectController) and request.GET:
+        form = AddRelPartForm(request.GET)
+        if form.is_valid():
+            attached = get_obj(form.cleaned_data["type"],
+                                form.cleaned_data["reference"],
+                                form.cleaned_data["revision"],
+                                request.user)
+            
+            if hasattr(plmobject, "is_document_attached"):
+                data["can_attach"] = not (hasattr(attached, "part") or \
+                                 plmobject.is_document_attached(attached))
+            elif hasattr(plmobject, "is_part_attached"):
+                data["can_attach"] = not (hasattr(attached, "document") or \
+                                          plmobject.is_part_attached(attached))
+    return data
+

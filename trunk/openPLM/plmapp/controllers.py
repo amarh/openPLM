@@ -957,7 +957,16 @@ class PartController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return self.documentpartlink_part.all()
-        
+     
+    def is_document_attached(self, document):
+        """
+        Returns True if *document* is attached to the current part.
+        """
+
+        if isinstance(document, PLMObjectController):
+            document = document.object
+        return bool(self.documentpartlink_part.filter(document=document))
+   
     def update_doc_cad(self, formset):
         u"""
         Updates doc_cad informations with data from *formset*
@@ -1179,6 +1188,15 @@ class DocumentController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return self.object.documentpartlink_document.all()
+
+    def is_part_attached(self, part):
+        """
+        Returns True if *part* is attached to the current document.
+        """
+
+        if isinstance(part, PLMObjectController):
+            part = part.object
+        return bool(self.documentpartlink_document.filter(part=part))
 
     def revise(self, new_revision):
         # same as PLMObjectController + duplicate files (and their thumbnails)

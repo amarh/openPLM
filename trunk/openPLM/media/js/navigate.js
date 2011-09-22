@@ -74,15 +74,41 @@ function can_add_child(part, form_child, cache){
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     var can = false;
-    $.ajaxSetup({async : false});
+    if (type == "Part"){
+        $.ajaxSetup({async : false});
 
-    $.get("/ajax/can_add_child/" + id + "/",
-        form,
-        function (result){
-            can = result.can_add;
-        }
-        );
-    $.ajaxSetup({async : true});
+        $.get("/ajax/can_add_child/" + id + "/",
+            form,
+            function (result){
+                can = result.can_add;
+            }
+            );
+        $.ajaxSetup({async : true});
+    }
+    cache[form] = can;
+    return can;
+}
+
+function can_attach(plmobject, form_child, cache){
+    var form = form_child.serialize();
+    if (form in cache){
+        return cache[form];
+    }
+    var id = plmobject.attr("id").split(":");
+    var type = id.slice(-2, -1);
+    var id = id.slice(-1);
+    var can = false;
+    
+    if (type == "Part" || type == "Document"){
+        $.ajaxSetup({async : false});
+        $.get("/ajax/can_attach/" + id + "/",
+            form,
+            function (result){
+                can = result.can_attach;
+            }
+            );
+        $.ajaxSetup({async : true});
+    }
     cache[form] = can;
     return can;
 }
@@ -120,6 +146,36 @@ function show_add_child(part, form_child){
     );
 }
 
+function show_attach(plmobject, form_child){
+	var id = plmobject.attr("id").split(":");
+    var type = id.slice(-2, -1);
+    var id = id.slice(-1);
+    
+    $.get("/ajax/attach/" + id + "/",
+        form_child.serialize(),
+        function (data){
+            $("#dialog-confirm").dialog("option", "buttons", {
+                Ok: function() {
+                    $.post("/ajax/attach/"+id+"/",
+                        $("#dialog-confirm>form").serialize(),
+                        function (result){
+                            if (result.result == "ok"){
+                                $("#dialog-confirm").dialog("close");
+                                location.reload();
+                            }
+                        });
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                }
+                
+            });
+            $("#dialog-confirm>form>table").html(data.form);
+            $("#dialog-confirm").dialog("open");
+        }
+    );
+}
+
 function init(){
         $("div.node").mouseenter(
         function () {
@@ -152,19 +208,27 @@ function init(){
 
         // add stuff
         // TODO : documents, check if selected part can be added
-        var cache = new Object();
+        var cache1 = new Object();
+        var cache2 = new Object();
         $("div.main_node").droppable({
 			accept: 
                 function (child_tr){
                     if (child_tr.is("tr.Content, tr.Content2")){
-                        return can_add_child($(this), $("form", child_tr), cache);
+                        return (can_add_child($(this), $("form", child_tr), cache1) ||
+                                can_attach($(this), $("form", child_tr), cache2)
+                                );
                      }
                     return false;
                 },
 			activeClass: "drop_active",
 			hoverClass: "drop_hover",
 			drop: function( event, ui ) {
-                show_add_child($(this), $("form", ui.draggable));
+                if (can_add_child($(this), $("form", ui.draggable), cache1)){
+                    show_add_child($(this), $("form", ui.draggable));
+                }
+                else if (can_attach($(this), $("form", ui.draggable), cache2)){
+                    show_attach($(this), $("form", ui.draggable));
+                }
 			}
 		});
 
@@ -267,13 +331,18 @@ cursor: 'crosshair'
         $("tr.Content").add("tr.Content2").css("z-index", "99");
         $("tr.Content").add("tr.Content2").draggable({ helper: 'clone' });
         $("#navAddForm").dialog({
-                autoOpen: false,
+            autoOpen: false,
 			height: 300,
 			width: 350,
 			modal: true,
-			close: function() {
-			}
 		});
+        $("#dialog-confirm").dialog({
+            autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+		});
+
 
         init();
 });
