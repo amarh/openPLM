@@ -307,7 +307,7 @@ class NavigationGraph(object):
             node.attr["label"] = encode(obj.username)
         node.attr["label"] += "\\n" + encode(extra_label)
         t = type_.__name__.replace("Controller", "")
-        node.attr["id"] = ":".join((str(obj_id or obj.id), t, str(obj.id)))
+        node.attr["id"] = "_".join((str(obj_id or obj.id), t, str(obj.id)))
 
     def convert_map(self, map_string):
         elements = []

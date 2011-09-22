@@ -70,7 +70,7 @@ function can_add_child(part, form_child, cache){
     if (form in cache){
         return cache[form];
     }
-    var id = part.attr("id").split(":");
+    var id = part.attr("id").split("_");
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     var can = false;
@@ -94,7 +94,7 @@ function can_attach(plmobject, form_child, cache){
     if (form in cache){
         return cache[form];
     }
-    var id = plmobject.attr("id").split(":");
+    var id = plmobject.attr("id").split("_");
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     var can = false;
@@ -114,7 +114,7 @@ function can_attach(plmobject, form_child, cache){
 }
 
 function show_add_child(part, form_child){
-	var id = part.attr("id").split(":");
+	var id = part.attr("id").split("_");
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     $.get("/ajax/add_child/" + id + "/",
@@ -147,7 +147,7 @@ function show_add_child(part, form_child){
 }
 
 function show_attach(plmobject, form_child){
-	var id = plmobject.attr("id").split(":");
+	var id = plmobject.attr("id").split("_");
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     
