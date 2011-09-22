@@ -105,6 +105,27 @@ def get_obj_by_id(obj_id, user):
     obj = models.get_all_plmobjects()[obj.type].objects.get(id=obj_id)
     return get_controller(obj.type)(obj, user)
 
+
+def get_obj_from_form(form, user):
+    u"""
+    Returns an adequate controller for the object identify by form.
+    The returned controller is instanciate with *user* as the user
+    who modify the object.
+
+    :param form: a valid :class:`.PLMObjectForm`
+    :param user: a :class:`.django.contrib.auth.models.User`
+    :return: a subinstance of a :class:`.PLMObjectController`
+    """
+
+    type_ = form.cleaned_data["type"]
+    if type_ == "User":
+        reference = form.cleaned_data["username"]
+        revision = "-"
+    else:
+        reference = form.cleaned_data["reference"]
+        revision = form.cleaned_data["revision"]
+    return get_obj(type_, reference, revision, user)
+
 def object_to_dict(plmobject):
     """
     Returns a dictionary representing *plmobject*. The returned dictionary
