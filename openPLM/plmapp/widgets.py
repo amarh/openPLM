@@ -7,7 +7,10 @@ from django.utils.safestring import mark_safe
 
 class JQueryAutoComplete(forms.TextInput):
     def __init__(self, source, options={}, attrs={}):
-        """source can be a list containing the autocomplete values or a
+        """
+        A :class:`TextInput` widget that enable auto completion through JQuery.
+        
+        *source* can be a list containing the autocomplete values or a
         string containing the url used for the XHR request.
 
         For available options see the autocomplete sample page::
