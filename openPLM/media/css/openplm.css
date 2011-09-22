@@ -622,7 +622,7 @@ div#FilterNav
 position: absolute;
 right: 10px;
 top: 10px;
-z-index: 3;
+z-index: 99;
 padding: 3px;
 width: 250px;
 text-align: left;
