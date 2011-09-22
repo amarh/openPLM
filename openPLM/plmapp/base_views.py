@@ -69,7 +69,6 @@ def json_view(func, API_VERSION=""):
             # Allow keyboard interrupts through for debugging.
             raise
         except Exception, e:
-            print e
             #Mail the admins with the error
             exc_info = sys.exc_info()
             subject = 'JSON view error: %s' % request.path
