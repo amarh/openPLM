@@ -650,10 +650,6 @@ font-size: 75%;
 padding: 5px;
 }
 
-div#FilterNav:hover ul
-{
-display: block;
-}
 
 .ui-button {
     border: 1px solid #aaa !important;
