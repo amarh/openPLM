@@ -446,9 +446,7 @@ class PLMObjectController(object):
                 self.object.save()
                 details = "change state from %(first)s to %(second)s" % \
                                      {"first" :state.name, "second" : new_state}
-                blacklist = send_mail(self.object, "sign_", "Promote",
-                                      details, self._user)
-                self._save_histo("Promote", details, blacklist)
+                self._save_histo("Promote", details, roles=["sign_"])
             except IndexError:
                 # FIXME raises it ?
                 pass
@@ -472,8 +470,7 @@ class PLMObjectController(object):
             self.object.save()
             details = "change state from %(first)s to %(second)s" % \
                     {"first" :state.name, "second" : new_state}
-            blacklist = send_mail(self.object, "sign_", "Demote", details, self._user)
-            self._save_histo("Demote", details, blacklist)
+            self._save_histo("Demote", details, roles=["sign_"])
         except IndexError:
             # FIXME raises it ?
             pass
@@ -512,17 +509,21 @@ class PLMObjectController(object):
             self._save_histo("Modify", self.__histo) 
             self.__histo = ""
 
-    def _save_histo(self, action, details, blacklist=()):
+    def _save_histo(self, action, details, blacklist=(), roles=()):
         """
         Records *action* with details *details* made by :attr:`_user` in
         on :attr:`object` in the histories table.
 
         *blacklist*, if given, should be a list of email whose no mail should
         be sent (empty by default).
+
+        A mail is sent to all notified users. Moreover, more roles can be
+        notified by settings the *roles" argument.
         """
-        models.History.objects.create(plmobject=self.object, action=action,
+        h = models.History.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
-        send_mail(self.object, "notified", action, details, self._user, blacklist)
+        roles = ["notified"] + list(roles)
+        send_mail(self.object, roles, action, [h], self._user, blacklist)
 
     @permission_required(role="owner")
     def revise(self, new_revision):
@@ -621,6 +622,8 @@ class PLMObjectController(object):
         :raise: :exc:`IntegrityError` if *new_notified* is already notified
             when :attr:`object` changes
         """
+        if new_notified != self._user:
+            self.check_permission("owner")
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
         details = "user: %s" % new_notified
@@ -636,7 +639,9 @@ class PLMObjectController(object):
         :raise: :exc:`ObjectDoesNotExist` if *notified* is not notified
             when :attr:`object` changes
         """
-
+        
+        if notified != self._user:
+            self.check_permission("owner")
         link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.delete()

@@ -261,8 +261,8 @@ class ControllerTest(TestCase):
         user.get_profile().save()
         controller.set_role(user, "owner")
         self.assertEqual(controller.owner, user)
-        controller.set_role(user, "notified")
-        PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
+        controller.set_role(self.user, "notified")
+        PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         controller.set_role(user, level_to_sign_str(0))
         link = PLMObjectUserLink.objects.get(role=level_to_sign_str(0),

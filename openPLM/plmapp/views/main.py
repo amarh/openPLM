@@ -56,6 +56,7 @@ from django.template import RequestContext
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
+from django.forms import HiddenInput
 
 from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
@@ -619,6 +620,19 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     
     object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
     object_management_list = object_management_list.order_by("role")
+    if not ctx["is_owner"]:
+        link = object_management_list.filter(role="notified", user=request.user)
+        ctx["is_notified"] = bool(link)
+        if link:
+            ctx["remove_notify_link"] = link[0]
+        else:
+            initial = { "type" : "User",
+                        "username" : request.user.username
+                      }
+            form = ReplaceManagementForm(initial=initial)
+            for field in ("type", "username"):
+                form.fields[field].widget = HiddenInput() 
+            ctx["notify_self_form"] = form
     ctx.update({'current_page':'management',
                 'object_management': object_management_list})
     request.session.update(request_dict)

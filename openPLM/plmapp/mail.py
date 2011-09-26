@@ -27,33 +27,28 @@ This module contains a function :func:`send_mail` which can be used to notify
 users about a changement in a :class:`.PLMObject`.
 """
 
+from threading import Thread
+
 import kjbuckets
 
 from django.conf import settings
-from django.core.mail import send_mail as sm
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.contrib.sites.models import Site
 
 from openPLM.plmapp.models import User, DelegationLink
 
-_TEMPLATE = u"""
-Message from OpenPLM
 
-Modification for {plmobject}:
-    - Type : {action}
-    - By : {user}
-    - Details :
-        {details}
-"""
-
-def send_mail(plmobject, role, action, details, user, blacklist=()):
+def send_mail(plmobject, roles, last_action, histories, user, blacklist=(),
+              template="mails/history"):
     """
     Sends a mail to users who have role *role* for *plmobject*.
 
     :param plmobject: object which was modified
     :type plmobject: :class:`.PLMObject`
-    :param str role: role of the users who should be notified (can be just the
-                     first characters of the role to match several roles)
-    :param str action: type of modification
-    :param str details: details
+    :param str roles: list of roles of the users who should be notified
+    :param str last_action: type of modification
+    :param str histories: list of :class:`.AbstractHistory`
     :param user: user who made the modification
     :type user: :class:`~django.contrib.auth.models.User` 
     :param blacklist: list of emails whose no mail should be sent (empty by default).
@@ -62,22 +57,42 @@ def send_mail(plmobject, role, action, details, user, blacklist=()):
     .. note::
 
         This function fails silently if it can not send the mail.
+        The mail is sent in a separated thread. 
     """
-    subject = u"[OpenPLM] -- %s" % plmobject
-    details = details.replace("\n", "\n" + " " * 8)
-    message = _TEMPLATE.format(**locals())
-    users = plmobject.plmobjectuserlink_plmobject.filter(role__contains=role).values_list("user", flat=True)
-    recipients = set(users)
-    links = DelegationLink.objects.filter(role__contains=role)\
-                .values_list("delegator", "delegatee")
-    gr = kjbuckets.kjGraph(tuple(links))
-    for user in users:
-        recipients.update(gr.reachable(user).items())
+    subject = "[PLM] " + unicode(plmobject)
+
+    recipients = set()
+    manager = plmobject.plmobjectuserlink_plmobject
+    for role in roles:
+        users = manager.filter(role__contains=role).values_list("user", flat=True)
+        recipients.update(users)
+        links = DelegationLink.objects.filter(role__contains=role)\
+                    .values_list("delegator", "delegatee")
+        gr = kjbuckets.kjGraph(tuple(links))
+        for u in users:
+            recipients.update(gr.reachable(u).items())
+
     if recipients:
         emails = User.objects.filter(id__in=recipients).exclude(email="")\
                         .values_list("email", flat=True)
         emails = set(emails) - set(blacklist)
-        sm(subject, message, settings.EMAIL_OPENPLM, emails, fail_silently=True)
+        ctx = {
+                "last_action" : last_action,
+                "histories" : histories, 
+                "plmobject" : plmobject,
+                "user" : user,
+                "site" : Site.objects.get_current(),
+            }
+        html_content = render_to_string(template + ".htm", ctx)
+        message = render_to_string(template + ".txt", ctx)
+        msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
+                emails)
+        msg.attach_alternative(html_content, "text/html")
+        t = Thread(target=msg.send, kwargs={"fail_silently" : True })
+        t.start()
         return emails
+
     return set()
+
+
 
