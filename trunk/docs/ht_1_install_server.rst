@@ -208,11 +208,24 @@ First steps in openPLM
 
     .. note ::
         For more information about the `Django Admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
-    
+
+    Then you must create a new *Site* (use the admin interface) and sets the `SITE_ID`
+    variable in the :file:`settings.py` file.
+
     You are now ready for your first login : ::
     
         http://localhost/
         
     .. image:: images/openplm_connexion.png
+
+
+Configuring E-mails
+===================
+
+There are several variables that can be set in the :file:`settings.py` to configure
+how mails are sent. See the `Django documentation <https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST>`_ for more details.
+
+OpenPLM adds another variable `EMAIL_OPENPLM` which is the e-mail address set
+in the `from` field of each e-mail. Usually, this is a `no-reply@` address.
 
 
