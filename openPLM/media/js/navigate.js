@@ -214,7 +214,6 @@ function init(){
         $(".node_thumbnails").hoverIntent(config);
 
         // add stuff
-        // TODO : documents, check if selected part can be added
         var cache1 = new Object();
         var cache2 = new Object();
         $("div.main_node").droppable({
@@ -366,6 +365,11 @@ cursor: 'crosshair'
 			modal: true,
 		});
 
+        $("#FilterNav").hoverIntent({
+            over: function() { $("#FilterNav ul").show();},
+            out: function() { $("#FilterNav ul").hide();},
+            timeout: 500
+             } );
 
         init();
 });
