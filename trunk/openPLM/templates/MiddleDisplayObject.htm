@@ -16,7 +16,7 @@
 	    </h2>
 	</div>
 	<div id="ActiveArea">
-        {% if object_menu %}
+        {% if object_menu and not navigate_bool %}
 	        <ul id="MenuList">
                 {% for menu_item in object_menu %}
 			        {% ifequal menu_item current_page%}
