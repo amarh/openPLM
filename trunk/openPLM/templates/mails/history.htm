@@ -1,0 +1,35 @@
+{% load i18n %}
+<html>
+    <head>
+    </head>
+    <body>
+        <h1> {% trans "Message from openPLM" %} </h1>
+        <p>
+        {% trans "Object:" %} Object: {{ plmobject }}
+        </p>
+        <p>
+            {% trans "A new action has been done:" %} {{ last_action }}
+
+        </p>
+        <h2> {% trans "Details" %} </h2>
+        <table class="Content">
+            {% for h in histories %}
+            <tr class="Content">
+                <td class="Content">
+                    {{h.date}}
+                </td>
+                <td class="Content">
+                    {{h.action}}
+                </td>
+                <td class="Content">
+                    {{ h.details|linebreaks }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="http://{{site.domain}}{{plmobject.plmobject_url}}">
+            {% trans "Click here to see more details." %}
+        </a>
+    </body>
+</html>

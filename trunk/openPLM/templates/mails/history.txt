@@ -1,0 +1,17 @@
+{% load i18n %}
+{% autoescape off %}
+{% trans "Message from openPLM" %}
+          
+{% trans "Object:" %}{{ plmobject }}
+
+{% trans "A new action has been done:" %} {{ last_action }}
+
+{% trans "Details:" %} 
+{% for h in histories %}
+  - {{h.date}} | {{h.action}} | {{ h.details|linebreaks }}
+{% endfor %}
+
+{% trans "Url of the object:" %} http://{{site.domain}}{{plmobject.plmobject_url}}
+
+{% endautoescape %}
+
