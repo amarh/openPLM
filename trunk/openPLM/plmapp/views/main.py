@@ -60,9 +60,7 @@ from django.forms import HiddenInput
 
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller 
-from openPLM.plmapp.controllers.user import UserController
-from openPLM.plmapp.controllers.group import GroupController
+from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
@@ -336,7 +334,6 @@ def add_children(request, obj_type, obj_ref, obj_revi):
             obj.add_child(child_obj,
                           add_child_form.cleaned_data["quantity"],
                           add_child_form.cleaned_data["order"])
-            ctx.update({'add_child_form': add_child_form, })
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
     else:
         add_child_form = AddChildForm()
@@ -446,7 +443,6 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
         if add_doc_cad_form.is_valid():
             doc_cad_obj = get_obj_from_form(add_doc_cad_form, request.user)
             obj.attach_to_document(doc_cad_obj)
-            ctx.update({'add_doc_cad_form': add_doc_cad_form, })
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
     else:
         add_doc_cad_form = AddDocCadForm()
@@ -657,8 +653,6 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                 if link.role == 'notified':
                     obj.remove_notified(link.user)
             return HttpResponseRedirect("../..")
-        else:
-            replace_management_form = ReplaceManagementForm(request.POST)
     else:
         replace_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
