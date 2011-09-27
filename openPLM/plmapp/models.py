@@ -194,7 +194,42 @@ class GroupInfo(models.Model):
     def excluded_creation_fields(cls):
         "Returns fields which should not be available in a creation form"
         return ["owner", "creator", "ctime", "mtime"]
-   
+
+    @classmethod
+    def get_creation_fields(cls):
+        """
+        Returns fields which should be displayed in a creation form.
+
+        By default, it returns :attr:`attributes` less attributes returned by
+        :meth:`excluded_creation_fields`
+        """
+        fields = []
+        for field in cls().attributes:
+            if field not in cls.excluded_creation_fields():
+                fields.append(field)
+        return fields
+
+    @classmethod
+    def excluded_modification_fields(cls):
+        """
+        Returns fields which should not be available in a modification form
+        
+        By default, it returns :attr:`attributes` less attributes returned by
+        :meth:`excluded_modification_fields`
+        """
+        return [ugettext_noop("name"), ugettext_noop("creator"),
+                ugettext_noop("owner"), ugettext_noop("ctime"),
+                ugettext_noop("mtime")]
+
+    @classmethod
+    def get_modification_fields(cls):
+        "Returns fields which should be displayed in a modification form"
+        fields = []
+        for field in cls().attributes:
+            if field not in cls.excluded_modification_fields():
+                fields.append(field)
+        return fields
+
     @property
     def is_editable(self):
         return True
@@ -675,6 +710,7 @@ def get_all_plmobjects():
 
     res = {}
     _get_all_subclasses(PLMObject, res)
+    res["Group"] = GroupInfo
     del res["PLMObject"]
     return res
 
