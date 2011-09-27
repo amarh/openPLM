@@ -750,14 +750,14 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 ##########################################################################################
 ###    Manage html pages for part / document creation and modification                 ###
 ##########################################################################################
-def get_non_modifyable_attributes_list(current_obj, current_user, cls=models.PLMObject):
+def get_non_modifyable_attributes(obj, user, cls=models.PLMObject):
     """
     Create a list of object's attributes we can't modify' and set them a value
     
     Example::
         >>> MyClass
         <class 'openPLM.plmapp.models.Part'>
-        >>> get_non_modifyable_attributes_list(MyClass)
+        >>> get_non_modifyable_attributes(MyClass)
         [('owner', 'Person'),
          ('creator', 'Person'),
          ('ctime', 'Date'),
@@ -766,26 +766,29 @@ def get_non_modifyable_attributes_list(current_obj, current_user, cls=models.PLM
     :param cls: :class: instance of `models.PLMObject`
     :return: list
     """
-    non_modifyable_fields_list = cls.excluded_creation_fields()
-    non_modifyable_attributes_list=[]
-    if current_obj == 'create':
-        for field in non_modifyable_fields_list:
+    non_modifyable_fields = cls.excluded_creation_fields()
+    non_modifyable_attributes = []
+    if obj == 'create':
+        for field in non_modifyable_fields:
             if field in ('ctime', 'mtime'):
-                non_modifyable_attributes_list.append(('datetime', field, datetime.datetime.now()))
+                non_modifyable_attributes.append(('datetime', field,
+                    datetime.datetime.now()))
             elif field in ('owner', 'creator'):
-                non_modifyable_attributes_list.append(('User', field, current_user.username))
+                non_modifyable_attributes.append(('User', field,
+                    user.username))
             elif field == 'state':
-                non_modifyable_attributes_list.append(('State', field, models.get_default_state()))
+                non_modifyable_attributes.append(('State', field,
+                    models.get_default_state()))
     else:
-        for field in non_modifyable_fields_list:
-            field_value = getattr(current_obj.object, field)
-            if type(field_value).__name__=='datetime':
-                non_modifyable_attributes_list.append(('datetime', field, field_value))
-            elif type(field_value).__name__=='User':
-                non_modifyable_attributes_list.append(('User', field, field_value.username))
-            elif type(field_value).__name__=='State':
-                non_modifyable_attributes_list.append(('State', field, field_value.name))
-    return non_modifyable_attributes_list
+        for field in non_modifyable_fields:
+            value = getattr(obj, field)
+            if isinstance(value, datetime.datetime):
+                non_modifyable_attributes.append(('datetime', field, value))
+            elif isinstance(value, User):
+                non_modifyable_attributes.append(('User', field, value.username))
+            elif isinstance(value, models.State):
+                non_modifyable_attributes.append(('State', field, value.name))
+    return non_modifyable_attributes
 
 ##########################################################################################
 @handle_errors
@@ -810,7 +813,7 @@ def create_object(request):
                 else:
                     class_for_div="ActiveBox4Part"
                 creation_form = get_creation_form(cls, {'revision':'a', 'lifecycle': str(models.get_default_lifecycle()), }, True)
-                non_modifyable_attributes_list = get_non_modifyable_attributes_list('create', request.user, cls)
+                non_modifyable_attributes = get_non_modifyable_attributes('create', request.user, cls)
     elif request.method == 'POST':
         if request.POST:
             type_form = TypeForm(request.POST)
@@ -821,7 +824,7 @@ def create_object(request):
                     class_for_div="ActiveBox4Doc"
                 else:
                     class_for_div="ActiveBox4Part"
-                non_modifyable_attributes_list = get_non_modifyable_attributes_list('create', request.user, cls)
+                non_modifyable_attributes = get_non_modifyable_attributes('create', request.user, cls)
                 creation_form = get_creation_form(cls, request.POST)
                 if creation_form.is_valid():
                     user = request.user
@@ -831,7 +834,7 @@ def create_object(request):
     ctx.update({'class4div': class_for_div,
                 'creation_form': creation_form,
                 'object_type': type_form.cleaned_data["type"],
-                'non_modifyable_attributes': non_modifyable_attributes_list })
+                'non_modifyable_attributes': non_modifyable_attributes })
     return r2r('DisplayObject4creation.htm', ctx, request)
 
 ##########################################################################################
@@ -850,27 +853,19 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
-    current_object, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    if obj_type == 'User':
-        cls = models.get_all_plmobjects()['UserProfile']
+    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    cls = models.get_all_plmobjects()[obj_type]
+    non_modifyable_attributes = get_non_modifyable_attributes(obj, request.user, cls)
+    if request.method == 'POST' and request.POST:
+        modification_form = get_modification_form(cls, request.POST)
+        if modification_form.is_valid():
+            obj.update_from_form(modification_form)
+            return HttpResponseRedirect(obj.plmobject_url)
     else:
-        cls = models.get_all_plmobjects()[obj_type]
-    non_modifyable_attributes_list = get_non_modifyable_attributes_list(current_object, request.user, cls)
-    if request.method == 'POST':
-        if request.POST:
-            modification_form = get_modification_form(cls, request.POST)
-            if modification_form.is_valid():
-                current_object.update_from_form(modification_form)
-                return HttpResponseRedirect(current_object.plmobject_url)
-            else:
-                pass
-        else:
-            modification_form = get_modification_form(cls, instance = current_object.object)
-    else:
-        modification_form = get_modification_form(cls, instance = current_object.object)
+        modification_form = get_modification_form(cls, instance=obj.object)
     request.session.update(request_dict)
     ctx.update({'modification_form': modification_form,
-                'non_modifyable_attributes': non_modifyable_attributes_list})
+                'non_modifyable_attributes': non_modifyable_attributes})
     return r2r('DisplayObject4modification.htm', ctx, request)
 
 #############################################################################################
