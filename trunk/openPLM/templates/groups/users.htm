@@ -4,33 +4,62 @@
 <!-- Manage html display in the Content div which correspond to the "users" menu -->
 
 {% block content %}
-    {% if is_owner %}
-        <span class="ButtonLeft">
-                <a class="Button" href="./add_user/">{% trans "Add another user" %}</a>
-        </span>
-        <span class="ButtonLeft">
-                <a class="Button" href="./edit/">{% trans "EDIT" %}</a>
-        </span>
-    {% endif %}
+     <form method="post" action="">	
 
-    <table class="Result">
-        <tr>
-            <th class="Content" > {% trans "Username" %} </th>
-            <th class="Content" > {% trans "First name" %} </th>
-            <th class="Content" > {% trans "Last name" %} </th>
-        </tr>
-        {% for user in obj.user_set.all %}
-            <tr class="Content"> 
-                <td class="Content"> 
-                    <a href="/user/{{user.username}}/">
-                        {{ user.username }}
-                    </a>
-                </td>
-                <td class="Content"> {{ user.firstname }} </td>
-                <td class="Content"> {{ link.lastname }} </td>
+        {{ user_formset.management_form }}
+        {% if is_owner %}
+            <span class="ButtonLeft">
+                    <a class="Button" href="./add_user/">{% trans "Add another user" %}</a>
+            </span>
+            {% if user_formset.forms %}
+                <input type="submit" value="{% trans "Remove selected users" %}"/>
+            {% endif %}
+        {% endif %}
+
+        <table class="Result">
+            <tr>
+                {% if is_owner %}
+                   <th class="Content" style="width:50px; text-align:center"></th>
+                {% endif %}
+                <th class="Content" > {% trans "Username" %} </th>
+                <th class="Content" > {% trans "First name" %} </th>
+                <th class="Content" > {% trans "Last name" %} </th>
             </tr>
-        {% endfor %}
-	</table>
+             <tr class="Content"> 
+                     {% if is_owner %}
+                        <td class="Content" style="width:50px; text-align:center"></td>
+                    {% endif %}
+
+                    <td class="Content"> 
+                        <a href="/user/{{obj.owner.username}}/">
+                            {{ obj.owner.username }}
+                        </a>
+                    </td>
+                    <td class="Content"> {{ obj.owner.first_name }} </td>
+                    <td class="Content"> {{ obj.owner.last_name }} </td>
+                </tr>
+
+            {% for form in user_formset.forms %}
+                {{ form.id }}
+                {{ form.user }}
+                {{ form.group }}
+                
+                <tr class="Content"> 
+                     {% if is_owner %}
+                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                    {% endif %}
+
+                    <td class="Content"> 
+                        <a href="/user/{{form.user_data.username}}/">
+                            {{ form.user_data.username }}
+                        </a>
+                    </td>
+                    <td class="Content"> {{ form.user_data.first_name }} </td>
+                    <td class="Content"> {{ form.user_data.last_name }} </td>
+                </tr>
+            {% endfor %}
+        </table>
+</form>
 {% endblock %}
 
 

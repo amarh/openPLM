@@ -63,6 +63,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
+import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
          handle_errors, get_generic_data, get_navigate_data
 
@@ -1177,6 +1178,16 @@ def navigate(request, obj_type, obj_ref, obj_revi):
 
 def display_users(request, obj_ref):
     obj, ctx, request_dict = get_generic_data(request, "Group", obj_ref)
+    if request.method == "POST":
+        formset = forms.get_user_formset(obj, request.POST)
+        if formset.is_valid():
+            obj.update_users(formset)
+            return HttpResponseRedirect(".")
+    else:
+        formset = forms.get_user_formset(obj)
+    ctx["user_formset"] = formset
+    ctx['current_page'] = 'users' 
+    request.session.update(request_dict)
     return r2r("groups/users.htm", ctx, request)
 
 

@@ -25,8 +25,9 @@
 import re
 
 from django import forms
+from django.forms.formsets import formset_factory
 from django.forms.models import modelform_factory, modelformset_factory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -370,4 +371,26 @@ class ReplaceManagementForm(forms.Form):
     type = forms.CharField(label=_("Type"))
     username = forms.CharField(label=_("Username"))
     
+    
+class ModifyUserForm(forms.Form):
+    delete = forms.BooleanField(required=False, initial=False)
+    user = forms.ModelChoiceField(queryset=User.objects.all(),
+                                   widget=forms.HiddenInput())
+    group = forms.ModelChoiceField(queryset=Group.objects.all(),
+                                   widget=forms.HiddenInput())
+    
+    @property
+    def user_data(self):
+        return self.initial["user"]
+
+UserFormset = formset_factory(ModifyUserForm, extra=0)
+def get_user_formset(controller, data=None):
+    if data is None:
+        queryset = controller.user_set.exclude(id=controller.owner.id)
+        initial = [dict(group=controller.object, user=user)
+                for user in queryset]
+        formset = UserFormset(initial=initial)
+    else:
+        formset = UserFormset(data)
+    return formset
 
