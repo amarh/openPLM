@@ -111,3 +111,35 @@ class GroupController(Controller):
         if role == models.ROLE_OWNER:
             return self.owner == self._user
         return False
+
+    def update_users(self, formset):
+        u"""
+        Updates users with data from *formset*
+        
+        :param formset:
+        :type formset: a formset_factory of 
+                        :class:`~plmapp.forms.ModifyUserForm`
+        
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
+        """
+        
+        self.check_permission("owner")
+        users = []
+        if formset.is_valid():
+            for form in formset.forms:
+                group = form.cleaned_data["group"]
+                if group.pk != self.object.pk:
+                    raise ValueError("Bad group %s (%s expected)" % (group, self.object))
+                delete = form.cleaned_data["delete"]
+                user = form.cleaned_data["user"]
+                if user == self.owner:
+                    raise ValueError("Bad user %s" % user)
+                if delete:
+                    users.append(user)
+            for user in users:
+                user.groups.remove(group)
+            self._save_histo("User removed", ", ".join((u.username for u in users)))
+                
+
+
