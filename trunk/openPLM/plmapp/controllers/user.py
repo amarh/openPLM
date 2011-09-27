@@ -34,6 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError
+from openPLM.plmapp.controllers.base import MetaController
 
 class UserController(object):
     u"""
@@ -54,6 +55,8 @@ class UserController(object):
         This class does not inherit from :class:`.PLMObjectController`.
 
     """
+
+    __metaclass__ = MetaController
 
     def __init__(self, obj, user):
         self.object = obj

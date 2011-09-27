@@ -40,7 +40,7 @@ All subclasses of ``PLMObject`` may have their own controller to add
 functionalities or redefined default behaviors.
 
 To get a suitable controller for a ``PLMObject`` instances use 
-:func:`~plmapp.controllers.plmobject.get_controller`.
+:func:`~plmapp.controllers.base.get_controller`.
 For example, `get_controller('Part')` returns :class:`.PartController`.
 
 If you have a ``PLMObject`` and an User, you can instanciate a controller.
@@ -141,10 +141,11 @@ This module defines several classes, here is a summary:
         =================== ===============================
     
     * functions:
-        :func:`~plmapp.controllers.plmobject.get_controller`
+        :func:`~plmapp.controllers.base.get_controller`
 
 """
-from openPLM.plmapp.controllers.plmobject import get_controller, PLMObjectController, \
+from openPLM.plmapp.controllers.base import MetaController, get_controller
+from openPLM.plmapp.controllers.plmobject import PLMObjectController, \
     rx_bad_ref
 from openPLM.plmapp.controllers.part import PartController
 from openPLM.plmapp.controllers.document import DocumentController
