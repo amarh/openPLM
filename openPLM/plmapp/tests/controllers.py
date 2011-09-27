@@ -36,6 +36,7 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 
 from openPLM.plmapp.utils import *
+from openPLM.plmapp.exceptions import *
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
 from openPLM.plmapp.lifecycle import *

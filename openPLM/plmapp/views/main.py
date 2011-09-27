@@ -61,7 +61,7 @@ from django.forms import HiddenInput
 from openPLM.plmapp.exceptions import ControllerError
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller 
-from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \

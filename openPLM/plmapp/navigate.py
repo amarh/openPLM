@@ -36,7 +36,7 @@ import pygraphviz as pgv
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
-from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.controllers.user import UserController
 
 basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
 

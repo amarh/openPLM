@@ -37,7 +37,7 @@ def get_doctest(module_name):
                 test_dict[obj_name] = obj.__doc__
                 return test_dict
 
-__test__ = get_doctest("plmapp.utils")
-__test__.update(get_doctest("plmapp.controllers"))
-__test__.update(get_doctest("plmapp.lifecycle"))
+__test__ = get_doctest("openPLM.plmapp.utils")
+__test__.update(get_doctest("openPLM.plmapp.controllers.plmobject"))
+__test__.update(get_doctest("openPLM.plmapp.lifecycle"))
 

@@ -32,14 +32,8 @@ from :class:`.PLMObjectController` are not defined.
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
-try:
-    import openPLM.plmapp.models as models
-    from openPLM.plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError, PermissionError
-except (ImportError, AttributeError):
-    import plmapp.models as models
-    from plmapp.exceptions import RevisionError, LockError, UnlockError, \
-        AddFileError, DeleteFileError, PermissionError
+import openPLM.plmapp.models as models
+from openPLM.plmapp.exceptions import PermissionError
 
 class UserController(object):
     u"""

@@ -46,7 +46,7 @@ from django.contrib.auth.decorators import login_required
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, \
         DocumentController
-from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph
 from openPLM.plmapp.forms import TypeForm, TypeFormWithoutUser, get_navigate_form, \
