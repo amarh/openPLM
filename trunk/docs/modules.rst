@@ -15,7 +15,6 @@ Modules
     mail
     models
     navigate
-    user_controller
     utils
     views
     widgets
