@@ -1,0 +1,36 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+<!-- Manage html display in the Content div which correspond to the "users" menu -->
+
+{% block content %}
+    {% if is_owner %}
+        <span class="ButtonLeft">
+                <a class="Button" href="./add_user/">{% trans "Add another user" %}</a>
+        </span>
+        <span class="ButtonLeft">
+                <a class="Button" href="./edit/">{% trans "EDIT" %}</a>
+        </span>
+    {% endif %}
+
+    <table class="Result">
+        <tr>
+            <th class="Content" > {% trans "Username" %} </th>
+            <th class="Content" > {% trans "First name" %} </th>
+            <th class="Content" > {% trans "Last name" %} </th>
+        </tr>
+        {% for user in obj.user_set.all %}
+            <tr class="Content"> 
+                <td class="Content"> 
+                    <a href="/user/{{user.username}}/">
+                        {{ user.username }}
+                    </a>
+                </td>
+                <td class="Content"> {{ user.firstname }} </td>
+                <td class="Content"> {{ link.lastname }} </td>
+            </tr>
+        {% endfor %}
+	</table>
+{% endblock %}
+
+

@@ -113,9 +113,6 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     for attr in obj.attributes:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
-    if isinstance(obj, UserController):
-        item = obj.get_verbose_name('rank')
-        object_attributes_list.append((item, getattr(obj, 'rank')))
     ctx.update({'current_page' : 'attributes',
                 'object_attributes': object_attributes_list})
     request.session.update(request_dict)
@@ -128,11 +125,11 @@ def display_object(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays attributes of the selected object.
     Redirection to :func:display_object_attributes
     """
-    
-    if obj_type != 'User':
-        url = u"/object/%s/%s/%s/attributes/" % (obj_type, obj_ref, obj_revi) 
+     
+    if obj_type in ('User', 'Group'):
+        url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
     else:
-        url = u"/user/%s/attributes/" % obj_ref
+        url = u"/object/%s/%s/%s/attributes/" % (obj_type, obj_ref, obj_revi) 
     return HttpResponsePermanentRedirect(iri_to_uri(url))
 
 ##########################################################################################
@@ -222,13 +219,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    if isinstance(obj, UserController):
-        history = models.UserHistory.objects
-    elif isinstance(obj, GroupController):
-        history = models.GroupHistory.objects
-    else: 
-        history = models.History.objects
-    history = history.filter(plmobject=obj.object).order_by('date')
+    history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('date')
     history = history.values_list('date', 'action', 'details')
     ctx.update({'current_page' : 'history', 
                 'object_history' : history})
@@ -347,8 +338,6 @@ def add_children(request, obj_type, obj_ref, obj_revi):
                           add_child_form.cleaned_data["order"])
             ctx.update({'add_child_form': add_child_form, })
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
-        else:
-            add_child_form = AddChildForm(request.POST)
     else:
         add_child_form = AddChildForm()
         ctx.update({'current_page':'BOM-child'})
@@ -459,9 +448,6 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
             obj.attach_to_document(doc_cad_obj)
             ctx.update({'add_doc_cad_form': add_doc_cad_form, })
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
-        else:
-            add_doc_cad_form = AddDocCadForm(request.POST)
-            ctx['class4div'] = class_for_div
     else:
         add_doc_cad_form = AddDocCadForm()
     ctx.update({'link_creation': True, 'add_doc_cad_form': add_doc_cad_form, })
@@ -529,8 +515,6 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
             obj.attach_to_part(part_obj)
             ctx.update({'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
-        else:
-            add_rel_part_form = add_rel_part_form(request.POST)
     else:
         add_rel_part_form = AddRelPartForm()
     ctx.update({'link_creation': True,
@@ -705,14 +689,10 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_management_form = ReplaceManagementForm(request.POST)
         if add_management_form.is_valid():
-            if add_management_form.cleaned_data["type"]=="User":
+            if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, "notified")
-                return HttpResponseRedirect("..")
-            else:
-                return HttpResponseRedirect("..")
-        else:
-            add_management_form = ReplaceManagementForm(request.POST)
+            return HttpResponseRedirect("..")
     else:
         add_management_form = ReplaceManagementForm()
     request.session.update(request_dict)
@@ -829,7 +809,7 @@ def create_object(request):
                 if creation_form.is_valid():
                     user = request.user
                     controller_cls = get_controller(type_name)
-                    controller = PLMObjectController.create_from_form(creation_form, user)
+                    controller = controller_cls.create_from_form(creation_form, user)
                     return HttpResponseRedirect(controller.plmobject_url)
     ctx.update({'class4div': class_for_div,
                 'creation_form': creation_form,
@@ -925,7 +905,6 @@ def change_user_password(request, obj_ref):
     if obj.object != request.user:
         raise PermissionError("You are not the user")
 
-    class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
         modification_form = PasswordChangeForm(obj, request.POST)
         if modification_form.is_valid():
@@ -935,7 +914,7 @@ def change_user_password(request, obj_ref):
     else:
         modification_form = PasswordChangeForm(obj)
     request.session.update(request_dict)
-    ctx.update({'class4div': class_for_div,
+    ctx.update({'class4div': "ActiveBox4User",
                 'modification_form': modification_form})
     return r2r('DisplayObject4PasswordModification.htm', ctx, request)
 
@@ -1126,8 +1105,6 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
                         request.FILES["filename"])
             return HttpResponseRedirect(obj.plmobject_url + "files/")
-        else:
-            checkin_file_form = AddFileForm(request.POST)
     else:
         checkin_file_form = AddFileForm()
     ctx.update({'link_creation' : True,
@@ -1202,4 +1179,10 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     return r2r('Navigate.htm', ctx, request)
+
+
+def display_users(request, obj_ref):
+    obj, ctx, request_dict = get_generic_data(request, "Group", obj_ref)
+    return r2r("groups/users.htm", ctx, request)
+
 

@@ -136,7 +136,7 @@ class UserProfile(models.Model):
     def attributes(self):
         u"Attributes to display in `Attributes view`"
         return ["first_name", "last_name", "email",  "creator", "owner",
-                "ctime", "mtime"]
+                "ctime", "mtime", "rank"]
 
     @property
     def menu_items(self):
