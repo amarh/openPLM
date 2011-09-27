@@ -1,7 +1,6 @@
 # usage: "from go import *" in a ./manage.py shell session
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
-ontrollers.user/g
 from openPLM.plmapp.forms import *
 from openPLM.computer.models import *
 
