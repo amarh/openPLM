@@ -137,6 +137,7 @@ urlpatterns += patterns2('', group_url,
     (r'$', display_object, group_dict),
     (r'attributes/$', display_object_attributes, group_dict),
     (r'history/$', display_object_history, group_dict),
+    (r'users/$', display_users),
     #(r'modify/$', modify_group),
     (r'navigate/$', navigate, group_dict),
 )
