@@ -1,8 +1,8 @@
 ==================================================
-:mod:`user_controller` --- Controllers for users
+:mod:`controllers.part` --- Controllers for parts
 ==================================================
 
-.. automodule:: plmapp.user_controller
+.. automodule:: plmapp.controllers.part
     :members:
     :show-inheritance:
     :undoc-members:
