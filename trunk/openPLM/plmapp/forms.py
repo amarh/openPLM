@@ -32,7 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
-from openPLM.plmapp.user_controller import UserController
+from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
 
 class PLMObjectForm(forms.Form):

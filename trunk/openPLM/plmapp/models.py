@@ -85,7 +85,7 @@ import kjbuckets
 from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
@@ -141,7 +141,8 @@ class UserProfile(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
-        return ["attributes", "history", "parts-doc-cad", "delegation"]
+        return ["attributes", "history", "parts-doc-cad", "delegation",
+                "organisation"]
 
     @classmethod
     def excluded_creation_fields(cls):
@@ -158,6 +159,15 @@ def add_profile(sender, instance, created, **kwargs):
 if __name__ == "openPLM.plmapp.models":
     post_save.connect(add_profile, sender=User)
 
+
+class GroupInfo(models.Model):
+    u"""
+    Class that stores additional data on a :class:`Group`.
+    """
+
+    group = models.ForeignKey(Group, primary_key=True)
+    description = models.TextField(blank=True)
+    creator = models.ForeignKey(User)
 
 # lifecycle stuff
 
@@ -817,12 +827,15 @@ class DocumentPartLink(Link):
 
 
 # abstraction stuff
+ROLE_NOTIFIED = "notified"
+ROLE_SIGN = "sign_"
+ROLE_OWNER = "owner"
+ROLE_SPONSOR = "sponsor"
 
-ROLES = [("owner", "owner"),
-         ("notified", "notified"),]
+ROLES = [ROLE_OWNER, ROLE_NOTIFIED, ROLE_SPONSOR]
 for i in range(10):
     level = level_to_sign_str(i)
-    ROLES.append((level, level))
+    ROLES.append(level)
 
 class DelegationLink(Link):
     """
@@ -842,10 +855,10 @@ class DelegationLink(Link):
     """
 
     ACTION_NAME = "Link : delegation"
-
+    
     delegator = models.ForeignKey(User, related_name="%(class)s_delegator")    
     delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")    
-    role = models.CharField(max_length=30, choices=ROLES)
+    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES))
 
     class Meta:
         unique_together = ("delegator", "delegatee", "role")
@@ -886,7 +899,7 @@ class PLMObjectUserLink(Link):
 
     plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
     user = models.ForeignKey(User, related_name="%(class)s_user")    
-    role = models.CharField(max_length=30, choices=ROLES)
+    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES))
 
     class Meta:
         unique_together = ("plmobject", "user", "role")
