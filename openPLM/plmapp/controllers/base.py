@@ -26,8 +26,12 @@
 """
 
 import re
+from functools import wraps
+
+from django.db.models.fields import FieldDoesNotExist
 
 import openPLM.plmapp.models as models
+from openPLM.plmapp.exceptions import PermissionError
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
@@ -80,4 +84,178 @@ class MetaController(type):
 
 #: shortcut for :meth:`MetaController.get_controller`
 get_controller = MetaController.get_controller
+
+def permission_required(func=None, role="owner"):
+    """
+    Decorator for methods of :class:`PLMObjectController` which
+    raises :exc:`.PermissionError` if :attr:`PLMObjectController._user`
+    has not the role *role*
+    """
+
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            args[0].check_permission(role)
+            return f(*args, **kwargs)
+        wrapper.__doc__ = "Permission required: `%s`\n%s" % (role, wrapper.__doc__)
+        return wrapper
+    if func:
+        return decorator(func)
+    return decorator
+
+class Controller(object):
+    u"""
+    Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
+    modification in an history
+    
+    :attributes:
+        .. attribute:: object
+
+            The :class:`.PLMObject` managed by the controller
+        .. attribute:: _user
+
+            :class:`~django.contrib.auth.models.User` who modifies ``object``
+
+    :param obj: managed object
+    :type obj: a subinstance of :class:`.PLMObject`
+    :param user: user who modifies *obj*
+    :type user: :class:`~django.contrib.auth.models.User`
+    """
+
+    __metaclass__ = MetaController
+
+    HISTORY = models.AbstractHistory
+
+    def __init__(self, obj, user):
+        self.object = obj
+        self._user = user
+        # variable to store attribute changes
+        self._histo = ""
+        # cache for permissions (dict(role->bool)) 
+        self.__permissions = {}
+
+    def __setattr__(self, attr, value):
+        # we override this method to make it to modify *object* directly
+        # if we modify *object*, we records the modification in **_histo*
+        if hasattr(self, "object") and hasattr(self.object, attr) and \
+           not attr in self.__dict__:
+            old_value = getattr(self.object, attr)
+            setattr(self.object, attr, value)
+            field = self.object._meta.get_field(attr).verbose_name.capitalize()
+            if old_value != value:
+                message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
+                        {"field" : field, "old" : old_value, "new" : value}
+                self._histo += message + "\n"
+        else:
+            super(Controller, self).__setattr__(attr, value)
+
+    def __getattr__(self, attr):
+        # we override this method to get attributes from *object* directly
+        obj = object.__getattribute__(self, "object")
+        if hasattr(self, "object") and hasattr(obj, attr) and \
+           not attr in self.__dict__:
+            return getattr(obj, attr)
+        else:
+            return object.__getattribute__(self, attr)
+
+    def save(self, with_history=True):
+        u"""
+        Saves :attr:`object` and records its history in the database.
+        If *with_history* is False, the history is not recorded.
+        """
+        self.object.save()
+        self.group_info.save()
+        if self._histo and with_history:
+            self._save_histo("Modify", self._histo) 
+            self._histo = ""
+
+    def _save_histo(self, action, details):
+        """
+        Records *action* with details *details* made by :attr:`_user` in
+        on :attr:`object` in the user histories table.
+        """
+        self.HISTORY.objects.create(plmobject=self.object, action=action,
+                                     details=details, user=self._user)
+
+    def get_verbose_name(self, attr_name):
+        """
+        Returns a verbose name for *attr_name*.
+
+        Example::
+
+            >>> ctrl.get_verbose_name("ctime")
+            u'date of creation'
+        """
+        try:
+            item = self.object._meta.get_field(attr_name).verbose_name
+        except FieldDoesNotExist:
+            item = attr_name
+        return item   
+
+    def update_from_form(self, form):
+        u"""
+        Updates :attr:`object` from data of *form*
+        
+        :raises: :exc:`ValueError` if *form* is invalid.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+            :attr:`object`.
+        :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
+        """
+        
+        self.check_permission("owner")
+        self.check_editable()
+        if form.is_valid():
+            need_save = False
+            for key, value in form.cleaned_data.iteritems():
+                if key not in ["reference", "type", "revision"]:
+                    setattr(self, key, value)
+                    need_save = True
+            if need_save:
+                self.save()
+        else:
+            raise ValueError("form is invalid")
+    
+    def check_permission(self, role, raise_=True):
+        """
+        This method checks if :attr:`_user` has permissions implied by *role*.
+        For example, *role* can be *owner* or *notified*.
+
+        If the check succeed, **True** is returned. Otherwise, if *raise_* is
+        **True** (the default), an :exc:`.PermissionError` is raised and if
+        *raise_* is **False**, **False** is returned.
+
+        .. admonition:: Implementation details
+
+            This method keeps a cache, so that you dont have to worry about
+            multiple calls to this method.
+        """
+        
+        if role in self.__permissions:
+            ok = self.__permissions[role]
+        else:
+            ok = self.has_permission(role)
+            self.__permissions[role] = ok
+        if not ok and raise_:
+            raise PermissionError("action not allowed for %s" % self._user)
+        return ok
+
+    def has_permission(self, role):
+        return False
+
+    def check_contributor(self, user=None):
+        """
+        This method checks if *user* is a contributor. If not, it raises
+        :exc:`.PermissionError`.
+
+        If *user* is None (the default), :attr:`_user` is used.
+        """
+        
+        if not user:
+            user = self._user
+        profile = user.get_profile()
+        if not (profile.is_contributor or profile.is_administrator):
+            raise PermissionError("%s is not a contributor" % user)
+
+    def check_editable(self):
+        return True
 

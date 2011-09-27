@@ -58,10 +58,11 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.forms import HiddenInput
 
-from openPLM.plmapp.exceptions import ControllerError
+from openPLM.plmapp.exceptions import ControllerError, PermissionError
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller 
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
@@ -223,6 +224,8 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if isinstance(obj, UserController):
         history = models.UserHistory.objects
+    elif isinstance(obj, GroupController):
+        history = models.GroupHistory.objects
     else: 
         history = models.History.objects
     history = history.filter(plmobject=obj.object).order_by('date')
@@ -890,11 +893,13 @@ def modify_user(request, obj_ref):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    if obj.object != request.user:
+        raise PermissionError("You are not the user")
     class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
         modification_form = OpenPLMUserChangeForm(request.POST)
         if modification_form.is_valid():
-            obj.cupdate_from_form(modification_form)
+            obj.update_from_form(modification_form)
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = OpenPLMUserChangeForm(instance=obj.object)
@@ -922,6 +927,9 @@ def change_user_password(request, obj_ref):
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    if obj.object != request.user:
+        raise PermissionError("You are not the user")
+
     class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
         modification_form = PasswordChangeForm(obj, request.POST)
