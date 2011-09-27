@@ -151,4 +151,5 @@ from openPLM.plmapp.controllers.part import PartController
 from openPLM.plmapp.controllers.document import DocumentController
 
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers.group import GroupController
 

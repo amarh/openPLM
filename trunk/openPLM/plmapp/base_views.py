@@ -38,7 +38,7 @@ from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response
 from django.http import HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
@@ -47,6 +47,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController, get_controller, \
         DocumentController
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph
 from openPLM.plmapp.forms import TypeForm, TypeFormWithoutUser, get_navigate_form, \
@@ -67,6 +68,9 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
     if obj_type == 'User':
         obj = get_object_or_404(User, username=obj_ref)
         controller_cls = UserController
+    elif obj_type == 'Group':
+        obj = get_object_or_404(Group, name=obj_ref)
+        controller_cls = GroupController
     else:
         obj = get_object_or_404(models.PLMObject, type=obj_type,
                                 reference=obj_ref,
@@ -157,6 +161,9 @@ def get_obj_from_form(form, user):
     type_ = form.cleaned_data["type"]
     if type_ == "User":
         reference = form.cleaned_data["username"]
+        revision = "-"
+    elif type_ == "Group":
+        reference = form.cleaned_data["name"]
         revision = "-"
     else:
         reference = form.cleaned_data["reference"]
@@ -316,7 +323,7 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
               })
     if hasattr(selected_object, "menu_items"):
         ctx['object_menu'] = selected_object.menu_items
-    if isinstance(selected_object, PLMObjectController):
+    if hasattr(selected_object, "check_permission"):
         ctx["is_owner"] = selected_object.check_permission("owner", False)
     return selected_object, ctx, request_dict.session
 

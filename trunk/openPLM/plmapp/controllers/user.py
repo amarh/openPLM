@@ -34,9 +34,9 @@ from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError
-from openPLM.plmapp.controllers.base import MetaController
+from openPLM.plmapp.controllers.base import Controller, permission_required
 
-class UserController(object):
+class UserController(Controller):
     u"""
     Object used to manage a :class:`~django.contrib.auth.models.User` and store his 
     modification in an history
@@ -56,14 +56,12 @@ class UserController(object):
 
     """
 
-    __metaclass__ = MetaController
+    HISTORY = models.UserHistory
 
     def __init__(self, obj, user):
-        self.object = obj
-        self._user = user
-        self.__histo = ""
-        self.creator = user
-        self.owner = user
+        super(UserController, self).__init__(obj, user)
+        self.creator = obj
+        self.owner = obj
         self.mtime = obj.last_login
         self.ctime = obj.date_joined
 
@@ -88,6 +86,7 @@ class UserController(object):
             item = names.get(attr_name, attr_name)
         return item
 
+    @permission_required(role=models.ROLE_OWNER)
     def update_from_form(self, form):
         u"""
         Updates :attr:`object` from data of *form*
@@ -108,7 +107,7 @@ class UserController(object):
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly
         # (or its profile)
-        # if we modify *object*, we records the modification in **__histo*
+        # if we modify *object*, we records the modification in **_histo*
         if hasattr(self, "object"):
             obj = object.__getattribute__(self, "object")
             profile = obj.get_profile()
@@ -125,7 +124,7 @@ class UserController(object):
             if old_value != value:
                 message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                         {"field" : field, "old" : old_value, "new" : value}
-                self.__histo += message + "\n"
+                self._histo += message + "\n"
         else:
             super(UserController, self).__setattr__(attr, value)
 
@@ -147,19 +146,13 @@ class UserController(object):
         Saves :attr:`object` and records its history in the database.
         If *with_history* is False, the history is not recorded.
         """
-        self.object.save()
         self.object.get_profile().save()
-        if self.__histo and with_history:
-            self._save_histo("Modify", self.__histo) 
-            self.__histo = ""
+        super(UserController, self).save(with_history)
 
-    def _save_histo(self, action, details):
-        """
-        Records *action* with details *details* made by :attr:`_user` in
-        on :attr:`object` in the user histories table.
-        """
-        models.UserHistory.objects.create(plmobject=self.object, action=action,
-                                     details=details, user=self._user)
+    def has_permission(self, role):
+        if role == models.ROLE_OWNER:
+            return self.object == self._user
+        return False
 
     def get_object_user_links(self):
         """
@@ -167,6 +160,7 @@ class UserController(object):
         """
         return self.plmobjectuserlink_user.order_by("plmobject")
 
+    @permission_required(role=models.ROLE_OWNER)
     def delegate(self, user, role):
         """
         Delegates role *role* to *user*.
@@ -205,6 +199,7 @@ class UserController(object):
                                  delegatee=user)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
 
+    @permission_required(role=models.ROLE_OWNER)
     def remove_delegation(self, delegation_link):
         """
         Removes a delegation (*delegation_link*). The delegator must be 

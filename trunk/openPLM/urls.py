@@ -62,7 +62,10 @@ object_pattern = '(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {
 
 object_url = r'^object/' + object_pattern
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
+group_url = r'^group/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
+group_dict = {'obj_type':'Group', 'obj_revi':'-'}
+
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -130,6 +133,13 @@ urlpatterns += patterns2('', user_url,
     (r'navigate/$', navigate, user_dict),
 )
 
+urlpatterns += patterns2('', group_url, 
+    (r'$', display_object, group_dict),
+    (r'attributes/$', display_object_attributes, group_dict),
+    (r'history/$', display_object_history, group_dict),
+    #(r'modify/$', modify_group),
+    (r'navigate/$', navigate, group_dict),
+)
 urlpatterns += patterns('',
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',

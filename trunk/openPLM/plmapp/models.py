@@ -142,7 +142,7 @@ class UserProfile(models.Model):
     def menu_items(self):
         "menu items to choose a view"
         return ["attributes", "history", "parts-doc-cad", "delegation",
-                "organisation"]
+                "groups"]
 
     @classmethod
     def excluded_creation_fields(cls):
@@ -168,6 +168,36 @@ class GroupInfo(models.Model):
     group = models.ForeignKey(Group, primary_key=True)
     description = models.TextField(blank=True)
     creator = models.ForeignKey(User)
+    
+    owner = models.ForeignKey(User, verbose_name=_("owner"), 
+                              related_name="%(class)s_owner")
+    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+                                 auto_now_add=False)
+    mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
+
+    @property
+    def plmobject_url(self):
+        return iri_to_uri("/group/%s/" % self.group.name)
+
+    @property
+    def attributes(self):
+        u"Attributes to display in `Attributes view`"
+        return ["name", "description", "creator", "owner",
+                "ctime", "mtime"]
+
+    @property
+    def menu_items(self):
+        "menu items to choose a view"
+        return ["attributes", "history", "users", "objects"]
+
+    @classmethod
+    def excluded_creation_fields(cls):
+        "Returns fields which should not be available in a creation form"
+        return ["owner", "creator", "ctime", "mtime"]
+   
+    @property
+    def is_editable(self):
+        return True
 
 # lifecycle stuff
 
@@ -714,6 +744,8 @@ class History(AbstractHistory):
 class UserHistory(AbstractHistory):
     plmobject = models.ForeignKey(User)
 
+class GroupHistory(AbstractHistory):
+    plmobject = models.ForeignKey(Group)
 
 # link stuff
 
