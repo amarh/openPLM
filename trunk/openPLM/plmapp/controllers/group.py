@@ -56,57 +56,48 @@ class GroupController(Controller):
     HISTORY = models.GroupHistory
 
     def __init__(self, obj, user):
+        if hasattr(obj, "groupinfo"):
+            obj = obj.groupinfo
         super(GroupController, self).__init__(obj, user)
-        self.group_info = models.GroupInfo.objects.get(group=obj)
-        self.form_instance = self.group_info
-    
-    def __setattr__(self, attr, value):
-        # we override this method to make it to modify *object* directly
-        # (or its profile)
-        # if we modify *object*, we records the modification in **_histo*
-        if hasattr(self, "object"):
-            obj = object.__getattribute__(self, "object")
-        else:
-            obj = None
-        if hasattr(self, "group_info"):
-            gi = object.__getattribute__(self, "group_info")
-        else:
-            gi = None
-        if obj and (hasattr(obj, attr) or hasattr(gi, attr)) and \
-           not attr in self.__dict__:
-            obj2 = obj if hasattr(obj, attr) else gi
-            old_value = getattr(obj2, attr)
-            setattr(obj2, attr, value)
-            # since x.verbose_name is a proxy methods, we need to get a real
-            # unicode object (with capitalize)
-            field = obj2._meta.get_field(attr).verbose_name.capitalize()
-            if old_value != value:
-                message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
-                        {"field" : field, "old" : old_value, "new" : value}
-                self._histo += message + "\n"
-        else:
-            super(GroupController, self).__setattr__(attr, value)
+   
+    @classmethod
+    def create(cls, name, description, user, data={}):
+        obj = models.GroupInfo(name=name, description=description)
+        obj.creator = user
+        obj.owner = user
+        if data:
+            for key, value in data.iteritems():
+                if key not in ["name", "description"]:
+                    setattr(obj, key, value)
+        obj.save()
+        infos = {"name" : name, "description" : description}
+        infos.update(data)
+        details = ",".join("%s : %s" % (k, v) for k, v in infos.items())
+        res = cls(obj, user)
+        user.groups.add(obj)
+        res._save_histo("Create", details)
+        return res
 
-    def __getattr__(self, attr):
-        # we override this method to get attributes from *object* directly
-        # (or its profile)
-        obj = object.__getattribute__(self, "object")
-        gi = object.__getattribute__(self, "group_info")
-        if hasattr(self, "object") and hasattr(obj, attr) and \
-           not attr in self.__dict__:
-            return getattr(obj, attr)
-        elif hasattr(gi, attr) and not attr in self.__dict__:
-            return getattr(gi, attr)
-        else:
-            return object.__getattribute__(self, attr)
-
-    def save(self, with_history=True):
+    @classmethod
+    def create_from_form(cls, form, user):
         u"""
-        Saves :attr:`object` and records its history in the database.
-        If *with_history* is False, the history is not recorded.
+        Creates a :class:`PLMObjectController` from *form* and associates *user*
+        as the creator/owner of the PLMObject.
+        
+        This method raises :exc:`ValueError` if *form* is invalid.
+
+        :param form: a django form associated to a model
+        :param user: user who creates/owns the object
+        :rtype: :class:`PLMObjectController`
         """
-        self.group_info.save()
-        super(GroupController, self).save(with_history)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            desc = form.cleaned_data["description"]
+            obj = cls.create(name, desc, user)
+            return obj
+        else:
+            raise ValueError("form is invalid")
+
 
     def has_permission(self, role):
         if role == models.ROLE_OWNER:
