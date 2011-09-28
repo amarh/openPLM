@@ -5,16 +5,19 @@
 
 {% block content %}
 	<table class="Content">
-	    {% for date, action, details in object_history %}
+	    {% for histo in object_history %}
 		    <tr class="Content">
 			    <td class="Content">
-			        {{date}}
+			        {{histo.date}}
 		        </td>
 		        <td class="Content">
-		            {{action}}
+		            {{histo.action}}
+	            </td>
+		        <td class="Content">
+		            {{histo.user}}
 	            </td>
 	            <td class="Content">
-	                {{ details|linebreaks }}
+	                {{ histo.details|linebreaks }}
                 </td>
 		    </tr>
 	    {% endfor %}
