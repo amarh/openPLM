@@ -144,8 +144,10 @@ class GroupController(Controller):
         
     @permission_required(role=models.ROLE_OWNER)
     def add_user(self, user):
-        user.groups.add(self._histo)
-        
-
-
+        """
+        Adds *user* to the group.
+        """
+        user.groups.add(self.object)
+        # TODO send a more relevant mail
+        self._save_histo("User added", user.username, users=(user,))
 
