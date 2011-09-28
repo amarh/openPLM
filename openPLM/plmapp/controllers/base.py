@@ -32,6 +32,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError
+from openPLM.plmapp.mail import send_mail
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
@@ -164,18 +165,20 @@ class Controller(object):
         If *with_history* is False, the history is not recorded.
         """
         self.object.save()
-        self.group_info.save()
         if self._histo and with_history:
             self._save_histo("Modify", self._histo) 
             self._histo = ""
 
-    def _save_histo(self, action, details):
+    def _save_histo(self, action, details, blacklist=(), roles=(), users=()):
         """
         Records *action* with details *details* made by :attr:`_user` in
         on :attr:`object` in the user histories table.
         """
-        self.HISTORY.objects.create(plmobject=self.object, action=action,
+        h = self.HISTORY.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
+        roles = [models.ROLE_OWNER] + list(roles)
+        send_mail(self, roles, action, [h], self._user, blacklist,
+                users)
 
     def get_verbose_name(self, attr_name):
         """

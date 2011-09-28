@@ -31,7 +31,7 @@ from :class:`.PLMObjectController` are not defined.
 
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers.base import Controller
+from openPLM.plmapp.controllers.base import Controller, permission_required
 
 class GroupController(Controller):
     u"""
@@ -140,6 +140,11 @@ class GroupController(Controller):
             for user in users:
                 user.groups.remove(group)
             self._save_histo("User removed", ", ".join((u.username for u in users)))
-                
+        
+    @permission_required(role=models.ROLE_OWNER)
+    def add_user(self, user):
+        user.groups.add(self._histo)
+        
+
 
 
