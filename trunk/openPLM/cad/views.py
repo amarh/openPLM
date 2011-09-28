@@ -31,14 +31,13 @@ import openPLM.plmapp.views as pviews
 def freecad(request, obj_ref, obj_revi):
     """ Manage html page for attributes """
     obj_type = "FreeCAD"
-    obj, ctx, request_dict = pviews.get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = pviews.get_generic_data(request, obj_type, obj_ref, obj_revi)
     object_attributes_list = []
     for attr in obj.attributes:
         item = obj.get_verbose_name(attr) + ":"
         object_attributes_list.append((item, getattr(obj, attr)))
     ctx.update({'current_page':'attributes', 
         'object_attributes': object_attributes_list})
-    request.session.update(request_dict)
     return render_to_response('DisplayObject.htm', ctx,
                               context_instance=RequestContext(request))
 
