@@ -238,7 +238,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     return r2r('DisplayObjectChild.htm', ctx, request)
 
 ##########################################################################################
-@handle_errors
+@handle_errors(undo="..")
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which edits the chidren of the selected object.
@@ -254,8 +254,6 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
         # TODO
         raise TypeError()
     if request.method == "POST":
-        if request.POST.get("action", "Undo") == "Undo":
-            return HttpResponseRedirect("..")
         formset = get_children_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_children(formset)
@@ -508,7 +506,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
             initial = { "type" : "User",
                         "username" : request.user.username
                       }
-            form = ReplaceManagementForm(initial=initial)
+            form = SelectUserForm(initial=initial)
             for field in ("type", "username"):
                 form.fields[field].widget = HiddenInput() 
             ctx["notify_self_form"] = form
@@ -518,7 +516,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     return r2r('DisplayObjectManagement.htm', ctx, request)
 
 ##########################################################################################
-@handle_errors
+@handle_errors(undo="../..")
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
@@ -534,7 +532,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         raise ValueError("Bad link id")
     
     if request.method == "POST":
-        replace_management_form = ReplaceManagementForm(request.POST)
+        replace_management_form = SelectUserForm(request.POST)
         if replace_management_form.is_valid():
             if replace_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(replace_management_form, request.user)
@@ -543,7 +541,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                     obj.remove_notified(link.user)
             return HttpResponseRedirect("../..")
     else:
-        replace_management_form = ReplaceManagementForm()
+        replace_management_form = SelectUserForm()
     request.session.update(request_dict)
     ctx.update({'current_page':'management', 
                 'replace_management_form': replace_management_form,
@@ -551,7 +549,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
 
 ##########################################################################################    
-@handle_errors
+@handle_errors(undo="../..")
 def add_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the addition of a "notification" link
@@ -563,14 +561,14 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
-        add_management_form = ReplaceManagementForm(request.POST)
+        add_management_form = SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, "notified")
             return HttpResponseRedirect("..")
     else:
-        add_management_form = ReplaceManagementForm()
+        add_management_form = SelectUserForm()
     request.session.update(request_dict)
     ctx.update({'current_page':'management', 
                 'replace_management_form': add_management_form,
@@ -817,7 +815,7 @@ def display_delegation(request, obj_ref):
 
 
 ##########################################################################################    
-@handle_errors
+@handle_errors(undo="../../..")
 def delegate(request, obj_ref, role, sign_level):
     """
     Manage html page for delegations modification of the selected
@@ -836,7 +834,7 @@ def delegate(request, obj_ref, role, sign_level):
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
-        delegation_form = ReplaceManagementForm(request.POST)
+        delegation_form = SelectUserForm(request.POST)
         if delegation_form.is_valid():
             if delegation_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(delegation_form, request.user)
@@ -851,7 +849,7 @@ def delegate(request, obj_ref, role, sign_level):
                         obj.delegate(user_obj.object, level_to_sign_str(int(sign_level)-1))
                         return HttpResponseRedirect("../../..")
     else:
-        delegation_form = ReplaceManagementForm()
+        delegation_form = SelectUserForm()
     if role == 'sign':
         if sign_level.isdigit():
             role = _("signer level") + " " + str(sign_level)
@@ -885,7 +883,7 @@ def stop_delegate(request, obj_ref, role, sign_level):
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
-        delegation_form = ReplaceManagementForm(request.POST)
+        delegation_form = SelectUserForm(request.POST)
         if delegation_form.is_valid():
             if delegation_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(delegation_form, request.user)
@@ -900,7 +898,7 @@ def stop_delegate(request, obj_ref, role, sign_level):
                     elif sign_level.is_digit():
                         return HttpResponseRedirect("../..")
     else:
-        delegation_form = ReplaceManagementForm()
+        delegation_form = SelectUserForm()
     action_message_string = _("Select the user you no longer want for your \"%s\" role delegation :") % role
     request.session.update(request_dict)
     ctx.update({'current_page':'parts-doc-cad',

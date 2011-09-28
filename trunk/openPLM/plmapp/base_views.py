@@ -40,11 +40,11 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response
-from django.http import HttpResponseServerError, Http404
+from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller, \
+from openPLM.plmapp.controllers import get_controller, \
         DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
@@ -178,7 +178,7 @@ def object_to_dict(plmobject):
     return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
                 revision=plmobject.revision, reference=plmobject.reference)
 
-def handle_errors(func):
+def handle_errors(func=None, undo="."):
     """
     Decorators which ensures that the user is connected and handles exceptions
     raised by a controller.
@@ -192,21 +192,27 @@ def handle_errors(func):
     If :attr:`settings.DEBUG` is False and another exception is raised,
     a :class:`.django.http.HttpResponseServerError` is returned.
     """
-    @wraps(func)
-    @login_required
-    def wrapper(request, *args, **kwargs):
-        try:
-            return func(request, *args, **kwargs)
-        except (ControllerError, ValueError) as exc:
-            return render_to_response("error.html", {"message" : str(exc)})
-        except Http404:
-            raise
-        except StandardError:
-            if settings.DEBUG:
+    def decorator(f):
+        @wraps(f)
+        @login_required
+        def wrapper(request, *args, **kwargs):
+            if request.method == "POST" and \
+                request.POST.get("action") == "Undo":
+                return HttpResponseRedirect(undo)
+            try:
+                return f(request, *args, **kwargs)
+            except (ControllerError, ValueError) as exc:
+                return render_to_response("error.html", {"message" : str(exc)})
+            except Http404:
                 raise
+            except StandardError:
+                if settings.DEBUG:
+                    raise
             return HttpResponseServerError()
-    return wrapper
-
+        return wrapper
+    if func:
+        return decorator(func)
+    return decorator
 
 def init_ctx(init_type_, init_reference, init_revision):
     """
