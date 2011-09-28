@@ -138,8 +138,8 @@ urlpatterns += patterns2('', group_url,
     (r'attributes/$', display_object_attributes, group_dict),
     (r'history/$', display_object_history, group_dict),
     (r'users/$', display_users),
-    #(r'modify/$', modify_group),
-    (r'navigate/$', navigate, group_dict),
+    (r'users/add/$', group_add_user),
+    #(r'navigate/$', navigate, group_dict),
 )
 urlpatterns += patterns('',
 	# In order to take into account the css file
