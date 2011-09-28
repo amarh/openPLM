@@ -458,7 +458,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     return r2r('DisplayObjectFiles.htm', ctx, request)
 
 ##########################################################################################
-@handle_errors
+@handle_errors(undo="..")
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.

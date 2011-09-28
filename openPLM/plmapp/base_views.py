@@ -178,7 +178,7 @@ def object_to_dict(plmobject):
     return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
                 revision=plmobject.revision, reference=plmobject.reference)
 
-def handle_errors(func=None, undo="."):
+def handle_errors(func=None, undo=".."):
     """
     Decorators which ensures that the user is connected and handles exceptions
     raised by a controller.
@@ -196,8 +196,7 @@ def handle_errors(func=None, undo="."):
         @wraps(f)
         @login_required
         def wrapper(request, *args, **kwargs):
-            if request.method == "POST" and \
-                request.POST.get("action") == "Undo":
+            if request.method == "POST" and request.POST.get("_undo"):
                 return HttpResponseRedirect(undo)
             try:
                 return f(request, *args, **kwargs)

@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<form method="POST" action="." {{ form_attributes }}>
+    <table class="Content">
+        {{ form }}
+        <tr>
+            <td>
+            </td>
+            <td>
+                <input type="submit" value="{% trans "Validate" %}" name="_validate"/>
+                <input type="submit" value="{% trans "Undo" %}" name="_undo"/>
+            </td>
+        </tr>
+    </table>
+</form>

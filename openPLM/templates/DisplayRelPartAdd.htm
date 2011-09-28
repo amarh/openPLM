@@ -3,20 +3,10 @@
 
 <!-- Manage html display in the Content div which correspond to the "parts" menu + "add new"-->
 
-{% block content %}
-<form method="POST" action="">
-    <table class="Content">
-        {{add_rel_part_form}}
-        <tr>
-            <td>
-            </td>
-            <td>
-                <input type="submit" value="{% trans "Validate" %}" name="action"/>
-                <input type="submit" value="{% trans "Undo" %}" name="action"/>
-            </td>
-        </tr>
-    </table>
-</form>
+{% block content %} 
+    {% with add_rel_part_form as form %}
+        {% include "snippets/undo_form.htm" %}
+    {% endwith %}
 {% endblock %}
 
 
