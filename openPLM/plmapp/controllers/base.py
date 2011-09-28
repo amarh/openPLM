@@ -129,6 +129,7 @@ class Controller(object):
 
     def __init__(self, obj, user):
         self.object = obj
+        self.form_instance = obj
         self._user = user
         # variable to store attribute changes
         self._histo = ""
