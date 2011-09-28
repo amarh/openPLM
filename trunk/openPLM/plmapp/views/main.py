@@ -1007,4 +1007,14 @@ def group_add_user(request, obj_ref):
     ctx['current_page'] = 'users' 
     return r2r("groups/add_user.htm", ctx, request)
 
+@handle_errors
+def display_groups(request, obj_ref):
+    """
+    View of the *groups* page of an user.
+
+    """
+
+    obj, ctx = get_generic_data(request, "User", obj_ref)
+    ctx['current_page'] = 'groups' 
+    return r2r("users/groups.htm", ctx, request)
 
