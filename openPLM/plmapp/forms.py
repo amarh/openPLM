@@ -368,7 +368,7 @@ class OpenPLMUserChangeForm(forms.ModelForm):
         exclude = ('username','is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'password')
 
 class ReplaceManagementForm(forms.Form):
-    type = forms.CharField(label=_("Type"))
+    type = forms.CharField(label=_("Type"), initial="User")
     username = forms.CharField(label=_("Username"))
     
     

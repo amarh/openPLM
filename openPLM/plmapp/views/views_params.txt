@@ -1,0 +1,9 @@
+
+:param request: :class:`django.http.QueryDict`
+:param obj_type: :attr:`.PLMObject.type`
+:type obj_type: str
+:param obj_ref: :attr:`.PLMObject.reference`
+:type obj_ref: str
+:param obj_revi: :attr:`.PLMObject.revision`
+:type obj_revi: str
+:return: a :class:`django.http.HttpResponse`

@@ -97,14 +97,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays attributes of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -138,14 +131,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays lifecycle of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
@@ -174,14 +160,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays all revisions of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -208,14 +187,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the history of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('date')
@@ -234,14 +206,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the chidren of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -281,14 +246,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     desactivate the `.ParentChildLink`
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -316,14 +274,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     Manage html page for chidren creation of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     request.session.update(request_dict)
@@ -349,14 +300,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the parent of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -392,14 +336,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -427,14 +364,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some documents or CAD.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -459,14 +389,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the related part of (:class:`DocumentPartLink` with) the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -493,14 +416,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some parts.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -525,14 +441,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the files (:class:`DocumentFile`) uploaded in the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
 
@@ -557,14 +466,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -591,14 +493,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the Users who manage the selected object (:class:`PLMObjectUserLink`).
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -629,16 +524,9 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
+    .. include:: views_params.txt 
     :param link_id: :attr:`.PLMObjectUserLink.id`
     :type link_id: str
-    :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
@@ -670,14 +558,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     (:class:`PLMObjectUserLink`) between some Users and the selected object. 
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -703,14 +584,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     Manage html page for the deletion of a "notification" link (:class:`PLMObjectUserLink`) between some Users and the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
@@ -819,14 +693,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     Manage html page for the modification of the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     cls = models.get_all_plmobjects()[obj_type]
@@ -855,11 +722,6 @@ def modify_user(request, obj_ref):
     
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
@@ -886,12 +748,7 @@ def change_user_password(request, obj_ref):
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
     if request.user.username=='test':
@@ -920,14 +777,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     Manage html page which displays the related parts and related documents of (:class:`PLMObjectUserLink` with) the selected :class:`~django.contrib.auth.models.User`.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -948,12 +798,8 @@ def display_delegation(request, obj_ref):
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
     :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
@@ -980,11 +826,7 @@ def delegate(request, obj_ref, role, sign_level):
     
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
     :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
     :param role: :attr:`.DelegationLink.role` if role is not "sign"
     :type role: str
     :param sign_level: used for :attr:`.DelegationLink.role` if role is "sign"
@@ -1032,12 +874,8 @@ def stop_delegate(request, obj_ref, role, sign_level):
     It computes a context dictionnary based on
     
     :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
     :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
     :param role: :attr:`.DelegationLink.role` if role is not "sign"
     :type role: str
     :param sign_level: used for :attr:`.DelegationLink.role` if role is "sign"
@@ -1080,13 +918,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     Manage html page for the files (:class:`DocumentFile`) checkin in the selected object.
     It computes a context dictionnary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
+    .. include:: views_params.txt 
     :param file_id_value: :attr:`.DocumentFile.id`
     :type file_id_value: str
     :return: a :class:`django.http.HttpResponse`
@@ -1135,16 +967,9 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
     Manage html page for the files (:class:`DocumentFile`) checkout from the selected object.
     It locks the :class:`DocumentFile` and, after, calls :func:`.views.download`
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :attr:`.PLMObject.type`
-    :type obj_type: str
-    :param obj_ref: :attr:`.PLMObject.reference`
-    :type obj_ref: str
-    :param obj_revi: :attr:`.PLMObject.revision`
-    :type obj_revi: str
+    .. include:: views_params.txt 
     :param docfile_id: :attr:`.DocumentFile.id`
     :type docfile_id_value: str
-    :return: :func:`.views.download`
     """
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
@@ -1163,14 +988,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     Some filters let user defines which type of links he/she wants to display.
     It computes a context dictionary based on
     
-    :param request: :class:`django.http.QueryDict`
-    :param obj_type: :class:`~django.contrib.auth.models.User`
-    :type obj_type: str
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param obj_revi: "-"
-    :type obj_revi: str
-    :return: a :class:`django.http.HttpResponse`
+    .. include:: views_params.txt 
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     return r2r('Navigate.htm', ctx, request)
