@@ -36,11 +36,28 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 
-from openPLM.plmapp.models import User, DelegationLink
+from openPLM.plmapp.models import User, DelegationLink, ROLE_OWNER
+
+
+def get_recipients(obj, roles, users):
+    recipients = set((u.id for u in users))
+    if hasattr(obj, "plmobjectuser_link_plmobject"):
+        manager = obj.plmobjectuserlink_plmobject
+        for role in roles:
+            users = manager.filter(role__contains=role).values_list("user", flat=True)
+            recipients.update(users)
+            links = DelegationLink.objects.filter(role__contains=role)\
+                        .values_list("delegator", "delegatee")
+            gr = kjbuckets.kjGraph(tuple(links))
+            for u in users:
+                recipients.update(gr.reachable(u).items())
+    elif ROLE_OWNER:
+        recipients.add(obj.owner.id)
+    return recipients
 
 
 def send_mail(plmobject, roles, last_action, histories, user, blacklist=(),
-              template="mails/history"):
+              users=(), template="mails/history"):
     """
     Sends a mail to users who have role *role* for *plmobject*.
 
@@ -59,19 +76,9 @@ def send_mail(plmobject, roles, last_action, histories, user, blacklist=(),
         This function fails silently if it can not send the mail.
         The mail is sent in a separated thread. 
     """
-    subject = "[PLM] " + unicode(plmobject)
 
-    recipients = set()
-    manager = plmobject.plmobjectuserlink_plmobject
-    for role in roles:
-        users = manager.filter(role__contains=role).values_list("user", flat=True)
-        recipients.update(users)
-        links = DelegationLink.objects.filter(role__contains=role)\
-                    .values_list("delegator", "delegatee")
-        gr = kjbuckets.kjGraph(tuple(links))
-        for u in users:
-            recipients.update(gr.reachable(u).items())
-
+    subject = "[PLM] " + unicode(plmobject.object)
+    recipients = get_recipients(plmobject, roles, users) 
     if recipients:
         emails = User.objects.filter(id__in=recipients).exclude(email="")\
                         .values_list("email", flat=True)

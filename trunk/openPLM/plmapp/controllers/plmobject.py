@@ -30,7 +30,6 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.mail import send_mail
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
     PromotionError
 from openPLM.plmapp.utils import level_to_sign_str
@@ -178,17 +177,7 @@ class PLMObjectController(Controller):
             # FIXME raises it ?
             pass
 
-    def save(self, with_history=True):
-        u"""
-        Saves :attr:`object` and records its history in the database.
-        If *with_history* is False, the history is not recorded.
-        """
-        self.object.save()
-        if self._histo and with_history:
-            self._save_histo("Modify", self._histo) 
-            self._histo = ""
-
-    def _save_histo(self, action, details, blacklist=(), roles=()):
+    def _save_histo(self, action, details, blacklist=(), roles=(), users=()):
         """
         Records *action* with details *details* made by :attr:`_user` in
         on :attr:`object` in the histories table.
@@ -199,10 +188,9 @@ class PLMObjectController(Controller):
         A mail is sent to all notified users. Moreover, more roles can be
         notified by settings the *roles" argument.
         """
-        h = models.History.objects.create(plmobject=self.object, action=action,
-                                     details=details, user=self._user)
         roles = ["notified"] + list(roles)
-        send_mail(self.object, roles, action, [h], self._user, blacklist)
+        super(PLMObjectController, self)._save_histo(action, details,
+                blacklist, roles, users)
 
     def has_permission(self, role):
         users = [self._user.id]
