@@ -99,7 +99,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_attributes_list = []
     for attr in obj.attributes:
@@ -107,7 +107,6 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
         object_attributes_list.append((item, getattr(obj, attr)))
     ctx.update({'current_page' : 'attributes',
                 'object_attributes': object_attributes_list})
-    request.session.update(request_dict)
     return r2r('DisplayObject.htm', ctx, request)
 
 ##########################################################################################
@@ -133,7 +132,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         if request.POST["action"] == "DEMOTE":
             obj.demote()
@@ -150,7 +149,6 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 'object_lifecycle': object_lifecycle,
                 'is_signer' : is_signer, 
                 'is_signer_dm' : is_signer_dm})
-    request.session.update(request_dict)
     return r2r('DisplayObjectLifecycle.htm', ctx, request)
 
 ##########################################################################################
@@ -162,7 +160,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if obj.is_revisable():
         if request.method == "POST" and request.POST:
@@ -171,13 +169,11 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
                 obj.revise(add_form.cleaned_data["revision"])
         else:
             add_form = AddRevisionForm({"revision" : get_next_revision(obj_revi)})
-    else:
-        add_form = None
+        ctx["add_revision_form"] = add_form
     revisions = obj.get_all_revisions()
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
-                'add_revision_form' : add_form})
-    request.session.update(request_dict)
+                })
     return r2r('DisplayObjectRevisions.htm', ctx, request)
 
 ##########################################################################################
@@ -189,12 +185,10 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('date')
-    history = history.values_list('date', 'action', 'details')
     ctx.update({'current_page' : 'history', 
-                'object_history' : history})
-    request.session.update(request_dict)
+                'object_history' : list(history)})
     return r2r('DisplayObjectHistory.htm', ctx, request)
 
 #############################################################################################
@@ -208,7 +202,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -234,7 +228,6 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'BOM-child',
                 'children': children,
                 "display_form" : display_form})
-    request.session.update(request_dict)
     return r2r('DisplayObjectChild.htm', ctx, request)
 
 ##########################################################################################
@@ -248,7 +241,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
         # TODO
@@ -262,7 +255,6 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
         formset = get_children_formset(obj)
     ctx.update({'current_page':'BOM-child',
                 'children_formset': formset, })
-    request.session.update(request_dict)
     return r2r('DisplayObjectChildEdit.htm', ctx, request)
 
 ##########################################################################################    
@@ -274,8 +266,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    request.session.update(request_dict)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
         add_child_form = AddChildForm(request.POST)
@@ -300,7 +291,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_parents"):
         # TODO
@@ -323,7 +314,6 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'parents',
                 'parents' :  parents,
                 'display_form' : display_form, })
-    request.session.update(request_dict)
     return r2r('DisplayObjectParents.htm', ctx, request)
 
 ##########################################################################################
@@ -336,7 +326,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_documents"):
         # TODO
@@ -351,7 +341,6 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'doc-cad',
                 'object_doc_cad': obj.get_attached_documents(),
                 'doc_cad_formset': formset})
-    request.session.update(request_dict)
     return r2r('DisplayObjectDocCad.htm', ctx, request)
 
 
@@ -364,9 +353,8 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
-    request.session.update(request_dict)
     if request.POST:
         add_doc_cad_form = AddDocCadForm(request.POST)
         if add_doc_cad_form.is_valid():
@@ -389,7 +377,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_parts"):
         # TODO
@@ -404,7 +392,6 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'parts', 
                 'object_rel_part': obj.get_attached_parts(),
                 'rel_part_formset': formset})
-    request.session.update(request_dict)
     return r2r('DisplayObjectRelPart.htm', ctx, request)
 
 ##########################################################################################    
@@ -416,9 +403,8 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
-    request.session.update(request_dict)
     if request.POST:
         add_rel_part_form = AddRelPartForm(request.POST)
         if add_rel_part_form.is_valid():
@@ -441,7 +427,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
 
     if not hasattr(obj, "files"):
         raise TypeError()
@@ -454,7 +440,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
         formset = get_file_formset(obj)
     ctx.update({'current_page':'files', 
                 'file_formset': formset})
-    request.session.update(request_dict)
     return r2r('DisplayObjectFiles.htm', ctx, request)
 
 ##########################################################################################
@@ -466,9 +451,9 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
-    request.session.update(request_dict)
+    
     if request.POST:
         add_file_form = AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
@@ -493,7 +478,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
     object_management_list = object_management_list.order_by("role")
@@ -512,7 +497,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
             ctx["notify_self_form"] = form
     ctx.update({'current_page':'management',
                 'object_management': object_management_list})
-    request.session.update(request_dict)
+    
     return r2r('DisplayObjectManagement.htm', ctx, request)
 
 ##########################################################################################
@@ -526,7 +511,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     :param link_id: :attr:`.PLMObjectUserLink.id`
     :type link_id: str
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
     if obj.object.id != link.plmobject.id:
         raise ValueError("Bad link id")
@@ -542,7 +527,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
             return HttpResponseRedirect("../..")
     else:
         replace_management_form = SelectUserForm()
-    request.session.update(request_dict)
+    
     ctx.update({'current_page':'management', 
                 'replace_management_form': replace_management_form,
                 'link_creation': True,})
@@ -558,7 +543,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
         add_management_form = SelectUserForm(request.POST)
@@ -569,7 +554,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect("..")
     else:
         add_management_form = SelectUserForm()
-    request.session.update(request_dict)
+    
     ctx.update({'current_page':'management', 
                 'replace_management_form': add_management_form,
                 'link_creation': True,})
@@ -648,8 +633,8 @@ def create_object(request):
     :return: a :class:`django.http.HttpResponse`
     """
 
-    obj, ctx, request_dict = get_generic_data(request)
-    request.session.update(request_dict)
+    obj, ctx = get_generic_data(request)
+    
     if request.method == 'GET':
         if request.GET:
             type_form = TypeForm(request.GET)
@@ -693,7 +678,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     cls = models.get_all_plmobjects()[obj_type]
     non_modifyable_attributes = get_non_modifyable_attributes(obj, request.user, cls)
     if request.method == 'POST' and request.POST:
@@ -703,7 +688,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(obj.plmobject_url)
     else:
         modification_form = get_modification_form(cls, instance=obj.form_instance)
-    request.session.update(request_dict)
+    
     ctx.update({'modification_form': modification_form,
                 'non_modifyable_attributes': non_modifyable_attributes})
     return r2r('DisplayObject4modification.htm', ctx, request)
@@ -722,7 +707,7 @@ def modify_user(request, obj_ref):
     :param obj_type: :class:`~django.contrib.auth.models.User`
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    obj, ctx = get_generic_data(request, "User", obj_ref)
     if obj.object != request.user:
         raise PermissionError("You are not the user")
     class_for_div="ActiveBox4User"
@@ -733,7 +718,7 @@ def modify_user(request, obj_ref):
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = OpenPLMUserChangeForm(instance=obj.object)
-    request.session.update(request_dict)
+    
     ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
     return r2r('DisplayObject4modification.htm', ctx, request)
     
@@ -751,7 +736,7 @@ def change_user_password(request, obj_ref):
     """
     if request.user.username=='test':
         return HttpResponseRedirect("/user/%s/attributes/" % request.user)
-    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    obj, ctx = get_generic_data(request, "User", obj_ref)
     if obj.object != request.user:
         raise PermissionError("You are not the user")
 
@@ -763,7 +748,7 @@ def change_user_password(request, obj_ref):
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = PasswordChangeForm(obj)
-    request.session.update(request_dict)
+    
     ctx.update({'class4div': "ActiveBox4User",
                 'modification_form': modification_form})
     return r2r('DisplayObject4PasswordModification.htm', ctx, request)
@@ -777,14 +762,14 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_object_user_links"):
         # TODO
         raise TypeError()
     ctx.update({'current_page':'parts-doc-cad',
                 'object_user_link': obj.get_object_user_links()})
-    request.session.update(request_dict)
+    
     return r2r('DisplayObjectRelPLMObject.htm', ctx, request)
 
 #############################################################################################
@@ -800,7 +785,7 @@ def display_delegation(request, obj_ref):
     :type obj_ref: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    obj, ctx = get_generic_data(request, "User", obj_ref)
     
     if not hasattr(obj, "get_user_delegation_links"):
         # TODO
@@ -810,7 +795,7 @@ def display_delegation(request, obj_ref):
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
     ctx.update({'current_page':'delegation', 
                 'user_delegation_link': obj.get_user_delegation_links()})
-    request.session.update(request_dict)
+    
     return r2r('DisplayObjectDelegation.htm', ctx, request)
 
 
@@ -831,7 +816,7 @@ def delegate(request, obj_ref, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    obj, ctx = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
         delegation_form = SelectUserForm(request.POST)
@@ -857,7 +842,7 @@ def delegate(request, obj_ref, role, sign_level):
             role = _("signer all levels")
     elif role == "notified":
         role = _("notified")
-    request.session.update(request_dict)
+    
     ctx.update({'current_page':'delegation',
                 'replace_management_form': delegation_form,
                 'link_creation': True,
@@ -880,7 +865,7 @@ def stop_delegate(request, obj_ref, role, sign_level):
     :type sign_level: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, "User", obj_ref)
+    obj, ctx = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
         delegation_form = SelectUserForm(request.POST)
@@ -900,7 +885,7 @@ def stop_delegate(request, obj_ref, role, sign_level):
     else:
         delegation_form = SelectUserForm()
     action_message_string = _("Select the user you no longer want for your \"%s\" role delegation :") % role
-    request.session.update(request_dict)
+    
     ctx.update({'current_page':'parts-doc-cad',
                 'replace_management_form': delegation_form,
                 'link_creation': True,
@@ -921,9 +906,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     :type file_id_value: str
     :return: a :class:`django.http.HttpResponse`
     """
-    obj, ctx, request_dict = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
-    request.session.update(request_dict)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.POST:
         checkin_file_form = AddFileForm(request.POST, request.FILES)
         if checkin_file_form.is_valid():
@@ -991,9 +974,9 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     return r2r('Navigate.htm', ctx, request)
 
-
+@handle_errors
 def display_users(request, obj_ref):
-    obj, ctx, request_dict = get_generic_data(request, "Group", obj_ref)
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
         formset = forms.get_user_formset(obj, request.POST)
         if formset.is_valid():
@@ -1003,7 +986,25 @@ def display_users(request, obj_ref):
         formset = forms.get_user_formset(obj)
     ctx["user_formset"] = formset
     ctx['current_page'] = 'users' 
-    request.session.update(request_dict)
     return r2r("groups/users.htm", ctx, request)
+
+@handle_errors
+def group_add_user(request, obj_ref):
+    """
+    View of the *Add user* page of a group.
+
+    """
+
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    if request.method == "POST":
+        form = SelectUserForm(request.POST)
+        if form.is_valid():
+            obj.add_user(User.objects.get(username=form.cleaned_data["username"]))
+            return HttpResponseRedirect("..")
+    else:
+        form = forms.SelectUserForm()
+    ctx["add_user_form"] = form
+    ctx['current_page'] = 'users' 
+    return r2r("groups/add_user.htm", ctx, request)
 
 
