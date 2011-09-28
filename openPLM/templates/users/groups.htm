@@ -1,0 +1,17 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+<!-- Manage html display in the Content div which correspond to the "history" menu -->
+
+{% block content %}
+	<table class="Content">
+	    {% for group in obj.groups.all %}
+		    <tr class="Content">
+			    <td class="Content">
+                    <a href="/group/{{group.name}}/"> {{group.name}} </a>
+		        </td>
+		    </tr>
+	    {% endfor %}
+	</table>
+{% endblock %}
+

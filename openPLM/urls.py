@@ -131,6 +131,7 @@ urlpatterns += patterns2('', user_url,
     (r'modify/$', modify_user),
     (r'password/$', change_user_password),
     (r'navigate/$', navigate, user_dict),
+    (r'groups/$', display_groups),
 )
 
 urlpatterns += patterns2('', group_url, 
