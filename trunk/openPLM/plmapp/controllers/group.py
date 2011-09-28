@@ -58,6 +58,7 @@ class GroupController(Controller):
     def __init__(self, obj, user):
         super(GroupController, self).__init__(obj, user)
         self.group_info = models.GroupInfo.objects.get(group=obj)
+        self.form_instance = self.group_info
     
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly
