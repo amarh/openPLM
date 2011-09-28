@@ -4,20 +4,10 @@
 <!-- Manage html display in the Content div which correspond to the "management" menu + "delegate"-->
 
 {% block content %}
-{% trans "Select a user for your delegation as : " %}{{role}}
-<form method="POST" action="">
-    <table class="Content">
-        {{replace_management_form}}
-        <tr>
-            <td>
-            </td>
-            <td>
-                <input type="submit" value="{% trans "Validate" %}" name="action"/>
-                <input type="submit" value="{% trans "Undo" %}" name="action"/>
-            </td>
-        </tr>
-    </table>
-</form>
+    {% trans "Select a user for your delegation as : " %}{{role}}
+    {% with replace_management_form as form %}
+        {% include "snippets/undo_form.htm" %}
+    {% endwith %}
 {% endblock %}
 
 

@@ -4,19 +4,10 @@
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
 
 {% block content %}
-{% trans "Connect new document :" %}
-<form method="POST" action="">
-    <table class="Content">
-        {{add_doc_cad_form}}
-        <tr>
-            <td></td>
-            <td>
-                <input type="submit" value="{% trans "Validate" %}" name="action"/>
-                <input type="submit" value="{% trans "Undo" %}" name="action"/>
-            </td>
-        </tr>
-    </table>
-</form>
+    {% trans "Connect new document :" %}
+    {% with add_doc_cad_form as form %}
+        {% include "snippets/undo_form.htm" %}
+    {% endwith %}
 {% endblock %}
 
 

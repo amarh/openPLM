@@ -4,18 +4,12 @@
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
 
 {% block content %}
-{% trans "Add new file / Check-in file :" %}
-<form method="POST" action="." enctype="multipart/form-data">
-    <table class="Content">
-        {{add_file_form}}
-        <tr>
-            <td></td>
-            <td>
-                <input type="submit" value="{% trans "Validate" %}" name="action"/>
-                <input type="submit" value="{% trans "Undo" %}" name="action"/>
-            </td>
-        </tr>
-    </table>
+    {% trans "Add new file / Check-in file :" %}
+    {% with add_file_form as form %}
+        {% with  "enctype='multipart/form-data'" as form_attributes %}
+            {% include "snippets/undo_form.htm" %}
+        {% endwith %}
+    {% endwith %}
 </form>
 {% endblock %}
 
