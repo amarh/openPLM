@@ -74,16 +74,17 @@ def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
     if Form is None:
         fields = cls.get_creation_fields()
         Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
-        Form.clean_reference = _clean_reference
-        Form.clean_revision = _clean_revision
-        def _clean(self):
-            cleaned_data = self.cleaned_data
-            ref = cleaned_data.get("reference", "")
-            rev = cleaned_data.get("revision", "")
-            if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
-                raise ValidationError(_("An object with the same type, reference and revision already exists"))
-            return cleaned_data
-        Form.clean = _clean
+        if issubclass(cls, m.PLMObject):
+            Form.clean_reference = _clean_reference
+            Form.clean_revision = _clean_revision
+            def _clean(self):
+                cleaned_data = self.cleaned_data
+                ref = cleaned_data.get("reference", "")
+                rev = cleaned_data.get("revision", "")
+                if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
+                    raise ValidationError(_("An object with the same type, reference and revision already exists"))
+                return cleaned_data
+            Form.clean = _clean
         get_creation_form.cache[cls] = Form
     if data:
         return Form(data=data, empty_permitted=empty_allowed)
@@ -137,11 +138,11 @@ class FakeItems(object):
 def get_search_form(cls=m.PLMObject, data=None):
     Form = get_search_form.cache.get(cls)
     if Form is None:
-        if issubclass(cls, m.PLMObject):
+        if issubclass(cls, (m.PLMObject, m.GroupInfo)):
             fields = set(cls.get_creation_fields())
             fields.update(set(cls.get_modification_fields()))
             fields.difference_update(("type", "lifecycle"))
-        else :
+        else:
             fields = set(["username", "first_name", "last_name"])
         fields_dict = {}
         for field in fields:

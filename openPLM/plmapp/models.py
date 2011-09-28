@@ -160,12 +160,11 @@ if __name__ == "openPLM.plmapp.models":
     post_save.connect(add_profile, sender=User)
 
 
-class GroupInfo(models.Model):
+class GroupInfo(Group):
     u"""
     Class that stores additional data on a :class:`Group`.
     """
 
-    group = models.ForeignKey(Group, primary_key=True)
     description = models.TextField(blank=True)
     creator = models.ForeignKey(User)
     
@@ -177,7 +176,7 @@ class GroupInfo(models.Model):
 
     @property
     def plmobject_url(self):
-        return iri_to_uri("/group/%s/" % self.group.name)
+        return iri_to_uri("/group/%s/" % self.name)
 
     @property
     def attributes(self):
@@ -994,6 +993,7 @@ def get_all_plmobjects_with_level():
     level=">"
     _get_all_subclasses_with_level(PLMObject, lst, level)
     if lst: del lst[0]
+    lst.append(("Group", "Group"))
     return lst
 
 @memoize_noarg
