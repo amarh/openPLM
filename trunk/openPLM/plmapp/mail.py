@@ -56,7 +56,7 @@ def get_recipients(obj, roles, users):
     return recipients
 
 
-def send_mail(plmobject, roles, last_action, histories, user, blacklist=(),
+def send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
               users=(), template="mails/history"):
     """
     Sends a mail to users who have role *role* for *plmobject*.
@@ -80,26 +80,31 @@ def send_mail(plmobject, roles, last_action, histories, user, blacklist=(),
     subject = "[PLM] " + unicode(plmobject.object)
     recipients = get_recipients(plmobject, roles, users) 
     if recipients:
-        emails = User.objects.filter(id__in=recipients).exclude(email="")\
-                        .values_list("email", flat=True)
-        emails = set(emails) - set(blacklist)
         ctx = {
                 "last_action" : last_action,
                 "histories" : histories, 
                 "plmobject" : plmobject,
                 "user" : user,
-                "site" : Site.objects.get_current(),
             }
+        return send_mail(subject, recipients, ctx, template, blacklist)
+    return set()
+
+def send_mail(subject, recipients, ctx, template, blacklist=()):
+    if recipients:
+        r = iter(recipients).next()
+        if hasattr(r, "id"):
+            recipients = [x.id for x in recipients]
+        emails = User.objects.filter(id__in=recipients).exclude(email="")\
+                        .values_list("email", flat=True)
+        emails = set(emails) - set(blacklist)
+        ctx["site"] = Site.objects.get_current()
         html_content = render_to_string(template + ".htm", ctx)
         message = render_to_string(template + ".txt", ctx)
         msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
-                emails)
+            emails)
         msg.attach_alternative(html_content, "text/html")
         t = Thread(target=msg.send, kwargs={"fail_silently" : True })
         t.start()
         return emails
-
     return set()
-
-
 

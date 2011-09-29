@@ -29,10 +29,14 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
+from django.conf import settings
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.sites.models import Site
 
 import openPLM.plmapp.models as models
+from openPLM.plmapp.mail import send_mail
+from openPLM.plmapp.utils import generate_password
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
 
@@ -218,4 +222,41 @@ class UserController(Controller):
         Returns all delegatees of :attr:`object`.
         """
         return self.delegationlink_delegator.order_by("role")
+
+    @permission_required(role=models.ROLE_OWNER)
+    def sponsor(self, username, first_name, last_name, email, group,
+            is_contributor=True):
+        try:
+            # checs *email*
+            if settings.RESTRICT_EMAIL_TO_DOMAINS:
+                # i don't know if a domain can contains a '@'
+                domain = email.rsplit("@", 1)[1]
+                if domain not in Site.objects.values_list("domain", flat=True):
+                    raise PermissionError("Email's domain not valid") 
+        except AttributeError:
+            # restriction disabled if the setting is not set
+            pass
+        password = generate_password()
+        new_user = models.User.objects.create(username=username, first_name=first_name,
+                last_name=last_name, email=email)
+        new_user.is_contributor = is_contributor
+        new_user.set_password(password)
+        new_user.groups.add(group)
+        new_user.save()
+        link = models.DelegationLink(delegator=self._user, delegatee=new_user,
+                role=models.ROLE_SPONSOR)
+        link.save()
+        ctx = {
+                "new_user" : new_user,
+                "sponsor" : self._user,
+                "password" : password,
+               }
+        send_mail("New account on openPLM", [new_user], ctx, "mails/new_account") 
+        models.UserHistory.objects.create(action="Create", user=self._user,
+                plmobject=self._user, details="New user: %s" % new_user.username)
+        models.UserHistory.objects.create(action="Create", user=self._user,
+                plmobject=new_user, details="Account created")
+        
+        
+
 
