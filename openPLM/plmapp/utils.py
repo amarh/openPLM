@@ -28,6 +28,7 @@ This module contains some functions which may be useful.
 
 import re
 import string
+import random
 from functools import wraps
 
 def next_in_seq(seq, value):
@@ -218,6 +219,13 @@ def memoize_noarg(func):
             wrapper._result = func()
         return wrapper._result
     return wrapper
+
+password_chars = string.ascii_letters + string.digits + "@!=&/*-_"
+def generate_password(length=12):
+    """
+    Generates a random password of *length* characters.
+    """
+    return "".join(random.choice(password_chars) for x in xrange(length))
 
 
 if __name__ == "__main__":

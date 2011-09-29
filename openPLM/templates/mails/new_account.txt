@@ -1,0 +1,16 @@
+{% load i18n %}
+{% blocktrans with new_user.first_name as first_name and new_user.last_name as last_name and new_user.username as username and site.domain as domain and sponsor.first_name as s_first_name and sponsor.last_name as s_last_name and sponsor.username as s_username %}
+Welcome {{first_name}} {{last_name}}!  
+
+{{ s_first_name }} {{s_last_name}} ({{s_username}}) added you to OpenPLM.
+
+Your credentials:
+
+    - username: {{username }}
+    - password: {{password}}
+
+You should change your password !
+See http://{{domain}}/user/{{username}}/password/
+
+{% endblocktrans %}
+

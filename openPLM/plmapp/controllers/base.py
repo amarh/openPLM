@@ -32,7 +32,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError
-from openPLM.plmapp.mail import send_mail
+from openPLM.plmapp.mail import send_histories_mail
 
 _controller_rx = re.compile(r"(?P<type>\w+)Controller")
 
@@ -178,7 +178,7 @@ class Controller(object):
         h = self.HISTORY.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
         roles = [models.ROLE_OWNER] + list(roles)
-        send_mail(self, roles, action, [h], self._user, blacklist,
+        send_histories_mail(self, roles, action, [h], self._user, blacklist,
                 users)
 
     def get_verbose_name(self, attr_name):

@@ -1,0 +1,35 @@
+{% load i18n %}
+<html>
+    <body>
+        <h1>
+            {% blocktrans with new_user.first_name as first_name and new_user.last_name as last_name %}
+            Welcome {{first_name}} {{last_name}}!
+            {% endblocktrans %}
+        </h1>  
+        <p>
+        {% blocktrans with  sponsor.first_name as s_first_name and sponsor.last_name as s_last_name and sponsor.username as s_username %}
+        {{ s_first_name }} {{s_last_name}} ({{s_username}}) added you to OpenPLM.
+        {% endblocktrans %}
+        </p>
+
+        <p>
+        {% trans "Your credentials:" %}
+        </p>
+        <table>
+            <tbody>
+                <tr>
+                    <td> {% trans "Username:" %}</td>
+                    <td>{{new_user.username }}</td>
+                </tr>
+                <tr>
+                    <td> {% trans "Password:" %} </td>
+                    <td>{{password}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p> {% trans "You should change your password!" %}</p>
+        <a href="http://{{site.domain}}/user/{{new_user.username}}/password/">
+            {% trans "Click here to change your password" %}
+        </a>
+    </body>
+</html>
