@@ -1024,7 +1024,6 @@ def sponsor(request, obj_ref):
     if request.method == "POST":
         form = forms.SponsorForm(request.POST)
         if form.is_valid():
-            # TODO: checks (first_name, last_name) and warns if it exists
             new_user = form.save()
             obj.sponsor(new_user)
             return HttpResponseRedirect("..")
