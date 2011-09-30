@@ -224,10 +224,10 @@ class UserController(Controller):
         return self.delegationlink_delegator.order_by("role")
 
     @permission_required(role=models.ROLE_OWNER)
-    def sponsor(self, username, first_name, last_name, email, group,
-            is_contributor=True):
+    def sponsor(self, new_user, is_contributor=True):
+        email = new_user.email
         try:
-            # checs *email*
+            # checks *email*
             if settings.RESTRICT_EMAIL_TO_DOMAINS:
                 # i don't know if a domain can contains a '@'
                 domain = email.rsplit("@", 1)[1]
@@ -237,11 +237,8 @@ class UserController(Controller):
             # restriction disabled if the setting is not set
             pass
         password = generate_password()
-        new_user = models.User.objects.create(username=username, first_name=first_name,
-                last_name=last_name, email=email)
         new_user.is_contributor = is_contributor
         new_user.set_password(password)
-        new_user.groups.add(group)
         new_user.save()
         link = models.DelegationLink(delegator=self._user, delegatee=new_user,
                 role=models.ROLE_SPONSOR)
