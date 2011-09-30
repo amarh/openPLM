@@ -29,7 +29,7 @@ from django.conf import settings
 # import custom application models
 for app in settings.INSTALLED_APPS:
     if app.startswith("openPLM"):
-    	__import__("%s.models" % app, globals(), locals(), [], -1)
+        __import__("%s.models" % app, globals(), locals(), [], -1)
 
 from django.conf.urls.defaults import include, patterns
 from openPLM.plmapp.views import *
@@ -121,6 +121,7 @@ urlpatterns += patterns2('', user_url,
     (r'history/$', display_object_history, user_dict),
     (r'parts-doc-cad/$', display_related_plmobject, user_dict),
     (r'delegation/$', display_delegation),
+    (r'delegation/sponsor/$', sponsor),
     (r'delegation/delegate/(?P<role>[^/]+)/$', delegate,
                     {'sign_level':'none'}),
     (r'delegation/delegate/(?P<role>[^/]+)/(?P<sign_level>\d+|all)/$', delegate),

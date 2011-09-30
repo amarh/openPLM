@@ -1018,3 +1018,19 @@ def display_groups(request, obj_ref):
     ctx['current_page'] = 'groups' 
     return r2r("users/groups.htm", ctx, request)
 
+@handle_errors
+def sponsor(request, obj_ref):
+    obj, ctx = get_generic_data(request, "User", obj_ref)
+    if request.method == "POST":
+        form = forms.SponsorForm(request.POST)
+        if form.is_valid():
+            # TODO: checks (first_name, last_name) and warns if it exists
+            new_user = form.save()
+            obj.sponsor(new_user)
+            return HttpResponseRedirect("..")
+    else:
+        form = SponsorForm(initial={"sponsor":obj.object}, sponsor=obj.id)
+    ctx["sponsor_form"] = form
+    ctx['current_page'] = 'delegation' 
+    return r2r("users/sponsor.htm", ctx, request)
+

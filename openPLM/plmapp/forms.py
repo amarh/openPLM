@@ -25,16 +25,19 @@
 import re
 
 from django import forms
+from django.conf import settings
 from django.forms.formsets import formset_factory
 from django.forms.models import modelform_factory, modelformset_factory
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.sites.models import Site
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
+from openPLM.plmapp.exceptions import PermissionError
 
 class PLMObjectForm(forms.Form):
     u"""
@@ -394,4 +397,42 @@ def get_user_formset(controller, data=None):
     else:
         formset = UserFormset(data)
     return formset
+
+
+class SponsorForm(forms.ModelForm):
+    sponsor = forms.ModelChoiceField(queryset=User.objects.all(),
+            required=True, widget=forms.HiddenInput())
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'groups')
+
+    def __init__(self, *args, **kwargs):
+        sponsor = kwargs.pop("sponsor", None)
+        super(SponsorForm, self).__init__(*args, **kwargs)
+        if "sponsor" in self.data:
+            sponsor = int(self.data["sponsor"])
+        if sponsor is not None:
+            qset = m.GroupInfo.objects.filter(owner__id=sponsor)
+            self.fields["groups"].query_set = qset
+        self.fields["groups"].help_text = _("The new user will belong to the selected groups") 
+        for field in self.fields.itervalues():
+            field.required = True
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if email and bool(User.objects.filter(email=email)):
+            raise forms.ValidationError(_(u'Email address must be unique.'))
+        try:
+            # checks *email*
+            if settings.RESTRICT_EMAIL_TO_DOMAINS:
+                # i don't know if a domain can contains a '@'
+                domain = email.rsplit("@", 1)[1]
+                if domain not in Site.objects.values_list("domain", flat=True):
+                    raise forms.ValidationError(_(u"Email's domain not valid")) 
+        except AttributeError:
+            # restriction disabled if the setting is not set
+            pass
+        return email
+    
 

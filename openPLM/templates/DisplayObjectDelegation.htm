@@ -4,6 +4,7 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
+    {% if is_owner %}
 	{% trans "START DELEGATE :" %}
     <span class="ButtonLeft">
             <a class="Button" 
@@ -35,6 +36,13 @@
                 {% trans "NOTIFICATIONS" %}
             </a>
     </span>
+    <span class="ButtonLeft">
+            <a class="Button" 
+                href="./delegate/sponsor/">
+                {% trans "Sponsor" %}
+            </a>
+        </span>
+    {% endif %}
     <table class="Result">
         <tr class="Content">
             <th class="Content"> {% trans "Username" %} </th>
@@ -43,18 +51,22 @@
             <th class="Content"> {% trans "Role" %} </th>
         </tr>
         {% for link in user_delegation_link %}
-        	<form method="post" action="">
 	            <tr class="Content">
 		            <td class="Content">{{link.delegatee.username}}</td>
 		            <td class="Content">{{link.delegatee.first_name}}</td>
 		            <td class="Content">{{link.delegatee.last_name}}</td>
 		            <td class="Content">{{link.role}}</td>
-		            <td class="Content">
-		                    <input type="hidden" name="link_id" value="{{link.id}}" />
-		                    <input type="submit" value="{% trans "STOP DELEGATION" %}"/>
-	                </td>
+                    {% if is_owner %}
+                        {% ifnotequal link.role "sponsor" %}
+                        <td class="Content">
+                            <form method="post" action="">
+                                <input type="hidden" name="link_id" value="{{link.id}}" />
+                                <input type="submit" value="{% trans "STOP DELEGATION" %}"/>
+                            </form>
+                        </td>
+                        {% endifnotequal %}
+                    {% endif %}
 	            </tr>
-        	</form>
         {% endfor %}
     </table>
 {% endblock %}
