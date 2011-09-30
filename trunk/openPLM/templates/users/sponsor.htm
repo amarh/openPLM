@@ -1,0 +1,12 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+<!-- Manage html display in the Content div which correspond to the "history" menu -->
+
+{% block content %}
+    <p> {% trans "Sponsor a new user" %} </p>
+    {% with sponsor_form as form %}
+        {% include "snippets/undo_form.htm" %}
+    {% endwith %}
+{% endblock %}
+
