@@ -402,6 +402,8 @@ def get_user_formset(controller, data=None):
 class SponsorForm(forms.ModelForm):
     sponsor = forms.ModelChoiceField(queryset=User.objects.all(),
             required=True, widget=forms.HiddenInput())
+    warned = forms.BooleanField(initial=False, required=False,
+                                widget=forms.HiddenInput())
 
     class Meta:
         model = User
@@ -416,8 +418,9 @@ class SponsorForm(forms.ModelForm):
             qset = m.GroupInfo.objects.filter(owner__id=sponsor)
             self.fields["groups"].query_set = qset
         self.fields["groups"].help_text = _("The new user will belong to the selected groups") 
-        for field in self.fields.itervalues():
-            field.required = True
+        for key, field in self.fields.iteritems():
+            if key != "warned":
+                field.required = True
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -434,5 +437,17 @@ class SponsorForm(forms.ModelForm):
             # restriction disabled if the setting is not set
             pass
         return email
-    
-
+  
+    def clean(self):
+        super(SponsorForm, self).clean()
+        if not self.cleaned_data.get("warned", False):
+            first_name = self.cleaned_data["first_name"]
+            last_name = self.cleaned_data["last_name"]
+            homonyms = User.objects.filter(first_name=first_name, last_name=last_name)
+            if homonyms:
+                self.data = self.data.copy()
+                self.data["warned"] = "on"
+                error = _(u"Warning! There are homonyms: %s!") % \
+                    u", ".join(u.username for u in homonyms)
+                raise forms.ValidationError(error)
+        return self.cleaned_data
