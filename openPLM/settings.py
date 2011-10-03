@@ -8,9 +8,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-    ("pcosquer", "pierre.cosquer@insa-rennes.fr"),
-    ("pjoulaud", "ninoo.fr@gmail.com"),
+    ('Your Name', 'your_email@domain.com'),
 )
 
 MANAGERS = ADMINS
@@ -92,6 +90,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'south',
     'openPLM.plmapp',
     # you can add your application after this line
     'openPLM.cad',
@@ -128,3 +127,7 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com",
 
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
+
+#: True if emails must have a domain of the list of sites
+RESTRICT_EMAIL_TO_DOMAINS = False
+

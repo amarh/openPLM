@@ -56,6 +56,11 @@ class ControllerTest(TestCase):
         self.user.save()
         self.user.get_profile().is_contributor = True
         self.user.get_profile().save()
+        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
+                description="grp")
+        self.group.save()
+        self.user.groups.add(self.group)
+        self.DATA["group"] = self.group
 
     def test_create(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
@@ -436,7 +441,8 @@ class DocumentControllerTest(ControllerTest):
         super(DocumentControllerTest, self).setUp()
         self.controller = self.CONTROLLER.create("adoc", self.TYPE, "a",
                                                  self.user, self.DATA)
-        self.part = PartController.create("mpart", "Part", "a", self.user)
+        self.part = PartController.create("mpart", "Part", "a", self.user,
+                self.DATA)
         self.old_files = []
 
     def tearDown(self):
@@ -584,7 +590,8 @@ class DocumentControllerTest(ControllerTest):
 
     def test_attach_to_part_error3(self):
         obj = PLMObject.objects.create(reference="obj", type="PLMObject",
-                           revision="a", creator=self.user, owner=self.user)
+                           revision="a", creator=self.user, owner=self.user,
+                           group=self.group)
         self.assertRaises(ValueError, self.controller.attach_to_part, obj)
     
     def test_attach_to_part_error4(self):

@@ -47,6 +47,11 @@ class CommonViewTest(TestCase):
         self.user.save()
         self.user.get_profile().is_contributor = True
         self.user.get_profile().save()
+        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
+                description="grp")
+        self.group.save()
+        self.user.groups.add(self.group)
+        self.DATA["group"] = self.group
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
         self.controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                                  self.user, self.DATA)
@@ -69,7 +74,8 @@ class ViewTest(CommonViewTest):
     def test_create2(self):
         response = self.client.get("/object/create/",
                                    {"type" : self.TYPE, "reference" : "mapart",
-                                    "revision" : "a", "name" : "MaPart"})
+                                    "revision" : "a", "name" : "MaPart",
+                                    "group" : str(self.group.id)})
 
         self.assertEqual(response.status_code, 200)
 
@@ -169,7 +175,7 @@ class SearchViewTest(CommonViewTest):
         # add a plmobject : the search should return the same results
         PLMObject.objects.create(reference="aa", type="PLMObject", 
                                      revision="c", owner=self.user,
-                                     creator=self.user)
+                                     creator=self.user, group=self.group)
         results = self.search({"type" : self.TYPE}) 
         self.assertEqual(results, [self.controller.object])
     
@@ -235,8 +241,13 @@ class MechantUserViewTest(TestCase):
         self.user.save()
         self.user.get_profile().is_contributor = True
         self.user.get_profile().save()
+        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
+                description="grp")
+        self.group.save()
+        self.user.groups.add(self.group)
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
-        self.controller = self.CONTROLLER.create("Part1", "Part", "a", owner)
+        self.controller = self.CONTROLLER.create("Part1", "Part", "a", owner,
+                {"group":self.group})
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
                                               self.controller.reference,
                                               self.controller.revision)

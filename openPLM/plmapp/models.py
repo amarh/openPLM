@@ -403,6 +403,7 @@ class PLMObject(models.Model):
     ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
+    group = models.ForeignKey(GroupInfo, related_name="%(class)s_group")
 
     # state and lifecycle
     lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"), 
@@ -411,7 +412,7 @@ class PLMObject(models.Model):
     state = models.ForeignKey(State, verbose_name=_("state"),
                               related_name="%(class)s_lifecyle",
                               default=get_default_state)
-
+    
     
     class Meta:
         # keys in the database
@@ -472,7 +473,7 @@ class PLMObject(models.Model):
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
-        return ["name",  "creator", "owner", "ctime", "mtime"]
+        return ["name",  "creator", "owner", "group", "ctime", "mtime"]
 
     @property
     def menu_items(self):
@@ -513,7 +514,7 @@ class PLMObject(models.Model):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_modification_fields`
         """
-        return [ugettext_noop("creator"), ugettext_noop("owner"), ugettext_noop("ctime"), ugettext_noop("mtime")]
+        return [ugettext_noop("creator"), ugettext_noop("owner"), ugettext_noop("ctime"), ugettext_noop("mtime"), ugettext_noop("group")]
 
     @classmethod
     def get_modification_fields(cls):
