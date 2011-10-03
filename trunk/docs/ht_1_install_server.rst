@@ -29,7 +29,7 @@ Install necessary packages
     #. :command:`easy_install odfpy`
     #. :command:`apt-get install graphviz graphviz-dev`
     #. :command:`easy_install pygraphviz`
-    #. :command:`apt-get install python-django`
+    #. :command:`apt-get install python-django python-django-south`
     #. :command:`apt-get install postgresql python-psycopg2 pgadmin3`
    
 Check applications are ok
@@ -137,7 +137,8 @@ Finalize installation
 =====================
 
     * :command:`cd /var/django/openPLM/trunk/openPLM/`
-    * :command:`./manage.py syncdb`
+    * :command:`./manage.py syncdb --all`
+    * :command:`./manage.py migrate --all --fake`
     
     .. note::
         You have to create the superadmin user for Django (in this example, we give 'MyAdmin' but you can change it)
