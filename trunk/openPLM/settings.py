@@ -131,3 +131,5 @@ MAX_FILE_SIZE = -1
 #: True if emails must have a domain of the list of sites
 RESTRICT_EMAIL_TO_DOMAINS = False
 
+COMPANY = "company"
+
