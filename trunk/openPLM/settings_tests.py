@@ -127,3 +127,6 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com",
 
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
+
+COMPANY = "company"
+

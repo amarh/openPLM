@@ -35,23 +35,16 @@ from openPLM.plmapp.lifecycle import *
 from openPLM.computer.models import *
 from openPLM.office.models import *
 from openPLM.cad.models import *
+
+from openPLM.plmapp.tests.base import BaseTestCase
         
-class CommonViewTest(TestCase):
+class CommonViewTest(BaseTestCase):
     TYPE = "Part"
     CONTROLLER = PartController
     DATA = {}
 
     def setUp(self):
-        self.user = User(username="user")
-        self.user.set_password("password")
-        self.user.save()
-        self.user.get_profile().is_contributor = True
-        self.user.get_profile().save()
-        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
-                description="grp")
-        self.group.save()
-        self.user.groups.add(self.group)
-        self.DATA["group"] = self.group
+        super(CommonViewTest, self).setUp()
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
         self.controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
                                                  self.user, self.DATA)
@@ -113,11 +106,20 @@ class ViewTest(CommonViewTest):
         wanted = (("draft", False), ("official", True), ("deprecated", False))
         self.assertEqual(lifecycles, wanted)
         # demote
+        lcl = LifecycleList("diop", "official", "draft", 
+                "issue1", "official", "deprecated")
+        lc = Lifecycle.from_lifecyclelist(lcl)
+        self.controller.lifecycle = lc
+        self.controller.state = State.objects.get(name="draft")
+        self.controller.save()
+        self.controller.promote()
+        self.assertEqual(self.controller.state.name, "issue1")
         response = self.client.post(self.base_url + "lifecycle/", 
                                     {"action" : "DEMOTE"})
         self.assertEqual(response.status_code, 200)
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True), ("official", False), ("deprecated", False))
+        wanted = (("draft", True), ("issue1", False), ("official", False),
+                ("deprecated", False))
         self.assertEqual(lifecycles, wanted)
 
     def test_revisions(self):

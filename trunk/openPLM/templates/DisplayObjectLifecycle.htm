@@ -5,7 +5,7 @@
 
 {% block content %}
     <form action="" method="POST">
-    {% if is_signer_dm %}
+        {% if is_signer_dm and obj.is_editable %}
         <input name="action" type="submit" value="DEMOTE"/>
         {% endif %}
         {% if is_signer and obj.is_promotable %}

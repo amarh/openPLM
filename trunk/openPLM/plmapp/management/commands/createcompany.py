@@ -126,6 +126,9 @@ class Command(BaseCommand):
                     creator=cie)
 
         cie.groups.add(gr)
+        p = cie.get_profile()
+        p.is_contributor = True
+        p.save()
 
         print "Company created successfully."
         

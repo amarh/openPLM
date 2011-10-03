@@ -27,6 +27,7 @@
 
 import re
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 import openPLM.plmapp.models as models
@@ -149,6 +150,9 @@ class PLMObjectController(Controller):
                 details = "change state from %(first)s to %(second)s" % \
                                      {"first" :state.name, "second" : new_state}
                 self._save_histo("Promote", details, roles=["sign_"])
+                if self.object.state == lifecycle.official_state:
+                    cie = models.User.objects.get(username=settings.COMPANY)
+                    self.set_owner(cie)
             except IndexError:
                 # FIXME raises it ?
                 pass
@@ -162,6 +166,8 @@ class PLMObjectController(Controller):
         
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
+        if not self.is_editable:
+            raise PromotionError()
         state = self.object.state
         lifecycle = self.object.lifecycle
         lcl = lifecycle.to_states_list()
