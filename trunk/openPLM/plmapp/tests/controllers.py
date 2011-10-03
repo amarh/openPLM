@@ -649,6 +649,7 @@ class DocumentControllerTest(ControllerTest):
         user = User(username="baduser")
         user.set_password("password")
         user.save()
+        user.groups.add(self.group)
         controller = self.CONTROLLER(self.controller.object, user)
         PLMObjectUserLink.objects.create(user=user, role="owner",
                                          plmobject=controller.object)
@@ -656,7 +657,19 @@ class DocumentControllerTest(ControllerTest):
         self.controller.lock(d)
         self.assertRaises(UnlockError, controller.checkin, d,
                           self.get_file())
-        
+    
+    def test_checkin_errors3(self):
+        user = User(username="baduser")
+        user.set_password("password")
+        user.save()
+        DelegationLink.objects.create(delegator=self.user, delegatee=user,
+                role=ROLE_OWNER)
+        controller = self.CONTROLLER(self.controller.object, user)
+        d = self.controller.add_file(self.get_file())
+        self.assertRaises(PermissionError, controller.checkin, d,
+                          self.get_file())
+
+
 class OfficeTest(DocumentControllerTest):
     TYPE = "OfficeDocument"
     CONTROLLER = OfficeDocumentController

@@ -388,3 +388,8 @@ class PLMObjectController(Controller):
         else:
             raise ValueError("bad value for role")
 
+    def check_permission(self, role, raise_=True):
+        if not bool(self.group.user_set.filter(id=self._user.id)):
+            raise PermissionError("action not allowed for %s" % self._user)
+        return super(PLMObjectController, self).check_permission(role, raise_)
+
