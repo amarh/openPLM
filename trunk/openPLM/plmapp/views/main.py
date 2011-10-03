@@ -1033,3 +1033,14 @@ def sponsor(request, obj_ref):
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.htm", ctx, request)
 
+@handle_errors
+def display_plmobjects(request, obj_ref):
+    """
+    View of the *objects* page of a group.
+    """
+    
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    ctx["objects"] = obj.plmobject_group.all().order_by("type", "reference", "revision")
+    ctx['current_page'] = 'groups'
+    return r2r("groups/objects.htm", ctx, request)
+
