@@ -1,0 +1,23 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+
+{% block content %}
+	<table class="Content">
+	    {% for object in objects %}
+            <tr class="Content">
+                <td class="Content">
+                    {{ object.type }}
+                </td>
+                
+                <td class="Content">
+                    <a href="{{ object.plmobject_url }}">{{object.reference}}</a>
+                </td>
+                <td class="Content">
+                    {{ object.revision }}
+                </td>
+		    </tr>
+	    {% endfor %}
+	</table>
+{% endblock %}
+
