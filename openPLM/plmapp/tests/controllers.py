@@ -31,7 +31,6 @@ import datetime
 from django.conf import settings
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.core.files.base import ContentFile
 from django.core.files import File
 
@@ -44,23 +43,12 @@ from openPLM.computer.models import *
 from openPLM.office.models import *
 from openPLM.cad.models import *
 
+from openPLM.plmapp.tests.base import BaseTestCase
 
-class ControllerTest(TestCase):
+class ControllerTest(BaseTestCase):
     CONTROLLER = PLMObjectController
     TYPE = "Part"
     DATA = {}
-
-    def setUp(self):
-        self.user = User(username="user")
-        self.user.set_password("password")
-        self.user.save()
-        self.user.get_profile().is_contributor = True
-        self.user.get_profile().save()
-        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
-                description="grp")
-        self.group.save()
-        self.user.groups.add(self.group)
-        self.DATA["group"] = self.group
 
     def test_create(self):
         controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
@@ -160,6 +148,15 @@ class ControllerTest(TestCase):
         controller.promote()
         self.assertEqual(controller.state.name, "official")
         self.failIf(controller.is_editable)
+        self.assertRaises(PromotionError, controller.demote)
+        lcl = LifecycleList("diop", "official", "draft", 
+                "issue1", "official", "deprecated")
+        lc = Lifecycle.from_lifecyclelist(lcl)
+        controller.lifecycle = lc
+        controller.state = State.objects.get(name="draft")
+        controller.save()
+        controller.promote()
+        self.assertEqual(controller.state.name, "issue1")
         controller.demote()
         self.assertEqual(controller.state.name, "draft")
         self.failUnless(controller.is_editable)
@@ -461,6 +458,14 @@ class DocumentControllerTest(ControllerTest):
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "official")
         self.failIf(self.controller.is_editable)
+        lcl = LifecycleList("diop", "official", "draft", 
+                "issue1", "official", "deprecated")
+        lc = Lifecycle.from_lifecyclelist(lcl)
+        self.controller.lifecycle = lc
+        self.controller.state = State.objects.get(name="draft")
+        self.controller.save()
+        self.controller.promote()
+        self.assertEqual(self.controller.state.name, "issue1")
         self.controller.demote()
         self.assertEqual(self.controller.state.name, "draft")
         self.failUnless(self.controller.is_editable)
