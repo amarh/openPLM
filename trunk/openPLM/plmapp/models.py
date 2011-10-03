@@ -257,15 +257,20 @@ class Lifecycle(models.Model):
 
         name of the lifecycle, must be unique
 
+    .. attribute:: official_state
+
+        *official* :class:`State` of the lifecycle
+
     .. note::
         A Lifecycle is iterable and each iteration returns a string of
         the next state.
 
+    .. seealso:: :class:`~plmapp.lifecycle.LifecycleList`
+        A class that simplifies the usage of a LifeCycle
+
     """
     name = models.CharField(max_length=50, primary_key=True)
     official_state = models.ForeignKey(State)
-
-    # XXX description field ?
 
     def __unicode__(self):
         return u'Lifecycle<%s>' % self.name
@@ -379,6 +384,9 @@ class PLMObject(models.Model):
         .. attribute:: state
             
             Current :class:`State` of the object
+        .. attribute:: group
+
+            :class:`GroupInfo` that owns the object
 
     .. note::
 
