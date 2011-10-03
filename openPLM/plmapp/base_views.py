@@ -330,6 +330,10 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         ctx['object_menu'] = selected_object.menu_items
     if hasattr(selected_object, "check_permission"):
         ctx["is_owner"] = selected_object.check_permission("owner", False)
+    if hasattr(selected_object, "check_readable"):
+        ctx["is_readable"] = selected_object.check_readable(False)
+    else:
+        ctx["is_readable"] = True
     return selected_object, ctx
 
 coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')

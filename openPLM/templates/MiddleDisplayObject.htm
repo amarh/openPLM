@@ -16,22 +16,26 @@
 	    </h2>
 	</div>
 	<div id="ActiveArea">
-        {% if object_menu and not navigate_bool %}
-	        <ul id="MenuList">
-                {% for menu_item in object_menu %}
-			        {% ifequal menu_item current_page%}
-			        <li class="CurrentPage">
-			        {%else%}
-			        <li>
-			        {%endifequal%}
-                        <a href="{{obj.plmobject_url}}{{menu_item}}/">
-                        {% filter upper %}{% trans menu_item %}{% endfilter%}
-		                </a>
-			        </li>
-	            {% endfor %}
-	            <li style="width:100%"></li>
-    	    </ul>
+        {% if is_readable %}
+            {% if object_menu and not navigate_bool %}
+                <ul id="MenuList">
+                    {% for menu_item in object_menu %}
+                        {% ifequal menu_item current_page%}
+                        <li class="CurrentPage">
+                        {%else%}
+                        <li>
+                        {%endifequal%}
+                            <a href="{{obj.plmobject_url}}{{menu_item}}/">
+                            {% filter upper %}{% trans menu_item %}{% endfilter%}
+                            </a>
+                        </li>
+                    {% endfor %}
+                    <li style="width:100%"></li>
+                </ul>
+            {% endif %}
+            {% block content %}{% endblock %}	
+        {% else %}
+            <p>{% trans "You are not allowed to see this object" %}</p>
         {% endif %}
-		{% block content %}{% endblock %}	
 	</div>
 {% endblock %}

@@ -402,3 +402,12 @@ class PLMObjectController(Controller):
                 return False
         return super(PLMObjectController, self).check_permission(role, raise_)
 
+    def check_readable(self, raise_=True):
+        if not self.is_editable:
+            return True
+        if bool(self.group.user_set.filter(id=self._user.id)):
+            return True
+        if raise_:
+            raise PermissionError("You can not see this object.")
+        return False
+
