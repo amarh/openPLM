@@ -209,7 +209,12 @@ class DocumentController(PLMObjectController):
         """
 
         if isinstance(part, PLMObjectController):
+            part.check_readable()
             part = part.object
+        else:
+            if not (isinstance(part, models.PLMObject) and hasattr(part, "part")):
+                raise ValueError("%s is not a part" % part)
+            type(self)(part, self._user).check_readable()
         self.documentpartlink_document.create(part=part)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (part, self.object))

@@ -63,6 +63,7 @@ class PartController(PLMObjectController):
         # check if child is not a parent
         if child.id == self.object.id:
             raise ValueError("Can not add child: child is current object")
+        type(self)(child, self._user).check_readable()
         parents = (p.link.parent.pk for p in self.get_parents(-1))
         if child.pk in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
@@ -259,7 +260,10 @@ class PartController(PLMObjectController):
         
         self.check_permission("owner")
         if isinstance(document, PLMObjectController):
+            document.check_readable()
             document = document.object
+        else:
+            type(self)(document, self._user).check_readable()
         self.documentpartlink_part.create(document=document)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (self.object, document))
