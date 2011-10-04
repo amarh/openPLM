@@ -146,7 +146,7 @@ def create(request):
         cls = models.get_all_plmobjects()[type_name]
     except KeyError:
         return {"result" : "error", 'error' : 'bad type'}
-    form = forms.get_creation_form(cls, request.POST)
+    form = forms.get_creation_form(request.user, cls, request.POST)
     if form.is_valid():
         controller_cls = get_controller(type_name)
         controller = controller_cls.create_from_form(form, request.user)
@@ -313,7 +313,8 @@ def get_creation_fields(request, typename):
     :implements: :func:`http_api.creation_fields`
     """
     try:
-        form = forms.get_creation_form(models.get_all_plmobjects()[typename])
+        form = forms.get_creation_form(request.user,
+                models.get_all_plmobjects()[typename])
     except KeyError:
         return {"result" : "error", "fields" : []}
     return {"fields" : get_fields_from_form(form)}

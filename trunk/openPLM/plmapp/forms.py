@@ -37,7 +37,6 @@ import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
-from openPLM.plmapp.exceptions import PermissionError
 
 class PLMObjectForm(forms.Form):
     u"""
@@ -61,7 +60,7 @@ def _clean_revision(self):
         raise ValidationError(_("Bad revision: '#', '?', '/' and '..' are not allowed"))
     return re.sub("\s+", " ", data.strip(" "))
 
-def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
+def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
     Returns a creation form suitable to creates an object
     of type *cls*.
@@ -89,10 +88,10 @@ def get_creation_form(cls=m.PLMObject, data=None, empty_allowed=False):
                 return cleaned_data
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
-    if data:
-        return Form(data=data, empty_permitted=empty_allowed)
-    else:
-        return Form()
+    form = Form(data=data, empty_permitted=empty_allowed) if data else Form()
+    if issubclass(cls, m.PLMObject):
+        form.fields["group"].queryset = user.groupinfo_set.all()
+    return form
 get_creation_form.cache = {}
         
 def get_modification_form(cls=m.PLMObject, data=None, instance=None):
@@ -144,7 +143,7 @@ def get_search_form(cls=m.PLMObject, data=None):
         if issubclass(cls, (m.PLMObject, m.GroupInfo)):
             fields = set(cls.get_creation_fields())
             fields.update(set(cls.get_modification_fields()))
-            fields.difference_update(("type", "lifecycle"))
+            fields.difference_update(("type", "lifecycle", "group"))
         else:
             fields = set(["username", "first_name", "last_name"])
         fields_dict = {}
@@ -416,7 +415,7 @@ class SponsorForm(forms.ModelForm):
             sponsor = int(self.data["sponsor"])
         if sponsor is not None:
             qset = m.GroupInfo.objects.filter(owner__id=sponsor)
-            self.fields["groups"].query_set = qset
+            self.fields["groups"].queryset = qset
         self.fields["groups"].help_text = _("The new user will belong to the selected groups") 
         for key, field in self.fields.iteritems():
             if key != "warned":
