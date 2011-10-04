@@ -12,7 +12,7 @@
 
             {% for lang in LANGUAGES %}
                 <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
-                    {{ lang.1 }}
+                {{ lang.1 }}
                 </option>
             {% endfor %}
         </select>
@@ -21,105 +21,106 @@
 {% endblock %}
 
 {% block SearchBlock %}
-	<form id="search_form" method="get" action="." enctype="text/plain">
+    <form id="search_form" method="get" action="." enctype="text/plain">
         <table class="Content" id="search_table">
-			{{type_form.as_table}}
-			{{attributes_form.as_table}}
-		</table>
+            {{type_form.as_table}}
+            {{attributes_form.as_table}}
+        </table>
         <div style="text-align:center"><input type="submit" value="{% trans "SEARCH !" %}"/></div>
-	</form>
+    </form>
 {% endblock %}
 
 {% block ResultBlock %}
     {% if link_creation %}
-	    Results for link creation :
+        Results for link creation :
     {% endif %}
-	<table class="Result">
-            {% for object in results %}
-                {% if forloop.first %}
-                    {% if not object.username %}                
-                        <col width="30%"/>
-                        <col width="30%"/>
-                        <col width="20%"/>
-                        <col width="20%"/>
-                    {% endif %}
-				    <tr class="Content">
-                        {% if object.username %}
+    <table class="Result">
+        {% for object in results %}
+            {% if forloop.first %}
+                {% if not object.username %}                
+                    <col width="30%"/>
+                    <col width="30%"/>
+                    <col width="20%"/>
+                    <col width="20%"/>
+                {% endif %}
+                <tr class="Content">
+                    {% if object.username %}
                         <th class="Content">{% trans "Username" %}</th>
                         <th class="Content">{% trans "Last name" %}</th>
-                        {% else %}
+                    {% else %}
                         <th class="Content">{% trans "Type" %}</th>
                         <th class="Content">{% trans "Reference" %}</th>
                         <th class="Content">{% trans "Rev." %}</th>
-                        {% endif %}
-                        {% if link_creation %}
-                            <th>{% trans "ADD" %}</th>
-                        {% else %}
-                            <th class="Content">{% trans "Name" %}</th>
-                        {% endif %}
-                    </tr>
+                    {% endif %}
+                    {% if link_creation %}
+                        <th>{% trans "ADD" %}</th>
+                    {% else %}
+                        <th class="Content">{% trans "Name" %}</th>
+                    {% endif %}
+                </tr>
+            {% endif %}
+
+            <tr class="{% cycle 'Content' 'Content2' as rowcolors %}">
+                {% if object.username %}
+                    <td class="Content">
+                        <a href="{{object.plmobject_url}}">
+                            {{object.username|escape}}
+                        </a>
+                    </td>
+                    <td class="Content">{{object.last_name|escape}}</td>
+                {% else %}
+                    <td class="Content">{{object.type|escape}}</td>
+                    <td class="Content reference">
+                        <a href="{{object.plmobject_url}}">
+                            {{object.reference|escape}}
+                        </a>
+                    </td>
+                    <td class="Content">{{object.revision|escape}}</td>
+                    {% if not link_creation %}
+                        <td class="Content">
+                            <span class="info">
+                                <span class="small">{{object.name|trunc:10}}</span>
+                                <span class="long">{{object.name}}</span>
+                            </span>
+                        </td>
+                    {% endif %}
                 {% endif %}
 
-			    <tr class="{% cycle 'Content' 'Content2' as rowcolors %}">
-				        {% if object.username %}
-				            <td class="Content">
-				                <a href="{{object.plmobject_url}}">
-				                        {{object.username|escape}}
-		                        </a>
-	                        </td>
-				            <td class="Content">{{object.last_name|escape}}</td>
-				        {% else %}
-				            <td class="Content">{{object.type|escape}}</td>
-				            <td class="Content reference">
-				                <a href="{{object.plmobject_url}}">
-				                        {{object.reference|escape}}
-		                        </a>
-	                        </td>
-                            <td class="Content">{{object.revision|escape}}</td>
-                            {% if not link_creation %}
-                            <td class="Content">
-                                <span class="info">
-                                    <span class="small">{{object.name|trunc:10}}</span>
-                                    <span class="long">{{object.name}}</span>
-                                </span>
-                            </td>
-                            {% endif %}
-                        {% endif %}
-
-				        <form method="post" action="." enctype="multipart/form-data">
-                                {% if object.username %}
+                <form method="post" action="." enctype="multipart/form-data">
+                    {% if object.username %}
                         <input type="hidden" name="type" value="User"/>
                         <input type="hidden" name="username" value="{{object.username|escape}}"/>
-                                
-                                {% else %}
-		                <input type="hidden" name="type" value="{{object.type|escape}}"/>
+
+                    {% else %}
+                        <input type="hidden" name="type" value="{{object.type|escape}}"/>
                         <input type="hidden" name="reference" value="{{object.reference|escape}}"/>
-		                <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
+                        <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
 
-                                {% endif %}
-                            {% if link_creation %}
-
-                                <td class="Content">
-                            <input type="submit" value="{% trans "ADD" %}"/>
-                        </td>
+                    {% endif %}
+                    {% if link_creation %}
+                        {% if object|can_add:attach %}
+                            <td class="Content">
+                                <input type="submit" value="{% trans "ADD" %}"/>
+                            </td>
                         {% endif %}
-                        </form>
-                    </tr>
-            {% empty %}
+                    {% endif %}
+                </form>
+            </tr>
+        {% empty %}
             <tr>{% trans "No result matching given query" %}</tr>
-			{% endfor %}
-	</table>
+        {% endfor %}
+    </table>
 {% endblock %}
 
 {% block CreationBlock %}
-	<form method="get" action="/object/create/" enctype="text/plain">
-		<ul>
-		    {{type_form4creation.as_ul}}
+    <form method="get" action="/object/create/" enctype="text/plain">
+        <ul>
+            {{type_form4creation.as_ul}}
             <li>
-                <input type="submit" value="{% trans "CREATE !" %}"/>
+            <input type="submit" value="{% trans "CREATE !" %}"/>
             </li>
         </ul>
-	</form>
+    </form>
 {% endblock %}
 
 

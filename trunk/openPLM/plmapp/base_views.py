@@ -323,6 +323,7 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
                 'type_form4creation' : type_form4creation,
                 'attributes_form' : attributes_form,
                 'link_creation' : False,
+                'attach' : (selected_object, False),
                 'class4div' : class_for_div,
                 'obj' : selected_object,
               })

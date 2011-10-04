@@ -31,6 +31,7 @@ from collections import namedtuple
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
+from openPLM.plmapp.controllers.base import get_controller
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
@@ -63,7 +64,7 @@ class PartController(PLMObjectController):
         # check if child is not a parent
         if child.id == self.object.id:
             raise ValueError("Can not add child: child is current object")
-        type(self)(child, self._user).check_readable()
+        get_controller(child.type)(child, self._user).check_readable()
         parents = (p.link.parent.pk for p in self.get_parents(-1))
         if child.pk in parents:
             raise ValueError("Can not add child %s to %s, it is a parent" %
@@ -73,6 +74,18 @@ class PartController(PLMObjectController):
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
 
+    def can_add_child(self, child):
+        """
+        Returns True if *child* can be added to *self*.
+        """
+
+        can_add = False
+        try:
+            self.check_add_child(child)
+            can_add = True
+        except StandardError:
+            pass
+        return can_add
 
     def add_child(self, child, quantity, order):
         """
@@ -258,12 +271,9 @@ class PartController(PLMObjectController):
             :attr:`object`.
         """
         
-        self.check_permission("owner")
+        self.check_attach_document(document)
         if isinstance(document, PLMObjectController):
-            document.check_readable()
             document = document.object
-        else:
-            type(self)(document, self._user).check_readable()
         self.documentpartlink_part.create(document=document)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (self.object, document))
@@ -300,7 +310,32 @@ class PartController(PLMObjectController):
         if isinstance(document, PLMObjectController):
             document = document.object
         return bool(self.documentpartlink_part.filter(document=document))
-   
+    
+    def check_attach_document(self, document):
+        self.check_permission("owner")
+        if isinstance(document, PLMObjectController):
+            document.check_readable()
+            document = document.object
+        else:
+            if not hasattr(document, "document"):
+                raise TypeError("%s is not a document" % document)
+            get_controller(document.type)(document, self._user).check_readable()
+            type(self)(document, self._user).check_readable()
+        if self.is_document_attached(document):
+            raise ValueError("Document is already attached.")
+
+    def can_attach_document(self, document):
+        """
+        Returns True if *document* can be attached to the current part.
+        """
+        can_attach = False
+        try:
+            self.check_attach_document(document)
+            can_attach = True
+        except StandardError:
+            pass
+        return can_attach
+
     def update_doc_cad(self, formset):
         u"""
         Updates doc_cad informations with data from *formset*
