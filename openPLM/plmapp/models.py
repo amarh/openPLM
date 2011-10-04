@@ -1012,6 +1012,26 @@ def get_all_users_and_plmobjects_with_level():
     _get_all_subclasses_with_level(User, list_of_choices, level)
     return list_of_choices
 
+
+class Invitation(models.Model):
+    PENDING = "p"
+    ACCEPTED = "a"
+    REFUSED = "r"
+    STATES = ((PENDING, "Pending"),
+              (ACCEPTED, "Accepted"),
+              (REFUSED, "Refused"))
+    group = models.ForeignKey(GroupInfo)
+    owner = models.ForeignKey(User, related_name="%(class)s_inv_owner")
+    guest = models.ForeignKey(User, related_name="%(class)s_inv_guest")
+    state = models.CharField(max_length=1, choices=STATES, default=PENDING)
+    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+                                 auto_now_add=False)
+    validation_time = models.DateTimeField(_("date of validation"), null=True)
+    guest_asked = models.BooleanField(_("True if guest created the invitation"))
+    token = models.CharField(max_length=155, primary_key=True,
+            default=lambda:str(random.getrandbits(512)))
+    
+    
 # import_models should be the last function
 
 def import_models(force_reload=False):

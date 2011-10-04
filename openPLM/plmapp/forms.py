@@ -450,3 +450,10 @@ class SponsorForm(forms.ModelForm):
                     u", ".join(u.username for u in homonyms)
                 raise forms.ValidationError(error)
         return self.cleaned_data
+
+_inv_qset = m.Invitation.objects.filter(state=m.Invitation.PENDING)
+class InvitationForm(forms.Form):
+    invitation = forms.ModelChoiceField(queryset=_inv_qset,
+            required=True, widget=forms.HiddenInput())
+
+

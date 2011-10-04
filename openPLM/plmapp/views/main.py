@@ -994,6 +994,7 @@ def display_users(request, obj_ref):
         formset = forms.get_user_formset(obj)
     ctx["user_formset"] = formset
     ctx['current_page'] = 'users' 
+    ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
     return r2r("groups/users.htm", ctx, request)
 
 @handle_errors
@@ -1014,6 +1015,19 @@ def group_add_user(request, obj_ref):
     ctx["add_user_form"] = form
     ctx['current_page'] = 'users' 
     return r2r("groups/add_user.htm", ctx, request)
+
+@handle_errors
+def group_ask_to_join(request, obj_ref):
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    if request.method == "POST":
+        obj.ask_to_join()
+        return HttpResponseRedirect("..")
+    else:
+        form = forms.SelectUserForm()
+    ctx["ask_form"] = ""
+    ctx['current_page'] = 'users' 
+    ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
+    return r2r("groups/ask_to_join.htm", ctx, request)
 
 @handle_errors
 def display_groups(request, obj_ref):
@@ -1051,4 +1065,41 @@ def display_plmobjects(request, obj_ref):
     ctx["objects"] = obj.plmobject_group.all().order_by("type", "reference", "revision")
     ctx['current_page'] = 'groups'
     return r2r("groups/objects.htm", ctx, request)
+
+@handle_errors(undo="../../../users/")
+def accept_invitation(request, obj_ref, token):
+    token = long(token)
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    inv = models.Invitation.objects.get(token=token)
+    if request.method == "POST":
+        form = forms.InvitationForm(request.POST)
+        if form.is_valid() and inv == form.cleaned_data["invitation"]:
+            obj.accept_invitation(inv)
+            return HttpResponseRedirect("../../../users/")
+    else:
+        form = forms.InvitationForm(initial={"invitation" : inv})
+    ctx["invitation_form"] = form
+    ctx['current_page'] = 'users'
+    ctx["invitation"] = inv
+    return r2r("groups/accept_invitation.htm", ctx, request)
+
+ 
+@handle_errors(undo="../../../users/")
+def refuse_invitation(request, obj_ref, token):
+    token = long(token)
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    inv = models.Invitation.objects.get(token=token)
+    if request.method == "POST":
+        form = forms.InvitationForm(request.POST)
+        if form.is_valid() and inv == form.cleaned_data["invitation"]:
+            obj.refuse_invitation(inv)
+            return HttpResponseRedirect("../../../users/")
+    else:
+        form = forms.InvitationForm(initial={"invitation" : inv})
+    ctx["invitation_form"] = form
+    ctx["invitation"] = inv
+    ctx['current_page'] = 'users'
+    return r2r("groups/refuse_invitation.htm", ctx, request)
+
+           
 

@@ -1,5 +1,6 @@
 from django import template
 from django.contrib.auth.models import User
+from openPLM.plmapp.controllers.user import UserController
 
 register = template.Library()
 
@@ -30,6 +31,6 @@ def can_add(child, arg):
     elif action == "add_child":
         return parent.can_add_child(child)
     elif action == "delegate":
-        return isinstance(child, User)
+        return isinstance(child, (User, UserController))
  
     return False
