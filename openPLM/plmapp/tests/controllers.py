@@ -588,16 +588,16 @@ class DocumentControllerTest(ControllerTest):
         self.controller.attach_to_part(self.part)
     
     def test_attach_to_part_error1(self):
-        self.assertRaises(ValueError, self.controller.attach_to_part, None)
+        self.assertRaises(TypeError, self.controller.attach_to_part, None)
     
     def test_attach_to_part_error2(self):
-        self.assertRaises(ValueError, self.controller.attach_to_part, self)
+        self.assertRaises(TypeError, self.controller.attach_to_part, self)
 
     def test_attach_to_part_error3(self):
         obj = PLMObject.objects.create(reference="obj", type="PLMObject",
                            revision="a", creator=self.user, owner=self.user,
                            group=self.group)
-        self.assertRaises(ValueError, self.controller.attach_to_part, obj)
+        self.assertRaises(TypeError, self.controller.attach_to_part, obj)
     
     def test_attach_to_part_error4(self):
         obj = self.CONTROLLER.create("ob", self.TYPE, "a", self.user, self.DATA)

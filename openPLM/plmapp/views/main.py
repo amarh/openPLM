@@ -65,7 +65,7 @@ from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
-         handle_errors, get_generic_data, get_navigate_data
+    get_obj_by_id, handle_errors, get_generic_data, get_navigate_data
 
 
 def r2r(template, dictionary, request):
@@ -938,6 +938,8 @@ def download(request, docfile_id, filename=""):
     :return: a :class:`django.http.HttpResponse`
     """
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
+    ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
+    ctrl.check_readable()
     name = doc_file.filename.encode("utf-8", "ignore")
     mimetype = guess_type(name, False)[0]
     if not mimetype:

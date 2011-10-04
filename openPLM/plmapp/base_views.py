@@ -305,17 +305,14 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         type_form4creation = TypeFormWithoutUser()
         request_dict.session['type'] = 'Part'
         attributes_form = get_search_form(models.Part)
-    if attributes_form.is_valid():
-        if search_need:
-            qset = cls.objects.all()
-            qset = attributes_form.search(qset)[:30]
-            if qset is None:
-                qset = []
-            if issubclass(cls, User):
-                qset = [UserController(u, request_dict.user) for u in qset]
-            request_dict.session["results"] = qset
-        else:
-            qset = request_dict.session["results"] 
+    if attributes_form.is_valid() and search_need:
+        qset = cls.objects.all()
+        qset = attributes_form.search(qset)[:30]
+        if qset is None:
+            qset = []
+        if issubclass(cls, User):
+            qset = [UserController(u, request_dict.user) for u in qset]
+        request_dict.session["results"] = qset
     else:
         qset = request_dict.session.get("results", [])
     ctx.update({'results' : qset, 
