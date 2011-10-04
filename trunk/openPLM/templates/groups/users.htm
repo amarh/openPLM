@@ -8,11 +8,17 @@
 
         {{ user_formset.management_form }}
         {% if is_owner %}
-            <span class="ButtonLeft">
+                <span class="ButtonLeft">
                     <a class="Button" href="./add/">{% trans "Add another user" %}</a>
-            </span>
+                </span>
             {% if user_formset.forms %}
                 <input type="submit" value="{% trans "Remove selected users" %}"/>
+            {% endif %}
+        {% else %}
+            {% if not in_group %}
+                <span class="ButtonLeft">
+                    <a class="Button" href="./join/">{% trans "Ask to join this group" %}</a>
+                </span>
             {% endif %}
         {% endif %}
 

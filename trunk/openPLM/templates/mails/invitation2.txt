@@ -1,0 +1,12 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans with group.name as group and invitation.guest.first_name as s_first_name and invitation.guest.last_name as s_last_name and invitation.guest.username as s_username %}
+{{ s_first_name }} {{s_last_name}} ({{s_username}}) ask you to join the group {{group}}.
+{% endblocktrans %}
+
+{% trans "Click here to accept the invitation" %}
+http://{{site.domain}}/group/{{group.name}}/invitation/accept/{{invitation.token}}/
+
+{% trans "Click here to refuse the invitation" %}
+http://{{site.domain}}/group/{{group.name}}/invitation/refuse/{{invitation.token}}/
+{% endautoescape %}

@@ -29,8 +29,11 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
+import datetime
 
 import openPLM.plmapp.models as models
+from openPLM.plmapp.mail import send_mail
+from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
 
 class GroupController(Controller):
@@ -138,7 +141,59 @@ class GroupController(Controller):
         """
         Adds *user* to the group.
         """
+        if not user.email:
+            raise ValueError("user's email is empty")
+        inv = models.Invitation.objects.create(group=self.object, owner=self._user,
+                guest=user, guest_asked=False)
+        ctx = { "group" : self.object,
+                "invitation" : inv,
+                }
+        subject = "[PLM] Invitation to join the group %s" % self.name 
+        send_mail(subject, [user], ctx, "mails/invitation1")
+
+    def ask_to_join(self):
+        """
+        Adds *user* to the group.
+        """
+        if not self.owner.email:
+            raise ValueError("user's email is empty")
+        inv = models.Invitation.objects.create(group=self.object, owner=self.owner,
+                guest=self._user, guest_asked=True)
+        ctx = { "group" : self.object,
+                "invitation" : inv,
+                "guest" : self._user
+                }
+        subject = "[PLM] %s ask you to join the group %s" % (self._user, self.name) 
+        send_mail(subject, [self.owner], ctx, "mails/invitation2")
+
+
+    def accept_invitation(self, invitation):
+        if invitation.state != models.Invitation.PENDING:
+            raise ValueError("Invalid invitation")
+        if invitation.guest_asked:
+            if self._user != invitation.owner:
+                raise PermissionError("You can not accept this invitation.")
+        else:
+            if self._user != invitation.guest:
+                raise PermissionError("You can not accept this invitation.")
+            
+        invitation.state = models.Invitation.ACCEPTED
+        invitation.validation_time = datetime.datetime.now()
+
+        user = invitation.guest
         user.groups.add(self.object)
-        # TODO send a more relevant mail
         self._save_histo("User added", user.username, users=(user,))
+
+    def refuse_invitation(self, invitation):
+        if invitation.state != models.Invitation.PENDING:
+            raise ValueError("Invalid invitation")
+        if invitation.guest_asked:
+            if self._user != invitation.owner:
+                raise PermissionError("You can not refuse this invitation.")
+        else:
+            if self._user != invitation.guest:
+                raise PermissionError("You can not refuse this invitation.")
+        invitation.state = models.Invitation.REFUSED
+        invitation.validation_time = datetime.datetime.now()
+        # TODO mail
 
