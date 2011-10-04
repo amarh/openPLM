@@ -251,7 +251,7 @@ class DocumentController(PLMObjectController):
             part.check_readable()
             part = part.object
         else:
-            if not hasattr(part, "part"):
+            if not (isinstance(part, models.PLMObject) and hasattr(part, "part")):
                 raise TypeError("%s is not a part" % part)
             get_controller(part.type)(part, self._user).check_readable()
         if self.is_part_attached(part):

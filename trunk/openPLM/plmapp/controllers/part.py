@@ -317,7 +317,8 @@ class PartController(PLMObjectController):
             document.check_readable()
             document = document.object
         else:
-            if not hasattr(document, "document"):
+            if not (isinstance(document, models.PLMObject) and \
+                    hasattr(document, "document")):
                 raise TypeError("%s is not a document" % document)
             get_controller(document.type)(document, self._user).check_readable()
             type(self)(document, self._user).check_readable()
