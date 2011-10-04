@@ -279,7 +279,9 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     else:
         add_child_form = AddChildForm()
         ctx.update({'current_page':'BOM-child'})
-    ctx.update({'link_creation': True, 'add_child_form': add_child_form, })
+    ctx.update({'link_creation': True,
+                'add_child_form': add_child_form,
+                'attach' : (obj, "add_child")})
     return r2r('DisplayObjectChildAdd.htm', ctx, request)
     
 ##########################################################################################    
@@ -363,7 +365,9 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
     else:
         add_doc_cad_form = AddDocCadForm()
-    ctx.update({'link_creation': True, 'add_doc_cad_form': add_doc_cad_form, })
+    ctx.update({'link_creation': True,
+                'add_doc_cad_form': add_doc_cad_form,
+                'attach' : (obj, "attach_doc")})
     return r2r('DisplayDocCadAdd.htm', ctx, request)
     
 #############################################################################################
@@ -415,7 +419,8 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     else:
         add_rel_part_form = AddRelPartForm()
     ctx.update({'link_creation': True,
-                'add_rel_part_form': add_rel_part_form, })
+                'add_rel_part_form': add_rel_part_form,
+                'attach' : (obj, "attach_part") })
     return r2r('DisplayRelPartAdd.htm', ctx, request)
 
 ##########################################################################################
@@ -464,7 +469,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             add_file_form = AddFileForm(request.POST)
     else:
         add_file_form = AddFileForm()
-    ctx.update({'link_creation': True, 'add_file_form': add_file_form, })
+    ctx.update({ 'add_file_form': add_file_form, })
     return r2r('DisplayFileAdd.htm', ctx, request)
 
 #############################################################################################
@@ -530,7 +535,8 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     
     ctx.update({'current_page':'management', 
                 'replace_management_form': replace_management_form,
-                'link_creation': True,})
+                'link_creation': True,
+                'attach' : (obj, "delegate")})
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
 
 ##########################################################################################    
@@ -557,7 +563,8 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     
     ctx.update({'current_page':'management', 
                 'replace_management_form': add_management_form,
-                'link_creation': True,})
+                'link_creation': True,
+                "attach" : (obj, "delegate")})
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
 
 ##########################################################################################    
@@ -846,6 +853,7 @@ def delegate(request, obj_ref, role, sign_level):
     ctx.update({'current_page':'delegation',
                 'replace_management_form': delegation_form,
                 'link_creation': True,
+                'attach' : (obj, "delegate"),
                 'role': role})
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
     
@@ -888,7 +896,6 @@ def stop_delegate(request, obj_ref, role, sign_level):
     
     ctx.update({'current_page':'parts-doc-cad',
                 'replace_management_form': delegation_form,
-                'link_creation': True,
                 'action_message': action_message_string})
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
     
@@ -915,8 +922,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
         checkin_file_form = AddFileForm()
-    ctx.update({'link_creation' : True,
-                'add_file_form' : checkin_file_form, })
+    ctx['add_file_form'] =  checkin_file_form
     return r2r('DisplayFileAdd.htm', ctx, request)
 
 ##########################################################################################

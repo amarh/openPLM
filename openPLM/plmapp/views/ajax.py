@@ -159,11 +159,7 @@ def ajax_can_add_child(request, part_id):
         form = forms.AddRelPartForm(request.GET)
         if form.is_valid():
             child = get_obj_from_form(form, request.user)
-            try:
-                part.check_add_child(child)
-                data["can_add"] = True
-            except StandardError:
-                pass
+            data["can_add"] = part.can_add_child(child)
     return data
 
 @login_required
@@ -208,11 +204,9 @@ def ajax_can_attach(request, plmobject_id):
         if form.is_valid():
             attached = get_obj_from_form(form, request.user)
             if attached.check_readable(False):
-                if hasattr(plmobject, "is_document_attached"):
-                    data["can_attach"] = not (hasattr(attached, "part") or \
-                                     plmobject.is_document_attached(attached))
-                elif hasattr(plmobject, "is_part_attached"):
-                    data["can_attach"] = not (hasattr(attached, "document") or \
-                                     plmobject.is_part_attached(attached))
+                if hasattr(plmobject, "can_attach_document"):
+                    data["can_attach"] = plmobject.can_attach_document(attached)
+                elif hasattr(plmobject, "can_attach_part"):
+                    data["can_attach"] = plmobject.can_attach_part(attached)
     return data
 

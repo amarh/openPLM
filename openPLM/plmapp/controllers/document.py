@@ -35,6 +35,7 @@ from django.conf import settings
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
+from openPLM.plmapp.controllers.base import get_controller
 
 class DocumentController(PLMObjectController):
     """
@@ -208,13 +209,9 @@ class DocumentController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
 
+        self.check_attach_part(part)        
         if isinstance(part, PLMObjectController):
-            part.check_readable()
             part = part.object
-        else:
-            if not (isinstance(part, models.PLMObject) and hasattr(part, "part")):
-                raise ValueError("%s is not a part" % part)
-            type(self)(part, self._user).check_readable()
         self.documentpartlink_document.create(part=part)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
                          "Part : %s - Document : %s" % (part, self.object))
@@ -247,6 +244,30 @@ class DocumentController(PLMObjectController):
         if isinstance(part, PLMObjectController):
             part = part.object
         return bool(self.documentpartlink_document.filter(part=part))
+
+    def check_attach_part(self, part):
+        self.check_permission("owner")
+        if isinstance(part, PLMObjectController):
+            part.check_readable()
+            part = part.object
+        else:
+            if not hasattr(part, "part"):
+                raise TypeError("%s is not a part" % part)
+            get_controller(part.type)(part, self._user).check_readable()
+        if self.is_part_attached(part):
+            raise ValueError("part is already attached.")
+    
+    def can_attach_part(self, part):
+        """
+        Returns True if *part* can be attached to the current document.
+        """
+        can_attach = False
+        try:
+            self.check_attach_part(part)
+            can_attach = True
+        except StandardError:
+            pass
+        return can_attach
 
     def revise(self, new_revision):
         # same as PLMObjectController + duplicate files (and their thumbnails)
