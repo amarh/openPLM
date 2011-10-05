@@ -237,9 +237,10 @@ class UserController(Controller):
             # restriction disabled if the setting is not set
             pass
         password = generate_password()
-        new_user.is_contributor = is_contributor
         new_user.set_password(password)
         new_user.save()
+        new_user.get_profile().is_contributor = is_contributor
+        new_user.get_profile().save()
         link = models.DelegationLink(delegator=self._user, delegatee=new_user,
                 role=models.ROLE_SPONSOR)
         link.save()

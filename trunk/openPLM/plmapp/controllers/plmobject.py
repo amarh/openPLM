@@ -104,8 +104,16 @@ class PLMObjectController(Controller):
         res._save_histo("Create", details)
         # add links
         models.PLMObjectUserLink.objects.create(plmobject=obj, user=user, role="owner")
+        try:
+            l = models.DelegationLink.objects.get(delegatee=user,
+                    role=models.ROLE_SPONSOR)
+            sponsor = l.delegator
+            if sponsor.username == settings.COMPANY:
+                sponsor = user
+        except models.DelegationLink.DoesNotExist:
+            sponsor = user
         for i in range(len(obj.lifecycle.to_states_list()) - 1):
-            models.PLMObjectUserLink.objects.create(plmobject=obj, user=user,
+            models.PLMObjectUserLink.objects.create(plmobject=obj, user=sponsor,
                                                     role=level_to_sign_str(i))
         return res
         
