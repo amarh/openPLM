@@ -182,6 +182,7 @@ class GroupController(Controller):
 
         user = invitation.guest
         user.groups.add(self.object)
+        user.groupinfo_set.add(self.object)
         self._save_histo("User added", user.username, users=(user,))
 
     def refuse_invitation(self, invitation):
