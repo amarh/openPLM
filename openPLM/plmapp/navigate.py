@@ -45,9 +45,9 @@ OSR = "only_search_results"
 
 def get_path(obj):
     if hasattr(obj, "type"):
-        return "/".join((obj.type, obj.reference, obj.revision))
+        return u"/".join((obj.type, obj.reference, obj.revision))
     else:
-        return obj.username
+        return u"User/%s/-/" % obj.username
 
 
 class FrozenAGraph(pgv.AGraph):
@@ -92,14 +92,23 @@ class NavigationGraph(object):
         *results* must not be a QuerySet if it contains users.
     """
 
-    GRAPH_ATTRIBUTES = dict(dpi='96.0', aspect='2', mindist=".5", center='true',
-                            ranksep='1.2', pad='0.1', mode="ipsep",
-                            overlap="false", splines="false", sep="+.1,.1",
-                            nodesep=".2", outputorder="edgesfirst",
+    GRAPH_ATTRIBUTES = dict(dpi='96.0',
+                            mindist=".5",
+                            center='true',
+                            pad='0.1',
+                            mode="ipsep",
+                            overlap="false",
+                            splines="false",
+                            sep="+.1,.1",
+                            outputorder="edgesfirst",
                             bgcolor="transparent")
     NODE_ATTRIBUTES = dict(shape='Mrecord', fixedsize='true', fontsize='10',
                            style='filled', width='1.0', height='0.6')
-    EDGE_ATTRIBUTES = dict(color='#000000', minlen="1.5", len="1.5", arrowhead='normal')
+    EDGE_ATTRIBUTES = dict(color='#aaaaaa',
+                           minlen="1.5",
+                           len="1.5",
+                           arrowhead='normal',
+                           fontsize="9")
     TYPE_TO_ATTRIBUTES = {UserController : dict(color='#c7dec5',
                             image=os.path.join(basedir, "user.png")),
                           PartController : dict(color='#b5c5ff',
@@ -176,15 +185,19 @@ class NavigationGraph(object):
 
         """
         self.options.update(options)
+        if self.options["prog"] == "twopi":
+            self.graph.graph_attr["ranksep"] = "1.2"
         
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
         for child_l in obj.get_children():
-            if self.options[OSR] and child_l.link.child.id not in self.results:
+            link = child_l.link
+            if self.options[OSR] and link.child.id not in self.results:
                 continue
-            child = PartController(child_l.link.child, None)
-            self.graph.add_edge(obj.id, child.id)
+            child = PartController(link.child, None)
+            label = "Qty: %d\\nOrder: %d" % (link.quantity, link.order) 
+            self.graph.add_edge(obj.id, child.id, label)
             self._set_node_attributes(child)
             if self.options['doc'] or child.id in self.options["doc_parts"]:
                self._create_doc_edges(child)
@@ -194,10 +207,12 @@ class NavigationGraph(object):
         if self.options[OSR] and self.users_result:
             return
         for parent_l in obj.get_parents():
-            if self.options[OSR] and parent_l.link.parent.id not in self.results:
+            link = parent_l.link
+            if self.options[OSR] and link.parent.id not in self.results:
                 continue
-            parent = PartController(parent_l.link.parent, None)
-            self.graph.add_edge(parent.id, obj.id)
+            parent = PartController(link.parent, None)
+            label = "Qty: %d\\nOrder: %d" % (link.quantity, link.order) 
+            self.graph.add_edge(parent.id, obj.id, label)
             self._set_node_attributes(parent)
             if self.options['doc'] or parent.id in self.options["doc_parts"]:
                 self._create_doc_edges(parent)
@@ -210,17 +225,17 @@ class NavigationGraph(object):
             if self.options[OSR] and link.part.id not in self.results:
                 continue
             part = PartController(link.part, None)
-            self.graph.add_edge(obj.id, part.id)
+            self.graph.add_edge(obj.id, part.id, " ")
             self._set_node_attributes(part)
     
-    def _create_doc_edges(self, obj, *args):
+    def _create_doc_edges(self, obj, obj_id=None, *args):
         if self.options[OSR] and self.users_result:
             return
         for document_item in obj.get_attached_documents():
             if self.options[OSR] and document_item.document.id not in self.results:
                 continue
             document = DocumentController(document_item.document, None)
-            self.graph.add_edge(obj.id, document.id)
+            self.graph.add_edge(obj_id or obj.id, document.id, " ")
             self._set_node_attributes(document)
 
     def _create_user_edges(self, obj, role):
@@ -232,7 +247,7 @@ class NavigationGraph(object):
                 continue
             user = UserController(user_item.user, None) 
             user_id = user_item.role + str(user_item.user.id)
-            self.graph.add_edge(user_id, obj.id)
+            self.graph.add_edge(user_id, obj.id, user_item.role.replace("_", "\\n"))
             self._set_node_attributes(user, user_id, user_item.role)
 
     def _create_object_edges(self, obj, role):
@@ -243,11 +258,15 @@ class NavigationGraph(object):
             if self.options[OSR] and part_doc_item.plmobject.id not in self.results:
                 continue
             part_doc_id = str(part_doc_item.role) + str(part_doc_item.plmobject_id)
-            self.graph.add_edge("User%d" % obj.id, part_doc_id)
+            self.graph.add_edge("User%d" % obj.id, part_doc_id,
+                    part_doc_item.role.replace("_", "\\n"))
             if hasattr(part_doc_item.plmobject, 'document'):
-                part_doc = DocumentController(part_doc_item.plmobject, None)
+                part_doc = DocumentController(part_doc_item.plmobject.document, None)
             else:
-                part_doc = PartController(part_doc_item.plmobject, None)
+                part_doc = PartController(part_doc_item.plmobject.part, None)
+                if part_doc.id in self.options["doc_parts"]:
+                    self._create_doc_edges(part_doc, part_doc_id)
+                
             self._set_node_attributes(part_doc, part_doc_id)
 
     def create_edges(self):
@@ -263,7 +282,7 @@ class NavigationGraph(object):
         self._set_node_attributes(self.object, id_)
         self.main_node = node.attr["id"]
         color = node.attr["color"]
-        node.attr.update(color="#444444", fillcolor=color, shape="box", root="true")
+        node.attr.update(color="#444444", fillcolor=color, shape="box")
         functions_dic = {'child':(self._create_child_edges, None),
                          'parents':(self._create_parents_edges, None),
                          'doc':(self._create_doc_edges, None),
@@ -281,7 +300,8 @@ class NavigationGraph(object):
                 function, argument = functions_dic[field]
                 function(self.object, argument)
         if not self.options["doc"] and self.object.id in self.options["doc_parts"]:
-            self._create_doc_edges(self.object, None)
+            if isinstance(self.object, PartController):
+                self._create_doc_edges(self.object, None)
 
     def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
         node = self.graph.get_node(obj_id or obj.id)
@@ -353,12 +373,12 @@ class NavigationGraph(object):
         """
         warnings.simplefilter('ignore', RuntimeWarning)
         # rebuild a frozen graph with sorted edges to avoid random output
-        edges = self.graph.edges()
-        self.graph.remove_edges_from(edges)
+        edges = self.graph.edges(keys=True)
+        self.graph.remove_edges_from((a, b) for a, b, k in edges)
         s = unicode(self.graph)
         s = s[:s.rfind("}")]
         edges.sort()
-        s += "\n".join(u"%s -> %s;" % (a,b) for a, b in edges) + "}\n"
+        s += "\n".join(u'%s -> %s [label="%s"];' % edge for edge in edges) + "}\n"
         self.graph.close()
         self.graph = FrozenAGraph(s)
 
