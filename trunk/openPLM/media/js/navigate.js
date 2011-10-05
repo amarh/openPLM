@@ -245,7 +245,14 @@ function init(){
         var uri = new String(document.location);
         var uri_rx = /\/object\/(.*)\/navigate\/?$/;
         var result = uri_rx.exec(uri);
-        uri = "/ajax/navigate/" + (result[1])  + "/";
+        if (result === null){
+            uri_rx = /\/user\/(.*)\/navigate\/?$/;
+            result = uri_rx.exec(uri);
+            uri = "/ajax/navigate/User/" + (result[1]) + "/-/";
+        }
+        else {
+            uri = "/ajax/navigate/" + (result[1])  + "/";
+        }
         $("#FilterButton").button().click(function () {
             $.post(uri,
                 $("#FilterNav").find("form").serialize(),
