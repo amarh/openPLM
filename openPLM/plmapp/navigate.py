@@ -298,8 +298,9 @@ class NavigationGraph(object):
             if type_ == DocumentController:
                 node.attr["tooltip"] = "/ajax/thumbnails/" + get_path(obj)
             elif type_ == PartController and not self.options["doc"]:
-                s = "+" if obj.id not in self.options["doc_parts"] else "-"
-                node.attr["tooltip"] = s + str(obj.id)
+                if obj.get_attached_documents():
+                    s = "+" if obj.id not in self.options["doc_parts"] else "-"
+                    node.attr["tooltip"] = s + str(obj.id)
         else:
             node.attr["label"] = obj.username
         node.attr["label"] += "\\n" + extra_label
