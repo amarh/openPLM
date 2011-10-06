@@ -260,7 +260,7 @@ class NavigationGraph(object):
             part_doc_id = str(part_doc_item.role) + str(part_doc_item.plmobject_id)
             self.graph.add_edge("User%d" % obj.id, part_doc_id,
                     part_doc_item.role.replace("_", "\\n"))
-            if hasattr(part_doc_item.plmobject, 'document'):
+            if part_doc_item.plmobject.is_document:
                 part_doc = DocumentController(part_doc_item.plmobject.document, None)
             else:
                 part_doc = PartController(part_doc_item.plmobject.part, None)

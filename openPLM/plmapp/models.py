@@ -477,6 +477,18 @@ class PLMObject(models.Model):
         rank = LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
         return level_to_sign_str(rank - 1) 
+   
+    @property
+    def is_part(self):
+        if self.type in get_all_plmobjects():
+            return issubclass(get_all_plmobjects()[self.type], Part)
+        return False
+
+    @property
+    def is_document(self):
+        if self.type in get_all_plmobjects():
+            return issubclass(get_all_plmobjects()[self.type], Document)
+        return False
     
     @property
     def attributes(self):
@@ -566,6 +578,13 @@ class Part(PLMObject):
                     return False
         return True
 
+    @property
+    def is_part(self):
+        return True
+    
+    @property
+    def is_document(self):
+        return False
 
 def _get_all_subclasses(base, d):
     if base.__name__ not in d:
@@ -699,6 +718,14 @@ class Document(PLMObject):
         items = list(super(Document, self).menu_items)
         items.extend([ugettext_noop("parts"), ugettext_noop("files")])
         return items
+
+    @property
+    def is_part(self):
+        return False
+    
+    @property
+    def is_document(self):
+        return True
 
 
 @memoize_noarg

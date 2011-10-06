@@ -128,13 +128,12 @@ class Controller(object):
     HISTORY = models.AbstractHistory
 
     def __init__(self, obj, user):
-        self.object = obj
-        self.form_instance = obj
         self._user = user
         # variable to store attribute changes
         self._histo = ""
         # cache for permissions (dict(role->bool)) 
         self.__permissions = {}
+        self.object = obj
 
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly

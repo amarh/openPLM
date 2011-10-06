@@ -105,7 +105,7 @@ class PartControllerTest(ControllerTest):
             # bad child type
             doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
             self.controller.add_child(doc, 10, 15)
-        self.assertRaises(ValueError, fail)
+        self.assertRaises(TypeError, fail)
 
     def test_add_child_error6(self):
         def fail():
