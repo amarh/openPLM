@@ -238,6 +238,7 @@ class UserController(Controller):
             pass
         password = generate_password()
         new_user.set_password(password)
+        new_user.groupinfo_set.add(*[g.groupinfo for g in new_user.groups.all()])
         new_user.save()
         new_user.get_profile().is_contributor = is_contributor
         new_user.get_profile().save()

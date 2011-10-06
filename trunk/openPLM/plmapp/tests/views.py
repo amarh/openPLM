@@ -243,8 +243,30 @@ class UserViewTestCase(CommonViewTest):
         self.assertEqual(response.status_code,  200)
         
     def test_navigate(self):
-        response = self.client.get(self.base_url + "navigate/")
+        response = self.client.get(self.user_url + "navigate/")
         self.assertEqual(response.status_code,  200)
+
+    def test_sponsor_get(self):
+        response = self.client.get(self.user_url + "delegation/sponsor/")
+        self.assertEqual(response.status_code,  200)
+        form = response.context["sponsor_form"]
+        self.assertEquals(set(g.id for g in self.user.groupinfo_owner.all()),
+                set(g.id for g in form.fields["groups"].queryset.all()))
+
+    def test_sponsor_post(self):
+        data = dict(sponsor=self.user.id, 
+                    username="loser", first_name="You", last_name="Lost",
+                    email="you.lost@example.com", groups=[self.group.pk])
+        response = self.client.post(self.user_url + "delegation/sponsor/", data,
+                follow=True)
+        self.assertEqual(response.status_code,  200)
+        user = User.objects.get(username=data["username"])
+        for attr in ("first_name", "last_name", "email"):
+            self.assertEquals(data[attr], getattr(user, attr))
+        self.assertTrue(user.get_profile().is_contributor)
+        self.assertFalse(user.get_profile().is_administrator)
+        self.assertTrue(self.group in user.groupinfo_set.all())
+
 
 class SearchViewTest(CommonViewTest):
 
