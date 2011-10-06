@@ -205,7 +205,40 @@ class PartViewTestCase(CommonViewTest):
         self.assertEqual(2, len(list(response.context["parents"])))
         self.assertEqual("parents", response.context["current_page"])
 
+    def test_doc_cad_empty(self):
+        response = self.client.get(self.base_url + "doc-cad/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(0, len(list(response.context["object_doc_cad"])))
+        self.assertEqual("doc-cad", response.context["current_page"])
+    
+    def test_doc_cad(self):
+        doc1 = DocumentController.create("doc1", "Document", "a", self.user,
+                self.DATA)
+        doc2 = DocumentController.create("doc2", "Document", "a", self.user,
+                self.DATA)
+        self.controller.attach_to_document(doc1)
+        self.controller.attach_to_document(doc2)
+        response = self.client.get(self.base_url + "doc-cad/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(2, len(list(response.context["object_doc_cad"])))
+        self.assertEqual("doc-cad", response.context["current_page"])
 
+    def test_doc_add_add_get(self):
+        response = self.client.get(self.base_url + "doc-cad/add/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["link_creation"])
+        self.assertEqual("attach_doc", response.context["attach"][1])
+
+    def test_doc_add_add_post(self):
+        doc1 = DocumentController.create("doc1", "Document", "a", self.user,
+                self.DATA)
+        data = {"type" : doc1.type, "reference" : doc1.reference,
+                "revision" : doc1.revision } 
+        response = self.client.post(self.base_url + "doc-cad/add/", data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        document = self.controller.get_attached_documents()[0].document
+        self.assertEqual(doc1.object, document)
+        
 
 class UserViewTestCase(CommonViewTest):
     
