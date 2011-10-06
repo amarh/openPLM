@@ -28,6 +28,8 @@ from openPLM.plmapp.tests.lifecycle import *
 from openPLM.plmapp.tests.views import *
 #from openPLM.plmapp.tests.closure import *
 
+import openPLM.plmapp.models
+
 def get_doctest(module_name):
     test_dict={}
     module = __import__(module_name,{},{},module_name.split('.')[-1])

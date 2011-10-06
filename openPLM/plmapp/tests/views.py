@@ -130,7 +130,121 @@ class ViewTest(CommonViewTest):
         # check add_revision_form
         add_revision_form = response.context["add_revision_form"]
         self.assertEqual(add_revision_form.data, {"revision": "b"})
+        response = self.client.post(self.base_url + "revisions/", {"revision" :"b"})
+        self.assertEqual(response.status_code, 200)
+        get_all_plmobjects()[self.TYPE].objects.get(reference=self.controller.reference,
+                revision="b")
+    
+    def test_history(self):
+        response = self.client.get(self.base_url + "history/")
+        self.assertEqual(response.status_code,  200)
 
+    def test_navigate(self):
+        response = self.client.get(self.base_url + "navigate/")
+        self.assertEqual(response.status_code,  200)
+
+class PartViewTestCase(CommonViewTest):
+
+    def test_children(self):
+        child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child1, 10 , 20)
+        child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child2, 10, 20)
+        response = self.client.get(self.base_url + "BOM-child/")
+        self.assertEqual(response.status_code, 200)
+        # context["children"] is an iterator
+        # this checks that the for loop has been executed
+        self.assertEqual(0, len(list(response.context["children"])))
+        self.assertEqual("BOM-child", response.context["current_page"])
+        form = response.context["display_form"]
+
+    def test_add_child(self):
+        response = self.client.get(self.base_url + "BOM-child/add/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["link_creation"])
+        child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
+        response = self.client.post(self.base_url + "BOM-child/add/",
+                {"type": "Part", "reference":"c1", "revision":"a",
+                 "quantity" : 10, "order" : 10 })
+        self.assertEquals(1, len(self.controller.get_children()))
+
+    def test_edit_children(self):
+        child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child1, 10 , 20)
+        response = self.client.get(self.base_url + "BOM-child/edit/")
+        self.assertEqual(response.status_code, 200)
+        formset = response.context["children_formset"]
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'1',
+            'form-MAX_NUM_FORMS': u'',
+            'form-0-child' :   child1.id,
+            'form-0-id'  : self.controller.get_children()[0].link.id,
+            'form-0-order'  :  45,
+            'form-0-parent' :  self.controller.id,
+            'form-0-quantity' :  '45.0',
+        }
+        response = self.client.post(self.base_url + "BOM-child/edit/", data)
+        link = self.controller.get_children()[0].link
+        self.assertEquals(45, link.order)
+        self.assertEquals(45.0, link.quantity)
+
+    def test_parents_empty(self):
+        response = self.client.get(self.base_url + "parents/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(0, len(list(response.context["parents"])))
+        self.assertEqual("parents", response.context["current_page"])
+        
+    def test_parents(self):
+        p1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
+        p1.add_child(self.controller, 10, 20)
+        p2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
+        p2.add_child(self.controller, 10, 20)
+        response = self.client.get(self.base_url + "parents/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(2, len(list(response.context["parents"])))
+        self.assertEqual("parents", response.context["current_page"])
+
+
+
+class UserViewTestCase(CommonViewTest):
+    
+    def setUp(self):
+        super(UserViewTestCase, self).setUp()
+        self.user_url = "/user/%s/" % self.user.username
+
+    
+    def test_user_attribute(self):
+        response = self.client.get(self.user_url + "attributes/")
+        self.assertEqual(response.status_code,  200)
+        self.failUnless(response.context["object_attributes"])
+        attributes = dict((x.capitalize(), y) for (x,y) in 
+                          response.context["object_attributes"])
+        self.assertEqual(attributes["E-mail address"], self.user.email)
+        self.assertTrue(response.context["is_owner"])
+
+    def test_delegation(self):
+        response = self.client.get(self.user_url + "delegation/")
+        self.assertEqual(response.status_code,  200)
+        # TODO
+
+    def test_groups(self):
+        response = self.client.get(self.user_url + "groups/")
+        self.assertEqual(response.status_code,  200)
+        # TODO
+
+    def test_part_doc_cads(self):
+        response = self.client.get(self.user_url + "parts-doc-cad/")
+        self.assertEqual(response.status_code,  200)
+        # TODO
+        
+    def test_history(self):
+        response = self.client.get(self.user_url + "history/")
+        self.assertEqual(response.status_code,  200)
+        
+    def test_navigate(self):
+        response = self.client.get(self.base_url + "navigate/")
+        self.assertEqual(response.status_code,  200)
 
 class SearchViewTest(CommonViewTest):
 
