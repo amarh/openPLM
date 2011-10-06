@@ -1,36 +1,110 @@
 {% extends "MiddleDisplayObject.htm" %}
 {% load i18n %}
+{% load comments %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
     {% if is_owner %}
-        {% ifequal object_type 'User' %}
-            <span class="ButtonLeft">
-                <a class="Button" href="/user/{{object_reference}}/modify/">{% trans "EDIT" %}</a>
-            </span>
-            <span class="ButtonLeft">
-                <a class="Button" href="/user/{{object_reference}}/password/">{% trans "PASSWORD" %}</a>
-            </span>
-        {% else %}
-            {% if obj.is_editable %}
+        <div>
+            {% ifequal object_type 'User' %}
                 <span class="ButtonLeft">
-                    <a class="Button" 
-                        href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
-                        {% trans "EDIT" %}
-                    </a>
+                    <a class="Button" href="/user/{{object_reference}}/modify/">{% trans "EDIT" %}</a>
                 </span>
-            {% endif %}
-        {% endifequal %}
+                <span class="ButtonLeft">
+                    <a class="Button" href="/user/{{object_reference}}/password/">{% trans "PASSWORD" %}</a>
+                </span>
+            {% else %}
+                {% if obj.is_editable %}
+                    <span class="ButtonLeft">
+                        <a class="Button" 
+                            href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
+                            {% trans "EDIT" %}
+                        </a>
+                    </span>
+                {% endif %}
+            {% endifequal %}
+        </div>
     {% endif %}
-	<table class="Content">
-	    {% for description,attribute in object_attributes %}
-		    <tr class="Content">
-                <td class="Content">{{description}}</td>
-                <td class="Content">{{attribute|linebreaks}}</td>
-		    </tr>
-	    {% endfor %}
-	</table>
+    <div>
+        <table class="Content">
+            {% for description,attribute in object_attributes %}
+                <tr class="Content">
+                    <td class="Content">{{description}}</td>
+                    <td class="Content">{{attribute|linebreaks}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="comments">
+        <div class="comment_list">
+            <h3>{% trans "Comments" %}</h3>
+            {% get_comment_count for obj.object as comment_count %}
+            {% if comment_count %}
+                <p>
+                {% blocktrans %}
+                    {{ comment_count }} comments have been posted.
+                {% endblocktrans %}
+                </p>
+
+                {% get_comment_list for obj.object as comment_list %}
+                {% for comment in comment_list %}
+                    <div class="comment">
+                        <span class="comment posted-by">
+                            {% trans "Posted by:" %}
+                            <a href="/user/{{comment.user_name}}/">{{ comment.user_name }}</a>
+                        </span>
+                        <span class="comment date">
+                            {% trans "Date:" %}
+                            {{ comment.submit_date|date:"r" }}
+                        </span>
+                        {{ comment.comment|linebreaks }}
+
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% trans "No comments have been posted yet." %}
+            {% endif %}
+        </div>
+        <div id="comment_form">
+
+            <h4>{% trans "Post a comment" %}</h4>
+
+            {% get_comment_form for obj.object as form %}
+            <div>
+                <form action="{% comment_form_target %}" method="post">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="next" value="{{obj.plmobject_url}}attributes/" />
+
+                        {% for field in form %}
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% else %}
+                                {% if field.errors %}
+                                    {{ field.errors }}
+                                {% endif %}
+                                <div
+                                    {% if field.errors %} class="error"{% endif %}
+                                    {% ifequal field.name "honeypot" %} style="display:none;"{% endifequal %}
+                                    {% ifequal field.name "name" %} style="display:none;"{% endifequal %}
+                                    {% ifequal field.name "email" %} style="display:none;"{% endifequal %}
+                                    {% ifequal field.name "url" %} style="display:none;"{% endifequal %}
+                                    {% ifequal field.name "title" %} style="display:none;"{% endifequal %}
+                                    >
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="submit">
+                            <input type="submit" name="post" class="submit-post" value="{% trans "Post" %}" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 

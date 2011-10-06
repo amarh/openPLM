@@ -75,6 +75,7 @@ urlpatterns += patterns('',
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),
+    (r'^comments/', include('django.contrib.comments.urls')),
     )
 
 urlpatterns += patterns2('', 'ajax/', 
