@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.comments',
     'south',
     'openPLM.plmapp',
     # you can add your application after this line
@@ -119,8 +120,14 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Add user, messages and perms variables in RequestContext
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.auth',
-)
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        "django.core.context_processors.media",
+        "django.core.context_processors.request",
+        )
+
+
 
 #: expeditor's mail used when sending notification emails
 EMAIL_OPENPLM = "no-reply@openplm.example.com",
