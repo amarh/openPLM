@@ -247,12 +247,13 @@ class DocumentController(PLMObjectController):
 
     def check_attach_part(self, part):
         self.check_permission("owner")
+        if not (hasattr(part, "is_part") and part.is_part):
+            raise TypeError("%s is not a part" % part)
+
         if isinstance(part, PLMObjectController):
             part.check_readable()
             part = part.object
         else:
-            if not (isinstance(part, models.PLMObject) and hasattr(part, "part")):
-                raise TypeError("%s is not a part" % part)
             get_controller(part.type)(part, self._user).check_readable()
         if self.is_part_attached(part):
             raise ValueError("part is already attached.")

@@ -694,7 +694,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
             obj.update_from_form(modification_form)
             return HttpResponseRedirect(obj.plmobject_url)
     else:
-        modification_form = get_modification_form(cls, instance=obj.form_instance)
+        modification_form = get_modification_form(cls, instance=obj.object)
     
     ctx.update({'modification_form': modification_form,
                 'non_modifyable_attributes': non_modifyable_attributes})

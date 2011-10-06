@@ -59,8 +59,8 @@ class PartController(PLMObjectController):
         """
         self.check_permission("owner")
         self.check_editable()
-        if not hasattr(child, "part"):
-            raise ValueError("Can not add child: not a Part")
+        if not child.is_part:
+            raise TypeError("Can not add child: not a Part")
         # check if child is not a parent
         if child.id == self.object.id:
             raise ValueError("Can not add child: child is current object")
@@ -313,13 +313,13 @@ class PartController(PLMObjectController):
     
     def check_attach_document(self, document):
         self.check_permission("owner")
+        if not hasattr(document, "is_document") or not document.is_document:
+            raise TypeError("%s is not a document" % document)
+
         if isinstance(document, PLMObjectController):
             document.check_readable()
             document = document.object
         else:
-            if not (isinstance(document, models.PLMObject) and \
-                    hasattr(document, "document")):
-                raise TypeError("%s is not a document" % document)
             get_controller(document.type)(document, self._user).check_readable()
             type(self)(document, self._user).check_readable()
         if self.is_document_attached(document):

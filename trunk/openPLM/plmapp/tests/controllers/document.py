@@ -217,7 +217,7 @@ class DocumentControllerTest(ControllerTest):
     
     def test_attach_to_part_error4(self):
         obj = self.CONTROLLER.create("ob", self.TYPE, "a", self.user, self.DATA)
-        self.assertRaises(ValueError, self.controller.attach_to_part, obj)
+        self.assertRaises(TypeError, self.controller.attach_to_part, obj)
     
     def test_detach_part(self):
         self.controller.attach_to_part(self.part)
