@@ -29,6 +29,7 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
+import re
 import datetime
 
 import openPLM.plmapp.models as models
@@ -36,6 +37,7 @@ from openPLM.plmapp.mail import send_mail
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
 
+rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class GroupController(Controller):
     u"""
     Object used to manage a :class:`~django.contrib.auth.models.Group` and store his 
@@ -65,6 +67,11 @@ class GroupController(Controller):
    
     @classmethod
     def create(cls, name, description, user, data={}):
+        if not name:
+            raise ValueError("name must not be empty")
+        if rx_bad_ref.search(name):
+            raise ValueError("Name contains a '/' or a '..'")
+
         obj = models.GroupInfo(name=name, description=description)
         obj.creator = user
         obj.owner = user
@@ -183,6 +190,8 @@ class GroupController(Controller):
         user = invitation.guest
         user.groups.add(self.object)
         user.groupinfo_set.add(self.object)
+        invitation.save()
+        user.save()
         self._save_histo("User added", user.username, users=(user,))
 
     def refuse_invitation(self, invitation):
@@ -196,5 +205,6 @@ class GroupController(Controller):
                 raise PermissionError("You can not refuse this invitation.")
         invitation.state = models.Invitation.REFUSED
         invitation.validation_time = datetime.datetime.now()
+        invitation.save()
         # TODO mail
 
