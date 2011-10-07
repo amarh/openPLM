@@ -208,12 +208,8 @@ Finalize installation
 =====================
 
     * :command:`cd /var/django/openPLM/trunk/openPLM/`
-    
-    Check we have all modules :
-     
-    * :command:`python2.6 check_modules.py`
-		All is ok
-    * :command:`./manage.py syncdb`
+    * :command:`./manage.py syncdb --all`
+    * :command:`./manage.py migrate --all --fake`
     
     .. note::
         You have to create the superadmin user for Django (in this example, we give 'MyAdmin' but you can change it)
@@ -231,13 +227,17 @@ Finalize installation
     
     * :command:`chown www-data:www-data /var/openPLM`
     
-    Change rights for the directory where thumbnails and navigate pictures will be stored :
+    Change rights for the directory where thumbnails will be stored :
     
     * :command:`chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails`
-    * :command:`chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/navigate`
-
-	Activate correct navigate.py file :
-    * :command:`cp plmapp/navigate.py.centos plmapp/navigate.py
+    
+    Check we have all modules :
+    
+    * :command:`./check_modules.py` ::
+    
+        /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
+        from sets import ImmutableSet
+        All is ok
     
     Configure Apache server :
 
