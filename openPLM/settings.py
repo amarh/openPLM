@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.comments',
+    'django.contrib.humanize',
     'south',
     'openPLM.plmapp',
     # you can add your application after this line

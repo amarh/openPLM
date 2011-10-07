@@ -186,7 +186,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('date')
+    history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
     ctx.update({'current_page' : 'history', 
                 'object_history' : list(history)})
     return r2r('DisplayObjectHistory.htm', ctx, request)

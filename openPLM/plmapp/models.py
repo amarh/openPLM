@@ -809,6 +809,9 @@ class AbstractHistory(models.Model):
     def __unicode__(self):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
 
+    def get_day(self):
+        return datetime.date(self.date.year, self.date.month, self.date.day) 
+
 class History(AbstractHistory):
     plmobject = models.ForeignKey(PLMObject)
 
