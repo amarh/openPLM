@@ -130,7 +130,7 @@ class NavigationGraph(object):
                              "notified", "part", "owned", "to_sign",
                              "request_notification_from", OSR) 
         self.options = dict.fromkeys(self.options_list, False)
-        self.options["prog"] = "twopi"
+        self.options["prog"] = "dot"
         self.options["doc_parts"] = []
         self.graph = pgv.AGraph(directed=True)
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
@@ -386,7 +386,7 @@ class NavigationGraph(object):
         picture_path = "media/navigate/" + t + str(self.object.id) + "-"
         for opt in self.options_list:
             picture_path += str(int(self.options[opt]))
-        prog = self.options.get("prog") or "twopi"
+        prog = self.options.get("prog", "dot")
         self.graph.layout(prog=prog)
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
         map_path= picture_path2 + ".map"

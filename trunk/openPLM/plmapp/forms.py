@@ -324,10 +324,11 @@ def get_doc_cad_formset(controller, data=None):
 class NavigateFilterForm(forms.Form):
     only_search_results = forms.BooleanField(initial=False,
                 required=False, label=_("only search results"))
-    prog = forms.ChoiceField(choices=(("twopi", _("Radial 1")),
-                                      ("neato", _("Radial 2")),
-                                      ("dot", _("Hierarchical"))),
-                             required=False, initial="twopi",
+    prog = forms.ChoiceField(choices=(("dot", _("Hierarchical")),
+                                      ("neato", _("Radial 1")),
+                                      ("twopi", _("Radial 2")),
+                                      ),
+                             required=False, initial="dot",
                              label=_("layout"))
     doc_parts = forms.CharField(initial="", required="",
                                 widget=forms.HiddenInput())
