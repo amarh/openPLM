@@ -1,0 +1,41 @@
+/* Timeline */
+
+h3 {
+    background: #f7f7f7;
+    border-bottom: 1px solid #d7d7d7;
+    font-size: 105%;
+    margin: 1em 0 .5em;
+    padding-left: 1em;
+}
+dl { line-height: 1.3em; margin-left: 1em }
+dt {
+    background: 3px 4px no-repeat;
+    padding: 0.3em 0;
+}
+dt :link, dt :visited {
+    background: 3px 3px no-repeat;
+    border: none;
+    color: #000;
+}
+dt>:link, dt>:visited {
+    /* Hide from IE/Win */
+    background-position: 3px 4px;
+}
+dt :link:hover, dt :visited:hover { background-color: #eed; color: #000 }
+dt em {
+    border-bottom: 1px dotted #bbb;
+    color: #b00;
+    font-style: normal;
+    text-decoration: none;
+}
+dt .time { color: #333; font-size: 80%; }
+dt .user { color: #222; }
+dt.highlight { background-color: #ffa; } 
+dd { 
+    font-size: 80%;
+    margin: 0 0 .75em 1.5em;
+    padding: 0;
+    color: #554;
+}
+
+

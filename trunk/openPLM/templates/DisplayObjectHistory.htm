@@ -1,26 +1,44 @@
 {% extends "MiddleDisplayObject.htm" %}
 {% load i18n %}
+{% load humanize %}
 
 <!-- Manage html display in the Content div which correspond to the "history" menu -->
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+
+{% endblock %}
+
 {% block content %}
-	<table class="Content">
-	    {% for histo in object_history %}
-		    <tr class="Content">
-			    <td class="Content">
-			        {{histo.date}}
-		        </td>
-		        <td class="Content">
-		            {{histo.action}}
-	            </td>
-		        <td class="Content">
-		            {{histo.user}}
-	            </td>
-	            <td class="Content">
-	                {{ histo.details|linebreaks }}
-                </td>
-		    </tr>
-	    {% endfor %}
-	</table>
+    {% regroup object_history by get_day as histories %}
+
+    {% for group in histories %}
+        <div class="timeline">
+            <h3>{{ group.grouper|naturalday}}</h3>
+
+            <dl>
+                {% for histo in group.list %}
+                    <dt class="changeset">
+                    <span class="time">
+                        {{histo.date|date:"G:i"}}
+                    </span>
+                    <span class="action">
+                        {{histo.action}}
+                    </span>
+                    <a href="/user/{{histo.user}}/">
+                        <span class="user">
+                            {{histo.user}}
+                        </span>
+                    </a>
+                    </dt>
+                    <dd>
+                    <div class="details">
+                        {{ histo.details|linebreaks }}
+                    </div>
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+    {% endfor %}
 {% endblock %}
 
