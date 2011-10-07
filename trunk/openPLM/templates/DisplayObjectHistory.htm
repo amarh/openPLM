@@ -14,7 +14,7 @@
 
     {% for group in histories %}
         <div class="timeline">
-            <h3>{{ group.grouper|naturalday}}</h3>
+            <h3>{{ group.grouper|naturalday|capfirst}}</h3>
 
             <dl>
                 {% for histo in group.list %}
