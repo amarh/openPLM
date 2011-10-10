@@ -115,7 +115,8 @@ class Command(BaseCommand):
                 sys.stderr.write("\nOperation cancelled.\n")
                 sys.exit(1)
                 
-        cie = User.objects.create(username=username, password=password)
+        cie = User.objects.create(username=username)
+        cie.set_password(password)
         try:
             gr = GroupInfo.objects.get(name="leading_group")
             gr.owner = cie
@@ -126,6 +127,7 @@ class Command(BaseCommand):
                     creator=cie)
 
         cie.groups.add(gr)
+        cie.save()
         p = cie.get_profile()
         p.is_contributor = True
         p.save()
