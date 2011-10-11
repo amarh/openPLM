@@ -40,28 +40,28 @@ function update_nav(focus_node_id, data){
         var offset = $(focus_node_id).offset();
     var date = new Date();
     var divNav = $("#DivNav");
-    $("#ImgNav").attr("src", data["img"] + '?v=' + date.getTime());
-    $("#ImgNav").load(
-         function() {
-            $("div.node").remove();
-            divNav.append(data.divs);
-            var submit = $("#FilterNav").find("li").last().clone();
-            $("#FilterNavUl").html(data.form);
-            $("#FilterNavUl").append(submit);
-            if (focus_node_id != null){
-                var new_offset = $(focus_node_id).offset();
-                var delta_top = new_offset.top - offset.top;
-                var delta_left = new_offset.left - offset.left;
-                divNav.css({
-                    left: '-=' + delta_left + "px",
-                    top: '-=' + delta_top + "px"});
-                }
-            else {
-                divNav.css({left: data.left + "px",
-                            top: data.top + "px"});
-            }
-            init();
-    });
+    $("#ImgNav").css("width", data.width+"px");
+    $("#ImgNav").css("height", data.height+"px");
+    var path = data["img"] + '?v=' + date.getTime();
+    $("#ImgNav").css("background", 'url("'+path+'") no-repeat 0 0');
+    $("div.node").remove();
+    divNav.append(data.divs);
+    var submit = $("#FilterNav").find("li").last().clone();
+    $("#FilterNavUl").html(data.form);
+    $("#FilterNavUl").append(submit);
+    if (focus_node_id != null){
+        var new_offset = $(focus_node_id).offset();
+        var delta_top = new_offset.top - offset.top;
+        var delta_left = new_offset.left - offset.left;
+        divNav.css({
+            left: '-=' + delta_left + "px",
+            top: '-=' + delta_top + "px"});
+        }
+    else {
+        divNav.css({left: data.left + "px",
+                    top: data.top + "px"});
+    }
+    init();
 }
 
 function display_docs(node_id, ajax_url, doc_parts){

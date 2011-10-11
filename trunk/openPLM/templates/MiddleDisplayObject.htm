@@ -5,37 +5,35 @@
 
 <!-- Manage the text displayed between title tags -->
 {% block title %}
-	openPLM - {{user}} - {{object_type}} | {{object_reference}} | {{object_revision}}
+    openPLM - {{user}} - {{object_type}} | {{object_reference}} | {{object_revision}}
 {% endblock %}
 
 <!-- Manage the Navigate block which have an object menu, a banner and a content -->
 {% block ObjectBlock %}
     <div id="ReferenceArea">
         <h2>
-		    {{object_type}} | {{object_reference}} | {{object_revision}}
-	    </h2>
-	</div>
-	<div id="ActiveArea">
+            {{object_type}} | {{object_reference}} | {{object_revision}}
+        </h2>
+    </div>
+    <div id="ActiveArea">
         {% if is_readable %}
             {% if object_menu and not navigate_bool %}
-                <ul id="MenuList">
-                    {% for menu_item in object_menu %}
-                        {% ifequal menu_item current_page%}
-                        <li class="CurrentPage">
-                        {%else%}
-                        <li>
-                        {%endifequal%}
+                <div id="menu">
+                    <ul id="MenuList">
+                        {% for menu_item in object_menu %}
+                            <li {% ifequal menu_item current_page%} class="CurrentPage" {%endifequal%}>
                             <a href="{{obj.plmobject_url}}{{menu_item}}/">
-                            {% filter upper %}{% trans menu_item %}{% endfilter%}
+                                {% filter upper %}{% trans menu_item %}{% endfilter%}
                             </a>
-                        </li>
-                    {% endfor %}
-                    <li style="width:100%"></li>
-                </ul>
+                            </li>
+                        {% endfor %}
+                        <li style="clear:both"></li>
+                    </ul>
+                </div>
             {% endif %}
-            {% block content %}{% endblock %}	
+                {% block content %}{% endblock %}	
         {% else %}
             <p>{% trans "You are not allowed to see this object" %}</p>
         {% endif %}
-	</div>
+    </div>
 {% endblock %}

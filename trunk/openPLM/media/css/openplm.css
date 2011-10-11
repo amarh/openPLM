@@ -155,7 +155,8 @@ a.Button
 div#Page
 {
     background: #ffffff url(/media/img/foot-complet.gif) no-repeat bottom right;
-    width: 1200px;
+    /*width: 1200px;*/
+    width: 90%;
     margin: auto;
     min-height: 500px;
 }
@@ -194,7 +195,8 @@ div#DisplayBox
     display: table-cell;
     height: 30px;
     float: left;
-    width: 380px;
+    max-width: 400px;
+    width: 40%;
     margin-right: 0px;
     margin-bottom: 0px;
     vertical-align: middle;
@@ -221,7 +223,8 @@ div#SearchBox, div#SearchBox4Search
 div#LoggedPersonBox
 {
     float: right;
-    width: 768px;
+    /*width: 768px;*/
+    width: 54%;
     text-align: left;
     height: 30px;
     margin-bottom: 0px;
@@ -243,17 +246,9 @@ div#ActiveBox
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
 li#NavigateButtonOff, li#NavigateButtonOn
 {
-    /*-moz-border-radius-topright: 0px;*/
-    /*-moz-border-radius-bottomright: 0px;*/
     margin-right: -5px;
 }
 
-/* WHEN BUTTON IS ON */
-/*li#NavigateButtonOn, li#StudyButtonOn*/
-/*{*/
-/*border: 2px inset;*/
-/*background-color: #777777;*/
-/*}*/
 
 #SetLangForm
 {
@@ -276,26 +271,34 @@ div#ReferenceArea
 div#ActiveArea
 {
     text-align: left;
+    float:none;
 }
 
 /* FOR THE MENU OF THE CURRENT OBJECT */
+div#menu {
+    margin-bottom: 10px;
+}
+
 ul#MenuList
 {
-    display: block;
+    /*display: block;*/
     text-indent: 10px;
     text-align: left;
     font-size: 90%;
     margin-bottom: 10px;
+    margin-top: 5px;
 }
 
 ul#MenuList li
 {
-    display: table-cell;
+    display: inline;
+    /*width: 100%;*/
     text-align: center;
     padding: 5px;
     border-bottom-style: solid;
     border-bottom-width: 1px;
     white-space:nowrap;
+    padding-top:5px;
 }
 
 ul#MenuList li.CurrentPage
@@ -330,6 +333,8 @@ ul#MenuList li a
 {
     text-decoration: none;
     color: #000000;
+    padding: 4px 0px;
+    display: inline-block;
 }
 
 /* *************************************************************************************** */
@@ -466,6 +471,7 @@ div#Navigate
     border-bottom: 1px solid #ccc;
     background-color: #dbb;
     padding: 3px;
+    overflow: auto;
 }
 
 div#navThumbnails {
@@ -475,11 +481,16 @@ div#navThumbnails {
     height: 500px;
     z-index:70;
     position:absolute;
+    height: 500px;
     right:0px;
     border-left: 1px solid #ccc;
     background: rgba(200, 230, 230, 0.7);
 }
 
+div#thumbnailsList {
+    overflow-y: scroll;
+    max-height: 480px;
+}
 div#thumbnailsList img{
     border-bottom: 1px solid #ccc;
     max-width: 160px;
@@ -489,6 +500,7 @@ div#thumbnailsList img{
 
 div#DivNav {
     position: absolute;
+
 }
 
 div.node > a > span {
@@ -517,7 +529,7 @@ img.node_thumbnails, img.node_show_docs {
     z-index:50;
 }
 
-img#ImgNav
+#ImgNav
 {
     position: absolute;
     z-index: 1;

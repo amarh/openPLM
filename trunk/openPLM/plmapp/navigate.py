@@ -359,7 +359,8 @@ class NavigationGraph(object):
                 show_doc.set("class", "node_show_docs" + self.BUTTON_CLASS)
                 show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
             a = ET.SubElement(div, "a", href=area.get("href")) 
-            ET.SubElement(a, "span")
+            span = ET.SubElement(a, "span")
+            span.text = " "
             elements.append(div)
 
         s = "\n".join(ET.tostring(div) for div in elements)
@@ -369,7 +370,7 @@ class NavigationGraph(object):
         """
         Renders an image of the graph
 
-        :returns: a tuple (image map data, url of the image)
+        :returns: a tuple (image map data, url of the image, path of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
         # rebuild a frozen graph with sorted edges to avoid random output
@@ -399,5 +400,5 @@ class NavigationGraph(object):
         map_string = s.read()
         self.graph.clear()
         warnings.simplefilter('default', RuntimeWarning)
-        return self.convert_map(map_string), picture_path
+        return self.convert_map(map_string), picture_path, picture_path2
 
