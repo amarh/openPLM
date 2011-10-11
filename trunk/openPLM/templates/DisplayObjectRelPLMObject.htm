@@ -1,29 +1,38 @@
 {% extends "MiddleDisplayObject.htm" %}
 {% load i18n %}
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+
+{% endblock %}
+
+
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
-	<table class="Result">
-	    <tr class="Content">
-            <th class="Content"> {% trans "Type" %} </th>
-            <th class="Content"> {% trans "Reference" %} </th>
-            <th class="Content"> {% trans "Revision" %} </th>
-            <th class="Content"> {% trans "Role" %} </th>
-	    </tr>
-	    {% for link in object_user_link %}
-		    <tr class="Content">
-			    <td class="Content">{{link.plmobject.type}}</td>
-			    <td class="Content">
-			        <a href={{link.plmobject.plmobject_url}}>
-			            {{link.plmobject.reference}}
-			        </a>
-		        </td>
-			    <td class="Content">{{link.plmobject.revision}}</td>
-			    <td class="Content">{{link.role}}</td>
-		    </tr>
-	    {% endfor %}
-	</table>
+
+    {% regroup object_user_link|dictsort:"role" by role as links %}
+
+    {% for group in links %}
+        <div class="timeline">
+            <h3>{{ group.grouper|capfirst}}</h3>
+
+            <ul>
+                {% for link in group.list|dictsort:"plmobject.type" %}
+                    <li>
+                    <span>{{link.plmobject.type}}</span>
+                    <a href={{link.plmobject.plmobject_url}}>
+                        <span>{{link.plmobject.reference}}</span>
+                    </a>
+                    <span>{{link.plmobject.revision}}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <br />
+        </div>
+
+    {% endfor %}
+
 {% endblock %}
 
 
