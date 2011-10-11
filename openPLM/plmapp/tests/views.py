@@ -152,9 +152,7 @@ class PartViewTestCase(CommonViewTest):
         self.controller.add_child(child2, 10, 20)
         response = self.client.get(self.base_url + "BOM-child/")
         self.assertEqual(response.status_code, 200)
-        # context["children"] is an iterator
-        # this checks that the for loop has been executed
-        self.assertEqual(0, len(list(response.context["children"])))
+        self.assertEqual(2, len(list(response.context["children"])))
         self.assertEqual("BOM-child", response.context["current_page"])
         form = response.context["display_form"]
 

@@ -113,6 +113,8 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
     context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     data = {
             "img" : context["picture_path"],
+            "width" : context["img_width"],
+            "height" : context["img_height"],
             "divs" : context["map_areas"],
             "left" : context["x_img_position"],
             "top" : context["y_img_position"],

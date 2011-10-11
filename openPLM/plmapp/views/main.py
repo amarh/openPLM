@@ -223,7 +223,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
         maximum = max(children, key=attrgetter("level")).level
         children = (c for c in children if c.level == maximum)
     # convert level to html space
-    children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
+    #children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
 
     ctx.update({'current_page':'BOM-child',
                 'children': children,
@@ -458,15 +458,12 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
-    
-    if request.POST:
+    if request.method == "POST":
         add_file_form = AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
             ctx.update({'add_file_form': add_file_form, })
             return HttpResponseRedirect(obj.plmobject_url + "files/")
-        else:
-            add_file_form = AddFileForm(request.POST)
     else:
         add_file_form = AddFileForm()
     ctx.update({ 'add_file_form': add_file_form, })
@@ -945,6 +942,7 @@ def download(request, docfile_id, filename=""):
     if not mimetype:
         mimetype = 'application/octet-stream'
     response = HttpResponse(file(doc_file.file.path), mimetype=mimetype)
+    response["Content-Length"] = doc_file.file.size
     if not filename:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response

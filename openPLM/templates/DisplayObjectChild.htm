@@ -3,6 +3,12 @@
 
 <!-- Manage html display in the Content div which correspond to the "children" menu -->
 
+{% block scripts %}
+
+    <script type="text/javascript" src="/media/js/bom.js"></script>
+
+{% endblock %}
+
 {% block content %}
     {% if is_owner and obj.is_editable %}
         <span class="ButtonLeft">
@@ -32,7 +38,8 @@
         </tr>
         {% for level, link in children %}
             <tr class="Content"> 
-                <td class="Content">{{ level|safe}} ↳</td>
+                <td class="Content expander level{{level}}"><span style="margin-left:{{level|add:"-1"}}0px;">↳</span></td>
+
                 <td class="Content"> {{ link.order }} </td>
                 <td class="Content"> {{ link.quantity }} </td>
                 <td class="Content"> 
