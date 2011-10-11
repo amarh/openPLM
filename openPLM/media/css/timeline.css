@@ -38,4 +38,25 @@ dd {
     color: #554;
 }
 
+div.timeline ul {
+    margin-left: 1em;
+    display: block !important;
+    width: 90%;
+}
+div.timeline ul li {
+    display: list-item !important;
+    line-height: 1.2em;
+    width: 30%; 
+    float:left;
+    list-style-type: square;
+    list-style-size: small;
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+div.timeline br {
+    clear:left;
+}
 
+div.timeline {
+    margin-bottom: 1em;
+}
