@@ -38,7 +38,9 @@
         </tr>
         {% for level, link in children %}
             <tr class="Content"> 
-                <td class="Content expander level{{level}}"><span style="margin-left:{{level|add:"-1"}}0px;">↳</span></td>
+                <td class="Content expander open level{{level}}" style="padding-left:{{level|add:"-1"}}0px;" >
+                    <span class="expander">↳</span>
+                </td>
 
                 <td class="Content"> {{ link.order }} </td>
                 <td class="Content"> {{ link.quantity }} </td>

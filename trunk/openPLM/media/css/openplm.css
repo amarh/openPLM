@@ -650,3 +650,33 @@ div#comments{
     border-top: 1px #444 solid;
 }
 
+td.expander span.expander {
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: auto;
+    display:block; width:16px; height:16px;
+    text-indent:-5000em;
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding-left:4px;
+    margin-left:6px;
+}
+
+td.expanded span.expander {
+    background-image: url("/media/img/expander_normal.png");
+}
+td.expanded span.expander:hover {
+    background-image: url("/media/img/expander_normal_hover.png");
+}
+
+td.open span.expander {
+    padding-left: 0;
+    margin-left: 2px;
+    background-image: url("/media/img/expander_open.png");
+}
+td.open span.expander:hover {
+    padding-left: 0;
+    margin-left: 2px;
+    background-image: url("/media/img/expander_open_hover.png");
+}
+
