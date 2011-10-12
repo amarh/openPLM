@@ -42,6 +42,8 @@ function update_nav(focus_node_id, data){
     var divNav = $("#DivNav");
     $("#ImgNav").css("width", data.width+"px");
     $("#ImgNav").css("height", data.height+"px");
+    divNav.css("width", data.width+"px");
+    divNav.css("height", data.height+"px");
     var path = data["img"] + '?v=' + date.getTime();
     $("#ImgNav").css("background", 'url("'+path+'") no-repeat 0 0');
     $("div.node").remove();
@@ -58,8 +60,9 @@ function update_nav(focus_node_id, data){
             top: '-=' + delta_top + "px"});
         }
     else {
-        divNav.css({left: data.left + "px",
-                    top: data.top + "px"});
+        //divNav.css({left: data.left + "px",
+                    //top: data.top + "px"});
+        center();
     }
     init();
 }
@@ -263,6 +266,15 @@ function init(){
 
 }
 
+function center(){
+    var nw = $("#Navigate").width();
+    var nh = $("#Navigate").height();
+    var dw = $("#DivNav").width();
+    var dh = $("#DivNav").height();
+    $("#DivNav").css({"left":((nw-dw)/2)+"px", "top": ((nh-dh)/2)+"px"});  
+
+};
+
 $(document).ready(function(){
 
         // Supprime la scrollbar en JS
@@ -377,6 +389,7 @@ cursor: 'crosshair'
             out: function() { $("#FilterNav ul").hide();},
             timeout: 500
              } );
-
+        
         init();
+        center();
 });
