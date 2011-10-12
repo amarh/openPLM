@@ -298,6 +298,10 @@ class PLMObjectController(Controller):
         """
 
         self.check_contributor(new_owner)
+        links = models.PLMObjectUserLink.objects.filter(plmobject=self.object,
+                role="owner")
+        for link in links:
+            link.delete()
         link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
                plmobject=self.object, role="owner")[0]
         self.owner = new_owner
