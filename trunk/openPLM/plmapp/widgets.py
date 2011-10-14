@@ -48,4 +48,3 @@ class JQueryAutoComplete(forms.TextInput):
                     'js' : self.render_js(final_attrs['id']),
                 })
 
-
