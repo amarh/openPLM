@@ -225,7 +225,7 @@ class DisplayChildrenForm(forms.Form):
               ("first", "First level",),
               ("last", "Last level"),)
     level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
-    date = forms.DateTimeField(required=False)
+    date = forms.SplitDateTimeField(required=False)
 
 class ModifyChildForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)

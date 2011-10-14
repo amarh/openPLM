@@ -2,6 +2,11 @@
 {% load i18n %}
 
 <!-- Manage html display in the Content div which correspond to the "management" menu -->
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+{% endblock %}
+
+
 
 {% block content %}
     {% if is_owner %}
@@ -19,38 +24,55 @@
                 {{ notify_self_form.as_p }}
                 <input name="action" type="submit" value="{% trans "Notify me" %}" />
             </form>
-         {% endif %}
+        {% endif %}
     {% endif %}
 
-    <table class="Content">
-        {% for link in object_management %}
-            <tr class="Content">
-                {% with link.user.get_profile as profile %}
-                    <td class="Content">{{ profile.rank }}</td>
-                {% endwith %}
-                <td class="Content">{{ link.user.username }}</td>
-                <td class="Content">{{ link.user.is_active|yesno:_("active,inactive") }}</td>
-                <td class="Content">{{ link.role }}</td>
-                {% if is_owner %}
-                    <td class="Content">
+    {% regroup object_management|dictsort:"role" by role as links %}
+
+    {% for group in links %}
+        <div class="timeline">
+            <h3>{{ group.grouper|capfirst}}</h3>
+
+            <dl>
+                {% for link in group.list|dictsort:"plmobject.type" %}
+                    <dt class="changeset">
+                    <span>{{link.user.first_name}}</span>
+                    <span>{{link.user.last_name}},</span>
+                    <a href="/user/{{link.user.username}}/"><span>{{link.user.username}}</span></a>,
+                    {% with link.user.get_profile as profile %}
+                        <span>{{ profile.rank }},</span>
+                    {% endwith %}
+
+                    <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
+                    </dt>
+                    <dd style="display:inline;">
+                    {% if is_owner %}
+                            <div style="float:left;">
+                        <span>&nbsp;</span>
                         <span class="ButtonLeft">
                             <a class="Button" href="./replace/{{link.id}}/">{% trans "REPLACE" %}</a>
                         </span>
-                    </td>
-                {% endif %}
-                {% if is_owner %}
-                    {% ifequal link.role 'notified'%}
-                        <td class="Content">
+                        </div>
+                    {% endif %}
+                    {% if is_owner %}
+                        {% ifequal link.role 'notified'%}
+                            <div style="float:left;">
+
                             <form action="./delete/" method="POST">
                                 <input name="link_id" type="hidden" value="{{link.id}}"/>
                                 <input name="action" type="submit" value="{% trans "Delete" %}" />
                             </form>
-                        </td>
-                    {% endifequal %}
-                {% endif %}
-            </tr>
-        {% endfor %}
-    </table>
+                        </div>
+                        {% endifequal %}
+                    {% endif %}
+                    </dd>
+                {% endfor %}
+            </dl>
+            <br />
+        </div>
+
+    {% endfor %}
+
 {% endblock %}
 
 
