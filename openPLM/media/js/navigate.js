@@ -268,10 +268,8 @@ function init(){
 
 function center(){
     var nw = $("#Navigate").width();
-    var nh = $("#Navigate").height();
     var dw = $("#DivNav").width();
-    var dh = $("#DivNav").height();
-    $("#DivNav").css({"left":((nw-dw)/2)+"px", "top": ((nh-dh)/2)+"px"});  
+    $("#DivNav").css({"left":((nw-dw)/2)+"px"});  
 
 };
 
