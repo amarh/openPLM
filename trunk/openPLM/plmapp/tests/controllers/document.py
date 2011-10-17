@@ -148,11 +148,10 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(f2.filename, f.name)
         self.assertEqual(f2.size, f.size)
         self.assertEqual(f2.file.read(), "data")
-        self.assertEqual(file(f2.file.name).read(), "data")
+        self.assertEqual(file(f2.file.path).read(), "data")
         self.assertEqual(os.path.splitext(f2.file.name)[1], ".txt")
         self.failIf("temp" in f2.file.path)
-        self.failUnless(f2.file.name.startswith(os.path.join(
-            settings.DOCUMENTS_DIR, "txt")))
+        self.failUnless(f2.file.path.startswith(settings.DOCUMENTS_DIR))
         self.failUnless(os.access(f2.file.path, os.F_OK))
         self.failUnless(os.access(f2.file.path, os.R_OK))
         self.failUnless(not os.access(f2.file.path, os.W_OK))

@@ -645,9 +645,9 @@ class DocumentStorage(FileSystemStorage):
         md5 = hashlib.md5()
         md5.update(basename)
         md5_value = md5.hexdigest() + "-%s" + ext
-        path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
+        path = os.path.join(ext2, md5_value % rand())
         while os.path.exists(path):
-            path = os.path.join(settings.DOCUMENTS_DIR, ext2, md5_value % rand())
+            path = os.path.join(ext2, md5_value % rand())
         return path
 
 #: :class:`DocumentStorage` instance which stores files in :const:`settings.DOCUMENTS_DIR`
