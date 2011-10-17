@@ -53,7 +53,7 @@
 	                </td>
 			        <td class="Content">
                         {% if instance.thumbnail %}
-                            <img class="thumbnail" src="{{THUMBNAILS_URL}}/{{instance.thumbnail.name}}"
+                            <img class="thumbnail" src="{{instance.thumbnail.url}}"
                                 alt="Thumbnail"/>
 		                {% else %}
                             {% trans "No thumbnail available" %}

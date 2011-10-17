@@ -24,7 +24,9 @@
 #    Pierre Cosquer : pierre.cosquer@insa-rennes.fr
 ################################################################################
 
+import urlparse
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.simplejson import JSONEncoder
 from django.views.decorators.cache import cache_page
@@ -100,9 +102,9 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     doc = "|".join((obj_type, obj_ref, obj_revi))
     for f in obj.files:
         if f.thumbnail:
-            img = "/media/thumbnails/%s" % f.thumbnail 
+            img = f.thumbnail.url 
         else:
-            img = "/media/img/image-missing.png"
+            img = urlparse.urljoin(settings.MEDIA_URL, "img/image-missing.png")
         files.append((f.filename, "/file/%d/" % f.id, img))
     return dict(files=files, doc=doc)
 
