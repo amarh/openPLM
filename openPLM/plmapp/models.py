@@ -653,7 +653,8 @@ class DocumentStorage(FileSystemStorage):
 #: :class:`DocumentStorage` instance which stores files in :const:`settings.DOCUMENTS_DIR`
 docfs = DocumentStorage(location=settings.DOCUMENTS_DIR)
 #: :class:`FileSystemStorage` instance which stores thumbnails in :const:`settings.THUMBNAILS_DIR`
-thumbnailfs = FileSystemStorage(location=settings.THUMBNAILS_DIR)
+thumbnailfs = FileSystemStorage(location=settings.THUMBNAILS_DIR,
+        base_url=settings.THUMBNAILS_URL)
 
 class DocumentFile(models.Model):
     """
@@ -683,7 +684,7 @@ class DocumentFile(models.Model):
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to="docs", storage=docfs)
     size = models.PositiveIntegerField()
-    thumbnail = models.ImageField(upload_to="thumbnails", storage=thumbnailfs,
+    thumbnail = models.ImageField(upload_to=".", storage=thumbnailfs,
                                  blank=True, null=True)
     locked = models.BooleanField(default=lambda: False)
     locker = models.ForeignKey(User, null=True, blank=True,

@@ -112,9 +112,10 @@ EMAIL_PORT = 1025
 
 #: directory that stores documents
 DOCUMENTS_DIR = "/var/openPLM/docs"
-THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
-#: directory that stores thumbnails
-THUMBNAILS_URL = MEDIA_URL + "thumbnails"
+THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails/")
+#: directory that stores thumbnails. Make sure to use a
+# trailing slash.
+THUMBNAILS_URL = MEDIA_URL + "thumbnails/"
 
 # Cookie used for session is temporary and is deleted when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
