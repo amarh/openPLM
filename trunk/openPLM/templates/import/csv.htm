@@ -4,7 +4,7 @@
 
 {% block content %}
     <h3>{% trans "Import of a csv file" %}</h3>
-    {% with "/import/csv/" as action %}
+    {% with "/import/"|add:target|add:"/" as action %}
         {% with csv_form as form %}
             {% include "snippets/undo_form.htm" %}
         {% endwith %}
