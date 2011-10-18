@@ -156,7 +156,7 @@ class GroupController(Controller):
                 "invitation" : inv,
                 }
         subject = "[PLM] Invitation to join the group %s" % self.name 
-        send_mail(subject, [user], ctx, "mails/invitation1")
+        self._send_mail(send_mail, subject, [user], ctx, "mails/invitation1")
 
     def ask_to_join(self):
         """
@@ -171,8 +171,7 @@ class GroupController(Controller):
                 "guest" : self._user
                 }
         subject = "[PLM] %s ask you to join the group %s" % (self._user, self.name) 
-        send_mail(subject, [self.owner], ctx, "mails/invitation2")
-
+        self._send_mail(send_mail, subject, [self.owner], ctx, "mails/invitation2")
 
     def accept_invitation(self, invitation):
         if invitation.state != models.Invitation.PENDING:

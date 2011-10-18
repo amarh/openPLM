@@ -27,6 +27,7 @@
 
 import re
 from functools import wraps
+from collections import deque
 
 from django.db.models.fields import FieldDoesNotExist
 
@@ -128,6 +129,8 @@ class Controller(object):
     HISTORY = models.AbstractHistory
 
     def __init__(self, obj, user):
+        self._mail_blocked = False
+        self._pending_mails = deque()
         self._user = user
         # variable to store attribute changes
         self._histo = ""
@@ -177,8 +180,8 @@ class Controller(object):
         h = self.HISTORY.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
         roles = [models.ROLE_OWNER] + list(roles)
-        send_histories_mail(self, roles, action, [h], self._user, blacklist,
-                users)
+        self._send_mail(send_histories_mail, self, roles, action, [h],
+                self._user, blacklist, users)
 
     def get_verbose_name(self, attr_name):
         """
@@ -261,4 +264,26 @@ class Controller(object):
 
     def check_editable(self):
         return True
+
+    def block_mails(self):
+        """
+        Blocks mails sending. Call :meth:`unblock_mails` to send blocked mails.
+        """
+        self._mail_blocked = True
+
+    def unblock_mails(self):
+        """
+        Unblock mails sending. This sends all previously blocked mails.
+        """
+        while self._pending_mails:
+            mail = self._pending_mails.popleft()
+            mail[0](*mail[1:])
+        self._mail_blocked = False
+
+    def _send_mail(self, func, *args):
+        if self._mail_blocked:
+            mail = (func,) + args
+            self._pending_mails.append(mail)
+        else:
+             func(*args)
 
