@@ -209,6 +209,7 @@ div#DisplayBox
 div#CreationBox, div#SearchBox, div#SearchBox4Search
 {
     display: none;
+    font-size: 14px;
     /*float: left;*/
     width: 100%;
     margin-right: 0px;

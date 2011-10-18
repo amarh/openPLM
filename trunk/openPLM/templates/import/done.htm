@@ -1,0 +1,11 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h3>{% trans "Data have been successfully imported." %}</h3>
+    <div>
+        <a href="/import/csv/">{% trans "Click here to import a new CSV file." %}</a>
+    </div>
+{% endblock %}
+

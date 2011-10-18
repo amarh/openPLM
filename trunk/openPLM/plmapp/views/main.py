@@ -45,7 +45,11 @@ Finaly we have :func:`navigate` which draw a picture with a central object and i
 
 """
 
+import os
+import csv
 import datetime
+import tempfile
+import itertools
 from operator import attrgetter
 from mimetypes import guess_type
 
@@ -66,7 +70,7 @@ from openPLM.plmapp.forms import *
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data
-
+import openPLM.plmapp.csvimport as csvimport
 
 def r2r(template, dictionary, request):
     """
@@ -1048,7 +1052,7 @@ def sponsor(request, obj_ref):
             obj.sponsor(new_user)
             return HttpResponseRedirect("..")
     else:
-        form = SponsorForm(initial={"sponsor":obj.object}, sponsor=obj.id)
+        form = SponsorForm(initial={"sponsor":obj.id}, sponsor=obj.id)
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.htm", ctx, request)
@@ -1099,5 +1103,71 @@ def refuse_invitation(request, obj_ref, token):
     ctx['current_page'] = 'users'
     return r2r("groups/refuse_invitation.htm", ctx, request)
 
-           
+@handle_errors
+def import_csv_init(request):
+    obj, ctx = get_generic_data(request)
+    if request.method == "POST":
+        csv_form = CSVForm(request.POST, request.FILES)
+        if csv_form.is_valid():
+            f = request.FILES["file"]
+            prefix = "openplmcsv"
+            tmp = tempfile.NamedTemporaryFile(prefix=prefix, delete=False)
+            for chunk in f.chunks():
+                tmp.write(chunk)
+            name = os.path.split(tmp.name)[1][len(prefix):]
+            tmp.close()
+            encoding = csv_form.cleaned_data["encoding"]
+            return HttpResponseRedirect("/import/csv/%s/%s/" % (name, encoding))
+    else:
+        csv_form = CSVForm()
+    ctx["csv_form"] = csv_form
+    ctx["step"] = 1
+    return r2r("import/csv.htm", ctx, request)
+
+@handle_errors
+def import_csv_apply(request, filename, encoding):
+    obj, ctx = get_generic_data(request)
+    ctx["encoding_error"] = False
+    ctx["io_error"] = False
+    try:
+        path = os.path.join(tempfile.gettempdir(), "openplmcsv" +  filename)
+        with open(path, "rb") as csv_file:
+            preview = csvimport.CSVPreview(csv_file, encoding)
+        if request.method == "POST":
+            headers_formset = forms.HeadersFormset(request.POST)
+            if headers_formset.is_valid():
+                headers = headers_formset.headers
+                try:
+                    with open(path, "rb") as csv_file:
+                        csvimport.import_csv(csv_file, headers, request.user,
+                                             encoding)
+                except csvimport.CSVImportError as exc:
+                    ctx["errors"] = exc.errors.iteritems()
+                else:
+                    os.remove(path)
+                    return HttpResponseRedirect("/import/done/")
+        else:
+            initial = [{"header": header} for header in preview.guessed_headers]
+            headers_formset = forms.HeadersFormset(initial=initial)
+        ctx.update({
+            "preview" :  preview,
+            "preview_data" : itertools.izip((f["header"] for f in headers_formset.forms),
+                preview.headers, *preview.rows),
+            "headers_formset" : headers_formset,
+        })
+    except UnicodeError:
+        ctx["encoding_error"] = True
+    except (IOError, csv.Error):
+        ctx["io_error"] = True
+    ctx["has_critical_error"] = ctx["io_error"] or ctx["encoding_error"] \
+            or "errors" in ctx
+    ctx["csv_form"] = CSVForm(initial={"encoding" : encoding})
+    ctx["step"] = 2
+    return r2r("import/csv.htm", ctx, request)
+
+
+@handle_errors
+def import_csv_done(request):
+    obj, ctx = get_generic_data(request)
+    return r2r("import/done.htm", ctx, request)
 

@@ -1,6 +1,9 @@
 {% load i18n %}
-
-<form method="POST" action="." {{ form_attributes }}>
+{% if form.is_multipart %}
+<form enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>
+{% else %}
+    <form method="post" action="{{action|default:"."}}"  {{ form_attributes }}>
+{% endif %}
     <table class="Content">
         {{ form }}
         <tr>
