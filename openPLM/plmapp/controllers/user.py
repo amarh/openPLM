@@ -250,7 +250,8 @@ class UserController(Controller):
                 "sponsor" : self._user,
                 "password" : password,
                }
-        send_mail("New account on openPLM", [new_user], ctx, "mails/new_account") 
+        self._send_mail(send_mail, "New account on openPLM", [new_user],
+                ctx, "mails/new_account") 
         models.UserHistory.objects.create(action="Create", user=self._user,
                 plmobject=self._user, details="New user: %s" % new_user.username)
         models.UserHistory.objects.create(action="Create", user=self._user,
