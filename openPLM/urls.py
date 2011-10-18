@@ -35,6 +35,7 @@ from django.conf.urls.defaults import include, patterns
 from openPLM.plmapp.views import *
 import openPLM.plmapp.views.api as api
 from django.contrib.auth.views import login, logout
+from openPLM.plmapp.csvimport import IMPORTERS
 
 from django.contrib import admin
 admin.autodiscover()
@@ -66,6 +67,8 @@ group_url = r'^group/(?P<obj_ref>[^/]+)/'
 user_dict = {'obj_type':'User', 'obj_revi':'-'}
 group_dict = {'obj_type':'Group', 'obj_revi':'-'}
 
+import_url = r'^import/(?P<target>%s)/' % ("|".join(IMPORTERS.keys()))
+
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -76,8 +79,9 @@ urlpatterns += patterns('',
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),
     (r'^comments/', include('django.contrib.comments.urls')),
-    ('^import/csv/$', import_csv_init),
-    ('^import/csv/(?P<filename>[\w]+)/(?P<encoding>[\w]+)/$', import_csv_apply),
+    (import_url + '$', import_csv_init),
+    (import_url + '(?P<filename>[\w]+)/(?P<encoding>[\w]+)/$',
+        import_csv_apply),
     ('^import/done/$', import_csv_done),
     )
 

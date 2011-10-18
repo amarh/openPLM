@@ -32,6 +32,7 @@ from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
+from django.utils.functional import memoize
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
@@ -464,28 +465,29 @@ class CSVForm(forms.Form):
     encoding = forms.TypedChoiceField(initial="utf_8", choices=ENCODINGS)
 
 
-class CSVHeaderForm(forms.Form):
-    header = forms.TypedChoiceField(choices=zip(csvimport.HEADERS,
-        csvimport.HEADERS), required=False)
+def get_headers_formset(Importer):
+    class CSVHeaderForm(forms.Form):
+        header = forms.TypedChoiceField(choices=zip(Importer.HEADERS,
+            Importer.HEADERS), required=False)
+
+    class BaseHeadersFormset(BaseFormSet):
+
+        def clean(self):
+            if any(self.errors):
+                return
+            headers = []
+            for form in self.forms:
+                header = form.cleaned_data['header']
+                if header and header in headers:
+                    raise forms.ValidationError(_("Columns must have distinct headers."))
+                headers.append(header) 
+            for field in Importer.REQUIRED_FIELDS:
+                if field not in headers:
+                    raise forms.ValidationError(Importer.MISSING_HEADERS_MSG())
+            self.headers = headers
 
 
-class BaseHeadersFormset(BaseFormSet):
+    return formset_factory(CSVHeaderForm, extra=0, formset=BaseHeadersFormset)
 
-    def clean(self):
-        if any(self.errors):
-            return
-        headers = []
-        for form in self.forms:
-            header = form.cleaned_data['header']
-            if header and header in headers:
-                raise forms.ValidationError(_("Columns must have distict headers."))
-            headers.append(header) 
-        for field in csvimport.REQUIRED_FIELDS:
-            if field not in headers:
-                raise forms.ValidationError(csvimport.MISSING_HEARDERS_MSG)
-        self.headers = headers
-
-
-HeadersFormset = formset_factory(CSVHeaderForm, extra=0,
-        formset=BaseHeadersFormset)
+get_headers_formset = memoize(get_headers_formset, {}, 1)
 

@@ -1103,8 +1103,8 @@ def refuse_invitation(request, obj_ref, token):
     ctx['current_page'] = 'users'
     return r2r("groups/refuse_invitation.htm", ctx, request)
 
-@handle_errors
-def import_csv_init(request):
+@handle_errors(undo="../..")
+def import_csv_init(request, target="csv"):
     obj, ctx = get_generic_data(request)
     if request.method == "POST":
         csv_form = CSVForm(request.POST, request.FILES)
@@ -1117,31 +1117,36 @@ def import_csv_init(request):
             name = os.path.split(tmp.name)[1][len(prefix):]
             tmp.close()
             encoding = csv_form.cleaned_data["encoding"]
-            return HttpResponseRedirect("/import/csv/%s/%s/" % (name, encoding))
+            return HttpResponseRedirect("/import/%s/%s/%s/" % (target, name,
+                                        encoding))
     else:
         csv_form = CSVForm()
     ctx["csv_form"] = csv_form
     ctx["step"] = 1
+    ctx["target"] = target
     return r2r("import/csv.htm", ctx, request)
 
-@handle_errors
-def import_csv_apply(request, filename, encoding):
+@handle_errors(undo="../..")
+def import_csv_apply(request, target, filename, encoding):
     obj, ctx = get_generic_data(request)
     ctx["encoding_error"] = False
     ctx["io_error"] = False
+    Importer = csvimport.IMPORTERS[target]
+    Formset = forms.get_headers_formset(Importer)
     try:
         path = os.path.join(tempfile.gettempdir(),
                             "openplmcsv" + request.user.username + filename)
         with open(path, "rb") as csv_file:
-            preview = csvimport.CSVPreview(csv_file, encoding)
+            importer = Importer(csv_file, request.user, encoding)
+            preview = importer.get_preview()
         if request.method == "POST":
-            headers_formset = forms.HeadersFormset(request.POST)
+            headers_formset = Formset(request.POST)
             if headers_formset.is_valid():
                 headers = headers_formset.headers
                 try:
                     with open(path, "rb") as csv_file:
-                        csvimport.import_csv(csv_file, headers, request.user,
-                                             encoding)
+                        importer = Importer(csv_file, request.user, encoding)
+                        importer.import_csv(headers)
                 except csvimport.CSVImportError as exc:
                     ctx["errors"] = exc.errors.iteritems()
                 else:
@@ -1149,7 +1154,7 @@ def import_csv_apply(request, filename, encoding):
                     return HttpResponseRedirect("/import/done/")
         else:
             initial = [{"header": header} for header in preview.guessed_headers]
-            headers_formset = forms.HeadersFormset(initial=initial)
+            headers_formset = Formset(initial=initial)
         ctx.update({
             "preview" :  preview,
             "preview_data" : itertools.izip((f["header"] for f in headers_formset.forms),
@@ -1164,6 +1169,7 @@ def import_csv_apply(request, filename, encoding):
             or "errors" in ctx
     ctx["csv_form"] = CSVForm(initial={"encoding" : encoding})
     ctx["step"] = 2
+    ctx["target"] = target
     return r2r("import/csv.htm", ctx, request)
 
 

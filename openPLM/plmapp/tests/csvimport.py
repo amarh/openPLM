@@ -82,9 +82,9 @@ class CSVImportTestCase(TransactionTestCase):
         csv_file = cStringIO.StringIO()
         UnicodeWriter(csv_file).writerows(csv_rows)
         csv_file.seek(0)
-        headers = CSVPreview(csv_file).guessed_headers
-        csv_file.seek(0)
-        objects = import_csv(csv_file, headers, self.user)
+        importer = CSVImporter(csv_file, self.user)
+        headers = importer.get_preview().guessed_headers
+        objects = importer.import_csv(headers)
         self.assertEquals(len(csv_rows) - 1, len(objects))
         sp1 = get_obj("SinglePart", "sp1", "s", self.user)
         self.assertEquals("SP1", sp1.name)
@@ -101,10 +101,9 @@ class CSVImportTestCase(TransactionTestCase):
         plmobjects = list(PLMObject.objects.all())
         UnicodeWriter(csv_file).writerows(csv_rows)
         csv_file.seek(0)
-        headers = CSVPreview(csv_file).guessed_headers
-        csv_file.seek(0)
-        self.assertRaises(CSVImportError, import_csv,
-                csv_file, headers, self.user)
+        importer = CSVImporter(csv_file, self.user)
+        headers = importer.get_preview().guessed_headers
+        self.assertRaises(CSVImportError, importer.import_csv, headers)
         self.assertEquals(plmobjects, list(PLMObject.objects.all()))
 
 
