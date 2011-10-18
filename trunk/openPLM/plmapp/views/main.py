@@ -1110,7 +1110,7 @@ def import_csv_init(request):
         csv_form = CSVForm(request.POST, request.FILES)
         if csv_form.is_valid():
             f = request.FILES["file"]
-            prefix = "openplmcsv"
+            prefix = "openplmcsv" + request.user.username
             tmp = tempfile.NamedTemporaryFile(prefix=prefix, delete=False)
             for chunk in f.chunks():
                 tmp.write(chunk)
@@ -1130,7 +1130,8 @@ def import_csv_apply(request, filename, encoding):
     ctx["encoding_error"] = False
     ctx["io_error"] = False
     try:
-        path = os.path.join(tempfile.gettempdir(), "openplmcsv" +  filename)
+        path = os.path.join(tempfile.gettempdir(),
+                            "openplmcsv" + request.user.username + filename)
         with open(path, "rb") as csv_file:
             preview = csvimport.CSVPreview(csv_file, encoding)
         if request.method == "POST":
