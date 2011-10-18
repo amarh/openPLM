@@ -26,7 +26,7 @@ import re
 
 from django import forms
 from django.conf import settings
-from django.forms.formsets import formset_factory
+from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import modelform_factory, modelformset_factory
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
@@ -37,6 +37,8 @@ import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.widgets import JQueryAutoComplete
+from openPLM.plmapp.encoding import ENCODINGS
+import openPLM.plmapp.csvimport as csvimport
 
 class PLMObjectForm(forms.Form):
     u"""
@@ -119,12 +121,12 @@ def integerfield_clean(value):
     return None
 
 class TypeForm(forms.Form):
-    LISTE = m.get_all_users_and_plmobjects_with_level()
-    type = forms.TypedChoiceField(choices=LISTE)
+    LIST = m.get_all_users_and_plmobjects_with_level()
+    type = forms.TypedChoiceField(choices=LIST)
 
 class TypeFormWithoutUser(forms.Form):
-    LISTE_WO_USER = m.get_all_plmobjects_with_level()
-    type = forms.TypedChoiceField(choices=LISTE_WO_USER)
+    LIST_WO_USER = m.get_all_plmobjects_with_level()
+    type = forms.TypedChoiceField(choices=LIST_WO_USER)
 
 class TypeSearchForm(TypeForm):
     def __init__(self, *args, **kwargs):
@@ -457,4 +459,33 @@ class InvitationForm(forms.Form):
     invitation = forms.ModelChoiceField(queryset=_inv_qset,
             required=True, widget=forms.HiddenInput())
 
+class CSVForm(forms.Form):
+    file = forms.FileField()
+    encoding = forms.TypedChoiceField(initial="utf_8", choices=ENCODINGS)
+
+
+class CSVHeaderForm(forms.Form):
+    header = forms.TypedChoiceField(choices=zip(csvimport.HEADERS,
+        csvimport.HEADERS), required=False)
+
+
+class BaseHeadersFormset(BaseFormSet):
+
+    def clean(self):
+        if any(self.errors):
+            return
+        headers = []
+        for form in self.forms:
+            header = form.cleaned_data['header']
+            if header and header in headers:
+                raise forms.ValidationError(_("Columns must have distict headers."))
+            headers.append(header) 
+        for field in csvimport.REQUIRED_FIELDS:
+            if field not in headers:
+                raise forms.ValidationError(csvimport.MISSING_HEARDERS_MSG)
+        self.headers = headers
+
+
+HeadersFormset = formset_factory(CSVHeaderForm, extra=0,
+        formset=BaseHeadersFormset)
 

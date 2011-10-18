@@ -6,9 +6,7 @@
 {% block content %}
     {% trans "Add new file / Check-in file :" %}
     {% with add_file_form as form %}
-        {% with  "enctype='multipart/form-data'" as form_attributes %}
-            {% include "snippets/undo_form.htm" %}
-        {% endwith %}
+        {% include "snippets/undo_form.htm" %}
     {% endwith %}
 </form>
 {% endblock %}

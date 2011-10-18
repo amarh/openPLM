@@ -76,6 +76,9 @@ urlpatterns += patterns('',
     (r'^home/', display_home_page),
     (r'^object/create/$', create_object),
     (r'^comments/', include('django.contrib.comments.urls')),
+    ('^import/csv/$', import_csv_init),
+    ('^import/csv/(?P<filename>[\w]+)/(?P<encoding>[\w]+)/$', import_csv_apply),
+    ('^import/done/$', import_csv_done),
     )
 
 urlpatterns += patterns2('', 'ajax/', 

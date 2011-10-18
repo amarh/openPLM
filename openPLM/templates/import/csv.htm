@@ -1,0 +1,76 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h3>{% trans "Import of a csv file" %}</h3>
+    {% with "/import/csv/" as action %}
+        {% with csv_form as form %}
+            {% include "snippets/undo_form.htm" %}
+        {% endwith %}
+    {% endwith %}
+
+    {% ifequal step 2 %}
+        {% if has_critical_error %}
+            <div class="errors">
+                <h4>{% trans "Error" %}</h4>
+                {% if errors %}
+                    <dl class="errors">
+                        {% for line, error in errors %}
+                            <dt class="errors">
+                            <span>
+                                {% blocktrans %} Line {{line}} {% endblocktrans%}
+                            </span>
+                            </dt>
+                            <dd class="errors">
+                            {{error|safe}}
+                            </dd>
+                        {% endfor %}
+                    </dl>
+                {% endif %}
+                {% if io_error %}
+                    {% trans "Error while reading the CSV file. Try upload a new file." %}
+                {% endif %}
+                {% if encoding_error %}
+                    {% trans "The given encoding seems wrong. Try upload a new file with the right encoding." %}
+                {% endif %}
+            </div>
+
+        {% else %}
+
+            {% with headers_formset.non_form_errors as errors%}
+                {{errors.as_ul }}
+            {% endwith%}
+            <form method="post" action=".">
+                {{ headers_formset.management_form }}
+
+                <table class="Content">
+                    <thead>
+                        <tr class="Content">
+                            <th class="Content">{% trans "Field" %}</th>
+                            <th class="Content">{% trans "Header" %}</th>
+                            {% for row in preview.rows %}
+                                <th class="Content">{% trans "Row" %} {{ count|add:"1"}}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in preview_data %}
+                            <tr class="Content">
+                                {% for value in row %}
+                                    <td class="Content">{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+                <input type="submit" value="{% trans "Validate" %}" name="_validate"/>
+                <input type="submit" value="{% trans "Undo" %}" name="_undo"/>
+
+            </form>
+        {% endif %}
+    {% endifequal %}
+
+{% endblock %}
+
