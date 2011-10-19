@@ -82,7 +82,7 @@ class CSVImportTestCase(TransactionTestCase):
         csv_file = cStringIO.StringIO()
         UnicodeWriter(csv_file).writerows(csv_rows)
         csv_file.seek(0)
-        importer = CSVImporter(csv_file, self.user)
+        importer = PLMObjectsImporter(csv_file, self.user)
         headers = importer.get_preview().guessed_headers
         objects = importer.import_csv(headers)
         self.assertEquals(len(csv_rows) - 1, len(objects))
@@ -101,7 +101,7 @@ class CSVImportTestCase(TransactionTestCase):
         plmobjects = list(PLMObject.objects.all())
         UnicodeWriter(csv_file).writerows(csv_rows)
         csv_file.seek(0)
-        importer = CSVImporter(csv_file, self.user)
+        importer = PLMObjectsImporter(csv_file, self.user)
         headers = importer.get_preview().guessed_headers
         self.assertRaises(CSVImportError, importer.import_csv, headers)
         self.assertEquals(plmobjects, list(PLMObject.objects.all()))

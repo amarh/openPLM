@@ -8,6 +8,7 @@ Modules
     
     base_views
     controllers
+    csvimport
     exceptions
     filehandlers
     forms

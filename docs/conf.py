@@ -23,6 +23,7 @@ sys.path.append(os.path.abspath('../openPLM'))
 from django.conf import global_settings, settings
 global_settings.DOCUMENTS_DIR = "/tmp"
 global_settings.THUMBNAILS_DIR = "/tmp"
+global_settings.THUMBNAILS_URL = "/media/thumbnails/"
 settings.configure()
 
 # -- General configuration -----------------------------------------------------
