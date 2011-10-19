@@ -75,16 +75,29 @@ class CSVImportTestCase(TransactionTestCase):
               u'SP1',
               u'Lui',
               self.group.name,
-              u'draft_official_deprecated']]
+              u'draft_official_deprecated'],
+             [u'SinglePart',
+              u'sp2',
+              u's',
+              u'SP2',
+              u'Lui',
+              self.group.name,
+              u'draft_official_deprecated'],
+             ]
+
+
+    def import_csv(self, Importer, rows):
+        csv_file = cStringIO.StringIO()
+        UnicodeWriter(csv_file).writerows(rows)
+        csv_file.seek(0)
+        importer = Importer(csv_file, self.user)
+        headers = importer.get_preview().guessed_headers
+        objects = importer.import_csv(headers)
+        return objects
 
     def test_import_valid(self):
         csv_rows = self.get_valid_rows()
-        csv_file = cStringIO.StringIO()
-        UnicodeWriter(csv_file).writerows(csv_rows)
-        csv_file.seek(0)
-        importer = PLMObjectsImporter(csv_file, self.user)
-        headers = importer.get_preview().guessed_headers
-        objects = importer.import_csv(headers)
+        objects = self.import_csv(PLMObjectsImporter, csv_rows)
         self.assertEquals(len(csv_rows) - 1, len(objects))
         sp1 = get_obj("SinglePart", "sp1", "s", self.user)
         self.assertEquals("SP1", sp1.name)
@@ -94,16 +107,80 @@ class CSVImportTestCase(TransactionTestCase):
         Tests that an import with an invalid row doest not modify
         the database.
         """
-        csv_file = cStringIO.StringIO()
         csv_rows = self.get_valid_rows()
         csv_rows.append(["BadType", "bt", "1", "BT",
             self.group.name, u'draft_official_deprecated'])
         plmobjects = list(PLMObject.objects.all())
-        UnicodeWriter(csv_file).writerows(csv_rows)
-        csv_file.seek(0)
-        importer = PLMObjectsImporter(csv_file, self.user)
-        headers = importer.get_preview().guessed_headers
-        self.assertRaises(CSVImportError, importer.import_csv, headers)
+        self.assertRaises(CSVImportError, self.import_csv,
+                PLMObjectsImporter, csv_rows)
         self.assertEquals(plmobjects, list(PLMObject.objects.all()))
 
+    def get_valid_bom(self):
+        return [["parent-type", "parent-reference", "parent-revision",
+                 "child-type", "child-reference", "child-revision",
+                 "quantity", "order"],
+                ["Part", "p1", "a", "SinglePart", "sp1", "s", "10", "15"],
+                ["SinglePart", "sp1", "s", "SinglePart", "sp2", "s", "10.5", "16"],
+                ]
+
+    def test_import_bom_valid(self):
+        """
+        Tests an import of a valid bom.
+        """
+        self.import_csv(PLMObjectsImporter, self.get_valid_rows())
+        csv_rows = self.get_valid_bom()
+        objects = self.import_csv(BOMImporter, csv_rows)
+        # objects should be [parent1, child1, ...]
+        self.assertEquals((len(csv_rows) - 1) * 2, len(objects))
+
+        # first row
+        parent = get_obj("Part", "p1", "a", self.user)
+        child = get_obj("SinglePart", "sp1", "s", self.user)
+        c = parent.get_children()[0]
+        self.assertEquals(c.link.parent.id, parent.id)
+        self.assertEquals(c.link.child.id, child.id)
+        self.assertEquals(c.link.quantity, 10)
+        self.assertEquals(c.link.order, 15)
+
+        # second row
+        parent = get_obj("SinglePart", "sp1", "s", self.user)
+        child = get_obj("SinglePart", "sp2", "s", self.user)
+        c = parent.get_children()[0]
+        self.assertEquals(c.link.parent.id, parent.id)
+        self.assertEquals(c.link.child.id, child.id)
+        self.assertEquals(c.link.quantity, 10.5)
+        self.assertEquals(c.link.order, 16)
+
+    def test_import_bom_invalid_order(self):
+        """
+        Tests an import of an invalid bom: invalid order.
+        """
+        self.import_csv(PLMObjectsImporter, self.get_valid_rows())
+        csv_rows = self.get_valid_bom()
+        csv_rows[-1][-1] = "not an integer"
+        self.assertRaises(CSVImportError, self.import_csv,
+                          BOMImporter, csv_rows)
+        self.assertEquals(0, len(ParentChildLink.objects.all()))
+    
+    def test_import_bom_invalid_parent(self):
+        """
+        Tests an import of an invalid bom: invalid parent.
+        """
+        self.import_csv(PLMObjectsImporter, self.get_valid_rows())
+        csv_rows = self.get_valid_bom()
+        csv_rows[1][0] = "not an type"
+        self.assertRaises(CSVImportError, self.import_csv,
+                          BOMImporter, csv_rows)
+        self.assertEquals(0, len(ParentChildLink.objects.all()))
+
+    def test_import_bom_invalid_duplicated_row(self):
+        """
+        Tests an import of an invalid bom: a row is duplicated.
+        """
+        self.import_csv(PLMObjectsImporter, self.get_valid_rows())
+        csv_rows = self.get_valid_bom()
+        csv_rows.append(csv_rows[-1])
+        self.assertRaises(CSVImportError, self.import_csv,
+                          BOMImporter, csv_rows)
+        self.assertEquals(0, len(ParentChildLink.objects.all()))
 
