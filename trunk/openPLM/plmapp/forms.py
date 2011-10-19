@@ -467,8 +467,9 @@ class CSVForm(forms.Form):
 
 def get_headers_formset(Importer):
     class CSVHeaderForm(forms.Form):
-        header = forms.TypedChoiceField(choices=zip(Importer.HEADERS,
-            Importer.HEADERS), required=False)
+        HEADERS = Importer.get_headers()
+        header = forms.TypedChoiceField(choices=zip(HEADERS, HEADERS),
+                required=False)
 
     class BaseHeadersFormset(BaseFormSet):
 
@@ -481,11 +482,10 @@ def get_headers_formset(Importer):
                 if header and header in headers:
                     raise forms.ValidationError(_("Columns must have distinct headers."))
                 headers.append(header) 
-            for field in Importer.REQUIRED_FIELDS:
+            for field in Importer.REQUIRED_HEADERS:
                 if field not in headers:
-                    raise forms.ValidationError(Importer.MISSING_HEADERS_MSG())
+                    raise forms.ValidationError(Importer.get_missing_headers_msg())
             self.headers = headers
-
 
     return formset_factory(CSVHeaderForm, extra=0, formset=BaseHeadersFormset)
 
