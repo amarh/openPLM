@@ -32,7 +32,7 @@
 	                <td><input type="submit" value="{% trans "LOGIN" %}" /></td>
 	            </tr>
 	        </table>
-	        <input type="hidden" name="next" value="/home/"/>
+	        <input type="hidden" name="next" value= {{ next|default:"/home/" }} />
         </form>
 	</div>
 </div>
