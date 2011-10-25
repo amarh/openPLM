@@ -5,6 +5,11 @@ for app in settings.INSTALLED_APPS:
         __import__("%s.models" % app, globals(), locals(), [], -1)
 
 import haystack
-haystack.autodiscover()
+import sys
+
+# little hack: autodiscover() fails if the database is not created
+# but syncdb or migrate would run autodiscover without this line
+if len(sys.argv) < 2 or sys.argv[1] not in ("syncdb", "migrate"):
+    haystack.autodiscover()
 
 
