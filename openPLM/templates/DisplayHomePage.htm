@@ -1,6 +1,7 @@
 {% extends "BaseDisplayHomePage.htm" %}
 {% load i18n %}
 {% load plmapp_tags %}
+{% load highlight %}
 
 <!-- Manage html display of the home page -->
 
@@ -32,84 +33,32 @@
 
 {% block ResultBlock %}
     {% if link_creation %}
-        Results for link creation :
+        {% trans "Results for link creation:" %}
     {% endif %}
-    <table class="Result">
-        {% for object in results %}
-            {% if forloop.first %}
-                {% if not object.username %}                
-                    <col width="30%"/>
-                    <col width="30%"/>
-                    <col width="20%"/>
-                    <col width="20%"/>
-                {% endif %}
-                <tr class="Content">
-                    {% if object.username %}
-                        <th class="Content">{% trans "Username" %}</th>
-                        <th class="Content">{% trans "Last name" %}</th>
-                    {% else %}
-                        <th class="Content">{% trans "Type" %}</th>
-                        <th class="Content">{% trans "Reference" %}</th>
-                        <th class="Content">{% trans "Rev." %}</th>
-                    {% endif %}
-                    {% if link_creation %}
-                        <th>{% trans "ADD" %}</th>
-                    {% else %}
-                        <th class="Content">{% trans "Name" %}</th>
-                    {% endif %}
-                </tr>
-            {% endif %}
-
-            <tr class="{% cycle 'Content' 'Content2' as rowcolors %}">
-                {% if object.username %}
-                    <td class="Content">
-                        <a href="{{object.plmobject_url}}">
-                            {{object.username|escape}}
-                        </a>
-                    </td>
-                    <td class="Content">{{object.last_name|escape}}</td>
-                {% else %}
-                    <td class="Content">{{object.type|escape}}</td>
-                    <td class="Content reference">
-                        <a href="{{object.plmobject_url}}">
-                            {{object.reference|escape}}
-                        </a>
-                    </td>
-                    <td class="Content">{{object.revision|escape}}</td>
-                    {% if not link_creation %}
-                        <td class="Content">
-                            <span class="info">
-                                <span class="small">{{object.name|trunc:10}}</span>
-                                <span class="long">{{object.name}}</span>
-                            </span>
-                        </td>
-                    {% endif %}
-                {% endif %}
-
+    <ul class="Result">
+        {% for result in results %}
+            <li class="Result">
+            <div class="reference">
+                {{result.rendered|safe}}
+            </div>
+            <div class="summary">
+                {{ result.highlighted.text|safe }}
+            </div>
+            {% if link_creation or navigate_bool %}
                 <form method="post" action="." enctype="multipart/form-data">
-                    {% if object.username %}
-                        <input type="hidden" name="type" value="User"/>
-                        <input type="hidden" name="username" value="{{object.username|escape}}"/>
-
-                    {% else %}
-                        <input type="hidden" name="type" value="{{object.type|escape}}"/>
-                        <input type="hidden" name="reference" value="{{object.reference|escape}}"/>
-                        <input type="hidden" name="revision" value="{{object.revision|escape}}"/>
-
-                    {% endif %}
-                    {% if link_creation %}
-                        {% if object|can_add:attach %}
-                            <td class="Content">
-                                <input type="submit" value="{% trans "ADD" %}"/>
-                            </td>
-                        {% endif %}
+                    {{result.rendered_add|safe}}
+                    {% if result.object|can_add:attach %}
+                        <input type="submit" value="{% trans "ADD" %}"/>
                     {% endif %}
                 </form>
-            </tr>
+
+            {% endif %}
+            </li>
+
         {% empty %}
-            <tr>{% trans "No result matching given query" %}</tr>
+            <li>{% trans "No result matching given query" %}</li>
         {% endfor %}
-    </table>
+    </ul>
 {% endblock %}
 
 {% block CreationBlock %}
@@ -120,15 +69,15 @@
             <input type="submit" value="{% trans "CREATE !" %}"/>
             </li>
             <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="ImportButton">
-                <a href="/import/csv/">
-                    {% trans "Import" %}
-                </a>
-             </li>
+            <a href="/import/csv/">
+                {% trans "Import" %}
+            </a>
+            </li>
             <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="ImportBOMButton">
-                <a href="/import/bom/">
-                    {% trans "Import a BOM" %}
-                </a>
-             </li>
+            <a href="/import/bom/">
+                {% trans "Import a BOM" %}
+            </a>
+            </li>
         </ul>
     </form>
 {% endblock %}

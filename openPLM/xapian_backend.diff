@@ -1,0 +1,38 @@
+--- original/xapian_backend.py	2011-08-22 12:41:58.000000000 +0200
++++ xapian_backend.py	2011-10-25 11:38:21.000000000 +0200
+@@ -1,5 +1,6 @@
+ # Copyright (C) 2009, 2010, 2011 David Sauve
+ # Copyright (C) 2009, 2010 Trapeze
++# 2011: Modifications by LinObject
+ 
+ __author__ = 'David Sauve'
+ __version__ = (1, 1, 6, 'beta')
+@@ -96,7 +97,7 @@
+                     begin = _marshal_value(long(begin))
+                     end = _marshal_value(long(end))
+                 return field_dict['column'], str(begin), str(end)
+-
++        return xapian.BAD_VALUENO, str(begin), str(end)
+ 
+ class XHExpandDecider(xapian.ExpandDecider):
+     def __call__(self, term):
+@@ -654,8 +655,9 @@
+         for term in query:
+             for match in re.findall('[^A-Z]+', term): # Ignore field identifiers
+                 match_re = re.compile(match, re.I)
+-                content = match_re.sub('<%s>%s</%s>' % (tag, term, tag), content)
+-        
++                content = match_re.sub('<%s>%s</%s>' % (tag, match, tag), content)
++        # remove non highlighted line
++        content = "...".join(line for line in content.splitlines() if "<em>" in line)
+         return content
+     
+     def _do_field_facets(self, results, field_facets):
+@@ -1224,7 +1226,6 @@
+         else:
+             return xapian.Query(xapian.Query.OP_PHRASE, term_list)
+ 
+-
+ def _marshal_value(value):
+     """
+     Private utility method that converts Python values to a string for Xapian values.

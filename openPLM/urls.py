@@ -196,4 +196,3 @@ urlpatterns += patterns2('', api_url,
     (r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
 )
 
-

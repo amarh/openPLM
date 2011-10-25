@@ -92,6 +92,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.comments',
     'django.contrib.humanize',
+    'djcelery',
+    'haystack',
     'south',
     'openPLM.plmapp',
     # you can add your application after this line
@@ -137,8 +139,22 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com"
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
 
-#: True if emails must have a domain of the list of sites
-RESTRICT_EMAIL_TO_DOMAINS = False
+# search stuff
+HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
+HAYSTACK_SEARCH_ENGINE = 'xapian'
+HAYSTACK_XAPIAN_PATH = "/var/openPLM/xapian_index/"
+HAYSTACK_INCLUDE_SPELLING = True
+EXTRACTOR = os.path.abspath(os.path.join(os.path.dirname(__file__), "bin", "extractor.sh"))
+
+# celery stuff
+import djcelery
+djcelery.setup_loader()
+
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_USER = "openplm"
+BROKER_PASSWORD = "secret"
+BROKER_VHOST = "openplm"
 
 COMPANY = "company"
 

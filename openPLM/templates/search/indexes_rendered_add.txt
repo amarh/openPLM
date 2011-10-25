@@ -1,0 +1,11 @@
+{% if object.username %}
+<input type="hidden" name="type" value="User"/>
+<input type="hidden" name="username" value="{{object.username|escape}}"/>
+
+{% else %}
+<input type="hidden" name="type" value="{{object.type|escape}}"/>
+<input type="hidden" name="reference" value="{{object.reference|escape}}"/>
+<input type="hidden" name="revision" value="{{object.revision|escape}}"/>
+
+{% endif %}
+

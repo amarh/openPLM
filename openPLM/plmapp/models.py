@@ -233,6 +233,10 @@ class GroupInfo(Group):
     def is_editable(self):
         return True
 
+    def get_attributes_and_values(self):
+        return [(attr, getattr(self, attr)) for attr in self.attributes]
+
+
 # lifecycle stuff
 
 class State(models.Model):
@@ -544,6 +548,9 @@ class PLMObject(models.Model):
             if field not in cls.excluded_modification_fields():
                 fields.append(field)
         return fields
+
+    def get_attributes_and_values(self):
+        return [(attr, getattr(self, attr)) for attr in self.attributes]
 
 # parts stuff
 

@@ -299,14 +299,21 @@ class UserViewTestCase(CommonViewTest):
         self.assertTrue(self.group in user.groupinfo_set.all())
 
 
+from django.core.management import call_command
 class SearchViewTest(CommonViewTest):
 
     def search(self, request):
-        response = self.client.get("/user/user/attributes/", request) 
+        # rebuild the index
+        call_command("rebuild_index", interactive=False)
+
+        query = u" ".join(u"%s:%s" % q for q in request.iteritems() if q[0] != "type")
+        query = query or "*"
+        response = self.client.get("/user/user/attributes/", {"type" : request["type"],
+                "q" : query}) 
         self.assertEqual(response.status_code, 200)
         results = list(response.context["results"])
-        results.sort(key=lambda r:r.pk)
-        return results
+        results.sort(key=lambda r:r.object.pk)
+        return [r.object for r in results]
 
     def test_forms(self):
         response = self.client.get("/user/user/attributes/")

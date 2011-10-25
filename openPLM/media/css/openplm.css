@@ -681,3 +681,7 @@ td.open span.expander:hover {
     background-image: url("/media/img/expander_open_hover.png");
 }
 
+/** simple search **/
+li.Result div.summary {
+    padding-left: 1em;
+}

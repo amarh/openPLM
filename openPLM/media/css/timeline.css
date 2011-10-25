@@ -60,3 +60,7 @@ div.timeline br {
 div.timeline {
     margin-bottom: 1em;
 }
+
+dd p br {
+    clear:none !important;
+}

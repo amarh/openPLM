@@ -2,6 +2,7 @@ import os
 import sys
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openPLM.settings'
+os.environ["CELERY_LOADER"] = "django"
 
 sys.path.append('/var/django/openPLM/trunk/')
 sys.path.append('/var/django/openPLM/trunk/openPLM')

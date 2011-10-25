@@ -1,0 +1,4 @@
+{% with object.document as object %}
+{% include "search/indexes_rendered.txt" %}
+{% endwith %}
+<span class="file">{{ object.filename }}</span>

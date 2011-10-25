@@ -1,0 +1,3 @@
+{% with object.document as object %}
+{% include "search/indexes_rendered_add.txt" %}
+{% endwith %}
