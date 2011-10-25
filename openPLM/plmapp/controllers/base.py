@@ -285,5 +285,5 @@ class Controller(object):
             mail = (func,) + args
             self._pending_mails.append(mail)
         else:
-             func(*args)
+            func(*args)
 

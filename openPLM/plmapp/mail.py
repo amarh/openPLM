@@ -26,21 +26,23 @@
 This module contains a function :func:`send_mail` which can be used to notify
 users about a changement in a :class:`.PLMObject`.
 """
-
-from threading import Thread
+from collections import Iterable, Mapping
 
 import kjbuckets
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Model
 from django.template.loader import render_to_string
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from celery.task import task
 
 from openPLM.plmapp.models import User, DelegationLink, ROLE_OWNER
 
 
 def get_recipients(obj, roles, users):
-    recipients = set((u.id for u in users))
+    recipients = set(users)
     if hasattr(obj, "plmobjectuser_link_plmobject"):
         manager = obj.plmobjectuserlink_plmobject
         for role in roles:
@@ -55,8 +57,57 @@ def get_recipients(obj, roles, users):
         recipients.add(obj.owner.id)
     return recipients
 
+def convert_users(users):
+    if users:
+        r = iter(users).next()
+        if hasattr(r, "id"):
+            users = [x.id for x in users]
+    return users
 
-def send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
+class CT(object):
+    def __init__(self, ct_id, pk):
+        self.ct_id = ct_id
+        self.pk = pk
+
+    @classmethod
+    def from_object(cls, obj):
+        return cls(ContentType.objects.get_for_model(obj).id, obj.pk)
+
+    def get_object(self):
+        ct = ContentType.objects.get_for_id(self.ct_id)
+        return ct.get_object_for_this_type(pk=self.pk)
+
+
+def serialize(obj):
+    if isinstance(obj, basestring):
+        return obj
+    if isinstance(obj, Model):
+        return CT.from_object(obj)
+    elif isinstance(obj, Mapping):
+        new_ctx = {}
+        for key, value in obj.iteritems():
+            new_ctx[key] = serialize(value)
+        return new_ctx
+    elif isinstance(obj, Iterable):
+        return [serialize(o) for o in obj]
+    return obj
+
+def unserialize(obj):
+    if isinstance(obj, basestring):
+        return obj
+    if isinstance(obj, CT):
+        return obj.get_object()
+    elif isinstance(obj, Mapping):
+        new_ctx = {}
+        for key, value in obj.iteritems():
+            new_ctx[key] = unserialize(value)
+        return new_ctx
+    elif isinstance(obj, Iterable):
+        return [unserialize(o) for o in obj]
+    return obj
+
+@task(ignore_result=True)
+def do_send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
               users=(), template="mails/history"):
     """
     Sends a mail to users who have role *role* for *plmobject*.
@@ -69,16 +120,18 @@ def send_histories_mail(plmobject, roles, last_action, histories, user, blacklis
     :param user: user who made the modification
     :type user: :class:`~django.contrib.auth.models.User` 
     :param blacklist: list of emails whose no mail should be sent (empty by default).
-    :return: set of emails whose a mail was sent
 
     .. note::
 
         This function fails silently if it can not send the mail.
         The mail is sent in a separated thread. 
     """
-
-    subject = "[PLM] " + unicode(plmobject.object)
+    
+    plmobject = unserialize(plmobject)
+    user = unserialize(user)
+    subject = "[PLM] " + unicode(plmobject)
     recipients = get_recipients(plmobject, roles, users) 
+    
     if recipients:
         ctx = {
                 "last_action" : last_action,
@@ -86,14 +139,12 @@ def send_histories_mail(plmobject, roles, last_action, histories, user, blacklis
                 "plmobject" : plmobject,
                 "user" : user,
             }
-        return send_mail(subject, recipients, ctx, template, blacklist)
-    return set()
+        do_send_mail(subject, recipients, ctx, template, blacklist)
 
-def send_mail(subject, recipients, ctx, template, blacklist=()):
+@task(ignore_result=True)
+def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
-        r = iter(recipients).next()
-        if hasattr(r, "id"):
-            recipients = [x.id for x in recipients]
+        ctx = unserialize(ctx)
         emails = User.objects.filter(id__in=recipients).exclude(email="")\
                         .values_list("email", flat=True)
         emails = set(emails) - set(blacklist)
@@ -103,8 +154,21 @@ def send_mail(subject, recipients, ctx, template, blacklist=()):
         msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
             emails)
         msg.attach_alternative(html_content, "text/html")
-        t = Thread(target=msg.send, kwargs={"fail_silently" : True })
-        t.start()
-        return emails
-    return set()
+        msg.send(fail_silently=True)
+
+def send_mail(subject, recipients, ctx, template, blacklist=()):
+    ctx = serialize(ctx)
+    do_send_mail.delay(subject, convert_users(recipients),
+            ctx, template, blacklist) 
+
+def send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
+              users=(), template="mails/history"):
+    if hasattr(plmobject, "object"):
+        plmobject = plmobject.object
+    plmobject = CT.from_object(plmobject)
+    histories = serialize(histories)
+    user = CT.from_object(user)
+    do_send_histories_mail.delay(plmobject, roles, last_action, histories, user, blacklist,
+              users, template)
+
 
