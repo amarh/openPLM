@@ -8,76 +8,90 @@ This document describes how to install an openPLM server.
 Requirements
 =============
 
-This HowTo is based on :
- * Ubuntu 10.04 LTS server edition
- * Apache Server version: Apache/2.2.14 (Ubuntu)
- * PostgreSQL 8.4.4
- * Python 2.6.5
- * Django 1.1.1
+This HowTo is based on:
+
+    * Ubuntu 10.04 LTS server edition (also tested on Debian Squeeze)
+    * Apache Server version: Apache/2.2.14 (Ubuntu)
+    * PostgreSQL 8.4.4
+    * Python 2.6.X
+    * Django 1.2.X
+    * Celery 2.3.X
+    * Haystack 1.2.X
+    * Xapian 1.2.X
  
-    .. note ::
-        Django framework can run with SQLite 3 and MySQL databases and with other web servers.
-        We welcome all feedbacks about these combinations. For more information, you can visit :
-        `Django website <http://www.djangoproject.com/>`_
+ 
+.. note::
+
+    Django framework can run with SQLite 3 and MySQL databases and with other web servers.
+    We welcome all feedbacks about these combinations. For more information, you can visit :
+    `Django website <http://www.djangoproject.com/>`_
 
 Install necessary packages
 ==========================
 
-    #. :command:`apt-get install swig build-essential pkg-config build-essential gettext`
-    #. :command:`apt-get install apache2 libapache2-mod-wsgi`
-    #. :command:`apt-get install python-setuptools python-dev python-imaging python-kjbuckets python-pypdf ipython`
-    #. :command:`easy_install odfpy`
-    #. :command:`apt-get install graphviz graphviz-dev`
-    #. :command:`easy_install pygraphviz`
-    #. :command:`apt-get install python-django python-django-south`
-    #. :command:`apt-get install postgresql python-psycopg2 pgadmin3`
+First, you must install some dependencies:
+
+    #. ``apt-get install swig build-essential pkg-config build-essential gettext``
+    #. ``apt-get install apache2 libapache2-mod-wsgi``
+    #. ``apt-get install python-setuptools python-dev python-imaging python-kjbuckets python-pypdf ipython``
+    #. ``easy_install odfpy``
+    #. ``apt-get install graphviz graphviz-dev``
+    #. ``easy_install pygraphviz>=1.1``
+    #. ``apt-get install python-xapian rabbitmq-server``
+    #. ``apt-get install python-django python-django-south``
+    #. ``easy_install celery``
+    #. ``easy_install django-celery``
+    #. ``easy_install django-haystack==1.2``
+    #. ``apt-get install postgresql python-psycopg2 pgadmin3``
+    #. ``apt-get install tracker-extract``
    
 Check applications are ok
 ===============================
 
-    For Apache server : ::
-    
-        root@openplm-demo:~# service apache2 status
-        
-        Apache is running (pid 5315).
-    
-    For Python : ::
-    
-        root@openplm-demo:~# python
-        
-        Python 2.6.5 (r265:79063, Apr 16 2010, 13:09:56) 
-        [GCC 4.4.3] on linux2
-        Type "help", "copyright", "credits" or "license" for more information.
-        >>> 
-    
-    
-    .. note ::
-    
-        press :kbd:`Control-D` to exit Python shell
-    
-    For Django : ::
-    
-        root@openplm-demo:~# django-admin --version
-        1.1.1
+For Apache server: ::
 
-Get codes using Subversion
+    root@openplm-demo:~# service apache2 status
+    
+    Apache is running (pid 5315).
+
+For Python: ::
+
+    root@openplm-demo:~# python
+    
+    Python 2.6.5 (r265:79063, Apr 16 2010, 13:09:56) 
+    [GCC 4.4.3] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> 
+
+
+.. note::
+
+    press :kbd:`Control-D` to exit Python shell
+
+For Django: ::
+
+    root@openplm-demo:~# django-admin --version
+    1.1.1
+
+
+Get code using Subversion
 ==========================
 
-    * :command:`apt-get install subversion`
+    * ``apt-get install subversion``
     
-    * :command:`mkdir /var/django`
+    * ``mkdir /var/django``
     
-    All files used for a new django site will be stored in this directory.
+All files used for a new django site will be stored in this directory.
     
-    * :command:`cd /var/django`
+    * ``cd /var/django``
     
-    * :command:`svn co svn://openplm.org/openPLM`
+    * ``svn co svn://openplm.org/openPLM``
     
-    The directory ./openPLM is created and all codes are downloaded.
+ The directory ./openPLM is created and all codes are downloaded.
     
-    * :command:`cd /var/django/openPLM`
+    * ``cd /var/django/openPLM``
     
-    * :command:`svn info` ::
+    * ``svn info`` ::
         
         Path: .
         URL: svn://openplm.org/openPLM
@@ -94,9 +108,9 @@ Get codes using Subversion
 Configure PostgreSQL
 ====================
 
-    Check PostgreSQL is running:
+Check PostgreSQL is running:
     
-    * :command:`ps aux|grep postgres` ::
+    * ``ps aux|grep postgres`` ::
     
         postgres 25961  0.0  0.9  50544  4968 ?    S    Aug26   0:14 /usr/lib/postgresql/8.4/bin/postgres -D /var/postgres
         postgres 25963  0.0  1.0  50664  5600 ?    Ss   Aug26   1:07 postgres: writer process                             
@@ -105,40 +119,41 @@ Configure PostgreSQL
         postgres 25966  0.0  0.2  14664  1224 ?    Ss   Aug26   0:24 postgres: stats collector process                    
         root     27338  0.0  0.1   3324   804 pts/3    R+   16:53   0:00 grep --color=auto postgres
     
-    .. note ::
+.. note::
     
-        If PostgreSQL is already installed, you can go to next topic directly.
+    If PostgreSQL is already installed, you can go to next topic directly.
     
-    Set password for 'postgres' user (in this example we give 'MyPassword' but you can change it)
+Set password for 'postgres' user (in this example we give 'MyPassword' but you can change it)
     
-    * :command:`passwd postgres`
-    * :command:`mkdir /var/postgres`
+    * ``passwd postgres``
+    * ``mkdir /var/postgres``
     
-    All files necessary to run PostgreSQL will be stored in this directory.
+All files necessary to run PostgreSQL will be stored in this directory.
     
-    * :command:`chown postgres:postgres /var/postgres/`
-    * :command:`find / -name initdb` ::
+    * ``chown postgres:postgres /var/postgres/``
+    * ``find / -name initdb`` ::
     
         /usr/lib/postgresql/8.4/bin/initdb
         
-    * :command:`locale-gen fr_FR.UTF-8`
-    * :command:`su postgres`
-    * :command:`/usr/lib/postgresql/8.4/bin/initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/`
-    * :command:`/usr/lib/postgresql/8.4/bin/postgres -D /var/postgres &`
-    * :command:`psql` ::
+    * ``locale-gen fr_FR.UTF-8``
+    * ``su postgres``
+    * ``/usr/lib/postgresql/8.4/bin/initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
+    * ``/usr/lib/postgresql/8.4/bin/postgres -D /var/postgres &``
+    * ``psql`` ::
     
             postgres=#create database openplm;
             postgres=#create role django with password 'MyPassword' login;
             \q
     
-    * :command:`exit`
+    * ``exit``
 
-Finalize installation
-=====================
 
-    * :command:`cd /var/django/openPLM/trunk/openPLM/`
-    * :command:`./manage.py syncdb --all`
-    * :command:`./manage.py migrate --all --fake`
+Create the database
+===================
+
+    * ``cd /var/django/openPLM/trunk/openPLM/``
+    * ``./manage.py syncdb --all``
+    * ``./manage.py migrate --all --fake``
     
     .. note::
         You have to create the superadmin user for Django (in this example, we give 'MyAdmin' but you can change it)
@@ -147,77 +162,127 @@ Finalize installation
     .. warning::
         Edit the '/var/django/openPLM/trunk/openPLM/settings.py' and set correct password ('MyPassword')
         for DATABASE_PASSWORD
+   
+Configure where the files are saved
+===================================
+
+Create directory where the uploaded files will be stored:
     
-    Create directory where the uploaded files will be stored :
+    * ``mkdir /var/openPLM``
+
     
-    * :command:`mkdir /var/openPLM`
+Change rights:
     
-    Change rights :
+    * ``chown www-data:www-data /var/openPLM``
     
-    * :command:`chown www-data:www-data /var/openPLM`
+Change rights for the directory where thumbnails will be stored:
     
-    Change rights for the directory where thumbnails will be stored :
+    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
+    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/navigate``
+  
+Configure the search engine
+=============================
+
+Although haystack supports several search engines, openPLM needs xapian.
+You may change the setting `HAYSTACK_XAPIAN_PATH` if you want to put the indexes
+in another directory.
+
+Once haystack is configured, you must rebuild the index:
+
+    * ``./manage.py rebuild_index``
+    * ``chown www-data:www-data -R /var/openPLM/xapian_index/``
     
-    * :command:`chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails`
+Configure Celery
+================
+
+openPLM uses Celery to manage asynchronous tasks. Celery needs a broker, you can
+choose any broker supported by celery but *rabbitmq* is recommanded.
+
+To configure rabbitmq, you must create an user and a vhost:
+
+    * ``rabbitmqctl add_user openplm 'a secret password but not this one'``
+    * ``rabbitmqctl add_vhost openplm``
+    * ``rabbitmqctl set_permissions -p openplm openplm ".*" ".*" ".*"``
+
+Then you must modify the `BROKER_*` settings, if you follow this tutorial, you
+only have to change `BROKER_PASSWORD`.
+
+:command:`celeryd`, celery's daemon must be run. openPLM ships with an init script:
+
+    * ``cp /var/django/openPLM/trunk/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
+    * ``cp /var/django/openPLM/trunk/openPLM/etc/default/celeryd /etc/default/celeryd``
+    * ``chmod +x /etc/init.d/celeryd``
+    * ``mkdir /var/log/celery``
+    * ``mkdir /var/run/celery``
+    * ``chown www-data:www-data /var/log/celery /var/run/celery``
+
+To launch :command:`celeryd`, run ``/etc/init.d celeryd start``.
+
+
+
+Check required modules
+======================
     
-    Check we have all modules :
-    
-    * :command:`./check_modules.py` ::
+    * ``./check_modules.py`` ::
     
         /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
         from sets import ImmutableSet
         All is ok
 
-    Configure Apache server :
-    * :command:`vi /etc/apache2/httpd.conf` : ::
+Configure Apache server
+=======================
+
+Edit you Apache configuration file (:file:`/etc/apache2/httpd.conf`) and
+add the following lines: ::
     
-            WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
-            Alias /media /var/django/openPLM/trunk/openPLM/media
-            <Directory /var/django/openPLM/trunk/openPLM/docs>
-                Order deny,allow
-                Allow from all
-            </Directory>
-            <Directory /var/django/openPLM/trunk/openPLM/media>
-                Order deny,allow
-                Allow from all
-            </Directory>
-    
-    Restart Apache server :
-    
-    * :command:`service apache2 restart`
+    WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+    Alias /media /var/django/openPLM/trunk/openPLM/media
+    <Directory /var/django/openPLM/trunk/openPLM/docs>
+        Order deny,allow
+        Allow from all
+    </Directory>
+    <Directory /var/django/openPLM/trunk/openPLM/media>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+Restart Apache server
+=====================
+
+    * ``service apache2 restart``
 
 First steps in openPLM
 ======================
 
-    Open your web browser and go to : ::
+Open your web browser and go to: ::
+
+    http://your_site_adress/admin/
     
-        http://your_site_adress/admin/
-        
-    .. note:: Here your_site_adress is given as example but you have to use your own site adress
+.. note:: Here your_site_adress is given as example but you have to use your own site adress
+
+Enter superadmin login and password:
+
+.. image:: images/admin_login.png
+
+You can add new user and edit them going to Home>Auth>User: 
+
+.. image:: images/admin_user.png
+
+Do not forget to edit Home>Plmapp>User profiles in order to give correct rights for openPLM application :
+
+.. image:: images/admin_userprofile.png
+
+.. note::
+    For more information about the `Django Admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
+
+Then you must create a new *Site* (use the admin interface) and sets the `SITE_ID`
+variable in the :file:`settings.py` file.
+
+You are now ready for your first login: ::
+
+    http://localhost/
     
-    Enter superadmin login and password :
-    
-    .. image:: images/admin_login.png
-    
-    You can add new user and edit them going to Home>Auth>User : 
-
-    .. image:: images/admin_user.png
-
-    Do not forget to edit Home>Plmapp>User profiles in order to give correct rights for openPLM application :
-
-    .. image:: images/admin_userprofile.png
-
-    .. note ::
-        For more information about the `Django Admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
-
-    Then you must create a new *Site* (use the admin interface) and sets the `SITE_ID`
-    variable in the :file:`settings.py` file.
-
-    You are now ready for your first login : ::
-    
-        http://localhost/
-        
-    .. image:: images/openplm_connexion.png
+.. image:: images/openplm_connexion.png
 
 
 Configuring E-mails
