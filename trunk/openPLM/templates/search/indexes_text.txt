@@ -1,0 +1,7 @@
+type:{{object.type}}
+reference:{{object.reference}}
+revision:{{object.revision}}
+
+{% for attr, value in object.get_attributes_and_values %}
+- {{attr}}:{{ value }}
+{% endfor %}

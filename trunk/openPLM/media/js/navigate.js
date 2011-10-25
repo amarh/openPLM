@@ -222,7 +222,7 @@ function init(){
         $("div.main_node").droppable({
 			accept: 
                 function (child_tr){
-                    if (child_tr.is("tr.Content, tr.Content2")){
+                    if (child_tr.is("li.Result")){
                         return (can_add_child($(this), $("form", child_tr), cache1) ||
                                 can_attach($(this), $("form", child_tr), cache2)
                                 );
@@ -367,8 +367,15 @@ cursor: 'crosshair'
                 } );
 
         // add on drag and drop
-        $("tr.Content").add("tr.Content2").css("z-index", "99");
-        $("tr.Content").add("tr.Content2").draggable({ helper: 'clone' });
+        $("li.Result").draggable({ 
+            zIndex: 2000,
+            cursor:"pointer",
+            cursorAt: { left: 16, top: -16} ,
+            helper: function (){
+                var div = $(this).find("div.reference").clone();
+                div.addClass("dragged");
+                return div;
+                }});
         $("#navAddForm").dialog({
             autoOpen: false,
 			height: 300,

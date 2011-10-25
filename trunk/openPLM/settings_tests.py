@@ -93,6 +93,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.comments',
     'django.contrib.humanize',
+    'djcelery',
+    'haystack',
     'openPLM.plmapp',
     # you can add your application after this line
     'openPLM.cad',
@@ -133,6 +135,19 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com",
 
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
+
+# search stuff
+HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
+HAYSTACK_SEARCH_ENGINE = 'xapian'
+HAYSTACK_XAPIAN_PATH = "/tmp/xapian_index/"
+HAYSTACK_INCLUDE_SPELLING = True
+EXTRACTOR = os.path.abspath("bin/extractor.sh")
+
+# celery stuff
+import djcelery
+djcelery.setup_loader()
+
+BROKER_BACKEND = "memory"
 
 COMPANY = "company"
 

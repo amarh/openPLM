@@ -45,6 +45,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
 
+from haystack.query import SearchQuerySet
+
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller, \
         DocumentController
@@ -53,7 +55,7 @@ from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph
 from openPLM.plmapp.forms import TypeForm, TypeFormWithoutUser, get_navigate_form, \
-        get_search_form
+        SimpleSearchForm
 
 def get_obj(obj_type, obj_ref, obj_revi, user):
     """
@@ -246,6 +248,7 @@ def init_ctx(init_type_, init_reference, init_revision):
         'object_reference': init_reference,
         'object_revision': init_revision,
         'object_type': init_type_,
+        'search_query' : "",
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         'LANGUAGES' : settings.LANGUAGES,
         }
@@ -294,30 +297,36 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         type_form4creation = TypeFormWithoutUser(request_dict.GET)
         if type_form.is_valid():
             cls = models.get_all_users_and_plmobjects()[type_form.cleaned_data["type"]]
-        attributes_form = get_search_form(cls, request_dict.GET)
+        attributes_form = SimpleSearchForm(request_dict.GET)
         request_dict.session.update(request_dict.GET.items())
         search_need = True
     elif request_dict.session and "type" in request_dict.session:
         type_form = TypeForm(request_dict.session)
         type_form4creation = TypeFormWithoutUser(request_dict.session)
         cls = models.get_all_users_and_plmobjects()[request_dict.session["type"]]
-        attributes_form = get_search_form(cls, request_dict.session)
+        attributes_form = SimpleSearchForm(request_dict.session)
     else:
         type_form = TypeForm()
         type_form4creation = TypeFormWithoutUser()
         request_dict.session['type'] = 'Part'
-        attributes_form = get_search_form(models.Part)
+        attributes_form = SimpleSearchForm()
     if attributes_form.is_valid() and search_need:
-        qset = cls.objects.all()
-        qset = attributes_form.search(qset)[:30]
+        m = {}
+        models._get_all_subclasses(cls, m)
+        search_query = attributes_form.cleaned_data["q"]
+        mods = m.values()
+        if issubclass(cls, models.Document):
+            mods.append(models.DocumentFile)
+        qset = attributes_form.search(*mods)[:30]
         if qset is None:
             qset = []
-        if issubclass(cls, User):
-            qset = [UserController(u, request_dict.user) for u in qset]
+        request_dict.session["search_query"] = search_query
         request_dict.session["results"] = qset
     else:
         qset = request_dict.session.get("results", [])
+        search_query = request_dict.session.get("search_query", "")
     ctx.update({'results' : qset, 
+                'search_query' : search_query,
                 'type_form' : type_form,
                 'type_form4creation' : type_form4creation,
                 'attributes_form' : attributes_form,
@@ -334,6 +343,13 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         ctx["is_readable"] = selected_object.check_readable(False)
     else:
         ctx["is_readable"] = True
+
+    # little hack to avoid a KeyError
+    # see https://github.com/toastdriven/django-haystack/issues/404
+    from haystack import site
+    for r in request_dict.session.get("results", []):
+        r.searchsite = site
+
     return selected_object, ctx
 
 coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
@@ -341,6 +357,7 @@ coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;'
 def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     FilterForm = get_navigate_form(obj)
+
     has_session = any(field in request.session for field in FilterForm.base_fields)
     if request.method == 'POST' and request.POST:
         form = FilterForm(request.POST)
@@ -355,7 +372,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         request.session.update(initial)
     if not form.is_valid():
         raise ValueError("Invalid form")
-    graph = NavigationGraph(obj, ctx["results"])
+    graph = NavigationGraph(obj, [r.object for r in ctx.get("results", [])])
     options = form.cleaned_data
     if options["update"]:
         options["doc_parts"] = [int(o)
