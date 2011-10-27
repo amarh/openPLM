@@ -5,7 +5,6 @@
 from functools import wraps
 
 from django.db.models.loading import get_model
-from django.core.cache import cache
 
 from haystack import site
 
