@@ -119,7 +119,7 @@ openPLM splits its views module:
     * all common functions are in the :mod:`~plmapp.base_views` module
     * classical HTML views are in the :mod:`~plmapp.views.main` module
     * ajax views are in the :mod:`~plmapp.views.ajax` module
-    * views that handle the HTTP/Json api are ine the :mod:`~plmapp.views.api` module
+    * views that handle the HTTP/Json api are in the :mod:`~plmapp.views.api` module
 
 Resources:
 
@@ -131,6 +131,9 @@ Tests
 
 Others
 +++++++
+
+A complete list of documented modules is available :doc:`here </modules>`.
+
 
 Custom applications
 ===================
