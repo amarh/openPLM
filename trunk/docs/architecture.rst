@@ -12,6 +12,8 @@ Main dependencies
 Django and Python
 +++++++++++++++++
 
+TODO
+
 Celery
 +++++++
 
@@ -30,6 +32,11 @@ based on distributed message passing. In OpenPLM, we use Celery (version 2.3) to
 
 South
 +++++
+
+`South <http://south.aeracode.org/>`_ is an intelligent schema and data
+migrations for Django projects. All applications of OpenPLM are managed by
+South to ensure easy updates.
+
 
 Haystack and Xapian
 ++++++++++++++++++++
@@ -55,29 +62,42 @@ page.
 plmapp
 ======
 
+plmapp is the main application of OpenPLM. It defines main models, views and
+controllers and is the core of OpenPLM.
+
 Models
 +++++++
+
+    A model is the single, definitive source of data about your data. It
+    contains the essential fields and behaviors of the data you’re storing.
+    
+    -- `Django's documentation <https://docs.djangoproject.com/en/1.3/topics/db/models/#module-django.db.models>`_
+
+Resources:
+
+    * API: :mod:`~openPLM.plmapp.models`
+    * :ref:`Related recipes <cookbook-models>`
 
 Controllers
 +++++++++++
 
-base
-----
+In Django, applications do not have dedicate controllers and let this kind of
+work to views. But OpenPLM has several kinds of views (html, api), so to
+keep the views simple and stupid, OpenPLM has controllers.
+Controllers manage user's rights (they ensures the user can do the asked action)
+and check inputs. Controllers also keep trace of what have been done
+(histories) and send mails to affected users. 
 
-plmobject
----------
+Resources:
+    
+    * :mod:`~plmapp.controllers`
+    * base: :mod:`~plmapp.controllers.base`
+    * plmobject: :mod:`~plmapp.controllers.plmobject`
+    * part: :mod:`~plmapp.controllers.part`
+    * document: :mod:`~plmapp.controllers.document`
+    * user: :mod:`~plmapp.controllers.user`
+    * group: :mod:`~plmapp.controllers.group`
 
-part
-----
-
-document
---------
-
-user
-----
-
-group
------
 
 Forms
 ++++++
@@ -88,11 +108,31 @@ Views
 base_views
 -----------
 
+Resources:
+
+    * API: :mod:`~plmapp.base_views`
+
 main
 ----
 
+Resources:
+
+    * API: :mod:`~plmapp.views.main`
+
 api
 ---
+
+Resources:
+
+    * module API: :mod:`~plmapp.views.api`
+    * :mod:`the HTTP api <http_api>`.
+
+ajax
+----
+
+Resources:
+
+    * API: :mod:`~plmapp.views.ajax`
 
 Tests
 ++++++

@@ -5,6 +5,8 @@ Cookbook
 =======================================
 
 
+.. _cookbook-models:
+
 Models
 =============
 
@@ -34,12 +36,18 @@ Condition on promotion
                 return False
 
 
+.. _cookbook-controllers:
+
 Controllers
 ===============
 
 
+.. _cookbook-tests:
+
 Tests
 ==============
+
+.. _cookbook-others:
 
 Others
 =============

@@ -18,4 +18,5 @@
     controllers_part
     controllers_document
     controllers_user
+    controllers_group
 
