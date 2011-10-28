@@ -34,6 +34,7 @@ Table of contents:
     :maxdepth: 2
     :numbered:   
 
+    resources
     tutorials
     architecture
     plugins
