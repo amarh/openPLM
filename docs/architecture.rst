@@ -75,7 +75,7 @@ Models
 
 Resources:
 
-    * API: :mod:`~openPLM.plmapp.models`
+    * Module: :mod:`~openPLM.plmapp.models`
     * :ref:`Related recipes <cookbook-models>`
 
 Controllers
@@ -102,37 +102,28 @@ Resources:
 Forms
 ++++++
 
+OpenPLM has many forms. Some forms are generated dynamically from a model
+(similar to a Django ModelForm). Obviously, views use forms but controllers
+also use form. For example, :meth:`.Controller.update_from_form` and
+:meth:`.PLMObjectController.create_from_form` take a form as their argument.
+
+Resources:
+
+    * forms module: :mod:`plmapp.forms`
+
 Views
 +++++
 
-base_views
------------
+OpenPLM splits its views module:
+
+    * all common functions are in the :mod:`~plmapp.base_views` module
+    * classical HTML views are in the :mod:`~plmapp.views.main` module
+    * ajax views are in the :mod:`~plmapp.views.ajax` module
+    * views that handle the HTTP/Json api are ine the :mod:`~plmapp.views.api` module
 
 Resources:
 
-    * API: :mod:`~plmapp.base_views`
-
-main
-----
-
-Resources:
-
-    * API: :mod:`~plmapp.views.main`
-
-api
----
-
-Resources:
-
-    * module API: :mod:`~plmapp.views.api`
     * :mod:`the HTTP api <http_api>`.
-
-ajax
-----
-
-Resources:
-
-    * API: :mod:`~plmapp.views.ajax`
 
 Tests
 ++++++
