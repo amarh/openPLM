@@ -34,6 +34,7 @@ Table of contents:
     :numbered:   
 
     tutorials
+    architecture
     plugins
     settings
     how-tos

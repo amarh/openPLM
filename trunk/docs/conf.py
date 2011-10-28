@@ -23,6 +23,7 @@ sys.path.append(os.path.abspath('../openPLM'))
 from django.conf import global_settings, settings
 global_settings.HAYSTACK_SITECONF = "openPLM.plmapp.search_sites"
 global_settings.HAYSTACK_SEARCH_ENGINE = "dummy"
+global_settings.BROKER_BACKEND = "memory"
 global_settings.DOCUMENTS_DIR = "/tmp"
 global_settings.THUMBNAILS_DIR = "/tmp"
 global_settings.THUMBNAILS_URL = "/media/thumbnails/"
