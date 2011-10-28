@@ -619,7 +619,6 @@ class DocumentStorage(FileSystemStorage):
         which do not exist.
         
         The path is computed as follow:
-            #. a root directory: :const:`settings.DOCUMENTS_DIR`
             #. a directory which name is the last extension of *name*.
                For example, it is :file:`gz` if *name* is :file:`a.tar.gz`.
                If *name* does not have an extension, the directory is 
@@ -630,15 +629,14 @@ class DocumentStorage(FileSystemStorage):
                 #. a random part with 3 characters in ``[a-z0-9]``
                 #. the extension, like :file:`.gz`
             
-            For example, if :const:`~settings.DOCUMENTS_DIR` is
-            :file:`/var/openPLM/docs/`, and *name* is :file:`my_file.tar.gz`,
+            For example, if *name* is :file:`my_file.tar.gz`,
             a possible output is:
 
-                :file:`/var/openPLM/docs/gz/c7bfe8d00ea6e7138215ebfafff187af-jj6.gz`
+                :file:`gz/c7bfe8d00ea6e7138215ebfafff187af-jj6.gz`
 
             If *name* is :file:`my_file`, a possible output is:
 
-                :file:`/var/openPLM/docs/no_ext/59c211e8fc0f14b21c78c87eafe1ab72-dhh`
+                :file:`no_ext/59c211e8fc0f14b21c78c87eafe1ab72-dhh`
         """
        
         def rand():
