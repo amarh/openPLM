@@ -11,6 +11,7 @@ omit =
     *tests*
     *migrations*
     *management*
+    *xapian_backend*
 
 [report]
 # Regexes for lines to exclude from consideration
