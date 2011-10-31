@@ -1,4 +1,5 @@
 
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -35,4 +36,12 @@ class BaseTestCase(TestCase):
         self.group.save()
         self.user.groups.add(self.group)
         self.DATA["group"] = self.group
+
+    def create(self, ref="Part1"):
+        return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
+
+    def get_file(self, name="temp.txt", data="data"):
+        f = ContentFile(data)
+        f.name = name
+        return f
 

@@ -46,10 +46,6 @@ class ControllerTest(BaseTestCase):
     DATA = {}
 
 
-    def create(self, ref="Part1"):
-        return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
-
-
     def test_create(self):
         controller = self.create()
         self.assertEqual(controller.name, "")
