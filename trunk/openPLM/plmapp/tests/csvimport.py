@@ -1,5 +1,5 @@
 
-import cStringIO
+import cStringIO, StringIO
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 
@@ -14,6 +14,7 @@ from openPLM.cad.models import *
 from openPLM.plmapp.csvimport import *
 from openPLM.plmapp.unicodecsv import *
 from openPLM.plmapp.base_views import *
+from openPLM.plmapp.forms import CSVForm
 
 
 class CSVImportTestCase(TransactionTestCase):
@@ -22,6 +23,7 @@ class CSVImportTestCase(TransactionTestCase):
     DATA = {}
 
     def setUp(self):
+        super(CSVImportTestCase, self).setUp()
         self.cie = User.objects.create(username="company")
         p = self.cie.get_profile()
         p.is_contributor = True
@@ -39,6 +41,7 @@ class CSVImportTestCase(TransactionTestCase):
         self.group.save()
         self.user.groups.add(self.group)
         self.DATA["group"] = self.group
+        self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
 
     def get_valid_rows(self):
         return [[u'Type',
@@ -183,4 +186,50 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertRaises(CSVImportError, self.import_csv,
                           BOMImporter, csv_rows)
         self.assertEquals(0, len(ParentChildLink.objects.all()))
+
+    def test_view_init_get(self):
+        response = self.client.get("/import/csv/")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.context["step"])
+        self.assertEqual("csv", response.context["target"])
+        form = response.context["csv_form"]
+        self.assertTrue(isinstance(form, CSVForm))
+
+    def test_view_csv_all(self):
+        """
+        Complex test that simulate an upload of a csv file (complete process).
+        """
+        # upload a csv file
+        csv_file = StringIO.StringIO()
+        csv_file.name = "data.csv"
+        UnicodeWriter(csv_file).writerows(self.get_valid_rows())
+        csv_file.seek(0)
+        response = self.client.post("/import/csv/", {"encoding":"utf_8",
+            "filename":"data.csv", "file":csv_file}, follow=True)
+        csv_file.close()
+
+        # load the second page
+        url = response.redirect_chain[0][0]
+        response2 = self.client.get(url)
+        self.assertEquals(2, response2.context["step"])
+        preview = response2.context["preview"]
+        self.assertFalse(None in preview.guessed_headers)
+        formset = response2.context["headers_formset"]
+
+        # validate and import the file
+        data = {}
+        for key, value in formset.management_form.initial.iteritems():
+            data["form-" + key] = value or ""
+        for i, d in enumerate(formset.initial):
+            for key, value in d.iteritems():
+                data["form-%d-%s" % (i, key)] = value
+            data['form-%d-ORDER' % i] = str(i)
+        response3 = self.client.post(url, data, follow=True)
+        url_done = response3.redirect_chain[-1][0]
+        self.assertEquals("http://testserver/import/done/", url_done)
+        # check an item
+        sp1 = get_obj("SinglePart", "sp1", "s", self.user)
+        self.assertEquals("SP1", sp1.name)
+
+
 
