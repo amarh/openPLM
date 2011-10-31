@@ -26,13 +26,8 @@
 This module contains some tests for openPLM.
 """
 
-import os
-import datetime
-from django.conf import settings
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.core.files import File
 
 from openPLM.plmapp.utils import *
 from openPLM.plmapp.exceptions import *
@@ -50,9 +45,13 @@ class ControllerTest(BaseTestCase):
     TYPE = "Part"
     DATA = {}
 
+
+    def create(self, ref="Part1"):
+        return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
+
+
     def test_create(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create()
         self.assertEqual(controller.name, "")
         self.assertEqual(controller.type, self.TYPE)
         self.assertEqual(type(controller.object), get_all_plmobjects()[self.TYPE])
@@ -65,10 +64,7 @@ class ControllerTest(BaseTestCase):
 
     def test_create_error1(self):
         # empty reference
-        def fail():
-            controller = self.CONTROLLER.create("", self.TYPE, "a",
-                                            self.user, self.DATA)
-        self.assertRaises(ValueError, fail)
+        self.assertRaises(ValueError, self.create, "")
 
     def test_create_error2(self):
         # empty revision
@@ -108,26 +104,19 @@ class ControllerTest(BaseTestCase):
         self.assertRaises(PermissionError, fail)
 
     def test_keys(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
-        controller2 = self.CONTROLLER.create("Part2", self.TYPE, "a",
-                                             self.user, self.DATA)
-        def fail():
-            controller3 = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                                 self.user, self.DATA)
-        self.assertRaises(IntegrityError, fail)
+        controller = self.create("Part1")
+        controller2 = self.create("Part2")
+        self.assertRaises(IntegrityError, self.create, "Part1")
 
     def test_getattr(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertEqual(controller.name, "")
         self.failUnless("name" in controller.attributes)
         self.assertEqual(controller.state.name, "draft")
         self.assertRaises(AttributeError, lambda: controller.unknown_attr)
 
     def test_setattr(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertEqual(controller.name, "")
         controller.name = "a name"
         self.assertEqual(controller.name, "a name")
@@ -135,15 +124,13 @@ class ControllerTest(BaseTestCase):
         self.assertEqual(controller.name, "a name")
 
     def test_setattr_errors(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertRaises(ValueError, setattr, controller, "owner", "error")
         self.assertRaises(ValueError, setattr, controller, "state", "error")
         self.assertRaises(ValueError, setattr, controller, "state", "draft")
 
     def test_promote(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertEqual(controller.state.name, "draft")
         controller.promote()
         self.assertEqual(controller.state.name, "official")
@@ -165,8 +152,7 @@ class ControllerTest(BaseTestCase):
         """
         Test :meth:`revise`
         """
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         rev = controller.revise("b")
         self.assertEqual(rev.revision, "b")
         def fail():
@@ -177,19 +163,16 @@ class ControllerTest(BaseTestCase):
 
     def test_revise_error1(self):
         "Revision : error : empty name"
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertRaises(RevisionError, controller.revise, "")
     
     def test_revise_error2(self):
         "Revision : error : same revision name"
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         self.assertRaises(RevisionError, controller.revise, "a")
 
     def test_set_owner(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         user.get_profile().is_contributor = True
@@ -198,15 +181,13 @@ class ControllerTest(BaseTestCase):
         self.assertEqual(controller.owner, user)
 
     def test_set_owner_error(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         self.assertRaises(PermissionError, controller.set_owner, user)
 
     def test_set_sign1(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         user.get_profile().is_contributor = True
@@ -218,8 +199,7 @@ class ControllerTest(BaseTestCase):
 
     def test_set_sign_error1(self):
         """Test sign error : bad level"""
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         user.get_profile().is_contributor = True
@@ -229,16 +209,14 @@ class ControllerTest(BaseTestCase):
 
     def test_set_sign_error2(self):
         """Test sign error : user is not a contributor"""    
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         self.assertRaises(PermissionError, controller.set_role, user,
                           level_to_sign_str(0))
 
     def test_add_notified(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         controller.add_notified(user)
@@ -246,8 +224,7 @@ class ControllerTest(BaseTestCase):
                                       role="notified")
 
     def test_remove_notified(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         controller.add_notified(self.user)
         PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
@@ -256,8 +233,7 @@ class ControllerTest(BaseTestCase):
             plmobject=controller.object, role="notified")))
 
     def test_set_role(self):
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         user = User(username="user2")
         user.save()
         user.get_profile().is_contributor = True
@@ -277,8 +253,7 @@ class ControllerTest(BaseTestCase):
         Tests that a :exc:`.PromotionError` is raised when 
         :meth:`.PLMObject.is_promotable` returns False.
         """
-        controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
-                                            self.user, self.DATA)
+        controller = self.create("Part1")
         # fake function so that is_promotable returns False
         def always_false():
             return False
