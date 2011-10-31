@@ -129,9 +129,7 @@ class TypeFormWithoutUser(forms.Form):
     type = forms.TypedChoiceField(choices=LIST_WO_USER)
 
 class TypeSearchForm(TypeForm):
-    def __init__(self, *args, **kwargs):
-        super(TypeSearchForm, self).__init__(*args, **kwargs)
-        self.fields['type'].widget.attrs['onChange'] = 'update_form();'
+    pass
 
 class FakeItems(object):
     def __init__(self, values):
