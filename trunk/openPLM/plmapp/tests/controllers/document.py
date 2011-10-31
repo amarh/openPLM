@@ -132,11 +132,6 @@ class DocumentControllerTest(ControllerTest):
         self.assertRaises(ValueError, self.controller.unlock, d)
         self.old_files.append(d)
     
-    def get_file(self, name="temp.txt", data="data"):
-        f = ContentFile(data)
-        f.name = name
-        return f
-
     def test_add_file(self):
         f = self.get_file()
         self.controller.add_file(f)
