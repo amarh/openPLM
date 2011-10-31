@@ -283,7 +283,7 @@ class DocumentController(PLMObjectController):
             if doc_file.thumbnail:
                 ext = os.path.splitext(doc_file.thumbnail.path)[1]
                 thumb = "%d%s" %(new_doc.id, ext)
-                thumb_path = re.sub(r"/\d+_*%s$" % ext, "/" + thumb,
+                thumb_path = re.sub(r"/\d+_.*%s$" % ext, "/" + thumb,
                                     doc_file.thumbnail.path)
                 shutil.copy(doc_file.thumbnail.path, thumb_path)
                 new_doc.thumbnail = os.path.basename(thumb_path)

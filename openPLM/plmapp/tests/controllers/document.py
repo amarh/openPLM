@@ -287,6 +287,27 @@ class DocumentControllerTest(ControllerTest):
         self.assertRaises(PermissionError, controller.checkin, d,
                           self.get_file())
 
+    def test_add_thumbnail(self):
+        thumbnail = ContentFile(file("datatests/thumbnail.png").read())
+        thumbnail.name = "Thumbnail.png"
+        self.controller.add_file(self.get_file())
+        f2 = self.controller.files.all()[0]
+        self.controller.add_thumbnail(f2, thumbnail)
+        self.assertNotEquals(None, f2.thumbnail)
+        Image.open
+        
+
+    def test_revise_with_thumbnail(self):
+        thumbnail = ContentFile(file("datatests/thumbnail.png").read())
+        thumbnail.name = "Thumbnail.png"
+        self.controller.add_file(self.get_file())
+        f2 = self.controller.files.all()[0]
+        self.controller.add_thumbnail(f2, thumbnail)
+
+        revb = self.controller.revise("b")
+        f3 = revb.files.all()[0]
+        self.assertNotEquals(f2.thumbnail.path, f3.thumbnail.path)
+
 
 class OfficeTest(DocumentControllerTest):
     TYPE = "OfficeDocument"
