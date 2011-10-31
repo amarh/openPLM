@@ -294,8 +294,6 @@ class DocumentControllerTest(ControllerTest):
         f2 = self.controller.files.all()[0]
         self.controller.add_thumbnail(f2, thumbnail)
         self.assertNotEquals(None, f2.thumbnail)
-        Image.open
-        
 
     def test_revise_with_thumbnail(self):
         thumbnail = ContentFile(file("datatests/thumbnail.png").read())
