@@ -394,7 +394,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
 
 .. py:function:: add_file
 
-    Adds a file to the document, the request must be have the attribute
+    Adds a file to the document, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
     :url: :samp:`{server}/api/{doc_id}/add_file/`
@@ -448,7 +448,7 @@ In the following queries, *df_id* is the id (an integer) of a
 
 .. py:function:: checkin
 
-    Updates (checks-in) the file, the request must be have the attribute
+    Updates (checks-in) the file, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
     :url: :samp:`{server}/api/{doc_id}/checkin/{df_id}/` 
@@ -460,7 +460,7 @@ In the following queries, *df_id* is the id (an integer) of a
 
 .. py:function:: add_thumbnail
 
-    Adds a thumbnail to the file, the request must be have the attribute
+    Adds a thumbnail to the file, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
     :url: :samp:`{server}/api/{doc_id}/add_thumbnail/{df_id}/` 
