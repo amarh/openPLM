@@ -26,22 +26,14 @@
 This module contains some tests for openPLM.
 """
 
-import os
-import datetime
-from django.conf import settings
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.core.files import File
 
 from openPLM.plmapp.utils import *
 from openPLM.plmapp.exceptions import *
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+from openPLM.plmapp.forms import get_creation_form, get_user_formset
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -58,7 +50,7 @@ class GroupControllerTestCase(BaseTestCase):
         obj = get_all_plmobjects()[self.TYPE].objects.get(name=controller.name)
         self.assertEqual(obj.owner, self.user)
         self.assertEqual(obj.creator, self.user)
-        self.assertTrue(obj in self.user.groupinfo_set.all())
+        self.assertTrue(self.user.groups.filter(id=obj.id))
 
     def test_create_error1(self):
         # empty name
@@ -101,7 +93,7 @@ class GroupControllerTestCase(BaseTestCase):
         self.assertFalse(inv.guest_asked)
         c2 = GroupController(controller.object, user)
         c2.accept_invitation(inv)
-        self.failUnless(c2.object in user.groupinfo_set.all())
+        self.failUnless(user.groups.filter(id=controller.id))
         self.assertEqual(inv.state, Invitation.ACCEPTED)
 
     def test_add_user_refused(self):
@@ -114,6 +106,43 @@ class GroupControllerTestCase(BaseTestCase):
         self.assertFalse(inv.guest_asked)
         c2 = GroupController(controller.object, user)
         c2.refuse_invitation(inv)
-        self.failIf(c2.object in user.groupinfo_set.all())
+        self.failIf(user.groups.filter(id=c2.id))
         self.assertEqual(inv.state, Invitation.REFUSED)
+
+    def test_create_from_form(self):
+        form = get_creation_form(self.user, GroupInfo,
+                {"name" : "grname", "description" :"desc" })
+        gr = self.CONTROLLER.create_from_form(form, self.user)
+        self.assertEqual(self.user.username, gr.owner.username)
+        self.assertEqual("grname", gr.name)
+        self.assertTrue(self.user.groups.get(id=gr.id))
+
+    def test_update_users(self):
+        controller = self.CONTROLLER.create("Grp1", "a", self.user, self.DATA)
+        user = User.objects.create(username="dede", email="dede@test")
+        user.groups.add(controller.object)
+        user2 = User.objects.create(username="dede2", email="dede2@test")
+        user2.groups.add(controller.object)
+        controller.save()
+        for u in (self.user, user, user2):
+            u.save()
+            self.assertTrue(u.groups.filter(id=controller.id))
+        data = {
+                'form-0-group': controller.id,
+                'form-0-user': user.id,
+                'form-0-delete' : 'on',
+                'form-0-ORDER': '0',
+                'form-1-group': controller.id,
+                'form-1-user': user2.id,
+                'form-1-ORDER': '1',
+                'form-MAX_NUM_FORMS': '',
+                'form-TOTAL_FORMS': 2, 
+                'form-INITIAL_FORMS': 2,
+                }
+        formset = get_user_formset(controller, data)
+        controller.update_users(formset)
+        self.assertFalse(user.groups.filter(id=controller.id))
+        self.assertTrue(user2.groups.filter(id=controller.id))
+        self.assertTrue(self.user.groups.filter(id=controller.id))
+
 
