@@ -166,7 +166,7 @@ class GroupInfo(Group):
     """
 
     description = models.TextField(blank=True)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, related_name="%(class)s_creator")
     
     owner = models.ForeignKey(User, verbose_name=_("owner"), 
                               related_name="%(class)s_owner")

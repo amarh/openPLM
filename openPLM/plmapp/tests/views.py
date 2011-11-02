@@ -296,7 +296,7 @@ class UserViewTestCase(CommonViewTest):
             self.assertEquals(data[attr], getattr(user, attr))
         self.assertTrue(user.get_profile().is_contributor)
         self.assertFalse(user.get_profile().is_administrator)
-        self.assertTrue(self.group in user.groupinfo_set.all())
+        self.assertTrue(user.groups.filter(id=self.group.id))
 
 
 from django.core.management import call_command

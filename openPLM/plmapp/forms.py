@@ -92,7 +92,8 @@ def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
         get_creation_form.cache[cls] = Form
     form = Form(data=data, empty_permitted=empty_allowed) if data else Form()
     if issubclass(cls, m.PLMObject):
-        form.fields["group"].queryset = user.groupinfo_set.all()
+        groups = user.groups.all().values_list("id", flat=True)
+        form.fields["group"].queryset = m.GroupInfo.objects.filter(id__in=groups)
     return form
 get_creation_form.cache = {}
         

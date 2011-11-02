@@ -188,7 +188,6 @@ class GroupController(Controller):
 
         user = invitation.guest
         user.groups.add(self.object)
-        user.groupinfo_set.add(self.object)
         invitation.save()
         user.save()
         self._save_histo("User added", user.username, users=(user,))
