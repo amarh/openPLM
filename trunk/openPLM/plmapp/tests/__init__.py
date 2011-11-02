@@ -29,17 +29,16 @@ from openPLM.plmapp.tests.views import *
 from openPLM.plmapp.tests.ajax import *
 from openPLM.plmapp.tests.api import *
 from openPLM.plmapp.tests.csvimport import *
-#from openPLM.plmapp.tests.closure import *
 
 import openPLM.plmapp.models
-
+from openPLM.plmapp.lifecycle import LifecycleList
 def get_doctest(module_name):
     test_dict={}
     module = __import__(module_name,{},{},module_name.split('.')[-1])
     for obj_name,obj in module.__dict__.items():
         if '__module__' in dir(obj) and obj.__module__ == module_name:
             if obj.__doc__:
-                test_dict[obj_name] = obj.__doc__
+                test_dict[obj_name] = obj
                 return test_dict
 
 __test__ = get_doctest("openPLM.plmapp.utils")
