@@ -47,12 +47,6 @@ Example::
         lifecycles[name] = LifecycleList(name, "official", *cycles)
 """
 
-try:
-    import pygraphviz as pgv
-except ImportError:
-    print "ImportError : Please install pygraphviz."
-    print "It's used to generate graphes from lifecycle"
-
 
 class LifecycleList(list):
     u"""
@@ -135,31 +129,6 @@ class LifecycleList(list):
             raise IndexError()
         return self[index - 1]
 
-    def draw_graph(self, current_state, output_path,
-                   normal_color="#7a7af8", current_color="#0808fa"):
-        u"""
-        Draws a graph (with pygraphviz) of the lifecycle. 
-
-        :param current_state: current state to highlight, may be empty
-        :type cuurent_state: str
-        :param output_path: pathname of the generated png
-        :type output_path: str
-        :param normal_color: fill color of normal states
-        :type normal_color: an html color (like ``cyan`` or ``#110011``)
-        :param current_color: fill color of current state
-        :type current_color: an html color (like ``cyan`` or ``#110011``)
-
-        """
-        graph = pgv.AGraph(directed=True)
-        graph.graph_attr["rankdir"] = "LR"
-        graph.graph_attr["bgcolor"] = "#00000000" # transparent
-        graph.node_attr["style"] = "filled"
-        graph.node_attr["fillcolor"] = normal_color
-        graph.add_edges_from(zip(self, self[1:]))
-        if current_state:
-            node = graph.get_node(current_state)
-            node.attr["fillcolor"] = current_color
-        graph.draw(path=output_path, format="png", prog="dot")
 
 if __name__ == "__main__":
     import doctest
