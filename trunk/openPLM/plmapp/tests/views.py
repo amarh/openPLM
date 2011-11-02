@@ -298,6 +298,20 @@ class UserViewTestCase(CommonViewTest):
         self.assertFalse(user.get_profile().is_administrator)
         self.assertTrue(user.groups.filter(id=self.group.id))
 
+    def test_modify_get(self):
+        response = self.client.get(self.user_url + "modify/")
+        self.assertEqual(response.status_code,  200)
+        form = response.context["modification_form"]
+        self.assertEqual(self.user.first_name, form.initial["first_name"])
+        self.assertEqual(self.user.email, form.initial["email"])
+
+    def test_modify_post(self):
+        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
+        response = self.client.post(self.user_url + "modify/", data,
+                follow=True)
+        self.assertEqual(response.status_code,  200)
+        user = User.objects.get(username=self.user.username)
+        self.assertEqual("Snow", user.last_name)
 
 from django.core.management import call_command
 class SearchViewTest(CommonViewTest):
