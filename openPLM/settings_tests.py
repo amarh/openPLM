@@ -148,6 +148,7 @@ import djcelery
 djcelery.setup_loader()
 
 BROKER_BACKEND = "memory"
+CELERY_ALWAYS_EAGER = True
 
 COMPANY = "company"
 
