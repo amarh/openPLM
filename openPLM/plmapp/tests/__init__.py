@@ -27,6 +27,7 @@ from openPLM.plmapp.tests.controllers import *
 from openPLM.plmapp.tests.lifecycle import *
 from openPLM.plmapp.tests.views import *
 from openPLM.plmapp.tests.ajax import *
+from openPLM.plmapp.tests.api import *
 from openPLM.plmapp.tests.csvimport import *
 #from openPLM.plmapp.tests.closure import *
 
