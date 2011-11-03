@@ -54,7 +54,10 @@ def get_recipients(obj, roles, users):
             for u in users:
                 recipients.update(gr.reachable(u).items())
     elif ROLE_OWNER:
-        recipients.add(obj.owner.id)
+        if hasattr(obj, "owner"):
+            recipients.add(obj.owner.id)
+        elif isinstance(obj, User):
+            recipients.add(obj.id)
     return recipients
 
 def convert_users(users):
