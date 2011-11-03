@@ -28,6 +28,7 @@ This module contains some tests for openPLM.
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from openPLM.plmapp import forms
 from openPLM.plmapp.utils import *
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers import *
@@ -139,9 +140,108 @@ class ViewTest(CommonViewTest):
         response = self.client.get(self.base_url + "history/")
         self.assertEqual(response.status_code,  200)
 
-    def test_navigate(self):
+    def test_navigate_get(self):
         response = self.client.get(self.base_url + "navigate/")
         self.assertEqual(response.status_code,  200)
+        self.assertTrue(response.context["filter_object_form"])
+        self.assertTrue(response.context["navigate_bool"])
+        
+    def test_navigate_post(self):
+        data = dict.fromkeys(("child", "parents",
+            "doc", "parents", "owner", "signer", "notified", "part",
+            "ownede", "to_sign", "request_notification_from"), True)
+        data["prog"] = "neato"
+        response = self.client.post(self.base_url + "navigate/", data)
+        self.assertEqual(response.status_code,  200)
+        self.assertTrue(response.context["filter_object_form"])
+        
+
+class DocumentViewTestCase(CommonViewTest):
+
+    TYPE = "Document"
+    CONTROLLER = DocumentController
+
+    def test_related_parts_get(self):
+        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        self.controller.attach_to_part(part)
+        
+        response = self.client.get(self.base_url + "parts/")
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("parts", response.context["current_page"])
+        self.assertEqual([part.id],
+                         [p.part.id for p in response.context["object_rel_part"]])
+        
+    def test_add_related_part_get(self):
+        response = self.client.get(self.base_url + "parts/add/")
+        self.assertEqual(response.status_code,  200)
+        self.assertTrue(response.context["link_creation"])
+        self.assertTrue(isinstance(response.context["add_rel_part_form"],
+                                   forms.AddRelPartForm))
+        attach = response.context["attach"]
+        self.assertEqual(self.controller.id, attach[0].id)
+        self.assertEqual("attach_part", attach[1])
+
+    def test_add_related_part_post(self):
+        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        data = {
+                "reference" : part.reference,
+                "type" : part.type,
+                "revision" : part.revision
+                }
+        response = self.client.post(self.base_url + "parts/add/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual([part.id],
+                         [p.part.id for p in self.controller.get_attached_parts()])
+
+    def test_files_empty_get(self):
+        response = self.client.get(self.base_url + "files/")
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("files", response.context["current_page"])
+        formset = response.context["file_formset"]
+        self.assertEqual(0, formset.total_form_count())
+
+    def test_files_get(self):
+        self.controller.add_file(self.get_file())
+        response = self.client.get(self.base_url + "files/")
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("files", response.context["current_page"])
+        formset = response.context["file_formset"]
+        self.assertEqual(1, formset.total_form_count())
+       
+    def test_files_post(self):
+        df1 = self.controller.add_file(self.get_file())
+        df2 = self.controller.add_file(self.get_file())
+        data = {
+                'form-0-document': self.controller.id,
+                'form-0-id': df1.id,
+                'form-0-delete' : 'on',
+                'form-0-ORDER': '0',
+                'form-1-document': self.controller.id,
+                'form-1-id': df2.id,
+                'form-1-ORDER': '1',
+                'form-MAX_NUM_FORMS': '',
+                'form-TOTAL_FORMS': 2, 
+                'form-INITIAL_FORMS': 2,
+                }
+        response = self.client.post(self.base_url + "files/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual([df2.id], [df.id for df in self.controller.files])
+
+    def test_add_file_get(self):
+        response = self.client.get(self.base_url + "files/add/")
+        self.assertEqual(response.status_code,  200)
+        self.assertTrue(isinstance(response.context["add_file_form"],
+                                   forms.AddFileForm))
+
+    def test_add_file_post(self):
+        f = self.get_file(data="crumble")
+        data = { "filename" : f }
+        response = self.client.post(self.base_url + "files/add/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        df = self.controller.files[0]
+        self.assertEqual(df.filename, f.name)
+        self.assertEqual("crumble", df.file.read())
+
 
 class PartViewTestCase(CommonViewTest):
 
