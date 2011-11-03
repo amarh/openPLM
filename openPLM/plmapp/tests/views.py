@@ -52,6 +52,10 @@ class CommonViewTest(BaseTestCase):
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
                                               self.controller.reference,
                                               self.controller.revision)
+        brian = User.objects.create(username="Brian", password="life")
+        brian.get_profile().is_contributor = True
+        brian.get_profile().save()
+        self.brian = brian
 
 class ViewTest(CommonViewTest):
 
@@ -154,9 +158,76 @@ class ViewTest(CommonViewTest):
         response = self.client.post(self.base_url + "navigate/", data)
         self.assertEqual(response.status_code,  200)
         self.assertTrue(response.context["filter_object_form"])
-        
+       
+    def test_management(self):
+        response = self.client.get(self.base_url + "management/")
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("management", response.context["current_page"])
 
-class DocumentViewTestCase(CommonViewTest):
+        self.controller.set_owner(self.brian)
+        response = self.client.get(self.base_url + "management/")
+        self.assertFalse(response.context["is_notified"])
+        form = response.context["notify_self_form"]
+        self.assertEqual("User", form.initial["type"])
+        self.assertEqual(self.user.username, form.initial["username"])
+
+    def test_management_add_get(self):
+        response = self.client.get(self.base_url + "management/add/")
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("management", response.context["current_page"])
+        self.assertTrue(response.context["link_creation"])
+        attach = response.context["attach"]
+        self.assertEqual(self.controller.id, attach[0].id)
+        self.assertEqual("delegate", attach[1])
+
+    def test_management_add_post(self):
+        data = dict(type="User", username=self.brian.username)
+        response = self.client.post(self.base_url + "management/add/",
+                data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=ROLE_NOTIFIED))
+
+    def test_management_replace_get(self):
+        role = level_to_sign_str(0)
+        self.controller.set_signer(self.brian, role)
+        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+            user=self.brian, role=role)
+        response = self.client.get(self.base_url + "management/replace/%d/" % link.id)
+        self.assertEqual(response.status_code,  200)
+        self.assertEqual("management", response.context["current_page"])
+        self.assertTrue(response.context["link_creation"])
+        attach = response.context["attach"]
+        self.assertEqual(self.controller.id, attach[0].id)
+        self.assertEqual("delegate", attach[1])
+    
+    def test_management_replace_post(self):
+        role = level_to_sign_str(0)
+        self.controller.set_signer(self.brian, role)
+        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+            user=self.brian, role=role)
+        data = dict(type="User", username=self.user.username)
+        response = self.client.post(self.base_url + "management/replace/%d/" % link.id,
+                data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=role))
+        self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.user, role=role))
+
+    def test_management_delete(self):
+        self.controller.add_notified(self.brian)
+        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+            user=self.brian, role=ROLE_NOTIFIED)
+        data = {"link_id" : link.id }
+        response = self.client.post(self.base_url + "management/delete/",
+                data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=ROLE_NOTIFIED))
+
+
+class DocumentViewTestCase(ViewTest):
 
     TYPE = "Document"
     CONTROLLER = DocumentController
@@ -242,6 +313,9 @@ class DocumentViewTestCase(CommonViewTest):
         self.assertEqual(df.filename, f.name)
         self.assertEqual("crumble", df.file.read())
 
+    def test_lifecycle(self):
+        self.controller.add_file(self.get_file())
+        super(DocumentViewTestCase, self).test_lifecycle()
 
 class PartViewTestCase(CommonViewTest):
 
