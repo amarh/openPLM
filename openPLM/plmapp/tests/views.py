@@ -487,6 +487,28 @@ class UserViewTestCase(CommonViewTest):
         user = User.objects.get(username=self.user.username)
         self.assertEqual("Snow", user.last_name)
 
+    def test_password_get(self):
+        response = self.client.get(self.user_url + "password/")
+        self.assertEqual(response.status_code,  200)
+        self.assertTrue(response.context["modification_form"])
+
+    def test_password_post(self):
+        data = dict(old_password="password", new_password1="pw",
+                new_password2="pw")
+        response = self.client.post(self.user_url + "password/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.user = User.objects.get(pk=self.user.pk)
+        self.assertTrue(self.user.check_password("pw"))
+
+    def test_password_error(self):
+        data = dict(old_password="error", new_password1="pw",
+                new_password2="pw")
+        response = self.client.post(self.user_url + "password/", data, follow=True)
+        self.user = User.objects.get(pk=self.user.pk)
+        self.assertTrue(self.user.check_password("password"))
+        self.assertFalse(self.user.check_password("pw"))
+
+
 from django.core.management import call_command
 class SearchViewTest(CommonViewTest):
 
