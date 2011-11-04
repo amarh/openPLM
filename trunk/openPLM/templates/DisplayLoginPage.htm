@@ -17,6 +17,11 @@
 <div id="Page" style="line-height:600px" >
 	<div id="LoginBox">
 	    <h1>{% trans "openPLM connexion :" %}</h1>
+        <div class="error">
+            {% for error in form.errors.values %}
+                {{ error }}
+            {% endfor %}
+        </div>
 	    <form action="{% url django.contrib.auth.views.login %}" method="post">
 	        <table style="display:inline-block">
 	            <tr>
@@ -26,9 +31,9 @@
 	            <tr>
 	                <td>{% trans "Password :" %} </td>
 	                <td><input type="password" name="password" value=""/></td>
-	            </tr>
+                </tr>
 	            <tr>
-	                <td></td>
+                    <td></td>
 	                <td><input type="submit" value="{% trans "LOGIN" %}" /></td>
 	            </tr>
 	        </table>
