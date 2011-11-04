@@ -98,6 +98,11 @@ Resources:
     * user: :mod:`~plmapp.controllers.user`
     * group: :mod:`~plmapp.controllers.group`
 
+The following figure shows which models a controller manages.
+As you can see, *PartController* manages the *Coffee* model since *CoffeeController* does not exist.
+
+.. figure:: uml_models_controllers.*
+    :width: 100%
 
 Forms
 ++++++
