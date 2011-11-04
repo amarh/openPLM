@@ -25,6 +25,9 @@
 """
 This module contains some tests for openPLM.
 """
+import os.path
+import shutil
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -56,6 +59,12 @@ class CommonViewTest(BaseTestCase):
         brian.get_profile().is_contributor = True
         brian.get_profile().save()
         self.brian = brian
+    
+    def tearDown(self):
+        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
+            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
+        
+        super(CommonViewTest, self).tearDown()
 
 class ViewTest(CommonViewTest):
 
@@ -413,12 +422,12 @@ class PartViewTestCase(CommonViewTest):
         
 
 class UserViewTestCase(CommonViewTest):
-    
+
     def setUp(self):
         super(UserViewTestCase, self).setUp()
         self.user_url = "/user/%s/" % self.user.username
-
-    
+        self.controller = UserController(self.user, self.user)
+        
     def test_user_attribute(self):
         response = self.client.get(self.user_url + "attributes/")
         self.assertEqual(response.status_code,  200)
@@ -427,11 +436,6 @@ class UserViewTestCase(CommonViewTest):
                           response.context["object_attributes"])
         self.assertEqual(attributes["E-mail address"], self.user.email)
         self.assertTrue(response.context["is_owner"])
-
-    def test_delegation(self):
-        response = self.client.get(self.user_url + "delegation/")
-        self.assertEqual(response.status_code,  200)
-        # TODO
 
     def test_groups(self):
         response = self.client.get(self.user_url + "groups/")
@@ -508,6 +512,65 @@ class UserViewTestCase(CommonViewTest):
         self.assertTrue(self.user.check_password("password"))
         self.assertFalse(self.user.check_password("pw"))
 
+    def test_delegation_get(self):
+        response = self.client.get(self.user_url + "delegation/")
+        self.assertEqual(response.status_code,  200)
+        
+    def test_delegation_remove(self):
+        self.controller.delegate(self.brian, ROLE_OWNER)
+        link = self.controller.get_user_delegation_links()[0]
+        data = {"link_id" : link.id }
+        response = self.client.post(self.user_url + "delegation/", data, follow=True)
+        self.assertEqual(response.status_code,  200)
+        self.assertFalse(self.controller.get_user_delegation_links())
+       
+    def test_delegate_get(self):
+        for role in ("owner", "notified"):
+            url = self.user_url + "delegation/delegate/%s/" % role
+            response = self.client.get(url)
+            self.assertEqual(response.status_code,  200)
+            self.assertEqual(role, unicode(response.context["role"]))
+            self.assertTrue(response.context["link_creation"])
+            self.assertEqual("delegation", response.context["current_page"])
+    
+    def test_delegate_sign_get(self):
+        for level in ("all", "1", "2"):
+            url = self.user_url + "delegation/delegate/sign/%s/" % str(level)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code,  200)
+            role = unicode(response.context["role"])
+            self.assertTrue(role.startswith("signer"))
+            self.assertTrue(level in role)
+            self.assertTrue(response.context["link_creation"])
+            self.assertEqual("delegation", response.context["current_page"])
+
+    def test_delegate_post(self):
+        data = { "type" : "User", "username": self.brian.username }
+        for role in ("owner", "notified"):
+            url = self.user_url + "delegation/delegate/%s/" % role
+            response = self.client.post(url, data, follow=True)
+            DelegationLink.objects.get(role=role, delegator=self.user,
+                    delegatee=self.brian)
+
+    def test_delegate_sign_post(self):
+        data = { "type" : "User", "username": self.brian.username }
+        for level in xrange(1, 4):
+            url = self.user_url + "delegation/delegate/sign/%d/" % level
+            response = self.client.post(url, data, follow=True)
+            role = level_to_sign_str(level - 1)
+            DelegationLink.objects.get(role=role,
+                delegator=self.user, delegatee=self.brian)
+
+    def test_delegate_sign_all_post(self):
+        # sign all level
+        data = { "type" : "User", "username": self.brian.username }
+        url = self.user_url + "delegation/delegate/sign/all/"
+        response = self.client.post(url, data, follow=True)
+        for level in xrange(2):
+            role = level_to_sign_str(level)
+            DelegationLink.objects.get(role=role, delegator=self.user,
+                    delegatee=self.brian)
+    
 
 from django.core.management import call_command
 class SearchViewTest(CommonViewTest):
