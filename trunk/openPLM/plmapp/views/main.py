@@ -858,47 +858,6 @@ def delegate(request, obj_ref, role, sign_level):
                 'role': role})
     return r2r('DisplayObjectManagementReplace.htm', ctx, request)
     
-##########################################################################################    
-@handle_errors
-def stop_delegate(request, obj_ref, role, sign_level):
-    """
-    Manage html page to stop delegations of (:class:`DelegationLink` with) the selected :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionnary based on
-    
-    :param request: :class:`django.http.QueryDict`
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :param role: :attr:`.DelegationLink.role` if role is not "sign"
-    :type role: str
-    :param sign_level: used for :attr:`.DelegationLink.role` if role is "sign"
-    :type sign_level: str
-    :return: a :class:`django.http.HttpResponse`
-    """
-    obj, ctx = get_generic_data(request, "User", obj_ref)
-    
-    if request.method == "POST":
-        delegation_form = SelectUserForm(request.POST)
-        if delegation_form.is_valid():
-            if delegation_form.cleaned_data["type"] == "User":
-                user_obj = get_obj_from_form(delegation_form, request.user)
-                if role == "notified":
-                    obj.set_role(user_obj.object, "notified")
-                    return HttpResponseRedirect("..")
-                elif role == "owner":
-                    return HttpResponseRedirect("..")
-                elif role == "sign":
-                    if sign_level == "all":
-                        return HttpResponseRedirect("..")
-                    elif sign_level.is_digit():
-                        return HttpResponseRedirect("../..")
-    else:
-        delegation_form = SelectUserForm()
-    action_message_string = _("Select the user you no longer want for your \"%s\" role delegation :") % role
-    
-    ctx.update({'current_page':'parts-doc-cad',
-                'replace_management_form': delegation_form,
-                'action_message': action_message_string})
-    return r2r('DisplayObjectManagementReplace.htm', ctx, request)
     
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
