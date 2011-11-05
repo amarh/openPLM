@@ -40,6 +40,17 @@ from openPLM.plmapp.csvimport import IMPORTERS
 from django.contrib import admin
 admin.autodiscover()
 
+# just a hack to prevent a KeyError
+from haystack.models import SearchResult
+def get_state(self):
+    ret_dict = self.__dict__.copy()
+    if 'searchsite' in ret_dict:
+        del(ret_dict['searchsite'])
+    del(ret_dict['log'])
+    return ret_dict
+SearchResult.__getstate__ = get_state
+
+
 urlpatterns = patterns('')
 # add custom application urls
 for app in settings.INSTALLED_APPS:
