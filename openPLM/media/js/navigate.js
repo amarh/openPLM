@@ -246,10 +246,10 @@ function init(){
                 return false;
         });
         var uri = new String(document.location);
-        var uri_rx = /\/object\/(.*)\/navigate\/?$/;
+        var uri_rx = /\/object\/(.*)\/navigate\/?/;
         var result = uri_rx.exec(uri);
         if (result === null){
-            uri_rx = /\/user\/(.*)\/navigate\/?$/;
+            uri_rx = /\/user\/(.*)\/navigate\/?/;
             result = uri_rx.exec(uri);
             uri = "/ajax/navigate/User/" + (result[1]) + "/-/";
         }
