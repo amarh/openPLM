@@ -72,19 +72,32 @@ class ViewTest(CommonViewTest):
         response = self.client.get("/home/", follow=True)
         self.assertEqual(response.status_code, 200)
         
-    def test_create(self):
+    def test_create_get(self):
         response = self.client.get("/object/create/", {"type" : self.TYPE})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["object_type"], self.TYPE)
         self.failUnless(response.context["creation_form"])
    
-    def test_create2(self):
-        response = self.client.get("/object/create/",
-                                   {"type" : self.TYPE, "reference" : "mapart",
-                                    "revision" : "a", "name" : "MaPart",
-                                    "group" : str(self.group.id)})
+    def test_create_post(self):
+        data = self.DATA.copy()
+        data.update({
+                "type" : self.TYPE,
+                "reference" : "mapart",
+                "revision" : "a",
+                "name" : "MaPart",
+                "group" : str(self.group.id),
+                "lifecycle" : get_default_lifecycle().pk,
+                "state" : get_default_state().pk,
+                })
 
+        response = self.client.post("/object/create/", data, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual("attributes", response.context["current_page"])
+        obj = PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
+        self.assertEqual(obj.id, response.context["obj"].id)
+        self.assertEqual("MaPart", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
 
     def test_display_attributes(self):
         response = self.client.get(self.base_url + "attributes/")
