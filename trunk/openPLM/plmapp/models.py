@@ -651,7 +651,7 @@ class DocumentStorage(FileSystemStorage):
         md5.update(basename)
         md5_value = md5.hexdigest() + "-%s" + ext
         path = os.path.join(ext2, md5_value % rand())
-        while os.path.exists(path):
+        while os.path.exists(os.path.join(self.location, path)):
             path = os.path.join(ext2, md5_value % rand())
         return path
 
@@ -687,7 +687,7 @@ class DocumentFile(models.Model):
             :class:`Document` linked to the file
     """
     filename = models.CharField(max_length=200)
-    file = models.FileField(upload_to="docs", storage=docfs)
+    file = models.FileField(upload_to=".", storage=docfs)
     size = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to=".", storage=thumbnailfs,
                                  blank=True, null=True)
