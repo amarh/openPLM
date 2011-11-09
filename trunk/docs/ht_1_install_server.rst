@@ -18,6 +18,8 @@ This HowTo is based on:
     * Celery 2.3.X
     * Haystack 1.2.X
     * Xapian 1.2.X
+    * Lepl 5.0
+    * South 0.7.3
  
  
 .. note::
@@ -36,14 +38,16 @@ First, you must install some dependencies:
     #. ``apt-get install python-setuptools python-dev python-imaging python-kjbuckets python-pypdf ipython``
     #. ``easy_install odfpy``
     #. ``apt-get install graphviz graphviz-dev``
-    #. ``easy_install pygraphviz>=1.1``
+    #. ``easy_install 'pygraphviz>=1.1'``
     #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django python-django-south``
+    #. ``apt-get install python-django``
+    #.  ``apt-get install 'south>=0.7'``
     #. ``easy_install celery``
     #. ``easy_install django-celery``
-    #. ``easy_install django-haystack==1.2``
+    #. ``easy_install 'django-haystack==1.2'``
     #. ``apt-get install postgresql python-psycopg2 pgadmin3``
     #. ``apt-get install tracker-extract``
+    #. ``easy_install lepl``
    
 Check applications are ok
 ===============================
@@ -198,9 +202,10 @@ Configure Celery
 openPLM uses Celery to manage asynchronous tasks. Celery needs a broker, you can
 choose any broker supported by celery but *rabbitmq* is recommanded.
 
-To configure rabbitmq, you must create an user and a vhost:
+To configure rabbitmq, you must create an user and a vhost (as root):
 
-    * ``rabbitmqctl add_user openplm 'a secret password but not this one'``
+    * ``rabbitmqctl add_user openplm 'secret'``
+      (change this password, use single quotes to put special characters or spaces)
     * ``rabbitmqctl add_vhost openplm``
     * ``rabbitmqctl set_permissions -p openplm openplm ".*" ".*" ".*"``
 
@@ -217,7 +222,6 @@ only have to change `BROKER_PASSWORD`.
     * ``chown www-data:www-data /var/log/celery /var/run/celery``
 
 To launch :command:`celeryd`, run ``/etc/init.d celeryd start``.
-
 
 
 Check required modules
@@ -260,9 +264,13 @@ Open your web browser and go to: ::
     
 .. note:: Here your_site_adress is given as example but you have to use your own site adress
 
+
 Enter superadmin login and password:
 
 .. image:: images/admin_login.png
+
+If you see an IOError (socket closed), checks your settings, in particular the
+stuff related to Celery and RabbitMQ. 
 
 You can add new user and edit them going to Home>Auth>User: 
 
