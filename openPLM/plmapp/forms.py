@@ -216,10 +216,8 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
 get_search_form.cache = {}    
 
-import xapian
-from haystack.query import SearchQuerySet, EmptySearchQuerySet
-from haystack import backend as search_backend
-from haystack.constants import DJANGO_CT
+from haystack.query import EmptySearchQuerySet
+from openPLM.plmapp.search import SmartSearchQuerySet
 
 class SimpleSearchForm(forms.Form):
     q = forms.CharField(label=_("Query"), required=False)
@@ -227,22 +225,10 @@ class SimpleSearchForm(forms.Form):
     def search(self, *models):
         if self.is_valid():
             query = self.cleaned_data["q"].strip()
-            sqs = SearchQuerySet().highlight().models(*models)
+            sqs = SmartSearchQuerySet().highlight().models(*models)
             if not query or query == "*":
                 return sqs
-            if models:
-                models = sorted(['%s:%s.%s' % (DJANGO_CT, model._meta.app_label, model._meta.module_name) for model in models])
-                models_clause = ' OR '.join(models)
-                final_query = '(%s) AND (%s)' % (query, models_clause)
-            else:
-                final_query = query
-
-            try:
-                sb = search_backend.SearchBackend()
-                xqr = sb.parse_query(final_query)
-                results = sqs.raw_search(xqr)
-            except xapian.QueryParserError:
-                results = sqs.auto_query(query)
+            results = sqs.auto_query(query)
             return results
         else:
             return EmptySearchQuerySet()
