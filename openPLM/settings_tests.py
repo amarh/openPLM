@@ -113,7 +113,7 @@ EMAIL_PORT = 1025
 ######################
 
 #: directory that stores documents
-DOCUMENTS_DIR = "/tmp"
+DOCUMENTS_DIR = "/tmp/docs/"
 THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
 #: directory that stores thumbnails
 THUMBNAILS_URL = MEDIA_URL + "thumbnails/"
