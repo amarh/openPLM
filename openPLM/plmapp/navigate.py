@@ -28,6 +28,8 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 """
 
 import os
+import string
+import random
 import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
@@ -383,10 +385,8 @@ class NavigationGraph(object):
         self.graph.close()
         self.graph = FrozenAGraph(s)
 
-        t = "p" if isinstance(self.object, PLMObjectController) else "u"
-        picture_path = "media/navigate/" + t + str(self.object.id) + "-"
-        for opt in self.options_list:
-            picture_path += str(int(self.options[opt]))
+        rand = "".join(random.choice(string.ascii_lowercase) for x in xrange(40))
+        picture_path = "media/navigate/" + rand
         prog = self.options.get("prog", "dot")
         self.graph.layout(prog=prog)
         picture_path2 = os.path.join(basedir, "..", "..", picture_path)
