@@ -1046,9 +1046,9 @@ class SearchQuery(BaseSearchQuery):
                 return self._phrase_query(term.split(), self.backend.content_field_name)
         else:
             if is_not:
-                return xapian.Query(xapian.Query.OP_AND_NOT, self._all_query(), self._term_query(term))
+                return xapian.Query(xapian.Query.OP_AND_NOT, self._all_query(), self.backend.parse_query(term))
             else:
-                return self._term_query(term)
+                return self.backend.parse_query(term)
     
     def _filter_exact(self, term, field, is_not):
         """

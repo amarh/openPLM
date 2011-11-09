@@ -584,18 +584,27 @@ class UserViewTestCase(CommonViewTest):
             DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
     
+def sorted_objects(l):
+    return sorted(l, key=lambda x: x.id)
 
 from django.core.management import call_command
-class SearchViewTest(CommonViewTest):
+class SearchViewTestCase(CommonViewTest):
 
-    def search(self, request):
-        # rebuild the index
-        call_command("rebuild_index", interactive=False)
-
+    def get_query(self, request):
+        if isinstance(request, basestring):
+            return request
         query = u" ".join(u"%s:%s" % q for q in request.iteritems() if q[0] != "type")
         query = query or "*"
-        response = self.client.get("/user/user/attributes/", {"type" : request["type"],
-                "q" : query}) 
+        return query
+
+    def search(self, request, type=None):
+        # rebuild the index
+        call_command("rebuild_index", interactive=False, verbosity=0)
+        
+        query = self.get_query(request)
+        t = type or request["type"]
+        response = self.client.get("/user/user/attributes/",
+                {"type" : t, "q" : query}) 
         self.assertEqual(response.status_code, 200)
         results = list(response.context["results"])
         results.sort(key=lambda r:r.object.pk)
@@ -610,15 +619,14 @@ class SearchViewTest(CommonViewTest):
     
     def test_session_forms(self):
         "Tests if form field are kept between two search"
-        response = self.client.get("/user/user/attributes/", {"type" : "Part",
-                                "revision" : "c", "name" : "a name"})
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get("/user/user/attributes/")
-        self.assertEqual(response.status_code, 200)
-        af = response.context["attributes_form"]
-        self.assertEqual(af.data["revision"], "c")
-        eaf = response.context["attributes_form"]
-        self.assertEqual(af.data["name"], "a name")
+        data =  {"type" : "Part", "revision" : "c", "name" : "a name"}
+        self.search(data)
+        query = self.get_query(data)
+        for x in range(4):
+            response = self.client.get("/user/user/attributes/")
+            self.assertEqual(response.status_code, 200)
+            af = response.context["attributes_form"]
+            self.assertEqual(af.data["q"], query)
 
     def test_empty(self):
         "Test a search with an empty database"
@@ -664,10 +672,56 @@ class SearchViewTest(CommonViewTest):
         c2 = self.CONTROLLER.create("b", self.TYPE, "c", self.user, self.DATA)
         results = self.search({"type" : self.TYPE})
         c = self.controller
-        wanted = [c.object, c2.object] if c.pk < c2.pk else [c2.object, c.object]
-        self.assertEqual(results, wanted)
+        self.assertEqual(results, sorted_objects([c.object, c2.object]))
 
-    # TODO : error cases
+    def test_search_or(self):
+        c2 = self.CONTROLLER.create("value2", self.TYPE, "c", self.user, self.DATA)
+        c3 = self.CONTROLLER.create("value3", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("%s OR %s" % (self.controller.reference, c2.reference),
+                self.TYPE)
+        self.assertEqual(sorted_objects([self.controller.object, c2.object]),
+                         sorted_objects(results)) 
+
+    def test_search_and(self):
+        c2 = self.CONTROLLER.create("value2", self.TYPE, "c", self.user, self.DATA)
+        c3 = self.CONTROLLER.create("value3", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("%s AND %s" % (self.controller.reference, c2.reference),
+                self.TYPE)
+        self.assertEqual([], results) 
+        results = self.search("value2 AND revision:c", self.TYPE)
+        self.assertEqual([c2.object], results)
+
+    def test_search_lisp_is_back(self):
+        c2 = self.CONTROLLER.create("value2", self.TYPE, "c", self.user, self.DATA)
+        c3 = self.CONTROLLER.create("value3", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("((%s) AND (%s) ) OR (*)" % (self.controller.reference,
+            c2.reference), self.TYPE)
+        self.assertEqual(3, len(results))
+
+    def test_search_dash(self):
+        for i in xrange(6):
+            self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",
+                    self.user, self.DATA)
+        
+        self.CONTROLLER.create("val-0i-5", self.TYPE, "c", self.user, self.DATA)
+        c = self.CONTROLLER.create("0i-5", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("val-0*", self.TYPE)
+        self.assertEqual(7, len(results))
+        self.assertTrue(c.object not in results) 
+
+    def test_search_all(self):
+        for i in xrange(6):
+            self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",
+                    self.user, self.DATA)
+        results = self.search("*", self.TYPE)
+        self.assertEqual(set(Part.objects.all()), set(results))
+
+    def test_search_not(self):
+        results = self.search("NOT %s" % self.controller.name, self.TYPE)
+        self.assertEqual([], results)
+        results = self.search("NOT nothing", self.TYPE)
+        self.assertEqual([self.controller.object], results)
+
 
 class HardDiskViewTest(ViewTest):
     TYPE = "HardDisk"
