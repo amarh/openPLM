@@ -495,6 +495,8 @@ def get_headers_formset(Importer):
             headers = []
             for form in self.forms:
                 header = form.cleaned_data['header']
+                if header == u'None':
+                    header = None
                 if header and header in headers:
                     raise forms.ValidationError(_("Columns must have distinct headers."))
                 headers.append(header) 
