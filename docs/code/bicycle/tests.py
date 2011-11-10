@@ -1,5 +1,5 @@
 from openPLM.plmapp.tests.controllers import PartControllerTest
-from openPLM.plmapp.tests.views import ViewTest
+from openPLM.plmapp.tests.views import PartViewTestCase
 
 from openPLM.bicycle.models import BicycleController
 
@@ -9,7 +9,7 @@ class BicycleControllerTest(PartControllerTest):
     DATA = {"nb_wheels" : 2}
 
 
-class BicycleViewTest(ViewTest):
+class BicycleViewTestCase(PartViewTestCase):
     TYPE = "Bicycle"
     DATA = {"nb_wheels" : 2,
             "color" : "blue"}

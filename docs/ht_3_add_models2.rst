@@ -12,11 +12,14 @@ This document describes how to add a model to openPLM.
     It's recommanded to initiate a development environment:
         
         #. copy openPLM's directory in another place
-        #. use the :file:`settings.py.sqlite` as settings file (rename it
-           :file:`settings.py`)
-        #. run :command:`./manage.py sql all`
-        #. run :command:`./manage.py syncdb` (this should ask you if you want to 
+        #. change your settings: use a sqlite3 database (the file
+           :file:`settings_tests.py` is a good candidate for a settings file)
+        #. checks that your settings do not conflict with another installation
+           of openPLM (:const:`~settings.DOCUMENTS_DIR`, etc.)
+        #. run ``./manage.py sql all``
+        #. run ``./manage.py syncdb --all`` (this should ask you if you want to 
            create a superuser, accept it)
+        #. run ``migrate --all --fake``
         #. edit the superuser profile (model UserProfile in the plmapp section)
            and set him as an administrator and a contributor
 
@@ -46,6 +49,11 @@ For example::
         'django.contrib.sessions',
         'django.contrib.sites',
         'django.contrib.admin',
+        'django.contrib.comments',
+        'django.contrib.humanize',
+        'djcelery',
+        'haystack',
+        'south',
         'openPLM.plmapp',
         # you can add your application after this line
         'openPLM.bicycle',
@@ -197,21 +205,29 @@ To make our model available on the admin interface, we just have to add this lin
     :end-before: class BicycleController
     :linenos:
 
-syncdb
-======================
+schemamigration and migrate
+===========================
 
-Now you can test your model. Run the following commands:
 
-    #. :command:`manage.py sql app_name`
-    #. :command:`manage.py syncdb`
+Then you must create a *migration* for your application. openPLM uses
+`South <http://south.aeracode.org/>`_ to manage migrations of database.
+You can also read `the South's tutorial <http://south.aeracode.org/docs/tutorial/index.html>`_.
 
-The last command should output::
+    #. ``/manage.py schemamigration app_name --initial``
 
-   Installing json fixture 'initial_data' from absolute path.
-   Installed 10 object(s) from 1 fixture(s)
+        This command will create a :file:`app_name/migrations` directory.
 
-Then you can run the server with the :command:`./manage.py runserver localhost:8000`.
+    #. ``./manage.py migrate app_name``
+
+        This command will create the table in the database.
+
+    #. ``./manage.py rebuild_index``
+        
+        This command will rebuild the search index.
+
+Then you can run the server with ``./runserver.sh``.
 Open the url http://localhost:8000/home/ and try to create a bicycle.
+
 
 
 Controller
@@ -243,7 +259,7 @@ care of *new_revision*.
 
 .. seealso::
 
-    mod:`controllers` and :ref:`how-to-add-a-controller` for more
+    :mod:`.controllers` and :ref:`how-to-add-a-controller` for more
     details about controllers.
 
 
@@ -301,6 +317,8 @@ writting something like this:
 
 .. literalinclude:: code/bicycle/tests.py
     :linenos:
+
+Add your application to the :file:`settings_tests.py` file.
 
 You can run the tests with the command ``./manage.py test app_name
 --settings=settings_tests``.
