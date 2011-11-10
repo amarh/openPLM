@@ -60,22 +60,40 @@ class CommonViewTest(BaseTestCase):
         brian.get_profile().is_contributor = True
         brian.get_profile().save()
         self.brian = brian
-    
+
     def tearDown(self):
         if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
             shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
         
         super(CommonViewTest, self).tearDown()
 
+    def post(self, url, data=None, follow=True, status_code=200,
+            link=False, page=""):
+        return self.get_or_post(self.client.post, url, data, follow, status_code,
+                link, page)
+
+    def get(self, url, data=None, follow=True, status_code=200,
+            link=False, page=""):
+        return self.get_or_post(self.client.get, url, data, follow, status_code,
+                link, page)
+    
+    def get_or_post(self, func, url, data=None, follow=True, status_code=200,
+            link=False, page=""):
+        response = func(url, data or {}, follow=follow)
+        self.assertEqual(response.status_code, status_code)
+        self.assertEqual(link, response.context["link_creation"])
+        if page:
+            self.assertEqual(page, response.context["current_page"])
+        return response
+
+
 class ViewTest(CommonViewTest):
 
     def test_home(self):
-        response = self.client.get("/home/", follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.get("/home/")
         
     def test_create_get(self):
-        response = self.client.get("/object/create/", {"type" : self.TYPE})
-        self.assertEqual(response.status_code, 200)
+        response = self.get("/object/create/", {"type" : self.TYPE})
         self.assertEqual(response.context["object_type"], self.TYPE)
         self.failUnless(response.context["creation_form"])
    
@@ -91,9 +109,7 @@ class ViewTest(CommonViewTest):
                 "state" : get_default_state().pk,
                 })
 
-        response = self.client.post("/object/create/", data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual("attributes", response.context["current_page"])
+        response = self.post("/object/create/", data, page="attributes")
         obj = PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual(obj.id, response.context["obj"].id)
         self.assertEqual("MaPart", obj.name)
@@ -101,8 +117,7 @@ class ViewTest(CommonViewTest):
         self.assertEqual(self.user, obj.creator)
 
     def test_display_attributes(self):
-        response = self.client.get(self.base_url + "attributes/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.base_url + "attributes/", page="attributes")
         self.failUnless(response.context["object_attributes"])
         attributes = dict((x.capitalize(), y) for (x,y) in 
                           response.context["object_attributes"])
@@ -115,21 +130,18 @@ class ViewTest(CommonViewTest):
     def test_edit_attributes(self):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
-        response = self.client.post(self.base_url + "modify/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "modify/", data)
         obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, data["name"])
 
     def test_lifecycle(self):
-        response = self.client.get(self.base_url + "lifecycle/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "lifecycle/")
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", True), ("official", False), ("deprecated", False))
         self.assertEqual(lifecycles, wanted)
         # promote
-        response = self.client.post(self.base_url + "lifecycle/", 
-                                    {"action" : "PROMOTE"})
-        self.assertEqual(response.status_code, 200)
+        response = self.post(self.base_url + "lifecycle/", 
+                            {"action" : "PROMOTE"})
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", False), ("official", True), ("deprecated", False))
         self.assertEqual(lifecycles, wanted)
@@ -142,34 +154,29 @@ class ViewTest(CommonViewTest):
         self.controller.save()
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
-        response = self.client.post(self.base_url + "lifecycle/", 
+        response = self.post(self.base_url + "lifecycle/", 
                                     {"action" : "DEMOTE"})
-        self.assertEqual(response.status_code, 200)
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", True), ("issue1", False), ("official", False),
                 ("deprecated", False))
         self.assertEqual(lifecycles, wanted)
 
     def test_revisions(self):
-        response = self.client.get(self.base_url + "revisions/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "revisions/")
         revisions = response.context["revisions"]
         self.assertEqual(revisions, [self.controller.object])
         # check add_revision_form
         add_revision_form = response.context["add_revision_form"]
         self.assertEqual(add_revision_form.data, {"revision": "b"})
-        response = self.client.post(self.base_url + "revisions/", {"revision" :"b"})
-        self.assertEqual(response.status_code, 200)
+        response = self.post(self.base_url + "revisions/", {"revision" :"b"})
         get_all_plmobjects()[self.TYPE].objects.get(reference=self.controller.reference,
                 revision="b")
     
     def test_history(self):
-        response = self.client.get(self.base_url + "history/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.base_url + "history/")
 
     def test_navigate_get(self):
-        response = self.client.get(self.base_url + "navigate/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.base_url + "navigate/")
         self.assertTrue(response.context["filter_object_form"])
         self.assertTrue(response.context["navigate_bool"])
         
@@ -178,36 +185,28 @@ class ViewTest(CommonViewTest):
             "doc", "parents", "owner", "signer", "notified", "part",
             "ownede", "to_sign", "request_notification_from"), True)
         data["prog"] = "neato"
-        response = self.client.post(self.base_url + "navigate/", data)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "navigate/", data)
         self.assertTrue(response.context["filter_object_form"])
        
     def test_management(self):
-        response = self.client.get(self.base_url + "management/")
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("management", response.context["current_page"])
-
+        response = self.get(self.base_url + "management/", page="management")
         self.controller.set_owner(self.brian)
-        response = self.client.get(self.base_url + "management/")
+        response = self.get(self.base_url + "management/")
         self.assertFalse(response.context["is_notified"])
         form = response.context["notify_self_form"]
         self.assertEqual("User", form.initial["type"])
         self.assertEqual(self.user.username, form.initial["username"])
 
     def test_management_add_get(self):
-        response = self.client.get(self.base_url + "management/add/")
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("management", response.context["current_page"])
-        self.assertTrue(response.context["link_creation"])
+        response = self.get(self.base_url + "management/add/",
+               link=True, page="management")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("delegate", attach[1])
 
     def test_management_add_post(self):
         data = dict(type="User", username=self.brian.username)
-        response = self.client.post(self.base_url + "management/add/",
-                data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "management/add/", data)
         self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=ROLE_NOTIFIED))
 
@@ -216,10 +215,8 @@ class ViewTest(CommonViewTest):
         self.controller.set_signer(self.brian, role)
         link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
-        response = self.client.get(self.base_url + "management/replace/%d/" % link.id)
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("management", response.context["current_page"])
-        self.assertTrue(response.context["link_creation"])
+        response = self.get(self.base_url + "management/replace/%d/" % link.id,
+                link=True, page="management")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("delegate", attach[1])
@@ -230,9 +227,8 @@ class ViewTest(CommonViewTest):
         link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         data = dict(type="User", username=self.user.username)
-        response = self.client.post(self.base_url + "management/replace/%d/" % link.id,
-                data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "management/replace/%d/" % link.id,
+                        data)
         self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=role))
         self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
@@ -243,9 +239,7 @@ class ViewTest(CommonViewTest):
         link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=ROLE_NOTIFIED)
         data = {"link_id" : link.id }
-        response = self.client.post(self.base_url + "management/delete/",
-                data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "management/delete/", data)
         self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=ROLE_NOTIFIED))
 
@@ -259,16 +253,12 @@ class DocumentViewTestCase(ViewTest):
         part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
         self.controller.attach_to_part(part)
         
-        response = self.client.get(self.base_url + "parts/")
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("parts", response.context["current_page"])
+        response = self.get(self.base_url + "parts/", page="parts")
         self.assertEqual([part.id],
                          [p.part.id for p in response.context["object_rel_part"]])
         
     def test_add_related_part_get(self):
-        response = self.client.get(self.base_url + "parts/add/")
-        self.assertEqual(response.status_code,  200)
-        self.assertTrue(response.context["link_creation"])
+        response = self.get(self.base_url + "parts/add/", link=True)
         self.assertTrue(isinstance(response.context["add_rel_part_form"],
                                    forms.AddRelPartForm))
         attach = response.context["attach"]
@@ -282,23 +272,18 @@ class DocumentViewTestCase(ViewTest):
                 "type" : part.type,
                 "revision" : part.revision
                 }
-        response = self.client.post(self.base_url + "parts/add/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "parts/add/", data)
         self.assertEqual([part.id],
                          [p.part.id for p in self.controller.get_attached_parts()])
 
     def test_files_empty_get(self):
-        response = self.client.get(self.base_url + "files/")
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("files", response.context["current_page"])
+        response = self.get(self.base_url + "files/", page="files")
         formset = response.context["file_formset"]
         self.assertEqual(0, formset.total_form_count())
 
     def test_files_get(self):
         self.controller.add_file(self.get_file())
-        response = self.client.get(self.base_url + "files/")
-        self.assertEqual(response.status_code,  200)
-        self.assertEqual("files", response.context["current_page"])
+        response = self.get(self.base_url + "files/", page="files")
         formset = response.context["file_formset"]
         self.assertEqual(1, formset.total_form_count())
        
@@ -317,21 +302,18 @@ class DocumentViewTestCase(ViewTest):
                 'form-TOTAL_FORMS': 2, 
                 'form-INITIAL_FORMS': 2,
                 }
-        response = self.client.post(self.base_url + "files/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "files/", data)
         self.assertEqual([df2.id], [df.id for df in self.controller.files])
 
     def test_add_file_get(self):
-        response = self.client.get(self.base_url + "files/add/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.base_url + "files/add/")
         self.assertTrue(isinstance(response.context["add_file_form"],
                                    forms.AddFileForm))
 
     def test_add_file_post(self):
         f = self.get_file(data="crumble")
         data = { "filename" : f }
-        response = self.client.post(self.base_url + "files/add/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.base_url + "files/add/", data)
         df = self.controller.files[0]
         self.assertEqual(df.filename, f.name)
         self.assertEqual("crumble", df.file.read())
@@ -340,23 +322,19 @@ class DocumentViewTestCase(ViewTest):
         self.controller.add_file(self.get_file())
         super(DocumentViewTestCase, self).test_lifecycle()
 
-class PartViewTestCase(CommonViewTest):
+class PartViewTestCase(ViewTest):
 
     def test_children(self):
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child1, 10 , 20)
         child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child2, 10, 20)
-        response = self.client.get(self.base_url + "BOM-child/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "BOM-child/", page="BOM-child")
         self.assertEqual(2, len(list(response.context["children"])))
-        self.assertEqual("BOM-child", response.context["current_page"])
         form = response.context["display_form"]
 
     def test_add_child(self):
-        response = self.client.get(self.base_url + "BOM-child/add/")
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["link_creation"])
+        response = self.get(self.base_url + "BOM-child/add/", link=True)
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         response = self.client.post(self.base_url + "BOM-child/add/",
                 {"type": "Part", "reference":"c1", "revision":"a",
@@ -366,8 +344,7 @@ class PartViewTestCase(CommonViewTest):
     def test_edit_children(self):
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child1, 10 , 20)
-        response = self.client.get(self.base_url + "BOM-child/edit/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "BOM-child/edit/")
         formset = response.context["children_formset"]
         data = {
             'form-TOTAL_FORMS': u'1',
@@ -379,32 +356,26 @@ class PartViewTestCase(CommonViewTest):
             'form-0-parent' :  self.controller.id,
             'form-0-quantity' :  '45.0',
         }
-        response = self.client.post(self.base_url + "BOM-child/edit/", data)
+        response = self.post(self.base_url + "BOM-child/edit/", data)
         link = self.controller.get_children()[0].link
         self.assertEquals(45, link.order)
         self.assertEquals(45.0, link.quantity)
 
     def test_parents_empty(self):
-        response = self.client.get(self.base_url + "parents/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "parents/", page="parents")
         self.assertEqual(0, len(list(response.context["parents"])))
-        self.assertEqual("parents", response.context["current_page"])
         
     def test_parents(self):
         p1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         p1.add_child(self.controller, 10, 20)
         p2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
         p2.add_child(self.controller, 10, 20)
-        response = self.client.get(self.base_url + "parents/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "parents/", page="parents")
         self.assertEqual(2, len(list(response.context["parents"])))
-        self.assertEqual("parents", response.context["current_page"])
 
     def test_doc_cad_empty(self):
-        response = self.client.get(self.base_url + "doc-cad/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "doc-cad/", page="doc-cad")
         self.assertEqual(0, len(list(response.context["object_doc_cad"])))
-        self.assertEqual("doc-cad", response.context["current_page"])
     
     def test_doc_cad(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -413,15 +384,11 @@ class PartViewTestCase(CommonViewTest):
                 self.DATA)
         self.controller.attach_to_document(doc1)
         self.controller.attach_to_document(doc2)
-        response = self.client.get(self.base_url + "doc-cad/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "doc-cad/", page="doc-cad")
         self.assertEqual(2, len(list(response.context["object_doc_cad"])))
-        self.assertEqual("doc-cad", response.context["current_page"])
 
     def test_doc_add_add_get(self):
-        response = self.client.get(self.base_url + "doc-cad/add/")
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["link_creation"])
+        response = self.get(self.base_url + "doc-cad/add/", link=True)
         self.assertEqual("attach_doc", response.context["attach"][1])
 
     def test_doc_add_add_post(self):
@@ -429,8 +396,7 @@ class PartViewTestCase(CommonViewTest):
                 self.DATA)
         data = {"type" : doc1.type, "reference" : doc1.reference,
                 "revision" : doc1.revision } 
-        response = self.client.post(self.base_url + "doc-cad/add/", data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.post(self.base_url + "doc-cad/add/", data)
         document = self.controller.get_attached_documents()[0].document
         self.assertEqual(doc1.object, document)
         
@@ -443,35 +409,28 @@ class UserViewTestCase(CommonViewTest):
         self.controller = UserController(self.user, self.user)
         
     def test_user_attribute(self):
-        response = self.client.get(self.user_url + "attributes/")
-        self.assertEqual(response.status_code,  200)
-        self.failUnless(response.context["object_attributes"])
+        response = self.get(self.user_url + "attributes/", page="attributes")
         attributes = dict((x.capitalize(), y) for (x,y) in 
                           response.context["object_attributes"])
         self.assertEqual(attributes["E-mail address"], self.user.email)
         self.assertTrue(response.context["is_owner"])
 
     def test_groups(self):
-        response = self.client.get(self.user_url + "groups/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "groups/")
         # TODO
 
     def test_part_doc_cads(self):
-        response = self.client.get(self.user_url + "parts-doc-cad/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "parts-doc-cad/")
         # TODO
         
     def test_history(self):
-        response = self.client.get(self.user_url + "history/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "history/")
         
     def test_navigate(self):
-        response = self.client.get(self.user_url + "navigate/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "navigate/")
 
     def test_sponsor_get(self):
-        response = self.client.get(self.user_url + "delegation/sponsor/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "delegation/sponsor/")
         form = response.context["sponsor_form"]
         self.assertEquals(set(g.id for g in self.user.groupinfo_owner.all()),
                 set(g.id for g in form.fields["groups"].queryset.all()))
@@ -480,9 +439,7 @@ class UserViewTestCase(CommonViewTest):
         data = dict(sponsor=self.user.id, 
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk])
-        response = self.client.post(self.user_url + "delegation/sponsor/", data,
-                follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.user_url + "delegation/sponsor/", data)
         user = User.objects.get(username=data["username"])
         for attr in ("first_name", "last_name", "email"):
             self.assertEquals(data[attr], getattr(user, attr))
@@ -491,78 +448,65 @@ class UserViewTestCase(CommonViewTest):
         self.assertTrue(user.groups.filter(id=self.group.id))
 
     def test_modify_get(self):
-        response = self.client.get(self.user_url + "modify/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "modify/")
         form = response.context["modification_form"]
         self.assertEqual(self.user.first_name, form.initial["first_name"])
         self.assertEqual(self.user.email, form.initial["email"])
 
     def test_modify_post(self):
         data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
-        response = self.client.post(self.user_url + "modify/", data,
-                follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.user_url + "modify/", data)
         user = User.objects.get(username=self.user.username)
         self.assertEqual("Snow", user.last_name)
 
     def test_password_get(self):
-        response = self.client.get(self.user_url + "password/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "password/")
         self.assertTrue(response.context["modification_form"])
 
     def test_password_post(self):
         data = dict(old_password="password", new_password1="pw",
                 new_password2="pw")
-        response = self.client.post(self.user_url + "password/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.user_url + "password/", data)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.check_password("pw"))
 
     def test_password_error(self):
         data = dict(old_password="error", new_password1="pw",
                 new_password2="pw")
-        response = self.client.post(self.user_url + "password/", data, follow=True)
+        response = self.post(self.user_url + "password/", data)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.check_password("password"))
         self.assertFalse(self.user.check_password("pw"))
 
     def test_delegation_get(self):
-        response = self.client.get(self.user_url + "delegation/")
-        self.assertEqual(response.status_code,  200)
+        response = self.get(self.user_url + "delegation/")
         
     def test_delegation_remove(self):
         self.controller.delegate(self.brian, ROLE_OWNER)
         link = self.controller.get_user_delegation_links()[0]
         data = {"link_id" : link.id }
-        response = self.client.post(self.user_url + "delegation/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
+        response = self.post(self.user_url + "delegation/", data)
         self.assertFalse(self.controller.get_user_delegation_links())
        
     def test_delegate_get(self):
         for role in ("owner", "notified"):
             url = self.user_url + "delegation/delegate/%s/" % role
-            response = self.client.get(url)
-            self.assertEqual(response.status_code,  200)
+            response = self.get(url, link=True, page="delegation")
             self.assertEqual(role, unicode(response.context["role"]))
-            self.assertTrue(response.context["link_creation"])
-            self.assertEqual("delegation", response.context["current_page"])
     
     def test_delegate_sign_get(self):
         for level in ("all", "1", "2"):
             url = self.user_url + "delegation/delegate/sign/%s/" % str(level)
-            response = self.client.get(url)
-            self.assertEqual(response.status_code,  200)
+            response = self.get(url, link=True, page="delegation")
             role = unicode(response.context["role"])
             self.assertTrue(role.startswith("signer"))
             self.assertTrue(level in role)
-            self.assertTrue(response.context["link_creation"])
-            self.assertEqual("delegation", response.context["current_page"])
 
     def test_delegate_post(self):
         data = { "type" : "User", "username": self.brian.username }
         for role in ("owner", "notified"):
             url = self.user_url + "delegation/delegate/%s/" % role
-            response = self.client.post(url, data, follow=True)
+            response = self.post(url, data)
             DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
 
@@ -570,7 +514,7 @@ class UserViewTestCase(CommonViewTest):
         data = { "type" : "User", "username": self.brian.username }
         for level in xrange(1, 4):
             url = self.user_url + "delegation/delegate/sign/%d/" % level
-            response = self.client.post(url, data, follow=True)
+            response = self.post(url, data)
             role = level_to_sign_str(level - 1)
             DelegationLink.objects.get(role=role,
                 delegator=self.user, delegatee=self.brian)
@@ -579,7 +523,7 @@ class UserViewTestCase(CommonViewTest):
         # sign all level
         data = { "type" : "User", "username": self.brian.username }
         url = self.user_url + "delegation/delegate/sign/all/"
-        response = self.client.post(url, data, follow=True)
+        response = self.post(url, data)
         for level in xrange(2):
             role = level_to_sign_str(level)
             DelegationLink.objects.get(role=role, delegator=self.user,
@@ -604,16 +548,14 @@ class SearchViewTestCase(CommonViewTest):
         
         query = self.get_query(request)
         t = type or request["type"]
-        response = self.client.get("/user/user/attributes/",
+        response = self.get("/user/user/attributes/",
                 {"type" : t, "q" : query}) 
-        self.assertEqual(response.status_code, 200)
         results = list(response.context["results"])
         results.sort(key=lambda r:r.object.pk)
         return [r.object for r in results]
 
     def test_forms(self):
-        response = self.client.get("/user/user/attributes/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get("/user/user/attributes/")
         # check if searchforms are present
         af = response.context["attributes_form"]
         eaf = response.context["type_form"]
@@ -624,8 +566,7 @@ class SearchViewTestCase(CommonViewTest):
         self.search(data)
         query = self.get_query(data)
         for x in range(4):
-            response = self.client.get("/user/user/attributes/")
-            self.assertEqual(response.status_code, 200)
+            response = self.get("/user/user/attributes/")
             af = response.context["attributes_form"]
             self.assertEqual(af.data["q"], query)
 
@@ -730,8 +671,7 @@ class HardDiskViewTest(ViewTest):
             "supplier" : "ASupplier"}
     
     def test_display_attributes2(self):
-        response = self.client.get(self.base_url + "attributes/")
-        self.assertEqual(response.status_code, 200)
+        response = self.get(self.base_url + "attributes/")
         self.failUnless(response.context["object_attributes"])
         attributes = dict(response.context["object_attributes"])
         self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
@@ -773,7 +713,6 @@ class MechantUserViewTest(TestCase):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
         response = self.client.post(self.base_url + "modify/", data, follow=True)
-        self.assertEqual(response.status_code,  200)
         obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, '')
         self.assertEqual(response.template.name, "error.html")
