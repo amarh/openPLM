@@ -1,5 +1,5 @@
-#-!- coding:utf-8 -!-
 #! /usr/bin/env python
+#-!- coding:utf-8 -!-
 
 ############################################################################
 # openPLM - open source PLM
@@ -55,10 +55,10 @@ if sys.version_info < (2, 6):
 
 try:
     import django
-    if django.VERSION >= (1, 1):
+    if django.VERSION >= (1, 2):
         installed.append("django")
     else:
-        print "the version of django is too old (1.1 required, found %s)" % django.get_version()
+        print "the version of django is too old (1.2 required, found %s)" % django.get_version()
         not_installed.append("django")
 except ImportError:
     print "django is not installed, see http://djangoproject.com"
@@ -66,10 +66,10 @@ except ImportError:
 
 try:
     import pygraphviz
-    if pygraphviz.__version__ >= "0.99.1":
+    if tuple(pygraphviz.__version__.split(".")) >= (1, 1):
         installed.append("django")
     else:
-        print "the version of pygraphviz is too old (0.99.1 required, found %s)" % pygraphviz.__version__
+        print "the version of pygraphviz is too old (1.1 required, found %s)" % pygraphviz.__version__
         not_installed.append("pygraphviz")
 except ImportError:
     print "pygraphviz is not installed, see http://networkx.lanl.gov/pygraphviz/"
