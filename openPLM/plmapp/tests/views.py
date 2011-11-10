@@ -46,11 +46,12 @@ class CommonViewTest(BaseTestCase):
     TYPE = "Part"
     CONTROLLER = PartController
     DATA = {}
+    REFERENCE = "Part1"
 
     def setUp(self):
         super(CommonViewTest, self).setUp()
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
-        self.controller = self.CONTROLLER.create("Part1", self.TYPE, "a",
+        self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
                                                  self.user, self.DATA)
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
                                               self.controller.reference,
@@ -776,4 +777,11 @@ class MechantUserViewTest(TestCase):
         obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, '')
         self.assertEqual(response.template.name, "error.html")
+
+class SpecialCharactersPartViewTestCase(PartViewTestCase):
+    REFERENCE = u"Pa *-\xc5\x93\xc3\xa9'"
+
+
+class SpecialCharactersDocumentViewTestCase(DocumentViewTestCase):
+    REFERENCE = u"Pa *-\xc5\x93\xc3\xa9'"
 
