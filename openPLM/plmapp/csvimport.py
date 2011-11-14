@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from openPLM.plmapp import models
 from openPLM.plmapp.unicodecsv import UnicodeReader
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
+from openPLM.plmapp.tasks import update_indexes
 
 
 # function that replace spaces by an underscore
@@ -140,17 +141,7 @@ class CSVImporter(object):
         return Preview(self.csv_file, self.encoding, self.get_headers_set())
 
     @transaction.commit_on_success
-    def import_csv(self, headers):
-        """
-        Imports the csv file. *headers* is the list of headers as given by the
-        user. Columns whose header is `None` are ignored.
-        *headers* must contains all values of :attr:`REQUIRED_HEADERS`.
-
-        If one or several errors occur (missing headers, row which can not be
-        parsed), a :exc:`CSVImportError` is raised with all detected errors.
-
-        :return: A list of :class:`.PLMObjectController` of all created objects.
-        """
+    def __do_import_csv(self, headers):
         self.csv_file.seek(0)
         reader = UnicodeReader(self.csv_file, encoding=self.encoding)
         self.headers_dict = dict((h, i) for i, h in enumerate(headers))
@@ -170,9 +161,32 @@ class CSVImporter(object):
                 self.store_errors(line + 2, e)
         if self._errors:
             raise CSVImportError(self._errors)
+
+    def import_csv(self, headers):
+        """
+        Imports the csv file. *headers* is the list of headers as given by the
+        user. Columns whose header is `None` are ignored.
+        *headers* must contains all values of :attr:`REQUIRED_HEADERS`.
+
+        If one or several errors occur (missing headers, row which can not be
+        parsed), a :exc:`CSVImportError` is raised with all detected errors.
+
+        :return: A list of :class:`.PLMObjectController` of all created objects.
+        """
+        # puts all stuff in a private method so we call tear_down only after
+        # after a database commit 
+        self.__do_import_csv(headers)
+        self.tear_down()
+        return self.objects
+
+    def tear_down(self):
+        """
+        Method called once *all* rows have been successfully parsed.
+
+        By default, this method sends all blocked mails.
+        """
         for obj in self.objects:
             obj.unblock_mails()
-        return self.objects
 
     def store_errors(self, line, *errors):
         """
@@ -251,6 +265,14 @@ class PLMObjectsImporter(CSVImporter):
         return set().union(*(cls.get_creation_fields()
             for cls in models.get_all_plmobjects().itervalues()))
 
+    def tear_down(self):
+        super(PLMObjectsImporter, self).tear_down()
+        instances = []
+        for obj in self.objects:
+            instance = obj.object
+            instances.append((instance._meta.app_label,
+                    instance._meta.module_name, instance._get_pk_val()))
+        update_indexes.delay(instances) 
 
     def parse_row(self, line, row):
         """
@@ -278,7 +300,7 @@ class PLMObjectsImporter(CSVImporter):
                     in form.errors.iteritems())
             self.store_errors(line, *items)
         else:
-            obj = PLMObjectController.create_from_form(form, self.user, True)
+            obj = PLMObjectController.create_from_form(form, self.user, True, True)
             self.objects.append(obj)
 
 
