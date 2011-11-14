@@ -30,16 +30,11 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.core.files import File
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+import openPLM.plmapp.exceptions as exc
+import openPLM.plmapp.models as models
+from openPLM.plmapp.controllers import PartController, DocumentController
+from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.controllers.plmobject import ControllerTest
 
@@ -74,9 +69,9 @@ class DocumentControllerTest(ControllerTest):
         self.failIf(self.controller.is_editable)
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
-        lc = Lifecycle.from_lifecyclelist(lcl)
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.controller.lifecycle = lc
-        self.controller.state = State.objects.get(name="draft")
+        self.controller.state = models.State.objects.get(name="draft")
         self.controller.save()
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
@@ -94,7 +89,7 @@ class DocumentControllerTest(ControllerTest):
         "Error : already locked"
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
-        self.assertRaises(LockError, self.controller.lock, d)
+        self.assertRaises(exc.LockError, self.controller.lock, d)
     
     def test_lock_error2(self):
         "Error : bad file"
@@ -113,7 +108,7 @@ class DocumentControllerTest(ControllerTest):
     
     def test_unlock_error1(self):
         d = self.controller.add_file(self.get_file())
-        self.assertRaises(UnlockError, self.controller.unlock, d)
+        self.assertRaises(exc.UnlockError, self.controller.unlock, d)
 
     def test_unlock_error2(self):
         user = User(username="baduser")
@@ -122,7 +117,7 @@ class DocumentControllerTest(ControllerTest):
         controller = self.CONTROLLER(self.controller.object, user)
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
-        self.assertRaises(UnlockError, controller.unlock, d)
+        self.assertRaises(exc.UnlockError, controller.unlock, d)
     
     def test_unlock_error3(self):
         "Error : bad file"
@@ -182,7 +177,7 @@ class DocumentControllerTest(ControllerTest):
         self.controller.add_file(self.get_file())
         f2 = self.controller.files.all()[0]
         self.controller.lock(f2)
-        self.assertRaises(DeleteFileError, self.controller.delete_file, f2)
+        self.assertRaises(exc.DeleteFileError, self.controller.delete_file, f2)
 
     def test_delete_file_error2(self):
         "Error : bad file"
@@ -202,7 +197,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertRaises(TypeError, self.controller.attach_to_part, self)
 
     def test_attach_to_part_error3(self):
-        obj = PLMObject.objects.create(reference="obj", type="PLMObject",
+        obj = models.PLMObject.objects.create(reference="obj", type="PLMObject",
                            revision="a", creator=self.user, owner=self.user,
                            group=self.group)
         self.assertRaises(TypeError, self.controller.attach_to_part, obj)
@@ -264,22 +259,22 @@ class DocumentControllerTest(ControllerTest):
         user.save()
         user.groups.add(self.group)
         controller = self.CONTROLLER(self.controller.object, user)
-        PLMObjectUserLink.objects.create(user=user, role="owner",
+        models.PLMObjectUserLink.objects.create(user=user, role="owner",
                                          plmobject=controller.object)
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
-        self.assertRaises(UnlockError, controller.checkin, d,
+        self.assertRaises(exc.UnlockError, controller.checkin, d,
                           self.get_file())
     
     def test_checkin_errors3(self):
         user = User(username="baduser")
         user.set_password("password")
         user.save()
-        DelegationLink.objects.create(delegator=self.user, delegatee=user,
-                role=ROLE_OWNER)
+        models.DelegationLink.objects.create(delegator=self.user, delegatee=user,
+                role=models.ROLE_OWNER)
         controller = self.CONTROLLER(self.controller.object, user)
         d = self.controller.add_file(self.get_file())
-        self.assertRaises(PermissionError, controller.checkin, d,
+        self.assertRaises(exc.PermissionError, controller.checkin, d,
                           self.get_file())
 
     def test_add_thumbnail(self):
@@ -300,42 +295,4 @@ class DocumentControllerTest(ControllerTest):
         revb = self.controller.revise("b")
         f3 = revb.files.all()[0]
         self.assertNotEquals(f2.thumbnail.path, f3.thumbnail.path)
-
-
-class OfficeTest(DocumentControllerTest):
-    TYPE = "OfficeDocument"
-    CONTROLLER = OfficeDocumentController
-    DATA = {}
-
-    def test_add_odt(self):
-        # format a4, 3 pages
-        f = file("datatests/office_a4_3p.odt", "rb")
-        my_file = File(f)
-        self.controller.add_file(my_file)
-        self.assertEquals(self.controller.nb_pages, 3)
-        self.assertEquals(self.controller.format, "A4")
-        f2 = self.controller.files.all()[0]
-        self.failUnless(f2.file.path.endswith(".odt"))
-        self.controller.delete_file(f2)
-
-    def test_add_odt2(self):
-        # fake odt
-        # No exceptions should be raised
-        self.controller.add_file(self.get_file("plop.odt"))
-        f2 = self.controller.files.all()[0]
-        self.controller.delete_file(f2)
-
-    def test_add_odt3(self):
-        # do not update fields
-        f = file("datatests/office_a4_3p.odt", "rb")
-        my_file = File(f)
-        self.controller.add_file(my_file, False)
-        self.assertEquals(self.controller.nb_pages, None)
-        f2 = self.controller.files.all()[0]
-        self.controller.delete_file(f2)
-
-class DesignTest(DocumentControllerTest):
-    TYPE = "Drawing"
-    CONTROLLER = DrawingController
-    DATA = {}
 

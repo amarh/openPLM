@@ -29,7 +29,7 @@ This module contains test for filehandlers stuff.
 import os.path
 from django.test import TestCase
 
-from openPLM.plmapp.filehandlers import *
+from openPLM.plmapp.filehandlers import HandlersManager, ODFHandler
 
 class FileHandlerTest(TestCase):
     FILE_TYPE = ".odt"

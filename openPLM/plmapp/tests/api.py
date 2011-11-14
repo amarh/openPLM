@@ -7,7 +7,6 @@ from openPLM.plmapp.controllers.document import DocumentController
 
 class ApiTestCase(CommonViewTest):
 
-
     def get(self, url, **get):
         return JSONDecoder().decode(self.client.get(url, get,
                 HTTP_USER_AGENT="openplm").content)

@@ -26,22 +26,44 @@
 This file demonstrates two different styles of tests (one doctest and one
 unittest). These will both pass when you run "manage.py test".
 
-Replace these with more appropriate tests for your application.
 """
 
-from django.test import TestCase
+from django.core.files.base import File
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
+from openPLM.office.models import OfficeDocumentController
+from openPLM.plmapp.tests.controllers.document import DocumentControllerTest
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
 
->>> 1 + 1 == 2
-True
-"""}
+class OfficeTest(DocumentControllerTest):
+    TYPE = "OfficeDocument"
+    CONTROLLER = OfficeDocumentController
+    DATA = {}
+
+    def test_add_odt(self):
+        # format a4, 3 pages
+        f = file("datatests/office_a4_3p.odt", "rb")
+        my_file = File(f)
+        self.controller.add_file(my_file)
+        self.assertEquals(self.controller.nb_pages, 3)
+        self.assertEquals(self.controller.format, "A4")
+        f2 = self.controller.files.all()[0]
+        self.failUnless(f2.file.path.endswith(".odt"))
+        self.controller.delete_file(f2)
+
+    def test_add_odt2(self):
+        # fake odt
+        # No exceptions should be raised
+        self.controller.add_file(self.get_file("plop.odt"))
+        f2 = self.controller.files.all()[0]
+        self.controller.delete_file(f2)
+
+    def test_add_odt3(self):
+        # do not update fields
+        f = file("datatests/office_a4_3p.odt", "rb")
+        my_file = File(f)
+        self.controller.add_file(my_file, False)
+        self.assertEquals(self.controller.nb_pages, None)
+        f2 = self.controller.files.all()[0]
+        self.controller.delete_file(f2)
+
 
