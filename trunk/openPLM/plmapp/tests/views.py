@@ -32,13 +32,14 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from openPLM.plmapp import forms
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+from openPLM.plmapp.utils import level_to_sign_str
+import openPLM.plmapp.models as m
+from openPLM.plmapp.controllers import DocumentController, PartController, \
+        UserController
+from openPLM.plmapp.lifecycle import LifecycleList
+#from openPLM.computer.models import *
+#from openPLM.office.models import *
+#from openPLM.cad.models import *
 
 from openPLM.plmapp.tests.base import BaseTestCase
         
@@ -105,12 +106,12 @@ class ViewTest(CommonViewTest):
                 "revision" : "a",
                 "name" : "MaPart",
                 "group" : str(self.group.id),
-                "lifecycle" : get_default_lifecycle().pk,
-                "state" : get_default_state().pk,
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
                 })
 
         response = self.post("/object/create/", data, page="attributes")
-        obj = PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual(obj.id, response.context["obj"].id)
         self.assertEqual("MaPart", obj.name)
         self.assertEqual(self.user, obj.owner)
@@ -131,7 +132,7 @@ class ViewTest(CommonViewTest):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
         response = self.post(self.base_url + "modify/", data)
-        obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
+        obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, data["name"])
 
     def test_lifecycle(self):
@@ -148,9 +149,9 @@ class ViewTest(CommonViewTest):
         # demote
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
-        lc = Lifecycle.from_lifecyclelist(lcl)
+        lc = m.Lifecycle.from_lifecyclelist(lcl)
         self.controller.lifecycle = lc
-        self.controller.state = State.objects.get(name="draft")
+        self.controller.state = m.State.objects.get(name="draft")
         self.controller.save()
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
@@ -169,7 +170,7 @@ class ViewTest(CommonViewTest):
         add_revision_form = response.context["add_revision_form"]
         self.assertEqual(add_revision_form.data, {"revision": "b"})
         response = self.post(self.base_url + "revisions/", {"revision" :"b"})
-        get_all_plmobjects()[self.TYPE].objects.get(reference=self.controller.reference,
+        m.get_all_plmobjects()[self.TYPE].objects.get(reference=self.controller.reference,
                 revision="b")
     
     def test_history(self):
@@ -207,13 +208,13 @@ class ViewTest(CommonViewTest):
     def test_management_add_post(self):
         data = dict(type="User", username=self.brian.username)
         response = self.post(self.base_url + "management/add/", data)
-        self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
-            user=self.brian, role=ROLE_NOTIFIED))
+        self.assertTrue(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=m.ROLE_NOTIFIED))
 
     def test_management_replace_get(self):
         role = level_to_sign_str(0)
         self.controller.set_signer(self.brian, role)
-        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         response = self.get(self.base_url + "management/replace/%d/" % link.id,
                 link=True, page="management")
@@ -224,24 +225,24 @@ class ViewTest(CommonViewTest):
     def test_management_replace_post(self):
         role = level_to_sign_str(0)
         self.controller.set_signer(self.brian, role)
-        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         data = dict(type="User", username=self.user.username)
         response = self.post(self.base_url + "management/replace/%d/" % link.id,
                         data)
-        self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertFalse(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=role))
-        self.assertTrue(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertTrue(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.user, role=role))
 
     def test_management_delete(self):
         self.controller.add_notified(self.brian)
-        link = PLMObjectUserLink.objects.get(plmobject=self.controller.object,
-            user=self.brian, role=ROLE_NOTIFIED)
+        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+            user=self.brian, role=m.ROLE_NOTIFIED)
         data = {"link_id" : link.id }
         response = self.post(self.base_url + "management/delete/", data)
-        self.assertFalse(PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
-            user=self.brian, role=ROLE_NOTIFIED))
+        self.assertFalse(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=m.ROLE_NOTIFIED))
 
 
 class DocumentViewTestCase(ViewTest):
@@ -482,7 +483,7 @@ class UserViewTestCase(CommonViewTest):
         response = self.get(self.user_url + "delegation/")
         
     def test_delegation_remove(self):
-        self.controller.delegate(self.brian, ROLE_OWNER)
+        self.controller.delegate(self.brian, m.ROLE_OWNER)
         link = self.controller.get_user_delegation_links()[0]
         data = {"link_id" : link.id }
         response = self.post(self.user_url + "delegation/", data)
@@ -507,7 +508,7 @@ class UserViewTestCase(CommonViewTest):
         for role in ("owner", "notified"):
             url = self.user_url + "delegation/delegate/%s/" % role
             response = self.post(url, data)
-            DelegationLink.objects.get(role=role, delegator=self.user,
+            m.DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
 
     def test_delegate_sign_post(self):
@@ -516,7 +517,7 @@ class UserViewTestCase(CommonViewTest):
             url = self.user_url + "delegation/delegate/sign/%d/" % level
             response = self.post(url, data)
             role = level_to_sign_str(level - 1)
-            DelegationLink.objects.get(role=role,
+            m.DelegationLink.objects.get(role=role,
                 delegator=self.user, delegatee=self.brian)
 
     def test_delegate_sign_all_post(self):
@@ -526,7 +527,7 @@ class UserViewTestCase(CommonViewTest):
         response = self.post(url, data)
         for level in xrange(2):
             role = level_to_sign_str(level)
-            DelegationLink.objects.get(role=role, delegator=self.user,
+            m.DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
     
 def sorted_objects(l):
@@ -573,7 +574,7 @@ class SearchViewTestCase(CommonViewTest):
     def test_empty(self):
         "Test a search with an empty database"
         # clear all plmobject so results is empty
-        for obj in PLMObject.objects.all():
+        for obj in m.PLMObject.objects.all():
             obj.delete()
         results = self.search({"type" : self.TYPE}) 
         self.assertEqual(results, [])
@@ -585,7 +586,7 @@ class SearchViewTestCase(CommonViewTest):
 
     def test_plmobject(self):
         # add a plmobject : the search should return the same results
-        PLMObject.objects.create(reference="aa", type="PLMObject", 
+        m.PLMObject.objects.create(reference="aa", type="PLMObject", 
                                      revision="c", owner=self.user,
                                      creator=self.user, group=self.group)
         results = self.search({"type" : self.TYPE}) 
@@ -656,7 +657,7 @@ class SearchViewTestCase(CommonViewTest):
             self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",
                     self.user, self.DATA)
         results = self.search("*", self.TYPE)
-        self.assertEqual(set(Part.objects.all()), set(results))
+        self.assertEqual(set(m.Part.objects.all()), set(results))
 
     def test_search_not(self):
         results = self.search("NOT %s" % self.controller.name, self.TYPE)
@@ -698,7 +699,7 @@ class MechantUserViewTest(TestCase):
         self.user.save()
         self.user.get_profile().is_contributor = True
         self.user.get_profile().save()
-        self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
+        self.group = m.GroupInfo(name="grp", owner=self.user, creator=self.user,
                 description="grp")
         self.group.save()
         self.user.groups.add(self.group)
@@ -713,7 +714,7 @@ class MechantUserViewTest(TestCase):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
         response = self.client.post(self.base_url + "modify/", data, follow=True)
-        obj = get_all_plmobjects()[self.TYPE].objects.all()[0]
+        obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, '')
         self.assertEqual(response.template.name, "error.html")
 
