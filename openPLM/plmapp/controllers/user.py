@@ -36,6 +36,7 @@ from django.contrib.sites.models import Site
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
+from openPLM.plmapp.tasks import update_index
 from openPLM.plmapp.utils import generate_password
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
@@ -152,6 +153,7 @@ class UserController(Controller):
         """
         self.object.get_profile().save()
         super(UserController, self).save(with_history)
+        update_index.delay("auth", "user", self.object.pk)
 
     def has_permission(self, role):
         if role == models.ROLE_OWNER:
@@ -249,6 +251,7 @@ class UserController(Controller):
                 "sponsor" : self._user,
                 "password" : password,
                }
+        update_index.delay("auth", "user", new_user.pk)
         self._send_mail(send_mail, "New account on openPLM", [new_user],
                 ctx, "mails/new_account") 
         models.UserHistory.objects.create(action="Create", user=self._user,
