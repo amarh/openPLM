@@ -172,6 +172,6 @@ def send_histories_mail(plmobject, roles, last_action, histories, user, blacklis
     histories = serialize(histories)
     user = CT.from_object(user)
     do_send_histories_mail.delay(plmobject, roles, last_action, histories, user, blacklist,
-              users, template)
+              convert_users(users), template)
 
 
