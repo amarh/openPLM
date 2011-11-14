@@ -1,7 +1,15 @@
 
+import os.path
+import shutil
 import cStringIO, StringIO
+from collections import defaultdict
+
+from django.conf import settings
+from django.core import mail
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
+
+from celery.signals import task_prerun
 
 from openPLM.plmapp.models import GroupInfo, PLMObject, ParentChildLink
 from openPLM.plmapp.csvimport import PLMObjectsImporter, BOMImporter,\
@@ -15,6 +23,7 @@ class CSVImportTestCase(TransactionTestCase):
 
     def setUp(self):
         super(CSVImportTestCase, self).setUp()
+        self.sent_tasks = defaultdict(list)
         self.cie = User.objects.create(username="company")
         p = self.cie.get_profile()
         p.is_contributor = True
@@ -23,6 +32,7 @@ class CSVImportTestCase(TransactionTestCase):
                 owner=self.cie, creator=self.cie)
         self.cie.groups.add(self.leading_group)
         self.user = User(username="user")
+        self.user.email = "test@example.net"
         self.user.set_password("password")
         self.user.save()
         self.user.get_profile().is_contributor = True
@@ -32,7 +42,18 @@ class CSVImportTestCase(TransactionTestCase):
         self.group.save()
         self.user.groups.add(self.group)
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
+        self.handler = task_prerun.connect(self.task_sent_handler)
 
+    def task_sent_handler(self, sender=None, task_id=None, task=None, args=None,
+                      kwargs=None, **kwds):
+        self.sent_tasks[task.name].append(task)
+
+    def tearDown(self):
+        super(CSVImportTestCase, self).tearDown()
+        task_prerun.disconnect(self.handler)
+        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
+            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
+        
     def get_valid_rows(self):
         return [[u'Type',
               u'reference',
@@ -94,6 +115,8 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertEquals(len(csv_rows) - 1, len(objects))
         sp1 = get_obj("SinglePart", "sp1", "s", self.user)
         self.assertEquals("SP1", sp1.name)
+        self.assertEqual(len(mail.outbox), len(objects))
+        self.assertEqual(1, len(self.sent_tasks["openPLM.plmapp.tasks.update_indexes"]))
 
     def test_import_csv_invalid_last_row(self):
         """
@@ -107,6 +130,8 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertRaises(CSVImportError, self.import_csv,
                 PLMObjectsImporter, csv_rows)
         self.assertEquals(plmobjects, list(PLMObject.objects.all()))
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(self.sent_tasks["openPLM.plmapp.tasks.update_indexes"])
 
     def get_valid_bom(self):
         return [["parent-type", "parent-reference", "parent-revision",

@@ -25,9 +25,6 @@
 """
 This module contains some tests for openPLM.
 """
-import os.path
-import shutil
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -58,12 +55,6 @@ class CommonViewTest(BaseTestCase):
         brian.get_profile().is_contributor = True
         brian.get_profile().save()
         self.brian = brian
-
-    def tearDown(self):
-        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
-            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
-        
-        super(CommonViewTest, self).tearDown()
 
     def post(self, url, data=None, follow=True, status_code=200,
             link=False, page=""):

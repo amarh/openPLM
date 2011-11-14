@@ -341,7 +341,9 @@ class BOMImporter(CSVImporter):
         child = get_obj(ctype, creference, crevision, self.user)
 
         parent.block_mails()
+        parent.object.no_index = True
         child.block_mails()
+        child.object.no_index = True
         self.objects.append(parent)
         self.objects.append(child)
 

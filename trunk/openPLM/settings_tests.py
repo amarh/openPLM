@@ -105,9 +105,7 @@ INSTALLED_APPS = (
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 ######################
 # openPLM's settings #
 ######################
@@ -144,11 +142,14 @@ HAYSTACK_INCLUDE_SPELLING = True
 EXTRACTOR = os.path.abspath("bin/extractor.sh")
 
 # celery stuff
+BROKER_BACKEND = "memory"
+CELERY_ALWAYS_EAGER = True
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
 import djcelery
 djcelery.setup_loader()
 
-BROKER_BACKEND = "memory"
-CELERY_ALWAYS_EAGER = True
-
 COMPANY = "company"
+
+TEST_RUNNER = "openPLM.plmapp.tests.runner.OpenPLMTestSuiteRunner"
 
