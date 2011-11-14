@@ -37,9 +37,6 @@ import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import DocumentController, PartController, \
         UserController
 from openPLM.plmapp.lifecycle import LifecycleList
-#from openPLM.computer.models import *
-#from openPLM.office.models import *
-#from openPLM.cad.models import *
 
 from openPLM.plmapp.tests.base import BaseTestCase
         
@@ -665,19 +662,6 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("NOT nothing", self.TYPE)
         self.assertEqual([self.controller.object], results)
 
-
-class HardDiskViewTest(ViewTest):
-    TYPE = "HardDisk"
-    DATA = {"capacity_in_go" : 500,
-            "supplier" : "ASupplier"}
-    
-    def test_display_attributes2(self):
-        response = self.get(self.base_url + "attributes/")
-        self.failUnless(response.context["object_attributes"])
-        attributes = dict(response.context["object_attributes"])
-        self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
-        self.assertEqual(attributes["supplier"], self.DATA["supplier"])
-        self.assertEqual(attributes["tech details"], "")
 
 class MechantUserViewTest(TestCase):
     """

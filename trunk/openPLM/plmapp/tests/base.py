@@ -3,14 +3,8 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+from openPLM.plmapp.models import GroupInfo
+from openPLM.plmapp.controllers import PLMObjectController
 
 
 class BaseTestCase(TestCase):

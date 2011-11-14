@@ -28,8 +28,9 @@ This module contains test for lifecycle stuff.
 
 from django.test import TestCase
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.models import *
+from openPLM.plmapp.models import Lifecycle, get_default_lifecycle, \
+        get_default_state, LifecycleStates
+from openPLM.plmapp.lifecycle import LifecycleList
 
 class LifecycleTest(TestCase):
     def test_get_default(self):

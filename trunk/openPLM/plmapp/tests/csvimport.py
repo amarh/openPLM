@@ -3,24 +3,15 @@ import cStringIO, StringIO
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
-from openPLM.plmapp.csvimport import *
-from openPLM.plmapp.unicodecsv import *
-from openPLM.plmapp.base_views import *
+from openPLM.plmapp.models import GroupInfo, PLMObject, ParentChildLink
+from openPLM.plmapp.csvimport import PLMObjectsImporter, BOMImporter,\
+        CSVImportError
+from openPLM.plmapp.base_views import get_obj
+from openPLM.plmapp.unicodecsv import UnicodeWriter
 from openPLM.plmapp.forms import CSVForm
 
 
 class CSVImportTestCase(TransactionTestCase):
-    CONTROLLER = PLMObjectController
-    TYPE = "Part"
-    DATA = {}
 
     def setUp(self):
         super(CSVImportTestCase, self).setUp()
@@ -40,7 +31,6 @@ class CSVImportTestCase(TransactionTestCase):
                 description="grp")
         self.group.save()
         self.user.groups.add(self.group)
-        self.DATA["group"] = self.group
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
 
     def get_valid_rows(self):

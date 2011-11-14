@@ -28,14 +28,7 @@ This module contains some tests for openPLM.
 
 import datetime
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+from openPLM.plmapp.controllers import PLMObjectController, PartController
 
 from openPLM.plmapp.tests.controllers.plmobject import ControllerTest
 
@@ -177,11 +170,5 @@ class PartControllerTest(ControllerTest):
         self.controller.add_child(self.controller2, 10, 15)
         self.controller.promote()
         self.failIf(self.controller.is_promotable())
-
-
-class HardDiskControllerTest(PartControllerTest):
-    TYPE = "HardDisk"
-    CONTROLLER = SinglePartController
-    DATA = {"capacity_in_go" : 500}
 
 

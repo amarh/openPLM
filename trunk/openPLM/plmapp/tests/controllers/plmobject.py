@@ -29,14 +29,11 @@ This module contains some tests for openPLM.
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
-from openPLM.plmapp.lifecycle import *
-from openPLM.computer.models import *
-from openPLM.office.models import *
-from openPLM.cad.models import *
+from openPLM.plmapp.utils import level_to_sign_str
+import openPLM.plmapp.exceptions as exc
+import openPLM.plmapp.models as models
+from openPLM.plmapp.controllers import PLMObjectController
+from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -50,12 +47,15 @@ class ControllerTest(BaseTestCase):
         controller = self.create()
         self.assertEqual(controller.name, "")
         self.assertEqual(controller.type, self.TYPE)
-        self.assertEqual(type(controller.object), get_all_plmobjects()[self.TYPE])
-        obj = get_all_plmobjects()[self.TYPE].objects.get(reference=controller.reference,
+        self.assertEqual(type(controller.object), 
+                models.get_all_plmobjects()[self.TYPE])
+        type_ = models.get_all_plmobjects()[self.TYPE]
+        obj = type_.objects.get(reference=controller.reference,
                 revision=controller.revision, type=controller.type)
         self.assertEqual(obj.owner, self.user)
         self.assertEqual(obj.creator, self.user)
-        PLMObjectUserLink.objects.get(plmobject=obj, user=self.user, role="owner")
+        models.PLMObjectUserLink.objects.get(plmobject=obj, user=self.user,
+                role=models.ROLE_OWNER)
         self.failUnless(obj.is_editable)
 
     def test_create_error1(self):
@@ -97,7 +97,7 @@ class ControllerTest(BaseTestCase):
         def fail():
             controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
                                             self.user, self.DATA)
-        self.assertRaises(PermissionError, fail)
+        self.assertRaises(exc.PermissionError, fail)
 
     def test_keys(self):
         controller = self.create("Part1")
@@ -131,12 +131,12 @@ class ControllerTest(BaseTestCase):
         controller.promote()
         self.assertEqual(controller.state.name, "official")
         self.failIf(controller.is_editable)
-        self.assertRaises(PromotionError, controller.demote)
+        self.assertRaises(exc.PromotionError, controller.demote)
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
-        lc = Lifecycle.from_lifecyclelist(lcl)
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
         controller.lifecycle = lc
-        controller.state = State.objects.get(name="draft")
+        controller.state = models.State.objects.get(name="draft")
         controller.save()
         controller.promote()
         self.assertEqual(controller.state.name, "issue1")
@@ -153,19 +153,19 @@ class ControllerTest(BaseTestCase):
         self.assertEqual(rev.revision, "b")
         def fail():
             controller.revise("b2")
-        self.assertRaises(RevisionError, fail)
+        self.assertRaises(exc.RevisionError, fail)
         for attr in controller.get_modification_fields():
             self.assertEqual(getattr(controller, attr), getattr(rev, attr))
 
     def test_revise_error1(self):
         "Revision : error : empty name"
         controller = self.create("Part1")
-        self.assertRaises(RevisionError, controller.revise, "")
+        self.assertRaises(exc.RevisionError, controller.revise, "")
     
     def test_revise_error2(self):
         "Revision : error : same revision name"
         controller = self.create("Part1")
-        self.assertRaises(RevisionError, controller.revise, "a")
+        self.assertRaises(exc.RevisionError, controller.revise, "a")
 
     def test_set_owner(self):
         controller = self.create("Part1")
@@ -180,7 +180,7 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()
-        self.assertRaises(PermissionError, controller.set_owner, user)
+        self.assertRaises(exc.PermissionError, controller.set_owner, user)
 
     def test_set_sign1(self):
         controller = self.create("Part1")
@@ -189,7 +189,7 @@ class ControllerTest(BaseTestCase):
         user.get_profile().is_contributor = True
         user.get_profile().save()
         controller.set_signer(user, level_to_sign_str(0))
-        link = PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+        link = models.PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
@@ -200,7 +200,7 @@ class ControllerTest(BaseTestCase):
         user.save()
         user.get_profile().is_contributor = True
         user.get_profile().save()
-        self.assertRaises(PermissionError, controller.set_role, user,
+        self.assertRaises(exc.PermissionError, controller.set_role, user,
                           level_to_sign_str(1664))
 
     def test_set_sign_error2(self):
@@ -208,7 +208,7 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()
-        self.assertRaises(PermissionError, controller.set_role, user,
+        self.assertRaises(exc.PermissionError, controller.set_role, user,
                           level_to_sign_str(0))
 
     def test_add_notified(self):
@@ -216,16 +216,16 @@ class ControllerTest(BaseTestCase):
         user = User(username="user2")
         user.save()
         controller.add_notified(user)
-        PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
+        models.PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
                                       role="notified")
 
     def test_remove_notified(self):
         controller = self.create("Part1")
         controller.add_notified(self.user)
-        PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
+        models.PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         controller.remove_notified(self.user)
-        self.assertEqual(0, len(PLMObjectUserLink.objects.filter(
+        self.assertEqual(0, len(models.PLMObjectUserLink.objects.filter(
             plmobject=controller.object, role="notified")))
 
     def test_set_role(self):
@@ -237,10 +237,10 @@ class ControllerTest(BaseTestCase):
         controller.set_role(user, "owner")
         self.assertEqual(controller.owner, user)
         controller.set_role(self.user, "notified")
-        PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
+        models.PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         controller.set_role(user, level_to_sign_str(0))
-        link = PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+        link = models.PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
@@ -254,5 +254,5 @@ class ControllerTest(BaseTestCase):
         def always_false():
             return False
         controller.object.is_promotable = always_false
-        self.assertRaises(PromotionError, controller.promote)
+        self.assertRaises(exc.PromotionError, controller.promote)
 

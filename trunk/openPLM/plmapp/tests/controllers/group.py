@@ -29,10 +29,8 @@ This module contains some tests for openPLM.
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 
-from openPLM.plmapp.utils import *
-from openPLM.plmapp.exceptions import *
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers import *
+from openPLM.plmapp.models import GroupInfo, Invitation, get_all_plmobjects
+from openPLM.plmapp.controllers import GroupController
 from openPLM.plmapp.forms import get_creation_form, get_user_formset
 
 from openPLM.plmapp.tests.base import BaseTestCase

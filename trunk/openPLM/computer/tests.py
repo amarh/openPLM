@@ -29,19 +29,26 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 """
 
-from django.test import TestCase
+from openPLM.computer.models import SinglePartController
+from openPLM.plmapp.tests.views import ViewTest
+from openPLM.plmapp.tests.controllers.part import PartControllerTest
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
+class HardDiskViewTest(ViewTest):
+    TYPE = "HardDisk"
+    DATA = {"capacity_in_go" : 500,
+            "supplier" : "ASupplier"}
+    
+    def test_display_attributes2(self):
+        response = self.get(self.base_url + "attributes/")
+        self.failUnless(response.context["object_attributes"])
+        attributes = dict(response.context["object_attributes"])
+        self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
+        self.assertEqual(attributes["supplier"], self.DATA["supplier"])
+        self.assertEqual(attributes["tech details"], "")
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
+class HardDiskControllerTest(PartControllerTest):
+    TYPE = "HardDisk"
+    CONTROLLER = SinglePartController
+    DATA = {"capacity_in_go" : 500}
 
->>> 1 + 1 == 2
-True
-"""}
 
