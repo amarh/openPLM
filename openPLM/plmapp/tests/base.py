@@ -6,6 +6,9 @@ from django.test import TestCase
 from openPLM.plmapp.models import GroupInfo
 from openPLM.plmapp.controllers import PLMObjectController
 
+import os.path
+import shutil
+from django.conf import settings
 
 class BaseTestCase(TestCase):
     CONTROLLER = PLMObjectController
@@ -22,6 +25,7 @@ class BaseTestCase(TestCase):
         self.cie.groups.add(self.leading_group)
         self.user = User(username="user")
         self.user.set_password("password")
+        self.user.email = "test@example.net"
         self.user.save()
         self.user.get_profile().is_contributor = True
         self.user.get_profile().save()
@@ -38,4 +42,9 @@ class BaseTestCase(TestCase):
         f = ContentFile(data)
         f.name = name
         return f
+
+    def tearDown(self):
+        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
+            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
+        super(BaseTestCase, self).tearDown()
 
