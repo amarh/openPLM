@@ -59,7 +59,7 @@ def set_template_name(index):
 class QueuedModelSearchIndex(ModelSearchIndex, QueuedSearchIndex):
     pass
 
-class UserIndex(QueuedModelSearchIndex):
+class UserIndex(ModelSearchIndex):
     class Meta:
         pass
     
@@ -69,8 +69,21 @@ class UserIndex(QueuedModelSearchIndex):
 set_template_name(UserIndex)
 site.register(models.User, UserIndex)
 
+class GroupIndex(ModelSearchIndex):
+    class Meta:
+        pass
+    
+    rendered = CharField(use_template=True, indexed=False)
+    rendered_add = CharField(use_template=True, indexed=False)
+
+set_template_name(GroupIndex)
+site.register(models.GroupInfo, GroupIndex)
+
+
 
 for key, model in models.get_all_plmobjects().iteritems():
+    if model == models.GroupInfo:
+        continue
     class ModelIndex(QueuedModelSearchIndex):
         model = model
         key = key

@@ -34,6 +34,7 @@ import datetime
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
+from openPLM.plmapp.tasks import update_index
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
 
@@ -86,6 +87,7 @@ class GroupController(Controller):
         res = cls(obj, user)
         user.groups.add(obj)
         res._save_histo("Create", details)
+        update_index.delay("plmapp", "groupinfo", obj.pk)
         return res
 
     @classmethod
@@ -205,4 +207,11 @@ class GroupController(Controller):
         invitation.validation_time = datetime.datetime.now()
         invitation.save()
         # TODO mail
-
+    
+    def save(self, with_history=True):
+        u"""
+        Saves :attr:`object` and records its history in the database.
+        If *with_history* is False, the history is not recorded.
+        """
+        super(GroupController, self).save(with_history)
+        update_index.delay("plmapp", "groupinfo", self.object.pk)
