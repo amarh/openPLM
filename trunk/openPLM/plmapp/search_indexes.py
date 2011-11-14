@@ -42,7 +42,9 @@ to update this to handle deletes as well (with a delete task).
         signals.post_delete.disconnect(self.enqueue_delete, sender=model)
 
     def enqueue_save(self, instance, **kwargs):
-        update_index.delay(instance._meta.app_label, instance._meta.module_name, instance._get_pk_val())
+        if not getattr(instance, "no_index", False):
+            update_index.delay(instance._meta.app_label,
+                    instance._meta.module_name, instance._get_pk_val())
 
     def enqueue_delete(self, instance, **kwargs):
         remove_instance_from_index(instance)

@@ -59,7 +59,8 @@ class PLMObjectController(Controller):
     HISTORY = models.History
     
     @classmethod
-    def create(cls, reference, type, revision, user, data={}, block_mails=False):
+    def create(cls, reference, type, revision, user, data={}, block_mails=False,
+            no_index=False):
         u"""
         This method builds a new :class:`.PLMObject` of
         type *class_* and return a :class:`PLMObjectController` associated to
@@ -90,6 +91,8 @@ class PLMObjectController(Controller):
         # create an object
         obj = class_(reference=reference, type=type, revision=revision,
                      owner=user, creator=user)
+        if no_index:
+            obj.no_index = True
         if data:
             for key, value in data.iteritems():
                 if key not in ["reference", "type", "revision"]:
@@ -120,7 +123,7 @@ class PLMObjectController(Controller):
         return res
         
     @classmethod
-    def create_from_form(cls, form, user, block_mails=False):
+    def create_from_form(cls, form, user, block_mails=False, no_index=False):
         u"""
         Creates a :class:`PLMObjectController` from *form* and associates *user*
         as the creator/owner of the PLMObject.
@@ -135,7 +138,8 @@ class PLMObjectController(Controller):
             ref = form.cleaned_data["reference"]
             type = form.Meta.model.__name__
             rev = form.cleaned_data["revision"]
-            obj = cls.create(ref, type, rev, user, form.cleaned_data, block_mails)
+            obj = cls.create(ref, type, rev, user, form.cleaned_data,
+                    block_mails, no_index)
             return obj
         else:
             raise ValueError("form is invalid")

@@ -48,11 +48,19 @@ def synchronized(cls):
 @synchronized
 @task(default_retry_delay = 5 * 60, max_retries = 1)
 def update_index(app_name, model_name, pk, **kwargs):
-    logger = update_index.get_logger(**kwargs)
     model_class = get_model(app_name, model_name)
     instance = model_class.objects.get(pk=pk)
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
+
+@synchronized
+@task(default_retry_delay = 5 * 60, max_retries = 1)
+def update_indexes(instances):
+    for app_name, model_name, pk in instances:
+        model_class = get_model(app_name, model_name)
+        instance = model_class.objects.get(pk=pk)
+        search_index = site.get_index(model_class)
+        search_index.update_object(instance)
 
 @task
 def add(a, b):
