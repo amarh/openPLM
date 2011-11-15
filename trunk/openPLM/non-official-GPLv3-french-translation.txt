@@ -875,4 +875,5 @@ bibliothèque. Si c’est ce que vous voulez faire, utilisez la Licence
 Générale Publique Limitée GNU au lieu de cette Licence ; mais d’abord,
 veuillez lire <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
+OKOK
 __________________________________________________________________
