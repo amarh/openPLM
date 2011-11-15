@@ -62,6 +62,9 @@ def _clean_revision(self):
         raise ValidationError(_("Bad revision: '#', '?', '/' and '..' are not allowed"))
     return re.sub("\s+", " ", data.strip(" "))
 
+INVALID_GROUP = _("Bad group, check that the group exists and that you belong"
+        " to this group.")
+
 def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
     Returns a creation form suitable to creates an object
@@ -92,8 +95,11 @@ def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
         get_creation_form.cache[cls] = Form
     form = Form(data=data, empty_permitted=empty_allowed) if data else Form()
     if issubclass(cls, m.PLMObject):
+        # display only valid groups
         groups = user.groups.all().values_list("id", flat=True)
-        form.fields["group"].queryset = m.GroupInfo.objects.filter(id__in=groups)
+        field = form.fields["group"]
+        field.queryset = m.GroupInfo.objects.filter(id__in=groups)
+        field.error_messages["invalid_choice"] = INVALID_GROUP
     return form
 get_creation_form.cache = {}
         
