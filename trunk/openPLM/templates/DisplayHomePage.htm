@@ -41,10 +41,12 @@
             <div class="reference">
                 {{result.rendered|safe}}
                 {% if navigate_bool %}
-                    <div class="toolbar">
-                        <button class="attach">{% trans "Attach" %}</button>
-                        <button class="add_child">{% trans "Add child" %}</button>
-                    </div>
+                    {% if result.object.is_part or result.object.is_document %}
+                        <div class="toolbar">
+                            <button class="attach">{% trans "Attach" %}</button>
+                            <button class="add_child">{% trans "Add child" %}</button>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
             <div class="summary">
