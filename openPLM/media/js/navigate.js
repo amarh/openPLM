@@ -219,29 +219,49 @@ function init(){
         // add stuff
         var cache1 = new Object();
         var cache2 = new Object();
-        $("div.main_node").droppable({
-			accept: 
-                function (child_tr){
-                    if (child_tr.is("li.Result")){
-                        return (can_add_child($(this), $("form", child_tr), cache1) ||
-                                can_attach($(this), $("form", child_tr), cache2)
-                                );
-                     }
-                    return false;
+        var main_node = $("div.main_node");
+        $("li.Result").hoverIntent(
+            function() { 
+                var li = $(this);
+                var form = li.children("form").first();
+                var add = can_add_child(main_node, form, cache1);
+                li.find("div.toolbar > button.add_child").button("option", "disabled", !add).button( "refresh" );
+                var attach = can_attach(main_node, form, cache2);
+                li.find("div.toolbar > button.attach").button("option", "disabled", !attach).button( "refresh" ); 
+
+            },
+            function() { 
+                $(this).find("div.toolbar > button").button("disable").button( "refresh" );
+            }
+        );
+
+        $("button.add_child").button({
+                icons: {
+                    primary: "ui-icon-plus"
                 },
-			activeClass: "drop_active",
-			hoverClass: "drop_hover",
-			drop: function( event, ui ) {
-                if (can_add_child($(this), $("form", ui.draggable), cache1)){
-                    show_add_child($(this), $("form", ui.draggable));
-                }
-                else if (can_attach($(this), $("form", ui.draggable), cache2)){
-                    show_attach($(this), $("form", ui.draggable));
-                }
-			}
-		});
-
-
+                text: false,
+                disabled: true
+            }).click(
+            function () {
+                var form = $(this).closest("li.Result").children("form");
+                show_add_child($("div.main_node"), form);
+            }
+        );
+        
+        $("button.attach").button({
+                icons: {
+                    primary: "ui-icon-link"
+                },
+                text: false,
+                disabled: true
+            }).click(
+            function () {
+                var form = $(this).closest("li.Result").children("form");
+                show_attach($("div.main_node"), form);
+            }
+        );
+        
+       
         $("#FilterNav").find("form").submit(function (e){
                 return false;
         });
@@ -319,17 +339,6 @@ cursor: 'crosshair'
 });
 
 
-
-        // add on drag and drop
-        $("li.Result").draggable({ 
-            zIndex: 2000,
-            cursor:"pointer",
-            cursorAt: { left: 16, top: -16} ,
-            helper: function (){
-                var div = $(this).find("div.reference").clone();
-                div.addClass("dragged");
-                return div;
-                }});
         $("#navAddForm").dialog({
             autoOpen: false,
 			height: 300,
