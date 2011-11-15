@@ -682,6 +682,26 @@ td.open span.expander:hover {
 }
 
 /** simple search **/
+li.Result {
+    padding-bottom: 0.5em;
+    display:block;
+}
+
+li.Result:hover {
+    background-color: #ccc !important;
+}
+
 li.Result div.summary {
     padding-left: 1em;
+    clear: both;
+}
+
+li.Result div.toolbar{
+    display:inline;
+    float: right;
+    margin: 2px;
+}
+li.Result div.toolbar button{
+    height: 16px;
+    width: 16px;
 }

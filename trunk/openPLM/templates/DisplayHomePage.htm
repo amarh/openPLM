@@ -40,6 +40,12 @@
             <li class="Result">
             <div class="reference">
                 {{result.rendered|safe}}
+                {% if navigate_bool %}
+                    <div class="toolbar">
+                        <button class="attach">{% trans "Attach" %}</button>
+                        <button class="add_child">{% trans "Add child" %}</button>
+                    </div>
+                {% endif %}
             </div>
             <div class="summary">
                 {{ result.highlighted.text|safe }}
@@ -47,7 +53,7 @@
             {% if link_creation or navigate_bool %}
                 <form method="post" action="." enctype="multipart/form-data">
                     {{result.rendered_add|safe}}
-                    {% if result.object|can_add:attach %}
+                    {% if link_creation and result.object|can_add:attach %}
                         <input type="submit" value="{% trans "ADD" %}"/>
                     {% endif %}
                 </form>
