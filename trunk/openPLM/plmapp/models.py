@@ -497,7 +497,8 @@ class PLMObject(models.Model):
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
-        return ["name",  "creator", "owner", "group", "ctime", "mtime"]
+        return ["type", "reference", "revision", "name", "creator", "owner",
+                "group", "ctime", "mtime"]
 
     @property
     def menu_items(self):
@@ -534,15 +535,21 @@ class PLMObject(models.Model):
     def excluded_modification_fields(cls):
         """
         Returns fields which should not be available in a modification form
+        """
+        return [ugettext_noop("type"), ugettext_noop("reference"),
+                ugettext_noop("revision"),
+                ugettext_noop("ctime"), ugettext_noop("creator"),
+                ugettext_noop("owner"), ugettext_noop("ctime"),
+                ugettext_noop("mtime"), ugettext_noop("group")]
+
+    @classmethod
+    def get_modification_fields(cls):
+        """
+        Returns fields which should be displayed in a modification form
         
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_modification_fields`
         """
-        return [ugettext_noop("creator"), ugettext_noop("owner"), ugettext_noop("ctime"), ugettext_noop("mtime"), ugettext_noop("group")]
-
-    @classmethod
-    def get_modification_fields(cls):
-        "Returns fields which should be displayed in a modification form"
         fields = []
         for field in cls().attributes:
             if field not in cls.excluded_modification_fields():
