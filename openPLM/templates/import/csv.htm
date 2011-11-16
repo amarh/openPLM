@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 
 {% block content %}
@@ -65,8 +65,8 @@
                     </tbody>
 
                 </table>
-                <input type="submit" value="{% trans "Validate" %}" name="_validate"/>
-                <input type="submit" value="{% trans "Undo" %}" name="_undo"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Undo" %}" name="_undo"/>
 
             </form>
         {% endif %}

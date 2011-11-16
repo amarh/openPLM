@@ -1,22 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-{% load i18n %}
+{% load i18n plmapp_tags %}
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="content-type" content="text/html" charset="ISO-8859-1"/>
-    <link type="text/css" href="/media/css/smoothness/jquery-ui-1.8.4.custom.css" rel="Stylesheet" /> 
+    <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
+    <link type="text/css" href="/media/css/openplm/jquery-ui.css" rel="Stylesheet" /> 
     <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
     
     {% block css %} {% endblock %}
     
     <title>{% block title %} {% endblock %}</title>
     <meta name="Robots" content="none"/>
-    <meta name="Author" content="philippe.joulaud pierre.cosquer" />
+    <meta name="Author" content="openplm" />
     <meta name="Classification" content="" />
     <meta name="Description" content="" />
     <meta name="keywords" content="" />
     <script type="text/javascript" src="/media/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/media/js/jquery-ui-1.8.4.custom.min.js"></script>
+    <script type="text/javascript" src="/media/js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/media/js/jquery.cookie.js"></script>
     <script type="text/javascript" src="/media/js/panels.js"></script>
    
@@ -24,12 +24,14 @@
     {% block scripts %} {% endblock %}
 
 </head>
-<!--<body onload="InitShowDiv()">-->
 <body>
   
 
     <div class="main-box" id="Page">
         <div class="top-box">
+            <div id="LoggedPersonBox">
+                {% block LoggedPersonBlock %}{% endblock %}
+            </div>
             <div id="DisplayBox">
                 <input type="checkbox" id="FindButton" />
                 <label for="FindButton">
@@ -45,37 +47,34 @@
 
                     {% if not creation_form %}
                         {% if navigate_bool %}
-                            <li class="ui-button ui-button-text ui-button-text-only ui-widget ui-state-focus ui-state-active  ui-corner-left" id="NavigateButtonOn">
+                        <li class="{{"Button"|button:"corner-left,state-focus"}}" id="NavigateButton">
                         {% else %}
-                        <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-left" id="NavigateButtonOff">
+                        <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
                         {% endif %}
                         {% ifequal class4div 'ActiveBox4User' %}
                             <a href="/user/{{object_reference}}/navigate/">
                         {% else %}
                             <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
                         {% endifequal %}
-                        {% trans "NAVIGATE" %}
+                        <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
                         </a>
                         </li>
                         {% if navigate_bool %}
-                            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-right"  id="StudyButtonOff">
+                            <li class="{{"Button"|button:"corner-right"}}" id="StudyButtonOff">
                         {% else %}
-                            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-focus ui-state-active ui-corner-right"  id="StudyButtonOn">
+                            <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButtonOn">
                         {% endif %}
                             <a href="../attributes/">
-                                {% trans "STUDY" %}
+                                <span class="ui-button-text">{% trans "STUDY" %}</span>
                             </a>
                         </li>
                         {% endif %}
-                    <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="QuitButton">
+                        <li class="{{"Button"|button}}" id="QuitButton">
                         <a href="/logout/">
-                            {% trans "EXIT" %}
+                            <span class="ui-button-text">{% trans "EXIT" %}</span>
                         </a>
                     </li>
                 </ul>
-            </div>
-            <div id="LoggedPersonBox">
-                {% block LoggedPersonBlock %}{% endblock %}
             </div>
         </div>
 
@@ -86,16 +85,12 @@
         <div class="left-col">
 
             <div id="CreationBox">
-                Create object :
+                <h2>{% trans "Create" %}</h2>
                 {% block CreationBlock %}{% endblock %}
             </div>
 
-            {% if link_creation %}
-                <div id="SearchBox" style="background:#ff4848">
-            {% else %}
-                <div id="SearchBox">
-            {% endif %}
-                Search object :
+            <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
+                <h2>{% trans "Search" %}</h2>
                 {% block SearchBlock %}{% endblock %}
                 <hr/>
                 {% block ResultBlock %}{% endblock %}
@@ -105,15 +100,7 @@
       </div>
          <div class="center-col heightfix">
 
-            {% ifequal class4div 'ActiveBox4Part' %}
-                <div id="ActiveBox">
-            {% endifequal %}
-            {% ifequal class4div 'ActiveBox4User' %}
-                <div id="ActiveBox" style="background:#c7dec5;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #c7dec5 100%)">
-            {% endifequal %}
-            {% ifequal class4div 'ActiveBox4Doc' %}
-                <div id="ActiveBox" style="background:#ffffc6;background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #ffffc6 100%)">
-            {% endifequal %}
+             <div id="ActiveBox" class="{{class4div}}">
                 {% block ObjectBlock %}{% endblock %}
             </div>
 

@@ -1,13 +1,11 @@
 {% extends "BaseDisplayHomePage.htm" %}
-{% load i18n %}
-{% load plmapp_tags %}
-{% load highlight %}
+{% load i18n plmapp_tags highlight %}
 
 <!-- Manage html display of the home page -->
 
 {% block LoggedPersonBlock %}
     {% get_current_language as LANGUAGE_CODE %}
-    <a href="/user/{{user}}/">{{user}}</a> | {{current_date|date:"D j N Y, G:i"}}
+    <a href="/user/{{user}}/">{{user.get_full_name}}</a> | {{current_date|date:"D j N Y, G:i"}}
     <form id="SetLangForm" action="/i18n/setlang/" method="post">
         <select name="language">
 
@@ -17,17 +15,17 @@
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value="{% trans "Go" %}" />
+        <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
     </form>
 {% endblock %}
 
 {% block SearchBlock %}
     <form id="search_form" method="get" action="." enctype="text/plain">
-        <table class="Content" id="search_table">
+        <table id="search_table">
             {{type_form.as_table}}
             {{attributes_form.as_table}}
         </table>
-        <div style="text-align:center"><input type="submit" value="{% trans "SEARCH !" %}"/></div>
+        <div style="text-align:center"><input type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/></div>
     </form>
 {% endblock %}
 
@@ -56,7 +54,7 @@
                 <form method="post" action="." enctype="multipart/form-data">
                     {{result.rendered_add|safe}}
                     {% if link_creation and result.object|can_add:attach %}
-                        <input type="submit" value="{% trans "ADD" %}"/>
+                        <input type="submit" class="{{"Button"|button}}" value="{% trans "ADD" %}"/>
                     {% endif %}
                 </form>
 
@@ -74,16 +72,16 @@
         <ul>
             {{type_form4creation.as_ul}}
             <li>
-            <input type="submit" value="{% trans "CREATE !" %}"/>
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
             </li>
-            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="ImportButton">
+            <li class="{{"Button"|button}}" id="ImportButton">
             <a href="/import/csv/">
-                {% trans "Import" %}
+                <span class="ui-button-text">{% trans "Import" %}</span>
             </a>
             </li>
-            <li class="ui-button ui-button-text  ui-button-text-only ui-widget ui-state-default ui-corner-all"  id="ImportBOMButton">
+            <li class="{{"Button"|button}}" id="ImportBOMButton">
             <a href="/import/bom/">
-                {% trans "Import a BOM" %}
+                <span class="ui-button-text">{% trans "Import a BOM" %}</span>
             </a>
             </li>
         </ul>

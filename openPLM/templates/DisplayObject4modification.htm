@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
@@ -32,7 +32,7 @@
 			</tr>
 		{% endfor %}
 		<tr class="Content">
-			<td></td><td><input type="submit" value="{% trans "MODIFY" %}" /></td>
+			<td></td><td><input type="submit" class="{{"Button"|button}}" value="{% trans "MODIFY" %}" /></td>
 		</tr>
 		</form>
 	</table>

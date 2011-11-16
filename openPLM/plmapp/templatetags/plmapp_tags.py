@@ -34,3 +34,20 @@ def can_add(child, arg):
         return isinstance(child, (User, UserController))
  
     return False
+
+@register.filter
+def button(css_class, options=""):
+    classes = set([css_class, " ui-button", 
+            "ui-button-text-only", "ui-widget", "ui-state-default",
+            "ui-corner-all"])
+    options = options.split(",")
+    for opt in options:
+        opt = opt.strip()
+        if opt:
+            if opt.startswith("icon"):
+                classes.remove("ui-button-text-only")
+            if opt.startswith("corner"):
+                classes.remove("ui-corner-all")
+            classes.add("ui-" + opt)
+    return " ".join(classes)
+

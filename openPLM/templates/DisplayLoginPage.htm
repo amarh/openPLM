@@ -1,45 +1,50 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
-	<link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
-	<title>{% trans "openPLM LOGIN PAGE" %}</title>
-	<meta name="Author" content="philippe.joulaud" />
-	<meta name="Classification" content="" />
-	<meta name="Description" content="" />
-	<meta name="keywords" content="" />
-</head>
+    <head>
+        <meta http-equiv="content-type" content="text/html"; charset="utf-8"/>
+        <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
+        <title>{% trans "openPLM LOGIN PAGE" %}</title>
+        <meta name="Author" content="philippe.joulaud" />
+        <meta name="Classification" content="" />
+        <meta name="Description" content="" />
+        <meta name="keywords" content="" />
+    </head>
 
-<body>
-<div id="Page" style="line-height:600px" >
-	<div id="LoginBox">
-	    <h1>{% trans "openPLM connexion :" %}</h1>
-        <div class="error">
-            {% for error in form.errors.values %}
-                {{ error }}
-            {% endfor %}
+    <body>
+        <div class="main-box" id="Page" style="line-height:600px" >  
+            <div class="content-box clearfix">
+                <div class="center-col heightfix">
+
+                    <div id="LoginBox">
+                        <h1>{% trans "openPLM connexion :" %}</h1>
+                        <div class="error">
+                            {% for error in form.errors.values %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        <form action="{% url django.contrib.auth.views.login %}" method="post">
+                            <table style="display:inline-block">
+                                <tr>
+                                    <td>{% trans "Login :" %}</td>
+                                    <td><input type="text" name="username" value=""/></td>
+                                </tr>
+                                <tr>
+                                    <td>{% trans "Password :" %} </td>
+                                    <td><input type="password" name="password" value=""/></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input type="submit" class="{{"Button"|button}}" value="{% trans "LOGIN" %}" /></td>
+                                </tr>
+                            </table>
+                            <input type="hidden" name="next" value="{{ next|default:"/home/"|urlencode }}"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-	    <form action="{% url django.contrib.auth.views.login %}" method="post">
-	        <table style="display:inline-block">
-	            <tr>
-	                <td>{% trans "Login :" %}</td>
-	                <td><input type="text" name="username" value=""/></td>
-	            </tr>
-	            <tr>
-	                <td>{% trans "Password :" %} </td>
-	                <td><input type="password" name="password" value=""/></td>
-                </tr>
-	            <tr>
-                    <td></td>
-	                <td><input type="submit" value="{% trans "LOGIN" %}" /></td>
-	            </tr>
-	        </table>
-	        <input type="hidden" name="next" value="{{ next|default:"/home/"|urlencode }}"/>
-        </form>
-	</div>
-</div>
-</body>
+    </body>
 </html>

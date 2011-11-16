@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "children" menu -->
 
@@ -16,22 +16,18 @@
 
 {% block content %}
     {% if is_owner and obj.is_editable %}
-        <span class="ButtonLeft">
-                <a class="Button" href="./add/">{% trans "ADD" %}</a>
-        </span>
-        <span class="ButtonLeft">
-                <a class="Button" href="./edit/">{% trans "EDIT" %}</a>
-        </span>
+        <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "ADD" %}</span></a>
+        <a class="{{"Button"|button}}" href="./edit/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
     {% endif %}
     <form method="GET" action="">
         {% trans "Display :" %}
         <ul>
             {{display_form.as_ul}}
         </ul>
-        <input type="submit" value="{% trans "GO !" %}"/>
+        <input type="submit" class="{{"Button"|button}}" value="{% trans "GO !" %}"/>
     </form>
-    <table class="Result">
-        <tr>
+    <table class="Content">
+        <tr class="Content">
             <th class="Content" style="width:50px"> </th>
             <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
             <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
