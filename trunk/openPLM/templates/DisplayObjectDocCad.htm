@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
 
@@ -7,14 +7,14 @@
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
         {% if is_owner %}
-            <span class="ButtonLeft">
-                <a class="Button" href="./add/">{% trans "ADD" %}</a>
-            </span>
+            <a class="{{"Button"|button}}" href="./add/">
+                <span class="ui-button-text">{% trans "Attach another document" %}</span>
+            </a>
             {% if doc_cad_formset.forms %}
-                <input type="submit" value="{% trans "DISCONNECT" %}"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
             {% endif %}
         {% endif %}
-        <table class="Result">
+        <table class="Content">
 	        {% for form in doc_cad_formset.forms %}
                 {{ form.id }}
                 {{ form.part }}

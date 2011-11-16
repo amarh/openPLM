@@ -5,14 +5,13 @@
 {
     padding: 0px;
     margin: 0px;
+    color: #c8c6c5;
 }
 
 body 
 {
-    background: #b3b3b3 url(/media/img/openplm.png) no-repeat right top fixed;
-    font-family: Arial, sans-serif, Comic Sans MS, Verdana;
-    text-align: center;
-    margin: 5px;
+    background: #343434;
+    font-family: Arial, sans-serif, Verdana;
 }
 
 img
@@ -29,10 +28,14 @@ img.thumbnail
 
 h2
 {
-    font-size: 30px;
+    font-size: 1.5em;
     line-height: 1.4;
 }
 
+h2, li.CurrentPage {
+    background: url("/media/img/dark/button_bg.png") repeat-x; 
+    background-size: auto 100%;
+}
 .clear
 {
     clear: both;
@@ -41,6 +44,7 @@ h2
 hr
 {
     margin-top: 10px;
+    padding: 0px !important;
     margin-bottom: 10px;
 }
 
@@ -62,16 +66,21 @@ div.main-box {
     position:relative;
     text-align:left;
     overflow:hidden;
-    width:80%;
 }
 div.top-box {
+    background:  url("/media/img/dark/logo_openplm.png") no-repeat left top,
+        url("/media/img/dark/banner.png") no-repeat right top;
+
+    height: 100px;
+    min-width: 100%;
+    padding-top: 1em;
 }
 div.bottom-box {
 }
 div.center-box {
     position:relative;
     margin-left:300px;
-    margin-top:60px;
+    margin-top: 100px;
 }
 div.reset-box {
     position:relative;
@@ -86,16 +95,14 @@ div.right-box {
 }
 div.content-box {
     position:relative;
-    width:100%;
     margin-top:60px;
+    width: 90%;
+    margin: auto;
+    min-height: 500px;
 }
 div.left-col {
     float:left;
     width:300px;
-}
-div.right-col {
-    float:right;
-    width:22%;
 }
 div.center-col {
     margin-left:330px;
@@ -107,9 +114,7 @@ div.center-col {
 * html div.left-col {
     margin-right:-3px;
 }
-* html div.right-col {
-    margin-left:-3px;
-}
+
 .clearfix:after {
     content: "."; 
     display: block;
@@ -124,55 +129,18 @@ div.center-col {
     height:0;
 }
 
-/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
-span.ButtonLeft
-{
-    display: inline-block;
-    height: 20px;
-    border: 1px groove #999999;
-    background: #cccccc url(/media/img/button.png) repeat-x;
-    -moz-border-radius: 1px;
-    text-align: center;
-}
 
-span.ButtonLeft:hover
-{
-    background: #f8b57d;
-}
-
-/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
-a.Button
-{
-    padding-left: 5px;
-    padding-right: 5px;
-    color: #000000;
-    text-decoration: none;
-    font-size: 90%;
-    cursor: default;
-}
-
-/* GLOBAL PAGE */
-div#Page
-{
-    background: #ffffff url(/media/img/foot-complet.gif) no-repeat bottom right;
-    /*width: 1200px;*/
-    width: 90%;
-    margin: auto;
-    min-height: 500px;
-}
 
 /* *************************************************************************************** */
 /*                          STYLE FOR THE MAIN BOXES                                       */
 /* *************************************************************************************** */
 /* FOR ALL BOXES */
-div#DisplayBox, div#CreationBox, div#SearchBox, div#SearchBox4Search, div#LoggedPersonBox,
-div#ActiveBox, div#LoginBox
+div#CreationBox, div#SearchBox, div#ActiveBox, div#LoginBox
 {
-    -moz-border-radius: 5px;
-    -moz-box-shadow: 5px 5px 10px #999999;
+    border-radius: 1px;
+    border: solid 2px #636363;
     /*background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #b5c5ff 100%);*/
-    border: 0px outset;
-    background-color: #b5c5ff;
+    background-color: #575454;
     margin: 8px;
     padding: 5px;
     text-align: left;
@@ -184,9 +152,16 @@ div#LoginBox
     display: inline-block;
     vertical-align: middle;
     line-height: 30px;
+    width: 500px;
     margin: auto;
     padding: 50px;
     text-align: center;
+}
+
+div#CreationBox > *, div#SearchBox > *,
+div#ReferenceArea h2,
+div#ActiveArea > *{
+    padding: 5px;
 }
 
 /* BOX WHERE WE FIND DIFFERENT BUTTONS FOR PAGE DISPLAY (SHOW/HIDE BOXES & NAVIGATE/STUDY) */
@@ -194,7 +169,6 @@ div#DisplayBox
 {
     display: table-cell;
     height: 30px;
-    float: left;
     max-width: 400px;
     width: 40%;
     margin-right: 0px;
@@ -206,46 +180,49 @@ div#DisplayBox
 }
 
 /* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
-div#CreationBox, div#SearchBox, div#SearchBox4Search
-{
+div#CreationBox, div#SearchBox {
     display: none;
     font-size: 14px;
     /*float: left;*/
     width: 100%;
     margin-right: 0px;
+    padding: 0;
 }
 
-div#SearchBox, div#SearchBox4Search
+div#ActiveBox
 {
+    min-height: 420px;
+    margin-bottom: 110px;
+    padding: 0px;
+}
+
+div.left-col h2,
+div#ReferenceArea {
+    margin: 0;
+}
+
+
+div#SearchBox {
     min-height: 200px;
 }
 
 /* BOX WHICH DISPLAY INFO ABOUT LOGGED-IN USER, LANGUAGE, TIME, ... */
 div#LoggedPersonBox
 {
-    float: right;
-    /*width: 768px;*/
-    width: 54%;
     text-align: left;
     height: 30px;
     margin-bottom: 0px;
+    margin-left: 100px;
 }
 
-/* MAIN BIG ACTIVE BOX */
-div#ActiveBox
-{
-    min-height: 420px;
-    margin-bottom: 110px;
-    padding: 5px;
-    background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #b5c5ff 100%);
-}
+
 
 /* *************************************************************************************** */
 /*                          STYLE FOR BUTTONS IN DISPLAYBOX                                */
 /* *************************************************************************************** */
 
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
-li#NavigateButtonOff, li#NavigateButtonOn
+li#NavigateButton
 {
     margin-right: -5px;
 }
@@ -254,6 +231,7 @@ li#NavigateButtonOff, li#NavigateButtonOn
 #SetLangForm
 {
     display: inline;
+    float: right;
 }
 
 
@@ -333,34 +311,34 @@ ul#MenuList li:hover
 ul#MenuList li a
 {
     text-decoration: none;
-    color: #000000;
     padding: 4px 0px;
     display: inline-block;
+}
+ul#MenuList li:not(.CurrentPage) a {
+    color: #000000;
 }
 
 /* *************************************************************************************** */
 /*                   STYLE FOR THE TABLES USED IN THE SEARCHBOX & ACTIVEBOX                */
 /* *************************************************************************************** */
-table.Content, table.Result
+table.Content
 {
     width: 100%;
     margin-top: 10px;
-    border-spacing: 0;
+    border-spacing: 2px;
 }
 
-table.Result
-{
-    overflow-x: sroll;
-    overflow-y: hidden;
-    table-layout: fixed;
-}
-
-th.Content, td.Content
+table.Content th,
+table.Content td
 {
     padding: 3px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #b5c5ff;
+}
+
+table.Content tr>* {
+    border-top: 2px solid #7f7c7c;
+    border-bottom: solid 2px #7f7c7c;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 table.Content th
@@ -372,80 +350,27 @@ table.Content th
 table.Content td
 {
     text-align: left;
+    background-color: #AFACAB;
 }
 
-td.reference {
-    word-wrap:break-word;
+table.Content td,
+table.Content td *{
+    color: #343434;
+    font-weight: 500;
 }
 
-tr.Content>td.Content
+
+table.Content td.description
 {
-    background-color: #E6E6FF;
+    background-color: #343434;
+}
+table.Content td.description,
+table.Content td.description *{
+    color: #afacab;
+    font-weight: 600;
 }
 
-tr.Content2>td.Content	{
-    background-color: #AAAAAA;
-}
 
-/* TRICK TO DISPLAY CORRECTLY LONG NAMES IN THE RESULTS TABLE */
-/* FULL NAME IS DISPLAYED ONLY IF MOUSE IS OVER IT */
-span.info span.long
-{
-    display: none;
-    text-wrap: normal;
-}
-
-span.info span.small
-{
-    display: block;
-    white-space: Nowrap;
-}
-
-span.info:hover span.long
-{
-    display: block;
-}
-
-span.info:hover span.small
-{
-    display: none;
-}
-
-/* TRICK TO DISPLAY CORRECTLY LONG NAMES IN THE RESULTS TABLE WHEN WE CONNECT AN OBJECT TO ANOTHER */
-/* FULL NAME IS DISPLAYED IN A TOOLTIP WHEN MOUSE IS OVER THE REFERENCE */
-a.tooltip em {
-    display:none;
-}
-a.tooltip:hover {
-    border: 0;
-    position: relative;
-    z-index: 500;
-    text-decoration:none;
-}
-
-a.tooltip:hover em {
-    font-style: normal;
-    display: block;
-    position: absolute;
-    top: 20px;
-    left: -10px;
-    padding: 5px;
-    color: #000;
-    border: 1px solid #bbb;
-    background: #ffc;
-    width:170px;
-}
-
-a.tooltip:hover em span {
-    position: absolute;
-    top: -7px;
-    left: 15px;
-    height: 7px;
-    width: 11px;
-    margin:0;
-    padding: 0;
-    border: 0;
-}
 
 /* *************************************************************************************** */
 /*              STYLE FOR ELEMENTS WHEN WE ARE IN NAVIGATE MODE DISPLAY                    */
@@ -512,15 +437,6 @@ div.node > a > span {
     left:0;
     text-decoration:none;
 }
-
-div.drop_active{
-    border: 1px solid red;
-}
-
-div.drop_hover {
-    background: rgba(200,100,100,0.5);
-}
-
 
 img.node_thumbnails, img.node_show_docs {
     position:absolute;
@@ -603,6 +519,10 @@ div#FilterNav
     -moz-border-radius: 5px;
 }
 
+div#FilterNav * {
+    color:black;
+}
+
 div#FilterNav ul
 {
     display: none;
@@ -619,22 +539,6 @@ div#FilterNav ul>li
     filter:alpha(opacity=80);
     font-size: 75%;
     padding: 5px;
-}
-
-
-.ui-button {
-    border: 1px solid #aaa !important;
-}
-
-.ui-button-text {
-    padding:0.4em 0.4em !important;
-    line-height: 1.0 !important
-}
-
-li.ui-button:hover {
-    background: url("/media/css/smoothness/images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
-    color: #212121;
-    font-weight: normal;
 }
 
 /* comments */
@@ -682,6 +586,9 @@ td.open span.expander:hover {
 }
 
 /** simple search **/
+ul.Result {
+    display: block;
+}
 li.Result {
     padding-bottom: 0.5em;
     display:block;
@@ -691,6 +598,9 @@ li.Result:hover {
     background-color: #ccc !important;
 }
 
+li.Result:hover *{
+    color: black !important;
+}
 li.Result div.summary {
     padding-left: 1em;
     clear: both;
@@ -705,3 +615,55 @@ li.Result div.toolbar button{
     height: 16px;
     width: 16px;
 }
+
+
+/** input **/
+input,
+select,
+select *,
+textarea {
+    color: black;
+    font-size: 1.1em;
+}
+
+/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
+a.Button, input.Button
+{
+    padding-left: 5px;
+    padding-right: 5px;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+input.Button{
+    margin: 0;
+}
+
+.ui-button {
+    border: 1px solid #aaa !important;
+}
+
+span.ui-button-text {
+    padding:0.4em 0.4em !important;
+}
+
+a.Button {
+    padding: 0 !important;
+    line-height: 1.0 !important;
+    font-size: 14px !important;
+}
+
+li.ui-button:hover,
+a.ui-button:hover,
+input.ui-button:hover {
+    background: url("/media/css/openplm/images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
+    color: black !important;
+    font-weight: normal;
+}
+
+li.ui-button:hover * {
+    color: black !important;
+
+}
+
+

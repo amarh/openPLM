@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "management" menu -->
 {% block css %}
@@ -10,19 +10,17 @@
 
 {% block content %}
     {% if is_owner %}
-        <span class="ButtonLeft">
-            <a class="Button" href="./add/" >{% trans "Notify" %}</a>
-        </span>
+        <a class="{{"Button"|button}}" href="./add/" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
     {% else %}
         {% if is_notified %}
             <form  method="POST" action="./delete/">
                 <input type="hidden" name="link_id" value="{{ remove_notify_link.id }}"/>
-                <input name="action" type="submit" value="{% trans "Unnotify me" %}" />
+                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Unnotify me" %}" />
             </form>
         {% else %}
             <form  method="POST" action="./add/">
                 {{ notify_self_form.as_p }}
-                <input name="action" type="submit" value="{% trans "Notify me" %}" />
+                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
             </form>
         {% endif %}
     {% endif %}
@@ -47,11 +45,9 @@
                     </dt>
                     <dd style="display:inline;">
                     {% if is_owner %}
-                            <div style="float:left;">
-                        <span>&nbsp;</span>
-                        <span class="ButtonLeft">
-                            <a class="Button" href="./replace/{{link.id}}/">{% trans "REPLACE" %}</a>
-                        </span>
+                        <div style="float:left;">
+                            <span>&nbsp;</span>
+                            <a class="{{"Button"|button}}" href="./replace/{{link.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
                         </div>
                     {% endif %}
                     {% if is_owner %}
@@ -60,7 +56,7 @@
 
                             <form action="./delete/" method="POST">
                                 <input name="link_id" type="hidden" value="{{link.id}}"/>
-                                <input name="action" type="submit" value="{% trans "Delete" %}" />
+                                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Delete" %}" />
                             </form>
                         </div>
                         {% endifequal %}

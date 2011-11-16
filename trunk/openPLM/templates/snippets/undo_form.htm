@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n plmapp_tags %}
 {% if form.is_multipart %}
 <form enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>
 {% else %}
@@ -10,8 +10,8 @@
             <td>
             </td>
             <td>
-                <input type="submit" value="{% trans "Validate" %}" name="_validate"/>
-                <input type="submit" value="{% trans "Undo" %}" name="_undo"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Undo" %}" name="_undo"/>
             </td>
         </tr>
     </table>

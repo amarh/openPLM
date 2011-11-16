@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "users" menu -->
 
@@ -8,21 +8,17 @@
 
         {{ user_formset.management_form }}
         {% if is_owner %}
-                <span class="ButtonLeft">
-                    <a class="Button" href="./add/">{% trans "Add another user" %}</a>
-                </span>
+            <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "Add another user" %}</span></a>
             {% if user_formset.forms %}
-                <input type="submit" value="{% trans "Remove selected users" %}"/>
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Remove selected users" %}"/>
             {% endif %}
         {% else %}
             {% if not in_group %}
-                <span class="ButtonLeft">
-                    <a class="Button" href="./join/">{% trans "Ask to join this group" %}</a>
-                </span>
+                <a class="{{"Button"|button}}" href="./join/"><span class="ui-button-text">{% trans "Ask to join this group" %}</span></a>
             {% endif %}
         {% endif %}
 
-        <table class="Result">
+        <table class="Content">
             <tr>
                 {% if is_owner %}
                    <th class="Content" style="width:50px; text-align:center"></th>

@@ -1,49 +1,31 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
     {% if is_owner %}
-	{% trans "START DELEGATE :" %}
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./delegate/owner/">
-                {% trans "OWNERSHIP" %}
-            </a>
-    </span>
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./delegate/sign/1/">
-                {% trans "SIGNATURE 1st LEVEL" %}
-            </a>
-    </span>
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./delegate/sign/2/">
-                {% trans "SIGNATURE 2nd LEVEL" %}
-            </a>
-    </span>
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./delegate/sign/all">
-                {% trans "ALL SIGNATURES" %}
-            </a>
-    </span>
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./delegate/notified/">
-                {% trans "NOTIFICATIONS" %}
-            </a>
-    </span>
-    <span class="ButtonLeft">
-            <a class="Button" 
-                href="./sponsor/">
-                {% trans "Sponsor" %}
-            </a>
-        </span>
+        {% trans "START DELEGATE :" %}
+        <a class="{{"Button"|button}}" href="./delegate/owner/">
+            <span class="ui-button-text">{% trans "OWNERSHIP" %}</span>
+        </a>
+        <a class="{{"Button"|button}}" href="./delegate/sign/1/">
+            <span class="ui-button-text">{% trans "SIGNATURE 1st LEVEL" %}</span>
+        </a>
+        <a class="{{"Button"|button}}" href="./delegate/sign/2/">
+            <span class="ui-button-text">{% trans "SIGNATURE 2nd LEVEL" %}</span>
+        </a>
+        <a class="{{"Button"|button}}" href="./delegate/sign/all">
+            <span class="ui-button-text">{% trans "ALL SIGNATURES" %}</span>
+        </a>
+        <a class="{{"Button"|button}}" href="./delegate/notified/">
+            <span class="ui-button-text">{% trans "NOTIFICATIONS" %}</span>
+        </a>
+        <a class="{{"Button"|button}}" href="./sponsor/">
+            <span class="ui-button-text">{% trans "Sponsor" %}</span>
+        </a>
     {% endif %}
-    <table class="Result">
+    <table class="Content">
         <tr class="Content">
             <th class="Content"> {% trans "Username" %} </th>
             <th class="Content"> {% trans "First Name" %} </th>
@@ -61,7 +43,7 @@
                         <td class="Content">
                             <form method="post" action="">
                                 <input type="hidden" name="link_id" value="{{link.id}}" />
-                                <input type="submit" value="{% trans "STOP DELEGATION" %}"/>
+                                <input type="submit" class="{{"Button"|button}}" value="{% trans "STOP DELEGATION" %}"/>
                             </form>
                         </td>
                         {% endifnotequal %}

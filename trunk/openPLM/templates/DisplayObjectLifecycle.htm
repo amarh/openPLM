@@ -1,15 +1,15 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
     <form action="" method="POST">
         {% if is_signer_dm and obj.is_editable %}
-        <input name="action" type="submit" value="DEMOTE"/>
+        <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE"/>
         {% endif %}
         {% if is_signer and obj.is_promotable %}
-        <input name="action" type="submit" value="PROMOTE"/>
+        <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE"/>
         {% endif %}
     </form>
     	<table class="Content">

@@ -1,5 +1,5 @@
 {% extends "MiddleDisplayObject.htm" %}
-{% load i18n %}
+{% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "files" menu -->
 
@@ -7,10 +7,8 @@
     <form method="POST" action="">
         {{ file_formset.management_form }}
 		{% if is_owner and obj.is_editable %}
-            <span class="ButtonLeft">
-                <a class="Button" href="./add/">{% trans "ADD" %}</a>
-            </span>
-            <input type="submit" value="{% trans "DELETE" %}"/>
+            <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "ADD" %}</span></a>
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
         {% endif %}
 	    <table class="Content">
 		    <tr class="Content">
@@ -30,23 +28,19 @@
                         <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
 			        <td class="Content">{{instance.size}}</td>
 			        <td class="Content">
-			            <span class="ButtonLeft">
-                            <a class="Button" href="/file/{{instance.id}}/">{% trans "DOWNLOAD" %}</a>
-                        </span>
+                        <a class="{{"Button"|button}}" href="/file/{{instance.id}}/">{% trans "DOWNLOAD" %}</a>
                     </td>
 			        <td class="Content">
-			            {% if is_owner and obj.is_editable %}
-			                <span class="ButtonLeft">
-                                {% if instance.locked %}
-		                            <a id="LockLink" class="Button" href="./checkin/{{instance.id}}/">
-		                                {% trans "CHECK-IN" %}
-	                                </a>
-                                {% else %}
-		                            <a id="UnlockLink" class="Button" href="./checkout/{{instance.id}}/">
-		                                {% trans "CHECK-OUT" %}
-	                                </a>
-                                {% endif %}
-	                        </span>
+                        {% if is_owner and obj.is_editable %}
+                            {% if instance.locked %}
+                                <a id="LockLink" class="{{"Button"|button}}" href="./checkin/{{instance.id}}/">
+                                    <span class="ui-button-text">{% trans "CHECK-IN" %}</span>
+                                </a>
+                            {% else %}
+                                <a id="UnlockLink" class="{{"Button"|button}}" href="./checkout/{{instance.id}}/">
+                                    <span class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                </a>
+                            {% endif %}
                         {% else %}
                             {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
 		                {% endif %}
