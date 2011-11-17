@@ -313,7 +313,10 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         models._get_all_subclasses(cls, m)
         search_query = attributes_form.cleaned_data["q"]
         mods = m.values()
-        if issubclass(cls, models.Document):
+        if issubclass(cls, models.Document) \
+            and search_query.strip() not in ("", "*"):
+            # include documentfiles if we search for a document and
+            # if the query does not retrieve all documents
             mods.append(models.DocumentFile)
         qset = attributes_form.search(*mods)[:30]
         if qset is None:
