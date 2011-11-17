@@ -28,7 +28,7 @@
                         <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
 			        <td class="Content">{{instance.size}}</td>
 			        <td class="Content">
-                        <a class="{{"Button"|button}}" href="/file/{{instance.id}}/">{% trans "DOWNLOAD" %}</a>
+                        <a class="{{"Button"|button}}" href="/file/{{instance.id}}/"><span class="ui-button-text">{% trans "DOWNLOAD" %}</span></a>
                     </td>
 			        <td class="Content">
                         {% if is_owner and obj.is_editable %}
