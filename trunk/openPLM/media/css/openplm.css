@@ -234,6 +234,9 @@ li#NavigateButton
     float: right;
 }
 
+#SetLangForm > * {
+    max-width: 8em;
+}
 
 /* *************************************************************************************** */
 /*                              STYLE INSIDE THE ACTIVEBOX                                 */
@@ -334,7 +337,7 @@ table.Content td
     padding: 3px;
 }
 
-table.Content tr>* {
+table.Content tr > *:not(.ui-widget) {
     border-top: 2px solid #7f7c7c;
     border-bottom: solid 2px #7f7c7c;
     margin-top: 2px;
@@ -354,7 +357,7 @@ table.Content td
 }
 
 table.Content td,
-table.Content td *{
+table.Content td *:not(.ui-button-text) {
     color: #343434;
     font-weight: 500;
 }
@@ -618,9 +621,8 @@ li.Result div.toolbar button{
 
 
 /** input **/
-input,
-select,
-select *,
+input[type=text],
+input[type=password],
 textarea {
     color: black;
     font-size: 1.1em;
@@ -666,4 +668,8 @@ li.ui-button:hover * {
 
 }
 
+div.selector {
 
+    background:url("/media/img/dark/drop.png") no-repeat right center, 
+        url("images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
+}
