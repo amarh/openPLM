@@ -40,7 +40,9 @@ from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
 from openPLM.plmapp.controllers.user import UserController
 
-basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img")
+basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img") 
+
+icondir = os.path.join(basedir, "navigate")
 
 # just a shortcut
 OSR = "only_search_results"
@@ -104,19 +106,21 @@ class NavigationGraph(object):
                             sep="+.1,.1",
                             outputorder="edgesfirst",
                             bgcolor="transparent")
-    NODE_ATTRIBUTES = dict(shape='Mrecord', fixedsize='true', fontsize='10',
-                           style='filled', width='1.0', height='0.6')
+    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='12',
+                           bgcolor="transparent", color="transparent",
+                            fontcolor="#7f7c7c",
+                           style='filled', width=100./96, height=70./96)
     EDGE_ATTRIBUTES = dict(color='#aaaaaa',
                            minlen="1.5",
                            len="1.5",
                            arrowhead='normal',
                            fontsize="9")
-    TYPE_TO_ATTRIBUTES = {UserController : dict(color='#c7dec5',
-                            image=os.path.join(basedir, "user.png")),
-                          PartController : dict(color='#b5c5ff',
-                            image=os.path.join(basedir, "part.png")),
-                          DocumentController : dict(color='#ffffc6',
-                            image=os.path.join(basedir, "document.png"))}
+    TYPE_TO_ATTRIBUTES = {UserController : dict(
+                            image=os.path.join(icondir, "user.png")),
+                          PartController : dict(
+                            image=os.path.join(icondir, "part.png")),
+                          DocumentController : dict(
+                            image=os.path.join(icondir, "document.png"))}
     
     BUTTON_CLASS = " ui-button ui-widget ui-state-default ui-corner-all "
 
@@ -283,8 +287,8 @@ class NavigationGraph(object):
         node = self.graph.get_node(id_)
         self._set_node_attributes(self.object, id_)
         self.main_node = node.attr["id"]
-        color = node.attr["color"]
-        node.attr.update(color="#444444", fillcolor=color, shape="box")
+        #color = node.attr["color"]
+        #node.attr.update(color="#444444", fillcolor=color)
         functions_dic = {'child':(self._create_child_edges, None),
                          'parents':(self._create_parents_edges, None),
                          'doc':(self._create_doc_edges, None),
