@@ -14,6 +14,10 @@ body
     font-family: Arial, sans-serif, Verdana;
 }
 
+form {
+    font-size: 14px !important;
+}
+
 img
 {
     border-style : none;
@@ -357,7 +361,7 @@ table.Content td
 }
 
 table.Content td,
-table.Content td *:not(.ui-button-text) {
+table.Content td *:not(.ui-button-text):not(.ui-button) {
     color: #343434;
     font-weight: 500;
 }
