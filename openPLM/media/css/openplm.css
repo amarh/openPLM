@@ -675,5 +675,5 @@ li.ui-button:hover * {
 div.selector {
 
     background:url("/media/img/dark/drop.png") no-repeat right center, 
-        url("images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
+        url("/media/css/openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
 }
