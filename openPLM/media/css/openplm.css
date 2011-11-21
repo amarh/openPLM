@@ -514,6 +514,12 @@ div#imgManagement
     float: left;
 }
 
+#main_content {
+    padding-left: 1em !important;
+    min-height: 500px;
+
+}
+
 /* DISPLAY A BOX IN THE NAVIGATEAREA FOR FILTER OPTIONS */
 div#FilterNav
 {
