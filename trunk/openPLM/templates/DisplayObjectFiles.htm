@@ -7,7 +7,10 @@
     <form method="POST" action="">
         {{ file_formset.management_form }}
 		{% if is_owner and obj.is_editable %}
-            <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "ADD" %}</span></a>
+            <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
+                <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
+                <span class="ui-button-text">{% trans "ADD" %}</span>
+            </a>
             <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
         {% endif %}
 	    <table class="Content">
