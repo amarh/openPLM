@@ -166,6 +166,11 @@ Create the database
     .. warning::
         Edit the '/var/django/openPLM/trunk/openPLM/settings.py' and set correct password ('MyPassword')
         for DATABASE_PASSWORD
+
+Compile message files
+=====================
+
+Run the following command: ``./manage.py compilemessages``.
    
 Configure where the files are saved
 ===================================
