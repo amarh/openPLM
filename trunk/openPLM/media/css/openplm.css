@@ -341,7 +341,9 @@ table.Content td
     padding: 3px;
 }
 
-table.Content tr > *:not(.ui-widget) {
+table.Content tr > p,
+table.Content tr > th,
+table.Content tr > ul {
     border-top: 2px solid #7f7c7c;
     border-bottom: solid 2px #7f7c7c;
     margin-top: 2px;
@@ -361,7 +363,9 @@ table.Content td
 }
 
 table.Content td,
-table.Content td *:not(.ui-button-text):not(.ui-button) {
+table.Content td a,
+table.Content td p,
+table.Content td li {
     color: #343434;
     font-weight: 500;
 }
