@@ -567,6 +567,10 @@ div.comment {
     border-left: 2px #888 solid;
 }
 
+div.comment > p {
+    overflow-x: scroll; /* scroll if there are too long lines (urls...) */ 
+}
+
 div#comments{
     margin:1em;
     border-top: 1px #444 solid;
@@ -642,6 +646,10 @@ textarea {
     font-size: 1.1em;
 }
 
+textarea {
+    width: 100%;
+}
+
 /* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
 a.Button, input.Button
 {
@@ -681,3 +689,4 @@ div.selector {
     background:url("/media/img/dark/drop.png") no-repeat right center, 
         url("/media/css/openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
 }
+
