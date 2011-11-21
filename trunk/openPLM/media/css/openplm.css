@@ -530,7 +530,7 @@ div#FilterNav
     -moz-border-radius: 5px;
 }
 
-div#FilterNav * {
+div#FilterNav label {
     color:black;
 }
 
@@ -666,15 +666,9 @@ a.Button {
 li.ui-button:hover,
 a.ui-button:hover,
 input.ui-button:hover {
-    background: url("/media/css/openplm/images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
-    color: black !important;
-    font-weight: normal;
+    background: url("/media/css/openplm/images/hover.png") repeat-x scroll 50% 50% #DADADA;
 }
 
-li.ui-button:hover * {
-    color: black !important;
-
-}
 
 div.selector {
 
