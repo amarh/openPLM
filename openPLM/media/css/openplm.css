@@ -365,6 +365,7 @@ table.Content tr > ul {
 table.Content th
 {
     text-align: right;
+    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
     padding-right: 10px;
 }
 
