@@ -43,28 +43,27 @@
 
                     <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
                     </dt>
-                    <dd style="display:inline;">
+                    <dd>
                     {% if is_owner %}
-                        <div style="float:left;">
+                        <ul class="management">
+                            <li>
                             <span>&nbsp;</span>
                             <a class="{{"Button"|button}}" href="./replace/{{link.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
-                        </div>
-                    {% endif %}
-                    {% if is_owner %}
+                            </li>
                         {% ifequal link.role 'notified'%}
-                            <div style="float:left;">
+                            <li>
 
                             <form action="./delete/" method="POST">
                                 <input name="link_id" type="hidden" value="{{link.id}}"/>
                                 <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Delete" %}" />
                             </form>
-                        </div>
+                            </li>
+                        </p>
                         {% endifequal %}
                     {% endif %}
                     </dd>
                 {% endfor %}
             </dl>
-            <br />
         </div>
 
     {% endfor %}
