@@ -36,17 +36,21 @@
                 {% block LoggedPersonBlock %}{% endblock %}
             </div>
             <div id="DisplayBox">
-                <input type="checkbox" id="FindButton" />
-                <label for="FindButton">
+                <ul>
+
+                    <li>
+                    <input type="checkbox" id="FindButton" />
+                    <label for="FindButton">
                         {% trans "FIND" %}
-                </label>
-
-                <input type="checkbox" id="CreationButton" />
-                <label for="CreationButton">
+                    </label>
+                    </li>
+                    <li>
+                    <input type="checkbox" id="CreationButton" />
+                    <label for="CreationButton">
                         {% trans "CREATE" %}
-                </label>
+                    </label>
+                    </li>
 
-                  <ul>
 
                     {% if not creation_form %}
                         {% if navigate_bool %}
