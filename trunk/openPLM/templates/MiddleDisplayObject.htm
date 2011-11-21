@@ -31,7 +31,9 @@
                     </ul>
                 </div>
             {% endif %}
+            <div id="main_content">
                 {% block content %}{% endblock %}	
+            </div>
         {% else %}
             <p>{% trans "You are not allowed to see this object" %}</p>
         {% endif %}
