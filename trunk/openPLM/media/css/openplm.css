@@ -37,8 +37,7 @@ h2
 }
 
 h2 {
-    background: url("/media/img/dark/button_bg.png") repeat-x; 
-    background-size: auto 100%;
+    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737; 
 }
 
 .clear
