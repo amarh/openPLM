@@ -3,48 +3,86 @@
 {% load i18n plmapp_tags %}
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="content-type" content="text/html"; charset="utf-8"/>
-        <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
-        <title>{% trans "openPLM LOGIN PAGE" %}</title>
-        <meta name="Author" content="philippe.joulaud" />
-        <meta name="Classification" content="" />
-        <meta name="Description" content="" />
-        <meta name="keywords" content="" />
-    </head>
+<head>
+    <meta http-equiv="content-type" content="text/html"; charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
+    <link rel="stylesheet" type="text/css" href="/media/css/loginpage.css" />
+    <title>{% trans "openPLM LOGIN PAGE" %}</title>
+    <meta name="Author" content="philippe.joulaud" />
+    <meta name="Classification" content="" />
+    <meta name="Description" content="" />
+    <meta name="keywords" content="" />
+</head>
 
-    <body>
-        <div class="main-box" id="Page" style="line-height:600px" >  
-            <div class="content-box clearfix">
-                <div class="center-col heightfix">
+<body>
+    <div class="main-box" id="Page"  style="">
+        <div class="top-box">
+            <div class="top-box-content">
+    {% get_current_language as LANGUAGE_CODE %}
+    <form id="SetLangForm" action="/i18n/setlang/" method="post">
+        <select name="language">
 
-                    <div id="LoginBox">
-                        <h1>{% trans "openPLM connexion :" %}</h1>
-                        <div class="error">
-                            {% for error in form.errors.values %}
-                            {{ error }}
-                            {% endfor %}
-                        </div>
-                        <form action="{% url django.contrib.auth.views.login %}" method="post">
-                            <table style="display:inline-block">
-                                <tr>
-                                    <td>{% trans "Login :" %}</td>
-                                    <td><input type="text" name="username" value=""/></td>
-                                </tr>
-                                <tr>
-                                    <td>{% trans "Password :" %} </td>
-                                    <td><input type="password" name="password" value=""/></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><input type="submit" class="{{"Button"|button}}" value="{% trans "LOGIN" %}" /></td>
-                                </tr>
-                            </table>
-                            <input type="hidden" name="next" value="{{ next|default:"/home/"|urlencode }}"/>
-                        </form>
-                    </div>
-                </div>
+            {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                {{ lang.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+    </form>
+	            <h4>{% trans "Welcome to openPLM" %}</h4>
+                <hr />
             </div>
         </div>
-    </body>
+        <div class="content-box clearfix">
+            <p>
+	            <b>openPLM</b> {% trans "is the first genuine open source PLM based on" %} <a href="http://djangoproject.com/">Django</a>
+	             {% trans "intended to provide a starting point for companies CMS/PLM/BIM projects." %}
+	             {% trans "By integrating numerous standard reusable PLM functionalities to take care of the things that companies have in common, it lets you focus on what makes your company different." %}
+            </p> 
+            <br />
+            <p>
+	        {% trans "For more information about openPLM, see" %} <a href="http://www.openplm.org">http://www.openplm.org</a>.
+            </p>
+            <div id="LoginBox">
+                <h4>{% trans "openPLM connexion :" %}</h4>
+                <div class="error">
+                    {% for error in form.errors.values %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                <form action="{% url django.contrib.auth.views.login %}" method="post">
+                    <table style="display:inline-block">
+                        <tr>
+                            <td>{% trans "Login :" %}</td>
+                            <td><input type="text" name="username" value=""/></td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Password :" %} </td>
+                            <td><input type="password" name="password" value=""/></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="submit" class="{{"Button"|button}}" value="{% trans "LOGIN" %}" /></td>
+                        </tr>
+                    </table>
+                    <input type="hidden" name="next" value="{{ next|default:"/home/"|urlencode }}"/>
+                </form>
+                <p style="line-height:15px; text-align:left">If you have any trouble logging in to your account, contact your administrator </p>
+            </div>
+            <h4>{% trans "Professionals" %}</h4>
+            <hr />
+            <p>
+	                {% trans "You are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
+                <a href="http://www.linobject.com/contact/">
+                    {% trans "contact us" %}.
+	            </a>
+            </p>
+        </div>
+        <div class="legal">
+            2010 openPLM &#0153;
+            - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
+        </div>
+    </div>
+</body>
 </html>
