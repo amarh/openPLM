@@ -52,8 +52,9 @@
                             {% trans "Date:" %}
                             {{ comment.submit_date|date:"r" }}
                         </span>
-                        {{ comment.comment|linebreaks }}
-
+                        <div class="comment_text">
+                            {{ comment.comment|linebreaks }}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}

@@ -567,8 +567,12 @@ div.comment {
     border-left: 2px #888 solid;
 }
 
-div.comment > p {
-    overflow-x: scroll; /* scroll if there are too long lines (urls...) */ 
+div.comment_text {
+    overflow-x: auto; /* scroll if there are too long lines (urls...) */ 
+}
+
+div.comment p {
+    margin: 1em 1em;
 }
 
 div#comments{
