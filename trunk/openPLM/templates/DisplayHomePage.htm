@@ -26,13 +26,15 @@
 {% endblock %}
 
 {% block SearchBlock %}
+    <div>
     <form id="search_form" method="get" action="." enctype="text/plain">
         <table id="search_table">
             {{type_form.as_table}}
             {{attributes_form.as_table}}
         </table>
-        <div style="text-align:center"><input type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/></div>
+        <div style="text-align:center"><input id="search_button" type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/></div>
     </form>
+</div>
 {% endblock %}
 
 {% block ResultBlock %}
