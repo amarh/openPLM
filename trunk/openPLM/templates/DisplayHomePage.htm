@@ -7,15 +7,21 @@
     {% get_current_language as LANGUAGE_CODE %}
     <a href="/user/{{user}}/">{{user.get_full_name}}</a> | {{current_date|date:"D j N Y, G:i"}}
     <form id="SetLangForm" action="/i18n/setlang/" method="post">
-        <select name="language">
+        <ul>
+            <li>
+            <select name="language">
 
-            {% for lang in LANGUAGES %}
-                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
-                {{ lang.1 }}
-                </option>
-            {% endfor %}
-        </select>
-        <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+                {% for lang in LANGUAGES %}
+                    <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                    {{ lang.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+            </li>
+            <li>
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+            </li>
+         </ul>
     </form>
 {% endblock %}
 
@@ -70,8 +76,11 @@
 {% block CreationBlock %}
     <form method="get" action="/object/create/" enctype="text/plain">
         <ul id="createbar">
-            {{ type_form4creation.as_ul }}
+            {% with type_form4creation.visible_fields.0 as field %}
+                <span id="select_type">{{field.label }}</span>
             <li>
+                {{ field }}
+            {% endwith %}
             <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
             </li>
         </ul>

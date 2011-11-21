@@ -84,15 +84,15 @@ textarea.uniform:focus {
 
 div.selector {
   /*background-position: -483px -130px;*/
-  line-height: 26px;
-  height: 26px;
+  /*line-height: 26px;*/
+  /*height: 26px;*/
   text-align: left;
 }
 
 div.selector span {
   /*background-position: right 0px;*/
-  height: 26px;
-  line-height: 26px;
+  /*height: 26px;*/
+  /*line-height: 26px;*/
 }
 
 div.selector select {
