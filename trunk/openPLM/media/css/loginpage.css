@@ -1,0 +1,32 @@
+/* *************************************************************************************** */
+/*                                  LOGIN PAGE STYLE                                          */
+/* *************************************************************************************** */
+
+
+div.main-box {
+    position:relative;
+    text-align:left;
+    overflow:hidden;
+    font-size: small;
+}
+
+div.top-box-content {
+    position:relative;
+    margin: auto;
+    margin-top: 30px;
+    width: 700px;
+}
+
+div.content-box {
+    width: 700px;
+    margin: auto;
+}
+
+div.legal {
+    text-align:center;
+    margin: 10px;
+}
+
+input.Button, select {
+color: #000000;
+}
