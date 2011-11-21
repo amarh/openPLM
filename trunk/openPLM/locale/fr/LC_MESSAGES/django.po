@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 14:34+0100\n"
-"PO-Revision-Date: 2010-08-27 09:41+0100\n"
-"Last-Translator: Pierre Cosquer <pcosquer@openplm.org>\n"
+"POT-Creation-Date: 2011-11-21 11:16+0100\n"
+"PO-Revision-Date: 2011-11-21 11:12+0100\n"
+"Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,86 +24,533 @@ msgstr "fournisseur"
 msgid "tech_details"
 msgstr "détail technique"
 
-#: plmapp/api.py:91
+#: plmapp/base_views.py:128
 msgid "Internal error"
 msgstr "Erreur interne"
 
-#: plmapp/forms.py:40
+#: plmapp/encoding.py:4
+msgid "Ascii"
+msgstr ""
+
+#: plmapp/encoding.py:5
+msgid "Big5"
+msgstr ""
+
+#: plmapp/encoding.py:6
+msgid "Big5hkscs"
+msgstr ""
+
+#: plmapp/encoding.py:7
+msgid "Charmap"
+msgstr ""
+
+#: plmapp/encoding.py:8
+msgid "CP-037"
+msgstr ""
+
+#: plmapp/encoding.py:9
+msgid "CP-1006"
+msgstr ""
+
+#: plmapp/encoding.py:10
+msgid "CP-1026"
+msgstr ""
+
+#: plmapp/encoding.py:11
+msgid "CP-1140"
+msgstr ""
+
+#: plmapp/encoding.py:12
+msgid "CP-1250"
+msgstr ""
+
+#: plmapp/encoding.py:13
+msgid "CP-1251"
+msgstr ""
+
+#: plmapp/encoding.py:14
+msgid "CP-1252"
+msgstr ""
+
+#: plmapp/encoding.py:15
+msgid "CP-1253"
+msgstr ""
+
+#: plmapp/encoding.py:16
+msgid "CP-1254"
+msgstr ""
+
+#: plmapp/encoding.py:17
+msgid "CP-1255"
+msgstr ""
+
+#: plmapp/encoding.py:18
+msgid "CP-1256"
+msgstr ""
+
+#: plmapp/encoding.py:19
+msgid "CP-1257"
+msgstr ""
+
+#: plmapp/encoding.py:20
+msgid "CP-1258"
+msgstr ""
+
+#: plmapp/encoding.py:21
+msgid "CP-424"
+msgstr ""
+
+#: plmapp/encoding.py:22
+msgid "CP-437"
+msgstr ""
+
+#: plmapp/encoding.py:23
+msgid "CP-500"
+msgstr ""
+
+#: plmapp/encoding.py:24
+msgid "CP-737"
+msgstr ""
+
+#: plmapp/encoding.py:25
+msgid "CP-775"
+msgstr ""
+
+#: plmapp/encoding.py:26
+msgid "CP-850"
+msgstr ""
+
+#: plmapp/encoding.py:27
+msgid "CP-852"
+msgstr ""
+
+#: plmapp/encoding.py:28
+msgid "CP-855"
+msgstr ""
+
+#: plmapp/encoding.py:29
+msgid "CP-856"
+msgstr ""
+
+#: plmapp/encoding.py:30
+msgid "CP-857"
+msgstr ""
+
+#: plmapp/encoding.py:31
+msgid "CP-860"
+msgstr ""
+
+#: plmapp/encoding.py:32
+msgid "CP-861"
+msgstr ""
+
+#: plmapp/encoding.py:33
+msgid "CP-862"
+msgstr ""
+
+#: plmapp/encoding.py:34
+msgid "CP-863"
+msgstr ""
+
+#: plmapp/encoding.py:35
+msgid "CP-864"
+msgstr ""
+
+#: plmapp/encoding.py:36
+msgid "CP-865"
+msgstr ""
+
+#: plmapp/encoding.py:37
+msgid "CP-866"
+msgstr ""
+
+#: plmapp/encoding.py:38
+msgid "CP-869"
+msgstr ""
+
+#: plmapp/encoding.py:39
+msgid "CP-874"
+msgstr ""
+
+#: plmapp/encoding.py:40
+msgid "CP-875"
+msgstr ""
+
+#: plmapp/encoding.py:41
+msgid "CP-932"
+msgstr ""
+
+#: plmapp/encoding.py:42
+msgid "CP-949"
+msgstr ""
+
+#: plmapp/encoding.py:43
+msgid "CP-950"
+msgstr ""
+
+#: plmapp/encoding.py:44
+msgid "Euc-jis-2004"
+msgstr ""
+
+#: plmapp/encoding.py:45
+msgid "Euc-jisx0213"
+msgstr ""
+
+#: plmapp/encoding.py:46
+msgid "Euc-jp"
+msgstr ""
+
+#: plmapp/encoding.py:47
+msgid "Euc-kr"
+msgstr ""
+
+#: plmapp/encoding.py:48
+msgid "Gb18030"
+msgstr ""
+
+#: plmapp/encoding.py:49
+msgid "Gb2312"
+msgstr ""
+
+#: plmapp/encoding.py:50
+msgid "GBK"
+msgstr ""
+
+#: plmapp/encoding.py:51
+msgid "HP-roman8"
+msgstr ""
+
+#: plmapp/encoding.py:52
+msgid "HZ"
+msgstr ""
+
+#: plmapp/encoding.py:53
+msgid "ISO-2022-JP"
+msgstr ""
+
+#: plmapp/encoding.py:54
+msgid "ISO-2022-JP-1"
+msgstr ""
+
+#: plmapp/encoding.py:55
+msgid "ISO-2022-JP-2"
+msgstr ""
+
+#: plmapp/encoding.py:56
+msgid "ISO-2022-JP-2004"
+msgstr ""
+
+#: plmapp/encoding.py:57
+msgid "ISO-2022-JP-3"
+msgstr ""
+
+#: plmapp/encoding.py:58
+msgid "ISO-2022-JP-EXT"
+msgstr ""
+
+#: plmapp/encoding.py:59
+msgid "ISO-2022-KR"
+msgstr ""
+
+#: plmapp/encoding.py:60
+msgid "ISO-8859-1"
+msgstr ""
+
+#: plmapp/encoding.py:61
+msgid "ISO-8859-10"
+msgstr ""
+
+#: plmapp/encoding.py:62
+msgid "ISO-8859-11"
+msgstr ""
+
+#: plmapp/encoding.py:63
+msgid "ISO-8859-13"
+msgstr ""
+
+#: plmapp/encoding.py:64
+msgid "ISO-8859-14"
+msgstr ""
+
+#: plmapp/encoding.py:65
+msgid "ISO-8859-15"
+msgstr ""
+
+#: plmapp/encoding.py:66
+msgid "ISO-8859-16"
+msgstr ""
+
+#: plmapp/encoding.py:67
+msgid "ISO-8859-2"
+msgstr ""
+
+#: plmapp/encoding.py:68
+msgid "ISO-8859-3"
+msgstr ""
+
+#: plmapp/encoding.py:69
+msgid "ISO-8859-4"
+msgstr ""
+
+#: plmapp/encoding.py:70
+msgid "ISO-8859-5"
+msgstr ""
+
+#: plmapp/encoding.py:71
+msgid "ISO-8859-6"
+msgstr ""
+
+#: plmapp/encoding.py:72
+msgid "ISO-8859-7"
+msgstr ""
+
+#: plmapp/encoding.py:73
+msgid "ISO-8859-8"
+msgstr ""
+
+#: plmapp/encoding.py:74
+msgid "ISO-8859-9"
+msgstr ""
+
+#: plmapp/encoding.py:75
+msgid "JOHAB"
+msgstr ""
+
+#: plmapp/encoding.py:76
+msgid "KOI8-R"
+msgstr ""
+
+#: plmapp/encoding.py:77
+msgid "KOI8-U"
+msgstr ""
+
+#: plmapp/encoding.py:78
+msgid "Latin-1"
+msgstr ""
+
+#: plmapp/encoding.py:79
+msgid "MacArabic"
+msgstr ""
+
+#: plmapp/encoding.py:80
+msgid "MacCenteuro"
+msgstr ""
+
+#: plmapp/encoding.py:81
+msgid "MacCroatian"
+msgstr ""
+
+#: plmapp/encoding.py:82
+msgid "MacCyrillic"
+msgstr ""
+
+#: plmapp/encoding.py:83
+msgid "MacFarsi"
+msgstr ""
+
+#: plmapp/encoding.py:84
+msgid "MacGreek"
+msgstr ""
+
+#: plmapp/encoding.py:85
+msgid "MacIceland"
+msgstr ""
+
+#: plmapp/encoding.py:86
+msgid "MacLatin2"
+msgstr ""
+
+#: plmapp/encoding.py:87
+msgid "MacRoman"
+msgstr ""
+
+#: plmapp/encoding.py:88
+msgid "MacRomanian"
+msgstr ""
+
+#: plmapp/encoding.py:89
+msgid "MacTurkish"
+msgstr ""
+
+#: plmapp/encoding.py:90
+msgid "PTCP154"
+msgstr ""
+
+#: plmapp/encoding.py:91
+msgid "Rot-13"
+msgstr ""
+
+#: plmapp/encoding.py:92
+msgid "Shift-JIS"
+msgstr ""
+
+#: plmapp/encoding.py:93
+msgid "Shift-JIS-2004"
+msgstr ""
+
+#: plmapp/encoding.py:94
+msgid "Shift-JISX0213"
+msgstr ""
+
+#: plmapp/encoding.py:95
+msgid "TIS-620"
+msgstr ""
+
+#: plmapp/encoding.py:96
+msgid "UTF-16"
+msgstr ""
+
+#: plmapp/encoding.py:97
+msgid "UTF-16-be"
+msgstr ""
+
+#: plmapp/encoding.py:98
+msgid "UTF-16-le"
+msgstr ""
+
+#: plmapp/encoding.py:99
+msgid "UTF-32"
+msgstr ""
+
+#: plmapp/encoding.py:100
+msgid "UTF-32-be"
+msgstr ""
+
+#: plmapp/encoding.py:101
+msgid "UTF-32-le"
+msgstr ""
+
+#: plmapp/encoding.py:102
+msgid "UTF-7"
+msgstr ""
+
+#: plmapp/encoding.py:103
+msgid "UTF-8"
+msgstr ""
+
+#: plmapp/encoding.py:104
+msgid "UTF-8-sig"
+msgstr ""
+
+#: plmapp/forms.py:56
 msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
 msgstr "Référence non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
-#: plmapp/forms.py:46
+#: plmapp/forms.py:62
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
-#: plmapp/forms.py:72
+#: plmapp/forms.py:65
+msgid ""
+"Bad group, check that the group exists and that you belong to this group."
+msgstr ""
+
+#: plmapp/forms.py:92
 #, fuzzy
 msgid "An object with the same type, reference and revision already exists"
 msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
 
-#: plmapp/forms.py:317
+#: plmapp/forms.py:229
+msgid "Query"
+msgstr "Requête"
+
+#: plmapp/forms.py:351
 msgid "only search results"
 msgstr "seulement les résultats de recherche"
 
-#: plmapp/forms.py:320
+#: plmapp/forms.py:352
+msgid "Hierarchical"
+msgstr "Hiérarchique"
+
+#: plmapp/forms.py:353
+msgid "Radial 1"
+msgstr ""
+
+#: plmapp/forms.py:354
+msgid "Radial 2"
+msgstr ""
+
+#: plmapp/forms.py:357
+msgid "layout"
+msgstr "disposition"
+
+#: plmapp/forms.py:364
 msgid "child"
 msgstr "enfants"
 
-#: plmapp/forms.py:321 plmapp/models.py:462
+#: plmapp/forms.py:365 plmapp/models.py:572
 msgid "parents"
 msgstr "parents"
 
-#: plmapp/forms.py:322
+#: plmapp/forms.py:366
 msgid "doc"
 msgstr "doc"
 
-#: plmapp/forms.py:323
+#: plmapp/forms.py:367
 msgid "cad"
 msgstr "cao"
 
-#: plmapp/forms.py:324 plmapp/forms.py:330 plmapp/models.py:326
-#: plmapp/models.py:441 plmapp/user_controller.py:90
+#: plmapp/forms.py:368 plmapp/forms.py:374 plmapp/models.py:171
+#: plmapp/models.py:220 plmapp/models.py:413 plmapp/models.py:542
+#: plmapp/controllers/user.py:90
 msgid "owner"
 msgstr "propriétaire"
 
-#: plmapp/forms.py:325 plmapp/forms.py:331
+#: plmapp/forms.py:369 plmapp/forms.py:375
 msgid "signer"
 msgstr "signataire"
 
-#: plmapp/forms.py:326 plmapp/forms.py:332 plmapp/views.py:1247
+#: plmapp/forms.py:370 plmapp/forms.py:376 plmapp/views/main.py:852
 msgid "notified"
 msgstr "notifié"
 
-#: plmapp/forms.py:329
+#: plmapp/forms.py:373
 msgid "part"
 msgstr "part"
 
-#: plmapp/forms.py:335
+#: plmapp/forms.py:379
 msgid "owned"
 msgstr "dont on est propriétaire"
 
-#: plmapp/forms.py:336
+#: plmapp/forms.py:380
 msgid "to sign"
 msgstr "à signer"
 
-#: plmapp/forms.py:337
+#: plmapp/forms.py:381
 msgid "request notification from"
 msgstr "dont on a demandé à être notifié"
 
-#: plmapp/forms.py:346 templates/DisplayHomePage.htm:49
-#: templates/DisplayHomePage4Addition.htm:50
-#: templates/DisplayObject4PasswordModification.htm:11
+#: plmapp/forms.py:400 templates/DisplayObject4PasswordModification.htm:11
 #: templates/DisplayObject4creation.htm:10
 #: templates/DisplayObject4modification.htm:10
-#: templates/DisplayObjectRelPLMObject.htm:9
 msgid "Type"
 msgstr "Type"
 
-#: plmapp/forms.py:347 templates/DisplayHomePage.htm:46
-#: templates/DisplayHomePage4Addition.htm:46
-#: templates/DisplayObjectDelegation.htm:40
+#: plmapp/forms.py:401 templates/DisplayObjectDelegation.htm:30
+#: templates/groups/users.htm:26
 msgid "Username"
 msgstr "Identifiant"
+
+#: plmapp/forms.py:445
+msgid "The new user will belong to the selected groups"
+msgstr "Le nouvel utilisateur appartiendra aux groupes sélectionnés"
+
+#: plmapp/forms.py:453
+msgid "Email address must be unique."
+msgstr ""
+
+#: plmapp/forms.py:460
+msgid "Email's domain not valid"
+msgstr ""
+
+#: plmapp/forms.py:475
+#, python-format
+msgid "Warning! There are homonyms: %s!"
+msgstr ""
+
+#: plmapp/forms.py:507
+msgid "Columns must have distinct headers."
+msgstr ""
 
 #: plmapp/models.py:129
 msgid "administrator"
@@ -116,222 +564,260 @@ msgstr "contributeur"
 msgid "viewer"
 msgstr "lecteur"
 
-#: plmapp/models.py:316
-msgid "reference"
-msgstr "référence"
-
-#: plmapp/models.py:317
-msgid "type"
-msgstr "type"
-
-#: plmapp/models.py:318
-msgid "revision"
-msgstr "révision"
-
-#: plmapp/models.py:321
-msgid "name"
-msgstr "nom"
-
-#: plmapp/models.py:322
-msgid "Name of the product"
-msgstr "Nom du produit"
-
-#: plmapp/models.py:324 plmapp/models.py:441 plmapp/user_controller.py:89
-msgid "creator"
-msgstr "créateur"
-
-#: plmapp/models.py:328 plmapp/user_controller.py:87
+#: plmapp/models.py:173 plmapp/models.py:415 plmapp/models.py:1070
+#: plmapp/controllers/user.py:87
 msgid "date of creation"
 msgstr "date de création"
 
-#: plmapp/models.py:330 plmapp/user_controller.py:86
+#: plmapp/models.py:175 plmapp/models.py:417 plmapp/controllers/user.py:86
 msgid "date of last modification"
 msgstr "date de la dernière modification"
 
-#: plmapp/models.py:333 plmapp/models.py:405
-msgid "lifecycle"
-msgstr "cycle de vie"
+#: plmapp/models.py:219 plmapp/models.py:408
+msgid "name"
+msgstr "nom"
 
-#: plmapp/models.py:336
-msgid "state"
-msgstr "état"
+#: plmapp/models.py:219 plmapp/models.py:411 plmapp/models.py:541
+#: plmapp/controllers/user.py:89
+msgid "creator"
+msgstr "créateur"
 
-#: plmapp/models.py:405
-msgid "attributes"
-msgstr "attributs"
-
-#: plmapp/models.py:406
-msgid "revisions"
-msgstr "révisions"
-
-#: plmapp/models.py:406
-msgid "history"
-msgstr "historique"
-
-#: plmapp/models.py:407
-msgid "management"
-msgstr "gestion"
-
-#: plmapp/models.py:441
+#: plmapp/models.py:220 plmapp/models.py:541 plmapp/models.py:542
 msgid "ctime"
 msgstr "date de création"
 
-#: plmapp/models.py:441
+#: plmapp/models.py:221 plmapp/models.py:543
 msgid "mtime"
 msgstr "date de modification"
 
-#: plmapp/models.py:462
+#: plmapp/models.py:403 plmapp/models.py:539
+msgid "reference"
+msgstr "référence"
+
+#: plmapp/models.py:404 plmapp/models.py:539
+msgid "type"
+msgstr "type"
+
+#: plmapp/models.py:405 plmapp/models.py:540
+msgid "revision"
+msgstr "révision"
+
+#: plmapp/models.py:409
+msgid "Name of the product"
+msgstr "Nom du produit"
+
+#: plmapp/models.py:421 plmapp/models.py:506
+msgid "lifecycle"
+msgstr "cycle de vie"
+
+#: plmapp/models.py:424
+msgid "state"
+msgstr "état"
+
+#: plmapp/models.py:506
+msgid "attributes"
+msgstr "attributs"
+
+#: plmapp/models.py:507
+msgid "revisions"
+msgstr "révisions"
+
+#: plmapp/models.py:507
+msgid "history"
+msgstr "historique"
+
+#: plmapp/models.py:508
+msgid "management"
+msgstr "gestion"
+
+#: plmapp/models.py:543
+msgid "group"
+msgstr ""
+
+#: plmapp/models.py:572
 msgid "BOM-child"
 msgstr "nomenclature"
 
-#: plmapp/models.py:463
+#: plmapp/models.py:573
 msgid "doc-cad"
 msgstr "doc-cao"
 
-#: plmapp/models.py:616
+#: plmapp/models.py:732
 msgid "parts"
 msgstr "parts"
 
-#: plmapp/models.py:616
+#: plmapp/models.py:732
 msgid "files"
 msgstr "fichiers"
 
-#: plmapp/user_controller.py:88
+#: plmapp/models.py:1072
+#, fuzzy
+msgid "date of validation"
+msgstr "date de création"
+
+#: plmapp/models.py:1073
+msgid "True if guest created the invitation"
+msgstr ""
+
+#: plmapp/controllers/user.py:88
 msgid "role in PLM"
 msgstr "rôle dans le PLM"
 
-#: plmapp/views.py:1243
+#: plmapp/management/commands/createcompany.py:27
+msgid "Enter a valid e-mail address."
+msgstr ""
+
+#: plmapp/views/main.py:848
 msgid "signer level"
 msgstr "signataire niveau"
 
-#: plmapp/views.py:1245
+#: plmapp/views/main.py:850
 msgid "signer all levels"
 msgstr "signataire tous niveaux"
 
-#: templates/404.html:17
-msgid "Error 404: page not found"
-msgstr "Erreur 404: page non trouvée"
-
-#: templates/BaseDisplayHomePage.htm:26
+#: templates/BaseDisplayHomePage.htm:41
 msgid "FIND"
 msgstr "TROUVER"
 
-#: templates/BaseDisplayHomePage.htm:29
+#: templates/BaseDisplayHomePage.htm:46
 #: templates/DisplayObject4creation.htm:46
 msgid "CREATE"
 msgstr "CREER"
 
-#: templates/BaseDisplayHomePage.htm:42
+#: templates/BaseDisplayHomePage.htm:62
 msgid "NAVIGATE"
 msgstr "NAVIGUER"
 
-#: templates/BaseDisplayHomePage.htm:51
+#: templates/BaseDisplayHomePage.htm:71
 msgid "STUDY"
 msgstr "ETUDIER"
 
-#: templates/BaseDisplayHomePage.htm:57
+#: templates/BaseDisplayHomePage.htm:77
 #, fuzzy
 msgid "EXIT"
 msgstr "SORTIR"
+
+#: templates/BaseDisplayHomePage.htm:91
+#, fuzzy
+msgid "Create"
+msgstr "créateur"
+
+#: templates/BaseDisplayHomePage.htm:96
+#, fuzzy
+msgid "Search"
+msgstr "Recherche pour:"
 
 #: templates/DisplayDocCadAdd.htm:7
 msgid "Connect new document :"
 msgstr "Connecter nouveau document :"
 
-#: templates/DisplayDocCadAdd.htm:14 templates/DisplayFileAdd.htm:14
-#: templates/DisplayObjectChildAdd.htm:13
-#: templates/DisplayObjectChildEdit.htm:40
-#: templates/DisplayObjectManagementReplace.htm:15
-#: templates/DisplayRelPartAdd.htm:14
-msgid "Validate"
-msgstr "Valider"
-
-#: templates/DisplayDocCadAdd.htm:15 templates/DisplayFileAdd.htm:15
-#: templates/DisplayObjectChildAdd.htm:14
-#: templates/DisplayObjectChildEdit.htm:41
-#: templates/DisplayObjectManagementReplace.htm:16
-#: templates/DisplayRelPartAdd.htm:15
-msgid "Undo"
-msgstr "Défaire"
-
 #: templates/DisplayFileAdd.htm:7
 msgid "Add new file / Check-in file :"
 msgstr "Ajouter nouveau fichier / Check-in fichier :"
 
-#: templates/DisplayHomePage.htm:19 templates/DisplayHomePage4Addition.htm:19
+#: templates/DisplayHomePage.htm:18
 msgid "Go"
 msgstr "Go"
 
-#: templates/DisplayHomePage.htm:30 templates/DisplayHomePage4Addition.htm:29
+#: templates/DisplayHomePage.htm:28
 msgid "SEARCH !"
 msgstr "RECHERCHER !"
 
-#: templates/DisplayHomePage.htm:47 templates/DisplayHomePage4Addition.htm:47
+#: templates/DisplayHomePage.htm:34
+msgid "Results for link creation:"
+msgstr ""
+
+#: templates/DisplayHomePage.htm:44
+msgid "Attach"
+msgstr ""
+
+#: templates/DisplayHomePage.htm:45
 #, fuzzy
-msgid "Last name"
-msgstr "Prénom"
+msgid "Add child"
+msgstr "enfants"
 
-#: templates/DisplayHomePage.htm:50 templates/DisplayHomePage4Addition.htm:51
-#: templates/DisplayObjectRelPLMObject.htm:10
-msgid "Reference"
-msgstr "Référence"
-
-#: templates/DisplayHomePage.htm:51 templates/DisplayHomePage4Addition.htm:52
-msgid "Rev."
-msgstr "Rév."
-
-#: templates/DisplayHomePage.htm:52
-msgid "Name"
-msgstr "Nom"
-
-#: templates/DisplayHomePage.htm:85 templates/DisplayHomePage4Addition.htm:100
-msgid "No result matching given query"
-msgstr "Aucun résultat ne correspond à la recherche"
-
-#: templates/DisplayHomePage.htm:95 templates/DisplayHomePage4Addition.htm:109
-msgid "CREATE !"
-msgstr "CREER !"
-
-#: templates/DisplayHomePage4Addition.htm:48
-#: templates/DisplayHomePage4Addition.htm:53
-#: templates/DisplayHomePage4Addition.htm:74
-#: templates/DisplayHomePage4Addition.htm:94
-#: templates/DisplayObjectChild.htm:9 templates/DisplayObjectDocCad.htm:11
-#: templates/DisplayObjectFiles.htm:11
-#: templates/DisplayObjectManagement.htm:10
-#: templates/DisplayObjectRelPart.htm:11
+#: templates/DisplayHomePage.htm:57 templates/DisplayObjectChild.htm:19
+#: templates/DisplayObjectFiles.htm:10 templates/DisplayObjectRelPart.htm:10
 msgid "ADD"
 msgstr "AJOUTER"
 
-#: templates/DisplayLoginPage.htm:9 templates/error.html:9
+#: templates/DisplayHomePage.htm:65
+msgid "No result matching given query"
+msgstr "Aucun résultat ne correspond à la recherche"
+
+#: templates/DisplayHomePage.htm:75
+msgid "CREATE !"
+msgstr "CREER !"
+
+#: templates/DisplayHomePage.htm:79
+msgid "Import"
+msgstr ""
+
+#: templates/DisplayHomePage.htm:84
+msgid "Import a BOM"
+msgstr ""
+
+#: templates/DisplayLoginPage.htm:9
 msgid "openPLM LOGIN PAGE"
 msgstr "PAGE D'ACCES à OpenPLM"
 
-#: templates/DisplayLoginPage.htm:19
+#: templates/DisplayLoginPage.htm:22
 #, fuzzy
 msgid "openPLM connexion :"
 msgstr "Connexion à OpenPLM"
 
-#: templates/DisplayLoginPage.htm:23
+#: templates/DisplayLoginPage.htm:31
 msgid "Login :"
 msgstr "Identifiant : "
 
-#: templates/DisplayLoginPage.htm:27
+#: templates/DisplayLoginPage.htm:35
 msgid "Password :"
 msgstr "Mot de passe :"
 
-#: templates/DisplayLoginPage.htm:32
+#: templates/DisplayLoginPage.htm:40
 msgid "LOGIN"
 msgstr "ENTRER"
 
-#: templates/DisplayObject.htm:9 templates/DisplayObject.htm.py:19
-#: templates/DisplayObjectChild.htm:12
+#: templates/DisplayObject.htm:11 templates/DisplayObject.htm.py:17
+#: templates/DisplayObjectChild.htm:20
 msgid "EDIT"
 msgstr "EDITER"
 
 #: templates/DisplayObject.htm:12
 msgid "PASSWORD"
 msgstr "MOT DE PASSE"
+
+#: templates/DisplayObject.htm:35
+msgid "Comments"
+msgstr ""
+
+#: templates/DisplayObject.htm:39
+#, python-format
+msgid ""
+"\n"
+"                    %(comment_count)s comments have been posted.\n"
+"                "
+msgstr ""
+
+#: templates/DisplayObject.htm:48
+msgid "Posted by:"
+msgstr ""
+
+#: templates/DisplayObject.htm:52
+msgid "Date:"
+msgstr ""
+
+#: templates/DisplayObject.htm:60
+msgid "No comments have been posted yet."
+msgstr ""
+
+#: templates/DisplayObject.htm:65
+msgid "Post a comment"
+msgstr ""
+
+#: templates/DisplayObject.htm:95
+msgid "Post"
+msgstr ""
 
 #: templates/DisplayObject4PasswordModification.htm:7
 msgid "PASSWORD MODIFICATION:"
@@ -353,20 +839,20 @@ msgstr "MODIFICATION DE L'OBJET"
 msgid "MODIFY"
 msgstr "MODIFIER"
 
-#: templates/DisplayObjectChild.htm:16 templates/DisplayObjectParents.htm:9
-#: templates/Navigate.htm:20
+#: templates/DisplayObjectChild.htm:23 templates/DisplayObjectParents.htm:9
+#: templates/Navigate.htm:65
 msgid "Display :"
 msgstr "Afficher :"
 
-#: templates/DisplayObjectChild.htm:20 templates/DisplayObjectParents.htm:13
+#: templates/DisplayObjectChild.htm:27 templates/DisplayObjectParents.htm:13
 msgid "GO !"
 msgstr "GO !"
 
-#: templates/DisplayObjectChild.htm:25
+#: templates/DisplayObjectChild.htm:32
 msgid "Ord."
 msgstr "Ord."
 
-#: templates/DisplayObjectChild.htm:26
+#: templates/DisplayObjectChild.htm:33
 msgid "Qty"
 msgstr "Qté"
 
@@ -382,48 +868,65 @@ msgstr "Quantité"
 msgid "Delete ?"
 msgstr "Effacer ?"
 
-#: templates/DisplayObjectDelegation.htm:7
+#: templates/DisplayObjectChildEdit.htm:40 templates/import/csv.htm:68
+#: templates/snippets/undo_form.htm:13
+msgid "Validate"
+msgstr "Valider"
+
+#: templates/DisplayObjectChildEdit.htm:41 templates/import/csv.htm:69
+#: templates/snippets/undo_form.htm:14
+msgid "Undo"
+msgstr "Défaire"
+
+#: templates/DisplayObjectDelegation.htm:8
 msgid "START DELEGATE :"
 msgstr "COMMENCER A DELEGUER :"
 
-#: templates/DisplayObjectDelegation.htm:11
+#: templates/DisplayObjectDelegation.htm:10
 msgid "OWNERSHIP"
 msgstr "PROPRIETE"
 
-#: templates/DisplayObjectDelegation.htm:17
+#: templates/DisplayObjectDelegation.htm:13
 msgid "SIGNATURE 1st LEVEL"
 msgstr "SIGNATURE 1er NIVEAU"
 
-#: templates/DisplayObjectDelegation.htm:23
+#: templates/DisplayObjectDelegation.htm:16
 msgid "SIGNATURE 2nd LEVEL"
 msgstr "SIGNATURE 2e NIVEAU"
 
-#: templates/DisplayObjectDelegation.htm:29
+#: templates/DisplayObjectDelegation.htm:19
 msgid "ALL SIGNATURES"
 msgstr "TOUTES SIGNATURES"
 
-#: templates/DisplayObjectDelegation.htm:35
+#: templates/DisplayObjectDelegation.htm:22
 msgid "NOTIFICATIONS"
 msgstr "NOTIFICATIONS"
 
-#: templates/DisplayObjectDelegation.htm:41
+#: templates/DisplayObjectDelegation.htm:25
+msgid "Sponsor"
+msgstr ""
+
+#: templates/DisplayObjectDelegation.htm:31
 msgid "First Name"
 msgstr "Prénom"
 
-#: templates/DisplayObjectDelegation.htm:42
+#: templates/DisplayObjectDelegation.htm:32
 msgid "Last Name"
 msgstr "Prénom"
 
-#: templates/DisplayObjectDelegation.htm:43
-#: templates/DisplayObjectRelPLMObject.htm:12
+#: templates/DisplayObjectDelegation.htm:33
 msgid "Role"
 msgstr "Rôle"
 
-#: templates/DisplayObjectDelegation.htm:54
+#: templates/DisplayObjectDelegation.htm:46
 msgid "STOP DELEGATION"
 msgstr "ARRETER DELEGATION"
 
-#: templates/DisplayObjectDocCad.htm:14 templates/DisplayObjectRelPart.htm:14
+#: templates/DisplayObjectDocCad.htm:11
+msgid "Attach another document"
+msgstr ""
+
+#: templates/DisplayObjectDocCad.htm:14 templates/DisplayObjectRelPart.htm:12
 msgid "DISCONNECT"
 msgstr "DECONNECTER"
 
@@ -431,35 +934,44 @@ msgstr "DECONNECTER"
 msgid "There are no document attached to this part"
 msgstr "Il n'y a pas de document attaché à cette part"
 
-#: templates/DisplayObjectFiles.htm:13
+#: templates/DisplayObjectFiles.htm:11
 msgid "DELETE"
 msgstr "DETRUIRE"
 
-#: templates/DisplayObjectFiles.htm:34
+#: templates/DisplayObjectFiles.htm:31
 msgid "DOWNLOAD"
 msgstr "TELECHARGER"
 
-#: templates/DisplayObjectFiles.htm:42
+#: templates/DisplayObjectFiles.htm:37
 msgid "CHECK-IN"
 msgstr "CHECK-IN"
 
-#: templates/DisplayObjectFiles.htm:46
+#: templates/DisplayObjectFiles.htm:41
 msgid "CHECK-OUT"
 msgstr "CHECK-OUT"
 
-#: templates/DisplayObjectFiles.htm:59
+#: templates/DisplayObjectFiles.htm:53
 msgid "No thumbnail available"
 msgstr "Aucun aperçu disponible"
 
-#: templates/DisplayObjectManagement.htm:20
-msgid "active,inactive"
-msgstr "actif,inactif"
+#: templates/DisplayObjectManagement.htm:13
+msgid "Notify"
+msgstr ""
 
-#: templates/DisplayObjectManagement.htm:25
+#: templates/DisplayObjectManagement.htm:18
+#, fuzzy
+msgid "Unnotify me"
+msgstr "notifié"
+
+#: templates/DisplayObjectManagement.htm:23
+msgid "Notify me"
+msgstr ""
+
+#: templates/DisplayObjectManagement.htm:50
 msgid "REPLACE"
 msgstr "REMPLACER"
 
-#: templates/DisplayObjectManagement.htm:34
+#: templates/DisplayObjectManagement.htm:59
 msgid "Delete"
 msgstr "Effacer ?"
 
@@ -467,11 +979,7 @@ msgstr "Effacer ?"
 msgid "Select a user for your delegation as : "
 msgstr "Sélectionez un utilisateur pour déléguer votre rôle de : "
 
-#: templates/DisplayObjectRelPLMObject.htm:11
-msgid "Revision"
-msgstr "Révision"
-
-#: templates/DisplayObjectRelPart.htm:37
+#: templates/DisplayObjectRelPart.htm:35
 msgid "There are no parts attached to this document"
 msgstr "Il n'y a pas de part attachée à ce document"
 
@@ -483,23 +991,256 @@ msgstr "NOUVEAU"
 msgid "You can not revise this object since a revision already exist."
 msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
 
-#: templates/Navigate.htm:24
+#: templates/MiddleDisplayObject.htm:36
+msgid "You are not allowed to see this object"
+msgstr ""
+
+#: templates/Navigate.htm:25
+msgid "Attach document?"
+msgstr ""
+
+#: templates/Navigate.htm:28
+msgid "Attach the selected document?"
+msgstr ""
+
+#: templates/Navigate.htm:69
 msgid "FILTER"
 msgstr "FILTRER"
 
-#: templates/error.html:18
-msgid "Error :"
+#: templates/groups/accept_invitation.htm:5
+msgid "Accept invitation ?"
+msgstr ""
+
+#: templates/groups/accept_invitation.htm:7
+#, python-format
+msgid ""
+"\n"
+"            Accept that %(guest)s join the group %(group)s ?\n"
+"        "
+msgstr ""
+
+#: templates/groups/accept_invitation.htm:11
+#, python-format
+msgid ""
+"\n"
+"            Accept to join the group %(group)s ?\n"
+"        "
+msgstr ""
+
+#: templates/groups/add_user.htm:6
+msgid "Add a new user to the group:"
+msgstr ""
+
+#: templates/groups/add_user.htm:11
+msgid "You can not add an user to this group."
+msgstr ""
+
+#: templates/groups/ask_to_join.htm:6
+msgid "You are already in this group."
+msgstr ""
+
+#: templates/groups/ask_to_join.htm:8
+msgid "Join this group ?"
+msgstr ""
+
+#: templates/groups/refuse_invitation.htm:5
+msgid "Refuse invitation ?"
+msgstr ""
+
+#: templates/groups/refuse_invitation.htm:7
+#, python-format
+msgid ""
+"\n"
+"            Refuse that %(guest)s join the group %(group)s ?\n"
+"        "
+msgstr ""
+
+#: templates/groups/refuse_invitation.htm:11
+#, python-format
+msgid ""
+"\n"
+"            Refuse to join the group %(group)s ?\n"
+"        "
+msgstr ""
+
+#: templates/groups/users.htm:11
+msgid "Add another user"
+msgstr ""
+
+#: templates/groups/users.htm:13
+msgid "Remove selected users"
+msgstr ""
+
+#: templates/groups/users.htm:17
+msgid "Ask to join this group"
+msgstr ""
+
+#: templates/groups/users.htm:27
+msgid "First name"
+msgstr "Prénom"
+
+#: templates/groups/users.htm:28
+#, fuzzy
+msgid "Last name"
+msgstr "Prénom"
+
+#: templates/import/csv.htm:6
+msgid "Import of a csv file"
+msgstr ""
+
+#: templates/import/csv.htm:16
+#, fuzzy
+msgid "Error"
 msgstr "Erreur :"
 
-#: templates/error.html:20
-msgid "go back"
-msgstr "revenir en arrière"
+#: templates/import/csv.htm:22
+#, python-format
+msgid " Line %(line)s "
+msgstr ""
 
-#~ msgid "Search for :"
-#~ msgstr "Recherche pour:"
+#: templates/import/csv.htm:32
+msgid "Error while reading the CSV file. Try upload a new file."
+msgstr ""
 
-#~ msgid "First name"
-#~ msgstr "Prénom"
+#: templates/import/csv.htm:35
+msgid ""
+"The given encoding seems wrong. Try upload a new file with the right "
+"encoding."
+msgstr ""
+
+#: templates/import/csv.htm:50
+msgid "Field"
+msgstr ""
+
+#: templates/import/csv.htm:51
+msgid "Header"
+msgstr ""
+
+#: templates/import/csv.htm:53
+msgid "Row"
+msgstr ""
+
+#: templates/import/done.htm:6
+msgid "Data have been successfully imported."
+msgstr ""
+
+#: templates/import/done.htm:8
+msgid "Click here to import a new CSV file."
+msgstr ""
+
+#: templates/import/done.htm:9
+msgid "Click here to import a new BOM."
+msgstr ""
+
+#: templates/mails/history.htm:6
+msgid "Message from openPLM"
+msgstr ""
+
+#: templates/mails/history.htm:8
+msgid "Object:"
+msgstr ""
+
+#: templates/mails/history.htm:11
+msgid "A new action has been done:"
+msgstr ""
+
+#: templates/mails/history.htm:14
+#, fuzzy
+msgid "Details"
+msgstr "détail technique"
+
+#: templates/mails/history.htm:32
+msgid "Click here to see more details."
+msgstr ""
+
+#: templates/mails/invitation1.htm:5 templates/mails/invitation2.htm:5
+#, python-format
+msgid ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
+"the group %(group)s.\n"
+"        "
+msgstr ""
+
+#: templates/mails/invitation1.htm:11 templates/mails/invitation2.htm:11
+msgid "Click here to accept the invitation"
+msgstr ""
+
+#: templates/mails/invitation1.htm:12 templates/mails/invitation2.htm:12
+msgid "Accept invitation"
+msgstr ""
+
+#: templates/mails/invitation1.htm:14 templates/mails/invitation2.htm:14
+msgid "Click here to refuse the invitation"
+msgstr ""
+
+#: templates/mails/invitation1.htm:15 templates/mails/invitation2.htm:15
+msgid "Refuse invitation"
+msgstr ""
+
+#: templates/mails/new_account.htm:5
+#, python-format
+msgid ""
+"\n"
+"            Welcome %(first_name)s %(last_name)s!\n"
+"            "
+msgstr ""
+
+#: templates/mails/new_account.htm:10
+#, python-format
+msgid ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
+"OpenPLM.\n"
+"        "
+msgstr ""
+
+#: templates/mails/new_account.htm:16
+msgid "Your credentials:"
+msgstr ""
+
+#: templates/mails/new_account.htm:21
+#, fuzzy
+msgid "Username:"
+msgstr "Identifiant"
+
+#: templates/mails/new_account.htm:25
+#, fuzzy
+msgid "Password:"
+msgstr "Mot de passe :"
+
+#: templates/mails/new_account.htm:30
+msgid "You should change your password!"
+msgstr ""
+
+#: templates/mails/new_account.htm:32
+msgid "Click here to change your password"
+msgstr ""
+
+#: templates/users/sponsor.htm:7
+msgid "Sponsor a new user"
+msgstr "Sponsoriser un nouvel utilisateur"
+
+#~ msgid "Error 404: page not found"
+#~ msgstr "Erreur 404: page non trouvée"
+
+#~ msgid "go back"
+#~ msgstr "revenir en arrière"
+
+#~ msgid "Reference"
+#~ msgstr "Référence"
+
+#~ msgid "Rev."
+#~ msgstr "Rév."
+
+#~ msgid "Name"
+#~ msgstr "Nom"
+
+#~ msgid "active,inactive"
+#~ msgstr "actif,inactif"
+
+#~ msgid "Revision"
+#~ msgstr "Révision"
 
 #~ msgid "e-mail."
 #~ msgstr "e-mail."
