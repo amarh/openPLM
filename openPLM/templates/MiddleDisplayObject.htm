@@ -20,6 +20,7 @@
             {% if object_menu and not navigate_bool %}
                 <div id="menu">
                     <ul id="MenuList">
+                        <li id="fake_menu_item_left" class="fake"></li>
                         {% for menu_item in object_menu %}
                             <li {% ifequal menu_item current_page%} class="CurrentPage" {%endifequal%}>
                             <a href="{{obj.plmobject_url}}{{menu_item}}/">
@@ -27,7 +28,7 @@
                             </a>
                             </li>
                         {% endfor %}
-                        <li style="clear:both"></li>
+                        <li id="fake_menu_item_right" class="fake"></li>
                     </ul>
                 </div>
             {% endif %}
