@@ -564,7 +564,7 @@ div#FilterNav ul>li
 /* comments */
 
 div.comment {
-
+    background-color: #343434;
     margin: 1em;
     padding-left:0.5em;
     border-left: 2px #888 solid;
@@ -701,6 +701,7 @@ div.selector {
 
     background:url("/media/img/dark/drop.png") no-repeat right center, 
         url("/media/css/openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
+    padding-left: 0px;
 }
 
 div.selector > *
@@ -713,4 +714,12 @@ div.selector > *
 ul#createbar li ,
 ul#importbar li {
     margin: 0.2em 0;
+}
+
+#SearchBox td > * {
+    width: 100%;
+}
+
+#search_button {
+    margin-top: 0.2em;
 }
