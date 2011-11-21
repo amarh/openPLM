@@ -156,9 +156,13 @@ div#LoginBox
     display: inline-block;
     vertical-align: middle;
     line-height: 30px;
-    width: 500px;
+    width: 45%;
+    position: relative;
+    left: 25%;
     margin: auto;
-    padding: 50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 25px;
     text-align: center;
 }
 
