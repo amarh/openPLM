@@ -281,18 +281,20 @@ ul#MenuList
     text-align: left;
     font-size: 90%;
     margin-top: 5px;
+    background-color : rgba(238, 238, 238, 0.5);
+    border-radius: 4px 4px 0 0;   
+    margin-left: 1em;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
 }
 
 ul#MenuList li
 {
     display: inline;
-    /*width: 100%;*/
     text-align: center;
     padding: 5px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
     white-space:nowrap;
-    padding-top:5px;
+    padding-top: 10px;
 }
 
 ul#MenuList li.CurrentPage,
@@ -306,23 +308,12 @@ ul#MenuList li:hover:not(.fake)
     border-width: 1px;
     padding-left: 4px;
     padding-right: 4px;
-    background: url("/media/img/dark/button_bg.png") repeat-x; 
-    background-size: auto 100%;
-}
-
-ul#MenuList li:not(.CurrentPage):not(:hover),
-li.fake
-{
-    background-color : rgba(238, 238, 238, 0.5);
+    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% rgba(238, 238, 238, 0.5);
+    border-radius: 4px 4px 0 0;
 }
 
 li#fake_menu_item_right {
-    border-radius: 0 4px 0 0;
     clear: both;
-}
-
-li#fake_menu_item_left {
-    border-radius: 4px 0 0 0;   
 }
 
 ul#MenuList li a
