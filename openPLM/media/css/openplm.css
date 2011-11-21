@@ -654,7 +654,7 @@ input.Button{
 }
 
 span.ui-button-text {
-    padding:0.4em 0.4em !important;
+    padding:0.4em 0.4em;
 }
 
 a.Button {

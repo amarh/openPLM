@@ -69,11 +69,13 @@
 
 {% block CreationBlock %}
     <form method="get" action="/object/create/" enctype="text/plain">
-        <ul>
-            {{type_form4creation.as_ul}}
+        <ul id="createbar">
+            {{ type_form4creation.as_ul }}
             <li>
             <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
             </li>
+        </ul>
+        <ul id="importbar">
             <li class="{{"Button"|button}}" id="ImportButton">
             <a href="/import/csv/">
                 <span class="ui-button-text">{% trans "Import" %}</span>

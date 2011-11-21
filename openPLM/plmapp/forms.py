@@ -133,7 +133,8 @@ class TypeForm(forms.Form):
 
 class TypeFormWithoutUser(forms.Form):
     LIST_WO_USER = m.get_all_plmobjects_with_level()
-    type = forms.TypedChoiceField(choices=LIST_WO_USER)
+    type = forms.TypedChoiceField(choices=LIST_WO_USER,
+            label=_("Select a type"))
 
 class TypeSearchForm(TypeForm):
     pass
