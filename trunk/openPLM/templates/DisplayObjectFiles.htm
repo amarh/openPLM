@@ -17,11 +17,11 @@
                 {{ form.document }}
                 {% with form.instance as instance %}
 			        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-			        <td class="Content" style="width:50px; text-align:center">
+			        <td class="Content ui-state-default ui-state-corner-all">
 			            {% if instance.locked %}
-			                <img src="/media/img/verrou_ferme.gif" title="Lock" alt="Lock" width="20" height="20"/>
+                            <span class="ui-icon ui-icon-locked">{% trans "Locked" %}</span>
 		                {% else %}
-		                    <img src="/media/img/verrou_ouvert.jpg" title="Unlock" alt="Unlock" width="20" height="20"/>
+                            <span class="ui-icon ui-icon-unlocked">{% trans "Unlocked" %}</span>
 		                {% endif %}
 		            </td>
                     <td class="Content">
