@@ -36,9 +36,15 @@
             {% get_comment_count for obj.object as comment_count %}
             {% if comment_count %}
                 <p>
-                {% blocktrans %}
-                    {{ comment_count }} comments have been posted.
-                {% endblocktrans %}
+                    {% if comment_count == 1 %}
+                        {% blocktrans %}
+                            One comment has been posted.
+                        {% endblocktrans %}
+                    {% else %}
+                        {% blocktrans %}
+                            {{ comment_count }} comments have been posted.
+                        {% endblocktrans %}
+                    {% endif %}
                 </p>
 
                 {% get_comment_list for obj.object as comment_list %}
