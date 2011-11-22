@@ -954,6 +954,8 @@ def display_users(request, obj_ref):
     else:
         formset = forms.get_user_formset(obj)
     ctx["user_formset"] = formset
+    ctx["pending_invitations"] = obj.invitation_set.filter(
+            state=models.Invitation.PENDING)
     ctx['current_page'] = 'users' 
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
     return r2r("groups/users.htm", ctx, request)
