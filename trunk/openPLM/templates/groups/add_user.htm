@@ -3,12 +3,13 @@
 
 {% block content %} 
     {% if is_owner %}
-        <p>{% trans "Add a new user to the group:" %} </p>
+        <h3>{% trans "Invite a new user to the group:" %} </h3>
+        <p>{% trans "The user will receive an e-mail and could accept your invitation." %}</p>
         {% with add_user_form as form %}
             {% include "snippets/undo_form.htm" %}
          {% endwith %}
     {% else %}
-        <p>{% trans "You can not add an user to this group." %} </p>
+        <p>{% trans "You can not invite an user to this group." %} </p>
     {% endif %}
 {% endblock %}
 

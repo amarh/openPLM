@@ -4,31 +4,33 @@
 <!-- Manage html display in the Content div which correspond to the "users" menu -->
 
 {% block content %}
-     <form method="post" action="">	
+    <div id="group_users"/>
+        <h3>{% trans "Users" %}</h3>
+        <form method="post" action="">	
 
-        {{ user_formset.management_form }}
-        {% if is_owner %}
-            <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "Add another user" %}</span></a>
-            {% if user_formset.forms %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "Remove selected users" %}"/>
-            {% endif %}
-        {% else %}
-            {% if not in_group %}
-                <a class="{{"Button"|button}}" href="./join/"><span class="ui-button-text">{% trans "Ask to join this group" %}</span></a>
-            {% endif %}
-        {% endif %}
-
-        <table class="Content">
-            <tr>
-                {% if is_owner %}
-                   <th class="Content" style="width:50px; text-align:center"></th>
+            {{ user_formset.management_form }}
+            {% if is_owner %}
+                <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "Invite another user" %}</span></a>
+                {% if user_formset.forms %}
+                    <input type="submit" class="{{"Button"|button}}" value="{% trans "Remove selected users" %}"/>
                 {% endif %}
-                <th class="Content" > {% trans "Username" %} </th>
-                <th class="Content" > {% trans "First name" %} </th>
-                <th class="Content" > {% trans "Last name" %} </th>
-            </tr>
-             <tr class="Content"> 
-                     {% if is_owner %}
+            {% else %}
+                {% if not in_group %}
+                    <a class="{{"Button"|button}}" href="./join/"><span class="ui-button-text">{% trans "Ask to join this group" %}</span></a>
+                {% endif %}
+            {% endif %}
+
+            <table class="Content">
+                <tr>
+                    {% if is_owner %}
+                        <th class="Content" style="width:50px; text-align:center"></th>
+                    {% endif %}
+                    <th class="Content" > {% trans "Username" %} </th>
+                    <th class="Content" > {% trans "First name" %} </th>
+                    <th class="Content" > {% trans "Last name" %} </th>
+                </tr>
+                <tr class="Content"> 
+                    {% if is_owner %}
                         <td class="Content" style="width:50px; text-align:center"></td>
                     {% endif %}
 
@@ -41,27 +43,56 @@
                     <td class="Content"> {{ obj.owner.last_name }} </td>
                 </tr>
 
-            {% for form in user_formset.forms %}
-                {{ form.id }}
-                {{ form.user }}
-                {{ form.group }}
-                
-                <tr class="Content"> 
-                     {% if is_owner %}
-                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-                    {% endif %}
+                {% for form in user_formset.forms %}
+                    {{ form.id }}
+                    {{ form.user }}
+                    {{ form.group }}
 
+                    <tr class="Content"> 
+                        {% if is_owner %}
+                            <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                        {% endif %}
+
+                        <td class="Content"> 
+                            <a href="/user/{{form.user_data.username}}/">
+                                {{ form.user_data.username }}
+                            </a>
+                        </td>
+                        <td class="Content"> {{ form.user_data.first_name }} </td>
+                        <td class="Content"> {{ form.user_data.last_name }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </form>
+
+    </div>
+
+    <div id="pending_invitations">
+        <h3>{% trans "Pending invitations" %}</h3>
+        <p>{% trans "The following invitations have been sent but guests has not yet accepted them." %}
+        <table class="Content">
+            <tr>
+                <th class="Content"> {% trans "Username" %} </th>
+                <th class="Content"> {% trans "First name" %} </th>
+                <th class="Content"> {% trans "Last name" %} </th>
+                <th class="Content"> {% trans "Date of the invitation" %} </th>
+            </tr>
+
+            {% for inv in pending_invitations %}
+                {% with inv.guest as guest %}
                     <td class="Content"> 
-                        <a href="/user/{{form.user_data.username}}/">
-                            {{ form.user_data.username }}
+                        <a href="/user/{{guest.username}}/">
+                            {{ guest.username }}
                         </a>
                     </td>
-                    <td class="Content"> {{ form.user_data.first_name }} </td>
-                    <td class="Content"> {{ form.user_data.last_name }} </td>
-                </tr>
+                    <td class="Content"> {{ guest.first_name }} </td>
+                    <td class="Content"> {{ guest.last_name }} </td>
+
+                {% endwith %}
+                <td class="Content"> {{ inv.ctime|date:"r" }} </td>
             {% endfor %}
         </table>
-</form>
+    </div>
 {% endblock %}
 
 
