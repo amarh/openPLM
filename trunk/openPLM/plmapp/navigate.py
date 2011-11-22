@@ -108,12 +108,13 @@ class NavigationGraph(object):
                             bgcolor="transparent")
     NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='12',
                            bgcolor="transparent", color="transparent",
-                            fontcolor="#7f7c7c",
+                           fontcolor="#7f7c7c",
                            style='filled', width=100./96, height=70./96)
     EDGE_ATTRIBUTES = dict(color='#aaaaaa',
                            minlen="1.5",
                            len="1.5",
                            arrowhead='normal',
+                           fontcolor="#aaaaaa",
                            fontsize="9")
     TYPE_TO_ATTRIBUTES = {UserController : dict(
                             image=os.path.join(icondir, "user.png")),
