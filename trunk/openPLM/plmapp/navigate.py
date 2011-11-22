@@ -290,6 +290,9 @@ class NavigationGraph(object):
         node = self.graph.get_node(id_)
         self._set_node_attributes(self.object, id_)
         self.main_node = node.attr["id"]
+        node.attr["image"] = node.attr["image"].replace(".png", "_main.png")
+        node.attr["width"] = 110. / 96 
+        node.attr["height"] = 80. / 96 
         #color = node.attr["color"]
         #node.attr.update(color="#444444", fillcolor=color)
         functions_dic = {'child':(self._create_child_edges, None),
