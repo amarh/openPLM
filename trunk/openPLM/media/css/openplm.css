@@ -468,6 +468,7 @@ li.Result div.toolbar button{
 
 /** input **/
 input[type=text],
+input[type=file],
 input[type=password],
 textarea {
     color: black;
