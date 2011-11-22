@@ -5,6 +5,7 @@
 
 {% block content %}
 	<h3>{% trans "OBJECT MODIFICATION:" %}</h3>
+		<form method="post" action="." >	
 	<table class="Content">
 		<tr class="Content">
 			<th>{% trans "Type" %}</th>
@@ -20,7 +21,6 @@
 				{% endifequal %}
 			</tr>
 		{% endfor%}
-		<form method="post" action="." >	
 		<tr class="Content">
 			<th><label for="id_type">&nbsp;</label></th>
 			<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
@@ -34,8 +34,8 @@
 		<tr class="Content">
 			<td></td><td><input type="submit" class="{{"Button"|button}}" value="{% trans "MODIFY" %}" /></td>
 		</tr>
-		</form>
 	</table>
+		</form>
 {% endblock %}
 
 
