@@ -106,14 +106,16 @@ class NavigationGraph(object):
                             sep="+.1,.1",
                             outputorder="edgesfirst",
                             bgcolor="transparent")
-    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='12',
+    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='11',
                            bgcolor="transparent", color="transparent",
-                           fontcolor="#7f7c7c",
+                           fontname="Sans bold",
+                           fontcolor="#aaaaaa",
                            style='filled', width=100./96, height=70./96)
     EDGE_ATTRIBUTES = dict(color='#aaaaaa',
                            minlen="1.5",
                            len="1.5",
                            arrowhead='normal',
+                           fontname="Sans bold",
                            fontcolor="#aaaaaa",
                            fontsize="9")
     TYPE_TO_ATTRIBUTES = {UserController : dict(
