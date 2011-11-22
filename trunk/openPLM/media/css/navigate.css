@@ -17,8 +17,8 @@ div#Navigate
 }
 
 #navThumbnailsBar {
-    border-bottom: 1px solid #ccc;
-    background-color: #dbb;
+    border-bottom: 1px solid #7f7c7c;
+    background-color: #343434;
     padding: 3px;
     overflow: auto;
 }
@@ -32,8 +32,8 @@ div#navThumbnails {
     position:absolute;
     height: 500px;
     right:0px;
-    border-left: 1px solid #ccc;
-    background: rgba(200, 230, 230, 0.7);
+    border-left: 1px solid #7f7c7c;
+    background: rgba(52, 52, 52, 0.7);
 }
 
 div#thumbnailsList {
@@ -41,7 +41,7 @@ div#thumbnailsList {
     max-height: 480px;
 }
 div#thumbnailsList img{
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #7f7c7c;
     max-width: 160px;
     max-height: 160px;
 }
