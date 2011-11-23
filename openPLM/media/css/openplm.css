@@ -275,7 +275,7 @@ div#ActiveArea
 
 /* FOR THE MENU OF THE CURRENT OBJECT */
 div#menu {
-    background: url("/media/img/dark/banner.png") no-repeat scroll left top transparent;
+    background: url("/media/img/dark/banner.png") no-repeat scroll left top white; 
     padding: 0.5em 0 0;
 }
 
