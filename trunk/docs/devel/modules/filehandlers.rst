@@ -9,7 +9,7 @@
   
 .. toctree::
     :maxdepth: 2
+    :glob:
 
-    filehandlers_base
-    filehandlers_odf
-    filehandlers_pdf
+    filehandlers/*
+
