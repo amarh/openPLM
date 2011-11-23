@@ -21,20 +21,20 @@
             <li>
             <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
             </li>
-         </ul>
+        </ul>
     </form>
 {% endblock %}
 
 {% block SearchBlock %}
     <div>
-    <form id="search_form" method="get" action="." enctype="text/plain">
-        <table id="search_table">
-            {{type_form.as_table}}
-            {{attributes_form.as_table}}
-        </table>
-        <div style="text-align:center"><input id="search_button" type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/></div>
-    </form>
-</div>
+        <form id="search_form" method="get" action="." enctype="text/plain">
+            <table id="search_table">
+                {{type_form.as_table}}
+                {{attributes_form.as_table}}
+            </table>
+            <div style="text-align:center"><input id="search_button" type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/></div>
+        </form>
+    </div>
 {% endblock %}
 
 {% block ResultBlock %}
@@ -76,29 +76,33 @@
 {% endblock %}
 
 {% block CreationBlock %}
-    <form method="get" action="/object/create/" enctype="text/plain">
-        <ul id="createbar">
-            {% with type_form4creation.visible_fields.0 as field %}
-                <span id="select_type">{{field.label }}</span>
-            <li>
-                {{ field }}
-            {% endwith %}
-            <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
-            </li>
-        </ul>
-        <ul id="importbar">
-            <li class="{{"Button"|button}}" id="ImportButton">
-            <a href="/import/csv/">
-                <span class="ui-button-text">{% trans "Import" %}</span>
-            </a>
-            </li>
-            <li class="{{"Button"|button}}" id="ImportBOMButton">
-            <a href="/import/bom/">
-                <span class="ui-button-text">{% trans "Import a BOM" %}</span>
-            </a>
-            </li>
-        </ul>
-    </form>
+    {% if user.get_profile.is_contributor %}
+        <form method="get" action="/object/create/" enctype="text/plain">
+            <ul id="createbar">
+                {% with type_form4creation.visible_fields.0 as field %}
+                    <span id="select_type">{{field.label }}</span>
+                    <li>
+                    {{ field }}
+                {% endwith %}
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
+                </li>
+            </ul>
+            <ul id="importbar">
+                <li class="{{"Button"|button}}" id="ImportButton">
+                <a href="/import/csv/">
+                    <span class="ui-button-text">{% trans "Import" %}</span>
+                </a>
+                </li>
+                <li class="{{"Button"|button}}" id="ImportBOMButton">
+                <a href="/import/bom/">
+                    <span class="ui-button-text">{% trans "Import a BOM" %}</span>
+                </a>
+                </li>
+            </ul>
+        </form>
+    {% else %}
+        <p>{% trans "You can not create an object since you are not a contributor."%}</p>
+    {% endif %}
 {% endblock %}
 
 
