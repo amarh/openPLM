@@ -22,6 +22,7 @@ function show_search_box(){
 
 function hide_create_box(){
     $("#CreationBox").hide();
+    $("label[for=CreationButton]").removeClass("ui-state-active");
     if ($("#SearchBox").is(":hidden")){
         hide_left_panel();
     }
@@ -30,6 +31,7 @@ function hide_create_box(){
 
 function hide_search_box(){
     $("#SearchBox").hide();
+    $("label[for=FindButton]").removeClass("ui-state-active");
     if ($("#CreationBox").is(":hidden")){
         hide_left_panel();
     }
@@ -67,6 +69,28 @@ $(function (){
     $("#CreationButton").attr("checked", create);
     $("#FindButton").button().click(toggle_search_box);
     $("#CreationButton").button().click(toggle_create_box);
+
+
+    var close_creation_box = $("<button>close</button>");
+    var button = close_creation_box.button({
+        icons: {
+                primary: "ui-icon-close"
+        },
+        text:false
+        }).click(toggle_create_box);
+    button.css({margin: "auto 0", float:"right", width:"1em", height:"1em" });
+    $("#CreationBox h2").append(button);
+
+    var close_search_box = $("<button>close</button>");
+    button = close_search_box.button({
+        icons: {
+                primary: "ui-icon-close"
+        },
+        text:false
+        }).click(toggle_search_box);
+    button.css({margin: "auto 0", float:"right", width:"1em", height:"1em" });
+    $("#SearchBox h2").append(button);
+
 
     if (search){
         show_search_box();
