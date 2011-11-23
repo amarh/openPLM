@@ -229,6 +229,7 @@ class UserController(Controller):
 
     @permission_required(role=models.ROLE_OWNER)
     def sponsor(self, new_user, is_contributor=True):
+        self.check_contributor()
         email = new_user.email
         try:
             # checks *email*

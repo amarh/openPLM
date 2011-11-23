@@ -21,9 +21,11 @@
         <a class="{{"Button"|button}}" href="./delegate/notified/">
             <span class="ui-button-text">{% trans "NOTIFICATIONS" %}</span>
         </a>
-        <a class="{{"Button"|button}}" href="./sponsor/">
-            <span class="ui-button-text">{% trans "Sponsor" %}</span>
-        </a>
+        {% if obj.is_contributor or obj.is_administrator %}
+            <a class="{{"Button"|button}}" href="./sponsor/">
+                <span class="ui-button-text">{% trans "Sponsor" %}</span>
+            </a>
+        {% endif %}
     {% endif %}
     <table class="Content">
         <tr class="Content">
