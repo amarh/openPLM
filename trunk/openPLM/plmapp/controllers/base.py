@@ -48,6 +48,9 @@ class MetaController(type):
     controllers_dict = {}
 
     def __new__(mcs, name, bases, attrs):
+        # sets a __slots__ attributes to reduce memory consumption
+        if name != "Controller" and "__slots__" not in attrs:
+            attrs["__slots__"] = Controller.__slots__
         cls = type.__new__(mcs, name, bases, attrs)
         if "MANAGED_TYPE" in attrs:
             managed = attrs["MANAGED_TYPE"].__name__
@@ -125,6 +128,8 @@ class Controller(object):
     """
 
     __metaclass__ = MetaController
+    __slots__ = ("object", "_user", "_histo", "_pending_mails", "_mail_blocked",
+            "__permissions", "__histo")
 
     HISTORY = models.AbstractHistory
 
@@ -142,10 +147,11 @@ class Controller(object):
         # we override this method to make it to modify *object* directly
         # if we modify *object*, we records the modification in **_histo*
         if hasattr(self, "object") and hasattr(self.object, attr) and \
-           not attr in self.__dict__:
-            old_value = getattr(self.object, attr)
-            setattr(self.object, attr, value)
-            field = self.object._meta.get_field(attr).verbose_name.capitalize()
+           not attr in type(self).__slots__:
+            obj = object.__getattribute__(self, "object")
+            old_value = getattr(obj, attr)
+            setattr(obj, attr, value)
+            field = obj._meta.get_field(attr).verbose_name.capitalize()
             if old_value != value:
                 message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
                         {"field" : field, "old" : old_value, "new" : value}
@@ -155,12 +161,11 @@ class Controller(object):
 
     def __getattr__(self, attr):
         # we override this method to get attributes from *object* directly
-        obj = object.__getattribute__(self, "object")
-        if hasattr(self, "object") and hasattr(obj, attr) and \
-           not attr in self.__dict__:
-            return getattr(obj, attr)
-        else:
+        if attr in type(self).__slots__:
             return object.__getattribute__(self, attr)
+        else:
+            obj = object.__getattribute__(self, "object")
+            return getattr(obj, attr)
 
     def save(self, with_history=True):
         u"""

@@ -63,6 +63,8 @@ class UserController(Controller):
 
     HISTORY = models.UserHistory
 
+    __slots__ = Controller.__slots__ + ("creator", "owner", "mtime", "ctime")
+
     def __init__(self, obj, user):
         super(UserController, self).__init__(obj, user)
         self.creator = obj
@@ -119,7 +121,7 @@ class UserController(Controller):
         else:
             obj = None
         if obj and (hasattr(obj, attr) or hasattr(profile, attr)) and \
-           not attr in self.__dict__:
+           not attr in self.__slots__:
             obj2 = obj if hasattr(obj, attr) else profile
             old_value = getattr(obj2, attr)
             setattr(obj2, attr, value)
@@ -139,9 +141,9 @@ class UserController(Controller):
         obj = object.__getattribute__(self, "object")
         profile = obj.get_profile()
         if hasattr(self, "object") and hasattr(obj, attr) and \
-           not attr in self.__dict__:
+           not attr in self.__slots__:
             return getattr(obj, attr)
-        elif hasattr(profile, attr) and not attr in self.__dict__:
+        elif hasattr(profile, attr) and not attr in self.__slots__:
             return getattr(profile, attr)
         else:
             return object.__getattribute__(self, attr)

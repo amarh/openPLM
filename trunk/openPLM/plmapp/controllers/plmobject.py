@@ -57,7 +57,7 @@ class PLMObjectController(Controller):
     """
 
     HISTORY = models.History
-    
+
     @classmethod
     def create(cls, reference, type, revision, user, data={}, block_mails=False,
             no_index=False):
