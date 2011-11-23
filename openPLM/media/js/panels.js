@@ -1,11 +1,11 @@
 function hide_left_panel(){
-    $("div.left-col").hide();
-    $("div.center-col").css("margin-left", "0");
+    $("div#left-col").hide();
+    $("div#center-col").css("margin-left", "0");
 }
 
 function show_left_panel(){
-    $("div.left-col").show();
-    $("div.center-col").css("margin-left", "330px");
+    $("div#left-col").show();
+    $("div#center-col").css("margin-left", "330px");
 }
 
 function show_create_box(){

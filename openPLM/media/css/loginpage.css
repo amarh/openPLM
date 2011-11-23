@@ -17,7 +17,7 @@ div.top-box-content {
     width: 700px;
 }
 
-div.content-box {
+div#content-box {
     width: 700px;
     margin: auto;
 }

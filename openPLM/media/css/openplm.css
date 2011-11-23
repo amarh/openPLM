@@ -83,7 +83,7 @@ div.top-box {
     min-width: 100%;
     padding-top: 1em;
 }
-div.bottom-box {
+div#bottom-box {
 }
 div.center-box {
     position:relative;
@@ -96,30 +96,26 @@ div.reset-box {
     left:100%;
     margin-left:-300px;
 } 
-div.right-box {
-    position:relative;
-    width:100%;
-    margin-left:-22%;
-}
-div.content-box {
+
+div#content-box {
     position:relative;
     margin-top:60px;
     width: 90%;
     margin: auto;
     min-height: 500px;
 }
-div.left-col {
+div#left-col {
     float:left;
     width:300px;
 }
-div.center-col {
+div#center-col {
     margin-left:330px;
 }
-* html div.center-col {
+* html div#center-col {
     height:1%;
     margin:0;
 }
-* html div.left-col {
+* html div#left-col {
     margin-right:-3px;
 }
 
@@ -208,7 +204,7 @@ div#ActiveBox
     padding: 0px;
 }
 
-div.left-col h2,
+div#left-col h2,
 div#ReferenceArea {
     margin: 0;
 }
