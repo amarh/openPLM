@@ -106,18 +106,35 @@ are two possibilities:
               
       *MyController* will be associated to *MyPart* and 
       ``get_controller("MyPart")`` will return *MyController*. 
+
     * if *MANAGED_TYPE* is not defined, the name class will be used: for
       example, *MyPartController* will be associated to *MyPart*. The rule
       is simple, it is just the name of the model followed by "Controller".
       The model may not be defined when the controller is written.
 
 If a controller exploits none of theses possibilities, it will still
-work but it will not be associated to a type.
+work but it will not be associated to a type and will not be used by existing
+views.
 
 .. note::
 
     This association is possible without any registration because 
     :class:`.PLMObjectController` metaclass is :class:`.MetaController`.
+
+If your controller has its own attributes, you must redefine the variable
+``__slots__`` and add its attributes::
+
+    class MyController(PLMObjectController):
+
+        __slots__ = PLMObjectController.__slots__ + ("my_attr", )
+
+        def __init__(self, object, user):
+            super(MyController, self).__init__(object, user)
+            self.my_attr = "value"
+
+By default, a controller inherits its ``__slots__`` attribute from its parent
+(this is set by :class:`.MetaController`).
+
 
 Classes and functions
 =====================
@@ -138,6 +155,7 @@ This module defines several classes, here is a summary:
         :class:`.Part`      :class:`.PartController`
         :class:`.Document`  :class:`.DocumentController`
         :class:`User`       :class:`.UserController`
+        :class:`.GroupInfo` :class:`.GroupController`
         =================== ===============================
     
     * functions:
