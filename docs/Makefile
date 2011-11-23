@@ -37,7 +37,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 tuto:
-	cd code && tar -pczf bicycle.tar.gz bicycle/*.py && cd .. 
+	cd devel/code && tar -pczf bicycle.tar.gz bicycle/*.py && cd ../.. 
 
 html: tuto
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
