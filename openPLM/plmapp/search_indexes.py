@@ -93,6 +93,8 @@ for key, model in models.get_all_plmobjects().iteritems():
        
         owner = CharField(model_attr="owner")
         creator = CharField(model_attr="creator")
+        state = CharField(model_attr="state__name")
+        lifecycle = CharField(model_attr="lifecycle__name")
 
         rendered = CharField(use_template=True, indexed=False)
         rendered_add = CharField(use_template=True, indexed=False)
