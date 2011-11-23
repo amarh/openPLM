@@ -180,7 +180,7 @@ class PartController(PLMObjectController):
                                        quantity=new_quantity, order=new_order)
         details = ""
         if link.quantity != new_quantity:
-            details += "quantity changes from %d to %d\n" % (link.quantity, new_quantity)
+            details += "quantity changes from %f to %f\n" % (link.quantity, new_quantity)
         if link.order != new_order:
             details += "order changes from %d to %d" % (link.order, new_order)
         self._save_histo("Modify - %s" % link.ACTION_NAME, details)
