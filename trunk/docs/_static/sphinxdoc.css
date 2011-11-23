@@ -1,6 +1,7 @@
 /**
  * Alternate Sphinx design
- * Originally created by Armin Ronacher for Werkzeug, adapted by Georg Brandl.
+ * Originally created by Armin Ronacher for Werkzeug, adapted by Georg Brandl
+ * and Pierr Cosquer.
  */
 
 @import url("basic.css");
@@ -14,7 +15,7 @@ body {
     line-height: 150%;
     text-align: center;
     /*background-color: #AFC1C4; */
-    background-color: #BFD1D4;
+    background-color: #343434;
     color: black;
     padding: 0;
     border: 1px solid #aaa;
@@ -357,8 +358,8 @@ table td, table th {
 }
 
 div.footer {
-    background-color: #E3EFF1;
-    color: #86989B;
+    background-color: #575454;
+    color: #afacab;
     padding: 3px 8px 3px 0;
     clear: both;
     font-size: 0.8em;
@@ -656,4 +657,8 @@ ul.search li div.context {
 
 ul.keywordmatches li.goodmatch a {
     font-weight: bold;
+}
+
+p.logo {
+    text-align: center;
 }

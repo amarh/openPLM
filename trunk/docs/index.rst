@@ -21,10 +21,10 @@ If you are a plugins developper, you may want to read :mod:`the api <http_api>`.
 
 If you are a core developper, you may want to read:
 
-    * An :doc:`architecture overview </architecture>` 
+    * An :doc:`architecture overview </devel/architecture>` 
     * Some :ref:`how-tos <how-tos>`
     * the :ref:`cookbook <cookbook>` which contains some useful pieces of code
-    * :ref:`modules' documentation <modules>`
+    * :doc:`modules' documentation </devel/modules>`
 
 
 Table of contents:
@@ -35,14 +35,15 @@ Table of contents:
     :numbered:   
 
     resources
-    tutorials
-    architecture
-    plugins
-    settings
-    how-tos
-    cookbook
-    http-api
-    modules
+    user/tutorials
+    user/plugins
+    admin/settings
+    admin/how-tos
+    devel/architecture
+    devel/how-tos
+    devel/cookbook
+    devel/http-api
+    devel/modules
 
 
 Indices and tables

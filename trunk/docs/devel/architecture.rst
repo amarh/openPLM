@@ -27,7 +27,7 @@ based on distributed message passing. In openPLM, we use Celery (version 2.3) to
 .. seealso::
     The documentation of Celery: http://celery.readthedocs.org/en/latest/ .
     
-    `RabbitMQ <http://www.rabbitmq.com/http://www.rabbitmq.com/>`_, an efficient
+    `RabbitMQ <http://www.rabbitmq.com/>`_, an efficient
     message broker recommended by Celery.
 
 South
@@ -137,7 +137,7 @@ Tests
 Others
 +++++++
 
-A complete list of documented modules is available :doc:`here </modules>`.
+A complete list of documented modules is available :doc:`here <modules>`.
 
 
 Custom applications
