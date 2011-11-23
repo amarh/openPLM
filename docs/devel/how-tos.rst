@@ -1,4 +1,4 @@
-.. _how-tos:
+.. _how-tos-devel:
 
 ================================
 List of how-to's
