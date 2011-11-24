@@ -12,4 +12,4 @@ and the features of openPLM.
 
     tutorials
     plugins
-
+    features
