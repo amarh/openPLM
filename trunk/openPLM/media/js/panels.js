@@ -78,8 +78,9 @@ $(function (){
         },
         text:false
         }).click(toggle_create_box);
-    button.css({margin: "auto 0", float:"right", width:"1em", height:"1em" });
-    $("#CreationBox h2").append(button);
+    var li = $("<li/>");
+    li.append(button);
+    $("#CreationBox h2>div.toolbar>ul").append(li);
 
     var close_search_box = $("<button>close</button>");
     button = close_search_box.button({
@@ -88,8 +89,9 @@ $(function (){
         },
         text:false
         }).click(toggle_search_box);
-    button.css({margin: "auto 0", float:"right", width:"1em", height:"1em" });
-    $("#SearchBox h2").append(button);
+    li = $("<li/>");
+    li.append(button);
+    $("#SearchBox h2>div.toolbar>ul").append(li);
 
 
     if (search){
