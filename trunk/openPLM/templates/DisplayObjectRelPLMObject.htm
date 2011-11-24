@@ -11,7 +11,7 @@
 
 {% block content %}
 
-    {% regroup object_user_link|dictsort:"role" by role as links %}
+    {% regroup object_user_link by role as links %}
 
     {% for group in links %}
         <div class="timeline">
