@@ -17,18 +17,28 @@
         <div class="timeline">
             <h3>{{ group.grouper|capfirst}}</h3>
 
-            <ul>
-                {% for link in group.list|dictsort:"plmobject.type" %}
-                    <li>
-                    <span>{{link.plmobject.type}}</span>
-                    <a href={{link.plmobject.plmobject_url}}>
-                        <span>{{link.plmobject.reference}}</span>
-                    </a>
-                    <span>{{link.plmobject.revision}}</span>
-                    </li>
+                {% regroup group.list by plmobject.type as groups %}
+
+                {% for gp in groups %}
+
+                    <div class="objects">
+
+                        <h4>{{ gp.grouper }} </h4>
+
+                        <ul>
+                            {% for link in gp.list %}
+                                <li>
+                                <span>{{link.plmobject.type}}</span>
+                                <a href={{link.plmobject.plmobject_url}}>
+                                    <span>{{link.plmobject.reference}}</span>
+                                </a>
+                                <span>{{link.plmobject.revision}}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <br />
+                    </div>
                 {% endfor %}
-            </ul>
-            <br />
         </div>
 
     {% endfor %}

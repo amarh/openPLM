@@ -71,3 +71,7 @@ div.timeline {
 div.timeline dd p br {
     clear:none !important;
 }
+
+div.timeline > div {
+    margin: 0.5em 1.2em 0.5em 1em;
+}
