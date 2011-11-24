@@ -30,7 +30,7 @@
         </select>
         <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
     </form>
-	            <h4>{% trans "Welcome to openPLM" %}</h4>
+	            <h1>{% trans "Welcome to openPLM" %}</h1>
                 <hr />
             </div>
         </div>
@@ -45,7 +45,7 @@
 	        {% trans "For more information about openPLM, see" %} <a href="http://www.openplm.org">http://www.openplm.org</a>.
             </p>
             <div id="LoginBox">
-                <h4>{% trans "openPLM connexion :" %}</h4>
+                <h2>{% trans "openPLM connexion :" %}</h2>
                 <div class="error">
                     {% for error in form.errors.values %}
                     {{ error }}
@@ -70,7 +70,7 @@
                 </form>
                 <p style="line-height:15px; text-align:left">If you have any trouble logging in to your account, contact your administrator </p>
             </div>
-            <h4>{% trans "Professionals" %}</h4>
+            <h1>{% trans "Professionals" %}</h1>
             <hr />
             <p>
 	                {% trans "You are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
