@@ -166,7 +166,7 @@ class UserController(Controller):
         """
         Returns all :class:`.Part` attached to :attr:`object`.
         """
-        return self.plmobjectuserlink_user.order_by("plmobject")
+        return self.plmobjectuserlink_user.all()
 
     @permission_required(role=models.ROLE_OWNER)
     def delegate(self, user, role):
