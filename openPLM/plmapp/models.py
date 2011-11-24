@@ -1022,6 +1022,8 @@ class PLMObjectUserLink(Link):
 
     class Meta:
         unique_together = ("plmobject", "user", "role")
+        ordering = ["user", "role", "plmobject__type", "plmobject__reference",
+                "plmobject__revision"]
 
     def __unicode__(self):
         return u"PLMObjectUserLink<%s, %s, %s>" % (self.plmobject, self.user, self.role)
