@@ -1,127 +1,143 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 {% load i18n plmapp_tags %}
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
-    <link type="text/css" href="/media/css/openplm/jquery-ui.css" rel="Stylesheet" /> 
-    <link rel="stylesheet" href="/media/css/uniform/uniform.openplm.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
-    
-    {% block css %} {% endblock %}
-    
-    <title>{% block title %} {% endblock %}</title>
-    <meta name="Robots" content="none"/>
-    <meta name="Author" content="openplm" />
-    <meta name="Classification" content="" />
-    <meta name="Description" content="" />
-    <meta name="keywords" content="" />
-    <script type="text/javascript" src="/media/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/media/js/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/media/js/jquery.cookie.js"></script>
-    <script src="/media/js/jquery.uniform.js" type="text/javascript"></script>
-    <script type="text/javascript" src="/media/js/combobox.js"></script>
-    <script type="text/javascript" src="/media/js/panels.js"></script>
+    <head>
+        <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
+        <link type="text/css" href="/media/css/openplm/jquery-ui.css" rel="Stylesheet" /> 
+        <link rel="stylesheet" href="/media/css/uniform/uniform.openplm.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
+        <link rel="stylesheet" type="text/css" href="/media/css/help.css" />
+
+        {% block css %} {% endblock %}
+
+        <title>{% block title %} {% endblock %}</title>
+        <meta name="Robots" content="none"/>
+        <meta name="Author" content="openplm" />
+        <meta name="Classification" content="" />
+        <meta name="Description" content="" />
+        <meta name="keywords" content="" />
+        <script type="text/javascript" src="/media/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/media/js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/media/js/jquery.cookie.js"></script>
+        <script src="/media/js/jquery.uniform.js" type="text/javascript"></script>
+        <script type="text/javascript" src="/media/js/combobox.js"></script>
+        <script type="text/javascript" src="/media/js/panels.js"></script>
+        <script type="text/javascript" src="/media/js/help.js"></script>
 
 
-    {% block scripts %} {% endblock %}
+        {% block scripts %} {% endblock %}
 
-</head>
-<body>
-  
+    </head>
+    <body>
 
-    <div class="main-box" id="Page">
-        <div class="top-box">
-            <div id="LoggedPersonBox">
-                {% block LoggedPersonBlock %}{% endblock %}
-            </div>
-            <div id="DisplayBox">
-                <ul>
+        {% get_current_language as LANGUAGE_CODE %}
+        <div class="main-box" id="Page">
+            <div class="top-box">
+                <div id="LoggedPersonBox">
+                    {% block LoggedPersonBlock %}{% endblock %}
+                </div>
+                <div id="DisplayBox">
+                    <ul>
 
-                    <li>
-                    <input type="checkbox" id="FindButton" />
-                    <label for="FindButton">
-                        {% trans "FIND" %}
-                    </label>
-                    </li>
-                    <li>
-                    <input type="checkbox" id="CreationButton" />
-                    <label for="CreationButton">
-                        {% trans "CREATE" %}
-                    </label>
-                    </li>
+                        <li>
+                        <input type="checkbox" id="FindButton" />
+                        <label for="FindButton">
+                            {% trans "FIND" %}
+                        </label>
+                        </li>
+                        <li>
+                        <input type="checkbox" id="CreationButton" />
+                        <label for="CreationButton">
+                            {% trans "CREATE" %}
+                        </label>
+                        </li>
 
 
-                    {% if not creation_form %}
+                        {% if not creation_form %}
                         {% if navigate_bool %}
                         <li class="{{"Button"|button:"corner-left,state-focus"}}" id="NavigateButton">
                         {% else %}
                         <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
                         {% endif %}
                         {% ifequal class4div 'ActiveBox4User' %}
-                            <a href="/user/{{object_reference}}/navigate/">
-                        {% else %}
+                        <a href="/user/{{object_reference}}/navigate/">
+                            {% else %}
                             <a href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/navigate/">
-                        {% endifequal %}
-                        <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
-                        </a>
-                        </li>
-                        {% if navigate_bool %}
+                                {% endifequal %}
+                                <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                            </a>
+                            </li>
+                            {% if navigate_bool %}
                             <li class="{{"Button"|button:"corner-right"}}" id="StudyButtonOff">
-                        {% else %}
+                            {% else %}
                             <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButtonOn">
-                        {% endif %}
+                            {% endif %}
                             <a href="../attributes/">
                                 <span class="ui-button-text">{% trans "STUDY" %}</span>
                             </a>
-                        </li>
-                        {% endif %}
-                        <li class="{{"Button"|button}}" id="QuitButton">
-                        <a href="/logout/">
-                            <span class="ui-button-text">{% trans "EXIT" %}</span>
-                        </a>
-                    </li>
-                </ul>
+                            </li>
+                            {% endif %}
+                            <li class="{{"Button"|button}}" id="QuitButton">
+                            <a href="/logout/">
+                                <span class="ui-button-text">{% trans "EXIT" %}</span>
+                            </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
+                <div id="content-box" class="clearfix">
+
+                    <div id="left-col">
+
+                        <div id="CreationBox">
+                            <h2>{% trans "Create" %}
+                                <div class="toolbar">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </h2>
+                            {% block CreationBlock %}{% endblock %}
+                        </div>
+
+                        <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
+                            <h2>{% trans "Search" %}
+                                <div class="toolbar">
+                                    <ul>
+                                        <li>
+                                        <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
+                                            href="/media/help/{{LANGUAGE_CODE}}/search.html" target="_blank">
+                                            <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
+                                            <span class="ui-button-text">?</span>
+                                        </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </h2>
+                            {% block SearchBlock %}{% endblock %}
+                            <hr/>
+                            {% block ResultBlock %}{% endblock %}
+                        </div>
+
+
+                    </div>
+                    <div id="center-col" class="heightfix">
+
+                        <div id="ActiveBox" class="{{class4div}}">
+                            {% block ObjectBlock %}{% endblock %}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div id="bottom-box">
+
+                </div>
+
             </div>
-        </div>
-
-
-
-    <div id="content-box" class="clearfix">
-
-        <div id="left-col">
-
-            <div id="CreationBox">
-                <h2>{% trans "Create" %}</h2>
-                {% block CreationBlock %}{% endblock %}
-            </div>
-
-            <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
-                <h2>{% trans "Search" %}</h2>
-                {% block SearchBlock %}{% endblock %}
-                <hr/>
-                {% block ResultBlock %}{% endblock %}
-            </div>
-
-
-      </div>
-         <div id="center-col" class="heightfix">
-
-             <div id="ActiveBox" class="{{class4div}}">
-                {% block ObjectBlock %}{% endblock %}
-            </div>
-
-        </div>
-
-    </div>
-            
-
-            <!--<br class="clear" />-->
-
-  <div id="bottom-box">
-
-  </div>
-
-    </div>
-</body>
-</html>
+        </body>
+    </html>
