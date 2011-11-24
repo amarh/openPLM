@@ -48,6 +48,10 @@ h3 {
     color: #444;
 }
 
+h3 + p {
+    margin-left: 1em;
+}
+
 .clear
 {
     clear: both;
@@ -393,6 +397,7 @@ div.comment {
     margin: 1em;
     padding-left:0.5em;
     border-left: 2px #888 solid;
+    border-radius: 0 1em;
 }
 
 div.comment_text {
