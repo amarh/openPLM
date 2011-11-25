@@ -74,6 +74,7 @@ ugettext = lambda s: s
 LANGUAGES = (
       ('fr', u'Français'),
       ('en', 'English'),
+      ('es', u'Español'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
