@@ -11,17 +11,7 @@
 			<th class="Content">{% trans "Type" %}</th>
 			<td class="Content">{{ object_type }}</td>
 		</tr>
-		{% for type, field, value in non_modifyable_attributes %}
-			<tr class="Content">
-				<th class="Content">{% trans field %}</th>
-				{% ifequal type 'datetime' %}
-				    <td class="Content">{{ value|date:"l j F Y, G:i" }}</td>
-				{% else %}
-				    <td class="Content">{{value}}</td>
-				{% endifequal %}
-			</tr>
-		{% endfor%}
-		<tr class="Content">
+		<tr class="Content hidden">
 			<th><label for="id_type">&nbsp;</label></th>
 			<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
 		</tr>
