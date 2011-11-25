@@ -10,7 +10,9 @@
             <input type="submit" class="{{"Button"|button}}" value="{% trans "NEW" %}"/>
         </form>
     {% else %}
-        {% trans "You can not revise this object since a revision already exist." %}
+        {% if is_owner %}
+            {% trans "You can not revise this object since a revision already exist." %}
+        {% endif %}
     {% endif %}
     <table class="Content">
         {% for object in revisions %}
