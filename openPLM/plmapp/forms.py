@@ -37,6 +37,7 @@ from django.utils.functional import memoize
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.widgets import JQueryAutoComplete
 from openPLM.plmapp.encoding import ENCODINGS
 
@@ -381,11 +382,19 @@ class UserNavigateFilterForm(NavigateFilterForm):
     to_sign = forms.BooleanField(required=False, label=_("to sign"))
     request_notification_from = forms.BooleanField(required=False, label=_("request notification from"))
 
+class GroupNavigateFilterForm(NavigateFilterForm):
+    owner = forms.BooleanField(required=False, label=_("owner"))
+    user = forms.BooleanField(required=False, label=_("user"))
+    part = forms.BooleanField(initial=True, required=False, label=_("part"))
+    doc = forms.BooleanField(initial=True, required=False, label=_("doc"))
+
 def get_navigate_form(obj):
     if isinstance(obj, UserController):
         cls = UserNavigateFilterForm
     elif isinstance(obj, DocumentController):
         cls = DocNavigateFilterForm
+    elif isinstance(obj, GroupController):
+        cls = GroupNavigateFilterForm
     else:
         cls = PartNavigateFilterForm
     return cls

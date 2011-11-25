@@ -39,6 +39,7 @@ import pygraphviz as pgv
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers.group import GroupController
 
 basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img") 
 
@@ -50,6 +51,8 @@ OSR = "only_search_results"
 def get_path(obj):
     if hasattr(obj, "type"):
         return u"/".join((obj.type, obj.reference, obj.revision))
+    elif hasattr(obj, 'name'):
+        return u"Group/%s/-/" % obj.name
     else:
         return u"User/%s/-/" % obj.username
 
@@ -119,6 +122,8 @@ class NavigationGraph(object):
                            fontcolor="#aaaaaa",
                            fontsize="9")
     TYPE_TO_ATTRIBUTES = {UserController : dict(
+                            image=os.path.join(icondir, "user.png")),
+                          GroupController : dict(
                             image=os.path.join(icondir, "user.png")),
                           PartController : dict(
                             image=os.path.join(icondir, "part.png")),
@@ -250,14 +255,21 @@ class NavigationGraph(object):
     def _create_user_edges(self, obj, role):
         if self.options[OSR] and not self.users_result:
             return
-        user_list = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
-        for user_item in user_list:
-            if self.options[OSR] and user_item.user.id not in self.results:
+        if hasattr(obj, 'user_set'):
+            if role == "owner":
+                users = ((obj.owner, role),)
+            else:
+                users = ((u, role) for u in obj.user_set.all())
+        else:
+            users = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
+            users = ((u.user, u.role) for u in users.all())
+        for user, role in users:
+            if self.options[OSR] and user.id not in self.results:
                 continue
-            user = UserController(user_item.user, None) 
-            user_id = user_item.role + str(user_item.user.id)
-            self.graph.add_edge(user_id, obj.id, user_item.role.replace("_", "\\n"))
-            self._set_node_attributes(user, user_id, user_item.role)
+            user = UserController(user, None) 
+            user_id = role + str(user.id)
+            self.graph.add_edge(user_id, obj.id, role.replace("_", "\\n"))
+            self._set_node_attributes(user, user_id, role)
 
     def _create_object_edges(self, obj, role):
         if self.options[OSR] and self.users_result:
@@ -302,6 +314,7 @@ class NavigationGraph(object):
                          'owner':(self._create_user_edges, 'owner'),
                          'signer':(self._create_user_edges, 'sign'),
                          'notified':(self._create_user_edges, 'notified'),
+                         'user':(self._create_user_edges, 'member'),
                          'part': (self._create_part_edges, None),
                          'owned':(self._create_object_edges, 'owner'),
                          'to_sign':(self._create_object_edges, 'sign'),
@@ -333,8 +346,10 @@ class NavigationGraph(object):
                 if obj.get_attached_documents():
                     s = "+" if obj.id not in self.options["doc_parts"] else "-"
                     node.attr["tooltip"] = s + str(obj.id)
-        else:
+        elif isinstance(obj, UserController):
             node.attr["label"] = obj.username
+        else:
+            node.attr["label"] = obj.name
         node.attr["label"] += "\\n" + extra_label
         t = type_.__name__.replace("Controller", "")
         node.attr["id"] = "_".join((str(obj_id or obj.id), t, str(obj.id)))
