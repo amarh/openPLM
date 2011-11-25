@@ -129,6 +129,7 @@ span.imgManagement {
 div#FilterNav
 {
     position: absolute;
+    border: 1px solid #242424;
     right: 10px;
     top: 10px;
     z-index: 99;
