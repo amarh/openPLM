@@ -205,7 +205,7 @@ class NavigationGraph(object):
             if self.options[OSR] and link.child.id not in self.results:
                 continue
             child = PartController(link.child, None)
-            label = "Qty: %d\\nOrder: %d" % (link.quantity, link.order) 
+            label = "Qty: %.2f\\nOrder: %d" % (link.quantity, link.order) 
             self.graph.add_edge(obj.id, child.id, label)
             self._set_node_attributes(child)
             if self.options['doc'] or child.id in self.options["doc_parts"]:
@@ -220,7 +220,7 @@ class NavigationGraph(object):
             if self.options[OSR] and link.parent.id not in self.results:
                 continue
             parent = PartController(link.parent, None)
-            label = "Qty: %d\\nOrder: %d" % (link.quantity, link.order) 
+            label = "Qty: %.2f\\nOrder: %d" % (link.quantity, link.order) 
             self.graph.add_edge(parent.id, obj.id, label)
             self._set_node_attributes(parent)
             if self.options['doc'] or parent.id in self.options["doc_parts"]:
