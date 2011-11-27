@@ -4,7 +4,12 @@
 
 import os.path
 
-DEBUG = True
+# ROOT_DIR = os.getcwd()
+ROOT_DIR = os.path.dirname(os.path.abspath( __file__ ))
+SPECIFIC_NAME = ROOT_DIR.split('/')[-2]
+# SPECIFIC_NAME = 'mobile_phone'
+
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -14,9 +19,9 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'openplm'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'django'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'django#6'         # Not used with sqlite3.
+DATABASE_NAME = 'openplm_' + SPECIFIC_NAME             # Or path to database file if using sqlite3.
+DATABASE_USER = 'django_' + SPECIFIC_NAME             # Not used with sqlite3.
+DATABASE_PASSWORD = 'django_' + SPECIFIC_NAME         # Not used with sqlite3.
 DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
@@ -39,7 +44,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/var/django/openPLM/trunk/openPLM/media/'
+MEDIA_ROOT = os.path.join(ROOT_DIR,'media/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -82,7 +87,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/var/django/openPLM/trunk/openPLM/templates",
+    os.path.join(ROOT_DIR, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -98,10 +103,8 @@ INSTALLED_APPS = (
     'south',
     'openPLM.plmapp',
     # you can add your application after this line
-    'openPLM.cad',
-    'openPLM.computer',
-    'openPLM.cae',
-    'openPLM.office',
+    'openPLM.phone',
+    'openPLM.phone_doc',
 )
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
@@ -115,14 +118,14 @@ CELERY_ROUTES = {
 }
 
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
+EMAIL_PORT = 25
 
 ######################
 # openPLM's settings #
 ######################
 
 #: directory that stores documents. Make sure to use a trailing slash.
-DOCUMENTS_DIR = "/var/openPLM/docs/"
+DOCUMENTS_DIR = os.path.join(ROOT_DIR, 'docs')
 THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails/")
 #: directory that stores thumbnails. Make sure to use a trailing slash.
 THUMBNAILS_URL = MEDIA_URL + "thumbnails/"
@@ -150,7 +153,7 @@ MAX_FILE_SIZE = -1
 # search stuff
 HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'xapian'
-HAYSTACK_XAPIAN_PATH = "/var/openPLM/xapian_index/"
+HAYSTACK_XAPIAN_PATH = "/var/demos/mobile_phone/openPLM/xapian_index/"
 HAYSTACK_INCLUDE_SPELLING = True
 EXTRACTOR = os.path.abspath(os.path.join(os.path.dirname(__file__), "bin", "extractor.sh"))
 
@@ -161,8 +164,8 @@ djcelery.setup_loader()
 BROKER_HOST = "localhost"
 BROKER_PORT = 5672
 BROKER_USER = "openplm"
-BROKER_PASSWORD = "secret"
+BROKER_PASSWORD = "openplm"
 BROKER_VHOST = "openplm"
 
-COMPANY = "company"
+COMPANY = "MyCompany"
 

@@ -22,6 +22,10 @@ div#content-box {
     margin: auto;
 }
 
+div#LoginBox {
+    left:0%;
+}
+
 div.legal {
     text-align:center;
     margin: 10px;
