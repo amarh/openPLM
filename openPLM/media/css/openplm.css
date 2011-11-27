@@ -5,7 +5,7 @@
 {
     padding: 0px;
     margin: 0px;
-    color: #c8c6c5;
+    color: #ffffff;
 }
 
 body 
@@ -391,7 +391,8 @@ table.Content td,
 table.Content td a,
 table.Content td p,
 table.Content td li {
-    color: #343434;
+/*    color: #343434; */
+    color: #000000;
     font-weight: 500;
 }
 
@@ -402,7 +403,8 @@ table.Content td.description
 }
 table.Content td.description,
 table.Content td.description *{
-    color: #afacab;
+/*    color: #afacab; */
+    color: #ffffff;
     font-weight: 600;
 }
 

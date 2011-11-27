@@ -109,10 +109,10 @@ class NavigationGraph(object):
                             sep="+.1,.1",
                             outputorder="edgesfirst",
                             bgcolor="transparent")
-    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='11',
+    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='10',
                            bgcolor="transparent", color="transparent",
                            fontname="Sans bold",
-                           fontcolor="#aaaaaa",
+                           fontcolor="#ffffff",
                            style='filled', width=100./96, height=70./96)
     EDGE_ATTRIBUTES = dict(color='#aaaaaa',
                            minlen="1.5",
