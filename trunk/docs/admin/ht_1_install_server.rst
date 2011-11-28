@@ -33,7 +33,7 @@ Install necessary packages
 
 First, you must install some dependencies:
 
-    #. ``apt-get install swig build-essential pkg-config build-essential gettext``
+    #. ``apt-get install swig build-essential pkg-config gettext``
     #. ``apt-get install apache2 libapache2-mod-wsgi``
     #. ``apt-get install python-setuptools python-dev python-imaging python-kjbuckets python-pypdf ipython``
     #. ``easy_install odfpy``
@@ -45,7 +45,7 @@ First, you must install some dependencies:
     #. ``easy_install celery``
     #. ``easy_install django-celery``
     #. ``easy_install 'django-haystack==1.2'``
-    #. ``apt-get install postgresql python-psycopg2 pgadmin3``
+    #. ``apt-get install postgresql python-psycopg2``
     #. ``apt-get install tracker-extract``
     #. ``easy_install lepl``
    
@@ -75,10 +75,8 @@ For Python: ::
 For Django: ::
 
     root@openplm-demo:~# django-admin --version
-    1.1.1
-
-
-Get code using Subversion
+    1.2.5
+2.5Get code using Subversion
 ==========================
 
     * ``apt-get install subversion``
@@ -229,7 +227,7 @@ only have to change `BROKER_PASSWORD`.
     * ``mkdir /var/run/celery``
     * ``chown www-data:www-data /var/log/celery /var/run/celery``
 
-To launch :command:`celeryd`, run ``/etc/init.d celeryd start``.
+To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 
 
 Check required modules
