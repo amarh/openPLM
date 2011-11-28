@@ -20,7 +20,7 @@ onOpenPLMLogin: function(e) {
                         var username = {value: user};              // default the username to user
                         var password = {value: pw};              // default the password to pass
                         var check = {value: true};                   // default the checkbox to true
-                        var result = prompts.promptUsernameAndPassword(null, "Title", "Enter username and password:",
+                        var result = prompts.promptUsernameAndPassword(null, "Login", "Enter username and password:",
                                 username, password, null, check);
 
                         // result is true if OK was pressed, false if cancel was pressed. username.value,
