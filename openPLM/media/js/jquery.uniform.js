@@ -643,7 +643,7 @@ Enjoy!
 
         if(elem.is("select")){
           //element is a select
-          if(elem.attr("multiple") != true){
+          if(elem.prop("multiple") != true){
             //element is not a multi-select
             if(elem.attr("size") == undefined || elem.attr("size") <= 1){
               doSelect(elem);
