@@ -32,6 +32,32 @@ from com.sun.star.frame.FrameSearchFlag import CREATE, ALL
 from com.sun.star.awt.WindowClass import MODALTOP
 from com.sun.star.awt.VclWindowPeerAttribute import OK, OK_CANCEL, YES_NO, YES_NO_CANCEL, \
                                        RETRY_CANCEL, DEF_OK, DEF_CANCEL, DEF_RETRY, DEF_YES, DEF_NO
+
+# Show a message box with the UNO based toolkit
+def MessageBox(ParentWin, MsgText, MsgTitle, MsgType="messbox", MsgButtons=OK):
+    MsgType = MsgType.lower()
+    #available msg types
+    MsgTypes = ("messbox", "infobox", "errorbox", "warningbox", "querybox")
+    if MsgType not in MsgTypes:
+        MsgType = "messbox"
+    #describe window properties.
+    aDescriptor = WindowDescriptor()
+    aDescriptor.Type = MODALTOP
+    aDescriptor.WindowServiceName = MsgType
+    aDescriptor.ParentIndex = -1
+    aDescriptor.Parent = ParentWin
+    aDescriptor.WindowAttributes = MsgButtons
+    tk = ParentWin.getToolkit()
+    msgbox = tk.createWindow(aDescriptor)
+    msgbox.setMessageText(MsgText)
+    if MsgTitle :
+        msgbox.setCaptionText(MsgTitle)
+    return msgbox.execute()
+
+def show_error(message, parent):
+    MessageBox(parent, message, "Error", "errorbox")
+
+
 def doc_to_type(doc):
     services = doc.SupportedServiceNames
     types = {'com.sun.star.text.TextDocument' : 'swriter',
@@ -221,6 +247,10 @@ class OpenPLMPluginInstance(object):
     
     def get_conf_data(self):
         try:
+            if not os.path.exists(self.PLUGIN_DIR):
+                os.makedirs(self.PLUGIN_DIR, 0700)
+            if not os.path.exists(self.CONF_FILE):
+                return {}
             with open(self.CONF_FILE, "r") as f:
                 try:
                     return json.load(f)
@@ -387,30 +417,6 @@ class OpenPLMPluginInstance(object):
 
 
 PLUGIN = OpenPLMPluginInstance()
-
-# Show a message box with the UNO based toolkit
-def MessageBox(ParentWin, MsgText, MsgTitle, MsgType="messbox", MsgButtons=OK):
-    MsgType = MsgType.lower()
-    #available msg types
-    MsgTypes = ("messbox", "infobox", "errorbox", "warningbox", "querybox")
-    if MsgType not in MsgTypes:
-        MsgType = "messbox"
-    #describe window properties.
-    aDescriptor = WindowDescriptor()
-    aDescriptor.Type = MODALTOP
-    aDescriptor.WindowServiceName = MsgType
-    aDescriptor.ParentIndex = -1
-    aDescriptor.Parent = ParentWin
-    aDescriptor.WindowAttributes = MsgButtons
-    tk = ParentWin.getToolkit()
-    msgbox = tk.createWindow(aDescriptor)
-    msgbox.setMessageText(MsgText)
-    if MsgTitle :
-        msgbox.setCaptionText(MsgTitle)
-    return msgbox.execute()
-
-def show_error(message, parent):
-    MessageBox(parent, message, "Error", "errorbox")
 
 class Dialog(unohelper.Base, XActionListener):
 
