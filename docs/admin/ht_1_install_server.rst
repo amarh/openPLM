@@ -40,7 +40,7 @@ First, you must install some dependencies:
     #. ``apt-get install graphviz graphviz-dev``
     #. ``easy_install 'pygraphviz>=1.1'``
     #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django``
+    #. ``apt-get install python-django python-docutils``
     #.  ``apt-get install 'south>=0.7'``
     #. ``easy_install celery``
     #. ``easy_install django-celery``
@@ -170,7 +170,10 @@ Create the database
 Compile message files
 =====================
 
-Run the following command: ``./manage.py compilemessages``.
+Run the following commands:
+    
+    #. ``make``
+    #. ``./manage.py compilemessages``.
    
 Configure where the files are saved
 ===================================
