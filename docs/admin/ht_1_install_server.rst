@@ -76,7 +76,8 @@ For Django: ::
 
     root@openplm-demo:~# django-admin --version
     1.2.5
-2.5Get code using Subversion
+
+Get code using Subversion
 ==========================
 
     * ``apt-get install subversion``
