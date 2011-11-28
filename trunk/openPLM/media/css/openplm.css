@@ -501,7 +501,7 @@ input[type=text],
 input[type=file],
 input[type=password],
 textarea {
-    color: black;
+    color: black !important;
     font-size: 1.1em;
 }
 
