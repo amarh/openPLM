@@ -45,8 +45,6 @@
             </p>
             <div id="LoginBox">
                 <h2>{% trans "openPLM connexion :" %}</h2>
-		<p>(Data structure for developments of mobile phones)</p>
-            	<p>For demo, login is <b>test</b> and password is <b>test</b></p>
                 <div class="error">
                     {% for error in form.errors.values %}
                     {{ error }}
@@ -70,9 +68,6 @@
                     <input type="hidden" name="next" value="{{ next|default:"/home/"|urlencode }}"/>
                 </form>
                 <p style="line-height:15px; text-align:left">If you have any trouble logging in to your account, contact your administrator </p>
-            </div>
-	    <div style="position:absolute; top:120px; left:380px">
-                <img src="/media/img/mobile3.jpg" width="140%" height="140%"/>
             </div>
             <h4>{% trans "Professionals" %}</h4>
             <hr />
