@@ -3,4 +3,4 @@
 pref("extensions.openplm.server", "http://localhost:8000/");
 
 // https://developer.mozilla.org/en/Localizing_extension_descriptions
-pref("extensions.openplm@example.com.description", "chrome://openplm/locale/overlay.properties");
+pref("extensions.openplm@openplm.org.description", "chrome://openplm/locale/overlay.properties");
