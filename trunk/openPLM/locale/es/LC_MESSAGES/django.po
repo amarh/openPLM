@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-25 09:24+0100\n"
+"POT-Creation-Date: 2011-11-28 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -434,126 +434,131 @@ msgstr "UTF-8"
 msgid "UTF-8-sig"
 msgstr "UTF-8-sig"
 
-#: plmapp/forms.py:56
+#: plmapp/forms.py:57
 msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
 msgstr "Referencia errónea: '#', '?', '/' y '..' no estan permitidos"
 
-#: plmapp/forms.py:62
+#: plmapp/forms.py:63
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "Revisión errónea: '#', '?', '/' y '..' no estan permitidos"
 
-#: plmapp/forms.py:65
+#: plmapp/forms.py:66
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
 msgstr ""
 "Grupo erróneo, compruebe que el grupo existe y usted pertenece al mismo."
-#: plmapp/forms.py:92
+
+#: plmapp/forms.py:93
 msgid "An object with the same type, reference and revision already exists"
 msgstr "Ya existe un objeto con el mismo tipo, referencia y revisión "
 
-#: plmapp/forms.py:137
+#: plmapp/forms.py:138
 msgid "Select a type"
 msgstr "Seleccione un tipo"
 
-#: plmapp/forms.py:230
+#: plmapp/forms.py:231
 msgid "Query"
 msgstr "Consulta"
 
-#: plmapp/forms.py:352
+#: plmapp/forms.py:353
 msgid "only search results"
 msgstr "sólo resultados de búsqueda"
 
-#: plmapp/forms.py:353
+#: plmapp/forms.py:354
 msgid "Hierarchical"
 msgstr "Jerárquico"
 
-#: plmapp/forms.py:354
+#: plmapp/forms.py:355
 msgid "Radial 1"
 msgstr "Radial 1"
 
-#: plmapp/forms.py:355
+#: plmapp/forms.py:356
 msgid "Radial 2"
 msgstr "Radial 2"
 
-#: plmapp/forms.py:358
+#: plmapp/forms.py:359
 msgid "layout"
 msgstr "disposición"
 
-#: plmapp/forms.py:365
+#: plmapp/forms.py:366
 msgid "child"
 msgstr "hijo"
 
-#: plmapp/forms.py:366 plmapp/models.py:572
+#: plmapp/forms.py:367 plmapp/models.py:572
 msgid "parents"
 msgstr "padres"
 
-#: plmapp/forms.py:367
+#: plmapp/forms.py:368 plmapp/forms.py:389
 msgid "doc"
 msgstr "doc"
 
-#: plmapp/forms.py:368
+#: plmapp/forms.py:369
 msgid "cad"
 msgstr "cad"
 
-#: plmapp/forms.py:369 plmapp/forms.py:375 plmapp/models.py:171
-#: plmapp/models.py:220 plmapp/models.py:413 plmapp/models.py:542
-#: plmapp/controllers/user.py:92
+#: plmapp/forms.py:370 plmapp/forms.py:376 plmapp/forms.py:386
+#: plmapp/models.py:171 plmapp/models.py:220 plmapp/models.py:413
+#: plmapp/models.py:542 plmapp/controllers/user.py:92
 msgid "owner"
 msgstr "propietario"
 
-#: plmapp/forms.py:370 plmapp/forms.py:376
+#: plmapp/forms.py:371 plmapp/forms.py:377
 msgid "signer"
 msgstr "firmante"
 
-#: plmapp/forms.py:371 plmapp/forms.py:377 plmapp/views/main.py:852
+#: plmapp/forms.py:372 plmapp/forms.py:378 plmapp/views/main.py:809
 msgid "notified"
 msgstr "notificado"
 
-#: plmapp/forms.py:374
+#: plmapp/forms.py:375 plmapp/forms.py:388
 msgid "part"
 msgstr "parte"
 
-#: plmapp/forms.py:380
+#: plmapp/forms.py:381
 msgid "owned"
 msgstr "somos propietarios"
 
-#: plmapp/forms.py:381
+#: plmapp/forms.py:382
 msgid "to sign"
 msgstr "a firmar"
 
-#: plmapp/forms.py:382
+#: plmapp/forms.py:383
 msgid "request notification from"
 msgstr "tenemos demanda de notificación"
 
-#: plmapp/forms.py:401 templates/DisplayObject4PasswordModification.htm:11
+#: plmapp/forms.py:387
+msgid "user"
+msgstr ""
+
+#: plmapp/forms.py:410 templates/DisplayObject4PasswordModification.htm:11
 #: templates/DisplayObject4creation.htm:11
 #: templates/DisplayObject4modification.htm:11
 msgid "Type"
 msgstr "Tipo"
 
-#: plmapp/forms.py:402 templates/DisplayObjectDelegation.htm:32
+#: plmapp/forms.py:411 templates/DisplayObjectDelegation.htm:32
 #: templates/groups/users.htm:28 templates/groups/users.htm.py:75
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: plmapp/forms.py:446
+#: plmapp/forms.py:455
 msgid "The new user will belong to the selected groups"
 msgstr "El nuevo usuario formara parte del grupo seleccionado"
 
-#: plmapp/forms.py:454
+#: plmapp/forms.py:463
 msgid "Email address must be unique."
 msgstr "La direccion de Email debe ser única."
 
-#: plmapp/forms.py:461
+#: plmapp/forms.py:470
 msgid "Email's domain not valid"
 msgstr "Dominio de Email no valido"
 
-#: plmapp/forms.py:476
+#: plmapp/forms.py:485
 #, python-format
 msgid "Warning! There are homonyms: %s!"
 msgstr "Atención! Hay homóninos: %s!"
 
-#: plmapp/forms.py:508
+#: plmapp/forms.py:517
 msgid "Columns must have distinct headers."
 msgstr "Las columnas deben tener cabeceras distintas."
 
@@ -641,7 +646,7 @@ msgstr "grupo"
 
 #: plmapp/models.py:572
 msgid "BOM-child"
-msgstr "BOM-hijo" 
+msgstr "BOM-hijo"
 
 #: plmapp/models.py:573
 msgid "doc-cad"
@@ -671,11 +676,11 @@ msgstr "rol en PLM"
 msgid "Enter a valid e-mail address."
 msgstr "Introduzca una dirección e-mail válida."
 
-#: plmapp/views/main.py:848
+#: plmapp/views/main.py:805
 msgid "signer level"
 msgstr "nivel del firmante"
 
-#: plmapp/views/main.py:850
+#: plmapp/views/main.py:807
 msgid "signer all levels"
 msgstr "firmante a todos los niveles "
 
@@ -684,7 +689,7 @@ msgid "FIND"
 msgstr "BUSCAR"
 
 #: templates/BaseDisplayHomePage.htm:52
-#: templates/DisplayObject4creation.htm:46
+#: templates/DisplayObject4creation.htm:36
 msgid "CREATE"
 msgstr "CREAR"
 
@@ -716,7 +721,7 @@ msgstr "Conectar nuevo documento :"
 msgid "Add new file / Check-in file :"
 msgstr "Añadir archivo/ Check-in de archivo :"
 
-#: templates/DisplayHomePage.htm:22 templates/DisplayLoginPage.htm:31
+#: templates/DisplayHomePage.htm:22 templates/DisplayLoginPage.htm:30
 msgid "Go"
 msgstr "Ir"
 
@@ -765,63 +770,66 @@ msgstr "No puedes crear un objeto si no eres contribuidor."
 msgid "openPLM LOGIN PAGE"
 msgstr "pagina de ACCESO a openPLM"
 
-#: templates/DisplayLoginPage.htm:33
+#: templates/DisplayLoginPage.htm:32
 msgid "Welcome to openPLM"
 msgstr "Bienvenido a openPLM"
 
-#: templates/DisplayLoginPage.htm:39
+#: templates/DisplayLoginPage.htm:38
 msgid "is the first genuine open source PLM based on"
 msgstr "es el primer software genuino PLM de codigo abierto basado en"
 
-#: templates/DisplayLoginPage.htm:40
+#: templates/DisplayLoginPage.htm:39
 msgid ""
 "intended to provide a starting point for companies CMS/PLM/BIM projects."
 msgstr ""
-"con la intencion de proporcionar un punto de partida para los proyectos CMS/PLM/BIM de su sociedad."
-#: templates/DisplayLoginPage.htm:41
+"con la intencion de proporcionar un punto de partida para los proyectos CMS/"
+"PLM/BIM de su sociedad."
+
+#: templates/DisplayLoginPage.htm:40
 msgid ""
 "By integrating numerous standard reusable PLM functionalities to take care "
 "of the things that companies have in common, it lets you focus on what makes "
 "your company different."
 msgstr ""
-"Integra numerosas funcionalidades PLM estandarizadas y reutilizables para hacer frente "
-"a las tareas más comunes de su empresa, permitiéndole centrarse "
+"Integra numerosas funcionalidades PLM estandarizadas y reutilizables para "
+"hacer frente a las tareas más comunes de su empresa, permitiéndole centrarse "
 "en aquello que hace a su compañia diferente."
 
-#: templates/DisplayLoginPage.htm:45
+#: templates/DisplayLoginPage.htm:44
 msgid "For more information about openPLM, see"
 msgstr "Para mas información sobre openPLM, visite"
 
-#: templates/DisplayLoginPage.htm:48
+#: templates/DisplayLoginPage.htm:47
 msgid "openPLM connexion :"
 msgstr "conexión openPLM :"
 
-#: templates/DisplayLoginPage.htm:57
+#: templates/DisplayLoginPage.htm:58
 msgid "Login :"
 msgstr "Usuario :"
 
-#: templates/DisplayLoginPage.htm:61
+#: templates/DisplayLoginPage.htm:62
 msgid "Password :"
 msgstr "Contraseña :"
 
-#: templates/DisplayLoginPage.htm:66
+#: templates/DisplayLoginPage.htm:67
 msgid "LOGIN"
 msgstr "ENTRAR"
 
-#: templates/DisplayLoginPage.htm:73
+#: templates/DisplayLoginPage.htm:77
 msgid "Professionals"
 msgstr "Profesionales"
 
-#: templates/DisplayLoginPage.htm:76
+#: templates/DisplayLoginPage.htm:80
 msgid ""
 "You are planning to use openPLM in a <b>professional</b> context. If you "
 "want to work with other professionals for your project management, for other "
 "solutions plugins, for openPLM software maintenance, "
 msgstr ""
 "Si esta planeando utilizar open PLM en un contexto <b>profesional</b>. Si "
-"usted quiere trabajar con otros profesionales en la gestión de su proyecto, para  "
-"soluciones plug-in y para el mantenimieto del software openPLM, "
-#: templates/DisplayLoginPage.htm:78
+"usted quiere trabajar con otros profesionales en la gestión de su proyecto, "
+"para  soluciones plug-in y para el mantenimieto del software openPLM, "
+
+#: templates/DisplayLoginPage.htm:82
 msgid "contact us"
 msgstr "contáctenos"
 
@@ -856,7 +864,8 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"                            %(comment_count)s comentarios han sido publicados.\n"
+"                            %(comment_count)s comentarios han sido "
+"publicados.\n"
 "                        "
 
 #: templates/DisplayObject.htm:54
@@ -895,7 +904,7 @@ msgstr "CREACCIÓN DE OBJETO:"
 msgid "OBJECT MODIFICATION:"
 msgstr "MODIFICACIÓN DE OBJETO:"
 
-#: templates/DisplayObject4modification.htm:35
+#: templates/DisplayObject4modification.htm:26
 msgid "MODIFY"
 msgstr "MODIFICAR"
 
@@ -1054,9 +1063,10 @@ msgstr "No hay partes adjuntas a este documento"
 msgid "NEW"
 msgstr "NUEVO"
 
-#: templates/DisplayObjectRevisions.htm:13
+#: templates/DisplayObjectRevisions.htm:14
 msgid "You can not revise this object since a revision already exist."
-msgstr "Usted no puede revisar este objeto por que ya existe una revision del mismo."
+msgstr ""
+"Usted no puede revisar este objeto por que ya existe una revision del mismo."
 
 #: templates/MiddleDisplayObject.htm:39
 msgid "You are not allowed to see this object"
@@ -1069,6 +1079,10 @@ msgstr "Adjuntar documento?"
 #: templates/Navigate.htm:33
 msgid "Attach the selected document?"
 msgstr "Adjuntar el documento seleccionado?"
+
+#: templates/Navigate.htm:48
+msgid "Close"
+msgstr ""
 
 #: templates/Navigate.htm:74
 msgid "FILTER"
@@ -1175,12 +1189,14 @@ msgid "Pending invitations"
 msgstr "Invitaciones pendientes"
 
 #: templates/groups/users.htm:72
+#, fuzzy
 msgid ""
-"The following invitations have been sent but guests has not yet accepted "
+"The following invitations have been sent but guests have not yet accepted "
 "them."
 msgstr ""
 "Las siguientes invitaciones han sido enviadas pero los invitados aun las "
 "aceptaron."
+
 #: templates/groups/users.htm:78
 msgid "Date of the invitation"
 msgstr "Fecha de invitacion"
@@ -1200,15 +1216,17 @@ msgstr "Linea %(line)s"
 
 #: templates/import/csv.htm:32
 msgid "Error while reading the CSV file. Try upload a new file."
-msgstr "Error durante la lectura del fichero CSV.Intente cargar un nuevo fichero."
+msgstr ""
+"Error durante la lectura del fichero CSV.Intente cargar un nuevo fichero."
 
 #: templates/import/csv.htm:35
 msgid ""
 "The given encoding seems wrong. Try upload a new file with the right "
 "encoding."
 msgstr ""
-"La codificación dada parece incorrecta.Intente cargar un nuevo fichero con la codificación "
-"correcta."
+"La codificación dada parece incorrecta.Intente cargar un nuevo fichero con "
+"la codificación correcta."
+
 #: templates/import/csv.htm:50
 msgid "Field"
 msgstr "Campo"
@@ -1262,9 +1280,10 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"        %(s_first_name)s %(s_last_name)s (%(s_username)s) os solicita unirse"
-"al grupo %(group)s.\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) os solicita "
+"unirseal grupo %(group)s.\n"
 "        "
+
 #: templates/mails/invitation1.htm:11 templates/mails/invitation2.htm:11
 msgid "Click here to accept the invitation"
 msgstr "Click aqui para aceptar la invitacion"
@@ -1291,6 +1310,7 @@ msgstr ""
 "\n"
 "            Bienvenido %(first_name)s %(last_name)s!\n"
 "            "
+
 #: templates/mails/new_account.htm:10
 #, python-format
 msgid ""
@@ -1330,4 +1350,5 @@ msgstr "Patrocinar un nuevo usuario"
 
 #: templates/users/sponsor.htm:14
 msgid "You can not sponsor a new user since you are not a contributor."
-msgstr "Usted no puede patrocinar a nuevos usuarios por que no es un contribuidor."
+msgstr ""
+"Usted no puede patrocinar a nuevos usuarios por que no es un contribuidor."
