@@ -1,11 +1,15 @@
 /* *************************************************************************************** */
 /*                                  GENERAL STYLE                                          */
 /* *************************************************************************************** */
-*
-{
+
+* {
     padding: 0px;
     margin: 0px;
     color: #ffffff;
+}
+
+:not(option):not(select):not(h3) {
+    color: #d8d6d5;
 }
 
 body 
@@ -45,7 +49,7 @@ h3 {
     font-size: 110%;
     margin: 0.5em 0 .5em;
     padding-left: 1em;
-    color: #444;
+    color: #333;
 }
 
 h3 + p,
@@ -384,7 +388,7 @@ table.Content th
 table.Content td
 {
     text-align: left;
-    background-color: #AFACAB;
+    background-color: #CFCCCB;
 }
 
 table.Content td,
