@@ -531,8 +531,6 @@ div.selector select {
   opacity: 0;
   filter: alpha(opacity:0);
   height: 100%;
-  border: none;
-  background: none;
 }
 
 /* Checker */
