@@ -5,11 +5,10 @@
 * {
     padding: 0px;
     margin: 0px;
-    color: #ffffff;
 }
 
 :not(option):not(select):not(h3) {
-    color: #d8d6d5;
+    color: #eee;
 }
 
 body 
