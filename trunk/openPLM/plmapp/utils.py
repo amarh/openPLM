@@ -121,10 +121,10 @@ UNITS = {"mm" : 1,
 
 def convert(value, from_, to):
     """
-    Example::
+    Convert *value* from *from_* unit to *to* unit.
 
-        >>> convert(10, "cm", "mm")
-        100.0
+    Example::
+        
         >>> "%.3f" % convert(10, "cm", "mm")
         '100.000'
         >>> "%.3f" % convert(10, "mm", "cm")
