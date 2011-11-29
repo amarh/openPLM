@@ -13,14 +13,23 @@ div#Navigate
 }
 
 #closeThumbnails {
-    float: right;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+#navDocument {
+    word-wrap: break-word;
+    padding-right: 20px;
 }
 
 #navThumbnailsBar {
     border-bottom: 1px solid #7f7c7c;
     background-color: #343434;
     padding: 3px;
-    overflow: auto;
+    overflow: hidden;
 }
 
 div#navThumbnails {
@@ -38,7 +47,6 @@ div#navThumbnails {
 
 div#thumbnailsList {
     overflow-y: scroll;
-    max-height: 480px;
 }
 div#thumbnailsList img{
     border-bottom: 1px solid #7f7c7c;
@@ -46,6 +54,10 @@ div#thumbnailsList img{
     max-height: 160px;
 }
 
+
+div#thumbnailsList > * {
+    display: block;
+}
 
 div#DivNav {
     position: absolute;
