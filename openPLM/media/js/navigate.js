@@ -21,16 +21,18 @@ function display_thumbnails(node_id, ajax_url){
     $.ajax({
         url: ajax_url,
         success: function( data ) {
+            var list = $("#thumbnailsList");
             $.each(data["files"], function(index, value){
                 var name = value[0];
                 var url = value[1];
                 var img = value[2];
                 var title = "Download " + name;
-                $("#thumbnailsList").append(
-                    $("<a href='"+ url +"'> <img src='" + img + "' width='160' height='160' title='" + title + "' /></a>"));
+                list.append(
+                    $("<div><a href='"+ url +"'> <img src='" + img + "' width='160' height='160' title='" + title + "' /></a></div>"));
                 });
             $("#navDocument").text(data["doc"]);
             show_thumbnails_panel($("#" + node_id));
+            list.outerHeight(list.parent().innerHeight() - $("#navDocument").outerHeight()-2);
         }
     });
 }
