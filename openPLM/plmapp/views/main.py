@@ -74,7 +74,9 @@ import openPLM.plmapp.csvimport as csvimport
 
 def r2r(template, dictionary, request):
     """
-    Shortcut for::
+    Shortcut for:
+    
+    ::
         
         render_to_response(template, dictionary,
                               context_instance=RequestContext(request))
