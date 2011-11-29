@@ -333,7 +333,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     If *all/* is given, all files are returned, otherwise, only unlocked files
     are returned.
     
-    :url: :samp:`{server}/api/{doc_id}/files/[all/]`
+    :url: :samp:`{server}/api/object/{doc_id}/files/[all/]`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.get_files`
@@ -345,7 +345,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
 
     Make a new revision of the document
 
-    :url: :samp:`{server}/api/{doc_id}/revise/`
+    :url: :samp:`{server}/api/object/{doc_id}/revise/`
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.revise`
@@ -362,7 +362,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
 
     Returns a possible new revision for the document.
 
-    :url: :samp:`{server}/api/{doc_id}/next_revision/`
+    :url: :samp:`{server}/api/object/{doc_id}/next_revision/`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.next_revision`
@@ -374,7 +374,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
 
     Returns True if the document can be revised.
 
-    :url: :samp:`{server}/api/{doc_id}/is_revisable/`
+    :url: :samp:`{server}/api/object/{doc_id}/is_revisable/`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.is_revisable`
@@ -386,7 +386,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
 
     Links the document with the part identified by *part_id*
 
-    :url: :samp:`{server}/api/{doc_id}/attach_to_part/{part_id}/`
+    :url: :samp:`{server}/api/object/{doc_id}/attach_to_part/{part_id}/`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.attach_to_part`
@@ -397,7 +397,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     Adds a file to the document, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
-    :url: :samp:`{server}/api/{doc_id}/add_file/`
+    :url: :samp:`{server}/api/object/{doc_id}/add_file/`
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.add_file`
@@ -417,7 +417,7 @@ In the following queries, *df_id* is the id (an integer) of a
 
     Returns True if the file is locked.
 
-    :url: :samp:`{server}/api/{doc_id}/is_locked/{df_id}/`
+    :url: :samp:`{server}/api/object/{doc_id}/is_locked/{df_id}/`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.is_locked`
@@ -429,8 +429,8 @@ In the following queries, *df_id* is the id (an integer) of a
 
     Locks the file
 
-    :url: :samp:`{server}/api/{doc_id}/lock/{df_id}/` or 
-          :samp:`{server}/api/{doc_id}/checkout/{df_id}/`
+    :url: :samp:`{server}/api/object/{doc_id}/lock/{df_id}/` or 
+          :samp:`{server}/api/object/{doc_id}/checkout/{df_id}/`
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.check_out`
@@ -440,7 +440,7 @@ In the following queries, *df_id* is the id (an integer) of a
 
     Unlocks the file
 
-    :url: :samp:`{server}/api/{doc_id}/unlock/{df_id}/` 
+    :url: :samp:`{server}/api/object/{doc_id}/unlock/{df_id}/` 
     :type: GET
     :login required: yes
     :implemented by: :func:`plmapp.api.unlock`
@@ -451,7 +451,7 @@ In the following queries, *df_id* is the id (an integer) of a
     Updates (checks-in) the file, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
-    :url: :samp:`{server}/api/{doc_id}/checkin/{df_id}/` 
+    :url: :samp:`{server}/api/object/{doc_id}/checkin/{df_id}/` 
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.check_in`
@@ -463,7 +463,7 @@ In the following queries, *df_id* is the id (an integer) of a
     Adds a thumbnail to the file, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
-    :url: :samp:`{server}/api/{doc_id}/add_thumbnail/{df_id}/` 
+    :url: :samp:`{server}/api/object/{doc_id}/add_thumbnail/{df_id}/` 
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.add_thumbnail`
