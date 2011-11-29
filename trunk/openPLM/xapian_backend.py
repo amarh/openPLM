@@ -1215,7 +1215,7 @@ class SearchQuery(BaseSearchQuery):
         Returns:
             A xapian.Query
         """
-        if field:
+        if field and field != self.backend.content_field_name:  
             return xapian.Query(
                 xapian.Query.OP_PHRASE, [
                     '%s%s%s' % (
