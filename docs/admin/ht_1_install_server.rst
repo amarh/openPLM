@@ -41,10 +41,10 @@ First, you must install some dependencies:
     #. ``easy_install 'pygraphviz>=1.1'``
     #. ``apt-get install python-xapian rabbitmq-server``
     #. ``apt-get install python-django python-docutils``
-    #.  ``apt-get install 'south>=0.7'``
+    #.  ``easy_install 'south>=0.7'``
     #. ``easy_install celery``
     #. ``easy_install django-celery``
-    #. ``easy_install 'django-haystack==1.2'``
+    #. ``easy_install 'django-haystack<2'``
     #. ``apt-get install postgresql python-psycopg2``
     #. ``apt-get install tracker-extract``
     #. ``easy_install lepl``
