@@ -1,11 +1,37 @@
+var topics = {};
+
+jQuery.Topic = function( id ) {
+    var callbacks,
+        method,
+        topic = id && topics[ id ];
+    if ( !topic ) {
+        callbacks = jQuery.Callbacks();
+        topic = {
+            publish: callbacks.fire,
+            subscribe: callbacks.add,
+            unsubscribe: callbacks.remove
+        };
+        if ( id ) {
+            topics[ id ] = topic;
+        }
+    }
+    return topic;
+};
+
 function hide_left_panel(){
     $("div#left-col").hide();
-    $("div#center-col").css("margin-left", "0");
+    if ($("div#center-col").css("margin-left") === "330px" ){
+        $("div#center-col").css("margin-left", "0");
+        $.Topic("hide_left_panel").publish();
+    }
 }
 
 function show_left_panel(){
     $("div#left-col").show();
-    $("div#center-col").css("margin-left", "330px");
+    if ($("div#center-col").css("margin-left") != "330px" ){
+        $("div#center-col").css("margin-left", "330px");
+        $.Topic("show_left_panel").publish();
+    }
 }
 
 function show_create_box(){
