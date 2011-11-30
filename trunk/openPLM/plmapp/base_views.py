@@ -392,13 +392,18 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     y_img_position_corrected = 500 // 2 - y_part_node_position
     img = Image.open(path)
     width, height = img.size
-    ctx.update({'filter_object_form': form,
-                         'map_areas': map_string, 'picture_path': "/"+url,
-                         'x_img_position': x_img_position_corrected,
-                         'y_img_position': y_img_position_corrected,
-                         'img_width' : width,
-                         'img_height' : height,
-                         'navigate_bool': True})
+    ctx.update({
+        'filter_object_form': form,
+        'map_areas': map_string,
+        'picture_path': "/"+url,
+        'x_img_position': x_img_position_corrected,
+        'y_img_position': y_img_position_corrected,
+        'img_width' : width,
+        'img_height' : height,
+        'center_x' : left + w // 2,
+        'center_y' : top + h //2,
+        'navigate_bool': True,
+    })
     return ctx
 
 

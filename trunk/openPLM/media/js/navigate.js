@@ -64,9 +64,11 @@ function update_nav(focus_node_id, data){
             top: '-=' + delta_top + "px"});
         }
     else {
-        //divNav.css({left: data.left + "px",
-                    //top: data.top + "px"});
-        center();
+        var nw = $("#Navigate").innerWidth();
+        var nh = $("#Navigate").innerHeight();
+        console.log((nw / 2 - data.center_x) + "px");
+        divNav.css({left: (nw / 2 - data.center_x) + "px",
+                    top: (nh / 2 - data.center_y) + "px"});
     }
     init();
 }
@@ -362,6 +364,12 @@ cursor: 'crosshair'
             timeout: 500
              } );
         
+        $.Topic("show_left_panel").subscribe(function (){
+                $("#DivNav").css({left : "-=330px"});
+        });
+        $.Topic("hide_left_panel").subscribe(function (){
+                $("#DivNav").css({left : "+=330px"});
+        });
         init();
         center();
 });
