@@ -15,15 +15,16 @@
     	<table class="Content">
     		<tr class="Content">
     		{% for status, is_current_state in object_lifecycle %}
-    			<td class="Content"
+                <td class="Content status Button ui-state-default ui-button-text-only 
     				{% if is_current_state %}
-    				    style="text-align:center; background-color:#0808fa"
-    				{% else %}
-    				    style="text-align:center; background-color:#7a7af8"
-				    {% endif %}>
+                        ui-state-active active
+                    {% else %}
+                        ui-state-inactive
+				    {% endif %}
+                    ">
     				{{status|upper}}</td>
     				{% if not forloop.last %}
-    				    <td style="text-align:center">===&gt;</td>
+    				    <td class="Content arrow">===&gt;</td>
 				    {% endif %}
     		{% endfor %}
     		</tr>

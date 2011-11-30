@@ -619,3 +619,20 @@ h2 div.toolbar > ul > li > button{
 #help-dialog .section * {
     font-size: 14px;
 }
+
+
+/* lifecycle */
+table.Content td.status {
+    text-align: center;
+    color: #eee;
+}
+
+table.Content td.arrow {
+    text-align: center;
+}
+
+table.Content td.status.active {
+    font-weight: bold;
+    border-color: #800;
+}
+
