@@ -58,14 +58,14 @@ h4 {
     border-left: 1px solid #636363;
     border-top: 1px solid #636363;
     border-radius: 1em 0 1em 0;
-    color: #C8C6C5;
+    color: #d8d6d5;
     padding: 0.2em 1em;
     font-size: 105%;
 }
 
 h4 + *,
 h4 ~ * {
-    margin-right: 1em;
+    margin-right: 1.2em;
 }
 
 .clear
@@ -430,6 +430,11 @@ div#comments{
     margin:1em;
     border-top: 1px #444 solid;
 }
+
+div#comment_form {
+    margin-top: 1em;
+}
+
 
 td.expander span.expander {
     cursor: pointer;
