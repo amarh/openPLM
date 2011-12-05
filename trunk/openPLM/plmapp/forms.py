@@ -525,3 +525,7 @@ def get_headers_formset(Importer):
 
 get_headers_formset = memoize(get_headers_formset, {}, 1)
 
+from openPLM.plmapp.archive import ARCHIVE_FORMATS
+class ArchiveForm(forms.Form):
+    format = forms.TypedChoiceField(choices=zip(ARCHIVE_FORMATS, ARCHIVE_FORMATS))
+
