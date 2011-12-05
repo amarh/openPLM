@@ -131,6 +131,7 @@ urlpatterns += patterns2('', object_url,
     (r'management/replace/(?P<link_id>\d+)/$', replace_management),
     (r'management/delete/$', delete_management),
     (r'navigate/$', navigate),
+    (r'(?:files/|doc-cad/)?archive/$', download_archive),
 )
 
 

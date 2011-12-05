@@ -4,6 +4,12 @@
 <!-- Manage html display in the Content div which correspond to the "files" menu -->
 
 {% block content %}
+    {% if file_formset.total_form_count %}
+        <form class="archive_form" method="GET" action="./archive/">
+            {{ archive_form.as_p }}
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
+        </form>
+    {% endif %}
     <form method="POST" action="">
         {{ file_formset.management_form }}
 		{% if is_owner and obj.is_editable %}
@@ -11,11 +17,13 @@
                 <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
                 <span class="ui-button-text">{% trans "ADD" %}</span>
             </a>
-            <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
+            {% if file_formset.total_form_count %}
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
+            {% endif %}
         {% endif %}
 	    <table class="Content">
+		    {% for form in file_formset.forms %}
 		    <tr class="Content">
-		        {% for form in file_formset.forms %}
                 {{ form.id }}
                 {{ form.document }}
                 {% with form.instance as instance %}

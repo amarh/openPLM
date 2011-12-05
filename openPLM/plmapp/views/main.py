@@ -62,6 +62,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.forms import HiddenInput
 
+from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller 
@@ -346,8 +347,10 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_doc_cad_formset(obj)
+    archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'doc-cad',
                 'object_doc_cad': obj.get_attached_documents(),
+                'archive_form' : archive_form,
                 'doc_cad_formset': formset})
     return r2r('DisplayObjectDocCad.htm', ctx, request)
 
@@ -449,8 +452,11 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
+    archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'files', 
-                'file_formset': formset})
+                'file_formset': formset,
+                'archive_form' : archive_form,
+               })
     return r2r('DisplayObjectFiles.htm', ctx, request)
 
 ##########################################################################################
@@ -848,8 +854,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
 @handle_errors 
 def download(request, docfile_id, filename=""):
     """
-    Manage html page for the files (:class:`DocumentFile`) download in the selected object.
-    It computes a context dictionnary based on
+    View to download a document file.
     
     :param request: :class:`django.http.QueryDict`
     :param docfile_id: :attr:`.DocumentFile.id`
@@ -868,7 +873,43 @@ def download(request, docfile_id, filename=""):
     if not filename:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
- 
+
+@handle_errors 
+def download_archive(request, obj_type, obj_ref, obj_revi):
+    """
+    View to download all files from a document/part.
+
+    .. include:: views_params.txt 
+    """
+
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    obj.check_readable()
+    
+    d_o_u = "document__owner__username"
+    if obj.is_document:
+        files = obj.files.select_related(d_o_u)
+    elif obj.is_part:
+        links = obj.get_attached_documents()
+        docs = (link.document for link in links)
+        files = itertools.chain(*(doc.files.select_related(d_o_u)
+            for doc in docs))
+    else:
+        return HttpResponseForbidden()
+
+    form = forms.ArchiveForm(request.GET)
+    if form.is_valid():
+        format = form.cleaned_data["format"]
+        name = "%s_%s.%s" % (obj_ref, obj_revi, format)
+        mimetype = guess_type(name, False)[0]
+        if not mimetype:
+            mimetype = 'application/octet-stream'
+        content = generate_archive(files, format)
+        response = HttpResponse(content, mimetype=mimetype)
+        #response["Content-Length"] = size
+        response['Content-Disposition'] = 'attachment; filename="%s"' % name
+        return response
+    return HttpResponseForbidden()
+
 ##########################################################################################
 @handle_errors 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
