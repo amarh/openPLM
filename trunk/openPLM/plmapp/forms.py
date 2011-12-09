@@ -224,13 +224,13 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
 get_search_form.cache = {}    
 
-from haystack.query import EmptySearchQuerySet
-from openPLM.plmapp.search import SmartSearchQuerySet
-
 class SimpleSearchForm(forms.Form):
     q = forms.CharField(label=_("Query"), required=False)
 
     def search(self, *models):
+        from haystack.query import EmptySearchQuerySet
+        from openPLM.plmapp.search import SmartSearchQuerySet
+
         if self.is_valid():
             query = self.cleaned_data["q"].strip()
             sqs = SmartSearchQuerySet().highlight().models(*models)

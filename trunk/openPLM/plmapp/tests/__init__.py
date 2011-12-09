@@ -22,6 +22,14 @@
 #    Pierre Cosquer : pierre.cosquer@insa-rennes.fr
 ################################################################################
 
+# import custom application models
+from django.conf import settings
+for app in settings.INSTALLED_APPS:
+    if app.startswith("openPLM"):
+        __import__("%s.models" % app, globals(), locals(), [], -1)
+
+import openPLM.plmapp.search_indexes
+
 from openPLM.plmapp.tests.filehandlers import *
 from openPLM.plmapp.tests.controllers import *
 from openPLM.plmapp.tests.lifecycle import *

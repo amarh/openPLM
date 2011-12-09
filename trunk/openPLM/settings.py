@@ -2,6 +2,7 @@
 # Django settings for openPLM project.
 # sqlite version
 
+import sys
 import os.path
 
 DEBUG = True
@@ -148,6 +149,8 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com"
 MAX_FILE_SIZE = -1
 
 # search stuff
+if "rebuild_index" not in sys.argv:
+    HAYSTACK_ENABLE_REGISTRATIONS = False
 HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'xapian'
 HAYSTACK_XAPIAN_PATH = "/var/openPLM/xapian_index/"

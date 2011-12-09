@@ -6,8 +6,6 @@ from functools import wraps
 
 from django.db.models.loading import get_model
 
-from haystack import site
-
 from celery.task import task
 
 def synchronized(cls=None, lock=None):
@@ -42,6 +40,9 @@ def synchronized(cls=None, lock=None):
 @synchronized
 @task(default_retry_delay = 60, max_retries = 10)
 def update_index(app_name, model_name, pk, **kwargs):
+    from haystack import site
+    import openPLM.plmapp.search_indexes
+
     model_class = get_model(app_name, model_name)
     instance = model_class.objects.get(pk=pk)
     search_index = site.get_index(model_class)
@@ -49,6 +50,9 @@ def update_index(app_name, model_name, pk, **kwargs):
 
 @task(default_retry_delay = 60, max_retries = 10)
 def update_indexes(instances):
+    from haystack import site
+    import openPLM.plmapp.search_indexes
+
     for app_name, model_name, pk in instances:
         model_class = get_model(app_name, model_name)
         instance = model_class.objects.get(pk=pk)
