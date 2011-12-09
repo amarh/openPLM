@@ -1,16 +1,23 @@
 from django.conf import settings
-
-from haystack.indexes import *
-from haystack import site
-
-import openPLM.plmapp.models as models
-
 from django.db.models import signals
 from django.db.models.loading import get_model
 
+from haystack import site
 from haystack import indexes
+from haystack.indexes import *
+from haystack.models import SearchResult
 
+import openPLM.plmapp.models as models
 from openPLM.plmapp.tasks import update_index
+
+# just a hack to prevent a KeyError
+def get_state(self):
+    ret_dict = self.__dict__.copy()
+    if 'searchsite' in ret_dict:
+        del(ret_dict['searchsite'])
+    del(ret_dict['log'])
+    return ret_dict
+SearchResult.__getstate__ = get_state
 
 ###########################
 # from https://github.com/mixcloud/django-celery-haystack-SearchIndex/
@@ -110,7 +117,6 @@ for key, model in models.get_all_plmobjects().iteritems():
                 return self.model.objects.filter(type=self.key)
             else:
                 return self.model.objects.all()
-
     set_template_name(ModelIndex)
     site.register(model, ModelIndex)
 

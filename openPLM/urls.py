@@ -31,6 +31,8 @@ for app in settings.INSTALLED_APPS:
     if app.startswith("openPLM"):
         __import__("%s.models" % app, globals(), locals(), [], -1)
 
+import openPLM.plmapp.search_indexes
+
 from django.conf.urls.defaults import include, patterns
 from openPLM.plmapp.views import *
 import openPLM.plmapp.views.api as api
@@ -39,16 +41,6 @@ from openPLM.plmapp.csvimport import IMPORTERS
 
 from django.contrib import admin
 admin.autodiscover()
-
-# just a hack to prevent a KeyError
-from haystack.models import SearchResult
-def get_state(self):
-    ret_dict = self.__dict__.copy()
-    if 'searchsite' in ret_dict:
-        del(ret_dict['searchsite'])
-    del(ret_dict['log'])
-    return ret_dict
-SearchResult.__getstate__ = get_state
 
 
 urlpatterns = patterns('')
