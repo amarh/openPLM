@@ -75,6 +75,18 @@ class CommonViewTest(BaseTestCase):
             self.assertEqual(page, response.context["current_page"])
         return response
 
+    def attach_to_official_document(self):
+        u""" If :attr:`controller`` is a PartController, this method attachs
+        an official document to it, so that it becomes promotable.
+
+        Does nothing if :attr:`controller` is a DocumentController.
+        """
+        if self.controller.is_part:
+            document = DocumentController.create("doc_1", "Document", "a",
+                    self.user, self.DATA)
+            document.add_file(self.get_file())
+            document.promote()
+            self.controller.attach_to_document(document)
 
 class ViewTest(CommonViewTest):
 
@@ -124,6 +136,7 @@ class ViewTest(CommonViewTest):
         self.assertEqual(obj.name, data["name"])
 
     def test_lifecycle(self):
+        self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", True), ("official", False), ("deprecated", False))

@@ -28,7 +28,11 @@ This module contains some tests for openPLM.
 
 import datetime
 
-from openPLM.plmapp.controllers import PLMObjectController, PartController
+from openPLM.plmapp.controllers import PLMObjectController, PartController, \
+        DocumentController
+import openPLM.plmapp.exceptions as exc
+import openPLM.plmapp.models as models
+from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.controllers.plmobject import ControllerTest
 
@@ -47,6 +51,12 @@ class PartControllerTest(ControllerTest):
                                                   self.user, self.DATA)
         self.controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
                                                   self.user, self.DATA)
+        self.document = DocumentController.create("Doc1", "Document", "a",
+                self.user, self.DATA)
+        self.document.add_file(self.get_file())
+        self.document.promote()
+        for ctrl in (self.controller, self.controller2):
+            ctrl.attach_to_document(self.document)
 
     def test_add_child(self):
         children = self.controller.get_children()
@@ -170,5 +180,44 @@ class PartControllerTest(ControllerTest):
         self.controller.add_child(self.controller2, 10, 15)
         self.controller.promote()
         self.failIf(self.controller.is_promotable())
+
+    def test_is_promotable_no_document(self):
+        "Tests that a part with no document attached is not promotable."""
+        self.failIf(self.controller3.is_promotable())
+
+    def test_is_promotable_no_official_document(self):
+        "Tests that a part with no official document attached is not promotable."
+        doc = DocumentController.create("doc_2", "Document", "a", self.user,
+                self.DATA)
+        self.controller3.attach_to_document(doc)
+        self.failIf(self.controller3.is_promotable())
+
+    def test_is_promotable_one_official_document(self):
+        """Tests that a part with one official document attached and another
+        not official is promotable."""
+        doc = DocumentController.create("doc_2", "Document", "a", self.user,
+                self.DATA)
+        self.controller3.attach_to_document(self.document)
+        self.controller3.attach_to_document(doc)
+        self.failUnless(self.controller3.is_promotable())
+
+    def test_promote(self):
+        controller = self.controller
+        self.assertEqual(controller.state.name, "draft")
+        controller.promote()
+        self.assertEqual(controller.state.name, "official")
+        self.failIf(controller.is_editable)
+        self.assertRaises(exc.PromotionError, controller.demote)
+        lcl = LifecycleList("diop", "official", "draft", 
+                "issue1", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        controller.lifecycle = lc
+        controller.state = models.State.objects.get(name="draft")
+        controller.save()
+        controller.promote()
+        self.assertEqual(controller.state.name, "issue1")
+        controller.demote()
+        self.assertEqual(controller.state.name, "draft")
+        self.failUnless(controller.is_editable)
 
 

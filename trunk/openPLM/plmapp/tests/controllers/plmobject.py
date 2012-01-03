@@ -47,9 +47,8 @@ class ControllerTest(BaseTestCase):
         controller = self.create()
         self.assertEqual(controller.name, "")
         self.assertEqual(controller.type, self.TYPE)
-        self.assertEqual(type(controller.object), 
-                models.get_all_plmobjects()[self.TYPE])
         type_ = models.get_all_plmobjects()[self.TYPE]
+        self.assertEqual(type(controller.object), type_) 
         obj = type_.objects.get(reference=controller.reference,
                 revision=controller.revision, type=controller.type)
         self.assertEqual(obj.owner, self.user)
@@ -124,25 +123,6 @@ class ControllerTest(BaseTestCase):
         self.assertRaises(ValueError, setattr, controller, "owner", "error")
         self.assertRaises(ValueError, setattr, controller, "state", "error")
         self.assertRaises(ValueError, setattr, controller, "state", "draft")
-
-    def test_promote(self):
-        controller = self.create("Part1")
-        self.assertEqual(controller.state.name, "draft")
-        controller.promote()
-        self.assertEqual(controller.state.name, "official")
-        self.failIf(controller.is_editable)
-        self.assertRaises(exc.PromotionError, controller.demote)
-        lcl = LifecycleList("diop", "official", "draft", 
-                "issue1", "official", "deprecated")
-        lc = models.Lifecycle.from_lifecyclelist(lcl)
-        controller.lifecycle = lc
-        controller.state = models.State.objects.get(name="draft")
-        controller.save()
-        controller.promote()
-        self.assertEqual(controller.state.name, "issue1")
-        controller.demote()
-        self.assertEqual(controller.state.name, "draft")
-        self.failUnless(controller.is_editable)
 
     def test_revise(self):
         """
