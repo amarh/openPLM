@@ -66,6 +66,19 @@ def _clean_revision(self):
 INVALID_GROUP = _("Bad group, check that the group exists and that you belong"
         " to this group.")
 
+def auto_complete_fields(form, cls):
+    """
+    Replaces textinputs field of *form* with auto complete fields.
+
+    :param form: a :class:`Form` instance or class
+    :param cls: class of the source that provides suggested values
+    """
+    for field, form_field in form.base_fields.iteritems():
+        if field not in ("reference", "revision") and \
+                isinstance(form_field.widget, forms.TextInput):
+            source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
+            form_field.widget = JQueryAutoComplete(source)
+
 def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
     u"""
     Returns a creation form suitable to creates an object
@@ -82,6 +95,8 @@ def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
     if Form is None:
         fields = cls.get_creation_fields()
         Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
+        # replace textinputs with autocomplete inputs, see ticket #66
+        auto_complete_fields(Form, cls)
         if issubclass(cls, m.PLMObject):
             Form.clean_reference = _clean_reference
             Form.clean_revision = _clean_revision
@@ -109,6 +124,7 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     if Form is None:
         fields = cls.get_modification_fields()
         Form = modelform_factory(cls, fields=fields)
+        auto_complete_fields(Form, cls)
         get_modification_form.cache[cls] = Form
     if data:
         return Form(data)

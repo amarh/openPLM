@@ -80,7 +80,7 @@ def ajax_autocomplete(request, obj_type, field):
         return HttpResponseForbidden()
     results = cls.objects.filter(**{"%s__icontains" % field : term})
     results = results.values_list(field, flat=True).order_by(field).distinct()
-    json = JSONEncoder().encode(list(results[:limit]))  
+    json = JSONEncoder().encode(list(str(r) for r in results[:limit]))  
     return HttpResponse(json, mimetype='application/json')
 
 @login_required
