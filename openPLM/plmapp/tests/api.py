@@ -60,6 +60,7 @@ class ApiTestCase(CommonViewTest):
             self.assertEqual(self.controller.revision, part["revision"])
 
     def test_search_editable_only(self):
+        self.attach_to_official_document()
         self.controller.promote()
         data = self.get("/api/search/true/", type="Part", reference="Pa*")
         self.assertEqual("ok", data["result"])

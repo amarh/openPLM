@@ -456,7 +456,7 @@ class PLMObject(models.Model):
     def is_editable(self):
         """
         True if the object is not in a non editable state
-        (for example, in an official or deprecated state
+        (for example, in an official or deprecated state).
         """
         current_rank = LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
@@ -494,6 +494,11 @@ class PLMObject(models.Model):
             return issubclass(get_all_plmobjects()[self.type], Document)
         return False
     
+    @property
+    def is_official(self):
+        u"Returns True if document's state is official."""
+        return self.state == self.lifecycle.official_state
+
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
@@ -575,12 +580,19 @@ class Part(PLMObject):
 
     def is_promotable(self):
         """
-        Returns True if the object is promotable. A part is promotable
-        if there is a next state in its lifecycle and if its childs which
-        have the same lifecycle are in a state as mature as the object's state.  
+        Returns True if the object is promotable. 
+        
+        A part is promotable if:
+        
+            #. there is a next state in its lifecycle and if its childs which
+               have the same lifecycle are in a state as mature as the
+               object's state.  
+
+            #. there is at least one official document attached to it.
         """
         if not self._is_promotable():
             return False
+        # check children
         childs = self.parentchildlink_parent.filter(end_time__exact=None).only("child")
         lcs = LifecycleStates.objects.filter(lifecycle=self.lifecycle)
         rank = lcs.get(state=self.state).rank
@@ -590,7 +602,15 @@ class Part(PLMObject):
                 rank_c = lcs.get(state=child.state).rank
                 if rank_c < rank:
                     return False
-        return True
+        # check that at least one document is attached and its state is official
+        # see ticket #57
+        found = False
+        links = self.documentpartlink_part.all()
+        for link in links:
+            found = link.document.is_official
+            if found:
+                break
+        return found
 
     @property
     def is_part(self):
