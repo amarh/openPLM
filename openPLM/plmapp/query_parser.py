@@ -29,8 +29,28 @@ class Conjunctives(List):
 class Query(Conjunctives):
     pass
 
+
+def convert_number(query, qualifier):
+    """ If query represents a number, replaces it with an OR query built with
+        several formatting of the number: for example, it replaces 51 with 51
+        or 051 or 0051... so that "51" matches "part-0051".
+
+        If *query* does not represent a number, it returns a simple
+        SQ(qualifier -> query) object.
+    """
+    sq = SQ()
+    if query.isdigit():
+        or_ = SQ()
+        numbers = ["0" * x + query for x in range(10)]
+        for nb in numbers:
+            or_ |= SQ(**{ qualifier : nb })
+        sq &= or_
+    else:
+        sq &= SQ(**{ qualifier : query })
+    return sq
+
 class Text(List):
-    
+   
     def to_SQ(self):
         if len(self) == 2:
             qualifier, text = self
@@ -40,17 +60,20 @@ class Text(List):
             text = self[0] 
         text = text.strip().lower()
         filters = {}
+        # here we replace a number with an OR query built with several formatting
+        # of the number:
+        # for example, we replace 51 with 51 or 051 or 0051...
+        sq = SQ()
         if text.endswith("*"):
-            sq = SQ()
             text = text.rstrip("*")
             items = split(text)
             for item in items[:-1]:
-                sq &= SQ(**{ qualifier: item })
+                sq &= convert_number(item, qualifier)
             suffix = "*" if qualifier == "content" else ""
             sq &= SQ(**{ qualifier + "__startswith" : items[-1]+suffix})
-            return sq
         else:
-            return SQ(**{ qualifier : text })
+            sq = convert_number(text, qualifier)
+        return sq
 
 class Not(List):
 

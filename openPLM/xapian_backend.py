@@ -68,8 +68,11 @@ class XHValueRangeProcessor(xapian.ValueRangeProcessor):
         Return a tuple of three strings: (column, low, high)
         """
         colon = begin.find(':')
-        field_name = begin[:colon]
-        begin = begin[colon + 1:len(begin)]
+        if colon == -1:
+            field_name = "text"
+        else:
+            field_name = begin[:colon] or "text"
+            begin = begin[colon + 1:len(begin)]
         for field_dict in self.backend.schema:
             if field_dict['field_name'] == field_name:
                 if not begin:
@@ -590,8 +593,8 @@ class SearchBackend(BaseSearchBackend):
                 DOCUMENT_CUSTOM_TERM_PREFIX + field_dict['field_name'].upper()
             )
         
-        vrp = XHValueRangeProcessor(self)
-        qp.add_valuerangeprocessor(vrp)
+        #vrp = XHValueRangeProcessor(self)
+        #qp.add_valuerangeprocessor(vrp)
         
         return qp.parse_query(query_string, flags)
     
