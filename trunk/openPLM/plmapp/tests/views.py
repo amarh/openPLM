@@ -653,6 +653,16 @@ class SearchViewTestCase(CommonViewTest):
         self.assertEqual(7, len(results))
         self.assertTrue(c.object not in results) 
 
+    def test_search_numbers(self):
+        """ Tests that 1759 matches 001759. (see ticket #69). """
+
+        c2 = self.CONTROLLER.create("part-001759", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("1759", self.TYPE)
+        self.assertEqual([c2.object], results) 
+        c3 = self.CONTROLLER.create("part-0001759", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("1759", self.TYPE)
+        self.assertEqual([c2.object, c3.object], results) 
+
     def test_search_all(self):
         for i in xrange(6):
             self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",
@@ -661,6 +671,8 @@ class SearchViewTestCase(CommonViewTest):
         self.assertEqual(set(m.Part.objects.all()), set(results))
 
     def test_search_not(self):
+        self.controller.name = "abcdef"
+        self.controller.save()
         results = self.search("NOT %s" % self.controller.name, self.TYPE)
         self.assertEqual([], results)
         results = self.search("NOT nothing", self.TYPE)
