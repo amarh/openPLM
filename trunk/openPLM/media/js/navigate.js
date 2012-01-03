@@ -66,7 +66,6 @@ function update_nav(focus_node_id, data){
     else {
         var nw = $("#Navigate").innerWidth();
         var nh = $("#Navigate").innerHeight();
-        console.log((nw / 2 - data.center_x) + "px");
         divNav.css({left: (nw / 2 - data.center_x) + "px",
                     top: (nh / 2 - data.center_y) + "px"});
     }
