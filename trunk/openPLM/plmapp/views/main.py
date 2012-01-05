@@ -610,33 +610,28 @@ def create_object(request):
     """
 
     obj, ctx = get_generic_data(request)
-    class_for_div = "ActiveBox4Part"
 
     if request.method == 'GET':
         type_form = TypeFormWithoutUser(request.GET)
         if type_form.is_valid():
             type_ = type_form.cleaned_data["type"]
             cls = models.get_all_plmobjects()[type_]
-            if issubclass(cls, models.Document):
-                class_for_div="ActiveBox4Doc"
             creation_form = get_creation_form(request.user, cls)
     elif request.method == 'POST':
         type_form = TypeFormWithoutUser(request.POST)
         if type_form.is_valid():
             type_name = type_form.cleaned_data["type"]
             cls = models.get_all_plmobjects()[type_name]
-            if issubclass(cls, models.Document):
-                class_for_div="ActiveBox4Doc"
             creation_form = get_creation_form(request.user, cls, request.POST)
             if creation_form.is_valid():
                 user = request.user
                 controller_cls = get_controller(type_name)
                 controller = controller_cls.create_from_form(creation_form, user)
                 return HttpResponseRedirect(controller.plmobject_url)
-    ctx.update({'class4div': class_for_div,
-                'creation_form': creation_form,
-                'object_type': type_form.cleaned_data["type"],
-               })
+    ctx.update({
+        'creation_form': creation_form,
+        'object_type': type_form.cleaned_data["type"],
+    })
     return r2r('DisplayObject4creation.htm', ctx, request)
 
 ##########################################################################################
