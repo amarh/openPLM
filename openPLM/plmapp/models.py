@@ -174,6 +174,10 @@ class GroupInfo(Group):
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 
+    def __init__(self, *args, **kwargs):
+        if "__fake__" not in kwargs:
+            super(GroupInfo, self).__init__(*args, **kwargs)
+
     @property
     def plmobject_url(self):
         return iri_to_uri("/group/%s/" % self.name)
@@ -203,7 +207,7 @@ class GroupInfo(Group):
         :meth:`excluded_creation_fields`
         """
         fields = []
-        for field in cls().attributes:
+        for field in cls(__fake__=True).attributes:
             if field not in cls.excluded_creation_fields():
                 fields.append(field)
         return fields
@@ -224,7 +228,7 @@ class GroupInfo(Group):
     def get_modification_fields(cls):
         "Returns fields which should be displayed in a modification form"
         fields = []
-        for field in cls().attributes:
+        for field in cls(__fake__=True).attributes:
             if field not in cls.excluded_modification_fields():
                 fields.append(field)
         return fields
@@ -284,9 +288,18 @@ class Lifecycle(models.Model):
         Converts a Lifecycle to a :class:`LifecycleList` (a list of strings)
         """
         
-        lcs = LifecycleStates.objects.filter(lifecycle=self).order_by("rank")
+        lcs = self.lifecyclestates_set.order_by("rank")
         return LifecycleList(self.name, self.official_state.name,
                              *(l.state.name for l in lcs))
+
+    @property
+    def first_state(self):
+        lcs = self.lifecyclestates_set.order_by("rank").only('state')
+        return lcs[0].state 
+
+    @property
+    def nb_states(self):
+        return self.lifecyclestates_set.count()
 
     def __iter__(self):
         return iter(self.to_states_list())
@@ -344,8 +357,7 @@ def get_default_state(lifecycle=None):
 
     if not lifecycle:
         lifecycle = get_default_lifecycle()
-    return State.objects.get(name=list(lifecycle)[0])
-
+    return lifecycle.first_state
 
 # PLMobjects
 
@@ -430,6 +442,13 @@ class PLMObject(models.Model):
         # keys in the database
         unique_together = (('reference', 'type', 'revision'),)
         ordering = ["type", "reference", "revision"]
+
+    def __init__(self, *args, **kwargs):
+        # little hack:
+        # get_creation_fields is a class method but it needs to create
+        # an instance, this hacks avoids calls to default value functions
+        if "__fake__" not in kwargs:
+            super(PLMObject, self).__init__(*args, **kwargs)
 
     def __unicode__(self):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
@@ -531,7 +550,7 @@ class PLMObject(models.Model):
         :meth:`excluded_creation_fields`
         """
         fields = ["reference", "type", "revision", "lifecycle"]
-        for field in cls().attributes:
+        for field in cls(__fake__=True).attributes:
             if field not in cls.excluded_creation_fields():
                 fields.append(field)
         return fields
@@ -556,7 +575,7 @@ class PLMObject(models.Model):
         :meth:`excluded_modification_fields`
         """
         fields = []
-        for field in cls().attributes:
+        for field in cls(__fake__=True).attributes:
             if field not in cls.excluded_modification_fields():
                 fields.append(field)
         return fields
