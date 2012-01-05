@@ -117,7 +117,7 @@ class PLMObjectController(Controller):
                 sponsor = user
         except models.DelegationLink.DoesNotExist:
             sponsor = user
-        for i in range(len(obj.lifecycle.to_states_list()) - 1):
+        for i in range(obj.lifecycle.nb_states - 1):
             models.PLMObjectUserLink.objects.create(plmobject=obj, user=sponsor,
                                                     role=level_to_sign_str(i))
         return res
@@ -376,7 +376,7 @@ class PLMObjectController(Controller):
         except ObjectDoesNotExist:
             pass
         # check if the role is valid
-        max_level = len(self.lifecycle.to_states_list()) - 1
+        max_level = self.lifecycle.nb_states - 1
         level = int(re.search(r"\d+", role).group(0))
         if level > max_level:
             # TODO better exception ?
