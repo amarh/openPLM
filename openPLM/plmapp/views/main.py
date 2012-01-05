@@ -610,28 +610,23 @@ def create_object(request):
     """
 
     obj, ctx = get_generic_data(request)
-    
+    class_for_div = "ActiveBox4Part"
+
     if request.method == 'GET':
-        type_form = TypeForm(request.GET)
+        type_form = TypeFormWithoutUser(request.GET)
         if type_form.is_valid():
             type_ = type_form.cleaned_data["type"]
-            cls = models.get_all_userprofiles_and_plmobjects()[type_]
+            cls = models.get_all_plmobjects()[type_]
             if issubclass(cls, models.Document):
                 class_for_div="ActiveBox4Doc"
-            else:
-                class_for_div="ActiveBox4Part"
-            data = {'revision':'a',
-                    'lifecycle': str(models.get_default_lifecycle()), }
-            creation_form = get_creation_form(request.user, cls, data, True)
+            creation_form = get_creation_form(request.user, cls)
     elif request.method == 'POST':
-        type_form = TypeForm(request.POST)
+        type_form = TypeFormWithoutUser(request.POST)
         if type_form.is_valid():
             type_name = type_form.cleaned_data["type"]
-            cls = models.get_all_userprofiles_and_plmobjects()[type_name]
+            cls = models.get_all_plmobjects()[type_name]
             if issubclass(cls, models.Document):
                 class_for_div="ActiveBox4Doc"
-            else:
-                class_for_div="ActiveBox4Part"
             creation_form = get_creation_form(request.user, cls, request.POST)
             if creation_form.is_valid():
                 user = request.user

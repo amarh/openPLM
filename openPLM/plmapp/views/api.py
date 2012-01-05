@@ -278,11 +278,15 @@ def get_fields_from_form(form):
     """
     fields = []
     for field_name, field in form.fields.items():
-        data = dict(name=field_name, label=field.label.capitalize(), initial=field.initial)
-        if callable(field.initial):
-            data["initial"] = field.initial()
-            if hasattr(data["initial"], "pk"):
-                data["initial"] = data["initial"].pk
+        initial = form.initial.get(field_name, field.initial)
+        if callable(initial):
+            initial = initial()
+        if hasattr(initial, "pk"):
+            initial = initial.pk
+        data = dict(name=field_name,
+                    label=field.label.capitalize(),
+                    initial=initial,
+               )
         data["type"] = field_to_type(field)
         if hasattr(field, "choices"):
             data["choices"] =  tuple(field.choices)

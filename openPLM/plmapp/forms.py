@@ -79,7 +79,51 @@ def auto_complete_fields(form, cls):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
             form_field.widget = JQueryAutoComplete(source)
 
-def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
+def get_new_reference(cls, start=0):
+    u"""
+    Returns a new reference for creating a :class:`.PLMObject` of type
+    *cls*.
+
+    The formatting is ``PART_000XX`` if *cls* is a subclass of :class:`.Part`
+    and ``DOC_000XX`` otherwise.
+    
+    The number is the count of Parts or Documents plus *start*.
+    It is incremented while an object with the same reference aleady exists.
+    *start* can be used to create several creation forms at once.
+
+    .. note::
+        The returned referenced may not be valid if a new object has been
+        created after the call to this function.
+    """
+    if issubclass(cls, m.Part):
+        base_cls, name = m.Part, "PART"
+    else:
+        base_cls, name = m.Document, "DOC"
+    nb = base_cls.objects.count() + start
+    reference = "%s_%05d" % (name, nb)
+    while base_cls.objects.filter(reference=reference).exists():
+        nb += 1
+        reference = "%s_%05d" % (name, nb)
+    return reference
+
+def get_initial_creation_data(cls, start=0):
+    u"""
+    Returns initial data to create a new object (from :func:`get_creation_form`).
+
+    :param cls: class of the created object
+    :param start: used to generate the reference,  see :func:`get_new_reference`
+    """
+    if issubclass(cls, m.PLMObject):
+        data = {
+                'reference' : get_new_reference(cls), 
+                'revision' : 'a',
+                'lifecycle' : str(m.get_default_lifecycle().pk),
+        }
+    else:
+        data = {}
+    return data
+
+def get_creation_form(user, cls=m.PLMObject, data=None, start=0):
     u"""
     Returns a creation form suitable to creates an object
     of type *cls*.
@@ -89,7 +133,10 @@ def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
     to create a :class:`~plmapp.models.PLMObject` and his associated
     :class:`~plmapp.controllers.PLMObjectController`.
 
-    If *initial* is provided, it will be used to fill the form.
+    If *data* is provided, it will be used to fill the form.
+
+    *start* is used if *data* is ``None``, it's usefull if you need to show
+    several initial creation forms at once and you want different references.
     """
     Form = get_creation_form.cache.get(cls)
     if Form is None:
@@ -109,7 +156,10 @@ def get_creation_form(user, cls=m.PLMObject, data=None, empty_allowed=False):
                 return cleaned_data
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
-    form = Form(data=data, empty_permitted=empty_allowed) if data else Form()
+    if data is None:
+        form = Form(initial=get_initial_creation_data(cls, start))
+    else:
+        form = Form(data=data)
     if issubclass(cls, m.PLMObject):
         # display only valid groups
         groups = user.groups.all().values_list("id", flat=True)
