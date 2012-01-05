@@ -87,7 +87,7 @@ def get_new_reference(cls, start=0):
     The formatting is ``PART_000XX`` if *cls* is a subclass of :class:`.Part`
     and ``DOC_000XX`` otherwise.
     
-    The number is the count of Parts or Documents plus *start*.
+    The number is the count of Parts or Documents plus *start* plus 1.
     It is incremented while an object with the same reference aleady exists.
     *start* can be used to create several creation forms at once.
 
@@ -99,7 +99,7 @@ def get_new_reference(cls, start=0):
         base_cls, name = m.Part, "PART"
     else:
         base_cls, name = m.Document, "DOC"
-    nb = base_cls.objects.count() + start
+    nb = base_cls.objects.count() + start + 1
     reference = "%s_%05d" % (name, nb)
     while base_cls.objects.filter(reference=reference).exists():
         nb += 1
