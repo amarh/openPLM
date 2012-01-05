@@ -280,13 +280,6 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
         selected_object = request_dict.user
     else:
         selected_object = get_obj(type_, reference, revision, request_dict.user)
-    # Defines a variable for background color selection
-    if isinstance(selected_object, UserController):
-        class_for_div="ActiveBox4User"
-    elif isinstance(selected_object, DocumentController):
-        class_for_div="ActiveBox4Doc"
-    else:
-        class_for_div="ActiveBox4Part"
     qset = []
     # Builds, update and treat Search form
     search_need = "results" not in request_dict.session
@@ -333,7 +326,6 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
                 'attributes_form' : attributes_form,
                 'link_creation' : False,
                 'attach' : (selected_object, False),
-                'class4div' : class_for_div,
                 'obj' : selected_object,
               })
     if hasattr(selected_object, "menu_items"):
