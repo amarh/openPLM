@@ -32,30 +32,36 @@ import kjbuckets
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from celery.task import task
 
-from openPLM.plmapp.models import User, DelegationLink, ROLE_OWNER
+from openPLM.plmapp.models import User, DelegationLink, ROLE_OWNER, ROLE_SIGN
 
 
 def get_recipients(obj, roles, users):
     recipients = set(users)
     if hasattr(obj, "plmobjectuserlink_plmobject"):
-        manager = obj.plmobjectuserlink_plmobject
+        manager = obj.plmobjectuserlink_plmobject.order_by()
+        users_q = Q()
+
         for role in roles:
-            users = manager.filter(role__contains=role).values_list("user", flat=True)
-            recipients.update(users)
-            links = DelegationLink.objects.filter(role__contains=role)\
+            if role == ROLE_SIGN:
+                users_q |= Q(role__startswith=role)
+            else:
+                users_q |= Q(role=role)
+        users = manager.filter(users_q).values_list("user", flat=True)
+        recipients.update(users)
+        links = DelegationLink.objects.filter(users_q)\
                         .values_list("delegator", "delegatee")
-            gr = kjbuckets.kjGraph(tuple(links))
-            for u in users:
-                recipients.update(gr.reachable(u).items())
-    elif ROLE_OWNER:
+        gr = kjbuckets.kjGraph(tuple(links))
+        for u in users:
+            recipients.update(gr.reachable(u).items())
+    elif roles == [ROLE_OWNER]:
         if hasattr(obj, "owner"):
-            recipients.add(obj.owner.id)
+            recipients.add(obj.owner_id)
         elif isinstance(obj, User):
             recipients.add(obj.id)
     return recipients
@@ -76,8 +82,10 @@ class CT(object):
     def from_object(cls, obj):
         return cls(ContentType.objects.get_for_model(obj).id, obj.pk)
 
-    def get_object(self):
-        ct = ContentType.objects.get_for_id(self.ct_id)
+    def get_object(self, ct_cache):
+        ct = ct_cache.get(self.ct_id)
+        if not ct:
+            ct = ct_cache[self.ct_id] = ContentType.objects.get_for_id(self.ct_id)
         return ct.get_object_for_this_type(pk=self.pk)
 
 
@@ -95,18 +103,18 @@ def serialize(obj):
         return [serialize(o) for o in obj]
     return obj
 
-def unserialize(obj):
+def unserialize(obj, ct_cache):
     if isinstance(obj, basestring):
         return obj
     if isinstance(obj, CT):
-        return obj.get_object()
+        return obj.get_object(ct_cache)
     elif isinstance(obj, Mapping):
         new_ctx = {}
         for key, value in obj.iteritems():
-            new_ctx[key] = unserialize(value)
+            new_ctx[key] = unserialize(value, ct_cache)
         return new_ctx
     elif isinstance(obj, Iterable):
-        return [unserialize(o) for o in obj]
+        return [unserialize(o, ct_cache) for o in obj]
     return obj
 
 @task(ignore_result=True)
@@ -129,9 +137,9 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
         This function fails silently if it can not send the mail.
         The mail is sent in a separated thread. 
     """
-    
-    plmobject = unserialize(plmobject)
-    user = unserialize(user)
+    ct_cache = {}
+    plmobject = unserialize(plmobject, ct_cache)
+    user = unserialize(user, ct_cache)
     subject = "[PLM] " + unicode(plmobject)
     recipients = get_recipients(plmobject, roles, users) 
     
@@ -142,12 +150,12 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
                 "plmobject" : plmobject,
                 "user" : user,
             }
-        do_send_mail(subject, recipients, ctx, template, blacklist)
+        do_send_mail(subject, recipients, ctx, template, blacklist, ct_cache)
 
 @task(ignore_result=True)
-def do_send_mail(subject, recipients, ctx, template, blacklist=()):
+def do_send_mail(subject, recipients, ctx, template, blacklist=(), ct_cache=None):
     if recipients:
-        ctx = unserialize(ctx)
+        ctx = unserialize(ctx, ct_cache or {})
         emails = User.objects.filter(id__in=recipients).exclude(email="")\
                         .values_list("email", flat=True)
         emails = set(emails) - set(blacklist)
