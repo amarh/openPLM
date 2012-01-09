@@ -256,7 +256,6 @@ class State(models.Model):
     def __unicode__(self):
         return u'State<%s>' % self.name
 
-
 class Lifecycle(models.Model):
     u"""
     Lifecycle : object which represents a lifecycle
@@ -277,8 +276,14 @@ class Lifecycle(models.Model):
         A class that simplifies the usage of a LifeCycle
 
     """
+
     name = models.CharField(max_length=50, primary_key=True)
     official_state = models.ForeignKey(State)
+
+    def __init__(self, *args, **kwargs):
+        super(Lifecycle, self).__init__(*args, **kwargs)
+        self._first_state = None
+        self._last_state = None
 
     def __unicode__(self):
         return u'Lifecycle<%s>' % self.name
@@ -294,8 +299,15 @@ class Lifecycle(models.Model):
 
     @property
     def first_state(self):
-        lcs = self.lifecyclestates_set.order_by("rank").only('state')
-        return lcs[0].state 
+        if self._first_state is None:
+            self._first_state = self.lifecyclestates_set.order_by('rank')[0].state
+        return self._first_state
+    
+    @property
+    def last_state(self):
+        if self._last_state is None:
+            self._last_state = self.lifecyclestates_set.order_by('-rank')[0].state
+        return self._last_state
 
     @property
     def nb_states(self):
@@ -342,13 +354,14 @@ class LifecycleStates(models.Model):
                                                  unicode(self.state),
                                                  self.rank)
 
-
+@memoize_noarg
 def get_default_lifecycle():
     u"""
     Returns the default :class:`Lifecycle` used when instanciate a :class:`PLMObject`
     """
     return Lifecycle.objects.all()[0]
 
+_default_states_cache = {}
 def get_default_state(lifecycle=None):
     u"""
     Returns the default :class:`State` used when instanciate a :class:`PLMObject`.
@@ -357,7 +370,11 @@ def get_default_state(lifecycle=None):
 
     if not lifecycle:
         lifecycle = get_default_lifecycle()
-    return lifecycle.first_state
+    state = _default_states_cache.get(lifecycle.name, None)
+    if state is None:
+        state = lifecycle.first_state
+        _default_states_cache[lifecycle.name] = state
+    return state
 
 # PLMobjects
 
@@ -412,7 +429,7 @@ class PLMObject(models.Model):
     """
 
     # key attributes
-    reference = models.CharField(_("reference"), max_length=50)
+    reference = models.CharField(_("reference"), max_length=50, db_index=True)
     type = models.CharField(_("type"), max_length=50)
     revision = models.CharField(_("revision"), max_length=50)
 
@@ -458,8 +475,7 @@ class PLMObject(models.Model):
         """
         Returns True if the object's state is the last state of its lifecyle
         """
-        lcl = self.lifecycle.to_states_list()
-        return lcl[-1] != self.state.name
+        return self.lifecycle.last_state != self.state
 
     def is_promotable(self):
         u"""
@@ -477,10 +493,9 @@ class PLMObject(models.Model):
         True if the object is not in a non editable state
         (for example, in an official or deprecated state).
         """
-        current_rank = LifecycleStates.objects.get(state=self.state,
-                            lifecycle=self.lifecycle).rank
-        official_rank = LifecycleStates.objects.get(state=self.lifecycle.official_state,
-                            lifecycle=self.lifecycle).rank
+        lcs = self.lifecycle.lifecyclestates_set.only("rank")
+        current_rank = lcs.get(state=self.state).rank
+        official_rank = lcs.get(state=self.lifecycle.official_state).rank
         return current_rank < official_rank
     
     def get_current_sign_level(self):
@@ -1016,7 +1031,8 @@ class DelegationLink(Link):
     
     delegator = models.ForeignKey(User, related_name="%(class)s_delegator")    
     delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")    
-    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES))
+    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
+            db_index=True)
 
     class Meta:
         unique_together = ("delegator", "delegatee", "role")
@@ -1057,7 +1073,8 @@ class PLMObjectUserLink(Link):
 
     plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
     user = models.ForeignKey(User, related_name="%(class)s_user")    
-    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES))
+    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
+            db_index=True)
 
     class Meta:
         unique_together = ("plmobject", "user", "role")

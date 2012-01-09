@@ -213,8 +213,12 @@ class PLMObjectController(Controller):
                 blacklist, roles, users)
 
     def has_permission(self, role):
-        users = [self._user.id]
-        users.extend(models.DelegationLink.get_delegators(self._user, role))
+        if role == models.ROLE_OWNER and self.owner == self._user:
+            return True
+        if self.plmobjectuserlink_plmobject.filter(user=self._user, role=role).exists():
+            return True
+
+        users = models.DelegationLink.get_delegators(self._user, role)
         qset = self.plmobjectuserlink_plmobject.filter(user__in=users,
                                                           role=role)
         return bool(qset)

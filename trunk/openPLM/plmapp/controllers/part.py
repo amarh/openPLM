@@ -321,7 +321,6 @@ class PartController(PLMObjectController):
             document = document.object
         else:
             get_controller(document.type)(document, self._user).check_readable()
-            type(self)(document, self._user).check_readable()
         if self.is_document_attached(document):
             raise ValueError("Document is already attached.")
 
