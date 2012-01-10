@@ -44,7 +44,7 @@ def update_index(app_name, model_name, pk, **kwargs):
     import openPLM.plmapp.search_indexes
 
     model_class = get_model(app_name, model_name)
-    instance = model_class.objects.get(pk=pk)
+    instance = model_class.objects.select_related(depth=1).get(pk=pk)
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
 
@@ -55,7 +55,7 @@ def update_indexes(instances):
 
     for app_name, model_name, pk in instances:
         model_class = get_model(app_name, model_name)
-        instance = model_class.objects.get(pk=pk)
+        instance = model_class.objects.select_related(depth=1).get(pk=pk)
         search_index = site.get_index(model_class)
         search_index.update_object(instance)
 update_indexes = synchronized(update_indexes, update_index.lock)
