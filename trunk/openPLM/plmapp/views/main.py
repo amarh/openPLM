@@ -127,7 +127,9 @@ def display_object(request, obj_type, obj_ref, obj_revi):
     if obj_type in ('User', 'Group'):
         url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
     else:
-        url = u"/object/%s/%s/%s/attributes/" % (obj_type, obj_ref, obj_revi) 
+        model_cls = models.get_all_plmobjects()[obj_type]
+        page = "files" if issubclass(model_cls, models.Document) else "attributes"
+        url = u"/object/%s/%s/%s/%s/" % (obj_type, obj_ref, obj_revi, page) 
     return HttpResponsePermanentRedirect(iri_to_uri(url))
 
 ##########################################################################################
