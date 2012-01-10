@@ -87,7 +87,7 @@ class CT(object):
 
     def get_object(self):
         model_class = get_model(self.app_label, self.module_name)
-        return model_class.objects.select_related(depth=1).get(pk=self.pk)
+        return model_class.objects.get(pk=self.pk)
 
 
 def serialize(obj):
