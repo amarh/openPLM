@@ -34,7 +34,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Model, Q
 from django.template.loader import render_to_string
-from django.contrib.contenttypes.models import ContentType
+from django.db.models.loading import get_model
 from django.contrib.sites.models import Site
 from celery.task import task
 
@@ -74,19 +74,20 @@ def convert_users(users):
     return users
 
 class CT(object):
-    def __init__(self, ct_id, pk):
-        self.ct_id = ct_id
+    __slots__ = ("app_label", "module_name", "pk")
+
+    def __init__(self, app_label, module_name, pk):
+        self.app_label = app_label
+        self.module_name = module_name
         self.pk = pk
 
     @classmethod
     def from_object(cls, obj):
-        return cls(ContentType.objects.get_for_model(obj).id, obj.pk)
+        return cls(obj._meta.app_label, obj._meta.module_name, obj.pk)
 
-    def get_object(self, ct_cache):
-        ct = ct_cache.get(self.ct_id)
-        if not ct:
-            ct = ct_cache[self.ct_id] = ContentType.objects.get_for_id(self.ct_id)
-        return ct.get_object_for_this_type(pk=self.pk)
+    def get_object(self):
+        model_class = get_model(self.app_label, self.module_name)
+        return model_class.objects.select_related(depth=1).get(pk=self.pk)
 
 
 def serialize(obj):
@@ -103,18 +104,18 @@ def serialize(obj):
         return [serialize(o) for o in obj]
     return obj
 
-def unserialize(obj, ct_cache):
+def unserialize(obj):
     if isinstance(obj, basestring):
         return obj
     if isinstance(obj, CT):
-        return obj.get_object(ct_cache)
+        return obj.get_object()
     elif isinstance(obj, Mapping):
         new_ctx = {}
         for key, value in obj.iteritems():
-            new_ctx[key] = unserialize(value, ct_cache)
+            new_ctx[key] = unserialize(value)
         return new_ctx
     elif isinstance(obj, Iterable):
-        return [unserialize(o, ct_cache) for o in obj]
+        return [unserialize(o) for o in obj]
     return obj
 
 @task(ignore_result=True)
@@ -137,9 +138,8 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
         This function fails silently if it can not send the mail.
         The mail is sent in a separated thread. 
     """
-    ct_cache = {}
-    plmobject = unserialize(plmobject, ct_cache)
-    user = unserialize(user, ct_cache)
+    plmobject = unserialize(plmobject)
+    user = unserialize(user)
     subject = "[PLM] " + unicode(plmobject)
     recipients = get_recipients(plmobject, roles, users) 
     
@@ -150,12 +150,12 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
                 "plmobject" : plmobject,
                 "user" : user,
             }
-        do_send_mail(subject, recipients, ctx, template, blacklist, ct_cache)
+        do_send_mail(subject, recipients, ctx, template, blacklist)
 
 @task(ignore_result=True)
-def do_send_mail(subject, recipients, ctx, template, blacklist=(), ct_cache=None):
+def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
-        ctx = unserialize(ctx, ct_cache or {})
+        ctx = unserialize(ctx)
         emails = User.objects.filter(id__in=recipients).exclude(email="")\
                         .values_list("email", flat=True)
         emails = set(emails) - set(blacklist)
