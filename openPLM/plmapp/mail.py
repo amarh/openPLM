@@ -45,16 +45,16 @@ def get_recipients(obj, roles, users):
     recipients = set(users)
     if hasattr(obj, "plmobjectuserlink_plmobject"):
         manager = obj.plmobjectuserlink_plmobject.order_by()
-        users_q = Q()
+        roles_filter = Q()
 
         for role in roles:
             if role == ROLE_SIGN:
-                users_q |= Q(role__startswith=role)
+                roles_filter |= Q(role__startswith=role)
             else:
-                users_q |= Q(role=role)
-        users = manager.filter(users_q).values_list("user", flat=True)
+                roles_filter |= Q(role=role)
+        users = manager.filter(roles_filter).values_list("user", flat=True)
         recipients.update(users)
-        links = DelegationLink.objects.filter(users_q)\
+        links = DelegationLink.objects.filter(roles_filter)\
                         .values_list("delegator", "delegatee")
         gr = kjbuckets.kjGraph(tuple(links))
         for u in users:
