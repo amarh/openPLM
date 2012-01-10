@@ -121,6 +121,10 @@ for key, model in models.get_all_plmobjects().iteritems():
     site.register(model, ModelIndex)
 
 from subprocess import Popen, PIPE
+import codecs
+import os.path
+text_files = set((".txt",))
+
 class DocumentFileIndex(QueuedModelSearchIndex):
     text = CharField(document=True, use_template=True)
     filename = CharField(model_attr='filename')
@@ -130,8 +134,15 @@ class DocumentFileIndex(QueuedModelSearchIndex):
     rendered_add = CharField(use_template=True, indexed=False)
 
     def prepare_file(self, obj):
-        p = Popen([settings.EXTRACTOR, obj.file.path], stdout=PIPE, close_fds=True)
-        return p.stdout.read()
+        # if it is a text file, we can dump it
+        # it's faster than launching a new process 
+        path = obj.file.path
+        name, ext = os.path.splitext(path)
+        if ext.lower() in text_files:
+            return codecs.open(path, encoding="utf-8", errors="ignore").read()
+        else:
+            p = Popen([settings.EXTRACTOR, path], stdout=PIPE, close_fds=True)
+            return p.stdout.read()
 
 site.register(models.DocumentFile, DocumentFileIndex)
 
