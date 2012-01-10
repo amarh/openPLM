@@ -81,6 +81,16 @@ class CT(object):
         self.module_name = module_name
         self.pk = pk
 
+    def __getstate__(self):
+        return dict(app_label=self.app_label, 
+                    module_name=self.module_name,
+                    pk=self.pk)
+    
+    def __setstate__(self, state):
+        self.app_label = state["app_label"]
+        self.module_name = state["module_name"]
+        self.pk = state["pk"]
+
     @classmethod
     def from_object(cls, obj):
         return cls(obj._meta.app_label, obj._meta.module_name, obj.pk)
