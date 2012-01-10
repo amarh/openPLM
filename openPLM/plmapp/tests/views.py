@@ -109,8 +109,9 @@ class ViewTest(CommonViewTest):
                 "lifecycle" : m.get_default_lifecycle().pk,
                 "state" : m.get_default_state().pk,
                 })
-
-        response = self.post("/object/create/", data, page="attributes")
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        page = "files" if issubclass(model_cls, m.Document) else "attributes"
+        response = self.post("/object/create/", data, page=page)
         obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual(obj.id, response.context["obj"].id)
         self.assertEqual("MaPart", obj.name)

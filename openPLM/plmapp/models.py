@@ -783,7 +783,8 @@ class Document(PLMObject):
     @property
     def menu_items(self):
         items = list(super(Document, self).menu_items)
-        items.extend([ugettext_noop("parts"), ugettext_noop("files")])
+        items.insert(0, ugettext_noop("files"))
+        items.append(ugettext_noop("parts"))
         return items
 
     @property
