@@ -637,7 +637,7 @@ def create_object(request):
     return r2r('DisplayObject4creation.htm', ctx, request)
 
 ##########################################################################################
-@handle_errors
+@handle_errors(undo="../attributes/")
 def modify_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected object.

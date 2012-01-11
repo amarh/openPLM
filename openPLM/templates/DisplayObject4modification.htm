@@ -23,7 +23,10 @@
 			</tr>
 		{% endfor %}
 		<tr class="Content">
-			<td></td><td><input type="submit" class="{{"Button"|button}}" value="{% trans "MODIFY" %}" /></td>
+            <td></td><td><input type="submit" class="{{"Button"|button}}" value="{% trans "MODIFY" %}" />
+            
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "Undo" %}" name="_undo"/>
+            </td>
 		</tr>
 	</table>
 		</form>
