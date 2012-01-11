@@ -239,7 +239,10 @@ class NavigationGraph(object):
             if self.options[OSR] and link.part.id not in self.results:
                 continue
             part = PartController(link.part, None)
-            self.graph.add_edge(obj.id, part.id, " ")
+            # create a link part -> document:
+            # if layout is dot, the part is on top of the document
+            # cf. tickets #82 and #83
+            self.graph.add_edge(part.id, obj.id, " ")
             self._set_node_attributes(part)
     
     def _create_doc_edges(self, obj, obj_id=None, *args):
