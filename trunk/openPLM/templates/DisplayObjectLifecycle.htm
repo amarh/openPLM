@@ -4,12 +4,16 @@
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
-    <form action="" method="POST">
+    <div id="form-promote-dialog" title="{% trans "Are you sure?" %}" style="display:none">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{% trans "If you promote or demote this object, you may not be allowed to undo this action." %}</p>
+    </div>
+
+    <form id ="form-promote" class="confirmation"  action="" method="POST">
         {% if is_signer_dm and obj.is_editable %}
-        <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE"/>
+            <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
         {% endif %}
         {% if is_signer and obj.is_promotable %}
-        <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE"/>
+            <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE" />
         {% endif %}
     </form>
     	<table class="Content">
