@@ -6,10 +6,6 @@ from django.test import TestCase
 from openPLM.plmapp.models import GroupInfo
 from openPLM.plmapp.controllers import PLMObjectController
 
-import os.path
-import shutil
-from django.conf import settings
-
 class BaseTestCase(TestCase):
     CONTROLLER = PLMObjectController
     TYPE = "Part"
@@ -44,7 +40,7 @@ class BaseTestCase(TestCase):
         return f
 
     def tearDown(self):
-        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
-            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
+        from haystack import backend
+        backend.SearchBackend.inmemory_db = None
         super(BaseTestCase, self).tearDown()
 

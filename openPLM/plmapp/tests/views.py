@@ -535,7 +535,6 @@ class UserViewTestCase(CommonViewTest):
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
 
-from django.core.management import call_command
 class SearchViewTestCase(CommonViewTest):
 
     def get_query(self, request):
@@ -546,8 +545,6 @@ class SearchViewTestCase(CommonViewTest):
         return query
 
     def search(self, request, type=None):
-        # rebuild the index
-        call_command("rebuild_index", interactive=False, verbosity=0)
         
         query = self.get_query(request)
         t = type or request["type"]
