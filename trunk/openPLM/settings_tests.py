@@ -143,8 +143,10 @@ if "rebuild_index" not in sys.argv:
     HAYSTACK_ENABLE_REGISTRATIONS = False
 HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'xapian'
-HAYSTACK_XAPIAN_PATH = "/tmp/xapian_index/"
-HAYSTACK_INCLUDE_SPELLING = True
+# use a memory backend
+HAYSTACK_XAPIAN_PATH = ":memory:" 
+# the memory backend does not support spelling
+HAYSTACK_INCLUDE_SPELLING = False
 EXTRACTOR = os.path.abspath("bin/extractor.sh")
 
 # celery stuff

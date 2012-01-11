@@ -1,14 +1,10 @@
 
-import os.path
-import shutil
 import cStringIO, StringIO
 from collections import defaultdict
 
-from django.conf import settings
 from django.core import mail
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
-from django.core.management import call_command
 
 from celery.signals import task_prerun
 
@@ -44,7 +40,6 @@ class CSVImportTestCase(TransactionTestCase):
         self.user.groups.add(self.group)
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
         task_prerun.connect(self.task_sent_handler)
-        call_command("rebuild_index", interactive=False, verbosity=0)
 
     def task_sent_handler(self, sender=None, task_id=None, task=None, args=None,
                       kwargs=None, **kwds):
@@ -53,9 +48,9 @@ class CSVImportTestCase(TransactionTestCase):
     def tearDown(self):
         super(CSVImportTestCase, self).tearDown()
         task_prerun.disconnect(self.task_sent_handler)
-        if os.path.exists(settings.HAYSTACK_XAPIAN_PATH):
-            shutil.rmtree(settings.HAYSTACK_XAPIAN_PATH)
-        
+        from haystack import backend
+        backend.SearchBackend.inmemory_db = None
+    
     def get_valid_rows(self):
         return [[u'Type',
               u'reference',
