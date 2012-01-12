@@ -149,11 +149,10 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
         The mail is sent in a separated thread. 
     """
     plmobject = unserialize(plmobject)
-    user = unserialize(user)
-    subject = "[PLM] " + unicode(plmobject)
     recipients = get_recipients(plmobject, roles, users) 
-    
     if recipients:
+        user = unserialize(user)
+        subject = "[PLM] " + unicode(plmobject)
         ctx = {
                 "last_action" : last_action,
                 "histories" : histories, 
@@ -165,10 +164,18 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
 @task(ignore_result=True)
 def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
+        if len(recipients) == 1:
+            email = User.objects.get(id=recipients.pop()).email
+            if not email or email in blacklist:
+                return
+            emails = (email,)
+        else:
+            emails = User.objects.filter(id__in=recipients).exclude(email="")\
+                            .values_list("email", flat=True)
+            emails = set(emails) - set(blacklist)
+            if not emails:
+                return
         ctx = unserialize(ctx)
-        emails = User.objects.filter(id__in=recipients).exclude(email="")\
-                        .values_list("email", flat=True)
-        emails = set(emails) - set(blacklist)
         ctx["site"] = Site.objects.get_current()
         html_content = render_to_string(template + ".htm", ctx)
         message = render_to_string(template + ".txt", ctx)
