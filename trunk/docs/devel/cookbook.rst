@@ -41,6 +41,12 @@ Condition on promotion
 Controllers
 ===============
 
+Creation of a controller
+------------------------
+
+.. code-block:: python
+
+   ctrl = PartController.create("Part_00011", "Part", "a", user, {"group":group})
 
 .. _cookbook-tests:
 
