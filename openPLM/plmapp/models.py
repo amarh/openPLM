@@ -90,6 +90,7 @@ from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
+from django.forms.util import ErrorList
 
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
@@ -282,8 +283,12 @@ class Lifecycle(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Lifecycle, self).__init__(*args, **kwargs)
+        # keep a cache of some values: Lifecycle are most of the time
+        # read-only objects, and there are no valid reasons to modify a
+        # lifecycle in a production environment
         self._first_state = None
         self._last_state = None
+        self._states_list = None
 
     def __unicode__(self):
         return u'Lifecycle<%s>' % self.name
@@ -292,10 +297,11 @@ class Lifecycle(models.Model):
         u"""
         Converts a Lifecycle to a :class:`LifecycleList` (a list of strings)
         """
-        
-        lcs = self.lifecyclestates_set.order_by("rank")
-        return LifecycleList(self.name, self.official_state.name,
-                             *(l.state.name for l in lcs))
+        if self._states_list is None:
+            lcs = self.lifecyclestates_set.order_by("rank")
+            self._states_list = LifecycleList(self.name, self.official_state.name,
+                    *lcs.values_list("state__name", flat=True))
+        return LifecycleList(self.name, self.official_state, *self._states_list)
 
     @property
     def first_state(self):
@@ -466,6 +472,7 @@ class PLMObject(models.Model):
         # an instance, this hacks avoids calls to default value functions
         if "__fake__" not in kwargs:
             super(PLMObject, self).__init__(*args, **kwargs)
+        self._promotion_errors = None
 
     def __unicode__(self):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
@@ -473,9 +480,13 @@ class PLMObject(models.Model):
 
     def _is_promotable(self):
         """
-        Returns True if the object's state is the last state of its lifecyle
+        Returns True if the object's state is the last state of its lifecycle.
         """
-        return self.lifecycle.last_state != self.state
+        self._promotion_errors = ErrorList()
+        if self.lifecycle.last_state == self.state:
+            self._promotion_errors.append(_(u"The object is at its last state."))
+            return False
+        return True
 
     def is_promotable(self):
         u"""
@@ -486,6 +497,15 @@ class PLMObject(models.Model):
             This method must be overriden.
         """
         raise NotImplementedError()
+
+    def _get_promotion_errors(self):
+        """ Returns an :class:`ErrorList` of promotion errors.
+        Calls :meth:`is_promotable()` if it has not already being called.
+        """
+        if self._promotion_errors is None:
+            self.is_promotable()
+        return self._promotion_errors
+    promotion_errors = property(_get_promotion_errors)
 
     @property
     def is_editable(self):
@@ -614,37 +634,51 @@ class Part(PLMObject):
 
     def is_promotable(self):
         """
-        Returns True if the object is promotable. 
+        Returns True if the part is promotable. 
         
         A part is promotable if:
-        
-            #. there is a next state in its lifecycle and if its childs which
-               have the same lifecycle are in a state as mature as the
-               object's state.  
+            
+            #. its state is not the last state of its lifecycle
+            
+            #. if the part is not editable (its state is official).
+            
+            #. the part is editable and:
 
-            #. there is at least one official document attached to it.
+                #. there is a next state in its lifecycle and if its children
+                    which have the same lifecycle are in a state as mature as
+                    the object's state.  
+
+                #. if the part has no children, there is at least one official
+                   document attached to it.
         """
         if not self._is_promotable():
             return False
+        if not self.is_editable:
+            return True
         # check children
-        childs = self.parentchildlink_parent.filter(end_time__exact=None).only("child")
-        lcs = LifecycleStates.objects.filter(lifecycle=self.lifecycle)
-        rank = lcs.get(state=self.state).rank
-        for link in childs:
+        children = self.parentchildlink_parent.filter(end_time__exact=None).only("child")
+        lcs = self.lifecycle.to_states_list()
+        rank = lcs.index(self.state.name)
+        for link in children:
             child = link.child
             if child.lifecycle == self.lifecycle:
-                rank_c = lcs.get(state=child.state).rank
-                if rank_c < rank:
+                rank_c = lcs.index(child.state.name)
+                if rank_c == 0 or rank_c < rank:
+                    self._promotion_errors.append(_("Some children are at a lower or draft state."))
                     return False
-        # check that at least one document is attached and its state is official
-        # see ticket #57
-        found = False
-        links = self.documentpartlink_part.all()
-        for link in links:
-            found = link.document.is_official
-            if found:
-                break
-        return found
+        if not children:
+            # check that at least one document is attached and its state is official
+            # see ticket #57
+            found = False
+            links = self.documentpartlink_part.all()
+            for link in links:
+                found = link.document.is_official
+                if found:
+                    break
+            if not found:
+                self._promotion_errors.append(_("There are no official documents attached."))
+            return found
+        return True
 
     @property
     def is_part(self):
@@ -778,7 +812,13 @@ class Document(PLMObject):
         """
         if not self._is_promotable():
             return False
-        return bool(self.files) and not bool(self.files.filter(locked=True))
+        if not bool(self.files):
+            self._promotion_errors.append(_("This document has no files."))
+            return False
+        if bool(self.files.filter(locked=True)):
+            self._promotion_errors.append(_("Some files are locked."))
+            return False
+        return True
 
     @property
     def menu_items(self):

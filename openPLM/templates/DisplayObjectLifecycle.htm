@@ -9,29 +9,42 @@
     </div>
 
     <form id ="form-promote" class="confirmation"  action="" method="POST">
-        {% if is_signer_dm and obj.is_editable %}
-            <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
+        {% if is_signer_dm %}
+            {% if obj.is_editable %}
+                <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
+            {% else %}
+                <p>{% trans "You can not demote this object since its state is official ore more advanced." %}</p>
+            {% endif %}
+        {% else %}
+            <p>{% trans "You do not have the permission to demote this object." %}</p>
         {% endif %}
-        {% if is_signer and obj.is_promotable %}
-            <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE" />
+        {% if is_signer %}
+            {% if obj.is_promotable %}
+                <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE" />
+            {% else %}
+                <p>{% trans "You can not promote this object:" %}</p>
+                {{ obj.promotion_errors.as_ul }}
+            {% endif %}
+        {% else %}
+            <p>{% trans "You do not have the permission to promote this object." %}</p>
         {% endif %}
     </form>
-    	<table class="Content">
-    		<tr class="Content">
-    		{% for status, is_current_state in object_lifecycle %}
+    <table class="Content">
+        <tr class="Content">
+            {% for status, is_current_state in object_lifecycle %}
                 <td class="Content status Button ui-state-default ui-button-text-only 
-    				{% if is_current_state %}
+                    {% if is_current_state %}
                         ui-state-active active
                     {% else %}
                         ui-state-inactive
-				    {% endif %}
+                    {% endif %}
                     ">
-    				{{status|upper}}</td>
-    				{% if not forloop.last %}
-    				    <td class="Content arrow">===&gt;</td>
-				    {% endif %}
-    		{% endfor %}
-    		</tr>
-    	</table>
+                    {{status|upper}}</td>
+                {% if not forloop.last %}
+                    <td class="Content arrow">===&gt;</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    </table>
 {% endblock %}
 
