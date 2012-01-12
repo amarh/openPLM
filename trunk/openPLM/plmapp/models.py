@@ -500,7 +500,7 @@ class PLMObject(models.Model):
 
     def _get_promotion_errors(self):
         """ Returns an :class:`ErrorList` of promotion errors.
-        Calls :meth:`is_promotable()` if it has not already being called.
+        Calls :meth:`is_promotable()` if it has not already been called.
         """
         if self._promotion_errors is None:
             self.is_promotable()
