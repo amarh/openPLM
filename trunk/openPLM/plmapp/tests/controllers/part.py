@@ -161,25 +161,26 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(parents, [])
 
     def test_is_promotable1(self):
+        """Tests promotion from draft state, an official document is attached."""
         self.failUnless(self.controller.is_promotable())
 
     def test_is_promotable2(self):
+        """Tests promotion from official state."""
         self.controller.promote()
         self.failUnless(self.controller.is_promotable())
     
     def test_is_promotable3(self):
+        """Tests promotions with an official child."""
+        self.controller2.promote()
         self.controller.add_child(self.controller2, 10, 15)
         self.failUnless(self.controller.is_promotable())
         
     def test_is_promotable4(self):
+        """Tests promotion from official state, with a deprecated child."""
+        self.controller2.promote()
         self.controller2.promote()
         self.controller.add_child(self.controller2, 10, 15)
         self.failUnless(self.controller.is_promotable())
-
-    def test_is_promotable5(self):
-        self.controller.add_child(self.controller2, 10, 15)
-        self.controller.promote()
-        self.failIf(self.controller.is_promotable())
 
     def test_is_promotable_no_document(self):
         "Tests that a part with no document attached is not promotable."""

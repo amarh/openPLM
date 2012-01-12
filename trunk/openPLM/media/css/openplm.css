@@ -649,3 +649,14 @@ form.archive_form > * {
     display: inline;
     padding-left: 0.5em;
 }
+
+ul.errorlist {
+    display: block;
+    padding-left: 1em;
+}
+ul.errorlist li {
+    display: list-item;
+    list-style-type: disc;
+    margin-left: 1em;
+}
+
