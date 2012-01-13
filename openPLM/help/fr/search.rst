@@ -6,7 +6,7 @@ Pour effectuer une recherche:
     
     #. sélectionner un type ;
     #. entrer une requête ;
-    #. cliquer sur le bouton rechercher ;
+    #. cliquer sur le bouton rechercher.
 
 Exemples de requêtes :
 
