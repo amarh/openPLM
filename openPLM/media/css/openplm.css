@@ -605,7 +605,10 @@ h2 div.toolbar > ul > li > button{
 /* Help dialog */
 
 #help-dialog h3 ~ * {
-    background-color: #343434;
+    padding-left: 1em;
+}
+#help-dialog h3 + * {
+    padding-top: 1em;
 }
 
 #help-dialog ul,
@@ -621,10 +624,15 @@ h2 div.toolbar > ul > li > button{
     margin-left: 2em;
 }
 
-#help-dialog .section * {
+#help-dialog .section *:not(h3) {
     font-size: 14px;
+    background-color: #343434;
 }
 
+tt.docutils.literal {
+    color: black;
+    background-color: #fffcb6 !important;
+}
 
 /* lifecycle */
 table.Content td.status {
