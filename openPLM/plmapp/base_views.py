@@ -352,15 +352,16 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     FilterForm = get_navigate_form(obj)
 
     has_session = any(field in request.session for field in FilterForm.base_fields)
+    initial = dict((k, v.initial) for k, v in FilterForm.base_fields.items())
     if request.method == 'POST' and request.POST:
         form = FilterForm(request.POST)
         if form.is_valid():
             request.session.update(form.cleaned_data)
     elif has_session:
         request.session.update(dict(doc_parts = ""))
-        form = FilterForm(request.session)
+        initial.update(request.session)
+        form = FilterForm(initial)
     else:
-        initial = dict((k, v.initial) for k, v in FilterForm.base_fields.items())
         form = FilterForm(initial)
         request.session.update(initial)
     if not form.is_valid():
