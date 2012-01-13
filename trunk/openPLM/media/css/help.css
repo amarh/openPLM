@@ -186,7 +186,7 @@ div.align-right {
 /*   text-align: left } */
 
 ol.simple, ul.simple {
-  margin-bottom: 1em }
+  padding-bottom: 1em }
 
 ol.arabic {
   list-style: decimal }
