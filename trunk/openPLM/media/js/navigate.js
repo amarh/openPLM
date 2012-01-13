@@ -282,10 +282,12 @@ function init(){
             uri = "/ajax/navigate/" + (result[1])  + "/";
         }
         $("#FilterButton").button().click(function () {
+            $("#Navigate").showLoading();
             $.post(uri,
                 $("#FilterNav").find("form").serialize(),
                 function (data) {
                     update_nav(null, data);
+                    $("#Navigate").hideLoading();
                 });
             } );
 
