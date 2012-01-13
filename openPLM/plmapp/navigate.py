@@ -150,6 +150,7 @@ class NavigationGraph(object):
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
+        self.title_to_nodes = {}
 
     def set_options(self, options):
         """
@@ -332,44 +333,68 @@ class NavigationGraph(object):
                 self._create_doc_edges(self.object, None)
 
     def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
-        node = self.graph.get_node(obj_id or obj.id)
+        obj_id = obj_id or obj.id
+        
+        # data and title_to_nodes are used to retrieve usefull data (url, tooltip)
+        # in convert_map
+        data = {}
+        node = self.graph.get_node(obj_id)
+        node.attr["tooltip"] = str(obj_id)
+        node.attr["URL"] = obj.plmobject_url + "navigate/"
+        
+        # set node attributes according to its type
         type_ = type(obj)
         if issubclass(type_, PartController):
             type_ = PartController
         elif issubclass(type_, DocumentController):
             type_ = DocumentController
         node.attr.update(self.TYPE_TO_ATTRIBUTES[type_])
-        node.attr["URL"] = obj.plmobject_url + "navigate/"
-        node.attr["tooltip"] = "None"
+
         if isinstance(obj, PLMObjectController):
-            node.attr['label'] = get_path(obj).replace("/", "\\n")
+            # display the object's name if it is not empty
+            path = get_path(obj)
+            node.attr['label'] = obj.name.strip() or path.replace("/", "\\n")
+            data["title"] = path.replace("/", " - ")
+            
+            # add urls to show/hide thumbnails and attached documents
             if type_ == DocumentController:
-                node.attr["tooltip"] = "/ajax/thumbnails/" + get_path(obj)
+                data["url"] = "/ajax/thumbnails/" + get_path(obj)
             elif type_ == PartController and not self.options["doc"]:
                 if obj.get_attached_documents():
                     s = "+" if obj.id not in self.options["doc_parts"] else "-"
-                    node.attr["tooltip"] = s + str(obj.id)
+                    data["url"] = s + str(obj.id)
         elif isinstance(obj, UserController):
-            node.attr["label"] = obj.username
+            full_name =  u'%s\\n%s' % (obj.first_name, obj.last_name)
+            node.attr["label"] = full_name.strip() or obj.username
+            data["title"] = obj.username
         else:
             node.attr["label"] = obj.name
         node.attr["label"] += "\\n" + extra_label
+        # id is used by the javascript
         t = type_.__name__.replace("Controller", "")
-        node.attr["id"] = "_".join((str(obj_id or obj.id), t, str(obj.id)))
+        node.attr["id"] = "_".join((str(obj_id), t, str(obj.id)))
+        self.title_to_nodes[node.attr["id"]] = data
 
     def convert_map(self, map_string):
         elements = []
         doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
+            data = self.title_to_nodes.get(area.get("id"), {})
+            # compute css position of the div
             left, top, x2, y2 = map(int, area.get("coords").split(","))
             width = x2 - left
             height = y2 - top
             style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
+            # create a div with a title, and an <a> element
             id_ = "Nav-%s" % area.get("id")
             div = ET.Element("div", id=id_, style=style)
             div.set("class", "node" + " main_node" * (self.main_node == area.get("id")))
-            url = area.get("title")
+            title = data.get("title")
+            if title:
+                div.set("title", title)
+            # add thumbnails and attached documents buttons
+            url = data.get("url", "None")
             if url.startswith("/ajax/thumbnails/"):
                 thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
                         title="Display thumbnails")
@@ -388,6 +413,7 @@ class NavigationGraph(object):
                         title="Show related documents")
                 show_doc.set("class", "node_show_docs" + self.BUTTON_CLASS)
                 show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
+            # add the link
             a = ET.SubElement(div, "a", href=area.get("href")) 
             span = ET.SubElement(a, "span")
             span.text = " "
