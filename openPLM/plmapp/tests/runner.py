@@ -1,10 +1,17 @@
 # from: http://djangosnippets.org/snippets/2211/ by cronosa
-from django.test.simple import DjangoTestSuiteRunner #@UnresolvedImport
+import os
 import logging
 from django.conf import settings
 EXCLUDED_APPS = getattr(settings, 'TEST_EXCLUDE', [])
+from django.test.simple import DjangoTestSuiteRunner
+from django_xml_test_runner.xmltestrunner import XMLTestSuiteRunner
 
-class OpenPLMTestSuiteRunner(DjangoTestSuiteRunner):
+if os.environ.get("TEST_OUTPUT", "stdin") == "xml":
+    TestSuiteRunner = XMLTestSuiteRunner
+else:
+    TestSuiteRunner= DjangoTestSuiteRunner
+
+class OpenPLMTestSuiteRunner(TestSuiteRunner):
     def __init__(self, *args, **kwargs):
         from django.conf import settings
         settings.TESTING = True
