@@ -31,6 +31,7 @@
             <th class="Content" style="width:50px"> </th>
             <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
             <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
+            <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
             <th class="Content"> {{ obj.reference }} </th>
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
@@ -45,6 +46,7 @@
 
                 <td class="Content"> {{ link.order }} </td>
                 <td class="Content"> {{ link.quantity }} </td>
+                <td class="Content"> {{ link.get_unit_display }} </td>
                 <td class="Content"> 
                     <a href="/object/{{link.child.type}}/{{link.child.reference}}/{{link.child.revision}}/">
                         {{ link.child.reference }}

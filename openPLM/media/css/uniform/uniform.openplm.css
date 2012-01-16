@@ -40,8 +40,8 @@ div.button span {
 .checker *, 
 .uploader *,
 .button *{
-  margin: 0;
-  padding: 0;
+  /*margin: 0;*/
+  /*padding: 0;*/
 }
 
 /* INPUT & TEXTAREA */

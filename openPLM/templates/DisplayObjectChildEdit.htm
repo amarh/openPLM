@@ -10,6 +10,7 @@
         <tr>
             <th class="Content">{% trans "Order" %}</th>
             <th class="Content">{% trans "Quantity" %} </th>
+            <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
             <th class="Content"> {{ obj.reference }} </th>
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
@@ -24,6 +25,7 @@
             <tr class="Content"> 
                 <td class="Content"> {{ form.order }} </td>
                 <td class="Content"> {{ form.quantity }} </td>
+                <td class="Content" style="width:50px"> {{ form.unit }} </td>
                 <td class="Content"> 
                     <a href="{{form.instance.child.plmobject_url}}">
                         {{ form.instance.child.reference }}

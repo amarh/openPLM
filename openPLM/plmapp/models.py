@@ -92,6 +92,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
 
+from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 
@@ -1005,6 +1006,8 @@ class ParentChildLink(Link):
     parent = models.ForeignKey(Part, related_name="%(class)s_parent")    
     child = models.ForeignKey(Part, related_name="%(class)s_child")    
     quantity = models.FloatField(default=lambda: 1)
+    unit = models.CharField(max_length=4, choices=UNITS,
+            default=lambda: DEFAULT_UNIT)
     order = models.PositiveSmallIntegerField(default=lambda: 1)
     end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     
@@ -1014,6 +1017,10 @@ class ParentChildLink(Link):
     def __unicode__(self):
         return u"ParentChildLink<%s, %s, %f, %d>" % (self.parent, self.child,
                                                      self.quantity, self.order)
+    def get_shortened_unit(self):
+        if self.unit == "-":
+            return u""
+        return self.get_unit_display()
 
 class DocumentPartLink(Link):
     """

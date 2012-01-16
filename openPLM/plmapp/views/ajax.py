@@ -138,7 +138,8 @@ def ajax_add_child(request, part_id):
         if form.is_valid():
             child = get_obj_from_form(form, request.user)
             part.add_child(child, form.cleaned_data["quantity"], 
-                           form.cleaned_data["order"])
+                           form.cleaned_data["order"],
+                           form.cleaned_data["unit"])
             return {"result" : "ok"}
         else:
             data["result"] = "error"
