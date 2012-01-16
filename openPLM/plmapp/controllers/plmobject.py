@@ -230,15 +230,14 @@ class PLMObjectController(Controller):
         if not self.object.is_editable:
             raise PermissionError("The object is not editable")
 
-    @permission_required(role="owner")
     def revise(self, new_revision):
         u"""
-        Makes a new revision : duplicates :attr:`object`. The duplicated 
+        Makes a new revision: duplicates :attr:`object`. The duplicated 
         object's revision is *new_revision*.
 
         Returns a controller of the new object.
         """
-        
+        self.check_readable() 
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
             raise RevisionError("Bad value for new_revision")
@@ -259,11 +258,11 @@ class PLMObjectController(Controller):
 
     def is_revisable(self, check_user=True):
         """
-        Returns True if :attr:`object` is revisable : if :meth:`revise` can be
+        Returns True if :attr:`object` is revisable: if :meth:`revise` can be
         called safely.
 
-        If *check_user* is True (the default), it also checks if :attr:`_user` is
-        the *owner* of :attr:`object`.
+        If *check_user* is True (the default), it also checks if :attr:`_user` can
+        see the objects.
         """
         # objects.get fails if a link does not exist
         # we can revise if any links exist
@@ -271,7 +270,7 @@ class PLMObjectController(Controller):
             models.RevisionLink.objects.get(old=self.object.pk)
             return False
         except ObjectDoesNotExist:
-            return self.check_permission("owner", False)
+            return self.check_readable(False)
     
     def get_previous_revisions(self):
         try:
