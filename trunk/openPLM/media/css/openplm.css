@@ -497,7 +497,11 @@ li.Result div.toolbar button{
     width: 16px;
 }
 
-
+li.Result div.summary em {
+    background-color: #fffcb6;
+    color: black;
+    font-style: normal;
+}
 /** input **/
 input[type=text],
 input[type=file],
