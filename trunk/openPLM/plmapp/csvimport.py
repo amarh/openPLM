@@ -14,7 +14,7 @@ from django.utils.safestring import mark_safe
 
 from openPLM.plmapp import models
 from openPLM.plmapp.unicodecsv import UnicodeReader
-from openPLM.plmapp.controllers.plmobject import PLMObjectController
+from openPLM.plmapp.controllers import PLMObjectController, UserController
 from openPLM.plmapp.tasks import update_indexes
 
 
@@ -352,7 +352,69 @@ class BOMImporter(CSVImporter):
         order = int(self.get_value(row, "order").replace(" ", ""))
 
         parent.add_child(child, quantity, order)
+
+class UsersImporter(CSVImporter):
+    """
+    A :class:`CSVImporter` that sponsors users from a CSV file.
+
+    The CSV must contain the following columns:
+
+        * username
+        * first_name
+        * last_name
+        * email
+        * groups (multiple groups can be separeted by a "/")
+
+    """
+
+    REQUIRED_HEADERS = ('username', 'first_name', 'last_name', 'email', 'groups')
+
+    HEADERS_SET = set(REQUIRED_HEADERS)
+
+    def __init__(self, csv_file, user, encoding="utf-8"):
+        self.ctrl = UserController(user, user)
+        self.ctrl.block_mails()
+        super(UsersImporter, self).__init__(csv_file, user)
+        self.groups = dict(user.groups.values_list("name", "id"))
+
+    @classmethod
+    def get_headers_set(cls):
+        return cls.HEADERS_SET 
+
+    def tear_down(self):
+        self.ctrl.unblock_mails()
+    
+    def parse_row(self, line, row): 
+        from openPLM.plmapp.forms import SponsorForm
+        un, fn, ln, em, grps = self.get_values(row, *self.REQUIRED_HEADERS)
+        groups = []
+        for grp in grps.split("/"):
+            try:
+                groups.append(self.groups[grp])
+            except KeyError:
+                self.store_errors(line, u"Invalid group:%s" % grp)
+                return
+        data = {
+                "sponsor" : self.user.id,
+                "username": un,
+                "last_name": ln,
+                "first_name": fn,
+                "email" : em,
+                "groups" : groups,
+                "warned" : True,
+                }
+        form = SponsorForm(data, sponsor=self.user.id)
+        if form.is_valid():
+            new_user = form.save()
+            self.ctrl.sponsor(new_user)
+            self.objects.append(new_user)
+        else:
+            items = (mark_safe(u"%s: %s" % item) for item 
+                    in form.errors.iteritems())
+            self.store_errors(line, *items)
+    
    
 #: Dictionary (name -> CSVImporter's subclass) of known :class:`CSVImporter`
-IMPORTERS = {"csv" : PLMObjectsImporter, "bom" : BOMImporter }
+IMPORTERS = {"csv" : PLMObjectsImporter, "bom" : BOMImporter,
+        "users" : UsersImporter}
 

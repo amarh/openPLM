@@ -33,7 +33,6 @@ from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.exceptions as exc
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController
-from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -137,8 +136,17 @@ class ControllerTest(BaseTestCase):
         for attr in controller.get_modification_fields():
             self.assertEqual(getattr(controller, attr), getattr(rev, attr))
 
+    def test_revise_official(self):
+        ctrl = self.create("Part1")
+        ctrl.state = ctrl.lifecycle.official_state
+        ctrl.set_owner(self.cie)
+        ctrl.save()
+        self.failUnless(ctrl.is_revisable())
+        rev = ctrl.revise("b")
+        self.assertEqual(self.user, rev.owner)
+
     def test_revise_error1(self):
-        "Revision : error : empty name"
+        "Revision : error : empty new revision"
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "")
     

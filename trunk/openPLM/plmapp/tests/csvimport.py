@@ -8,9 +8,10 @@ from django.test import TransactionTestCase
 
 from celery.signals import task_prerun
 
+import openPLM.plmapp.models as models
 from openPLM.plmapp.models import GroupInfo, PLMObject, ParentChildLink
 from openPLM.plmapp.csvimport import PLMObjectsImporter, BOMImporter,\
-        CSVImportError
+        CSVImportError, UsersImporter
 from openPLM.plmapp.base_views import get_obj
 from openPLM.plmapp.unicodecsv import UnicodeWriter
 from openPLM.plmapp.forms import CSVForm
@@ -243,5 +244,45 @@ class CSVImportTestCase(TransactionTestCase):
         sp1 = get_obj("SinglePart", "sp1", "s", self.user)
         self.assertEquals("SP1", sp1.name)
 
+    def get_users_rows(self):
+        return [['username', 'first_name', 'last_name', 'email', 'groups'],
+                ['user_1', 'fn1', 'ln1', 'user_1@example.net', 'grp'],
+                ['user_2', 'fn2', 'ln2', 'user_2@example.net', 'grp'],
+                ['user_3', 'fn3', 'ln3', 'user_3@example.net', 'grp'],
+                ['user_4', 'fn4', 'ln4', 'user_4@example.net', 'grp'],
+                ['user_5', 'fn5', 'ln5', 'user_5@example.net', 'grp'],
+               ]
 
+    def test_users_valid(self):
+        csv_rows = self.get_users_rows()
+        objects = self.import_csv(UsersImporter, csv_rows)
+        self.assertEquals(len(csv_rows) - 1, len(objects))
+        users = models.User.objects.filter(username__startswith="user_")
+        self.assertEquals(5, users.count())
+        sponsor_links = self.user.delegationlink_delegator.filter(role="sponsor")
+        self.assertEquals(5, sponsor_links.count())
+        self.assertEquals(set(users.values_list("id", flat=True)),
+                set(sponsor_links.values_list("delegatee", flat=True)))
+
+    def test_users_invalid_duplicated_users(self):
+        csv_rows = self.get_users_rows()
+        csv_rows.append(csv_rows[1])
+        self.assertRaises(CSVImportError, self.import_csv,
+                          UsersImporter, csv_rows)
+        # 2 : company + test
+        self.assertEquals(2, User.objects.count())
+        sponsor_links = self.user.delegationlink_delegator.filter(role="sponsor")
+        self.assertFalse(bool(sponsor_links))
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_users_invalid_missing_first_name(self):
+        csv_rows = self.get_users_rows()
+        csv_rows[1][1] = ""
+        self.assertRaises(CSVImportError, self.import_csv,
+                          UsersImporter, csv_rows)
+        # 2 : company + test
+        self.assertEquals(2, User.objects.count())
+        sponsor_links = self.user.delegationlink_delegator.filter(role="sponsor")
+        self.assertFalse(bool(sponsor_links))
+        self.assertEqual(len(mail.outbox), 0)
 
