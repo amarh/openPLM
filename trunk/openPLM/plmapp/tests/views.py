@@ -341,7 +341,7 @@ class PartViewTestCase(ViewTest):
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         response = self.client.post(self.base_url + "BOM-child/add/",
                 {"type": "Part", "reference":"c1", "revision":"a",
-                 "quantity" : 10, "order" : 10 })
+                    "quantity" : 10, "order" : 10, "unit" : "m"})
         self.assertEquals(1, len(self.controller.get_children()))
 
     def test_edit_children(self):
@@ -358,6 +358,7 @@ class PartViewTestCase(ViewTest):
             'form-0-order'  :  45,
             'form-0-parent' :  self.controller.id,
             'form-0-quantity' :  '45.0',
+            'form-0-unit' :  'cm',
         }
         response = self.post(self.base_url + "BOM-child/edit/", data)
         link = self.controller.get_children()[0].link

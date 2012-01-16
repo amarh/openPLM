@@ -111,12 +111,13 @@ class PartControllerTest(ControllerTest):
         self.assertRaises(ValueError, fail)
 
     def test_modify_child(self):
-        self.controller.add_child(self.controller2, 10, 15)
-        self.controller.modify_child(self.controller2, 3, 5)
+        self.controller.add_child(self.controller2, 10, 15, "-")
+        self.controller.modify_child(self.controller2, 3, 5, "kg")
         children = self.controller.get_children()
         level, link = children[0]
         self.assertEqual(link.quantity, 3)
         self.assertEqual(link.order, 5)
+        self.assertEqual(link.unit, "kg")
 
     def test_delete_child(self):
         self.controller.add_child(self.controller2, 10, 15)

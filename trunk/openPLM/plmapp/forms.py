@@ -35,6 +35,7 @@ from django.contrib.sites.models import Site
 from django.utils.functional import memoize
 
 import openPLM.plmapp.models as m
+from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
@@ -311,6 +312,7 @@ class SimpleSearchForm(forms.Form):
 class AddChildForm(PLMObjectForm):
     quantity = forms.FloatField()
     order = forms.IntegerField()
+    unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
 
 
 class DisplayChildrenForm(forms.Form):
@@ -330,7 +332,7 @@ class ModifyChildForm(forms.ModelForm):
     order = forms.IntegerField(widget=forms.TextInput(attrs={'size':'2'}))
     class Meta:
         model = m.ParentChildLink
-        fields = ["order", "quantity", "child", "parent"]
+        fields = ["order", "quantity", "unit", "child", "parent",]
 
 ChildrenFormset = modelformset_factory(m.ParentChildLink,
                                        form=ModifyChildForm, extra=0)

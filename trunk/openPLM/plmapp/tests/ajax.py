@@ -94,7 +94,7 @@ class AjaxTestCase(CommonViewTest):
         p2 = self.create("part2")
         data = self.post("/ajax/add_child/%d/" % self.controller.id,
                 type=p2.type, reference=p2.reference, revision=p2.revision,
-                quantity="10", order="10")
+                quantity="10", order="10", unit="g")
         self.assertEqual("ok", data["result"])
 
         link = self.controller.get_children()[0].link

@@ -30,6 +30,7 @@ from collections import namedtuple
 
 
 import openPLM.plmapp.models as models
+from openPLM.plmapp.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 
@@ -53,7 +54,6 @@ class PartController(PLMObjectController):
         :type child: :class:`.Part`
         
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
-        :raises: :exc:`ValueError` if *quantity* or *order* are negative.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.    
         """
@@ -87,7 +87,7 @@ class PartController(PLMObjectController):
             pass
         return can_add
 
-    def add_child(self, child, quantity, order):
+    def add_child(self, child, quantity, order, unit=DEFAULT_UNIT):
         """
         Adds *child* to *self*.
 
@@ -97,6 +97,7 @@ class PartController(PLMObjectController):
         :type quantity: positive float
         :param order: order
         :type order: positive int
+        :param unit: a valid unit
         
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
         :raises: :exc:`ValueError` if *quantity* or *order* are negative.
@@ -119,6 +120,7 @@ class PartController(PLMObjectController):
         link.child = child
         link.quantity = quantity
         link.order = order
+        link.unit = unit
         link.save()
         # records creation in history
         self._save_histo(link.ACTION_NAME,
@@ -146,7 +148,7 @@ class PartController(PLMObjectController):
         link.save()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
-    def modify_child(self, child, new_quantity, new_order):
+    def modify_child(self, child, new_quantity, new_order, new_unit):
         """
         Modifies information about *child*.
 
@@ -170,19 +172,23 @@ class PartController(PLMObjectController):
             raise ValueError("Quantity or order is negative")
         link = models.ParentChildLink.objects.get(parent=self.object,
                                                   child=child, end_time=None)
-        if link.quantity == new_quantity and link.order == new_order:
+        if (link.quantity == new_quantity and link.order == new_order and
+            link.unit == new_unit):
             # do not make an update if it is useless
             return
         link.end_time = datetime.datetime.today()
         link.save()
         # make a new link
         link2 = models.ParentChildLink(parent=self.object, child=child,
-                                       quantity=new_quantity, order=new_order)
+                                       quantity=new_quantity, order=new_order,
+                                       unit=new_unit)
         details = ""
         if link.quantity != new_quantity:
             details += "quantity changes from %f to %f\n" % (link.quantity, new_quantity)
         if link.order != new_order:
             details += "order changes from %d to %d" % (link.order, new_order)
+        if link.unit != new_unit:
+            details += "unit changes from %s to %s" % (link.unit, new_unit)
         self._save_histo("Modify - %s" % link.ACTION_NAME, details)
         link2.save(force_insert=True)
 
@@ -253,13 +259,15 @@ class PartController(PLMObjectController):
                 else:
                     quantity = form.cleaned_data["quantity"]
                     order = form.cleaned_data["order"]
-                    self.modify_child(child, quantity, order)
+                    unit = form.cleaned_data["unit"]
+                    self.modify_child(child, quantity, order, unit)
 
     def revise(self, new_revision):
         # same as PLMObjectController + add children
         new_controller = super(PartController, self).revise(new_revision)
         for level, link in self.get_children(1):
-            new_controller.add_child(link.child, link.quantity, link.order)
+            new_controller.add_child(link.child, link.quantity, link.order,
+                    link.unit)
         return new_controller
 
     def attach_to_document(self, document):
