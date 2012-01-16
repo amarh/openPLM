@@ -7,6 +7,8 @@
     {% if is_owner %}
         {% if obj.is_contributor or obj.is_administrator %}
             <p> {% trans "Sponsor a new user" %} </p>
+            <a href="/import/users/">{% trans "Click here to sponsor several users from a CSV file." %}</a>
+
             {% with sponsor_form as form %}
                 {% include "snippets/undo_form.htm" %}
             {% endwith %}
