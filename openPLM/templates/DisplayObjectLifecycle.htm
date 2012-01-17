@@ -13,7 +13,7 @@
             {% if obj.is_editable %}
                 <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
             {% else %}
-                <p>{% trans "You can not demote this object since its state is official ore more advanced." %}</p>
+                <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
             {% endif %}
         {% else %}
             <p>{% trans "You do not have the permission to demote this object." %}</p>
