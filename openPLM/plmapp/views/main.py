@@ -283,11 +283,12 @@ def add_children(request, obj_type, obj_ref, obj_revi):
             child_obj = get_obj_from_form(add_child_form, request.user)
             obj.add_child(child_obj,
                           add_child_form.cleaned_data["quantity"],
-                          add_child_form.cleaned_data["order"])
+                          add_child_form.cleaned_data["order"],
+                          add_child_form.cleaned_data["unit"])
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
     else:
         add_child_form = AddChildForm()
-        ctx.update({'current_page':'BOM-child'})
+        ctx['current_page'] = 'BOM-child'
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
                 'attach' : (obj, "add_child")})
