@@ -190,7 +190,9 @@ Change rights for the directory where thumbnails will be stored:
     
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/navigate``
-  
+ 
+.. _search-engine:
+
 Configure the search engine
 =============================
 
@@ -202,7 +204,9 @@ Once haystack is configured, you must rebuild the index:
 
     * ``./manage.py rebuild_index``
     * ``chown www-data:www-data -R /var/openPLM/xapian_index/``
-    
+   
+.. _celery:
+
 Configure Celery
 ================
 
@@ -216,7 +220,7 @@ To configure rabbitmq, you must create an user and a vhost (as root):
     * ``rabbitmqctl add_vhost openplm``
     * ``rabbitmqctl set_permissions -p openplm openplm ".*" ".*" ".*"``
 
-Then you must modify the `BROKER_*` settings, if you follow this tutorial, you
+Then you must modify the `BROKER_*` settings in the :file:`settings.py`, if you follow this tutorial, you
 only have to change `BROKER_PASSWORD`.
 
 :command:`celeryd`, celery's daemon must be run. openPLM ships with an init script:
@@ -308,5 +312,49 @@ how mails are sent. See the `Django documentation <https://docs.djangoproject.co
 
 OpenPLM adds another variable `EMAIL_OPENPLM` which is the e-mail address set
 in the `from` field of each e-mail. Usually, this is a `no-reply@` address.
+
+Troubleshootings
+==================
+
+.. contents::
+    :local:
+
+Admin pages are ugly
+---------------------
+
+openPLM ships with a simlink (:file:`/path/to/openPLM/media/admin`) that may
+be broken on your system.
+
+To fix this link, run the following command:
+``ln -s `python -c 'import django; print django.__path__[0]'`/contrib/admin/media
+/var/django/openPLM/trunk/openPLM/media/admin``
+
+
+IOError at /object/create -- Socket closed
+------------------------------------------
+
+This error is thrown if Celery is misconfigured and can not connect to
+RabbitMQ. See :ref:`celery` for more details, do not forget to edit
+the `BROKER_*` variables in the :file:`settings.py` file.
+
+I cannot find any objects
+----------------------------
+
+You can rebuild the search index (:ref:`search-engine`) and see if openPLM
+finds your parts.
+
+It is possible that celery can not update the
+search index. You can check celery's log (:file:`/var/log/celery/*.log`) and
+see if it contains lines like ``[.. INFO/MainProcess] Got task from broker: openPLM.plmapp.tasks.update_index[...]``. It may be a permission problem and
+``chown www-data:www-data -R /var/openPLM/xapian_index/`` may fix it.
+
+I try to connect to http://server/ but I always get an "It works" page
+----------------------------------------------------------------------
+
+Maybe your apache installation is a little broken. Does http://server/home/
+show a more acceptable result?
+
+
+
 
 
