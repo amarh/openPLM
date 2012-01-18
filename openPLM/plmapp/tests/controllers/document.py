@@ -47,9 +47,10 @@ class DocumentControllerTest(ControllerTest):
         super(DocumentControllerTest, self).setUp()
         self.controller = self.CONTROLLER.create("adoc", self.TYPE, "a",
                                                  self.user, self.DATA)
-        self.part = PartController.create("mpart", "Part", "a", self.user,
-                self.DATA)
         self.old_files = []
+
+    def get_part(self):
+        return PartController.create("mpart", "Part", "a", self.user, self.DATA)
 
     def tearDown(self):
         for f in list(self.controller.files.all()) + self.old_files:
@@ -188,7 +189,10 @@ class DocumentControllerTest(ControllerTest):
         self.old_files.append(d)
 
     def test_attach_to_part(self):
-        self.controller.attach_to_part(self.part)
+        part = self.get_part()
+        self.controller.attach_to_part(part)
+        attached = self.controller.get_attached_parts()[0].part
+        self.assertEqual(part.id, attached.id)
     
     def test_attach_to_part_error1(self):
         self.assertRaises(TypeError, self.controller.attach_to_part, None)
@@ -207,21 +211,24 @@ class DocumentControllerTest(ControllerTest):
         self.assertRaises(TypeError, self.controller.attach_to_part, obj)
     
     def test_detach_part(self):
-        self.controller.attach_to_part(self.part)
-        self.controller.detach_part(self.part)
-        self.assertEqual(len(self.controller.get_attached_parts()), 0)
+        part = self.get_part()
+        self.controller.attach_to_part(part)
+        self.controller.detach_part(part)
+        self.assertEqual(self.controller.get_attached_parts().count(), 0)
 
     def test_get_attached_parts(self):
-        self.controller.attach_to_part(self.part)
+        part = self.get_part()
+        self.controller.attach_to_part(part)
         links = list(self.controller.get_attached_parts())
-        self.assertEqual([l.part for l in links], [self.part.object])
+        self.assertEqual([l.part for l in links], [part.object])
         
     def test_get_attached_parts_empty(self):
         links = list(self.controller.get_attached_parts())
         self.assertEqual(links, [])
 
     def test_revise2(self):
-        self.controller.attach_to_part(self.part)
+        part = self.get_part()
+        self.controller.attach_to_part(part)
         self.controller.add_file(self.get_file())
         f1 = self.controller.files.all()[0]
         rev = self.controller.revise("new_name")
@@ -267,6 +274,7 @@ class DocumentControllerTest(ControllerTest):
                           self.get_file())
     
     def test_checkin_errors3(self):
+        """ Tests that only the user who locked a file can check-in it."""
         user = User(username="baduser")
         user.set_password("password")
         user.save()

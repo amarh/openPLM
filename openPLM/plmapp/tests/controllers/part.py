@@ -49,12 +49,11 @@ class PartControllerTest(ControllerTest):
                                                   self.user, self.DATA)
         self.controller3 = self.CONTROLLER.create("aPart3", self.TYPE, "a",
                                                   self.user, self.DATA)
-        self.controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
         self.document = DocumentController.create("Doc1", "Document", "a",
                 self.user, self.DATA)
         self.document.add_file(self.get_file())
-        self.document.promote()
+        self.document.state = self.document.lifecycle.official_state
+        self.document.object.save()
         for ctrl in (self.controller, self.controller2):
             ctrl.attach_to_document(self.document)
 
@@ -125,17 +124,19 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(self.controller.get_children(), [])
 
     def test_get_children(self):
+        controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
+                                                  self.user, self.DATA)
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 15)
-        self.controller.add_child(self.controller4, 10, 15)
+        self.controller.add_child(controller4, 10, 15)
         wanted = [(1, self.controller2.object.pk),
                   (2, self.controller3.object.pk),
-                  (1, self.controller4.object.pk)]
+                  (1, controller4.object.pk)]
         children = [(lvl, lk.child.pk) for lvl, lk in self.controller.get_children(-1)]
         self.assertEqual(children, wanted)
         wanted = [(1, self.controller2.object.pk),
-                  (1, self.controller4.object.pk)]
+                  (1, controller4.object.pk)]
         # first level
         children = [(lvl, lk.child.pk) for lvl, lk in self.controller.get_children(1)]
         self.assertEqual(children, wanted)
@@ -145,10 +146,12 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(children, wanted)
 
     def test_get_parents(self):
+        controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
+                                                  self.user, self.DATA)
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 15)
-        self.controller.add_child(self.controller4, 10, 15)
+        self.controller.add_child(controller4, 10, 15)
         wanted = [(1, self.controller2.object.pk),
                   (2, self.controller.object.pk),]
         parents = [(lvl, lk.parent.pk) for lvl, lk in self.controller3.get_parents(-1)]
