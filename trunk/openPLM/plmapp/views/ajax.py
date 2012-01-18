@@ -132,14 +132,15 @@ def ajax_add_child(request, part_id):
     part = get_obj_by_id(part_id, request.user)
     data = {}
     if request.GET:
-        form = forms.AddChildForm(initial=request.GET)
+        form = forms.AddChildForm(part.object, initial=request.GET)
     else:
-        form = forms.AddChildForm(request.POST)
+        form = forms.AddChildForm(part.object, request.POST)
         if form.is_valid():
             child = get_obj_from_form(form, request.user)
             part.add_child(child, form.cleaned_data["quantity"], 
                            form.cleaned_data["order"],
-                           form.cleaned_data["unit"])
+                           form.cleaned_data["unit"],
+                           **form.extensions)
             return {"result" : "ok"}
         else:
             data["result"] = "error"

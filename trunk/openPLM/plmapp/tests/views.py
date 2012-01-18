@@ -364,6 +364,7 @@ class PartViewTestCase(ViewTest):
         link = self.controller.get_children()[0].link
         self.assertEquals(45, link.order)
         self.assertEquals(45.0, link.quantity)
+        self.assertEquals('cm', link.unit)
 
     def test_parents_empty(self):
         response = self.get(self.base_url + "parents/", page="parents")

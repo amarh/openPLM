@@ -36,6 +36,9 @@
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
             <th class="Content"> {{ obj.name }} </th>
+            {% for field in extra_columns %}
+                <th class="Content"> {{ field }} </th>
+            {% endfor %}
             <th class="Content"> {{ obj.state.name }} </th>
         </tr>
         {% for level, link in children %}
@@ -55,10 +58,13 @@
                 <td class="Content"> {{ link.child.revision }} </td>
                 <td class="Content"> {{ link.child.type }} </td>
                 <td class="Content"> {{ link.child.name }} </td>
+                {% for field in extra_columns %}
+                    <td class="Content"> {{ extension_data|key:link|key:field }} </td>
+                {% endfor %}
                 <td class="Content"> {{ link.child.state.name }} </td>
             </tr>
         {% endfor %}
-	</table>
+    </table>
 {% endblock %}
 
 

@@ -52,6 +52,7 @@ import tempfile
 import itertools
 from operator import attrgetter
 from mimetypes import guess_type
+from collections import defaultdict
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse,\
@@ -231,11 +232,25 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     if level == "last" and children:
         maximum = max(children, key=attrgetter("level")).level
         children = (c for c in children if c.level == maximum)
-    # convert level to html space
-    #children = (("&nbsp;" * 2 * (level-1), link) for level, link in children)
-
+    children = list(children)
+    extra_columns = []
+    extension_data = defaultdict(dict)
+    for pcle in models.get_pcles(obj.object):
+        fields = pcle.get_visible_fields()
+        if fields:
+            extra_columns.extend(fields)
+            for child in children:
+                link = child.link
+                for field in pcle.get_visible_fields():
+                    try:
+                        e = pcle.objects.get(link=link)
+                        extension_data[link][field] = getattr(e, field)
+                    except pcle.DoesNotExist:
+                        extension_data[link][field] = ""
     ctx.update({'current_page':'BOM-child',
                 'children': children,
+                'extra_columns' : extra_columns,
+                'extension_data': extension_data,
                 "display_form" : display_form})
     return r2r('DisplayObjectChild.htm', ctx, request)
 
@@ -262,7 +277,17 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect("..")
     else:
         formset = get_children_formset(obj)
+    extra_columns = []
+    extra_fields = []
+    for pcle in models.get_pcles(obj.object):
+        fields = pcle.get_visible_fields()
+        if fields:
+            extra_columns.extend(fields)
+            prefix = pcle._meta.module_name
+            extra_fields.extend('%s_%s' % (prefix, f) for f in fields)
     ctx.update({'current_page':'BOM-child',
+                'extra_columns' : extra_columns,
+                'extra_fields' : extra_fields,
                 'children_formset': formset, })
     return r2r('DisplayObjectChildEdit.htm', ctx, request)
 
@@ -278,16 +303,17 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_child_form = AddChildForm(request.POST)
+        add_child_form = AddChildForm(obj.object, request.POST)
         if add_child_form.is_valid():
             child_obj = get_obj_from_form(add_child_form, request.user)
             obj.add_child(child_obj,
                           add_child_form.cleaned_data["quantity"],
                           add_child_form.cleaned_data["order"],
-                          add_child_form.cleaned_data["unit"])
+                          add_child_form.cleaned_data["unit"],
+                          **add_child_form.extensions)
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
     else:
-        add_child_form = AddChildForm()
+        add_child_form = AddChildForm(obj.object)
         ctx['current_page'] = 'BOM-child'
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,

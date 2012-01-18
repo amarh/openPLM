@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'openPLM.computer',
     'openPLM.cae',
     'openPLM.office',
+    'openPLM.plmapp.tests',
 )
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'

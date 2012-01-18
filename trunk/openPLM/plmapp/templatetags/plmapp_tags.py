@@ -51,3 +51,17 @@ def button(css_class, options=""):
             classes.add("ui-" + opt)
     return " ".join(classes)
 
+def key(d, key_name):
+    try:
+        value = d[key_name]
+    except KeyError:
+        from django.conf import settings
+        value = settings.TEMPLATE_STRING_IF_INVALID
+    return value
+key = register.filter('key', key)
+
+def attr(o, attr_name):
+    from django.conf import settings
+    return getattr(o, attr_name, settings.TEMPLATE_STRING_IF_INVALID)
+attr = register.filter('attr', attr)
+

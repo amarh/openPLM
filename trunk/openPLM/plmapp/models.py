@@ -83,6 +83,7 @@ import datetime
 
 import kjbuckets
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -619,6 +620,9 @@ class PLMObject(models.Model):
     def get_attributes_and_values(self):
         return [(attr, getattr(self, attr)) for attr in self.attributes]
 
+    def get_leaf_object(self):
+        return get_all_plmobjects()[self.type].objects.get(id=self.id)
+
 # parts stuff
 
 class Part(PLMObject):
@@ -1022,6 +1026,125 @@ class ParentChildLink(Link):
             return u""
         return self.get_unit_display()
 
+    @property
+    def extensions(self):
+        return ParentChildLinkExtension.children.filter(link=self)
+
+    def get_extension_data(self):
+        extension_data = {}
+        for ext in self.extensions:
+            if ext.one_per_link():
+                extension_data[ext._meta.module_name] = ext.to_dict()
+        return extension_data
+
+    def clone(self, save=False, extension_data=None, **kwargs):
+        # original data
+        data = dict(parent=self.parent, child=self.child,
+                quantity=self.quantity, order=self.order, unit=self.unit,
+                end_time=self.end_time)
+        # update data from kwargs
+        for key, value in kwargs.iteritems():
+            if key in data:
+                data[key] = value
+        link = ParentChildLink(**data)
+        if save:
+            link.save()
+        # clone the extensions
+        extensions = []
+        extension_data = extension_data or {}
+        for ext in self.extensions:
+            extensions.append(ext.clone(link, save, 
+                **extension_data.get(ext._meta.module_name, {})))
+        return link, extensions
+
+
+class ChildQuerySet(QuerySet):
+    def iterator(self):
+        for obj in super(ChildQuerySet, self).iterator():
+            yield obj.get_child_object()
+
+
+class ChildManager(models.Manager):
+    def get_query_set(self):
+        return ChildQuerySet(self.model)
+
+
+class ParentModel(models.Model):
+    _child_name = models.CharField(max_length=100, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self._child_name = self.get_child_name()
+        super(ParentModel, self).save(*args, **kwargs)
+
+    def get_child_name(self):
+        if type(self) is self.get_parent_model():
+            return self._child_name
+        return self.get_parent_link().related_query_name()
+
+    def get_child_object(self):
+        return getattr(self, self.get_child_name())
+
+    def get_parent_link(self):
+        return self._meta.parents[self.get_parent_model()]
+
+    def get_parent_model(self):
+        raise NotImplementedError
+
+    def get_parent_object(self):
+        return getattr(self, self.get_parent_link().name)
+
+registered_pcles = []
+class ParentChildLinkExtension(ParentModel):
+
+    link = models.ForeignKey(ParentChildLink, related_name="%(class)s_link")
+
+    objects = models.Manager()
+    children = ChildManager()
+
+    @classmethod
+    def get_visible_fields(cls):
+        return []
+
+    @classmethod
+    def get_editable_fields(cls):
+        return list(cls.get_visible_fields())
+
+    @classmethod
+    def one_per_link(cls):
+        """ Returns True if only one extension should be created per link.
+
+        By default return True if :meth:`get_visible_fields` returns a
+        non empty list."""
+        return bool(cls.get_visible_fields())
+    
+    @classmethod
+    def apply_to(cls, parent):
+        return True
+
+    def clone(self, link, save=False, **data):
+        raise NotImplementedError
+
+    def get_parent_model(self):
+        return ParentChildLinkExtension
+
+    def to_dict(self):
+        d = {}
+        for field in self._meta.get_all_field_names():
+            if field not in ("id", "link", "_child_name",
+                    'parentchildlinkextension_ptr'):
+                d[field] = getattr(self, field)
+        return d
+    
+def register_pcle(pcle):
+    registered_pcles.append(pcle)
+
+def get_pcles(parent):
+    return list([pcle for pcle in registered_pcles if pcle.apply_to(parent)])
+
+
 class DocumentPartLink(Link):
     """
     Link between a :class:`Part` and a :class:`Document`
@@ -1045,7 +1168,6 @@ class DocumentPartLink(Link):
 
     def __unicode__(self):
         return u"DocumentPartLink<%s, %s>" % (self.document, self.part)
-
 
 # abstraction stuff
 ROLE_NOTIFIED = "notified"
@@ -1180,7 +1302,7 @@ class Invitation(models.Model):
     token = models.CharField(max_length=155, primary_key=True,
             default=lambda:str(random.getrandbits(512)))
     
-    
+   
 # import_models should be the last function
 
 def import_models(force_reload=False):
