@@ -87,7 +87,7 @@ class PartController(PLMObjectController):
             pass
         return can_add
 
-    def add_child(self, child, quantity, order, unit=DEFAULT_UNIT):
+    def add_child(self, child, quantity, order, unit=DEFAULT_UNIT, **extension_data):
         """
         Adds *child* to *self*.
 
@@ -122,6 +122,12 @@ class PartController(PLMObjectController):
         link.order = order
         link.unit = unit
         link.save()
+        # handle plces
+        for pcle in models.get_pcles(self.object):
+            name = pcle._meta.module_name
+            if name in extension_data and pcle.one_per_link():
+                ext = pcle(link=link, **extension_data[name])
+                ext.save()
         # records creation in history
         self._save_histo(link.ACTION_NAME,
                          "parent : %s\nchild : %s" % (self.object, child))
@@ -148,7 +154,8 @@ class PartController(PLMObjectController):
         link.save()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
-    def modify_child(self, child, new_quantity, new_order, new_unit):
+    def modify_child(self, child, new_quantity, new_order, new_unit,
+            **extension_data):
         """
         Modifies information about *child*.
 
@@ -172,16 +179,17 @@ class PartController(PLMObjectController):
             raise ValueError("Quantity or order is negative")
         link = models.ParentChildLink.objects.get(parent=self.object,
                                                   child=child, end_time=None)
+        original_extension_data = link.get_extension_data()
+
         if (link.quantity == new_quantity and link.order == new_order and
-            link.unit == new_unit):
+            link.unit == new_unit and original_extension_data == extension_data):
             # do not make an update if it is useless
             return
         link.end_time = datetime.datetime.today()
         link.save()
         # make a new link
-        link2 = models.ParentChildLink(parent=self.object, child=child,
-                                       quantity=new_quantity, order=new_order,
-                                       unit=new_unit)
+        link2, extensions = link.clone(quantity=new_quantity, order=new_order,
+                       unit=new_unit, end_time=None, extension_data=extension_data)
         details = ""
         if link.quantity != new_quantity:
             details += "quantity changes from %f to %f\n" % (link.quantity, new_quantity)
@@ -189,8 +197,22 @@ class PartController(PLMObjectController):
             details += "order changes from %d to %d" % (link.order, new_order)
         if link.unit != new_unit:
             details += "unit changes from %s to %s" % (link.unit, new_unit)
+
+        # TODO: details of extension changes
+
         self._save_histo("Modify - %s" % link.ACTION_NAME, details)
         link2.save(force_insert=True)
+        # save cloned extensions
+        for ext in extensions:
+            ext.link = link2
+            ext.save(force_insert=True)
+        # add new extensions
+        for pcle in models.get_pcles(self.object):
+            name = pcle._meta.module_name
+            if (name in extension_data and name not in original_extension_data
+                and pcle.one_per_link()):
+                ext = pcle(link=link2, **extension_data[name])
+                ext.save()
 
     def get_children(self, max_level=1, current_level=1, date=None):
         """
@@ -260,14 +282,14 @@ class PartController(PLMObjectController):
                     quantity = form.cleaned_data["quantity"]
                     order = form.cleaned_data["order"]
                     unit = form.cleaned_data["unit"]
-                    self.modify_child(child, quantity, order, unit)
+                    self.modify_child(child, quantity, order, unit,
+                            **form.extensions)
 
     def revise(self, new_revision):
         # same as PLMObjectController + add children
         new_controller = super(PartController, self).revise(new_revision)
         for level, link in self.get_children(1):
-            new_controller.add_child(link.child, link.quantity, link.order,
-                    link.unit)
+            link.clone(save=True, parent=new_controller.object)
         return new_controller
 
     def attach_to_document(self, document):

@@ -23,11 +23,13 @@
 ################################################################################
 
 import re
+from collections import defaultdict
 
 from django import forms
 from django.conf import settings
 from django.forms.formsets import formset_factory, BaseFormSet
-from django.forms.models import modelform_factory, modelformset_factory
+from django.forms.models import modelform_factory, modelformset_factory, \
+        BaseModelFormSet
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -195,12 +197,22 @@ def integerfield_clean(value):
             raise ValidationError("Number or \"< Number\" or \"> Number\"")
     return None
 
+def group_types(types):
+    res = []
+    group = []
+    for type_, long_name in types:
+        if long_name[0] not in '=>':
+            group = []
+            res.append((long_name, group))
+        group.append((type_, long_name))
+    return res
+
 class TypeForm(forms.Form):
-    LIST = m.get_all_users_and_plmobjects_with_level()
+    LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
 
 class TypeFormWithoutUser(forms.Form):
-    LIST_WO_USER = m.get_all_plmobjects_with_level()
+    LIST_WO_USER = group_types(m.get_all_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST_WO_USER,
             label=_("Select a type"))
 
@@ -314,6 +326,27 @@ class AddChildForm(PLMObjectForm):
     order = forms.IntegerField()
     unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
 
+    def __init__(self, parent, *args, **kwargs):
+        super(AddChildForm, self).__init__(*args, **kwargs)
+        self._pcles = defaultdict(list)
+        for pcle in m.get_pcles(parent):
+            for field in pcle.get_editable_fields():
+                model_field = pcle._meta.get_field(field)
+                form_field = model_field.formfield()
+                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                self.fields[field_name] = form_field
+                self._pcles[pcle].append(field)
+        
+    def clean(self):
+        super(AddChildForm, self).clean()
+        self.extensions = {}
+        for pcle, fields in self._pcles.iteritems():
+            data = {}
+            for field in fields:
+                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                data[field] = self.cleaned_data[field_name]
+            self.extensions[pcle._meta.module_name] = data
+        return self.cleaned_data
 
 class DisplayChildrenForm(forms.Form):
     LEVELS = (("all", "All levels",),
@@ -330,12 +363,42 @@ class ModifyChildForm(forms.ModelForm):
                                    widget=forms.HiddenInput())
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'size':'4'}))
     order = forms.IntegerField(widget=forms.TextInput(attrs={'size':'2'}))
+
     class Meta:
         model = m.ParentChildLink
         fields = ["order", "quantity", "unit", "child", "parent",]
+    
+    def clean(self):
+        super(ModifyChildForm, self).clean()
+        self.extensions = {}
+        for pcle, fields in self.pcles.iteritems():
+            data = {}
+            for field in fields:
+                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                data[field] = self.cleaned_data[field_name]
+            self.extensions[pcle._meta.module_name] = data
+        return self.cleaned_data
+
+class BaseChildrenFormSet(BaseModelFormSet):
+    def add_fields(self, form, index):
+        super(BaseChildrenFormSet, self).add_fields(form, index)
+        form.pcles = defaultdict(list)
+        parent = form.instance.parent.get_leaf_object()
+        for pcle in m.get_pcles(parent):
+            try:
+                ext = pcle.objects.get(link=form.instance)
+            except pcle.DoesNotExist:
+                ext = None
+            for field in pcle.get_editable_fields():
+                initial = getattr(ext, field, None)
+                model_field = pcle._meta.get_field(field)
+                form_field = model_field.formfield(initial=initial)
+                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                form.fields[field_name] = form_field
+                form.pcles[pcle].append(field)
 
 ChildrenFormset = modelformset_factory(m.ParentChildLink,
-                                       form=ModifyChildForm, extra=0)
+       form=ModifyChildForm, extra=0, formset=BaseChildrenFormSet)
 def get_children_formset(controller, data=None):
     if data is None:
         queryset = m.ParentChildLink.objects.filter(parent=controller,

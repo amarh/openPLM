@@ -38,6 +38,7 @@ from openPLM.plmapp.tests.ajax import *
 from openPLM.plmapp.tests.api import *
 from openPLM.plmapp.tests.csvimport import *
 from openPLM.plmapp.tests.archive import *
+from openPLM.plmapp.tests.pcle import *
 
 import openPLM.plmapp.models
 from openPLM.plmapp.lifecycle import LifecycleList

@@ -15,6 +15,9 @@
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
             <th class="Content"> {{ obj.name }} </th>
+            {% for field in extra_columns %}
+                <th class="Content"> {{ field }} </th>
+            {% endfor %}
             <th class="Content"> {{ obj.state.name }} </th>
             <th class="Content"> {% trans "Delete ?" %} </th>
         </tr>
@@ -34,6 +37,9 @@
                 <td class="Content"> {{ form.instance.child.revision }} </td>
                 <td class="Content"> {{ form.instance.child.type }} </td>
                 <td class="Content"> {{ form.instance.child.name }} </td>
+                {% for field in extra_fields %}
+                    <td class="Content"> {{ form|key:field }} </td>
+                {% endfor %}
                 <td class="Content"> {{ form.instance.child.state.name }} </td>
                 <td class="Content"> {{ form.delete }} </td>
             </tr>

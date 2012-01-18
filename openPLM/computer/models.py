@@ -27,7 +27,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 
-from openPLM.plmapp.models import Part
+from openPLM.plmapp.models import Part, ParentChildLinkExtension, register_pcle
 from openPLM.plmapp.controllers import PartController
 
 def register(cls):
@@ -65,6 +65,28 @@ class MotherBoard(SinglePart):
         return attrs
 
 register(MotherBoard)
+
+class ReferenceDesignator(ParentChildLinkExtension):
+
+    reference_designator = models.CharField(max_length=200, blank=True)
+
+    @classmethod
+    def get_visible_fields(cls):
+        return ("reference_designator", )
+
+    @classmethod
+    def apply_to(cls, parent):
+        return isinstance(parent, MotherBoard)
+   
+    def clone(self, link, save, **data):
+        ref = data.get("reference_designator", self.reference_designator)
+        clone = ReferenceDesignator(link=link, reference_designator=ref)
+        if save:
+            clone.save()
+        return clone
+
+register(ReferenceDesignator)
+register_pcle(ReferenceDesignator)
 
 
 class RAM(SinglePart):
