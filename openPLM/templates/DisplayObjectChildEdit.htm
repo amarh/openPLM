@@ -15,8 +15,8 @@
             <th class="Content"> {{ obj.revision }} </th>
             <th class="Content"> {{ obj.type }} </th>
             <th class="Content"> {{ obj.name }} </th>
-            {% for field in extra_columns %}
-                <th class="Content"> {{ field }} </th>
+            {% for field, verbose_name in extra_columns %}
+                <th class="Content"> {{ verbose_name|capfirst }} </th>
             {% endfor %}
             <th class="Content"> {{ obj.state.name }} </th>
             <th class="Content"> {% trans "Delete ?" %} </th>

@@ -238,10 +238,11 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     for PCLE in models.get_PCLEs(obj.object):
         fields = PCLE.get_visible_fields()
         if fields:
-            extra_columns.extend(fields)
+            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                    for f in fields)
             for child in children:
                 link = child.link
-                for field in PCLE.get_visible_fields():
+                for field in fields:
                     try:
                         e = PCLE.objects.get(link=link)
                         extension_data[link][field] = getattr(e, field)
@@ -282,7 +283,8 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     for PCLE in models.get_PCLEs(obj.object):
         fields = PCLE.get_visible_fields()
         if fields:
-            extra_columns.extend(fields)
+            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                    for f in fields)
             prefix = PCLE._meta.module_name
             extra_fields.extend('%s_%s' % (prefix, f) for f in fields)
     ctx.update({'current_page':'BOM-child',
