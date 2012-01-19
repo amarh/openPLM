@@ -123,10 +123,10 @@ class PartController(PLMObjectController):
         link.unit = unit
         link.save()
         # handle plces
-        for pcle in models.get_pcles(self.object):
-            name = pcle._meta.module_name
-            if name in extension_data and pcle.one_per_link():
-                ext = pcle(link=link, **extension_data[name])
+        for PCLE in models.get_PCLEs(self.object):
+            name = PCLE._meta.module_name
+            if name in extension_data and PCLE.one_per_link():
+                ext = PCLE(link=link, **extension_data[name])
                 ext.save()
         # records creation in history
         self._save_histo(link.ACTION_NAME,
@@ -207,11 +207,11 @@ class PartController(PLMObjectController):
             ext.link = link2
             ext.save(force_insert=True)
         # add new extensions
-        for pcle in models.get_pcles(self.object):
-            name = pcle._meta.module_name
+        for PCLE in models.get_PCLEs(self.object):
+            name = PCLE._meta.module_name
             if (name in extension_data and name not in original_extension_data
-                and pcle.one_per_link()):
-                ext = pcle(link=link2, **extension_data[name])
+                and PCLE.one_per_link()):
+                ext = PCLE(link=link2, **extension_data[name])
                 ext.save()
 
     def get_children(self, max_level=1, current_level=1, date=None):
