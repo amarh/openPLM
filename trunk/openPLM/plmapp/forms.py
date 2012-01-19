@@ -363,6 +363,8 @@ class ModifyChildForm(forms.ModelForm):
                                    widget=forms.HiddenInput())
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'size':'4'}))
     order = forms.IntegerField(widget=forms.TextInput(attrs={'size':'2'}))
+    unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT,
+            widget=forms.Select(attrs={"class":"tiny"}))
 
     class Meta:
         model = m.ParentChildLink
@@ -394,6 +396,8 @@ class BaseChildrenFormSet(BaseModelFormSet):
                 model_field = PCLE._meta.get_field(field)
                 form_field = model_field.formfield(initial=initial)
                 field_name = "%s_%s" % (PCLE._meta.module_name, field)
+                if isinstance(form_field.widget, forms.TextInput):
+                    form_field.widget.attrs["size"] = 10
                 form.fields[field_name] = form_field
                 form.PCLEs[PCLE].append(field)
 
