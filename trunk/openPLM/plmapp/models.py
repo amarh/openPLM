@@ -997,12 +997,16 @@ class ParentChildLink(Link):
         .. attribute:: quantity
             
             amount of child (a positive float)
+        .. attribute:: unit
+            
+            unit of the quantity
         .. attribute:: order
             
             positive integer
         .. attribute:: end_time
             
             date of end of the link, None if the link is still alive
+
     """
 
     ACTION_NAME = "Link : parent-child"
@@ -1019,18 +1023,28 @@ class ParentChildLink(Link):
         unique_together = ("parent", "child", "end_time")
 
     def __unicode__(self):
-        return u"ParentChildLink<%s, %s, %f, %d>" % (self.parent, self.child,
-                                                     self.quantity, self.order)
+        return u"ParentChildLink<%s, %s, %f, %s, %d>" % (self.parent, self.child,
+                                 self.quantity, self.unit, self.order)
+
     def get_shortened_unit(self):
+        """ Returns unit as a human readable string.
+        If :attr:`unit` equals to "-", returns an empty string.
+        """
         if self.unit == "-":
             return u""
         return self.get_unit_display()
 
     @property
     def extensions(self):
+        """ Returns a queryset of bound :class:`ParentChildLinkExtension`. """
         return ParentChildLinkExtension.children.filter(link=self)
 
     def get_extension_data(self):
+        """
+        Returns a dictionary of extension data. The returned value can be passed
+        as a valid arguement to :meth:`clone`.
+        """
+
         extension_data = {}
         for ext in self.extensions:
             if ext.one_per_link():
@@ -1038,6 +1052,33 @@ class ParentChildLink(Link):
         return extension_data
 
     def clone(self, save=False, extension_data=None, **kwargs):
+        u"""
+        Clone this link.
+
+        It is possible to pass additional arguement to override some original
+        values.
+
+        :param save: If True, the cloned link and its extensions are saved
+        :param extension_data: dictionary PCLE module name -> data of data
+            that are given to :meth:`ParentChildLinkExtension.clone`.
+        
+        :return: a tuple (cloned link, list of cloned extensions)
+
+        Example::
+
+            >>> print link
+            ParentChildLink<Part<PART_2/MotherBoard/a>, Part<ttd/RAM/a>, 4.000000, -, 10>
+            >>> link.extensions
+            [<ReferenceDesignator: ReferenceDesignator<m1,m2,>>]
+            >>> clone, ext = link.clone(False,
+            ...    {"referencedesignator" : { "reference_designator" : "new_value"}},
+            ...    quantity=51)
+            >>> print clone
+            ParentChildLink<Part<PART_2/MotherBoard/a>, Part<ttd/RAM/a>, 51.000000, -, 10>
+            >>> print ext
+            [<ReferenceDesignator: ReferenceDesignator<new_value>>]
+            
+        """
         # original data
         data = dict(parent=self.parent, child=self.child,
                 quantity=self.quantity, order=self.order, unit=self.unit,
@@ -1098,7 +1139,19 @@ class ParentModel(models.Model):
 
 registered_PCLEs = []
 class ParentChildLinkExtension(ParentModel):
+    """
+    Extension of a :class:`ParentChildLink` used to store additional data.
 
+    This class is abstract, subclass must define the :meth:`clone` method,
+    add at least one field (or it would be useless) and may override
+    :meth:`get_visible_fields` or :meth:`get_editable_fields`.
+
+    .. seealso::
+    
+        :ref:`bom_extensions` explains how to subclass this class.
+    """
+
+    #! link bound to the PCLE
     link = models.ForeignKey(ParentChildLink, related_name="%(class)s_link")
 
     objects = models.Manager()
@@ -1106,10 +1159,20 @@ class ParentChildLinkExtension(ParentModel):
 
     @classmethod
     def get_visible_fields(cls):
+        """
+        Returns the list of visible fieldnames.
+        
+        By default, returns an empty list.
+        """
         return []
 
     @classmethod
     def get_editable_fields(cls):
+        """
+        Returns the list of editable fields.
+
+        By default, returns :meth:`get_visible_fields`.
+        """
         return list(cls.get_visible_fields())
 
     @classmethod
@@ -1122,15 +1185,44 @@ class ParentChildLinkExtension(ParentModel):
     
     @classmethod
     def apply_to(cls, parent):
+        """
+        Returns True if this extension applies to *parent*.
+
+        :param parent: part which will have a new child
+        :type parent: :class:`Part` (its most specific subclass).
+        
+        Returns True by default.
+        """
         return True
 
     def clone(self, link, save=False, **data):
+        """
+        Clone this extension.
+        
+        **Subclass must define its implementation.** and respect the
+        following specification:
+
+        :param link: the new cloned link, the cloned extension must be
+                     bound to it
+        :type link: :class:`ParentChildLink`
+        :param save: True if the cloned extension must be saved, False
+                     (the default) if it must not be saved.
+        :type save: boolean
+        :param data: additional data that override the original values
+        
+        :return: the cloned extension
+        """
         raise NotImplementedError
 
     def get_parent_model(self):
         return ParentChildLinkExtension
 
     def to_dict(self):
+        """
+        Returns a dictionary fieldnames -> value that can be safely passed as
+        a kwargument to :meth:`clone` and that is used to compare two
+        extensions. 
+        """
         d = {}
         for field in self._meta.get_all_field_names():
             if field not in ("id", "link", "_child_name",
@@ -1139,10 +1231,20 @@ class ParentChildLinkExtension(ParentModel):
         return d
     
 def register_PCLE(PCLE):
+    """
+    Register *PCLE* so that openPLM can show its visible fields.
+
+    :param PCLE: the registered PCLE
+    :type PCLE: a subclass of :class:`ParentChildLinkExtension`.
+    """
     registered_PCLEs.append(PCLE)
 
 def get_PCLEs(parent):
-    return list([PCLE for PCLE in registered_PCLEs if PCLE.apply_to(parent)])
+    """
+    Returns the list of registered :class:`ParentChildLinkExtension` that
+    applied to *parent*.
+    """
+    return [PCLE for PCLE in registered_PCLEs if PCLE.apply_to(parent)]
 
 
 class DocumentPartLink(Link):
