@@ -23,3 +23,4 @@ If you are a core developper, you may want to read:
     cookbook
     http-api
     modules
+    bom

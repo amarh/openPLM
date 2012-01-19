@@ -70,6 +70,9 @@ class ReferenceDesignator(ParentChildLinkExtension):
 
     reference_designator = models.CharField(max_length=200, blank=True)
 
+    def __unicode__(self):
+        return u"ReferenceDesignator<%s>" % self.reference_designator
+
     @classmethod
     def get_visible_fields(cls):
         return ("reference_designator", )
