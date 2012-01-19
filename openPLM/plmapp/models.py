@@ -1096,7 +1096,7 @@ class ParentModel(models.Model):
     def get_parent_object(self):
         return getattr(self, self.get_parent_link().name)
 
-registered_pcles = []
+registered_PCLEs = []
 class ParentChildLinkExtension(ParentModel):
 
     link = models.ForeignKey(ParentChildLink, related_name="%(class)s_link")
@@ -1138,11 +1138,11 @@ class ParentChildLinkExtension(ParentModel):
                 d[field] = getattr(self, field)
         return d
     
-def register_pcle(pcle):
-    registered_pcles.append(pcle)
+def register_PCLE(PCLE):
+    registered_PCLEs.append(PCLE)
 
-def get_pcles(parent):
-    return list([pcle for pcle in registered_pcles if pcle.apply_to(parent)])
+def get_PCLEs(parent):
+    return list([PCLE for PCLE in registered_PCLEs if PCLE.apply_to(parent)])
 
 
 class DocumentPartLink(Link):

@@ -328,24 +328,24 @@ class AddChildForm(PLMObjectForm):
 
     def __init__(self, parent, *args, **kwargs):
         super(AddChildForm, self).__init__(*args, **kwargs)
-        self._pcles = defaultdict(list)
-        for pcle in m.get_pcles(parent):
-            for field in pcle.get_editable_fields():
-                model_field = pcle._meta.get_field(field)
+        self._PCLEs = defaultdict(list)
+        for PCLE in m.get_PCLEs(parent):
+            for field in PCLE.get_editable_fields():
+                model_field = PCLE._meta.get_field(field)
                 form_field = model_field.formfield()
-                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                field_name = "%s_%s" % (PCLE._meta.module_name, field)
                 self.fields[field_name] = form_field
-                self._pcles[pcle].append(field)
+                self._PCLEs[PCLE].append(field)
         
     def clean(self):
         super(AddChildForm, self).clean()
         self.extensions = {}
-        for pcle, fields in self._pcles.iteritems():
+        for PCLE, fields in self._PCLEs.iteritems():
             data = {}
             for field in fields:
-                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                field_name = "%s_%s" % (PCLE._meta.module_name, field)
                 data[field] = self.cleaned_data[field_name]
-            self.extensions[pcle._meta.module_name] = data
+            self.extensions[PCLE._meta.module_name] = data
         return self.cleaned_data
 
 class DisplayChildrenForm(forms.Form):
@@ -371,31 +371,31 @@ class ModifyChildForm(forms.ModelForm):
     def clean(self):
         super(ModifyChildForm, self).clean()
         self.extensions = {}
-        for pcle, fields in self.pcles.iteritems():
+        for PCLE, fields in self.PCLEs.iteritems():
             data = {}
             for field in fields:
-                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                field_name = "%s_%s" % (PCLE._meta.module_name, field)
                 data[field] = self.cleaned_data[field_name]
-            self.extensions[pcle._meta.module_name] = data
+            self.extensions[PCLE._meta.module_name] = data
         return self.cleaned_data
 
 class BaseChildrenFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(BaseChildrenFormSet, self).add_fields(form, index)
-        form.pcles = defaultdict(list)
+        form.PCLEs = defaultdict(list)
         parent = form.instance.parent.get_leaf_object()
-        for pcle in m.get_pcles(parent):
+        for PCLE in m.get_PCLEs(parent):
             try:
-                ext = pcle.objects.get(link=form.instance)
-            except pcle.DoesNotExist:
+                ext = PCLE.objects.get(link=form.instance)
+            except PCLE.DoesNotExist:
                 ext = None
-            for field in pcle.get_editable_fields():
+            for field in PCLE.get_editable_fields():
                 initial = getattr(ext, field, None)
-                model_field = pcle._meta.get_field(field)
+                model_field = PCLE._meta.get_field(field)
                 form_field = model_field.formfield(initial=initial)
-                field_name = "%s_%s" % (pcle._meta.module_name, field)
+                field_name = "%s_%s" % (PCLE._meta.module_name, field)
                 form.fields[field_name] = form_field
-                form.pcles[pcle].append(field)
+                form.PCLEs[PCLE].append(field)
 
 ChildrenFormset = modelformset_factory(m.ParentChildLink,
        form=ModifyChildForm, extra=0, formset=BaseChildrenFormSet)

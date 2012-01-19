@@ -235,17 +235,17 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     children = list(children)
     extra_columns = []
     extension_data = defaultdict(dict)
-    for pcle in models.get_pcles(obj.object):
-        fields = pcle.get_visible_fields()
+    for PCLE in models.get_PCLEs(obj.object):
+        fields = PCLE.get_visible_fields()
         if fields:
             extra_columns.extend(fields)
             for child in children:
                 link = child.link
-                for field in pcle.get_visible_fields():
+                for field in PCLE.get_visible_fields():
                     try:
-                        e = pcle.objects.get(link=link)
+                        e = PCLE.objects.get(link=link)
                         extension_data[link][field] = getattr(e, field)
-                    except pcle.DoesNotExist:
+                    except PCLE.DoesNotExist:
                         extension_data[link][field] = ""
     ctx.update({'current_page':'BOM-child',
                 'children': children,
@@ -279,11 +279,11 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
         formset = get_children_formset(obj)
     extra_columns = []
     extra_fields = []
-    for pcle in models.get_pcles(obj.object):
-        fields = pcle.get_visible_fields()
+    for PCLE in models.get_PCLEs(obj.object):
+        fields = PCLE.get_visible_fields()
         if fields:
             extra_columns.extend(fields)
-            prefix = pcle._meta.module_name
+            prefix = PCLE._meta.module_name
             extra_fields.extend('%s_%s' % (prefix, f) for f in fields)
     ctx.update({'current_page':'BOM-child',
                 'extra_columns' : extra_columns,

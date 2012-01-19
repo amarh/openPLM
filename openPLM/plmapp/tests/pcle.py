@@ -80,9 +80,9 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
     CONTROLLER = PartController
    
     def setUp(self):
-        self.registered_pcles = list(models.registered_pcles)
-        models.register_pcle(MockExtension)
-        models.register_pcle(InvisibleMockExtension)
+        self.registered_PCLEs = list(models.registered_PCLEs)
+        models.register_PCLE(MockExtension)
+        models.register_PCLE(InvisibleMockExtension)
         super(ParentChildLinkExtensionTestCase, self).setUp()
         self.controller = self.CONTROLLER.create("aPart1", self.TYPE, "a",
                                                  self.user, self.DATA)
@@ -96,10 +96,10 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
                                                   self.user, self.DATA)
 
     def tearDown(self):
-        models.registered_pcles = self.registered_pcles
+        models.registered_PCLEs = self.registered_PCLEs
         super(ParentChildLinkExtensionTestCase, self).tearDown()
    
-    def test_clone_pcle(self):
+    def test_clone_PCLE(self):
         link = models.ParentChildLink.objects.create(parent=self.controller.object,
                 child=self.controller2.object, quantity=3, order=4, unit="m")
         self.assertFalse(bool(link.extensions))

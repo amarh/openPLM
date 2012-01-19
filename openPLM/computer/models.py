@@ -27,7 +27,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 
-from openPLM.plmapp.models import Part, ParentChildLinkExtension, register_pcle
+from openPLM.plmapp.models import Part, ParentChildLinkExtension, register_PCLE
 from openPLM.plmapp.controllers import PartController
 
 def register(cls):
@@ -86,7 +86,7 @@ class ReferenceDesignator(ParentChildLinkExtension):
         return clone
 
 register(ReferenceDesignator)
-register_pcle(ReferenceDesignator)
+register_PCLE(ReferenceDesignator)
 
 
 class RAM(SinglePart):
