@@ -76,6 +76,12 @@ def ajax_autocomplete(request, obj_type, field):
         cls = models.get_all_users_and_plmobjects()[obj_type]
     except KeyError:
         return HttpResponseForbidden()
+    if hasattr(cls, "attributes"):
+        if field not in cls(__fake__=True).attributes:
+            return HttpResponseForbidden()
+    elif cls == models.User:
+        if field not in ("email", "first_name", "last_name"):
+            return HttpResponseForbidden()
     if field not in cls._meta.get_all_field_names():
         return HttpResponseForbidden()
     results = cls.objects.filter(**{"%s__icontains" % field : term})
