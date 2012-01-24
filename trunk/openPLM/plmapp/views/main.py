@@ -630,6 +630,21 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 ###    Manage html pages for part / document creation and modification                 ###
 ##########################################################################################
 
+_creation_views = {}
+def register_creation_view(type_, view):
+    """
+    Register a creation view for *type_* (a subclass of :class:`.PLMObject`).
+    
+    Most of the applications does not need to call this function which is 
+    available for special cases which cannot be handled by :func:`create_object`.
+
+    .. note::
+        
+        You must ensure that the module that calls this function has been imported.
+        For example, you can import it in your :file:`urls.py` file.
+    """
+    _creation_views[type_] = view
+
 @handle_errors
 def create_object(request):
     """
@@ -647,12 +662,16 @@ def create_object(request):
         if type_form.is_valid():
             type_ = type_form.cleaned_data["type"]
             cls = models.get_all_plmobjects()[type_]
+            if cls in _creation_views:
+                return _creation_views[cls](request)
             creation_form = get_creation_form(request.user, cls)
     elif request.method == 'POST':
         type_form = TypeFormWithoutUser(request.POST)
         if type_form.is_valid():
             type_name = type_form.cleaned_data["type"]
             cls = models.get_all_plmobjects()[type_name]
+            if cls in _creation_views:
+                return _creation_views[cls](request)
             creation_form = get_creation_form(request.user, cls, request.POST)
             if creation_form.is_valid():
                 user = request.user
