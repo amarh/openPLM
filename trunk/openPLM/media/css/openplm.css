@@ -670,14 +670,18 @@ h2 div.toolbar > ul > li > button{
 
 #help-dialog ul,
 #help-dialog ol,
+#main_content ul,
+#main_content ol,
 {
     display: block;
 }
-#help-dialog ul li {
+#help-dialog ul li,
+#main_content ul li {
     display: list-item;
     list-style-type: square;
 }
-#help-dialog li {
+#help-dialog li,
+#main_content li {
     margin-left: 2em;
 }
 
