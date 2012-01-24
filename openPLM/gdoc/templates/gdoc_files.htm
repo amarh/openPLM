@@ -7,16 +7,24 @@
     <p>
     {% trans "You cannot add a file to a GoogleDocument."%} 
     </p>
-
-    <ul>
-        <li>
-        <a href="{{edit_uri}}">{% trans "Click here to edit the file in Google Document ." %}</a>
-        </li>
-        <li>
-        <a href="{{download_uri}}">{% trans "Click here to download the file from Google." %}</a>
-        </li>
+    {% if error %}
+        <p>
+        {% blocktrans %}
+            You cannot access to this Google Document. If you did not created
+            this document, you can ask its owner to grant you the permission
+            to read this file in Google Document.
+        {% endblocktrans%}
+        </p>
+    {% else %}
+        <ul>
+            <li>
+            <a href="{{edit_uri}}">{% trans "Click here to edit the file in Google Document ." %}</a>
+            </li>
+            <li>
+            <a href="{{download_uri}}">{% trans "Click here to download the file from Google." %}</a>
+            </li>
     </ul>
-
+    {% endif %}
 {% endblock %}
 
 
