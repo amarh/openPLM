@@ -11,4 +11,5 @@ This documentation explains how to administrate openPLM.
 
     how-tos
     settings
+    applications
 
