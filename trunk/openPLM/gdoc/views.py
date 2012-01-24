@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 
+import gdata.client
 from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
 
@@ -100,21 +101,26 @@ def display_files(request, client, obj_type, obj_ref, obj_revi):
     
     if not hasattr(obj, "files"):
         raise TypeError()
-
-    entry = client.get_resource_by_id(obj.resource_id)
-    edit_uri = ""
-    for link in entry.link:
-        if link.rel == 'alternate':
-            edit_uri = link.href
-            break
-    uri = client._get_download_uri(entry.content.src)
-    ctx.update({
-        'current_page' : 'files', 
-        'resource' : obj.resource_id.split(":", 1)[-1],
-        'download_uri' : uri,
-        'edit_uri' : edit_uri,
-        })
+    try:
+        entry = client.get_resource_by_id(obj.resource_id)
+        edit_uri = ""
+        for link in entry.link:
+            if link.rel == 'alternate':
+                edit_uri = link.href
+                break
+        uri = client._get_download_uri(entry.content.src)
+        ctx.update({
+            'resource' : obj.resource_id.split(":", 1)[-1],
+            'download_uri' : uri,
+            'edit_uri' : edit_uri,
+            'error' : False,
+            })
+    except gdata.client.RequestError:
+        ctx['error'] = True
+    
+    ctx['current_page'] = 'files'
     return pviews.r2r('gdoc_files.htm', ctx, request)
+
 
 @oauth2_required
 @handle_errors
