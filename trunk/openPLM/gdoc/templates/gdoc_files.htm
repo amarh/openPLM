@@ -1,0 +1,22 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block content %}
+    <p>
+    {% trans "You cannot add a file to a GoogleDocument."%} 
+    </p>
+
+    <ul>
+        <li>
+        <a href="https://docs.google.com/document/d/{{resource}}/edit">{% trans "Click here to edit the file in Google Document ." %}</a>
+        </li>
+        <li>
+        <a href="{{download_uri}}">{% trans "Click here to download the file from Google." %}</a>
+        </li>
+    </ul>
+
+{% endblock %}
+
+
