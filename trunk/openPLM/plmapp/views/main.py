@@ -699,7 +699,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
         modification_form = get_modification_form(cls, request.POST)
         if modification_form.is_valid():
             obj.update_from_form(modification_form)
-            return HttpResponseRedirect(obj.plmobject_url)
+            return HttpResponseRedirect(obj.plmobject_url + "attributes/")
     else:
         modification_form = get_modification_form(cls, instance=obj.object)
     
