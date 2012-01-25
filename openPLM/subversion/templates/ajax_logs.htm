@@ -1,0 +1,42 @@
+{% load i18n plmapp_tags %}
+{% load humanize %}
+
+<div id="logs">
+    {% if error %}
+        {% blocktrans %}
+            Sorry, openPLM cannot access to this repository.
+        {% endblocktrans %}
+    {% else %}
+        <p>
+        {% trans "Last changelogs:" %}
+        </p>
+        {% regroup logs by day as histories %}
+
+        {% for group in histories %}
+            <div class="timeline">
+                <h3>{{ group.grouper|naturalday|capfirst}}</h3>
+
+                <dl>
+                    {% for histo in group.list %}
+                        <dt class="changeset">
+                        <span class="time">
+                            {{histo.date|date:"G:i"}}
+                        </span>
+                        <span class="user">
+                            {{histo.author}}
+                        </span>
+                        <span class="revision">
+                            {{histo.revision.number}}
+                        </span>
+                        </dt>
+                        <dd>
+                        <div class="details">
+                            {{ histo.message|linebreaks }}
+                        </div>
+                        </dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
