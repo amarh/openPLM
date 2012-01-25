@@ -1,0 +1,31 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n plmapp_tags %}
+{% load humanize %}
+
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+    <!--
+        $(function (){
+                $.ajax({
+                url: "ajax/",
+                success: function(data){
+                    $("#logs").html(data);
+                    }
+                    });
+        });
+    -->
+    </script>
+
+{% endblock %}
+
+{% block content %}
+    <div id="logs">
+        {% trans "Loading..." %}
+    </div>
+{% endblock %}
+

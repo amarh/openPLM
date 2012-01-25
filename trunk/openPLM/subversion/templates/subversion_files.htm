@@ -1,0 +1,29 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block content %}
+    <p>
+    {% trans "You cannot add a file to a SubversionRepository."%} 
+    </p>
+    <div class="document">
+
+        <p>{% trans "To check-out this repository, run the following command:" %}</p>
+        <blockquote>
+            <ul class="simple">
+                <li><tt class="docutils literal">{{obj.checkout_cmd}}</tt></li>
+            </ul>
+        </blockquote>
+
+        <p>{% trans "To export this repository, run the following command:" %}</p>
+        <blockquote>
+            <ul class="simple">
+                <li><tt class="docutils literal">{{obj.export_cmd}}</tt></li>
+            </ul>
+        </blockquote>
+    </div>
+
+{% endblock %}
+
+
