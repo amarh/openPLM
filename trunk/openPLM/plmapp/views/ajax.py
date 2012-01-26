@@ -36,9 +36,9 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
-        json_view, get_navigate_data 
+        json_view, get_navigate_data, secure_required 
 
-
+@secure_required
 @login_required
 def ajax_search_form(request):
     """
@@ -56,6 +56,7 @@ def ajax_search_form(request):
     else:
         return HttpResponseForbidden()
 
+@secure_required
 @login_required
 @cache_page(60 * 60)
 def ajax_autocomplete(request, obj_type, field):
