@@ -252,10 +252,6 @@ add the following lines: ::
     
     WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
     Alias /media /var/django/openPLM/trunk/openPLM/media
-    <Directory /var/django/openPLM/trunk/openPLM/docs>
-        Order deny,allow
-        Allow from all
-    </Directory>
     <Directory /var/django/openPLM/trunk/openPLM/media>
         Order deny,allow
         Allow from all
@@ -271,7 +267,7 @@ First steps in openPLM
 
 Open your web browser and go to: ::
 
-    http://your_site_adress/admin/
+    http://your_site_address/admin/
     
 .. note:: Here your_site_adress is given as example but you have to use your own site adress
 
@@ -303,6 +299,49 @@ You are now ready for your first login: ::
     
 .. image:: images/openplm_connexion.png
 
+Requiring HTTPS connections
+==============================
+
+If your (apache) server support HTTPS, you can force HTTPS connections by setting the
+:const:`FORCE_HTTPS` and :const:`SESSION_COOKIE_SECURE` to ``True`` in the
+:file:`settings.py` file.
+
+Each HTTP connection will be redirected to an HTTPS connection.
+
+A possible apache configuration would be (the rewrite and ssl modules must
+be enabled)::
+
+    NameVirtualHost *:80
+    <VirtualHost *:80>
+
+        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+        <Location "/admin">
+            RewriteEngine On
+            RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+        </Location>
+        <Location "/media">
+            RewriteEngine On
+            RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+        </Location>
+
+    </VirtualHost>
+
+    NameVirtualHost *:443
+    <VirtualHost *:443>
+
+        SSLEngine on
+        SSLCertificateFile    /etc/ssl/mycert.crt
+        SSLCertificateKeyFile /etc/ssl/mykey.key
+        SSLVerifyClient none
+
+        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+        Alias /media /var/django/openPLM/trunk/openPLM/media
+        <Directory /var/django/openPLM/trunk/openPLM/media>
+            Order deny,allow
+            Allow from all
+        </Directory>
+
+    </VirtualHost>
 
 Configuring E-mails
 ===================
