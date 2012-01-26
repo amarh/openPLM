@@ -14,11 +14,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     Files page of a SubversionRepository. 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
-    if not hasattr(obj, "files"):
-        raise TypeError()
-
-    
     ctx['current_page'] = 'files'
     return pviews.r2r('subversion_files.htm', ctx, request)
 

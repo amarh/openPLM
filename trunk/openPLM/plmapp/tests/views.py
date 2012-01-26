@@ -70,9 +70,10 @@ class CommonViewTest(BaseTestCase):
             link=False, page=""):
         response = func(url, data or {}, follow=follow)
         self.assertEqual(response.status_code, status_code)
-        self.assertEqual(link, response.context["link_creation"])
-        if page:
-            self.assertEqual(page, response.context["current_page"])
+        if status_code == 200:
+            self.assertEqual(link, response.context["link_creation"])
+            if page:
+                self.assertEqual(page, response.context["current_page"])
         return response
 
     def attach_to_official_document(self):
