@@ -118,7 +118,7 @@ def get_initial_creation_data(cls, start=0):
     """
     if issubclass(cls, m.PLMObject):
         data = {
-                'reference' : get_new_reference(cls), 
+                'reference' : get_new_reference(cls, start), 
                 'revision' : 'a',
                 'lifecycle' : str(m.get_default_lifecycle().pk),
         }
