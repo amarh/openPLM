@@ -625,6 +625,10 @@ div.selector > *
     line-height: 1.3;
 }
 
+div.selector select *{
+    font-size: 1em;
+}
+
 ul#createbar li ,
 ul#importbar li {
     margin: 0.2em 0;
