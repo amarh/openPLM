@@ -43,6 +43,18 @@
     {% endif %}
     <ul class="Result">
         {% for result in results %}
+
+            {% if forloop.first %}
+                <h3>
+                    {% trans "Results" %}
+                    <span id="numresults">
+                        {% blocktrans with results|length as count and search_count as total %}
+                            (1 - {{count}} on {{total}})
+                        {% endblocktrans %}
+                    </span> 
+            </h3>
+            {% endif %}
+
             <li class="Result">
             <div class="reference">
                 {{result.rendered|safe}}

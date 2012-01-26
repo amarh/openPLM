@@ -324,16 +324,18 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
             # include documentfiles if we search for a document and
             # if the query does not retrieve all documents
             mods.append(models.DocumentFile)
-        qset = attributes_form.search(*mods)[:30]
-        if qset is None:
-            qset = []
+        qset = attributes_form.search(*mods)
         request_dict.session["search_query"] = search_query
+        search_count = request_dict.session["search_count"] = qset.count()
+        qset = qset[:30]
         request_dict.session["results"] = qset
     else:
         qset = request_dict.session.get("results", [])
         search_query = request_dict.session.get("search_query", "")
+        search_count = request_dict.session.get("search_count", 0)
     ctx.update({'results' : qset, 
                 'search_query' : search_query,
+                'search_count' : search_count,
                 'type_form' : type_form,
                 'type_form4creation' : type_form4creation,
                 'attributes_form' : attributes_form,

@@ -555,6 +555,13 @@ li.Result div.summary em {
     color: black;
     font-style: normal;
 }
+
+span#numresults {
+    color: #343434;
+    font-size: 1em;
+    font-weight: normal;
+}
+
 /** input **/
 input[type=text],
 input[type=file],
