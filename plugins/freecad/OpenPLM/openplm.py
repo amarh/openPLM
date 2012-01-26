@@ -8,7 +8,7 @@ import tempfile
 # poster makes it possible to send http request with files
 # sudo easy_install poster
 from poster.encode import multipart_encode
-from poster.streaminghttp import StreamingHTTPRedirectHandler, StreamingHTTPHandler
+import poster.streaminghttp as shttp
 
 import urllib2
 
@@ -48,9 +48,9 @@ class OpenPLMPluginInstance(object):
     CONF_FILE = os.path.join(PLUGIN_DIR, "conf.json")
 
     def __init__(self):
-        
-        self.opener = urllib2.build_opener(StreamingHTTPHandler(),
-                                           StreamingHTTPRedirectHandler(),
+        self.opener = urllib2.build_opener(shttp.StreamingHTTPHandler(),
+                                           shttp.StreamingHTTPRedirectHandler(),
+                                           shttp.StreamingHTTPSHandler(),
                                            urllib2.HTTPCookieProcessor())
         self.opener.addheaders = [('User-agent', 'openplm')]
         self.username = ""
