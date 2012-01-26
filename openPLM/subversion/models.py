@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_noop
 
+import pysvn
+
 import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
@@ -50,7 +52,6 @@ class SubversionRepository(Document):
 
 admin.site.register(SubversionRepository)
 
-import pysvn
 
 def parse_revision(rev_string):
     """Convert *rev_string* into a :class:`pysvn.Revision` object."""
