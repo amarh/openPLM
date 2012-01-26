@@ -117,7 +117,11 @@ class PLMObjectController(Controller):
                 sponsor = user
         except models.DelegationLink.DoesNotExist:
             sponsor = user
-        for i in range(obj.lifecycle.nb_states - 1):
+        # the user can promote to the next state
+        models.PLMObjectUserLink.objects.create(plmobject=obj, user=user,
+                                                 role=level_to_sign_str(0))
+        # from the next state, only the sponsor can promote this object
+        for i in range(1, obj.lifecycle.nb_states - 1):
             models.PLMObjectUserLink.objects.create(plmobject=obj, user=sponsor,
                                                     role=level_to_sign_str(i))
         return res
