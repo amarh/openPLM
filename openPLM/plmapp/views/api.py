@@ -31,6 +31,7 @@ This modules contains all stuff related to the api
 import functools
 
 import django.forms
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseForbidden
@@ -40,7 +41,8 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller, DocumentController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils import get_next_revision
-from openPLM.plmapp.base_views import json_view, get_obj_by_id, object_to_dict
+from openPLM.plmapp.base_views import json_view, get_obj_by_id, object_to_dict,\
+        secure_required
 
 #: Version of the API (value: ``'1.0'``)
 API_VERSION = "1.0"
@@ -63,6 +65,7 @@ def login_json(func):
     """
    
     json_func = json_view(func, API_VERSION)
+    @secure_required
     @api_login_required
     @csrf_exempt
     @functools.wraps(func)

@@ -90,6 +90,17 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
         controller_cls = get_controller(obj_type)
     return controller_cls(obj, user)
 
+# from http://www.redrobotstudios.com/blog/2009/02/18/securing-django-with-ssl/
+def secure_required(view_func):
+    """Decorator makes sure URL is accessed over https."""
+    def _wrapped_view_func(request, *args, **kwargs):
+        if not request.is_secure():
+            if getattr(settings, 'FORCE_HTTPS', False):
+                request_url = request.build_absolute_uri(request.get_full_path())
+                secure_url = request_url.replace('http://', 'https://')
+                return HttpResponseRedirect(secure_url)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view_func
 
 def json_view(func, API_VERSION=""):
     """
@@ -103,7 +114,7 @@ def json_view(func, API_VERSION=""):
     message describing the exception.
     """
     @functools.wraps(func)
-    def wrap(request, *a, **kw):
+    def wrapper(request, *a, **kw):
         try:
             response = dict(func(request, *a, **kw))
             if 'result' not in response:
@@ -130,7 +141,8 @@ def json_view(func, API_VERSION=""):
         response["api_version"] = API_VERSION
         json = simplejson.dumps(response)
         return HttpResponse(json, mimetype='application/json')
-    return wrap
+
+    return secure_required(wrapper)
 
 
 def get_obj_by_id(obj_id, user):
@@ -196,6 +208,7 @@ def handle_errors(func=None, undo=".."):
     """
     def decorator(f):
         @wraps(f)
+        @secure_required
         @login_required
         def wrapper(request, *args, **kwargs):
             if request.method == "POST" and request.POST.get("_undo"):
