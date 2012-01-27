@@ -303,16 +303,34 @@ def get_search_form(cls=m.PLMObject, data=None):
         return Form(empty_permitted=True)
 get_search_form.cache = {}    
 
-class SimpleSearchForm(forms.Form):
+
+from haystack.forms import SearchForm
+class SimpleSearchForm(SearchForm):
+   
+    LIST = group_types(m.get_all_users_and_plmobjects_with_level())
+    type = forms.TypedChoiceField(choices=LIST)
     q = forms.CharField(label=_("Query"), required=False)
 
-    def search(self, *models):
+    def __init__(self, *args, **kwargs):
+        super(SimpleSearchForm, self).__init__(*args, **kwargs)
+        self.fields.insert(0, 'type', self.fields.pop('type'))
+    
+    def search(self):
         from haystack.query import EmptySearchQuerySet
         from openPLM.plmapp.search import SmartSearchQuerySet
-
+        
         if self.is_valid():
+            cls = m.get_all_users_and_plmobjects()[self.cleaned_data["type"]]
+            d = {}
+            m._get_all_subclasses(cls, d)
+            mods = d.values()
             query = self.cleaned_data["q"].strip()
-            sqs = SmartSearchQuerySet().highlight().models(*models)
+            if issubclass(cls, m.Document) and query.strip() not in ("", "*"):
+            # include documentfiles if we search for a document and
+            # if the query does not retrieve all documents
+                mods.append(m.DocumentFile)
+
+            sqs = SmartSearchQuerySet().highlight().models(*mods)
             if not query or query == "*":
                 return sqs
             results = sqs.auto_query(query)

@@ -268,13 +268,13 @@ def init_ctx(init_type_, init_reference, init_revision):
 ###   Manage html code for Search and Results function and other global parameters     ###
 ##########################################################################################
 
-def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
+def get_generic_data(request, type_='-', reference='-', revision='-', search=True):
     """
     Get a request and return a controller, a context dictionnary with elements common to all pages
     (search form, search data, search results, ...) and another dictionnary to update the
     request.session dictionnary.
     
-    :param request_dict: :class:`django.http.QueryDict`
+    :param request: :class:`django.http.QueryDict`
     :param type_: :attr:`.PLMObject.type`
     :type type_: str
     :param reference: :attr:`.PLMObject.reference`
@@ -284,81 +284,68 @@ def get_generic_data(request_dict, type_='-', reference='-', revision='-'):
     :return: a :class:`PLMObjectController` or a :class:`UserController`
     :return: ctx
     :type ctx: dic
-    :return: request_dict.session
-    :type request_dict.session: dic
+    :return: request.session
+    :type request.session: dic
     """
     ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
     if type_ == reference == revision == '-':
-        selected_object = request_dict.user
+        obj = request.user
     else:
-        selected_object = get_obj(type_, reference, revision, request_dict.user)
-    qset = []
+        obj = get_obj(type_, reference, revision, request.user)
     # Builds, update and treat Search form
-    search_need = "results" not in request_dict.session
-    if request_dict.GET and "type" in request_dict.GET:
-        type_form = TypeForm(request_dict.GET)
-        type_form4creation = TypeFormWithoutUser(request_dict.GET)
-        if type_form.is_valid():
-            cls = models.get_all_users_and_plmobjects()[type_form.cleaned_data["type"]]
-        attributes_form = SimpleSearchForm(request_dict.GET)
-        request_dict.session.update(request_dict.GET.items())
-        search_need = True
-    elif request_dict.session and "type" in request_dict.session:
-        type_form = TypeForm(request_dict.session)
-        type_form4creation = TypeFormWithoutUser(request_dict.session)
-        cls = models.get_all_users_and_plmobjects()[request_dict.session["type"]]
-        attributes_form = SimpleSearchForm(request_dict.session)
+    search_needed = "results" not in request.session
+    if request.method == "GET" and "type" in request.GET:
+        type_form4creation = TypeFormWithoutUser(request.GET)
+        search_form = SimpleSearchForm(request.GET)
+        request.session["type"] = request.GET["type"]
+        request.session["q"] = request.GET.get("q", "")
+        search_needed = True
+    elif "type" in request.session:
+        type_form4creation = TypeFormWithoutUser(request.session)
+        search_form = SimpleSearchForm(request.session)
     else:
-        type_form = TypeForm()
         type_form4creation = TypeFormWithoutUser()
-        request_dict.session['type'] = 'Part'
-        attributes_form = SimpleSearchForm()
-    if attributes_form.is_valid() and search_need:
-        m = {}
-        models._get_all_subclasses(cls, m)
-        search_query = attributes_form.cleaned_data["q"]
-        mods = m.values()
-        if issubclass(cls, models.Document) \
-            and search_query.strip() not in ("", "*"):
-            # include documentfiles if we search for a document and
-            # if the query does not retrieve all documents
-            mods.append(models.DocumentFile)
-        qset = attributes_form.search(*mods)
-        request_dict.session["search_query"] = search_query
-        search_count = request_dict.session["search_count"] = qset.count()
+        request.session['type'] = 'Part'
+        search_form = SimpleSearchForm()
+
+    if search and search_needed and search_form.is_valid():
+        search_query = search_form.cleaned_data["q"]
+        qset = search_form.search()
+        request.session["search_query"] = search_query
+        search_count = request.session["search_count"] = qset.count()
         qset = qset[:30]
-        request_dict.session["results"] = qset
+        request.session["results"] = qset
     else:
-        qset = request_dict.session.get("results", [])
-        search_query = request_dict.session.get("search_query", "")
-        search_count = request_dict.session.get("search_count", 0)
+        qset = request.session.get("results", [])
+        search_query = request.session.get("search_query", "")
+        search_count = request.session.get("search_count", 0)
+
     ctx.update({'results' : qset, 
                 'search_query' : search_query,
                 'search_count' : search_count,
-                'type_form' : type_form,
                 'type_form4creation' : type_form4creation,
-                'attributes_form' : attributes_form,
+                'search_form' : search_form,
                 'link_creation' : False,
-                'attach' : (selected_object, False),
-                'obj' : selected_object,
+                'attach' : (obj, False),
+                'obj' : obj,
               })
-    if hasattr(selected_object, "menu_items"):
-        ctx['object_menu'] = selected_object.menu_items
-    if hasattr(selected_object, "check_permission"):
-        ctx["is_owner"] = selected_object.check_permission("owner", False)
-    if hasattr(selected_object, "check_readable"):
-        ctx["is_readable"] = selected_object.check_readable(False)
+    if hasattr(obj, "menu_items"):
+        ctx['object_menu'] = obj.menu_items
+    if hasattr(obj, "check_permission"):
+        ctx["is_owner"] = obj.check_permission("owner", False)
+    if hasattr(obj, "check_readable"):
+        ctx["is_readable"] = obj.check_readable(False)
     else:
         ctx["is_readable"] = True
 
     # little hack to avoid a KeyError
     # see https://github.com/toastdriven/django-haystack/issues/404
     from haystack import site
-    for r in request_dict.session.get("results", []):
+    for r in request.session.get("results", []):
         r.searchsite = site
 
-    return selected_object, ctx
+    return obj, ctx
 
 coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
 
