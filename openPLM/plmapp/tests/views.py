@@ -559,9 +559,8 @@ class SearchViewTestCase(CommonViewTest):
 
     def test_forms(self):
         response = self.get("/user/user/attributes/")
-        # check if searchforms are present
-        af = response.context["attributes_form"]
-        eaf = response.context["type_form"]
+        # check that searchform is present
+        af = response.context["search_form"]
     
     def test_session_forms(self):
         "Tests if form field are kept between two search"
@@ -570,7 +569,7 @@ class SearchViewTestCase(CommonViewTest):
         query = self.get_query(data)
         for x in range(4):
             response = self.get("/user/user/attributes/")
-            af = response.context["attributes_form"]
+            af = response.context["search_form"]
             self.assertEqual(af.data["q"], query)
 
     def test_empty(self):
