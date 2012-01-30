@@ -1,27 +1,40 @@
 /* Timeline */
 
 
+div.timeline h3 {
+    background-color: #807C7D;
+    color: white;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 0;
+    font-weight: 500;
+    font-size: 105%;
+}
+
 div.timeline dl {
     line-height: 1.3em;
-    margin-left: 1em;
+    margin-left: 0em;
+    font-weight: 500;
+    background-color: #e4e3e1;
 }
+
+div.timeline * {
+    color: #373434;
+}
+
 div.timeline dt {
     background: 3px 4px no-repeat;
-    background-color: #343434;
+    background-color: #e4e3e1;
     padding: 0.3em 0;
     padding-left: 0.5em;
     border-radius: 12px 0 0 0;
+    font-size: 90%;
+    font-weight: 600;
 }
-div.timeline dt :link, div.timeline dt :visited,
-div.timeline dt :link *:hover, div.timeline dt :visited *:hover {
-    /*background: 3px 3px no-repeat;*/
-    color: #000;
-}
+
 div.timeline dt :link:hover,
 div.timeline dt :link:hover *,
 div.timeline dt :visited:hover *, 
 div.timeline dt :visited:hover { 
-    color: #000;
     background-color: #ccc;
 }
 div.timeline dt em {
@@ -31,17 +44,24 @@ div.timeline dt em {
     text-decoration: none;
 }
 div.timeline dt .time { 
-    font-size: 80%; 
+    /*font-size: 80%; */
 }
 div.timeline dt .user {
 }
 div.timeline dt.highlight { background-color: #ffa; } 
 div.timeline dd { 
     font-size: 80%;
-    padding: 0 0 .75em 1.5em;
-    margin: 0 0 1.5em;
-    background-color: #343434;
+    padding: 0 0 .75em 1em;
     border-radius: 0 0 12px 0;
+    
+    display: list-item;
+    list-style-position: inside;
+    list-style-image: url("../img/puce.png");
+}
+
+div.timeline div.details,
+div.timeline div.details > p {
+    display: inline;
 }
 
 div.timeline ul:not(.management) {

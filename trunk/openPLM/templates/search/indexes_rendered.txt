@@ -1,19 +1,21 @@
 {% if object.username %}
-
-    <span class="full_name"> {{ object.get_full_name}} </span>
+    <span class="user_bullet">&nbsp;</span>
+    <span class="full_name"> {{ object.get_full_name}} </span> //
     <a href="/user/{{object.username}}"/><span>{{ object.username}}</span></a>
     <span class="email"> {{ object.email }} </span>
 
 {% else %}
 
     {% if object.type %}
-        <span class="type"> {{object.type}} </span>
-        <a href="{{object.plmobject_url}}"/><span class="reference">{{object.reference}}</span></a>
-        <span class="revision">{{object.revision}} </span>
+        <span class="{{object.is_part|yesno:"part,document"}}_bullet">&nbsp;</span>
+        <span class="type"> {{object.type}} </span> //
+        <a href="{{object.plmobject_url}}"/><span class="reference">{{object.reference}}</span></a> //
+        <span class="revision">{{object.revision}}</span>
         <span class="name">{{object.name}} </span>
 
     {% else %}
-        <a href="{{object.plmobject_url}}"/><span class="name">{{object.name}}</span></a>
+        <span class="group_bullet">&nbsp;</span>
+        <a href="{{object.plmobject_url}}"/><span class="groupname">{{object.name}}</span></a>
     {% endif %}
 {% endif %}
 

@@ -28,12 +28,15 @@ menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
 	padding: 0;
+    font-family: sans-serif;
 	border: 0;
 	/*font-size: 100%;*/
 	/*font: inherit;*/
 	vertical-align: baseline;
     color: #eee;
+    color: #575454;
 }
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
@@ -62,8 +65,7 @@ table {
 
 body 
 {
-    background: #343434;
-    font-family: Arial, sans-serif, Verdana;
+    background-color: #7f7c7d;
 }
 
 form {
@@ -86,18 +88,16 @@ h2
 {
     font-size: 1.5em;
     line-height: 1.3;
-    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737; 
+    /*background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737; */
 }
 
 h3 {
-    background: #f7f7f7;
-    border-bottom: 1px solid #d7d7d7;
-    border-radius: 0 1em;
-    border-top: 1px #343434;
+    background: #7f7c7c;
     font-size: 110%;
     margin: 0.5em 0 .5em;
-    padding-left: 1em;
-    color: #333;
+    padding: 0.5em 1em;
+    color: white;
+    font-weight:normal;
 }
 
 h3 + p,
@@ -110,9 +110,10 @@ h4 {
     border-left: 1px solid #636363;
     border-top: 1px solid #636363;
     border-radius: 1em 0 1em 0;
-    color: #d8d6d5;
+    color: #d8d6d5 !important;
     padding: 0.2em 1em;
     font-size: 105%;
+    font-weight: 500;
 }
 
 h4 + *,
@@ -154,16 +155,46 @@ div.main-box {
     position:relative;
     text-align:left;
     overflow:hidden;
+
+    background: rgb(52,52,52); /* Old browsers */
+
+    background: -moz-linear-gradient(left,  rgba(52,52,52,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(52,52,52,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+
+    background: -webkit-linear-gradient(left,  rgba(52,52,52,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+
+    background: -o-linear-gradient(left,  rgba(52,52,52,1) 0%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
+
+    background: -ms-linear-gradient(left,  rgba(52,52,52,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
+
+    background: linear-gradient(left,  rgba(52,52,52,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#343434', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+
+
+
 }
 div.top-box {
-    background:  url("/media/img/dark/logo_openplm.png") no-repeat left top,
-        url("/media/img/dark/banner.png") no-repeat right top;
-
+    background-color: #343434;
+    background: url("/media/img/dark/logo_openplm.png") no-repeat left top,
+        url("/media/img/dark/banner.png") no-repeat #343434 right top;
+    background-size: auto auto, auto 100%;
     height: 100px;
     min-width: 100%;
     padding-top: 1em;
 }
+
+div.top-box * {
+    color: #eee;
+}
+
 div#bottom-box {
+    background-color: #343434;
+    background:  url("/media/img/dark/footer.png") no-repeat #343434 right bottom;
+    height: 50px;
+    margin-top: -1em;
+
 }
 div.center-box {
     position:relative;
@@ -178,11 +209,14 @@ div.reset-box {
 } 
 
 div#content-box {
+    background-color: #7f7d7d;
     position:relative;
-    margin-top:60px;
-    width: 90%;
-    margin: auto;
+    /*width: 90%;*/
+    margin: 1em;
+    margin-top: 0;
     min-height: 500px;
+    box-shadow: 0 0px 8px #333;
+    border-radius: 0 5px 0 0;
 }
 div#left-col {
     float:left;
@@ -221,33 +255,17 @@ div#center-col {
 /* FOR ALL BOXES */
 div#CreationBox, div#SearchBox, div#ActiveBox, div#LoginBox
 {
-    border-radius: 1px;
-    border: solid 2px #636363;
+    /*border-radius: 1px;*/
+    /*border: solid 2px #636363;*/
     /*background-image: -moz-radial-gradient(90% 20% 45deg, ellipse farthest-corner, #e5e5e5 0%, #b5c5ff 100%);*/
-    background-color: #575454;
+    background-color: #C8C6C5;
     margin: 8px;
     padding: 5px;
     text-align: left;
 }
 
-/* BOX WE FIND IN THE LOGIN PAGE */
-div#LoginBox
-{
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 30px;
-    width: 45%;
-    position: relative;
-    left: 25%;
-    margin: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 25px;
-    text-align: center;
-}
 
 div#CreationBox > *, div#SearchBox > *,
-div#ReferenceArea h2,
 div#ActiveArea > *{
     padding: 5px;
 }
@@ -255,16 +273,15 @@ div#ActiveArea > *{
 /* BOX WHERE WE FIND DIFFERENT BUTTONS FOR PAGE DISPLAY (SHOW/HIDE BOXES & NAVIGATE/STUDY) */
 div#DisplayBox
 {
-    display: table-cell;
-    height: 30px;
-    max-width: 400px;
-    width: 40%;
+    width: 100%;
     margin-right: 0px;
     margin-bottom: 0px;
+    padding: 0.2em 0em;
     vertical-align: middle;
     /*line-height: 30px;*/
     font-size: 14px;
     text-align: center;
+    background-color: #c8c7c5;
 }
 
 /* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
@@ -277,11 +294,36 @@ div#CreationBox, div#SearchBox {
     padding: 0;
 }
 
+#CreationBox h2, #SearchBox h2 {
+    color: #eee;
+    font-size: 100%;
+    padding-left: 1em;
+    font-weight: 600;
+    font-variant:small-caps;
+
+    background-color:  #afacab;
+    background-position: left-center, left center, right center;
+    background-size: 2%, 33%, 65%;
+    background-repeat: no-repeat;
+
+    background-image:-moz-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -moz-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+    
+    background-image:-webkit-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -webkit-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+
+    background-image:-o-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -o-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+
+    background-image:-ms-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -ms-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+
+    background-image:linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+
+}
+
 div#ActiveBox
 {
     min-height: 420px;
-    margin-bottom: 110px;
+    margin-bottom: 2em;
     padding: 0px;
+    box-shadow: 1px 1px 15px #333333;
 }
 
 div#left-col h2,
@@ -297,17 +339,29 @@ div#SearchBox {
 /* BOX WHICH DISPLAY INFO ABOUT LOGGED-IN USER, LANGUAGE, TIME, ... */
 div#LoggedPersonBox
 {
-    text-align: left;
+    text-align: right;
     height: 30px;
+    font-size: 14px;
     margin-bottom: 0px;
     margin-left: 100px;
+background: -moz-linear-gradient(left,  rgba(55,52,52,0) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6+ */
+
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(55,52,52,0)), color-stop(100%,rgba(0,0,0,0.8))); /* Chrome,Safari4+ */
+
+background: -webkit-linear-gradient(left,  rgba(55,52,52,0) 0%,rgba(0,0,0,0.8) 100%); /* Chrome10+,Safari5.1+ */
+
+background: -o-linear-gradient(left,  rgba(55,52,52,0) 0%,rgba(0,0,0,0.8) 100%); /* Opera 11.10+ */
+
+background: -ms-linear-gradient(left,  rgba(55,52,52,0) 0%,rgba(0,0,0,0.8) 100%); /* IE10+ */
+
+background: linear-gradient(left,  rgba(55,52,52,0) 0%,rgba(0,0,0,0.8) 100%); /* W3C */
+
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00373434', endColorstr='#cc000000',GradientType=1 ); /* IE6-9 */
+
+
 }
 
 
-
-/* *************************************************************************************** */
-/*                          STYLE FOR BUTTONS IN DISPLAYBOX                                */
-/* *************************************************************************************** */
 
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
 li#NavigateButton
@@ -319,78 +373,107 @@ li#NavigateButton
 #SetLangForm
 {
     display: inline;
-    float: right;
     padding-right: 1em;
 }
 
 #SetLangForm div.selector {
     max-width: 8em;
+    margin-left: 5em;
 }
 
-/* *************************************************************************************** */
-/*                              STYLE INSIDE THE ACTIVEBOX                                 */
-/* *************************************************************************************** */
+#SetLangForm * {
+    line-height: 1em;
+    font-size: 1em;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+#SetLangForm .Button {
+    margin: 0;
+    padding: 3px;
+}
+
 /* AREA WHERE TYPE-REFERENCE-REVISION IS DISPLAYED */
 div#ReferenceArea
 {
     text-align: left;
     font-weight: lighter;
+    background-color: #fefefe;
+    padding-bottom: 0.5em;
+    min-height: 60px;
+}
+
+#ReferenceArea h2 {
+    padding-bottom: 0.3em;
+    padding-left: 100px;
+    padding-top: 0.5em;
+    border-bottom: solid 1px #b2b0b0;
 }
 
 /* ACTIVE AREA */
 div#ActiveArea
 {
     text-align: left;
+    background-color: #b0acab;
     float:none;
 }
 
 #main_content {
     padding-left: 1em !important;
     min-height: 500px;
+    border: 2px solid white;
+    background-color: #c8c6c5;
+    margin: 0em 0.5em 0.5em 0.5em;
 }
 
-/* FOR THE MENU OF THE CURRENT OBJECT */
+/* menu stuff*/
 div#menu {
-    background: url("/media/img/dark/banner.png") no-repeat scroll left top white; 
-    padding: 0.5em 0 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    margin-left: -2px;
+    padding: 0;
 }
 
 ul#MenuList
 {
-    /*display: block;*/
+    display: block;
     text-indent: 10px;
     text-align: left;
     font-size: 90%;
     margin-top: 5px;
-    background-color : rgba(238, 238, 238, 0.5);
-    border-radius: 4px 4px 0 0;   
-    margin-left: 1em;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+    /*background-color : rgba(238, 238, 238, 0.5);*/
+    margin-left: 0em;
+    /*border-bottom-style: solid;*/
+    /*border-bottom-width: 1px;*/
 }
 
 ul#MenuList li
 {
-    display: inline;
+    display: inline-block;
     text-align: center;
     padding: 5px;
     white-space:nowrap;
+    background: url("../img/dark/menu_bg.png") no-repeat center center;
+    background-size: 100% 100%;
     padding-top: 10px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-color: transparent;
+    border-style: solid;
 }
 
-ul#MenuList li.CurrentPage,
-ul#MenuList li:hover:not(.fake)
+ul#MenuList li.CurrentPage
 {
-    border-top-style: solid;
-    border-right-style: solid;
-    border-left-style: solid;
-    border-color: #7f7c7c;
-    border-bottom-style: none;
-    border-width: 1px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% rgba(238, 238, 238, 0.5);
-    border-radius: 4px 4px 0 0;
+    background: url("../img/dark/menu_active_bg.png") no-repeat center center;
+    background-size: 100% 100%;
+    border-color: white;
+    border-left-width: 2px;
+    border-right-width: 2px;
+}
+ul#MenuList li:hover
+{
+    background: url("../img/dark/menu_hover_bg.png") no-repeat center center;
+    background-size: 100% 100%;
 }
 
 li#fake_menu_item_right {
@@ -402,11 +485,14 @@ ul#MenuList li a
     text-decoration: none;
     padding: 4px 0px;
     display: inline-block;
-}
-ul#MenuList li:not(.CurrentPage):not(:hover) a {
-    color: #000000;
+    color: #eee;
+    text-shadow: 1px 1px rgba(50, 50, 50, 0.7) 
 }
 
+ul#MenuList li.CurrentPage a {
+    color: #343434;
+    text-shadow: 1px 1px rgba(250, 250, 250, 0.7) 
+}
 
 /* *************************************************************************************** */
 /*                   STYLE FOR THE TABLES USED IN THE SEARCHBOX & ACTIVEBOX                */
@@ -417,36 +503,42 @@ table.Content
     margin-top: 10px;
     border-spacing: 2px;
     border-collapse: separate;
+    font-size: 14px;
 }
 
 table.Content th,
 table.Content td
 {
     padding: 3px;
-    border-top: 2px solid #7f7c7c;
-    border-bottom: solid 2px #7f7c7c;
+    /*border-top: 2px solid #7f7c7c;*/
+    /*border-bottom: solid 2px #7f7c7c;*/
 }
 
 table.Content th
 {
     text-align: right;
-    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
     padding-right: 10px;
+    font-weight: medium;
+    color: #eee;
+    background-color: #585455;
+}
+
+table.Content th * {
+    font-weight: 600
+    color: #eee;
 }
 
 table.Content td
 {
     text-align: left;
-    background-color: #CFCCCB;
+    background-color: #e4e3e1;
 }
 
 table.Content td,
 table.Content td a,
 table.Content td p,
 table.Content td li {
-/*    color: #343434; */
-    color: #000000;
-    font-weight: 500;
+    color: black;
 }
 
 
@@ -456,19 +548,23 @@ table.Content td.description
 }
 table.Content td.description,
 table.Content td.description *{
-/*    color: #afacab; */
     color: #ffffff;
-    font-weight: 600;
+    font-weight: bold;
+    width: 15em;
 }
 
 /* comments */
 
 div.comment {
-    background-color: #343434;
+    background-color: #e4e3e1;
     margin: 1em;
     padding-left:0.5em;
     border-left: 2px #888 solid;
     border-radius: 0 1em;
+}
+
+div.comment * {
+    color: black;
 }
 
 div.comment_text {
@@ -522,9 +618,20 @@ td.open span.expander:hover {
 /** simple search **/
 ul.Result {
     display: block;
+    background-color: #e4e3e2;
+    margin: 0.5em;
+    overflow-y: auto;
+    max-height: 30em;
 }
+
+ul.Result p {
+    padding: 0.3em;
+}
+
 li.Result {
-    padding-bottom: 0.5em;
+    background-color: #fff;
+    padding: 0.5em;
+    margin-bottom: 0.4em;
     display:block;
 }
 
@@ -536,12 +643,15 @@ li.Result:hover *{
     color: black !important;
 }
 li.Result div.summary {
-    padding-left: 1em;
+    padding-left: 1.5em;
     clear: both;
+    font-size: 90%;
+    padding-top: 0.3em;
 }
 
 li.Result div.toolbar{
     display:inline;
+    position:static;
     float: right;
     margin: 2px;
 }
@@ -589,14 +699,17 @@ a.Button, input.Button
 
 input.Button{
     margin: 0;
+    color: #343434;
 }
 
 .ui-button {
     border: 1px solid #7f7c7c !important;
+    text-shadow: 1px 1px rgba(200, 200, 200, 0.7);
 }
 
 span.ui-button-text {
     padding:0.4em 0.4em;
+    color: #343434 !important;
 }
 
 a.Button {
@@ -610,13 +723,6 @@ a.Button > span {
     font-size: 1.1em;
     line-height: 1.3 !important;
 }
-
-li.ui-button:hover,
-a.ui-button:hover,
-input.ui-button:hover {
-    background: url("/media/css/openplm/images/hover.png") repeat-x scroll 50% 50% #DADADA;
-}
-
 
 div.selector {
 
@@ -668,6 +774,7 @@ h2 div.toolbar > ul > li > *{
 }
 h2 div.toolbar > ul > li > button{
     height: 1.1em;
+    background: none;
 }
 
 /* Help dialog */
@@ -682,7 +789,7 @@ h2 div.toolbar > ul > li > button{
 #help-dialog ul,
 #help-dialog ol,
 #main_content ul,
-#main_content ol,
+#main_content ol
 {
     display: block;
 }
@@ -698,7 +805,6 @@ h2 div.toolbar > ul > li > button{
 
 #help-dialog .section *:not(h3) {
     font-size: 14px;
-    background-color: #343434;
 }
 
 tt.docutils.literal {
@@ -742,4 +848,103 @@ ul.errorlist li {
 
 div.selector.tiny {
     max-width: 6em;
+}
+
+
+/* type, reference, revision, name */
+span.name {
+    font-style: italic;
+    font-weight: normal;
+}
+
+span.revision {
+    background: #7f7c7c;
+    color: #fff;
+    padding: 0 0.2em;
+}
+
+span.document_bullet:after,
+span.user_bullet:after,
+span.group_bullet:after,
+span.part_bullet:after {
+    content: '■';
+}
+span.document_bullet {
+    color: rgb(49, 39, 131);
+}
+span.part_bullet {
+    color: rgb(0, 159, 227);
+}
+span.user_bullet, span.group_bullet {
+    color: rgb(230, 0, 126);
+}
+
+li.Result span.name,
+li.Result span.username {
+    display: block;
+    margin-left: 1em;
+}
+
+#ReferenceArea div.icon {
+    width: 60px;
+    height: 60px;
+    float: left;
+}
+
+div.document_icon {
+    background-image: url("../img/icon_doc.png");
+}
+
+div.part_icon {
+    background-image: url("../img/icon_part.png");
+}
+div.user_icon {
+    background-image: url("../img/icon_user.png");
+}
+
+
+/** footer */
+div#links {
+    background-color: rgba(50, 50, 50, 0.8);
+    bottom: 0px;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    height: 33px;
+}
+#links * {
+    color: #eee;
+    font-size: small;
+    display: inline;
+}
+
+a#linobject {
+    position: absolute;
+    right: 0;
+    background: url("../img/linobject.png");
+    text-indent: -10000px;
+    width: 195px;
+    height: 33px;
+}
+
+
+
+li.ui-button:hover,
+a.ui-button:hover,
+input.ui-button:hover,
+.ui-state-hover {
+    background: url("/media/css/openplm/images/bg_hover.png") no-repeat scroll 50% 50% , url("/media/css/openplm/images/hover.png") repeat-x scroll left center;
+    background-size: auto 100%, auto;
+
+}
+
+.center {
+    text-align: center;
+    width: 100%;
+}
+
+
+.ui-dialog-title,
+.ui-datepicker-title span {
+    color: white;
 }

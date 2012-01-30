@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
+
         <link type="text/css" href="/media/css/openplm/jquery-ui.css" rel="Stylesheet" /> 
         <link rel="stylesheet" href="/media/css/uniform/uniform.openplm.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
@@ -38,6 +39,11 @@
                 <div id="LoggedPersonBox">
                     {% block LoggedPersonBlock %}{% endblock %}
                 </div>
+            </div>
+
+
+
+            <div id="content-box" class="clearfix">
                 <div id="DisplayBox">
                     <ul>
 
@@ -62,31 +68,28 @@
                         <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
                         {% endif %}
                         <a href="{{obj.plmobject_url}}navigate/">
-                                <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
-                            </a>
-                            </li>
-                            {% if navigate_bool %}
-                            <li class="{{"Button"|button:"corner-right"}}" id="StudyButtonOff">
-                            {% else %}
-                            <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButtonOn">
-                            {% endif %}
-                            <a href="{{obj.plmobject_url}}attributes/">
-                                <span class="ui-button-text">{% trans "STUDY" %}</span>
-                            </a>
-                            </li>
-                            {% endif %}
-                            <li class="{{"Button"|button}}" id="QuitButton">
-                            <a href="/logout/">
-                                <span class="ui-button-text">{% trans "EXIT" %}</span>
-                            </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                        </a>
+                        </li>
+                        {% if navigate_bool %}
+                        <li class="{{"Button"|button:"corner-right"}}" id="StudyButtonOff">
+                        {% else %}
+                        <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButtonOn">
+                        {% endif %}
+                        <a href="{{obj.plmobject_url}}attributes/">
+                            <span class="ui-button-text">{% trans "STUDY" %}</span>
+                        </a>
+                        </li>
+                        {% endif %}
+                        <li class="{{"Button"|button}}" id="QuitButton">
+                        <a href="/logout/">
+                            <span class="ui-button-text">{% trans "EXIT" %}</span>
+                        </a>
+                        </li>
+                    </ul>
                 </div>
 
-
-
-                <div id="content-box" class="clearfix">
+                <div class="clearfix">
 
                     <div id="left-col">
 
@@ -130,11 +133,18 @@
                     </div>
 
                 </div>
-
-                <div id="bottom-box">
-
-                </div>
-
             </div>
-        </body>
-    </html>
+
+            <div id="bottom-box">
+                <div id="links">
+                    <div class="legal">
+                        2010-2012 openPLM &#0153;
+                        - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
+                    </div>
+                    <a id="linobject" href="http://www.linobject.com">Powered by LinObject</a>
+                </div>                    
+            </div>
+
+        </div>
+    </body>
+</html>
