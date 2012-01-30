@@ -152,6 +152,7 @@ div#FilterNav
     opacity:0.8;
     filter:alpha(opacity=80);
     -moz-border-radius: 5px;
+    color: #eee;
 }
 
 div#FilterNav label {

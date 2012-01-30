@@ -61,7 +61,10 @@ from django.template import RequestContext
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
+from django.utils.decorators import method_decorator
 from django.forms import HiddenInput
+
+from haystack.views import SearchView
 
 from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
@@ -1178,4 +1181,16 @@ def import_csv_apply(request, target, filename, encoding):
 def import_csv_done(request):
     obj, ctx = get_generic_data(request)
     return r2r("import/done.htm", ctx, request)
+
+class OpenPLMSearchView(SearchView):
+
+    def extra_context(self):
+        extra = super(OpenPLMSearchView, self).extra_context()
+        obj, ctx = get_generic_data(self.request, search=False)
+        extra.update(ctx)
+        return extra
+
+    @method_decorator(handle_errors)
+    def __call__(self, request):
+        return super(OpenPLMSearchView, self).__call__(request)
 

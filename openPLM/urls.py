@@ -33,7 +33,7 @@ for app in settings.INSTALLED_APPS:
 
 import openPLM.plmapp.search_indexes
 
-from django.conf.urls.defaults import include, patterns
+from django.conf.urls.defaults import include, patterns, url
 from openPLM.plmapp.views import *
 import openPLM.plmapp.views.api as api
 from django.contrib.auth.views import login, logout
@@ -194,5 +194,16 @@ urlpatterns += patterns2('', api_url,
     (r'is_?locked/(?P<df_id>\d+)/$', api.is_locked),
     (r'checkin/(?P<df_id>\d+)/$', api.check_in),
     (r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
+)
+
+from haystack.views import search_view_factory
+from openPLM.plmapp.forms import SimpleSearchForm
+
+urlpatterns += patterns('haystack.views',
+    url(r'^search/', search_view_factory(
+        view_class=OpenPLMSearchView,
+        template="search/search.htm",
+        form_class=SimpleSearchForm
+    ), name='haystack_search'),
 )
 
