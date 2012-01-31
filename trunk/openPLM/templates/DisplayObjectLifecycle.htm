@@ -1,6 +1,13 @@
 {% extends "MiddleDisplayObject.htm" %}
 {% load i18n plmapp_tags %}
 
+
+{% block css %}
+
+    <link rel="stylesheet" href="/media/css/lifecycle.css" type="text/css" charset="utf-8" />
+{% endblock css %}
+
+
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
@@ -29,22 +36,40 @@
             <p>{% trans "You do not have the permission to promote this object." %}</p>
         {% endif %}
     </form>
-    <table class="Content">
-        <tr class="Content">
-            {% for status, is_current_state in object_lifecycle %}
-                <td class="Content status Button ui-state-default ui-button-text-only 
+    <div class="lifecycle">
+        {% for status, is_current_state, signer in object_lifecycle %}
+            <div class="state_wrapper">
+                <div class="state
+                    {% if forloop.first %}
+                        draft
+                    {% endif %}
+                    {% if status == obj.lifecycle.official_state.name %}
+                        official 
+                    {% endif %}
+                    {% if forloop.last %}
+                        deprecated
+                    {% endif %}
                     {% if is_current_state %}
-                        ui-state-active active
-                    {% else %}
-                        ui-state-inactive
+                        active
                     {% endif %}
                     ">
-                    {{status|upper}}</td>
+                    <span class="state">{{status}}</span>
+                </div>
                 {% if not forloop.last %}
-                    <td class="Content arrow">===&gt;</td>
+                    <div class="management">
+                        <span class="signer">{{signer}}</span>
+                    </div>
                 {% endif %}
-            {% endfor %}
-        </tr>
-    </table>
+            </div>
+            {% if not forloop.last %}
+                <div class="arrow
+                    {% if is_current_state %}
+                        active
+                    {% endif %}
+                    ">&gt;</div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
 {% endblock %}
 

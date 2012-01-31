@@ -1,0 +1,77 @@
+
+
+div.lifecycle {
+    background-color: #E4E3E2;
+    display: block;
+    margin: 1em;
+}
+
+div.lifecycle > div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div.state_wrapper {
+    max-width: 120px;
+    text-align: center;
+}
+
+
+div.lifecycle div.state {
+    width: 118px;
+    line-height: 119px;
+    background: url("../img/lifecycle/proposition_off.png") no-repeat;
+    text-align: center;
+}
+div.lifecycle div.state span.state {
+    font-variant: small-caps;
+    text-transform: capitalize;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+div.lifecycle div.draft { 
+    background: url("../img/lifecycle/draft_off.png") no-repeat;
+}
+
+div.lifecycle div.draft.active { 
+    background: url("../img/lifecycle/draft_on.png") no-repeat;
+}
+
+
+div.lifecycle div.official { 
+    background: url("../img/lifecycle/official_off.png") no-repeat;
+}
+
+div.lifecycle div.official.active { 
+    background: url("../img/lifecycle/official_on.png") no-repeat;
+}
+
+div.lifecycle div.deprecated {
+    background: url("../img/lifecycle/deprecated_off.png") no-repeat;
+}
+
+div.lifecycle div.deprecated span.state {
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+div.lifecycle div.deprecated.active {
+    background: url("../img/lifecycle/deprecated_on.png") no-repeat;
+}
+
+
+div.lifecycle div.arrow {
+    line-height: 119px;
+    width: 38px;
+    background: url("../img/lifecycle/arrow_off.png") no-repeat center center;
+    text-indent: -100000px;
+}
+
+div.lifecycle div.arrow.active {
+    background: url("../img/lifecycle/arrow_on.png") no-repeat center center;
+
