@@ -141,13 +141,17 @@ class ViewTest(CommonViewTest):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True), ("official", False), ("deprecated", False))
+        wanted = (("draft", True, u'user'),
+                  ("official", False, u'user'),
+                  ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
         # promote
         response = self.post(self.base_url + "lifecycle/", 
                             {"action" : "PROMOTE"})
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", False), ("official", True), ("deprecated", False))
+        wanted = (("draft", False, u'user'),
+                  ("official", True, u'user'),
+                  ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
         # demote
         lcl = LifecycleList("diop", "official", "draft", 
@@ -161,8 +165,10 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "lifecycle/", 
                                     {"action" : "DEMOTE"})
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True), ("issue1", False), ("official", False),
-                ("deprecated", False))
+        wanted = (("draft", True, u'user'),
+                  ("issue1", False, u'user'),
+                  ("official", False, None),
+                  ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
 
     def test_revisions(self):
