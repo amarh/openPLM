@@ -154,8 +154,10 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     
     state = obj.state.name
     object_lifecycle = []
-    for st in obj.lifecycle:
-        object_lifecycle.append((st, st == state))
+    roles = dict(obj.plmobjectuserlink_plmobject.values_list("role", "user__username"))
+    for i, st in enumerate(obj.lifecycle):
+        signer = roles.get(level_to_sign_str(i))
+        object_lifecycle.append((st, st == state, signer))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
     ctx.update({'current_page':'lifecycle', 
