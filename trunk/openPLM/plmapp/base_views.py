@@ -295,19 +295,20 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         obj = get_obj(type_, reference, revision, request.user)
     # Builds, update and treat Search form
     search_needed = "results" not in request.session
+    search_id = "search_id_%s" 
     if request.method == "GET" and "type" in request.GET:
         type_form4creation = TypeFormWithoutUser(request.GET)
-        search_form = SimpleSearchForm(request.GET)
+        search_form = SimpleSearchForm(request.GET, auto_id=search_id)
         request.session["type"] = request.GET["type"]
         request.session["q"] = request.GET.get("q", "")
         search_needed = True
     elif "type" in request.session:
         type_form4creation = TypeFormWithoutUser(request.session)
-        search_form = SimpleSearchForm(request.session)
+        search_form = SimpleSearchForm(request.session, auto_id=search_id)
     else:
         type_form4creation = TypeFormWithoutUser()
         request.session['type'] = 'Part'
-        search_form = SimpleSearchForm()
+        search_form = SimpleSearchForm(auto_id=search_id)
 
     if search and search_needed and search_form.is_valid():
         search_query = search_form.cleaned_data["q"]

@@ -185,7 +185,8 @@ div.top-box {
     padding-top: 1em;
 }
 
-div.top-box * {
+div#LoggedPersonBox > a,
+div#LoggedPersonBox {
     color: #eee;
 }
 
@@ -518,13 +519,13 @@ table.Content th
 {
     text-align: right;
     padding-right: 10px;
-    font-weight: medium;
+    font-weight: 500;
     color: #eee;
     background-color: #585455;
 }
 
 table.Content th * {
-    font-weight: 600
+    font-weight: 600;
     color: #eee;
 }
 
@@ -725,9 +726,6 @@ a.Button > span {
 }
 
 div.selector {
-
-    background:url("/media/img/dark/drop.png") no-repeat right center, 
-        url("/media/css/openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #373737;
     padding-left: 0px;
 }
 
@@ -948,3 +946,8 @@ input.ui-button:hover,
 .ui-datepicker-title span {
     color: white;
 }
+
+span#select_type {
+    display: block;
+}
+
