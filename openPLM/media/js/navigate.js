@@ -53,8 +53,10 @@ function update_nav(focus_node_id, data){
     var submit = $("#FilterNav").find("li").last().clone();
     $("#FilterNavUl").html(data.form);
     $("#FilterNavUl").append(submit);
-    $("#FilterNavUl select").uniform();
-    $("#FilterNavUl div.selector").addClass("ui-widget ui-button ui-state-default ui-corner-all")
+    $("#FilterNavUl select").css("width", "12em");
+    $("#FilterNavUl select").chosen({disable_search_threshold: 7});
+    $("#FilterNavUl div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all")
+    $("#FilterNavUl div.chzn-container-single").addClass("selector");
     if (focus_node_id != null){
         var new_offset = $(focus_node_id).offset();
         var delta_top = new_offset.top - offset.top;
