@@ -405,6 +405,8 @@ class BaseChildrenFormSet(BaseModelFormSet):
         form.PCLEs = defaultdict(list)
         parent = form.instance.parent.get_leaf_object()
         for PCLE in m.get_PCLEs(parent):
+            if not PCLE.one_per_link():
+                continue
             try:
                 ext = PCLE.objects.get(link=form.instance)
             except PCLE.DoesNotExist:
