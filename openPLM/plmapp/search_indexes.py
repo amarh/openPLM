@@ -123,7 +123,7 @@ for key, model in models.get_all_plmobjects().iteritems():
 from subprocess import Popen, PIPE
 import codecs
 import os.path
-text_files = set((".txt",))
+text_files = set((".txt", ".test", ))
 
 class DocumentFileIndex(QueuedModelSearchIndex):
     text = CharField(document=True, use_template=True)
