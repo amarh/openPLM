@@ -397,7 +397,10 @@ In the following queries, *doc_id* is a the id (an integer) of a
     Adds a file to the document, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
-    :url: :samp:`{server}/api/object/{doc_id}/add_file/`
+    If the url ends with ``thumbnail/`` a thumbnail will be generated
+    by openPLM.
+
+    :url: :samp:`{server}/api/object/{doc_id}/add_file/[thumbnail/]`
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.add_file`
@@ -451,7 +454,10 @@ In the following queries, *df_id* is the id (an integer) of a
     Updates (checks-in) the file, the request must have the attribute
     ``enctype="multipart/form-data"``.
 
-    :url: :samp:`{server}/api/object/{doc_id}/checkin/{df_id}/` 
+    If the url ends with ``thumbnail/`` a thumbnail will be generated
+    by openPLM.
+
+    :url: :samp:`{server}/api/object/{doc_id}/checkin/{df_id}/[thumbnail/]`
     :type: POST
     :login required: yes
     :implemented by: :func:`plmapp.api.check_in`
