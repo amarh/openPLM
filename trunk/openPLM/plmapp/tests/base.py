@@ -34,7 +34,7 @@ class BaseTestCase(TestCase):
     def create(self, ref="Part1"):
         return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
 
-    def get_file(self, name="temp.txt", data="data"):
+    def get_file(self, name="temp.test", data="data"):
         f = ContentFile(data)
         f.name = name
         return f

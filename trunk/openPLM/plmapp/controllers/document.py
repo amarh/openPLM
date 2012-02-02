@@ -36,6 +36,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
+from openPLM.plmapp.thumbnailers import generate_thumbnail
 
 class DocumentController(PLMObjectController):
     """
@@ -97,7 +98,7 @@ class DocumentController(PLMObjectController):
         self._save_histo("Locked",
                          "%s unlocked by %s" % (doc_file.filename, self._user))
 
-    def add_file(self, f, update_attributes=True):
+    def add_file(self, f, update_attributes=True, thumbnail=True):
         """
         Adds file *f* to the document. *f* should be a :class:`~django.core.files.File`
         with an attribute *name* (like an :class:`UploadedFile`).
@@ -125,6 +126,8 @@ class DocumentController(PLMObjectController):
         self._save_histo("File added", "file : %s" % f.name)
         if update_attributes:
             self.handle_added_file(doc_file)
+        if thumbnail:
+           generate_thumbnail.delay(doc_file.id) 
         return doc_file
 
     def add_thumbnail(self, doc_file, thumbnail_file):
@@ -292,7 +295,8 @@ class DocumentController(PLMObjectController):
             new_doc.save()
         return rev
 
-    def checkin(self, doc_file, new_file, update_attributes=True):
+    def checkin(self, doc_file, new_file, update_attributes=True,
+            thumbnail=True):
         """
         Updates *doc_file* with data from *new_file*. *doc_file*.thumbnail
         is deleted if it is present.
@@ -336,6 +340,8 @@ class DocumentController(PLMObjectController):
         self._save_histo("Check-in", doc_file.filename)
         if update_attributes:
             self.handle_added_file(doc_file)
+        if thumbnail:
+            generate_thumbnail.delay(doc_file.id)
             
     def update_rel_part(self, formset):
         u"""

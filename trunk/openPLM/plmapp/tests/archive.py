@@ -14,21 +14,21 @@ class ArchiveViewTestCase(CommonViewTest):
         self.filenames = []
         self.contents = {}
         for i in range(5):
-            name = "file_%d.txt" % i
+            name = "file_%d.test" % i
             content = "content_%d" % i
             self.filenames.append(name)
             self.contents[name] = content
             self.document.add_file(self.get_file(name, content))
        
-        # add another file named "file_4.txt"
-        self.filenames.append("file_4_1.txt")
-        self.contents["file_4_1.txt"] = content
+        # add another file named "file_4.test"
+        self.filenames.append("file_4_1.test")
+        self.contents["file_4_1.test"] = content
         self.document.add_file(self.get_file(name, content))
         
         # create another document
         self.document_bis = DocumentController.create('doc2', 'Document',
                 'a', self.user, self.DATA)
-        self.file_bis = "file_bis.txt"
+        self.file_bis = "file_bis.test"
         self.document_bis.add_file(self.get_file(self.file_bis, "file_bis"))
         self.contents[self.file_bis] = "file_bis"
 

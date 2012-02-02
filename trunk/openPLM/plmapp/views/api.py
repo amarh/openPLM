@@ -200,7 +200,7 @@ def check_out(request, doc_id, df_id):
 
 
 @login_json
-def check_in(request, doc_id, df_id):
+def check_in(request, doc_id, df_id, thumbnail=False):
     """
     Checks-in the :class:`.DocumentFile` identified by *df_id* from
     the :class:`.Document` identified by *doc_id*
@@ -216,7 +216,7 @@ def check_in(request, doc_id, df_id):
     df = models.DocumentFile.objects.get(id=df_id)
     form = forms.AddFileForm(request.POST, request.FILES)
     if form.is_valid():
-        doc.checkin(df, request.FILES['filename'])
+        doc.checkin(df, request.FILES['filename'], thumbnail=thumbnail)
     return {}
 
 @login_json
@@ -439,7 +439,7 @@ def attach_to_part(request, doc_id, part_id):
 
 
 @login_json
-def add_file(request, doc_id):
+def add_file(request, doc_id, thumbnail=False):
     """
     Adds a file to the :class:`.Document` identified by *doc_id*.
 
@@ -452,7 +452,7 @@ def add_file(request, doc_id):
     """
     doc = get_obj_by_id(doc_id, request.user)
     form = forms.AddFileForm(request.POST, request.FILES)
-    df = doc.add_file(request.FILES["filename"])
+    df = doc.add_file(request.FILES["filename"], thumbnail=thumbnail)
     return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
 
 

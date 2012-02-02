@@ -138,7 +138,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(f2.size, f.size)
         self.assertEqual(f2.file.read(), "data")
         self.assertEqual(file(f2.file.path).read(), "data")
-        self.assertEqual(os.path.splitext(f2.file.name)[1], ".txt")
+        self.assertEqual(os.path.splitext(f2.file.name)[1], ".test")
         self.failIf("temp" in f2.file.path)
         self.failUnless(f2.file.path.startswith(settings.DOCUMENTS_DIR))
         self.failUnless(os.access(f2.file.path, os.F_OK))
@@ -149,19 +149,19 @@ class DocumentControllerTest(ControllerTest):
     def test_add_several_files(self):
         nb = 5
         for i in xrange(nb):
-            f = self.get_file("temp%d.txt" % i, "data%d" % i)
+            f = self.get_file("temp%d.test" % i, "data%d" % i)
             self.controller.add_file(f)
         files = self.controller.files.all().order_by('filename')
         self.assertEqual(len(files), nb)
         for i, f2 in enumerate(files):
-            self.assertEqual(f2.filename, "temp%d.txt" % i)
+            self.assertEqual(f2.filename, "temp%d.test" % i)
             self.assertEqual(f2.file.read(), "data%d" % i)
  
     def test_add_file_error1(self):
         """
         test add_file : file too big
         """
-        f = self.get_file("temp.txt", "x" * 500)
+        f = self.get_file("temp.test", "x" * 500)
         old, settings.MAX_FILE_SIZE = settings.MAX_FILE_SIZE, 400
         self.assertRaises(ValueError, self.controller.add_file, f)
         settings.MAX_FILE_SIZE = old
