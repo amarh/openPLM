@@ -763,7 +763,7 @@ thumbnailfs = FileSystemStorage(location=settings.THUMBNAILS_DIR,
 
 class DocumentFile(models.Model):
     """
-    Model which stores informations of a file link to a :class:`Document`
+    Model which stores informations of a file bounded to a :class:`Document`
     
     :model attributes:
         .. attribute:: filename
