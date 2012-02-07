@@ -1,0 +1,65 @@
+{% extends "select_pdf.htm" %}
+{% load i18n plmapp_tags %}
+
+{% block css %}
+
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+    <style>
+        div.timeline dd {
+            list-style: none;
+        }
+    </style>
+{% endblock %}
+
+
+{% block pdf_formset %}
+    {% for level, link in children %}
+        <div class="timeline" >
+            <h3>
+                <span class="level">{% trans "Level:" %} {{level}}</span>
+                &nbsp;-&nbsp;
+                {% with link.child as child %}
+                    <span class="type">{{ child.type }}</span> //
+                    <span class="reference">{{ child.reference }}</span> // 
+                    <span class="revision">{{ child.revision }}</span> // 
+                    <span class="name">{{ child.name }}</span>
+                {% endwith %}
+            </h3>
+            {% for pdf_formset in link.formsets %}
+                <dl>
+                    {{ pdf_formset.management_form }}
+                    {% for form in pdf_formset.forms %}
+
+                        {% if forloop.first %}
+                            <dt>
+                            {% with form.instance.document as doc %}
+                                <span class="document_bullet">&nbsp;</span>
+                                <span class="type">{{ doc.type }}</span> //
+                                <span class="reference">{{ doc.reference }}</span> //
+                                <span class="revision">{{ doc.revision }}</span> //
+                                <span class="name">{{ doc.name }}</span>
+                            {% endwith %}
+                            </dt>
+                            <dd>
+                            <table class="Content">
+                                <tbody>
+                                {% endif %}
+                                <tr class="Content">
+                                    {{ form.id }}
+                                    {{ form.document }}
+                                    <td class="Content" style="width:50px; text-align:center">{{ form.selected }}</td>
+                                    <td class="Content">{{ form.instance.filename }}</td>
+                                </tr>
+                                {% if forloop.last %}
+                                </tbody>
+                            </table>
+                            </dd>
+                        {% endif %}
+                    {% endfor %}
+                </dl>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
+
+

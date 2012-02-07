@@ -1,0 +1,51 @@
+{% extends "base.xhtml" %}
+{% load i18n plmapp_tags %}
+
+
+{% block title %}
+    {{ obj.type }}-{{ obj.reference }}-{{ obj.revision }}
+{% endblock %}
+
+{% block page_title %}
+    {{ obj.type }} // {{ obj.reference }} // {{ obj.revision }} // {{obj.name}}
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        <table class="Content">
+            <thead>
+                <th>{% trans "File" %} </th>
+            </thead>
+
+            <tbody>
+                {% for file in files %}
+                    <tr class="Content">
+                        <td class="Content description">{{file.filename}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr/>
+
+        <table class="Content">
+            <thead>
+                <th>{% trans "State" %} </th>
+                <th>{% trans "User who promoted/demoted the object" %} </th>
+                <th>{% trans "Date" %} </th>
+            </thead>
+
+            <tbody>
+                {% for h in state_histories %}
+                    <tr class="Content">
+                        <td class="Content">{{h.state}}</td>
+                        <td class="Content">{{h.user.get_full_name}} ({{h.user.username}})</td>
+                        <td class="Content">{{h.date|date:"r"}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

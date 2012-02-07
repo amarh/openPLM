@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load i18n plmapp_tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+    <head>
+        <title>
+            {%block title%}	
+            {%endblock%}
+        </title>
+        <style type="text/css">
+            {% block style %}
+                @page {
+                    size: {{pagesize}};
+                    margin: 1cm;
+                    @frame footer {
+                        -pdf-frame-content: footerContent;
+                        bottom: 1cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                        width: 100%;
+                    }
+                }
+                span.date {
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                span.pagenumber {
+                    right: 0cm;
+                }
+                table.Content tr {
+                    border: 1px solid black;
+                }
+                table.Content td,
+                table.Content th {
+                    padding: 0.2em;
+                }
+            {% endblock %}	
+        </style>
+    </head>
+    <body>
+        <div>
+            {%block page_header%}
+                <div>
+                    <h1>{% block page_title %} {% endblock %}</h1>
+                </div>
+                <hr />
+            {%endblock%}
+            {%block content%}
+            {%endblock%}
+        </div>
+        <div id="footerContent">
+            {%block page_foot%}
+                <span class="date">{% now "D j N Y, G:i" %}</span>
+                <div class="pagenumber">
+                    <pdf:pagenumber>
+                </div>
+            {%endblock%}
+        </div>
+    </body>
+</html>
+

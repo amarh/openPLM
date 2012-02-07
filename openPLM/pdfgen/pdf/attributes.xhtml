@@ -1,0 +1,40 @@
+{% extends "base.xhtml" %}
+{% load i18n plmapp_tags %}
+
+
+{% block title %}
+    {% if obj.is_document or obj.is_part %}
+        {{ obj.type }}-{{ obj.reference }}-{{ obj.revision }}
+    {% else %}
+        {{ obj.get_full_name }} {{ obj.username }}
+        {{ obj.name }}
+    {% endif %}
+{% endblock %}
+
+{% block page_title %}
+    {% if obj.is_document or obj.is_part %}
+        {{ obj.type }} // {{ obj.reference }} // {{ obj.revision }} // {{obj.name}}
+    {% else %}
+        {% if obj.username %}
+            {% trans "User" %} // {{ obj.get_full_name}} // {{obj.username }}
+        {% else %}
+            {% trans "Group" %} // {{ obj.name }}
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        <table class="Content">
+            {% for description, attribute in attributes %}
+                <tr class="Content">
+                    <td class="Content description">{{description|capfirst}}</td>
+                    <td class="Content">{{attribute|linebreaks}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
