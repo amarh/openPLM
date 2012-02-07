@@ -782,9 +782,9 @@ class DocumentFile(models.Model):
             
             :class:`~django.contrib.auth.models.User` who locked the file,
             None, if the file is not locked
-        .. attribute document
+        .. attribute:: document
 
-            :class:`Document` linked to the file
+            :class:`Document` bounded to the file (required)
     """
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to=".", storage=docfs)
