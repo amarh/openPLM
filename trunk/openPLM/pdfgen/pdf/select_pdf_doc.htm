@@ -1,0 +1,21 @@
+{% extends "select_pdf.htm" %}
+{% load i18n plmapp_tags %}
+
+
+{% block pdf_formset %}
+    {{ pdf_formset.management_form }}
+    <table class="Content">
+        {% for form in pdf_formset.forms %}
+            {{ form.id }}
+            {{ form.document }}
+            <tr class="Content">
+                <td class="Content"  style="width:50px; text-align:center">{{ form.selected }}</td>
+                <td class="Content">{{ form.instance.filename }}</td>
+            </tr>
+        {% empty %}
+            <tr><td>{% trans "There are no PDF files." %}</td></tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+

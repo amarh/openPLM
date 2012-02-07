@@ -1,0 +1,22 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n plmapp_tags %}
+
+
+{% block content %}
+
+    <p>
+        {% blocktrans %}
+            Select PDF files that will be merged into a unique PDF
+            and click on the Download button.
+        {% endblocktrans %}
+    </p>
+    <form method="get" action=".">	
+        {% block pdf_formset %}
+        {% endblock %}
+        <div>
+            <input type="submit" name="Download" class="{{"download"|button}}" value="{% trans "Download" %}"/>
+        </div>
+    </form>
+{% endblock %}
+
+
