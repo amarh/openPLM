@@ -46,14 +46,14 @@ from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import get_controller, \
-        DocumentController
+from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph
-from openPLM.plmapp.forms import TypeForm, TypeFormWithoutUser, get_navigate_form, \
+from openPLM.plmapp.forms import TypeFormWithoutUser, get_navigate_form, \
         SimpleSearchForm
+from openPLM.plmapp.utils import can_generate_pdf
 
 def get_obj(obj_type, obj_ref, obj_revi, user):
     """
@@ -262,6 +262,7 @@ def init_ctx(init_type_, init_reference, init_revision):
         'search_query' : "",
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         'LANGUAGES' : settings.LANGUAGES,
+        'can_generate_pdf' : can_generate_pdf(),
         }
 
 ##########################################################################################

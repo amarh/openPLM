@@ -228,6 +228,14 @@ def generate_password(length=12):
     return "".join(random.choice(password_chars) for x in xrange(length))
 
 
+def can_generate_pdf():
+    """
+    Returns ``True`` if openPLM can generate pdf files, i.e, pisa (xhtml2pdf)
+    is installed.
+    """
+    from django.conf import settings
+    return 'openPLM.pdfgen' in settings.INSTALLED_APPS
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

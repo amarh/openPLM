@@ -25,7 +25,7 @@
 # import custom application models
 from django.conf import settings
 for app in settings.INSTALLED_APPS:
-    if app.startswith("openPLM"):
+    if app.startswith("openPLM") and app != 'openPLM.pdfgen':
         __import__("%s.models" % app, globals(), locals(), [], -1)
 
 import openPLM.plmapp.search_indexes

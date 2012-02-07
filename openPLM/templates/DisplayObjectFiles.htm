@@ -12,7 +12,7 @@
     {% endif %}
     <form method="POST" action="">
         {{ file_formset.management_form }}
-		{% if is_owner and obj.is_editable %}
+        {% if is_owner and obj.is_editable %}
             <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
                 <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
                 <span class="ui-button-text">{% trans "ADD" %}</span>
@@ -20,55 +20,65 @@
             {% if file_formset.total_form_count %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
             {% endif %}
+        {% else %}
+            {# placeholder since archive_form: float is right #}
+            <span>&nbsp;</span>
         {% endif %}
-	    <table class="Content">
-		    {% for form in file_formset.forms %}
-		    <tr class="Content">
-                {{ form.id }}
-                {{ form.document }}
-                {% with form.instance as instance %}
-			        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-			        <td class="Content ui-state-default ui-state-corner-all">
-			            {% if instance.locked %}
-                            <span class="ui-icon ui-icon-locked">{% trans "Locked" %}</span>
-		                {% else %}
-                            <span class="ui-icon ui-icon-unlocked">{% trans "Unlocked" %}</span>
-		                {% endif %}
-		            </td>
-                    <td class="Content">
-                        <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
-			        <td class="Content">{{instance.size|filesizeformat}}</td>
-			        <td class="Content">
-                        <a class="{{"Button"|button}}" href="/file/{{instance.id}}/"><span class="ui-button-text">{% trans "DOWNLOAD" %}</span></a>
-                    </td>
-			        <td class="Content">
-                        {% if is_owner and obj.is_editable %}
+        <table class="Content">
+            {% for form in file_formset.forms %}
+                <tr class="Content">
+                    {{ form.id }}
+                    {{ form.document }}
+                    {% with form.instance as instance %}
+                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                        <td class="Content ui-state-default ui-state-corner-all">
                             {% if instance.locked %}
-                                <a id="LockLink" class="{{"Button"|button}}" href="./checkin/{{instance.id}}/">
-                                    <span class="ui-button-text">{% trans "CHECK-IN" %}</span>
-                                </a>
+                                <span class="ui-icon ui-icon-locked">{% trans "Locked" %}</span>
                             {% else %}
-                                <a id="UnlockLink" class="{{"Button"|button}}" href="./checkout/{{instance.id}}/">
-                                    <span class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                </a>
+                                <span class="ui-icon ui-icon-unlocked">{% trans "Unlocked" %}</span>
                             {% endif %}
-                        {% else %}
-                            {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
-		                {% endif %}
-	                </td>
-			        <td class="Content">
-                        {% if instance.thumbnail %}
-                            <img class="thumbnail" src="{{instance.thumbnail.url}}"
+                        </td>
+                        <td class="Content">
+                            <a href="/file/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
+                        <td class="Content">{{instance.size|filesizeformat}}</td>
+                        <td class="Content">
+                            <a class="{{"Button"|button}}" href="/file/{{instance.id}}/"><span class="ui-button-text">{% trans "DOWNLOAD" %}</span></a>
+                        </td>
+                        <td class="Content">
+                            {% if is_owner and obj.is_editable %}
+                                {% if instance.locked %}
+                                    <a id="LockLink" class="{{"Button"|button}}" href="./checkin/{{instance.id}}/">
+                                        <span class="ui-button-text">{% trans "CHECK-IN" %}</span>
+                                    </a>
+                                {% else %}
+                                    <a id="UnlockLink" class="{{"Button"|button}}" href="./checkout/{{instance.id}}/">
+                                        <span class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                {{ is_owner|yesno:"Object is not editable,you are not the owner" }}
+                            {% endif %}
+                        </td>
+                        <td class="Content">
+                            {% if instance.thumbnail %}
+                                <img class="thumbnail" src="{{instance.thumbnail.url}}"
                                 alt="Thumbnail"/>
-		                {% else %}
-                            {% trans "No thumbnail available" %}
-		                {% endif %}
-	                </td>
-                {% endwith %}
-            </tr>
-	    {% endfor %}
-	    </table>
+                            {% else %}
+                                {% trans "No thumbnail available" %}
+                            {% endif %}
+                        </td>
+                    {% endwith %}
+                </tr>
+            {% endfor %}
+        </table>
     </form>
+    {% if can_generate_pdf %}
+        <div>
+            <a href="../pdf/" class="{{"Button"|button}}">
+                <span class="ui-button-text">{% trans "Download merged PDF files"%}</span>
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 

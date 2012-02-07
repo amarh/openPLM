@@ -81,6 +81,8 @@ class CommonViewTest(BaseTestCase):
         an official document to it, so that it becomes promotable.
 
         Does nothing if :attr:`controller` is a DocumentController.
+
+        Returns the created document (a controller) or None.
         """
         if self.controller.is_part:
             document = DocumentController.create("doc_1", "Document", "a",
@@ -88,6 +90,8 @@ class CommonViewTest(BaseTestCase):
             document.add_file(self.get_file())
             document.promote()
             self.controller.attach_to_document(document)
+            return document
+        return None
 
 class ViewTest(CommonViewTest):
 

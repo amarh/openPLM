@@ -33,6 +33,15 @@
         </div>
     {% endif %}
 
+    {% if can_generate_pdf %}
+        <div>
+            <a href="/pdf{{obj.plmobject_url}}attributes/" class="{{"Button"|button}}">
+                <span class="ui-button-text">{% trans "Download PDF file"%}</span>
+            </a>
+        </div>
+    {% endif %}
+
+
     <div id="comments">
         <h3>{% trans "Comments" %}</h3>
         <div class="comment_list">

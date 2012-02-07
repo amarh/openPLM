@@ -28,7 +28,7 @@ from django.conf import settings
 
 # import custom application models
 for app in settings.INSTALLED_APPS:
-    if app.startswith("openPLM"):
+    if app.startswith("openPLM") and app != "openPLM.pdfgen":
         __import__("%s.models" % app, globals(), locals(), [], -1)
 
 import openPLM.plmapp.search_indexes
@@ -38,6 +38,7 @@ from openPLM.plmapp.views import *
 import openPLM.plmapp.views.api as api
 from django.contrib.auth.views import login, logout
 from openPLM.plmapp.csvimport import IMPORTERS
+from openPLM.plmapp.utils import can_generate_pdf
 
 from django.contrib import admin
 admin.autodiscover()

@@ -48,6 +48,7 @@ First, you must install some dependencies:
     #. ``apt-get install postgresql python-psycopg2``
     #. ``apt-get install tracker-extract``
     #. ``easy_install lepl``
+    #. ``apt-get install python-pisa``
    
 Check applications are ok
 ===============================
