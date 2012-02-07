@@ -55,7 +55,7 @@ class DocumentController(PLMObjectController):
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
             * :exc:`.PermissionError` if :attr:`object` is not editable.
-            * :exc:`LockError` if *doc_file* is already locked
+            * :exc:`.LockError` if *doc_file* is already locked
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
