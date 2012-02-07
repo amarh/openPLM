@@ -325,7 +325,7 @@ class SimpleSearchForm(SearchForm):
             m._get_all_subclasses(cls, d)
             mods = d.values()
             query = self.cleaned_data["q"].strip()
-            if issubclass(cls, m.Document) and query.strip() not in ("", "*"):
+            if issubclass(cls, m.Document) and query not in ("", "*"):
             # include documentfiles if we search for a document and
             # if the query does not retrieve all documents
                 mods.append(m.DocumentFile)
