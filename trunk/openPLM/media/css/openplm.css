@@ -833,6 +833,9 @@ form.archive_form > * {
     display: inline;
     padding-left: 0.5em;
 }
+form.archive_form > p > * {
+    vertical-align: middle;
+}
 
 ul.errorlist {
     display: block;

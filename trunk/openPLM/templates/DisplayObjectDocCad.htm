@@ -10,16 +10,15 @@
             <input type="submit" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
         </form>
     {% endif %}
+    {% if can_generate_pdf %}
+        <div>
+            <a href="../pdf/" class="{{"Button"|button}}">
+                <span class="ui-button-text">{% trans "Download merged PDF files"%}</span>
+            </a>
+        </div>
+    {% endif %}
     <form method="post" action="">	
         {{ doc_cad_formset.management_form }}
-        {% if is_owner %}
-            <a class="{{"Button"|button}}" href="./add/">
-                <span class="ui-button-text">{% trans "Attach another document" %}</span>
-            </a>
-            {% if object_doc_cad.count > 0 %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
-            {% endif %}
-        {% endif %}
         <table class="Content">
 	        {% for form in doc_cad_formset.forms %}
                 {{ form.id }}
@@ -41,6 +40,14 @@
                 <tr><td>{% trans "There are no document attached to this part" %}</td></tr>
 	        {% endfor %}
 	    </table>
+        {% if is_owner %}
+            <a class="{{"Button"|button}}" href="./add/">
+                <span class="ui-button-text">{% trans "Attach another document" %}</span>
+            </a>
+            {% if object_doc_cad.count > 0 %}
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
+            {% endif %}
+        {% endif %}
     </form>
 {% endblock %}
 

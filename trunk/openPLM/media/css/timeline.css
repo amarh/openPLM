@@ -3,10 +3,14 @@
 
 div.timeline h3 {
     background-color: #807C7D;
-    color: white;
     border-radius: 4px 4px 0 0;
     margin-bottom: 0;
-    font-weight: 500;
+}
+
+div.timeline h3,
+div.timeline h3 > span {
+    color: white;
+    font-weight: bold;
     font-size: 105%;
 }
 
@@ -17,7 +21,7 @@ div.timeline dl {
     background-color: #e4e3e1;
 }
 
-div.timeline * {
+div.timeline [color=""] {
     color: #373434;
 }
 
