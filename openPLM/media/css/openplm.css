@@ -177,10 +177,10 @@ div.main-box {
 }
 div.top-box {
     background-color: #343434;
-    background: url("/media/img/dark/logo_openplm.png") no-repeat left top,
+    background: url("/media/img/dark/logo_openplm_linear.png") no-repeat left top,
         url("/media/img/dark/banner.png") no-repeat #343434 right top;
     background-size: auto auto, auto 100%;
-    height: 100px;
+    height: 70px;
     min-width: 100%;
     padding-top: 1em;
 }
@@ -344,7 +344,7 @@ div#LoggedPersonBox
     height: 30px;
     font-size: 14px;
     margin-bottom: 0px;
-    margin-left: 100px;
+    margin-left: 300px;
 background: -moz-linear-gradient(left,  rgba(55,52,52,0) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6+ */
 
 background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(55,52,52,0)), color-stop(100%,rgba(0,0,0,0.8))); /* Chrome,Safari4+ */
