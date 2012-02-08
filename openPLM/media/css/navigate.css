@@ -8,7 +8,6 @@ div#Navigate
     width: 100;
     height: 500px;
     margin: 0;
-    background-image: -moz-radial-gradient(50% 50% 45deg, #575454 0%, #343434 100%);
     overflow: scroll;
 }
 
@@ -23,6 +22,7 @@ div#Navigate
 #navDocument {
     word-wrap: break-word;
     padding-right: 20px;
+    color: #eee;
 }
 
 #navThumbnailsBar {
@@ -48,12 +48,17 @@ div#navThumbnails {
 div#thumbnailsList {
     overflow-y: scroll;
 }
-div#thumbnailsList img{
-    border-bottom: 1px solid #7f7c7c;
+div#thumbnailsList img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
     max-width: 160px;
     max-height: 160px;
+    float: none;
 }
-
+div#thumbnailsList a > div {
+    border-bottom: 1px solid #7f7c7c;
+}
 
 div#thumbnailsList > * {
     display: block;
