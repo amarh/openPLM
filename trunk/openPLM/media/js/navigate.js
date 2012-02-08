@@ -28,7 +28,7 @@ function display_thumbnails(node_id, ajax_url){
                 var img = value[2];
                 var title = "Download " + name;
                 list.append(
-                    $("<div><a href='"+ url +"'> <img src='" + img + "' width='160' height='160' title='" + title + "' /></a></div>"));
+                    $("<div><a href='"+ url +"'><div> <img src='" + img + "' title='" + title + "' /></div></a></div>"));
                 });
             $("#navDocument").text(data["doc"]);
             show_thumbnails_panel($("#" + node_id));
