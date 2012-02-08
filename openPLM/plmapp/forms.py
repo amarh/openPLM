@@ -381,8 +381,7 @@ class ModifyChildForm(forms.ModelForm):
                                    widget=forms.HiddenInput())
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'size':'4'}))
     order = forms.IntegerField(widget=forms.TextInput(attrs={'size':'2'}))
-    unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT,
-            widget=forms.Select(attrs={"class":"tiny"}))
+    unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
 
     class Meta:
         model = m.ParentChildLink

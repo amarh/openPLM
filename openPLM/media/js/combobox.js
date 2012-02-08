@@ -67,8 +67,6 @@ $(
             }
         );
 
-        $("select.tiny").parent().addClass("tiny");
-
     }
 
  );

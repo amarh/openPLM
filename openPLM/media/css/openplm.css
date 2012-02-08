@@ -849,11 +849,6 @@ ul.errorlist li {
     margin-left: 1em;
 }
 
-div.selector.tiny {
-    max-width: 6em;
-}
-
-
 /* type, reference, revision, name */
 span.name {
     font-style: italic;
