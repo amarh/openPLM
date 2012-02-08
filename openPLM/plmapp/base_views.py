@@ -268,6 +268,17 @@ def init_ctx(init_type_, init_reference, init_revision):
 ##########################################################################################
 ###   Manage html code for Search and Results function and other global parameters     ###
 ##########################################################################################
+def update_navigation_history(request, obj, type_, reference, revision):
+    history = request.session.get("navigation_history", [])
+    value = (obj.plmobject_url, type_, reference, revision)
+    if value in history:
+        # move value at the end
+        history.remove(value)
+    history.append(value)
+    if len(history) > 7:
+        history = history[-7:]
+    request.session["navigation_history"] = history
+
 
 def get_generic_data(request, type_='-', reference='-', revision='-', search=True):
     """
@@ -294,6 +305,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         obj = request.user
     else:
         obj = get_obj(type_, reference, revision, request.user)
+        update_navigation_history(request, obj, type_, reference, revision)
     # Builds, update and treat Search form
     search_needed = "results" not in request.session
     search_id = "search_id_%s" 
@@ -331,6 +343,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
                 'link_creation' : False,
                 'attach' : (obj, False),
                 'obj' : obj,
+                'navigation_history' : request.session.get("navigation_history", []),
               })
     if hasattr(obj, "menu_items"):
         ctx['object_menu'] = obj.menu_items
@@ -346,7 +359,8 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     from haystack import site
     for r in request.session.get("results", []):
         r.searchsite = site
-
+    
+    request.session.save()
     return obj, ctx
 
 coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')

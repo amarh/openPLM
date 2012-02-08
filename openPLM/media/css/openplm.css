@@ -401,13 +401,15 @@ div#ReferenceArea
     font-weight: lighter;
     background-color: #fefefe;
     padding-bottom: 0.5em;
+}
+#reference-title {
     min-height: 60px;
 }
 
 #ReferenceArea h2 {
     padding-bottom: 0.3em;
     padding-left: 100px;
-    padding-top: 0.5em;
+    padding-top: 0.3em;
     border-bottom: solid 1px #b2b0b0;
 }
 
@@ -952,5 +954,39 @@ input.ui-button:hover,
 
 span#select_type {
     display: block;
+}
+
+
+/* navigation history */
+
+#navigation_history {
+    padding: 0.2em;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: none;
+    height: 1em;
+    margin: 0.2em;
+    border-bottom: 1px solid #ccc;
+}
+
+#navigation_history_inner {
+    position: absolute;
+    right: 0;
+    white-space: nowrap; 
+    min-width: 100%;
+}
+
+#navigation_history li {
+    font-size: x-small;
+}
+#navigation_history * {
+    color: black;
+    font-weight: normal;
+    text-decoration: none;
+}
+#navigation_history li:not(:last-child):after {
+    content: "»";
+    padding: 0.2em;
+    font-size: small;
 }
 
