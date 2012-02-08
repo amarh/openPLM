@@ -40,7 +40,6 @@ $(
         $("select").chosen({disable_search_threshold: 7});
 
         $("div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all");
-        $("div.chzn-container-single").addClass("selector");
       
         $("div.chzn-drop").css("width", "");
         $("div.chzn-drop").each(
