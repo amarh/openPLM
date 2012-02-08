@@ -56,7 +56,6 @@ function update_nav(focus_node_id, data){
     $("#FilterNavUl select").css("width", "12em");
     $("#FilterNavUl select").chosen({disable_search_threshold: 7});
     $("#FilterNavUl div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all")
-    $("#FilterNavUl div.chzn-container-single").addClass("selector");
     if (focus_node_id != null){
         var new_offset = $(focus_node_id).offset();
         var delta_top = new_offset.top - offset.top;

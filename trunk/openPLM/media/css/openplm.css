@@ -377,7 +377,7 @@ li#NavigateButton
     padding-right: 1em;
 }
 
-#SetLangForm div.selector {
+#SetLangForm div.chzn-container-single {
     max-width: 8em;
     margin-left: 5em;
 }
@@ -727,18 +727,18 @@ a.Button > span {
     line-height: 1.3 !important;
 }
 
-div.selector {
+div.chzn-container-single {
     padding-left: 0px;
 }
 
-div.selector > *
+div.chzn-container-single > *
 {
     padding: 0.4em !important;
     font-size: 1.1em;
     line-height: 1.3;
 }
 
-div.selector select *{
+div.chzn-container-single select *{
     font-size: 1em;
 }
 
