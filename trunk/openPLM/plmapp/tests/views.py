@@ -203,6 +203,26 @@ class ViewTest(CommonViewTest):
     
     def test_history(self):
         response = self.get(self.base_url + "history/")
+        history = response.context["object_history"]
+        # it should contains at least one item
+        self.assertTrue(history)
+        # edit the controller and checks that the history grows
+        self.controller.name = "new name"
+        self.controller.save()
+        response = self.get(self.base_url + "history/")
+        history2 = response.context["object_history"]
+        self.failUnless(len(history2) > len(history))
+        # create a new revision: both should appear in the history 
+        revb = self.controller.revise("new_revision")
+        response = self.get(self.base_url + "history/")
+        history3 = response.context["object_history"]
+        self.assertTrue([x for x in history3 if x.plmobject.id == self.controller.id])
+        self.assertTrue([x for x in history3 if x.plmobject.id == revb.id])
+        # also check revb/history/ page
+        response = self.get(revb.plmobject_url + "history/")
+        history4 = response.context["object_history"]
+        self.assertTrue([x for x in history4 if x.plmobject.id == self.controller.id])
+        self.assertTrue([x for x in history4 if x.plmobject.id == revb.id])
 
     def test_navigate_get(self):
         response = self.get(self.base_url + "navigate/")
