@@ -208,7 +208,13 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
+    if hasattr(obj, "get_all_revisions"):
+        # display history of all revisions
+        objects = [o.id for o in obj.get_all_revisions()]
+        history = obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')
+        history = history.select_related("plmobject__revision")
+    else:
+        history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
     ctx.update({'current_page' : 'history', 
                 'object_history' : list(history)})
     return r2r('DisplayObjectHistory.htm', ctx, request)
