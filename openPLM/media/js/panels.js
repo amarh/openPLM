@@ -57,7 +57,7 @@ function hide_create_box(){
 
 function hide_search_box(){
     $("#SearchBox").hide();
-    $("label[for=FindButton]").removeClass("ui-state-active");
+    $("label[for=SearchButton]").removeClass("ui-state-active");
     if ($("#CreationBox").is(":hidden")){
         hide_left_panel();
     }
@@ -91,9 +91,9 @@ $(function (){
     var search = $.cookie("search_box") === "true";
     var create = $.cookie("create_box") === "true";
 
-    $("#FindButton").attr("checked", search);
+    $("#SearchButton").attr("checked", search);
     $("#CreationButton").attr("checked", create);
-    $("#FindButton").button().click(toggle_search_box);
+    $("#SearchButton").button().click(toggle_search_box);
     $("#CreationButton").button().click(toggle_create_box);
 
 
