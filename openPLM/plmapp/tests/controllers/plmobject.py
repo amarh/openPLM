@@ -42,6 +42,14 @@ class ControllerTest(BaseTestCase):
     DATA = {}
 
 
+    def get_contributor(self, username="user2"):
+        """ Returns a new contributor"""
+        user = User(username="user2")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        return user
+
     def test_create(self):
         controller = self.create()
         self.assertEqual(controller.name, "")
@@ -145,26 +153,54 @@ class ControllerTest(BaseTestCase):
         rev = ctrl.revise("b")
         self.assertEqual(self.user, rev.owner)
 
+    def test_revise_same_group(self):
+        """
+        Test that an user can revise an object if it belongs to its group.
+        """
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        self.group.user_set.add(user)
+        self.group.save()
+        ctrl = self.CONTROLLER(controller.object, user)
+        self.failUnless(ctrl.is_revisable())
+        rev = ctrl.revise("b")
+        self.assertEqual(user, rev.owner)
+
+    def test_revise_error_other_group(self):
+        """
+        Tests that an user who does not belong to the group cannot revise
+        the object.
+        """
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        ctrl = self.CONTROLLER(controller.object, user)
+        self.failIf(ctrl.is_revisable())
+        self.assertRaises(exc.PermissionError, ctrl.revise, "b")
+        count = models.PLMObject.objects.filter(reference=controller.reference).count()
+        self.assertEqual(1, count)
+
     def test_revise_error1(self):
         "Revision : error : empty new revision"
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "")
+        count = models.PLMObject.objects.filter(reference=controller.reference).count()
+        self.assertEqual(1, count)
     
     def test_revise_error2(self):
         "Revision : error : same revision name"
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "a")
+        count = models.PLMObject.objects.filter(reference=controller.reference).count()
+        self.assertEqual(1, count)
 
     def test_set_owner(self):
         controller = self.create("Part1")
-        user = User(username="user2")
-        user.save()
-        user.get_profile().is_contributor = True
-        user.get_profile().save()
+        user = self.get_contributor()
         controller.set_owner(user)
         self.assertEqual(controller.owner, user)
 
     def test_set_owner_error(self):
+        """ set_owner: error: user is not a contributor"""
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()

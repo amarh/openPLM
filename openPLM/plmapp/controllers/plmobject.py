@@ -241,6 +241,7 @@ class PLMObjectController(Controller):
 
         Returns a controller of the new object.
         """
+        # TODO: changes the group and cancels other previous unofficial revisions
         self.check_readable() 
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
@@ -274,7 +275,10 @@ class PLMObjectController(Controller):
             models.RevisionLink.objects.get(old=self.object.pk)
             return False
         except ObjectDoesNotExist:
-            return self.check_readable(False)
+            if check_user:
+                return self.check_readable(False)
+            else:
+                return True
     
     def get_previous_revisions(self):
         try:
@@ -420,6 +424,9 @@ class PLMObjectController(Controller):
             raise ValueError("bad value for role")
 
     def check_permission(self, role, raise_=True):
+        if self._user.username == settings.COMPANY:
+            # the company is like a super user
+            return True
         if not bool(self.group.user_set.filter(id=self._user.id)):
             if raise_:
                 raise PermissionError("action not allowed for %s" % self._user)
@@ -428,7 +435,18 @@ class PLMObjectController(Controller):
         return super(PLMObjectController, self).check_permission(role, raise_)
 
     def check_readable(self, raise_=True):
+        """
+        Returns ``True`` if the user can read (is allowed to) this object.
+
+        Raises a :exc:`.PermissionError` if the user cannot read the object
+        and *raise_* is ``True`` (the default).
+        """
         if not self.is_editable:
+            return True
+        if self._user.username == settings.COMPANY:
+            # the company is like a super user
+            return True
+        if self.owner == self._user:
             return True
         if bool(self.group.user_set.filter(id=self._user.id)):
             return True
