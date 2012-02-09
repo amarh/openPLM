@@ -34,6 +34,8 @@ import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
 
+from django.utils.html import linebreaks
+
 import pygraphviz as pgv
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
@@ -355,7 +357,7 @@ class NavigationGraph(object):
         if isinstance(obj, PLMObjectController):
             # display the object's name if it is not empty
             path = get_path(obj)
-            node.attr['label'] = obj.name.strip() or path.replace("/", "\\n")
+            label = obj.name.strip() or path.replace("/", "\n")
             data["title"] = path.replace("/", " - ")
             
             # add urls to show/hide thumbnails and attached documents
@@ -366,12 +368,14 @@ class NavigationGraph(object):
                     s = "+" if obj.id not in self.options["doc_parts"] else "-"
                     data["url"] = s + str(obj.id)
         elif isinstance(obj, UserController):
-            full_name =  u'%s\\n%s' % (obj.first_name, obj.last_name)
-            node.attr["label"] = full_name.strip() or obj.username
+            full_name =  u'%s\n%s' % (obj.first_name, obj.last_name)
+            label = full_name.strip() or obj.username
             data["title"] = obj.username
         else:
-            node.attr["label"] = obj.name
-        node.attr["label"] += "\\n" + extra_label
+            label = obj.name
+        #node.attr["label"] += "\n" + extra_label
+        node.attr["label"] = ""
+        data["label"] = label + "\n" + extra_label
         # id is used by the javascript
         t = type_.__name__.replace("Controller", "")
         node.attr["id"] = "_".join((str(obj_id), t, str(obj.id)))
@@ -383,18 +387,23 @@ class NavigationGraph(object):
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
             data = self.title_to_nodes.get(area.get("id"), {})
+            
             # compute css position of the div
             left, top, x2, y2 = map(int, area.get("coords").split(","))
             width = x2 - left
             height = y2 - top
             style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
+            
             # create a div with a title, and an <a> element
             id_ = "Nav-%s" % area.get("id")
             div = ET.Element("div", id=id_, style=style)
             div.set("class", "node" + " main_node" * (self.main_node == area.get("id")))
+            
+            div.append(ET.fromstring(linebreaks(data["label"]).encode("utf-8")))
             title = data.get("title")
             if title:
                 div.set("title", title)
+            
             # add thumbnails and attached documents buttons
             url = data.get("url", "None")
             if url.startswith("/ajax/thumbnails/"):
@@ -415,13 +424,14 @@ class NavigationGraph(object):
                         title="Show related documents")
                 show_doc.set("class", "node_show_docs" + self.BUTTON_CLASS)
                 show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
+            
             # add the link
             a = ET.SubElement(div, "a", href=area.get("href")) 
             span = ET.SubElement(a, "span")
             span.text = " "
             elements.append(div)
 
-        s = "\n".join(ET.tostring(div) for div in elements)
+        s = u"\n".join(ET.tostring(div) for div in elements)
         return s
 
     def render(self):
