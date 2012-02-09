@@ -985,3 +985,6 @@ span#select_type {
     font-size: small;
 }
 
+.ui-dialog * {
+    font-size: medium;
+}
