@@ -150,8 +150,8 @@ class ViewTest(CommonViewTest):
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
         # promote
-        response = self.post(self.base_url + "lifecycle/", 
-                            {"action" : "PROMOTE"})
+        response = self.post(self.base_url + "lifecycle/apply/", 
+                {"action" : "PROMOTE", "password":"password"})
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", False, u'user'),
                   ("official", True, u'user'),
@@ -166,14 +166,29 @@ class ViewTest(CommonViewTest):
         self.controller.save()
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
-        response = self.post(self.base_url + "lifecycle/", 
-                                    {"action" : "DEMOTE"})
+        response = self.post(self.base_url + "lifecycle/apply/", 
+                {"action" : "DEMOTE", "password":"password"})
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", True, u'user'),
                   ("issue1", False, u'user'),
                   ("official", False, None),
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
+
+    def test_lifecycle_bad_password(self):
+        self.attach_to_official_document()
+        response = self.get(self.base_url + "lifecycle/")
+        lifecycles = tuple(response.context["object_lifecycle"])
+        wanted = (("draft", True, u'user'),
+                  ("official", False, u'user'),
+                  ("deprecated", False, None))
+        self.assertEqual(lifecycles, wanted)
+        # try to promote
+        response = self.post(self.base_url + "lifecycle/apply/", 
+                {"action" : "PROMOTE", "password":"wrong_password"})
+        lifecycles = tuple(response.context["object_lifecycle"])
+        self.assertEqual(lifecycles, wanted)
+        self.assertFalse(response.context["password_form"].is_valid())
 
     def test_revisions(self):
         response = self.get(self.base_url + "revisions/")

@@ -683,3 +683,22 @@ from openPLM.plmapp.archive import ARCHIVE_FORMATS
 class ArchiveForm(forms.Form):
     format = forms.TypedChoiceField(choices=zip(ARCHIVE_FORMATS, ARCHIVE_FORMATS))
 
+class ConfirmPasswordForm(forms.Form):
+    """
+    A form that checks the user has entered its password.
+    """
+    password = forms.CharField(label=_("Password"), 
+            widget=forms.PasswordInput(attrs= { "autocomplete" : "off" }))
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
+
+    def clean_password(self):
+        """
+        Validates that the password field is correct.
+        """
+        password = self.cleaned_data["password"]
+        if not self.user.check_password(password):
+            raise forms.ValidationError(_("Your password was entered incorrectly. Please enter it again."))
+        return password

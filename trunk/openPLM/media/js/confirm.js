@@ -14,7 +14,7 @@ function confirm_submit(form, e) {
     e.preventDefault();
     $("#" + form.attr("id") + "-dialog" ).dialog({
 			resizable: false,
-			height:250,
+			height:300,
 			modal: true,
 			buttons: {
 				Cancel: function() {
@@ -28,6 +28,7 @@ function confirm_submit(form, e) {
                         'type':'hidden',
                         'name': button.attr('name')
                     }).val(button.val()).appendTo(form);
+                    $(this).find("input").hide().appendTo(form);                    
                     form.submit();
 				}
 			}
@@ -38,16 +39,29 @@ function confirm_submit(form, e) {
 
 $(
     function(){
-        $(".confirmation input[type=submit]").click(function() {
+        $("form.confirmation input[type=submit]").click(function() {
             $("input[type=submit]", $(this).parents("form")).removeAttr("clicked");
             $(this).attr("clicked", "true");
         });
-
-        $(".confirmation").submit(
+        $("form.confirmation").submit(
             function (e) {
                 return confirm_submit($(this), e);
             }
         );
+        $("form.confirmation").each(function (){
+            var form = $(this);
+            var dialog = $("#" + form.attr("id") + "-dialog" );
+            dialog.hide();
+            if (dialog.hasClass("c-error")){
+                var cls = dialog.attr("class").split(" ");
+                var actions = $.grep(cls, function(x){return /^action-/.test(x);});
+                if (actions.length > 0) {
+                    var action = actions[0].replace(/^action-/, ""); 
+                    form.find("input[type=submit][value=" + action +"]").click();
+                }
+            }
+        });
+
 
     }
 );
