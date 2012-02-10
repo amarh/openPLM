@@ -302,21 +302,19 @@ div#CreationBox, div#SearchBox {
     font-weight: 600;
     font-variant:small-caps;
 
-    background-color:  #afacab;
-    background-position: left-center, left center, right center;
-    background-size: 2%, 33%, 65%;
+    background-color:  #aaa;
+    background-position: left center;
+    background-size: cover;
     background-repeat: no-repeat;
-
-    background-image:-moz-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -moz-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
     
-    background-image:-webkit-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -webkit-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
+    text-shadow: 1px 1px #000;
+}
 
-    background-image:-o-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -o-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
-
-    background-image:-ms-linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), -ms-radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
-
-    background-image:linear-gradient(left, rgba(98,100,102,1) 0%, rgba(136,136,136,1) 100%), radial-gradient(40% center, circle cover, #666, #afacab 100%), none;
-
+#CreationBox h2 {
+    background-image: url("../img/dark/h2_bg_1.png");
+}
+#SearchBox h2 {
+    background-image: url("../img/dark/h2_bg_2.png");
 }
 
 div#ActiveBox
