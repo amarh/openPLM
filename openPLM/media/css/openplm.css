@@ -742,13 +742,21 @@ div.chzn-container-single select *{
     font-size: 1em;
 }
 
-ul#createbar li ,
-ul#importbar li {
+ul#createbar > li ,
+ul#importbar > li {
     margin: 0.2em 0;
 }
 
 #SearchBox td > * {
     width: 100%;
+}
+
+#id_type_chzn {
+    max-width: 65%;
+}
+
+#create_button {
+    width: 30%;
 }
 
 #search_button {
