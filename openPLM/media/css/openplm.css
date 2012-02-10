@@ -567,15 +567,22 @@ td.open span.expander:hover {
 }
 
 /** simple search **/
-ul.Result {
+
+div.Result {
     display: block;
     background-color: #e4e3e2;
-    margin: 0.5em;
+    /*max-height: 30em;*/
+}
+
+ul.Result {
+    display: block;
+    /*background-color: #e4e3e2;*/
+    /*margin: 0.5em;*/
+    /*margin: 0.5em;*/
     overflow-y: auto;
     max-height: 30em;
 }
-
-ul.Result p {
+div.Result p {
     padding: 0.3em;
 }
 
