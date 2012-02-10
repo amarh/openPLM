@@ -153,13 +153,16 @@ div.main-box {
 }
 
 div.top-box {
-    background-color: #343434;
-    background: url("/media/img/dark/logo_openplm_linear.png") no-repeat left top,
-        url("/media/img/dark/banner.png") no-repeat #343434 right top;
-    background-size: auto auto, auto 100%;
+    background: url("/media/img/dark/banner.png") no-repeat #343434 right top;
     height: 70px;
     min-width: 100%;
     padding-top: 1em;
+}
+
+div.top-box #home {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 div#LoggedPersonBox > a,
