@@ -95,7 +95,10 @@
                     <li>
                     {{ field }}
                 {% endwith %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE !" %}"/>
+                <input id="create_button" type="submit" 
+                    class="{{"Button"|button}}"
+                    title="{% trans "Click here to create a new object." %}"
+                    value="{% trans "CREATE !" %}"/>
                 </li>
             </ul>
             <ul id="importbar">
