@@ -36,6 +36,12 @@
         {% get_current_language as LANGUAGE_CODE %}
         <div class="main-box" id="Page">
             <div class="top-box">
+                <div id="home">
+                    <a href="/home/">
+                        <img src="/media/img/dark/logo_openplm_linear.png"
+                        alt="logo-openplm" title="{% trans "Home page" %}">
+                    </a>
+                </div>
                 <div id="LoggedPersonBox">
                     {% block LoggedPersonBlock %}{% endblock %}
                 </div>
