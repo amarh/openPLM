@@ -40,50 +40,55 @@
     {% if link_creation %}
         {% trans "Results for link creation:" %}
     {% endif %}
-    <ul class="Result">
+    <div class="Result">
         {% for result in results %}
 
             {% if forloop.first %}
                 <p>
-                    {% trans "Results" %}
-                    <span id="numresults">
-                        {% blocktrans with results|length as count and search_count as total %}
-                            (1 - {{count}} on {{total}})
-                        {% endblocktrans %}
-                    </span> 
+                {% trans "Results" %}
+                <span id="numresults">
+                    {% blocktrans with results|length as count and search_count as total %}
+                        (1 - {{count}} on {{total}})
+                    {% endblocktrans %}
+                </span> 
                 </p>
-            {% endif %}
-
-            <li class="Result">
-            {% if navigate_bool %}
-                {% if result.object.is_part or result.object.is_document %}
-                    <div class="toolbar">
-                        <button class="attach">{% trans "Attach" %}</button>
-                        <button class="add_child">{% trans "Add child" %}</button>
-                    </div>
+                <ul class="Result">
                 {% endif %}
-            {% endif %}
-            <div class="reference">
-                {{result.rendered|safe}}
-            </div>
-            <div class="summary">
-                {{ result.highlighted.text|safe }}
-            </div>
-            {% if link_creation or navigate_bool %}
-                <form method="post" action="." enctype="multipart/form-data">
-                    {{result.rendered_add|safe}}
-                    {% if link_creation and result.object|can_add:attach %}
-                        <input type="submit" class="{{"Button"|button}}" value="{% trans "ADD" %}"/>
-                    {% endif %}
-                </form>
 
+                <li class="Result">
+                {% if navigate_bool %}
+                    {% if result.object.is_part or result.object.is_document %}
+                        <div class="toolbar">
+                            <button class="attach">{% trans "Attach" %}</button>
+                            <button class="add_child">{% trans "Add child" %}</button>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <div class="reference">
+                    {{result.rendered|safe}}
+                </div>
+                <div class="summary">
+                    {{ result.highlighted.text|safe }}
+                </div>
+                {% if link_creation or navigate_bool %}
+                    <form method="post" action="." enctype="multipart/form-data">
+                        {{result.rendered_add|safe}}
+                        {% if link_creation and result.object|can_add:attach %}
+                            <input type="submit" class="{{"Button"|button}}" value="{% trans "ADD" %}"/>
+                        {% endif %}
+                    </form>
+
+                {% endif %}
+                </li>
+
+                {% if forloop.last %}
+                </ul>
             {% endif %}
-            </li>
 
         {% empty %}
             <li>{% trans "No result matching given query" %}</li>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}
 
 {% block CreationBlock %}
@@ -96,9 +101,9 @@
                     {{ field }}
                 {% endwith %}
                 <input id="create_button" type="submit" 
-                    class="{{"Button"|button}}"
-                    title="{% trans "Click here to create a new object." %}"
-                    value="{% trans "CREATE !" %}"/>
+                class="{{"Button"|button}}"
+                title="{% trans "Click here to create a new object." %}"
+                value="{% trans "CREATE !" %}"/>
                 </li>
             </ul>
             <ul id="importbar">
