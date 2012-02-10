@@ -581,7 +581,7 @@ ul.Result p {
 
 li.Result {
     background-color: #fff;
-    padding: 0.5em;
+    padding: 0.5em 0.2em 0.5em 0.5em;
     margin-bottom: 0.4em;
     display:block;
 }
