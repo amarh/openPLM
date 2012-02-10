@@ -746,7 +746,10 @@ ul#importbar > li {
 }
 
 #SearchBox td > * {
-    width: 100%;
+    width: 90%;
+    max-width: 90%;
+    min-width: 90%;
+    vertical-align: middle;
 }
 
 #id_type_chzn {
