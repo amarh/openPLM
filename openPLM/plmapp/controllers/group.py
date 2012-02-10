@@ -148,34 +148,43 @@ class GroupController(Controller):
     @permission_required(role=models.ROLE_OWNER)
     def add_user(self, user):
         """
-        Adds *user* to the group.
+        Asks *user* to join the group.
+
+        It sends to *user* an email so that he can validate its inscription.
+
+        :raises: :exc:`ValueError` if user's email is empty.
         """
         if not user.email:
             raise ValueError("user's email is empty")
         inv = models.Invitation.objects.create(group=self.object, owner=self._user,
                 guest=user, guest_asked=False)
-        ctx = { "group" : self.object,
-                "invitation" : inv,
-                }
-        subject = "[PLM] Invitation to join the group %s" % self.name 
-        self._send_mail(send_mail, subject, [user], ctx, "mails/invitation1")
+        self.send_invitation_to_guest(inv)
 
     def ask_to_join(self):
         """
-        Adds *user* to the group.
+        Asks to join the group.
+        
+        It sends an email to the group's owner so that he can validate the
+        inscription.
+        
+        :raises: :exc:`ValueError` if the owner's email is empty.
         """
         if not self.owner.email:
             raise ValueError("user's email is empty")
         inv = models.Invitation.objects.create(group=self.object, owner=self.owner,
                 guest=self._user, guest_asked=True)
-        ctx = { "group" : self.object,
-                "invitation" : inv,
-                "guest" : self._user
-                }
-        subject = "[PLM] %s ask you to join the group %s" % (self._user, self.name) 
-        self._send_mail(send_mail, subject, [self.owner], ctx, "mails/invitation2")
+        self.send_invitation_to_owner(inv)
 
     def accept_invitation(self, invitation):
+        """
+        Accepts an invitation.
+
+        If the owner sent *invitation*, it checks that :attr:`_user` is the
+        guest and adds him to the group.
+
+        If the guest sent *invitation*, it checks that :attr:`_user` is the
+        owner and adds the guest to the group.
+        """
         if invitation.state != models.Invitation.PENDING:
             raise ValueError("Invalid invitation")
         if invitation.guest_asked:
@@ -194,7 +203,55 @@ class GroupController(Controller):
         user.save()
         self._save_histo("User added", user.username, users=(user,))
 
+    def send_invitation_to_owner(self, invitation):
+        """
+        Sends a mail to the owner asking him to accept the invitation
+        to join the group.
+
+        This method can be called to resend an invitation.
+
+        :raises: :exc:`ValueError` if the invitation's state is not 
+            :attr:`.Invitation.PENDING`
+        """
+        if invitation.state != models.Invitation.PENDING:
+            raise ValueError("Invalid invitation")
+        ctx = { "group" : self.object,
+                "invitation" : invitation,
+                "guest" : self._user,
+                }
+        subject = "[PLM] %s ask you to join the group %s" % (self._user, self.name) 
+        self._send_mail(send_mail, subject, [self.owner], ctx, "mails/invitation2")
+
+    def send_invitation_to_guest(self, invitation):
+        """
+        Sends a mail to the guest asking him to accept the invitation
+        to join the group.
+
+        This method can be called to resend an invitation.
+        
+        :raises: :exc:`ValueError` if the invitation's state is not 
+            :attr:`.Invitation.PENDING`
+        """
+        if invitation.state != models.Invitation.PENDING:
+            raise ValueError("Invalid invitation")
+        ctx = { "group" : self.object,
+                "invitation" : invitation,
+                }
+        subject = "[PLM] Invitation to join the group %s" % self.name 
+        self._send_mail(send_mail, subject, [invitation.guest], ctx,
+                "mails/invitation1")
+
     def refuse_invitation(self, invitation):
+        """
+        Refuses an invitation.
+
+        If the owner sent *invitation*, it checks that :attr:`_user` is the
+        guest and *invitation* is marked as refused.
+
+        If the guest sent *invitation*, it checks that :attr:`_user` is the
+        owner and *invitation* is marked as refused.
+
+        """
         if invitation.state != models.Invitation.PENDING:
             raise ValueError("Invalid invitation")
         if invitation.guest_asked:
