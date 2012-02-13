@@ -225,7 +225,7 @@ class UserController(Controller):
         """
         Returns all delegatees of :attr:`object`.
         """
-        return self.delegationlink_delegator.order_by("role")
+        return self.delegationlink_delegator.order_by("role", "delegatee__username")
 
     @permission_required(role=models.ROLE_OWNER)
     def sponsor(self, new_user, is_contributor=True):
@@ -261,7 +261,30 @@ class UserController(Controller):
                 plmobject=self._user, details="New user: %s" % new_user.username)
         models.UserHistory.objects.create(action="Create", user=self._user,
                 plmobject=new_user, details="Account created")
-        
-        
-
+       
+    @permission_required(role=models.ROLE_OWNER)
+    def resend_sponsor_mail(self, new_user):
+        try:
+            link = models.DelegationLink.objects.get(delegator=self._user,
+                delegatee=new_user, role=models.ROLE_SPONSOR)
+        except models.DelegationLink.DoesNotExist:
+            raise PermissionError("You did not sponsored %s"
+                    % new_user.username)
+        # checks that new_user did not logged on openPLM to not
+        # reset its password
+        if new_user.last_login >= link.ctime:
+            raise ValueError("Can not resend a sponsor mail:"
+                    "%s has already logged on openPLM" % new_user)
+        # generate a new password
+        password = generate_password()
+        new_user.set_password(password)
+        new_user.save()
+        # send a mail
+        ctx = {
+                "new_user" : new_user,
+                "sponsor" : self._user,
+                "password" : password,
+               }
+        self._send_mail(send_mail, "New account on openPLM", [new_user],
+                ctx, "mails/new_account") 
 

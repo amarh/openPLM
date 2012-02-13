@@ -35,22 +35,33 @@
             <th class="Content"> {% trans "Role" %} </th>
         </tr>
         {% for link in user_delegation_link %}
-	            <tr class="Content">
-		            <td class="Content">{{link.delegatee.username}}</td>
-		            <td class="Content">{{link.delegatee.first_name}}</td>
-		            <td class="Content">{{link.delegatee.last_name}}</td>
-		            <td class="Content">{{link.role}}</td>
-                    {% if is_owner %}
-                        {% ifnotequal link.role "sponsor" %}
+            <tr class="Content">
+                <td class="Content">{{link.delegatee.username}}</td>
+                <td class="Content">{{link.delegatee.first_name}}</td>
+                <td class="Content">{{link.delegatee.last_name}}</td>
+                <td class="Content">{{link.role}}</td>
+                {% if is_owner %}
+                    {% if link.role != "sponsor" %}
                         <td class="Content">
                             <form method="post" action="">
                                 <input type="hidden" name="link_id" value="{{link.id}}" />
                                 <input type="submit" class="{{"Button"|button}}" value="{% trans "STOP DELEGATION" %}"/>
                             </form>
                         </td>
-                        {% endifnotequal %}
+                    {% else %}
+                        {% if link.delegatee.last_login <= link.ctime %}
+                            <td class="Content">
+                                <form method="post" action="sponsor/mail/">
+                                    <input type="hidden" name="link_id" value="{{link.id}}" />
+                                    <input type="submit" class="{{"Button"|button}}" value="{% trans "Resend mail" %}"/>
+                                </form>
+                            </td>
+                        {% endif %}
+
+
                     {% endif %}
-	            </tr>
+                {% endif %}
+            </tr>
         {% endfor %}
     </table>
 {% endblock %}

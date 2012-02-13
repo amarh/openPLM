@@ -1063,6 +1063,9 @@ def display_groups(request, obj_ref):
 
 @handle_errors
 def sponsor(request, obj_ref):
+    """
+    View of the *sponsor* page.
+    """
     obj, ctx = get_generic_data(request, "User", obj_ref)
     if request.method == "POST":
         form = forms.SponsorForm(request.POST)
@@ -1075,6 +1078,18 @@ def sponsor(request, obj_ref):
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.htm", ctx, request)
+
+@handle_errors
+def sponsor_resend_mail(request, obj_ref):
+    obj, ctx = get_generic_data(request, "User", obj_ref)
+    if request.method == "POST":
+        try:
+            link_id = request.POST["link_id"]
+            link = models.DelegationLink.objects.get(id=int(link_id))
+            obj.resend_sponsor_mail(link.delegatee)
+        except (KeyError, ValueError, ControllerError) as e:
+            return HttpResponseForbidden()
+    return HttpResponseRedirect("../../")
 
 @handle_errors
 def display_plmobjects(request, obj_ref):
@@ -1121,6 +1136,24 @@ def refuse_invitation(request, obj_ref, token):
     ctx["invitation"] = inv
     ctx['current_page'] = 'users'
     return r2r("groups/refuse_invitation.htm", ctx, request)
+
+@handle_errors
+def send_invitation(request, obj_ref, token):
+    """
+    Views to (re)send an invitation.
+
+    :param obj_ref: name of the group
+    :param token: token that identify the invitation
+    """
+    token = long(token)
+    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    inv = models.Invitation.objects.get(token=token)
+    if request.method == "POST":
+        if inv.guest_asked:
+            obj.send_invitation_to_owner(inv)
+        else:
+            obj.send_invitation_to_guest(inv)
+    return HttpResponseRedirect("../../../users/")
 
 @handle_errors(undo="../..")
 def import_csv_init(request, target="csv"):
