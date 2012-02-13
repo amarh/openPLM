@@ -91,9 +91,17 @@
                                 </td>
                                 <td class="Content"> {{ guest.first_name }} </td>
                                 <td class="Content"> {{ guest.last_name }} </td>
-
                             {% endwith %}
                             <td class="Content"> {{ inv.ctime|date:"r" }} </td>
+                            {% if inv.guest_asked and inv.guest == user or inv.owner == user %}
+                                <td class="Conent">
+                                    <form method="POST" action="../invitation/send/{{inv.pk}}/">
+                                        <input type="submit" name="Send"
+                                            class="{{"Button"|button}}"
+                                            value="{% trans "Resend" %}"/>
+                                    </form>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
