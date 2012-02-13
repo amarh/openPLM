@@ -11,7 +11,7 @@
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
-    <form id ="form-promote" class="confirmation"  action="apply/" method="POST">
+    <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
         <div id="form-promote-dialog"
             title="{% trans "Are you sure?" %}"
             {% if password_form.is_bound and not password_form.is_valid %} 
