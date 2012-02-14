@@ -385,3 +385,13 @@ class DocumentController(PLMObjectController):
                 if delete:
                     self.delete_file(filename)
 
+    def cancel(self):
+        """
+        Cancels the object:
+
+            * calls :meth:`.PLMObjectController.cancel`
+            * removes all :class:`.DocumentPartLink` related to the object
+        """
+        super(DocumentController, self).cancel()
+        self.get_attached_parts().delete()
+
