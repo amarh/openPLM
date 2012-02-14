@@ -226,7 +226,14 @@ class SearchBackend(BaseSearchBackend):
                 weights = index.get_field_weights()
                 for field in self.schema:
                     if field['field_name'] in data.keys():
-                        prefix = DOCUMENT_CUSTOM_TERM_PREFIX + field['field_name'].upper()
+                        if field['field_name'] == 'id': continue
+                        if field['type'] == "date":
+                            # dates have another prefix to not match them
+                            # with a general query
+                            prefix = DOCUMENT_CUSTOM_TERM_PREFIX + "DATE" +\
+                                field['field_name'].upper()
+                        else:
+                            prefix = DOCUMENT_CUSTOM_TERM_PREFIX + field['field_name'].upper()
                         value = data[field['field_name']]
                         try:
                             weight = int(weights[field['field_name']])
@@ -237,6 +244,11 @@ class SearchBackend(BaseSearchBackend):
                                 term = _marshal_term(value)
                                 term_generator.index_text(term, weight)
                                 term_generator.index_text(term, weight, prefix)
+                                if "_" in term:
+                                    for t in term.split("_"):
+                                        term_generator.index_text(t, weight)
+                                        term_generator.index_text(t, weight, prefix)
+
                                 if len(term.split()) == 1:
                                     document.add_term(term, weight)
                                     document.add_term(prefix + term, weight)
@@ -253,7 +265,16 @@ class SearchBackend(BaseSearchBackend):
                             if field['multi_valued'] == 'false':
                                 term = _marshal_term(value)
                                 if len(term.split()) == 1:
-                                    document.add_term(term, weight)
+                                    if field['type'] != 'date':
+                                        document.add_term(term, weight)
+                                    else:
+                                        # also add year, year+month and year+month+day
+                                        document.add_term(prefix + term[:4], weight)
+                                        document.add_term(prefix + term[:6], weight)
+                                        document.add_term(prefix + term[:8], weight)
+                                    document.add_value(field['column'], _marshal_value(value))
+                                    document.add_value(field['column'], _marshal_value(value))
+                                    document.add_value(field['column'], _marshal_value(value))
                                     document.add_term(prefix + term, weight)
                                     document.add_value(field['column'], _marshal_value(value))
                             else:
@@ -456,7 +477,7 @@ class SearchBackend(BaseSearchBackend):
             facets_dict['dates'] = self._do_date_facets(results, date_facets)
         if query_facets:
             facets_dict['queries'] = self._do_query_facets(results, query_facets)
-        
+
         return {
             'results': results,
             'hits': self._get_hit_count(database, enquire),
@@ -586,12 +607,22 @@ class SearchBackend(BaseSearchBackend):
         qp.set_stemmer(xapian.Stem(self.language))
         qp.set_stemming_strategy(xapian.QueryParser.STEM_SOME)
         qp.add_boolean_prefix('django_ct', DOCUMENT_CT_TERM_PREFIX)
-
+        if ":" in query_string:
+            field, value = query_string.split(":", 1)
+        else:
+            field = ""
         for field_dict in self.schema:
-            qp.add_prefix(
-                field_dict['field_name'],
-                DOCUMENT_CUSTOM_TERM_PREFIX + field_dict['field_name'].upper()
-            )
+            if field_dict["field_name"] != "id":
+                qp.add_prefix(
+                    field_dict['field_name'],
+                    DOCUMENT_CUSTOM_TERM_PREFIX + field_dict['field_name'].upper()
+                )
+            if field_dict["field_name"] == field.lower() and field_dict["type"] == "date":
+                qp.add_prefix(
+                    field_dict['field_name'],
+                    DOCUMENT_CUSTOM_TERM_PREFIX + "DATE" + field.upper()
+                )
+
         
         #vrp = XHValueRangeProcessor(self)
         #qp.add_valuerangeprocessor(vrp)
@@ -1190,11 +1221,16 @@ class SearchQuery(BaseSearchQuery):
         elif field == 'django_ct':
             return xapian.Query('%s%s' % (DOCUMENT_CT_TERM_PREFIX, term))
         elif field:
+            prefix = DOCUMENT_CUSTOM_TERM_PREFIX
+            for field_dict in self.backend.schema:
+                if field_dict["field_name"] == field.lower() and field_dict["type"] == "date":
+                    prefix += "DATE"            
+                    break
             stemmed = 'Z%s%s%s' % (
-                DOCUMENT_CUSTOM_TERM_PREFIX, field.upper(), stem(term)
+                prefix, field.upper(), stem(term)
             )
             unstemmed = '%s%s%s' % (
-                DOCUMENT_CUSTOM_TERM_PREFIX, field.upper(), term
+                prefix, field.upper(), term
             )
         else:
             stemmed = 'Z%s' % stem(term)

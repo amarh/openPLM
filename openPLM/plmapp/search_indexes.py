@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db.models import signals
 from django.db.models.loading import get_model
@@ -66,20 +68,46 @@ def set_template_name(index):
 class QueuedModelSearchIndex(ModelSearchIndex, QueuedSearchIndex):
     pass
 
+
+def prepare_date(date):
+    """
+    Returns a date rounded to the day.
+    """
+    return datetime.datetime(date.year, date.month, date.day)
+
 class UserIndex(ModelSearchIndex):
     class Meta:
-        pass
+        fields = ("username", "last_name", "first_name", "email")
+
+    ctime = DateTimeField(model_attr="date_joined")
     
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
+    
+    def prepare_ctime(self, obj):
+        return prepare_date(obj.date_joined)
+
 
 set_template_name(UserIndex)
 site.register(models.User, UserIndex)
 
 class GroupIndex(ModelSearchIndex):
     class Meta:
-        pass
-    
+        fields = ("name", "description", "owner", "creator")
+
+    owner = CharField(model_attr="owner__username")
+    creator = CharField(model_attr="creator__username")
+
+    ctime = DateTimeField(model_attr="ctime")
+    mtime = DateTimeField(model_attr="mtime")
+
+    def prepare_ctime(self, obj):
+        return prepare_date(obj.ctime)
+
+    def prepare_mtime(self, obj):
+        return prepare_date(obj.mtime)
+
+
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
 
@@ -97,26 +125,27 @@ for key, model in models.get_all_plmobjects().iteritems():
         class Meta:
             fields = set(model.get_creation_fields())
             fields.update(model.get_modification_fields())
-       
-        owner = CharField(model_attr="owner")
-        creator = CharField(model_attr="creator")
+
+        owner = CharField(model_attr="owner__username")
+        creator = CharField(model_attr="creator__username")
         state = CharField(model_attr="state__name")
         lifecycle = CharField(model_attr="lifecycle__name")
+
+        ctime = DateTimeField(model_attr="ctime")
+        mtime = DateTimeField(model_attr="mtime")
 
         rendered = CharField(use_template=True, indexed=False)
         rendered_add = CharField(use_template=True, indexed=False)
        
-        def prepare_owner(self, obj):
-            return obj.owner.username
+        def prepare_ctime(self, obj):
+            return prepare_date(obj.ctime)
 
-        def prepare_creator(self, obj):
-            return obj.creator.username
+        def prepare_mtime(self, obj):
+            return prepare_date(obj.mtime)
 
         def index_queryset(self):
-            if "type" in self.model.get_creation_fields():
-                return self.model.objects.filter(type=self.key)
-            else:
-                return self.model.objects.all()
+            return self.model.objects.filter(type=self.key)
+
     set_template_name(ModelIndex)
     site.register(model, ModelIndex)
 
@@ -128,7 +157,7 @@ text_files = set((".txt", ".test", ))
 class DocumentFileIndex(QueuedModelSearchIndex):
     text = CharField(document=True, use_template=True)
     filename = CharField(model_attr='filename')
-    file = CharField(model_attr='file')
+    file = CharField(model_attr='file', stored=False)
     
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
@@ -139,10 +168,11 @@ class DocumentFileIndex(QueuedModelSearchIndex):
         path = obj.file.path
         name, ext = os.path.splitext(path)
         if ext.lower() in text_files:
-            return codecs.open(path, encoding="utf-8", errors="ignore").read()
+            content = codecs.open(path, encoding="utf-8", errors="ignore").read()
         else:
             p = Popen([settings.EXTRACTOR, path], stdout=PIPE, close_fds=True)
-            return p.stdout.read()
+            content = p.stdout.read()
+        return content
 
 site.register(models.DocumentFile, DocumentFileIndex)
 

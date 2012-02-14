@@ -1,7 +1,3 @@
-type:{{object.type}}
-reference:{{object.reference}}
-revision:{{object.revision}}
-
 {% for attr, value in object.get_attributes_and_values %}
-- {{attr}}:{{ value }}
+{% if "time" not in attr %} - {{attr}}:{{ value }} {% endif %}
 {% endfor %}
