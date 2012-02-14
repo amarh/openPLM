@@ -28,6 +28,7 @@ Table of contents:
     user/index
     admin/index
     devel/index
+    specs/index
 
 
 Indices and tables
