@@ -304,3 +304,17 @@ class DocumentControllerTest(ControllerTest):
         f3 = revb.files.all()[0]
         self.assertNotEquals(f2.thumbnail.path, f3.thumbnail.path)
 
+    def test_cancel(self):
+        """
+        Tests :meth:`.Document.cancel`.
+        """ 
+        self.assertFalse(self.controller.is_cancelled)
+        part = self.get_part()
+        self.controller.attach_to_part(part)
+        self.assertEqual(1, self.controller.get_attached_parts().count())
+        # cancels the object
+        self.controller.cancel()
+        self.check_cancelled_object(self.controller)
+        # tests the links
+        self.assertEqual(0, self.controller.get_attached_parts().count())
+

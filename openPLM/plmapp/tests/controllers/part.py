@@ -225,4 +225,21 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(controller.state.name, "draft")
         self.failUnless(controller.is_editable)
 
+    def test_cancel(self):
+        """
+        Tests :meth:`.Part.cancel`.
+        """ 
+        self.assertFalse(self.controller.is_cancelled)
+        self.assertEqual(1, self.controller.get_attached_documents().count())
+        # builds a small bom to checks that links are removed
+        self.controller.add_child(self.controller2, 10, 10, "-")
+        self.controller3.add_child(self.controller, 10, 10, "-")
+        # cancels the object
+        self.controller.cancel()
+        self.check_cancelled_object(self.controller)
+        # tests the links
+        self.assertEqual(0, self.controller.get_attached_documents().count())
+        self.assertEqual(0, len(self.controller.get_children()))
+        self.assertEqual(0, len(self.controller3.get_children()))
+         
 

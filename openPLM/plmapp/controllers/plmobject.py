@@ -269,6 +269,9 @@ class PLMObjectController(Controller):
         If *check_user* is True (the default), it also checks if :attr:`_user` can
         see the objects.
         """
+        # a cancelled object cannot be revised.
+        if self.is_cancelled:
+            return False
         # objects.get fails if a link does not exist
         # we can revise if any links exist
         try:
@@ -443,6 +446,8 @@ class PLMObjectController(Controller):
         """
         if not self.is_editable:
             return True
+        if self.is_cancelled:
+            return True
         if self._user.username == settings.COMPANY:
             # the company is like a super user
             return True
@@ -453,4 +458,20 @@ class PLMObjectController(Controller):
         if raise_:
             raise PermissionError("You can not see this object.")
         return False
+
+    def cancel(self):
+        """
+        Cancels the object:
+
+            * Its lifecycle becomes "cancelled".
+            * Its owner becomes the company.
+            * It removes all signer.
+        """
+        company = models.User.objects.get(username=settings.COMPANY)
+        self.set_owner(company)
+        self.lifecycle = models.get_cancelled_lifecycle()
+        self.state = models.get_cancelled_state()
+        self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).delete()
+        self.save(with_history=False)
+        self._save_histo("Cancel", "Object cancelled") 
 

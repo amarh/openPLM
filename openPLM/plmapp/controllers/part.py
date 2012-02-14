@@ -28,6 +28,7 @@
 import datetime
 from collections import namedtuple
 
+from django.db.models.query import Q
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.units import DEFAULT_UNIT
@@ -388,4 +389,18 @@ class PartController(PLMObjectController):
                 document = form.cleaned_data["document"]
                 if delete:
                     self.detach_document(document)
+
+    def cancel(self):
+        """
+        Cancels the object:
+
+            * calls :meth:`.PLMObjectController.cancel`
+            * removes all :class:`.DocumentPartLink` related to the object
+            * removes all children/parents link (set their end_time)
+        """
+        super(PartController, self).cancel()
+        self.get_attached_documents().delete()
+        q = Q(parent=self.object) | Q(child=self.object)
+        now = datetime.datetime.today()
+        models.ParentChildLink.objects.filter(q, end_time=None).update(end_time=now)
 

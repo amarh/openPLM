@@ -535,6 +535,11 @@ class PLMObject(models.Model):
         official_rank = lcs.get(state=self.lifecycle.official_state).rank
         return current_rank < official_rank
     
+    @property
+    def is_cancelled(self):
+        """ True if the object is cancelled. """
+        return self.lifecycle == get_cancelled_lifecycle()
+    
     def get_current_sign_level(self):
         """
         Returns the current sign level that an user must have to promote this
@@ -555,12 +560,14 @@ class PLMObject(models.Model):
    
     @property
     def is_part(self):
+        """ True if the plmobject is a part."""
         if self.type in get_all_plmobjects():
             return issubclass(get_all_plmobjects()[self.type], Part)
         return False
 
     @property
     def is_document(self):
+        """ True if the plmobject is a document."""
         if self.type in get_all_plmobjects():
             return issubclass(get_all_plmobjects()[self.type], Document)
         return False
@@ -638,6 +645,8 @@ class PLMObject(models.Model):
 
     def get_leaf_object(self):
         return get_all_plmobjects()[self.type].objects.get(id=self.id)
+
+
 
 # parts stuff
 
@@ -925,6 +934,7 @@ class AbstractHistory(models.Model):
         ("Revise", "Revise"),
         ("Promote", "Promote"),
         ("Demote", "Demote"),
+        ("Cancel", "Cancel"),
     )
     
     class Meta:

@@ -280,3 +280,16 @@ class ControllerTest(BaseTestCase):
         controller.object.is_promotable = always_false
         self.assertRaises(exc.PromotionError, controller.promote)
 
+    def check_cancelled_object(self, ctrl):
+        """ Checks a cancelled plmobject."""
+        self.assertTrue(ctrl.is_cancelled)
+        self.assertEqual("cancelled", ctrl.state.name)
+        self.assertEqual("cancelled", ctrl.lifecycle.name)
+        self.assertEqual(self.cie, ctrl.owner)
+        self.assertTrue(ctrl.check_readable())
+        self.assertFalse(ctrl.is_revisable())
+        self.assertFalse(ctrl.is_promotable())
+        signers = ctrl.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN)
+        self.assertEqual(0, signers.count())
+
+
