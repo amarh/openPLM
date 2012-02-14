@@ -169,6 +169,9 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0):
         field = form.fields["group"]
         field.queryset = m.GroupInfo.objects.filter(id__in=groups)
         field.error_messages["invalid_choice"] = INVALID_GROUP
+        # do not accept the cancelled lifecycle
+        lifecycles = m.Lifecycle.objects.exclude(pk=m.get_cancelled_lifecycle().pk)
+        form.fields["lifecycle"].queryset = lifecycles
     return form
 get_creation_form.cache = {}
         

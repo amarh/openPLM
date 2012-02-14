@@ -15,19 +15,25 @@
         "fields": {}
     }, 
     {
+        "pk": "cancelled", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
         "pk": "draft_official_deprecated", 
         "model": "plmapp.lifecycle", 
         "fields": {
             "official_state":"official"
         }
-    }, 
+    },
     {
-        "pk": "draft_official", 
+        "pk": "cancelled", 
         "model": "plmapp.lifecycle", 
         "fields": {
-            "official_state":"official"
+            "official_state":"cancelled"
         }
     }, 
+
     {
         "pk": 1, 
         "model": "plmapp.lifecyclestates", 
@@ -59,18 +65,9 @@
         "pk": 4, 
         "model": "plmapp.lifecyclestates", 
         "fields": {
-            "state": "draft", 
-            "lifecycle": "draft_official", 
+            "state": "cancelled", 
+            "lifecycle": "cancelled", 
             "rank": 0
         }
-    }, 
-    {
-        "pk": 5, 
-        "model": "plmapp.lifecyclestates", 
-        "fields": {
-            "state": "official", 
-            "lifecycle": "draft_official", 
-            "rank": 1
-        }
-    }
+    } 
 ]

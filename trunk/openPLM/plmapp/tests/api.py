@@ -136,7 +136,7 @@ class ApiTestCase(CommonViewTest):
     def test_create(self):
         data = self.post("/api/create/", type="Document", name="docu",
                 reference="DocRef", revision="0", group=self.group.id,
-                lifecycle="draft_official")
+                lifecycle="draft_official_deprecated")
         self.assertEqual("ok", data["result"])
         obj = data["object"]
         self.assertEqual("DocRef", obj["reference"])

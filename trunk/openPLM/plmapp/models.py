@@ -367,7 +367,22 @@ def get_default_lifecycle():
     u"""
     Returns the default :class:`Lifecycle` used when instanciate a :class:`PLMObject`
     """
-    return Lifecycle.objects.all()[0]
+    return Lifecycle.objects.get(name="draft_official_deprecated")
+
+@memoize_noarg
+def get_cancelled_lifecycle():
+    u"""
+    Returns the "cancelled" Lifecycle.
+    """
+    return Lifecycle.objects.get(name="cancelled")
+
+@memoize_noarg
+def get_cancelled_state():
+    u"""
+    Returns the "cancelled" State.
+    """
+    return State.objects.get(name="cancelled")
+
 
 _default_states_cache = {}
 def get_default_state(lifecycle=None):
