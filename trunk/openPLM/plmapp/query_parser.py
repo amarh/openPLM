@@ -8,7 +8,7 @@ try:
 except Exception:
     SQ = None
 
-split = re.compile("[%s]" % re.escape(string.punctuation)).split
+split = re.compile("[%s]+" % re.escape(string.punctuation)).split
 
 class Alternatives(List):
 
@@ -64,12 +64,14 @@ class Text(List):
         # of the number:
         # for example, we replace 51 with 51 or 051 or 0051...
         sq = SQ()
+        if text == "*":
+            qualifier = "content"
         if text.endswith("*"):
             text = text.rstrip("*")
             items = split(text)
             for item in items[:-1]:
                 sq &= convert_number(item, qualifier)
-            suffix = "*" if qualifier == "content" else ""
+            suffix = "*" if qualifier in ("text", "content") else ""
             sq &= SQ(**{ qualifier + "__startswith" : items[-1]+suffix})
         else:
             sq = convert_number(text, qualifier)

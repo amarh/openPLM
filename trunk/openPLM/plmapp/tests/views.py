@@ -708,6 +708,16 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("1759", self.TYPE)
         self.assertEqual([c2.object, c3.object], results) 
 
+    def test_search_numbers_separated_by_underscores(self):
+        """ Tests that 1759 matches 001759. (see ticket #69)."""
+
+        c2 = self.CONTROLLER.create("part_001759", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("1759", self.TYPE)
+        self.assertEqual([c2.object], results) 
+        c3 = self.CONTROLLER.create("part_0001759", self.TYPE, "c", self.user, self.DATA)
+        results = self.search("1759", self.TYPE)
+        self.assertEqual([c2.object, c3.object], results) 
+
     def test_search_all(self):
         for i in xrange(6):
             self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",

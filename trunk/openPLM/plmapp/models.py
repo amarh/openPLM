@@ -587,8 +587,9 @@ class PLMObject(models.Model):
         :meth:`excluded_creation_fields`
         """
         fields = ["reference", "type", "revision", "lifecycle"]
+        excludes = cls.excluded_creation_fields()
         for field in cls(__fake__=True).attributes:
-            if field not in cls.excluded_creation_fields():
+            if field not in excludes and field not in fields:
                 fields.append(field)
         return fields
 
