@@ -80,6 +80,28 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(self.controller.state.name, "draft")
         self.failUnless(self.controller.is_editable)
 
+    def test_is_promotable_no_file(self):
+        """ Tests that a document without a file is not promotable."""
+        self.assertFalse(self.controller.files)
+        self.assertFalse(self.controller.is_promotable())
+
+    def test_is_promotable_one_locked_file(self):
+        """ Tests that a document with one locked file is not promotable."""
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertFalse(self.controller.is_promotable())
+
+    def test_is_promotable_one_unlocked_file(self):
+        """ Tests that a document with one unlocked file is promotable."""
+        d = self.controller.add_file(self.get_file())
+        self.assertTrue(self.controller.is_promotable())
+
+    def test_is_promotable_two_unlocked_files(self):
+        """ Tests that a document with two unlocked files is promotable."""
+        self.controller.add_file(self.get_file("plop.txt"))
+        self.controller.add_file(self.get_file("plap.txt"))
+        self.assertTrue(self.controller.is_promotable())
+
     def test_lock(self):
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
