@@ -181,9 +181,9 @@ class PartControllerTest(ControllerTest):
         
     def test_is_promotable4(self):
         """Tests promotion from official state, with a deprecated child."""
-        self.controller2.promote()
-        self.controller2.promote()
         self.controller.add_child(self.controller2, 10, 15)
+        self.controller2.promote()
+        self.controller2.promote()
         self.failUnless(self.controller.is_promotable())
 
     def test_is_promotable_no_document(self):
