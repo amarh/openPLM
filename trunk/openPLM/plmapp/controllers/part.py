@@ -60,6 +60,10 @@ class PartController(PLMObjectController):
         """
         self.check_permission("owner")
         self.check_editable()
+        if child.is_cancelled:
+            raise ValueError("Can not add child: child is cancelled.")
+        if child.is_deprecated:
+            raise ValueError("Can not add child: child is deprecated.")
         if not child.is_part:
             raise TypeError("Can not add child: not a Part")
         # check if child is not a parent
@@ -344,9 +348,13 @@ class PartController(PLMObjectController):
     
     def check_attach_document(self, document):
         self.check_permission("owner")
+        self.check_editable()
         if not hasattr(document, "is_document") or not document.is_document:
             raise TypeError("%s is not a document" % document)
-
+        if document.is_cancelled: 
+            raise ValueError("Can not attach: document is cancelled.")
+        if document.is_deprecated: 
+            raise ValueError("Can not attach: document is deprecated.")
         if isinstance(document, PLMObjectController):
             document.check_readable()
             document = document.object

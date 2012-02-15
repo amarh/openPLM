@@ -250,9 +250,13 @@ class DocumentController(PLMObjectController):
 
     def check_attach_part(self, part):
         self.check_permission("owner")
+        self.check_editable()
         if not (hasattr(part, "is_part") and part.is_part):
             raise TypeError("%s is not a part" % part)
-
+        if part.is_cancelled: 
+            raise ValueError("Can not attach: part is cancelled.")
+        if part.is_deprecated: 
+            raise ValueError("Can not attach: part is deprecated.")
         if isinstance(part, PLMObjectController):
             part.check_readable()
             part = part.object
