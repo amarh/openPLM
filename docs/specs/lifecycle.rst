@@ -27,12 +27,26 @@ Parts
     #. Part without children shall have at least one linked official
        document before being promoted 
 
+       :Tests: - plmapp.PartControllerTest.test_is_promotable1
+               - plmapp.PartControllerTest.test_is_promotable_no_document
+               - plmapp.PartControllerTest.test_is_promotable_no_official_document
+               - plmapp.PartControllerTest.test_is_promotable_one_official_document
+
 Documents
 ----------
 
     #. Document shall not be promoted without a file in
        it or equivalent 
+
+       :Tests: - plmapp.DocumentControllerTest.test_is_promotable_no_file
+               - plmapp.DocumentControllerTest.test_is_promotable_one_unlocked_file
+               - suversion.SubversionRepositoryTestCase.test_is_promotable
+
     #. Document shall not be promoted if one of their files is locked 
+
+       :Tests: - plmapp.DocumentControllerTest.test_is_promotable_one_locked_file
+               - plmapp.DocumentControllerTest.test_is_promotable_one_unlocked_file
+               - plmapp.DocumentControllerTest.test_is_promotable_two_unlocked_files
         
 Promote rules to official for Standard lifecycles
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
