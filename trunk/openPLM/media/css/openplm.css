@@ -455,9 +455,10 @@ table.Content
 {
     width: 100%;
     margin-top: 10px;
-    border-spacing: 2px;
+    border-spacing: 1px;
     border-collapse: separate;
     font-size: 14px;
+    background-color: #adacab;
 }
 
 table.Content th,
@@ -472,7 +473,7 @@ table.Content th
 {
     text-align: right;
     padding-right: 10px;
-    font-weight: 500;
+    font-weight: bold;
     color: #eee;
     background-color: #585455;
 }
@@ -543,30 +544,28 @@ td.expander span.expander {
     cursor: pointer;
     margin-top: auto;
     margin-bottom: auto;
-    display:block; width:16px; height:16px;
-    text-indent:-5000em;
+    display:block; min-width:36px; height:16px;
+    text-indent: 36px;
     background-repeat: no-repeat;
-    background-position: 0 50%;
+    background-position: 0 0;
     padding-left:4px;
     margin-left:6px;
+    color:black;
+    text-align:right;
 }
 
 td.expanded span.expander {
-    background-image: url("/media/img/expander_normal.png");
+    background-image: url("/media/img/expander_normal_puce.png");
 }
 td.expanded span.expander:hover {
-    background-image: url("/media/img/expander_normal_hover.png");
+    background-image: url("/media/img/expander_normal_hover_puce.png");
 }
 
 td.open span.expander {
-    padding-left: 0;
-    margin-left: 2px;
-    background-image: url("/media/img/expander_open.png");
+    background-image: url("/media/img/expander_open_puce.png");
 }
 td.open span.expander:hover {
-    padding-left: 0;
-    margin-left: 2px;
-    background-image: url("/media/img/expander_open_hover.png");
+    background-image: url("/media/img/expander_open_hover_puce.png");
 }
 
 /** simple search **/

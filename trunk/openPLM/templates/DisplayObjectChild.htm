@@ -28,7 +28,7 @@
     </form>
     <table class="Content">
         <tr class="Content">
-            <th class="Content" style="width:50px"> </th>
+            <th class="Content" style="width:50px"> {% trans "Level" %} </th>
             <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
             <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
             <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
@@ -44,7 +44,7 @@
         {% for level, link in children %}
             <tr class="Content"> 
                 <td class="Content expander open level{{level}}" style="padding-left:{{level|add:"-1"}}0px;" >
-                    <span class="expander">↳</span>
+                    <span class="expander">{{level}}</span>
                 </td>
 
                 <td class="Content"> {{ link.order }} </td>
