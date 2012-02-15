@@ -169,13 +169,36 @@ class PLMObjectController(Controller):
                                      {"first" :state.name, "second" : new_state}
                 self._save_histo("Promote", details, roles=["sign_"])
                 if self.object.state == lifecycle.official_state:
-                    cie = models.User.objects.get(username=settings.COMPANY)
-                    self.set_owner(cie)
+                    self._officialize()
             except IndexError:
                 # FIXME raises it ?
                 pass
         else:
             raise PromotionError()
+
+    def _officialize(self):
+        """ Officialize the object (called by :meth:`promote`)."""
+        # changes the owner to the company
+        cie = models.User.objects.get(username=settings.COMPANY)
+        self.set_owner(cie)
+        for rev in self.get_previous_revisions():
+            if rev.is_cancelled:
+                # nothing to do
+                pass
+            else:
+                if rev.is_editable:
+                    ctrl = type(self)(rev.get_leaf_object(), self._user)
+                    ctrl.cancel()
+                elif rev.is_official:
+                    ctrl = type(self)(rev.get_leaf_object(), self._user)
+                    ctrl._deprecate()
+
+    def _deprecate(self):
+        """ Deprecate the object. """
+        cie = models.User.objects.get(username=settings.COMPANY)
+        self.state = self.lifecycle.last_state
+        self.set_owner(cie)
+        self.save()
 
     def demote(self):
         u"""
@@ -241,7 +264,7 @@ class PLMObjectController(Controller):
 
         Returns a controller of the new object.
         """
-        # TODO: changes the group and cancels other previous unofficial revisions
+        # TODO: changes the group
         self.check_readable() 
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
@@ -267,11 +290,12 @@ class PLMObjectController(Controller):
         called safely.
 
         If *check_user* is True (the default), it also checks if :attr:`_user` can
-        see the objects.
+        see the object.
         """
-        # a cancelled object cannot be revised.
-        if self.is_cancelled:
+        # a cancelled or deprecated object cannot be revised.
+        if self.is_cancelled or self.is_deprecated:
             return False
+        
         # objects.get fails if a link does not exist
         # we can revise if any links exist
         try:
@@ -315,13 +339,18 @@ class PLMObjectController(Controller):
         :param new_owner: the new owner
         :type new_owner: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
+        :raise: :exc:`ValueError` if *new_owner* is the company and the 
+                object is editable
         """
 
         self.check_contributor(new_owner)
+        if new_owner.username == settings.COMPANY:
+            if self.is_editable:
+                raise ValueError("The company cannot own an editable object.")
+
         links = models.PLMObjectUserLink.objects.filter(plmobject=self.object,
                 role="owner")
-        for link in links:
-            link.delete()
+        links.delete()
         link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
                plmobject=self.object, role="owner")[0]
         self.owner = new_owner
@@ -379,6 +408,7 @@ class PLMObjectController(Controller):
         :raise: :exc:`.PermissionError` if *signer* is not a contributor
         :raise: :exc:`.PermissionError` if *role* is invalid (level to high)
         """
+
         self.check_contributor(signer)
         # remove old signer
         old_signer = None
@@ -468,9 +498,9 @@ class PLMObjectController(Controller):
             * It removes all signer.
         """
         company = models.User.objects.get(username=settings.COMPANY)
-        self.set_owner(company)
         self.lifecycle = models.get_cancelled_lifecycle()
         self.state = models.get_cancelled_state()
+        self.set_owner(company)
         self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).delete()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
