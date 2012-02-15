@@ -193,6 +193,57 @@ class ControllerTest(BaseTestCase):
         count = models.PLMObject.objects.filter(reference=controller.reference).count()
         self.assertEqual(1, count)
 
+    def test_promote_to_official_revision_previous_is_official(self):
+        """
+        Tests that the promotion to the official status deprecates a
+        previous official revision.
+        """
+        ctrl = self.create("Part1")
+        ctrl.state = ctrl.lifecycle.official_state
+        ctrl.set_owner(self.cie)
+        ctrl.save()
+        rev = ctrl.revise("b")
+        rev.object.is_promotable = lambda: True
+        self.assertEqual(self.user, rev.owner)
+        rev.promote()
+        self.assertTrue(rev.is_official)
+        ctrl = rev.get_previous_revisions()[0]
+        self.assertTrue(ctrl.is_deprecated)
+        self.assertEqual(ctrl.owner, self.cie)
+
+    def test_promote_to_official_revision_previous_is_deprecated(self):
+        """
+        Tests that the promotion of the official status with a
+        previous deprecated revision.
+        """
+        ctrl = self.create("Part1")
+        # deprecate ctrl after revising it
+        rev = ctrl.revise("b")
+        ctrl.state = ctrl.lifecycle.last_state
+        ctrl.set_owner(self.cie)
+        ctrl.save()
+        rev.object.is_promotable = lambda: True
+        self.assertEqual(self.user, rev.owner)
+        rev.promote()
+        self.assertTrue(rev.is_official)
+        ctrl = rev.get_previous_revisions()[0]
+        self.assertTrue(ctrl.is_deprecated)
+        self.assertEqual(ctrl.owner, self.cie)
+
+    def test_promote_to_official_revision_previous_is_editable(self):
+        """
+        Tests that the promotion to the official status cancels a
+        previous editable revision.
+        """
+        ctrl = self.create("Part1")
+        ctrl.save()
+        rev = ctrl.revise("b")
+        rev.object.is_promotable = lambda: True
+        self.assertEqual(self.user, rev.owner)
+        rev.promote()
+        ctrl = rev.get_previous_revisions()[0]
+        self.assertTrue(ctrl.is_cancelled)
+
     def test_set_owner(self):
         controller = self.create("Part1")
         user = self.get_contributor()
@@ -205,6 +256,14 @@ class ControllerTest(BaseTestCase):
         user = User(username="user2")
         user.save()
         self.assertRaises(exc.PermissionError, controller.set_owner, user)
+
+    def test_set_owner_error2(self):
+        """
+        Tests that set_owner raises a ValueError if the new owner is the
+        company and the object is editable.
+        """
+        controller = self.create("Part1")
+        self.assertRaises(ValueError, controller.set_owner, self.cie)
 
     def test_set_sign1(self):
         controller = self.create("Part1")
@@ -289,6 +348,7 @@ class ControllerTest(BaseTestCase):
         self.assertTrue(ctrl.check_readable())
         self.assertFalse(ctrl.is_revisable())
         self.assertFalse(ctrl.is_promotable())
+        self.assertFalse(ctrl.is_editable)
         signers = ctrl.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN)
         self.assertEqual(0, signers.count())
 
