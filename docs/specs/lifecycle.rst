@@ -6,6 +6,7 @@ Lifecycle
 
     The following rules may not have been implemented.
 
+TODO: Add examples, list tests validating these rules.
 
 Standard lifecycles
 =====================
@@ -24,40 +25,42 @@ Parts
 -------
 
     #. Part without children shall have at least one linked official
-       document before being promoted
+       document before being promoted 
 
 Documents
 ----------
 
     #. Document shall not be promoted without a file in
-       it or equivalent
-    #. Document shall not be promoted if one of their files is locked
+       it or equivalent 
+    #. Document shall not be promoted if one of their files is locked 
         
 Promote rules to official for Standard lifecycles
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     #. Promoting one object to official status shall
-       push the prior official revision to deprecated status
+       push the prior official revision to deprecated status 
     #. Promoting one object to official status shall
-       push all prior non official revisions to cancel lifecycle
+       push all prior non official revisions to cancelled lifecycle 
     #. Parent part shall not be promoted to a status
-       higher than its child's status
+       higher than its child's status:
+
+       **What to do if the lifecycles are different?**
        
 Ownership
 ++++++++++
 
     #. When an object is official, ownership shall switch from
-       one user to Company
-    #. When an object is deprecated, ownership shall stay to Company
-    #. Non official objects can't switch to Company ownership
+       one user to Company 
+    #. When an object is deprecated, ownership shall stay to Company 
+    #. Non official objects can't switch to Company ownership 
 
 Visibility
 +++++++++++++
 
     #. Object is visible only by its group's users when its status is before
-       official
-    #. Object is visible by all users when its status is official
-    #. Object is visible by all users when its status is deprecated
+       official 
+    #. Object is visible by all users when its status is official 
+    #. Object is visible by all users when its status is deprecated 
 
 Edit/Modification
 ++++++++++++++++++
@@ -73,9 +76,10 @@ Edit/Modification
 Revision
 ++++++++++
 
-    #. All users who can see an object can revise it
-    #. Only the last revision can be revised
+    #. All users who can see an object can revise it 
+    #. Only the last revision can be revised 
     #. An object can be revised whatever is its status (except deprecated)
+    #. The user who revises an object can change the group of the revised object? **??** 
 
 Notification
 +++++++++++++
@@ -87,17 +91,16 @@ Notification
        e-mail
 
 
-Cancel lifecycle
+Cancelled lifecycle
 ====================
 
-(not yet implemented)
 
-    #. Shall have only one status: Cancel
+    #. Shall have only one status: Cancelled
     #. Object is visible by all users
     #. Ownership is Company
-    #. Object is cancel if it is pushed by another promoted to
+    #. Object is cancelled if it is pushed by another promoted to
        official status
     #. All part-part and part-document links shall be removed
     #. Cancelled objects can't be edited nor modified
-    #. Users can't revise an object with cancel status
+    #. Users can't revise an object with cancelled status
 
