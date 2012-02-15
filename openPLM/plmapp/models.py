@@ -539,6 +539,11 @@ class PLMObject(models.Model):
     def is_cancelled(self):
         """ True if the object is cancelled. """
         return self.lifecycle == get_cancelled_lifecycle()
+
+    @property
+    def is_deprecated(self):
+        """ True if the object is deprecated. """
+        return self.state == self.lifecycle.last_state
     
     def get_current_sign_level(self):
         """
