@@ -154,8 +154,10 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0):
                 cleaned_data = self.cleaned_data
                 ref = cleaned_data.get("reference", "")
                 rev = cleaned_data.get("revision", "")
-                if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref):
+                if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     raise ValidationError(_("An object with the same type, reference and revision already exists"))
+                elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
+                    raise ValidationError(_("An object with the same type and revision exists, you may consider to revise it."))
                 return cleaned_data
             Form.clean = _clean
         get_creation_form.cache[cls] = Form

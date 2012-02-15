@@ -123,6 +123,30 @@ class ViewTest(CommonViewTest):
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
 
+    def test_create_post_error_same_reference(self):
+        """
+        Tests that the creation of an object with the same type and
+        reference but a different revision is forbidden.
+        """
+        data = self.DATA.copy()
+        ref = self.controller.reference
+        rev = "a new revision" 
+        data.update({
+                "type" : self.TYPE,
+                "reference" : ref, 
+                "revision" : rev,
+                "name" : "An invalid object",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data)
+        qset = m.PLMObject.objects.filter(type=self.TYPE,
+                reference=ref, revision=ref)
+        self.assertFalse(response.context["creation_form"].is_valid())
+        self.assertFalse(qset.exists())
+
     def test_display_attributes(self):
         response = self.get(self.base_url + "attributes/", page="attributes")
         self.failUnless(response.context["object_attributes"])
