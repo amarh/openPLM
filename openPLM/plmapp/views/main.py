@@ -63,6 +63,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.forms import HiddenInput
+from django.views.i18n import set_language as dj_set_language
 
 from haystack.views import SearchView
 
@@ -88,6 +89,20 @@ def r2r(template, dictionary, request):
     """
     return render_to_response(template, dictionary,
                               context_instance=RequestContext(request))
+
+
+def set_language(request):
+    """
+    A wrapper arround :func:`django.views.i18n.set_language` that
+    stores the language in the user profile.
+    """
+    response = dj_set_language(request)
+    if request.method == "POST" and request.user.is_authenticated():
+        language = request.session.get('django_language')
+        if language:
+            request.user.get_profile().language = language
+            request.user.get_profile().save()
+    return response
 
 ##########################################################################################
 ###                    Function which manage the html home page                        ###

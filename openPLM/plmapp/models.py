@@ -109,6 +109,9 @@ class UserProfile(models.Model):
     is_administrator = models.BooleanField(default=False, blank=True)
     #: True if user is a contributor
     is_contributor = models.BooleanField(default=False, blank=True)
+    #: language
+    language = models.CharField(max_length=5, default="en",
+            choices=settings.LANGUAGES)
     
     @property
     def is_viewer(self):
