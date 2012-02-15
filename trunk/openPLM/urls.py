@@ -75,7 +75,7 @@ import_url = r'^import/(?P<target>%s)/' % ("|".join(IMPORTERS.keys()))
 
 urlpatterns += patterns('',
     (r'^admin/', include(admin.site.urls)),
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    (r'^i18n/setlang/', 'openPLM.plmapp.views.main.set_language'),
 
     (r'^(?:home/)?$', display_home_page),
     (r'^accounts/?$', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
