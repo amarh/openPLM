@@ -67,25 +67,25 @@
                         </li>
 
 
-                        {% if not creation_form %}
-                        {% if navigate_bool %}
-                        <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
-                        {% else %}
-                        <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
-                        {% endif %}
-                        <a href="{{obj.plmobject_url}}navigate/">
-                            <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
-                        </a>
-                        </li>
-                        {% if navigate_bool %}
-                        <li class="{{"Button"|button:"corner-right"}}" id="StudyButtonOff">
-                        {% else %}
-                        <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButtonOn">
-                        {% endif %}
-                        <a href="{{obj.plmobject_url}}attributes/">
-                            <span class="ui-button-text">{% trans "STUDY" %}</span>
-                        </a>
-                        </li>
+                        {% if object_reference != "-" %}
+                            {% if navigate_bool %}
+                                <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
+                            {% else %}
+                                <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
+                            {% endif %}
+                                <a href="{{obj.plmobject_url}}navigate/">
+                                    <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                                </a>
+                                </li>
+                            {% if navigate_bool %}
+                                <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
+                            {% else %}
+                                <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButton">
+                            {% endif %}
+                            <a href="{{obj.plmobject_url}}attributes/">
+                                <span class="ui-button-text">{% trans "STUDY" %}</span>
+                            </a>
+                            </li>
                         {% endif %}
                         <li class="{{"Button"|button}}" id="QuitButton">
                         <a href="/logout/">
