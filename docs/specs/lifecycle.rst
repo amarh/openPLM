@@ -196,8 +196,14 @@ Promote rules to official for Standard lifecycles
 
     #. Promoting one object to official status shall
        push the prior official revision to deprecated status 
+
+       :Tests: - plmapp.ControllerTest.test_promote_to_official_revision_previous_is_official
+
     #. Promoting one object to official status shall
        push all prior non official revisions to cancelled lifecycle 
+
+       :Tests: - plmapp.ControllerTest.test_promote_to_official_revision_previous_is_editable
+
     #. Parent part shall not be promoted to a status
        higher than its child's status:
 
