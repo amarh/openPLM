@@ -339,6 +339,41 @@ class ControllerTest(BaseTestCase):
         controller.object.is_promotable = always_false
         self.assertRaises(exc.PromotionError, controller.promote)
 
+    def test_promote_to_official_status(self):
+        """
+        Promotes a draft object to official status and checks that its owner
+        is the company.
+        """
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        controller.promote()
+        self.assertEqual(self.cie, controller.owner)
+        self.assertEqual("official", controller.state.name)
+        self.assertTrue(controller.is_official)
+        self.assertFalse(controller.is_editable)
+        self.assertFalse(controller.is_deprecated)
+        self.assertFalse(controller.is_cancelled)
+        controller.check_readable()
+
+    def test_promote_to_deprecated_status(self):
+        """
+        Promotes a draft object to deprecated status and checks that its owner
+        is the company.
+        """
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        # promote to official
+        controller.promote()
+        # promote to deprecated
+        controller.promote()
+        self.assertEqual(self.cie, controller.owner)
+        self.assertEqual("deprecated", controller.state.name)
+        self.assertFalse(controller.is_official)
+        self.assertFalse(controller.is_editable)
+        self.assertTrue(controller.is_deprecated)
+        self.assertFalse(controller.is_cancelled)
+        controller.check_readable()
+
     def check_cancelled_object(self, ctrl):
         """ Checks a cancelled plmobject."""
         self.assertTrue(ctrl.is_cancelled)

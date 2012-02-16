@@ -207,15 +207,25 @@ Promote rules to official for Standard lifecycles
     #. Parent part shall not be promoted to a status
        higher than its child's status:
 
-       **What to do if the lifecycles are different?**
+       .. warning::
+       
+            What to do if the lifecycles are different?
        
 Ownership
 ++++++++++
 
     #. When an object is official, ownership shall switch from
        one user to Company 
+
+       :Tests: - plmapp.ControllerTest.test_promote_to_official_status
+
     #. When an object is deprecated, ownership shall stay to Company 
+       
+       :Tests: - plmapp.ControllerTest.test_promote_to_deprecated_status
+       
     #. Non official objects can't switch to Company ownership 
+       
+       :Tests: - plmapp.ControllerTest.test_set_owner_error2
 
 Visibility
 +++++++++++++
