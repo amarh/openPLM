@@ -107,12 +107,48 @@ def set_language(request):
 ##########################################################################################
 ###                    Function which manage the html home page                        ###
 ##########################################################################################
+
+def get_last_edited_objects(user):
+    """
+    Returns the 5 last objects edited by *user*. It returns a list of the most
+    recent history entries associated to these objects.
+    """
+    histories = []
+    plmobjects = []
+    r = ("plmobject__id", "plmobject__reference", "plmobject__revision", "plmobject__type")
+    qs = user.history_user.order_by("-date", "-pk").select_related("plmobject")
+    qs = qs.only("date", "action", "details", *r)
+    try:
+        h = qs[0]
+        histories.append(h)
+        plmobjects.append(h.plmobject_id)
+        for i in xrange(4):
+            h = qs.filter(date__lt=h.date).exclude(plmobject__in=plmobjects)[0]
+            histories.append(h)
+            plmobjects.append(h.plmobject_id)
+    except (models.History.DoesNotExist, IndexError):
+        pass # no more histories
+    return histories
+
 @handle_errors
 def display_home_page(request):
     """
-    Once the user is logged in, redirection to his/her own user object with :func:navigate
+    Home page view.
     """
-    return HttpResponseRedirect("/user/%s/navigate/" % request.user)
+    obj, ctx = get_generic_data(request, "User", request.user.username)
+    del ctx["object_menu"]
+
+    ctx["last_edited_objects"] = get_last_edited_objects(obj.object)
+
+    pending_invitations_owner = obj.invitation_inv_owner. \
+            filter(state=models.Invitation.PENDING).order_by("group__name")
+    ctx["pending_invitations_owner"] = pending_invitations_owner
+    pending_invitations_guest = obj.invitation_inv_guest. \
+            filter(state=models.Invitation.PENDING).order_by("group__name")
+    ctx["pending_invitations_guest"] = pending_invitations_guest
+    ctx["display_group"] = True
+
+    return r2r("home.htm", ctx, request)
 
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###
