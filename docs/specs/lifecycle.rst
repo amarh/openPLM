@@ -27,6 +27,65 @@ Parts
     #. Part without children shall have at least one linked official
        document before being promoted 
 
+       :Examples:
+            - Can promote:
+
+                .. graphviz::
+                    
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+
+                        subgraph g {
+                            part [label="Part\ndraft"]
+                            doc [label="Document\nofficial", shape="folder"]
+                            doc -> part;
+                        }
+                        
+                        subgraph g2 {
+                            part1 [label="Part\ndraft"]
+                            doc1 [label="Document\nofficial", shape="folder"]
+                            doc2 [label="Document\ndeprecated", shape="folder"]
+                            doc1 -> part1;
+                            doc2 -> part1;
+                        }
+
+                        subgraph g3 {
+                            part3 [label="Part\ndraft"]
+                            doc31 [label="Document\nofficial", shape="folder"]
+                            doc32 [label="Document\ndraft", shape="folder"]
+                            doc31 -> part3;
+                            doc32 -> part3;
+                        }
+
+                    }
+
+            - Can not promote:
+
+                .. graphviz::
+
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+                    
+                        subgraph g1 {
+                            part [label="Part\ndraft"]
+                        }
+                        
+                        subgraph g2 {
+                            part1 [label="Part\ndraft"]
+                            doc1 [label="Document\ndraft", shape="folder"]
+                            doc2 [label="Document\ndeprecated", shape="folder"]
+                            doc1 -> part1;
+                            doc2 -> part1;
+                        }
+                        
+                        subgraph g3 {
+                            part3 [label="Part\ndraft"]
+                            doc31 [label="Document\ndraft", shape="folder"]
+                            doc31 -> part3;
+                        }
+                    }
+
+
        :Tests: - plmapp.PartControllerTest.test_is_promotable1
                - plmapp.PartControllerTest.test_is_promotable_no_document
                - plmapp.PartControllerTest.test_is_promotable_no_official_document
@@ -37,12 +96,96 @@ Documents
 
     #. Document shall not be promoted without a file in
        it or equivalent 
+       
+       :Examples:
+            - Can promote:
+
+                .. graphviz::
+                    
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+
+                        subgraph g {
+                            file [label="File\nunlocked", shape="note"]
+                            doc [label="Document\ndraft", shape="folder"]
+                            doc -> file;
+                        }
+                        
+                        subgraph g2 {
+                            file1 [label="File\nunlocked", shape="note"]
+                            file2 [label="File\nunlocked", shape="note"]
+                            doc2 [label="Document\ndraft", shape="folder"]
+                            doc2 -> file1;
+                            doc2 -> file2;
+                        }
+
+                    }
+
+            - Can not promote:
+
+                .. graphviz::
+
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+                    
+                        subgraph g1 {
+                            doc [label="Document\ndraft", shape="folder"]
+                        }
+                    }
+
 
        :Tests: - plmapp.DocumentControllerTest.test_is_promotable_no_file
                - plmapp.DocumentControllerTest.test_is_promotable_one_unlocked_file
                - suversion.SubversionRepositoryTestCase.test_is_promotable
 
     #. Document shall not be promoted if one of their files is locked 
+
+       :Examples:
+            - Can promote:
+
+                .. graphviz::
+                    
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+
+                        subgraph g {
+                            file [label="File\nunlocked", shape="note"]
+                            doc [label="Document\ndraft", shape="folder"]
+                            doc -> file;
+                        }
+                        
+                        subgraph g2 {
+                            file1 [label="File\nunlocked", shape="note"]
+                            file2 [label="File\nunlocked", shape="note"]
+                            doc2 [label="Document\ndraft", shape="folder"]
+                            doc2 -> file1;
+                            doc2 -> file2;
+                        }
+
+                    }
+
+            - Can not promote:
+
+                .. graphviz::
+
+                    digraph {
+                        node [fontsize=10, shape="box", width=".2", height=".2"];
+
+                        subgraph g {
+                            file [label="File\nlocked", shape="note"]
+                            doc [label="Document\ndraft", shape="folder"]
+                            doc -> file;
+                        }
+                        
+                        subgraph g2 {
+                            file1 [label="File\nlocked", shape="note"]
+                            file2 [label="File\nunlocked", shape="note"]
+                            doc2 [label="Document\ndraft", shape="folder"]
+                            doc2 -> file1;
+                            doc2 -> file2;
+                        }
+
+                    }
 
        :Tests: - plmapp.DocumentControllerTest.test_is_promotable_one_locked_file
                - plmapp.DocumentControllerTest.test_is_promotable_one_unlocked_file
