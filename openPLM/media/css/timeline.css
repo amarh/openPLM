@@ -26,11 +26,8 @@ div.timeline [color=""] {
 }
 
 div.timeline dt {
-    background: 3px 4px no-repeat;
-    background-color: #e4e3e1;
     padding: 0.3em 0;
     padding-left: 0.5em;
-    border-radius: 12px 0 0 0;
     font-size: 90%;
     font-weight: 600;
 }
