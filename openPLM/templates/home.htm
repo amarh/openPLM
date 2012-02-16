@@ -1,0 +1,82 @@
+{% extends "MiddleDisplayObject.htm" %}
+{% load i18n plmapp_tags %}
+{% load humanize %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+
+    <style>
+        div.timeline, div.invitations { font-size:  90%; }
+        div.invitations .Button,
+        div.invitations .Button span.ui-button-text { padding: 0.1em; }
+    </style>
+{% endblock %}
+{# Home page #}
+
+{% block content %}
+
+    <div>
+        <h3>{% trans "Your account" %}</h3>
+        <div class="account">
+            <p>
+            <a href="{{obj.plmobject_url}}edit/">{% trans "Click here to edit your personal information." %}</a>
+            </p>
+        </div>
+    </div>
+
+    <div>
+        <h3>{% trans "Last edited objects" %}</h3>
+
+        <div class="timeline">
+
+            <dl>
+                {% for histo in last_edited_objects %}
+                    <dt class="changeset">
+                    <span class="time">
+                        {{ histo.date|naturalday|capfirst }} - {{histo.date|date:"G:i"}}
+                    </span>
+                    <span class="action"> {{histo.action}} </span>
+                    {% with histo.plmobject as plmobject %}
+                        <span class="type">{{ plmobject.type }}</span>
+                        {% spaceless %}
+                            <a href="{{ plmobject.plmobject_url }}">
+                                <span class="reference">{{ plmobject.reference }}</span>
+                            </a>
+                        {% endspaceless %}
+                        <span class="revision">{{ plmobject.revision }}</span>
+                    {% endwith %}
+                    </dt>
+                    <dd>
+                    <div class="details">
+                        {{ histo.details|linebreaks }}
+                    </div>
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+    {% with pending_invitations_owner as pending_invitations %}
+        {% if pending_invitations %}
+            <div>
+                <h3>{% trans "Groups that you own: pending invitations" %}</h3>
+                <div class="invitations">
+                    {% include "groups/pending_invitations.htm" %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% with pending_invitations_guest as pending_invitations %}
+        {% if pending_invitations %}
+            <div>
+
+                <h3>{% trans "Groups that you may join: pending invitations" %}</h3>
+                <div class="invitations">
+                    {% include "groups/pending_invitations.htm" %}
+                </div>
+
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
+
+
