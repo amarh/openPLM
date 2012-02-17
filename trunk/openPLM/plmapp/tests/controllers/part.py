@@ -275,6 +275,42 @@ class PartControllerTest(ControllerTest):
         self.add_child()
         self.controller.delete_child(self.controller2)
         self.assertEqual(self.controller.get_children(), [])
+    
+    def test_delete_child_error_not_owner(self):
+        """
+        Tests that only the owner can delete a child link.
+        """
+        self.add_child()
+        robert = self.get_contributor()
+        robert.groups.add(self.group)
+        ctrl = self.CONTROLLER(self.controller.object, robert)
+        self.assertRaises(exc.PermissionError, ctrl.delete_child,
+                self.controller2.object)
+        self.assertEqual(1, len(self.controller.get_children()))
+
+    def test_delete_child_error_official_status(self):
+        """
+        Tests that it is not possible to delete a child link of an offical
+        part.
+        """
+        self.add_child()
+        self.promote_to_official(self.controller)
+        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
+        self.assertRaises(exc.PermissionError, self.controller.delete_child,
+                self.controller2)
+        self.assertEqual(1, len(self.controller.get_children()))
+
+    def test_delete_child_error_deprecated_status(self):
+        """
+        Tests that it is not possible to delete a child link of a deprecated
+        part.
+        """
+        self.add_child()
+        self.promote_to_deprecated(self.controller)
+        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
+        self.assertRaises(exc.PermissionError, self.controller.delete_child,
+                self.controller2)
+        self.assertEqual(1, len(self.controller.get_children()))
 
     def test_get_children(self):
         controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",

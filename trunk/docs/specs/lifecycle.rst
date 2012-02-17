@@ -256,16 +256,21 @@ Edit/Modification
     #. Part links can be created/removed only by its owner
        
        :Tests: - plmapp.PartControllerTest.test_add_child_error_not_owner
+               - plmapp.PartControllerTest.test_delete_child_error_not_owner
 
     #. Part links can't be removed at official status
+       
+       :Tests: - plmapp.PartControllerTest.test_delete_child_error_official_status
       
     #. Part's child links can't be created/removed at official status
       
        :Tests: - plmapp.PartControllerTest.test_add_child_error_official_status
+               - plmapp.PartControllerTest.test_delete_child_error_official_status
        
     #. Part's parent links can be created/removed at official status
       
        :Tests: - plmapp.PartControllerTest.test_add_child_error_official_status
+               - plmapp.PartControllerTest.test_delete_child_error_official_status
        
     #. Documents links can be created/removed at all status
     #. Ownership and other signature rights can be modified only by its owner
