@@ -109,6 +109,8 @@ class StreamedPdfFileWriter(PdfFileWriter):
             return data
 
     def __iter__(self):
+
+        warnings.simplefilter('ignore', DeprecationWarning)
         # mostly based on PdfFileWriter.write
 
         # Begin writing, so that, even if _sweepIndirectReferences takes
@@ -162,8 +164,10 @@ class StreamedPdfFileWriter(PdfFileWriter):
         
         # eof
         yield("\nstartxref\n%s\n%%%%EOF\n" % (xref_location))
+        warnings.simplefilter('default', DeprecationWarning)
 
 def render_to_pdf(template_src, context_dict, filename):
+    warnings.simplefilter('ignore', DeprecationWarning)
     template = get_template(template_src)
     context = Context(context_dict)
     html = template.render(context)
@@ -172,6 +176,7 @@ def render_to_pdf(template_src, context_dict, filename):
     if not pdf.err:
         response = http.HttpResponse(result.getvalue(), mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        warnings.simplefilter('default', DeprecationWarning)
         return response
     raise ValueError()
 

@@ -1,3 +1,4 @@
+import warnings
 from cStringIO import StringIO
 
 from pyPdf import PdfFileReader
@@ -13,9 +14,11 @@ class PdfAttributesViewTestCase(CommonViewTest):
         by setting num_pages to None).
         """
         stream = StringIO(response.content)
+        warnings.simplefilter('ignore', DeprecationWarning)
         pdf = PdfFileReader(stream) # fails if it is not a valid pdf
         if num_pages is not None:
             self.assertEqual(num_pages, pdf.getNumPages())
+        warnings.simplefilter('default', DeprecationWarning)
 
     def test_user_attributes(self):
         response = self.client.get("/pdf/user/%s/attributes/" % self.user.username)
