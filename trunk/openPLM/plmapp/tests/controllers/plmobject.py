@@ -387,4 +387,55 @@ class ControllerTest(BaseTestCase):
         signers = ctrl.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN)
         self.assertEqual(0, signers.count())
 
+    def test_is_readable_owner(self):
+        """
+        Checks that the owner can read the object.
+        """
+        controller = self.create("P1")
+        controller.check_readable()
 
+    def test_is_readable_company(self):
+        """
+        Checks that the owner can read the object.
+        """
+        controller = self.create("P1")
+        ctrl = self.CONTROLLER(controller.object, self.cie)
+        ctrl.check_readable()
+
+    def test_is_readable_group_ok(self):
+        """
+        Tests that an user who belongs to the object's group can see the
+        object.
+        """
+        controller = self.create("P1")
+        robert = models.User.objects.create_user("Robert", "pwd", "robert@p.txt")
+        robert.groups.add(self.group)
+        ctrl = self.CONTROLLER(controller.object, robert)
+        ctrl.check_readable()
+
+    def test_is_readable_group_invalid(self):
+        """
+        Tests that an user who does not belong to the object's group can not
+        see the object.
+        """
+        controller = self.create("P1")
+        robert = models.User.objects.create_user("Robert", "pwd", "robert@p.txt")
+        ctrl = self.CONTROLLER(controller.object, robert)
+        self.assertRaises(exc.PermissionError, ctrl.check_readable)
+
+    def test_is_readable_not_editable(self):
+        """
+        Tests that an official or deprecated object is readable by every body.
+        """
+        controller = self.create("P1")
+        controller.object.is_promotable = lambda: True
+        robert = models.User.objects.create_user("Robert", "pwd", "robert@p.txt")
+        robert.groups.add(self.group)
+        ned = models.User.objects.create_user("Ned", "pwd", "ned@p.txt")
+        for i in range(2):
+            # i = 1 -> official, i = 2 -> deprecated
+            controller.promote()
+            for user in (self.user, self.cie, robert, ned):
+                ctrl = self.CONTROLLER(controller.object, user)
+                ctrl.check_readable()        
+        
