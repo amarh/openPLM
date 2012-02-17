@@ -50,6 +50,16 @@ class ControllerTest(BaseTestCase):
         user.get_profile().save()
         return user
 
+    def promote_to_official(self, ctrl):
+        ctrl.object.state = ctrl.lifecycle.official_state
+        ctrl.set_owner(self.cie)
+        self.assertTrue(ctrl.is_official)
+
+    def promote_to_deprecated(self, ctrl):
+        ctrl.object.state = ctrl.lifecycle.last_state
+        ctrl.set_owner(self.cie)
+        self.assertTrue(ctrl.is_deprecated)
+
     def test_create(self):
         controller = self.create()
         self.assertEqual(controller.name, "")
