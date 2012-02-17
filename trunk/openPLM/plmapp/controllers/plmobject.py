@@ -180,7 +180,7 @@ class PLMObjectController(Controller):
         """ Officialize the object (called by :meth:`promote`)."""
         # changes the owner to the company
         cie = models.User.objects.get(username=settings.COMPANY)
-        self.set_owner(cie)
+        self.set_owner(cie, True)
         for rev in self.get_previous_revisions():
             if rev.is_cancelled:
                 # nothing to do
@@ -197,7 +197,7 @@ class PLMObjectController(Controller):
         """ Deprecate the object. """
         cie = models.User.objects.get(username=settings.COMPANY)
         self.state = self.lifecycle.last_state
-        self.set_owner(cie)
+        self.set_owner(cie, True)
         self.save()
 
     def demote(self):
@@ -334,7 +334,7 @@ class PLMObjectController(Controller):
         return self.get_previous_revisions() + [self.object] +\
                self.get_next_revisions()
 
-    def set_owner(self, new_owner):
+    def set_owner(self, new_owner, dirty=False):
         """
         Sets *new_owner* as current owner.
 
@@ -344,25 +344,31 @@ class PLMObjectController(Controller):
         
         :param new_owner: the new owner
         :type new_owner: :class:`~django.contrib.auth.models.User`
+        :param dirty: True if set_owner should skip sanity checks and
+                      should not send a mail (usefull for tests, default is
+                      False)
         :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
         :raise: :exc:`ValueError` if *new_owner* is the company and the 
                 object is editable
         """
-
-        self.check_contributor(new_owner)
-        if new_owner.username == settings.COMPANY:
-            if self.is_editable:
-                raise ValueError("The company cannot own an editable object.")
+        
+        if not dirty:
+            self.check_contributor(new_owner)
+            if new_owner.username == settings.COMPANY:
+                if self.is_editable:
+                    raise ValueError("The company cannot own an editable object.")
 
         links = models.PLMObjectUserLink.objects.filter(plmobject=self.object,
                 role="owner")
         links.delete()
-        link = models.PLMObjectUserLink.objects.get_or_create(user=self.owner,
-               plmobject=self.object, role="owner")[0]
-        self.owner = new_owner
-        link.user = new_owner
-        link.save()
-        self.save()
+        models.PLMObjectUserLink.objects.create(user=new_owner,
+               plmobject=self.object, role="owner")
+        if dirty:
+            self.object.owner = new_owner
+            self.object.save()
+        else:
+            self.owner = new_owner
+            self.save()
         # we do not need to write this event in an history since save() has
         # already done it
 
@@ -509,7 +515,7 @@ class PLMObjectController(Controller):
         company = models.User.objects.get(username=settings.COMPANY)
         self.lifecycle = models.get_cancelled_lifecycle()
         self.state = models.get_cancelled_state()
-        self.set_owner(company)
+        self.set_owner(company, True)
         self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).delete()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
