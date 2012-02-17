@@ -269,8 +269,10 @@ class PLMObjectController(Controller):
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
             raise RevisionError("Bad value for new_revision")
-        if models.RevisionLink.objects.filter(old=self.object.pk):
-            raise RevisionError("a revision already exists for %s" % self.object)
+        if self.is_cancelled or self.is_deprecated:
+            raise RevisionError("Object is deprecated or cancelled.")
+        if models.RevisionLink.objects.filter(old=self.object.pk).exists():
+            raise RevisionError("A revision already exists for %s" % self.object)
         data = {}
         fields = self.get_modification_fields() + self.get_creation_fields()
         for attr in fields:

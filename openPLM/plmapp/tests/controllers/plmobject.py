@@ -166,6 +166,10 @@ class ControllerTest(BaseTestCase):
         rev = ctrl.revise("b")
         self.assertEqual(user, rev.owner)
 
+    def assertOneRevision(self, ctrl):
+        count = models.PLMObject.objects.filter(reference=ctrl.reference).count()
+        self.assertEqual(1, count)
+
     def test_revise_error_other_group(self):
         """
         Tests that an user who does not belong to the group cannot revise
@@ -176,22 +180,37 @@ class ControllerTest(BaseTestCase):
         ctrl = self.CONTROLLER(controller.object, user)
         self.failIf(ctrl.is_revisable())
         self.assertRaises(exc.PermissionError, ctrl.revise, "b")
-        count = models.PLMObject.objects.filter(reference=controller.reference).count()
-        self.assertEqual(1, count)
+        self.assertOneRevision(controller)
 
-    def test_revise_error1(self):
+    def test_revise_error_empty_revision(self):
         "Revision : error : empty new revision"
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "")
-        count = models.PLMObject.objects.filter(reference=controller.reference).count()
-        self.assertEqual(1, count)
+        self.assertOneRevision(controller)
     
-    def test_revise_error2(self):
+    def test_revise_error_same_revision(self):
         "Revision : error : same revision name"
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "a")
-        count = models.PLMObject.objects.filter(reference=controller.reference).count()
-        self.assertEqual(1, count)
+        self.assertOneRevision(controller)
+
+    def test_revise_error_cancelled_object(self):
+        """ Tests it is not possible to revise a cancelled object."""
+        controller = self.create("Part1")
+        controller.cancel()
+        self.assertFalse(controller.is_revisable())
+        self.assertRaises(exc.RevisionError, controller.revise, "n")
+        self.assertOneRevision(controller)
+
+    def test_revise_error_deprecated_object(self):
+        """ Tests it is not possible to revise a deprecated object."""
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        controller.promote()
+        controller.promote()
+        self.assertFalse(controller.is_revisable())
+        self.assertRaises(exc.RevisionError, controller.revise, "n")
+        self.assertOneRevision(controller)
 
     def test_promote_to_official_revision_previous_is_official(self):
         """
