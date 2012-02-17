@@ -161,6 +161,38 @@ class PartControllerTest(ControllerTest):
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
 
+    def test_add_child_error_deprecated_child(self):
+        """
+        Tests that it is not possible to add a deprecated child.
+        """
+        self.controller2.promote()
+        self.controller2.promote()
+        def fail():
+            self.add_child()
+        self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
+
+    def test_add_child_error_cancelled_child(self):
+        """
+        Tests that it is not possible to add a cancelled child.
+        """
+        self.controller.cancel()
+        def fail():
+            self.add_child()
+        self.assertRaises(exc.PermissionError, fail)
+        self.assertFalse(self.controller.get_children())
+
+    def test_add_child_error_cancelled(self):
+        """
+        Tests that it is not possible to add a child to a cancelled object.
+        """
+        self.controller.cancel()
+        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
+        def fail():
+            ctrl.add_child(self.controller2.object, 10, 15, "m")
+        self.assertRaises(exc.PermissionError, fail)
+        self.assertFalse(self.controller.get_children())
+
     def _test_modify_child(self, new_qty, new_order, new_unit):
         self.add_child()
         self.controller.modify_child(self.controller2, new_qty, new_order,
