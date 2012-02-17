@@ -156,9 +156,7 @@ class ControllerTest(BaseTestCase):
 
     def test_revise_official(self):
         ctrl = self.create("Part1")
-        ctrl.state = ctrl.lifecycle.official_state
-        ctrl.set_owner(self.cie)
-        ctrl.save()
+        self.promote_to_official(ctrl)
         self.failUnless(ctrl.is_revisable())
         rev = ctrl.revise("b")
         self.assertEqual(self.user, rev.owner)
@@ -215,9 +213,7 @@ class ControllerTest(BaseTestCase):
     def test_revise_error_deprecated_object(self):
         """ Tests it is not possible to revise a deprecated object."""
         controller = self.create("Part1")
-        controller.object.is_promotable = lambda: True
-        controller.promote()
-        controller.promote()
+        self.promote_to_deprecated(controller)
         self.assertFalse(controller.is_revisable())
         self.assertRaises(exc.RevisionError, controller.revise, "n")
         self.assertOneRevision(controller)
@@ -228,9 +224,7 @@ class ControllerTest(BaseTestCase):
         previous official revision.
         """
         ctrl = self.create("Part1")
-        ctrl.state = ctrl.lifecycle.official_state
-        ctrl.set_owner(self.cie)
-        ctrl.save()
+        self.promote_to_official(ctrl)
         rev = ctrl.revise("b")
         rev.object.is_promotable = lambda: True
         self.assertEqual(self.user, rev.owner)
@@ -296,10 +290,7 @@ class ControllerTest(BaseTestCase):
 
     def test_set_sign1(self):
         controller = self.create("Part1")
-        user = User(username="user2")
-        user.save()
-        user.get_profile().is_contributor = True
-        user.get_profile().save()
+        user = self.get_contributor()
         controller.set_signer(user, level_to_sign_str(0))
         link = models.PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
@@ -308,10 +299,7 @@ class ControllerTest(BaseTestCase):
     def test_set_sign_error1(self):
         """Test sign error : bad level"""
         controller = self.create("Part1")
-        user = User(username="user2")
-        user.save()
-        user.get_profile().is_contributor = True
-        user.get_profile().save()
+        user = self.get_contributor()
         self.assertRaises(exc.PermissionError, controller.set_role, user,
                           level_to_sign_str(1664))
 
@@ -342,10 +330,7 @@ class ControllerTest(BaseTestCase):
 
     def test_set_role(self):
         controller = self.create("Part1")
-        user = User(username="user2")
-        user.save()
-        user.get_profile().is_contributor = True
-        user.get_profile().save()
+        user = self.get_contributor()
         controller.set_role(user, "owner")
         self.assertEqual(controller.owner, user)
         controller.set_role(self.user, "notified")
@@ -467,4 +452,4 @@ class ControllerTest(BaseTestCase):
             for user in (self.user, self.cie, robert, ned):
                 ctrl = self.CONTROLLER(controller.object, user)
                 ctrl.check_readable()        
-        
+
