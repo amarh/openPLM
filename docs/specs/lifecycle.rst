@@ -250,10 +250,23 @@ Edit/Modification
 ++++++++++++++++++
 
     #. Object can only be edited by its owner
+        
+       :Tests: - plmapp.MechantUserViewTest.test_edit_attributes
+
     #. Part links can be created/removed only by its owner
+       
+       :Tests: - plmapp.PartControllerTest.test_add_child_error_not_owner
+
     #. Part links can't be removed at official status
+      
     #. Part's child links can't be created/removed at official status
+      
+       :Tests: - plmapp.PartControllerTest.test_add_child_error_official_status
+       
     #. Part's parent links can be created/removed at official status
+      
+       :Tests: - plmapp.PartControllerTest.test_add_child_error_official_status
+       
     #. Documents links can be created/removed at all status
     #. Ownership and other signature rights can be modified only by its owner
 
@@ -263,6 +276,11 @@ Revision
     #. All users who can see an object can revise it 
     #. Only the last revision can be revised 
     #. An object can be revised whatever is its status (except deprecated)
+
+       :Tests: - plmapp.ControllerTest.test_revise_error_deprecated_object
+               - plmapp.Controller.test_revise 
+               - plmapp.Controller.test_revise_official 
+      
     #. The user who revises an object can change the group of the revised object? **??** 
 
 Notification
@@ -284,7 +302,12 @@ Cancelled lifecycle
     #. Ownership is Company
     #. Object is cancelled if it is pushed by another promoted to
        official status
+
+       :Tests: - plmapp.ControllerTest.test_promote_to_official_revision_previous_is_editable
+
     #. All part-part and part-document links shall be removed
     #. Cancelled objects can't be edited nor modified
     #. Users can't revise an object with cancelled status
+
+       :Tests: - plmapp.ControllerTest.test_revise_error_cancelled_object
 
