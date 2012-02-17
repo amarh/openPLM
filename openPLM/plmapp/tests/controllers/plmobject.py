@@ -52,12 +52,12 @@ class ControllerTest(BaseTestCase):
 
     def promote_to_official(self, ctrl):
         ctrl.object.state = ctrl.lifecycle.official_state
-        ctrl.set_owner(self.cie)
+        ctrl.set_owner(self.cie, True)
         self.assertTrue(ctrl.is_official)
 
     def promote_to_deprecated(self, ctrl):
         ctrl.object.state = ctrl.lifecycle.last_state
-        ctrl.set_owner(self.cie)
+        ctrl.set_owner(self.cie, True)
         self.assertTrue(ctrl.is_deprecated)
 
     def test_create(self):
