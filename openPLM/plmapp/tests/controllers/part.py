@@ -58,6 +58,9 @@ class PartControllerTest(ControllerTest):
             ctrl.attach_to_document(self.document)
 
     def test_add_child(self):
+        """ Tests the addition of a child and checks that the BOM is
+        consistent."""
+
         children = self.controller.get_children()
         self.assertEqual(len(children), 0)
         self.controller.add_child(self.controller2, 10, 15)
@@ -70,42 +73,58 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(link.quantity, 10)
         self.assertEqual(link.order, 15)
 
-    def test_add_child_error1(self):
+    def test_add_child_error_invalid_quantity(self):
+        """
+        Tests that add_child raises a ValueError if the quantity is invalid.
+        """
         def fail():
-            # bad quantity
             self.controller.add_child(self.controller2, -10, 15)
         self.assertRaises(ValueError, fail)
 
-    def test_add_child_error2(self):
+    def test_add_child_error_invalid_order(self):
+        """
+        Tests that add_child raises a ValueError if the order is invalid.
+        """
         def fail():
-            # bad order
             self.controller.add_child(self.controller2, 10, -15)
         self.assertRaises(ValueError, fail)
     
-    def test_add_child_error3(self):
+    def test_add_child_error_child_is_parent(self):
+        """
+        Tests that add_child raises a ValueError if the given child
+        is a parent.
+        """
         def fail():
-            # bad child : parent
             self.controller2.add_child(self.controller, 10, 15)
             self.controller.add_child(self.controller2, 10, 15)
         self.assertRaises(ValueError, fail)
     
-    def test_add_child_error4(self):
+    def test_add_child_error_already_a_child(self):
+        """
+        Tests that add_child raises a ValueError if the given child
+        is already a child.
+        """
         def fail():
-            # bad child : already a child
             self.controller.add_child(self.controller2, 10, 15)
             self.controller.add_child(self.controller2, 10, 15)
         self.assertRaises(ValueError, fail)
     
-    def test_add_child_error5(self):
+    def test_add_child_error_child_is_document(self):
+        """
+        Tests that add_child raises a ValueError if the given child
+        is a document.
+        """
         def fail():
-            # bad child type
             doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
             self.controller.add_child(doc, 10, 15)
         self.assertRaises(ValueError, fail)
 
-    def test_add_child_error6(self):
+    def test_add_child_error_child_is_self(self):
+        """
+        Tests that add_child raises a ValueError if the given child
+        is the controller.
+        """
         def fail():
-            # bad child : add self
             self.controller.add_child(self.controller, 10, 15)
         self.assertRaises(ValueError, fail)
 
