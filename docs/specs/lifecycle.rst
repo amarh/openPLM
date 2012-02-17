@@ -272,7 +272,7 @@ Edit/Modification
        :Tests: - plmapp.PartControllerTest.test_add_child_error_official_status
                - plmapp.PartControllerTest.test_delete_child_error_official_status
        
-    #. Documents links can be created/removed at all status
+    #. Owner can create/remove links between draft Documents and parts at all status
     #. Ownership and other signature rights can be modified only by its owner
 
 Revision
