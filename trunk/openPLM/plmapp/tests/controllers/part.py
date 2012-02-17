@@ -57,13 +57,17 @@ class PartControllerTest(ControllerTest):
         for ctrl in (self.controller, self.controller2):
             ctrl.attach_to_document(self.document)
 
+    def add_child(self, qty=10, order=15, unit="-"):
+        """ Adds controller2 to controller."""
+        self.controller.add_child(self.controller2, qty, order, unit)
+
     def test_add_child(self):
         """ Tests the addition of a child and checks that the BOM is
         consistent."""
 
         children = self.controller.get_children()
         self.assertEqual(len(children), 0)
-        self.controller.add_child(self.controller2, 10, 15)
+        self.add_child()
         children = self.controller.get_children()
         self.assertEqual(len(children), 1)
         level, link = children[0]
@@ -78,35 +82,38 @@ class PartControllerTest(ControllerTest):
         Tests that add_child raises a ValueError if the quantity is invalid.
         """
         def fail():
-            self.controller.add_child(self.controller2, -10, 15)
+            self.add_child(qty=-10)
         self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
 
     def test_add_child_error_invalid_order(self):
         """
         Tests that add_child raises a ValueError if the order is invalid.
         """
         def fail():
-            self.controller.add_child(self.controller2, 10, -15)
+            self.add_child(order=-15)
         self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
     
     def test_add_child_error_child_is_parent(self):
         """
         Tests that add_child raises a ValueError if the given child
         is a parent.
         """
+        self.controller2.add_child(self.controller, 10, 15)
         def fail():
-            self.controller2.add_child(self.controller, 10, 15)
-            self.controller.add_child(self.controller2, 10, 15)
+            self.add_child()
         self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
     
     def test_add_child_error_already_a_child(self):
         """
         Tests that add_child raises a ValueError if the given child
         is already a child.
         """
+        self.add_child()
         def fail():
-            self.controller.add_child(self.controller2, 10, 15)
-            self.controller.add_child(self.controller2, 10, 15)
+            self.add_child()
         self.assertRaises(ValueError, fail)
     
     def test_add_child_error_child_is_document(self):
@@ -118,6 +125,7 @@ class PartControllerTest(ControllerTest):
             doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
             self.controller.add_child(doc, 10, 15)
         self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
 
     def test_add_child_error_child_is_self(self):
         """
@@ -127,18 +135,112 @@ class PartControllerTest(ControllerTest):
         def fail():
             self.controller.add_child(self.controller, 10, 15)
         self.assertRaises(ValueError, fail)
+        self.assertFalse(self.controller.get_children())
 
-    def test_modify_child(self):
-        self.controller.add_child(self.controller2, 10, 15, "-")
-        self.controller.modify_child(self.controller2, 3, 5, "kg")
+    def test_add_child_error_not_owner(self):
+        """
+        Tests that only the owner can add a child.
+        """
+        user = self.get_contributor()
+        user.groups.add(self.group)
+        ctrl = self.CONTROLLER(self.controller.object, user)
+        def fail():
+            ctrl.add_child(self.controller2.object, 10, 15, "kg")
+        self.assertRaises(exc.PermissionError, fail)
+        self.assertFalse(self.controller.get_children())
+    
+    def test_add_child_error_official_status(self):
+        """
+        Tests that it is not possible to add a child to an official
+        object.
+        """
+        self.controller.promote()
+        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
+        def fail():
+            ctrl.add_child(self.controller2.object, 10, 15, "m")
+        self.assertRaises(exc.PermissionError, fail)
+        self.assertFalse(self.controller.get_children())
+
+    def _test_modify_child(self, new_qty, new_order, new_unit):
+        self.add_child()
+        self.controller.modify_child(self.controller2, new_qty, new_order,
+                new_unit)
         children = self.controller.get_children()
         level, link = children[0]
-        self.assertEqual(link.quantity, 3)
-        self.assertEqual(link.order, 5)
-        self.assertEqual(link.unit, "kg")
+        self.assertEqual(link.quantity, new_qty)
+        self.assertEqual(link.order, new_order)
+        self.assertEqual(link.unit, new_unit)
+
+    def test_modify_child(self):
+        """
+        Tests the modification of a child link.
+        """
+        self._test_modify_child(3, 5, "kg")
+
+    def test_modify_child_only_quantity(self):
+        """
+        Tests the modification of a child link. Only the quantity changes.
+        """
+        self._test_modify_child(3, 15, "-")
+
+    def test_modify_child_only_order(self):
+        """
+        Tests the modification of a child link. Only the order changes.
+        """
+        self._test_modify_child(10, 25, "-")
+
+    def test_modify_child_only_unit(self):
+        """
+        Tests the modification of a child link. Only the unit changes.
+        """
+        self._test_modify_child(10, 15, "m")
+
+    def _test_modify_child_error(self, new_qty, new_order, new_unit):
+        self.add_child()
+        def fail():
+            self.controller.modify_child(self.controller2, new_qty,
+                    new_order, new_unit)
+        self.assertRaises(ValueError, fail)
+        children = self.controller.get_children()
+        level, link = children[0]
+        self.assertEqual(link.quantity, 10)
+        self.assertEqual(link.order, 15)
+        self.assertEqual(link.unit, "-")
+
+    def test_modify_child_error_invalid_quantity(self):
+        """
+        Tests the modification of a child link. The quantity is invalid.
+        """
+        self._test_modify_child_error(-3, 15, "-")
+
+    def test_modify_child_error_invalid_order(self):
+        """
+        Tests the modification of a child link. The order is invalid.
+        """
+        self._test_modify_child_error(10, -15, "-")
+
+    def test_modify_child_error_official_status(self):
+        """
+        Tests that it is not possible to modify a child of an official object.
+        """
+        self.add_child()
+        self.controller2.promote()
+        self.controller.promote()
+        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
+        def fail():
+            ctrl.add_child(self.controller2.object, 20, 25, "mm")
+        self.assertRaises(exc.PermissionError, fail)
+        children = self.controller.get_children()
+        level, link = children[0]
+        self.assertEqual(link.quantity, 10)
+        self.assertEqual(link.order, 15)
+        self.assertEqual(link.unit, "-")
 
     def test_delete_child(self):
-        self.controller.add_child(self.controller2, 10, 15)
+        """
+        Tests the deletion of a child link.
+        """
+        self.add_child()
         self.controller.delete_child(self.controller2)
         self.assertEqual(self.controller.get_children(), [])
 
