@@ -114,9 +114,6 @@ class PartController(PLMObjectController):
         if isinstance(child, PLMObjectController):
             child = child.object
         self.check_add_child(child)
-        # check if child is not already a direct child
-        if child.pk in (c.link.child.pk for c in self.get_children(1)):
-            raise ValueError("%s is already a child of %s" % (child, self.object))
         if order < 0 or quantity < 0:
             raise ValueError("Quantity or order is negative")
         # data are valid : create the link
