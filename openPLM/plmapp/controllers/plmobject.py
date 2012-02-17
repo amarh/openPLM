@@ -335,6 +335,10 @@ class PLMObjectController(Controller):
     def set_owner(self, new_owner):
         """
         Sets *new_owner* as current owner.
+
+        .. note::
+            This method does **NOT** check that the current user
+            is the owner of the object. :meth:`set_role` does that check. 
         
         :param new_owner: the new owner
         :type new_owner: :class:`~django.contrib.auth.models.User`
@@ -439,19 +443,22 @@ class PLMObjectController(Controller):
 
         .. note::
             If *role* is `owner` or a sign role, the old user who had
-            this role will lose it.
+            this role will lose it. Only the owner can changes these
+            roles.
 
             If *role* is notified, others roles are preserved.
-        
+
         :raise: :exc:`ValueError` if *role* is invalid
         :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
         """
         if role == "owner":
+            self.check_permission("owner")
             self.set_owner(user)
         elif role == "notified":
             self.add_notified(user)
         elif role.startswith("sign"):
+            self.check_permission("owner")
             self.set_signer(user, role)
         else:
             raise ValueError("bad value for role")
