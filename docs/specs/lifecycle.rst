@@ -232,8 +232,19 @@ Visibility
 
     #. Object is visible only by its group's users when its status is before
        official 
+
+       :Tests: - plmapp.ControllerTest.test_is_readable_group_ok
+               - plmapp.ControllerTest.test_is_readable_group_invalid 
+               - plmapp.ControllerTest.test_is_readable_owner 
+               - plmapp.ControllerTest.test_is_readable_company 
+
     #. Object is visible by all users when its status is official 
+
+       :Tests: - plmapp.ControllerTest.test_is_readable_not_editable
+        
     #. Object is visible by all users when its status is deprecated 
+
+       :Tests: - plmapp.ControllerTest.test_is_readable_not_editable
 
 Edit/Modification
 ++++++++++++++++++
