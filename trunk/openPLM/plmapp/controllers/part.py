@@ -344,19 +344,28 @@ class PartController(PLMObjectController):
         return bool(self.documentpartlink_part.filter(document=document))
     
     def check_attach_document(self, document):
-        self.check_permission("owner")
-        self.check_editable()
         if not hasattr(document, "is_document") or not document.is_document:
             raise TypeError("%s is not a document" % document)
+        if self.is_cancelled: 
+            raise ValueError("Can not attach: part is cancelled.")
         if document.is_cancelled: 
             raise ValueError("Can not attach: document is cancelled.")
         if document.is_deprecated: 
             raise ValueError("Can not attach: document is deprecated.")
         if isinstance(document, PLMObjectController):
             document.check_readable()
+            ctrl = document
             document = document.object
         else:
-            get_controller(document.type)(document, self._user).check_readable()
+            ctrl = get_controller(document.type)(document, self._user)
+            ctrl.check_readable()
+        if document.is_draft:
+            owner_ok = ctrl.check_permission("owner", raise_=False)
+        else:
+            self.check_editable()
+            owner_ok = False
+        if not owner_ok:
+            self.check_permission("owner")
         if self.is_document_attached(document):
             raise ValueError("Document is already attached.")
 

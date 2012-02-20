@@ -1,4 +1,4 @@
-############################################################################
+#R###########################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
 # 
@@ -431,4 +431,39 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(0, len(self.controller.get_children()))
         self.assertEqual(0, len(self.controller3.get_children()))
          
+    def test_attach_to_document(self):
+        """
+        Tests :meth:`.PartController.attach_to_document`.
+        """
+        doc = DocumentController.create("Doc2", "Document", "a",
+                self.user, self.DATA)
+        part = self.controller3
+        part.check_attach_document(doc)
+        doc.check_attach_part(part)
+        part.attach_to_document(doc)
+        self.assertEqual([part.object.id],
+            list(doc.get_attached_parts().values_list("part", flat=True)))
+        self.assertEqual([doc.object.id],
+            list(part.get_attached_documents().values_list("document", flat=True)))
+        self.assertEqual(list(doc.get_attached_parts()),
+                list(part.get_attached_documents()))
+        self.assertFalse(part.can_attach_document(doc))
+        self.assertFalse(doc.can_attach_part(part))
+
+    def test_attach_to_document_error_not_owner(self):
+        """
+        Tests that only the owner can attach a draft document to a part.
+        """
+        doc = DocumentController.create("Doc2", "Document", "a",
+                self.user, self.DATA)
+        self.promote_to_official(doc)
+        robert = self.get_contributor()
+        robert.groups.add(self.group)
+        part = self.CONTROLLER(self.controller3.object, robert)
+        part.check_readable()
+        self.assertFalse(part.can_attach_document(doc))
+        self.assertRaises(exc.PermissionError, part.attach_to_document, doc)
+        self.assertFalse(part.get_attached_documents())
+        self.assertFalse(doc.get_attached_parts())
+
 
