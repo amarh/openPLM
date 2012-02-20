@@ -533,6 +533,8 @@ class PLMObject(models.Model):
         True if the object is not in a non editable state
         (for example, in an official or deprecated state).
         """
+        if self.is_cancelled:
+            return False
         lcs = self.lifecycle.lifecyclestates_set.only("rank")
         current_rank = lcs.get(state=self.state).rank
         official_rank = lcs.get(state=self.lifecycle.official_state).rank
@@ -546,8 +548,18 @@ class PLMObject(models.Model):
     @property
     def is_deprecated(self):
         """ True if the object is deprecated. """
-        return self.state == self.lifecycle.last_state
+        return not self.is_cancelled and self.state == self.lifecycle.last_state
     
+    @property
+    def is_official(self):
+        u"Returns True if object is official."""
+        return not self.is_cancelled and self.state == self.lifecycle.official_state
+
+    @property
+    def is_draft(self):
+        u""" Returns True if the object is a draft. """
+        return not self.is_cancelled and self.state == self.lifecycle.first_state
+
     def get_current_sign_level(self):
         """
         Returns the current sign level that an user must have to promote this
@@ -580,11 +592,6 @@ class PLMObject(models.Model):
             return issubclass(get_all_plmobjects()[self.type], Document)
         return False
     
-    @property
-    def is_official(self):
-        u"Returns True if document's state is official."""
-        return self.state == self.lifecycle.official_state
-
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
