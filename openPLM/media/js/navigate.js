@@ -1,3 +1,34 @@
+function draw_edges(data, width, height){
+    var r = Raphael("navholder", width, height);
+    
+    var s = r.set();
+    var arrows = r.set();
+    $.each(data.edges, function (i,v) {
+        var e = r.path(v);
+        s.push(e);
+        e.hover( function(){
+            e.attr("stroke-width", 3);
+            e.attr("stroke", "#d214c5");
+        }, function (){
+            e.attr("stroke-width", 1.5);
+            e.attr("stroke", "#343434");
+        });
+
+    });
+    $.each(data.arrows, function (i,v) {
+        arrows.push(r.path("M"+v+"z"));
+    });
+    s.scale(data.scale[0], data.scale[1], 0, 0);
+    s.translate(data.translate[0], data.translate[1]);
+    arrows.scale(data.scale[0], data.scale[1], 0, 0);
+    arrows.translate(data.translate[0], data.translate[1]);
+    arrows.attr("fill", "#343434");
+    s.attr("stroke", "#343434");
+    s.attr("stroke-width", 1.5);
+    arrows.attr("stroke-width", 1.5);
+} 
+
+
 
 function show_thumbnails_panel(node){
     if ($("#navThumbnails").is(":hidden")) {
@@ -42,13 +73,11 @@ function update_nav(focus_node_id, data){
         var offset = $(focus_node_id).offset();
     var date = new Date();
     var divNav = $("#DivNav");
-    $("#ImgNav").css("width", data.width+"px");
-    $("#ImgNav").css("height", data.height+"px");
     divNav.css("width", data.width+"px");
     divNav.css("height", data.height+"px");
-    var path = data["img"] + '?v=' + date.getTime();
-    $("#ImgNav").css("background", 'url("'+path+'") no-repeat 0 0');
     $("div.node").remove();
+    $("div.edge").remove();
+    $("#navholder").children().remove();
     divNav.append(data.divs);
     var submit = $("#FilterNav").find("li").last().clone();
     $("#FilterNavUl").html(data.form);
@@ -71,6 +100,7 @@ function update_nav(focus_node_id, data){
                     top: (nh / 2 - data.center_y) + "px"});
     }
     init();
+    draw_edges(data.edges, data.width, data.height);
 }
 
 function display_docs(node_id, ajax_url, doc_parts){

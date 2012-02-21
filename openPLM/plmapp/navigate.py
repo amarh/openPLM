@@ -27,15 +27,15 @@ This module provides :class:`NavigationGraph` which is used to generate
 the navigation's graph in :func:`~plmapp.views.navigate`.
 """
 
-import os
-import string
-import random
+import re
 import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
+from collections import defaultdict
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
+from django.utils.html import linebreaks
 
 import pygraphviz as pgv
 
@@ -43,10 +43,6 @@ from openPLM.plmapp import models
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
 from openPLM.plmapp.controllers.user import UserController
-
-basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img") 
-
-icondir = os.path.join(basedir, "navigate")
 
 # just a shortcut
 OSR = "only_search_results"
@@ -125,13 +121,14 @@ class NavigationGraph(object):
                            len="1.5",
                            arrowhead='normal',
                            fontname="Sans bold",
-                           fontcolor="#373434",
+                           fontcolor="transparent",
                            fontsize="9")
     TYPE_TO_IMAGE = {
-            "user" : os.path.join(icondir, "user.png"),
-            "group" : os.path.join(icondir, "user.png"),
-            "part" : os.path.join(icondir, "part.png"),
-            "document" : os.path.join(icondir, "document.png")}
+            "user" : "user.png",
+            "group" : "user.png",
+            "part" : "part.png",
+            "document" : "document.png",
+            }
 
     def __init__(self, obj, results=()):
         self.object = obj
@@ -147,6 +144,8 @@ class NavigationGraph(object):
         self.options = dict.fromkeys(self.options_list, False)
         self.options["prog"] = "dot"
         self.options["doc_parts"] = []
+        self.nodes = defaultdict(dict)
+        self.edges = set()
         self.graph = pgv.AGraph(directed=True)
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
@@ -215,7 +214,8 @@ class NavigationGraph(object):
             child = PartController(link.child, None)
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
-            self.graph.add_edge(obj.id, child.id, label)
+            #self.graph.add_edge(obj.id, child.id, label)
+            self.edges.add((obj.id, child.id, label))
             self._set_node_attributes(child)
             if self.options['doc'] or child.id in self.options["doc_parts"]:
                self._create_doc_edges(child)
@@ -231,7 +231,7 @@ class NavigationGraph(object):
             parent = PartController(link.parent, None)
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
-            self.graph.add_edge(parent.id, obj.id, label)
+            self.edges.add((parent.id, obj.id, label))
             self._set_node_attributes(parent)
             if self.options['doc'] or parent.id in self.options["doc_parts"]:
                 self._create_doc_edges(parent)
@@ -247,7 +247,7 @@ class NavigationGraph(object):
             # create a link part -> document:
             # if layout is dot, the part is on top of the document
             # cf. tickets #82 and #83
-            self.graph.add_edge(part.id, obj.id, " ")
+            self.edges.add((part.id, obj.id, " "))
             self._set_node_attributes(part)
     
     def _create_doc_edges(self, obj, obj_id=None, *args):
@@ -257,7 +257,7 @@ class NavigationGraph(object):
             if self.options[OSR] and document_item.document.id not in self.results:
                 continue
             document = DocumentController(document_item.document, None)
-            self.graph.add_edge(obj_id or obj.id, document.id, " ")
+            self.edges.add((obj_id or obj.id, document.id, " "))
             self._set_node_attributes(document)
 
     def _create_user_edges(self, obj, role):
@@ -276,7 +276,7 @@ class NavigationGraph(object):
                 continue
             user.plmobject_url = "/user/%s/" % user.username
             user_id = role + str(user.id)
-            self.graph.add_edge(user_id, obj.id, role.replace("_", "\\n"))
+            self.edges.add((user_id, obj.id, role.replace("_", "\\n")))
             self._set_node_attributes(user, user_id, role)
 
     def _create_object_edges(self, obj, role):
@@ -284,18 +284,23 @@ class NavigationGraph(object):
             return
         node = "User%d" % obj.id
         if role in ("owner", "notified"):
-            qs = obj.plmobjectuserlink_user.filter(role=role)
-            for link in qs.select_related("plmobject").only(*_plmobjects_attrs):
-                if self.options[OSR] and link.plmobject_id not in self.results:
+            if role == "owner":
+                qs = obj.plmobject_owner
+            else:
+                qs = obj.plmobjectuserlink_user.filter(role=role)
+                qs = qs.values_list("plmobject_id", flat=True).order_by()
+                qs = models.PLMObject.objects.filter(id__in=qs)
+            links = qs.only("id", "type", "reference", "revision", "name")
+            for plmobject in links:
+                if self.options[OSR] and plmobject.id not in self.results:
                     continue
-                part_doc_id = role + str(link.plmobject_id)
-                self.graph.add_edge(node, part_doc_id, role)
-                part_doc = link.plmobject
-                if part_doc.is_part:
-                    if part_doc.id in self.options["doc_parts"]:
-                        part_doc = PartController(link.plmobject.part, None)
-                        self._create_doc_edges(part_doc, part_doc_id)
-                self._set_node_attributes(part_doc, part_doc_id)
+                part_doc_id = role + str(plmobject.id)
+                self.edges.add((node, part_doc_id, role))
+                if plmobject.is_part:
+                    if plmobject.id in self.options["doc_parts"]:
+                        plmobject = PartController(plmobject.part, None)
+                        self._create_doc_edges(plmobject, part_doc_id)
+                self._set_node_attributes(plmobject, part_doc_id)
 
         else:
             # signer roles
@@ -304,11 +309,11 @@ class NavigationGraph(object):
                 if self.options[OSR] and link.plmobject_id not in self.results:
                     continue
                 part_doc_id = link.role + str(link.plmobject_id)
-                self.graph.add_edge(node, part_doc_id, link.role.replace("_", "\\n"))
+                self.edges.add((node, part_doc_id, link.role.replace("_", "\\n")))
                 part_doc = link.plmobject
                 if part_doc.is_part:
                     if part_doc.id in self.options["doc_parts"]:
-                        part_doc = PartController(link.plmobject.part, None)
+                        part_doc = PartController(part_doc.part, None)
                         self._create_doc_edges(part_doc, part_doc_id)
                 self._set_node_attributes(part_doc, part_doc_id)
 
@@ -316,19 +321,18 @@ class NavigationGraph(object):
         """
         Builds the graph (adds all edges and nodes that respected the options)
         """
-        self.options["doc_parts"] = set(self.options["doc_parts"])
+        self.options["doc_parts"] = frozenset(self.options["doc_parts"])
         self.doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         if isinstance(self.object, UserController):
             id_ = "User%d" % self.object.id
         else:
             id_ = self.object.id
-        self.graph.add_node(id_)
-        node = self.graph.get_node(id_)
+        #self.graph.add_node(id_)
+        node = self.nodes[id_]
         self._set_node_attributes(self.object, id_)
-        self.main_node = node.attr["id"]
-        node.attr["image"] = node.attr["image"].replace(".png", "_main.png")
-        node.attr["width"] = 110. / 96 
-        node.attr["height"] = 80. / 96 
+        self.main_node = node["id"]
+        node["width"] = 110. / 96 
+        node["height"] = 80. / 96 
         functions_dic = {'child':(self._create_child_edges, None),
                          'parents':(self._create_parents_edges, None),
                          'doc':(self._create_doc_edges, None),
@@ -371,7 +375,7 @@ class NavigationGraph(object):
         # data and title_to_nodes are used to retrieve usefull data (url, tooltip)
         # in convert_map
         data = {}
-        node = self.graph.get_node(obj_id)
+        #node = self.graph.get_node(obj_id)
         
         # set node attributes according to its type
         if isinstance(obj, (PLMObjectController, models.PLMObject)):
@@ -399,10 +403,9 @@ class NavigationGraph(object):
         id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), obj.id)
 
         data["label"] = label + "\n" + extra_label if extra_label else label
-        node.attr.update(
+        data["type"] = type_
+        self.nodes[obj_id].update(
                 URL=obj.plmobject_url + "navigate/",
-                label="",
-                image=NavigationGraph.TYPE_TO_IMAGE[type_],
                 id=id_,
                 )
         self.title_to_nodes[id_] = data
@@ -411,6 +414,17 @@ class NavigationGraph(object):
         elements = []
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
+            if area.get("href") == ".":
+                if area.get("shape") == "rect":
+                    title = area.get("title")
+                    if title:
+                        left, top, x2, y2 = map(int, area.get("coords").split(","))
+                        s = "position:absolute;z-index:3;top:%dpx;left:%dpx;" % (top, left)
+                        title = linebreaks(title.replace("\\n", "\n"))
+                        div = "<div class='edge' style='%s'>%s</div>" % (s, title)
+                        elements.append(div)
+                continue
+
             data = self.title_to_nodes.get(area.get("id"), {})
             
             # compute css position of the div
@@ -431,6 +445,34 @@ class NavigationGraph(object):
             elements.append(render_to_string("navigate/node.htm", ctx))
         return u"\n".join(elements)
 
+    def parse_svg(self, svg):
+        # TODO: optimize this function
+        edges = []
+        arrows = []
+        root = ET.fromstring(svg)
+        transform = root.getchildren()[0].get("transform")
+        
+        m = re.search(r"scale\((.*?)\)", transform)
+        if m:
+            scale = map(float, m.group(1).split(" ", 1))
+        else:
+            scale = (1, 1)
+        
+        m = re.search(r"translate\((.*?)\)", transform)
+        if m:
+            translate = map(float, m.group(1).split(" ", 1))
+        else:
+            translate = (0, 0)
+
+        width = root.get("width").replace("pt", "")
+        height = root.get("height").replace("pt", "")
+        for path in root.findall(".//{http://www.w3.org/2000/svg}path"):
+            edges.append(path.get("d"))
+        for poly in root.findall(".//{http://www.w3.org/2000/svg}polygon"):
+            arrows.append(poly.get("points"))
+        return dict(width=width, height=height, scale=scale, translate=translate, 
+                edges=edges, arrows=arrows)
+
     def render(self):
         """
         Renders an image of the graph
@@ -438,28 +480,23 @@ class NavigationGraph(object):
         :returns: a tuple (image map data, url of the image, path of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
-        # rebuild a graph with sorted edges to avoid random output
-        edges = self.graph.edges(keys=True)
-        self.graph.remove_edges_from((a, b) for a, b, k in edges)
+        # builds the graph
+        for key, attrs in self.nodes.iteritems():
+            self.graph.add_node(key, label="", **attrs)
         s = unicode(self.graph)
         s = s[:s.rfind("}")]
-        edges.sort()
-        s += "\n".join(u'%s -> %s [label="%s"];' % edge for edge in edges) + "}\n"
+        s += "\n".join(u'%s -> %s [label="%s", href="."];' % edge for edge in sorted(self.edges)) + "}\n"
         self.graph.close()
         self.graph = FrozenAGraph(s)
 
-        rand = "".join(random.choice(string.ascii_lowercase) for x in xrange(40))
-        picture_path = "media/navigate/" + rand
         prog = self.options.get("prog", "dot")
         self.graph.layout(prog=prog)
-        picture_path2 = os.path.join(basedir, "..", "..", picture_path)
-        map_path= picture_path2 + ".map"
-        picture_path += ".png"
-        picture_path2 += ".png"
         s = StringIO.StringIO()
-        self.graph.draw(picture_path2, format='png', prog=prog)
+        svg = StringIO.StringIO()
+        self.graph.draw(svg, format='svg', prog=prog)
+        svg.seek(0)
         self.graph.draw(s, format='cmapx', prog=prog)
         s.seek(0)
         map_string = s.read()
         self.graph.clear()
-        return self.convert_map(map_string), picture_path, picture_path2
+        return self.convert_map(map_string), self.parse_svg(svg.read())

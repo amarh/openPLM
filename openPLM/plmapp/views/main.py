@@ -62,6 +62,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
+from django.utils import simplejson
 from django.forms import HiddenInput
 from django.views.i18n import set_language as dj_set_language
 
@@ -1050,6 +1051,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
+    ctx["edges"] = simplejson.dumps(ctx["edges"])
     return r2r('Navigate.htm', ctx, request)
 
 @handle_errors
