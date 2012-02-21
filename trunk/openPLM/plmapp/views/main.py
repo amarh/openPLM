@@ -850,8 +850,12 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     if not hasattr(obj, "get_object_user_links"):
         # TODO
         raise TypeError()
+    objs = obj.get_object_user_links().select_related("plmobject")
+    objs = objs.only("role", "plmobject__type", "plmobject__reference",
+            "plmobject__revision", "plmobject__name")
     ctx.update({'current_page':'parts-doc-cad',
-                'object_user_link': obj.get_object_user_links()})
+        'object_user_link': objs
+        })
     
     return r2r('DisplayObjectRelPLMObject.htm', ctx, request)
 
