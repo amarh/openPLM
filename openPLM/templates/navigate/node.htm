@@ -1,0 +1,18 @@
+<div id="{{id|safe}}" class="node {{main|yesno:"main_node, "}}" style="{{style|safe}}"
+    title="{{title_}}">
+
+    {{label|linebreaks}}
+
+    {% if thumbnails %}
+        <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="Display thumbnails"
+        onclick="display_thumbnails('{{id|safe}}', '/ajax/thumbnails/{{path}}');"/>
+    {% endif %}
+
+    {% if show_documents %}
+        <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all " title="Show related documents"
+        onclick="display_docs('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');"/>
+    {% endif %}
+
+    <a href="{{href|safe}}"><span>&nbsp;</span></a>
+
+</div>
