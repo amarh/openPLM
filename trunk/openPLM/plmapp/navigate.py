@@ -34,14 +34,15 @@ import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
 
-from django.utils.html import linebreaks
+from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 
 import pygraphviz as pgv
 
+from openPLM.plmapp import models
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
                                        DocumentController
 from openPLM.plmapp.controllers.user import UserController
-from openPLM.plmapp.controllers.group import GroupController
 
 basedir = os.path.join(os.path.dirname(__file__), "..", "media", "img") 
 
@@ -49,16 +50,6 @@ icondir = os.path.join(basedir, "navigate")
 
 # just a shortcut
 OSR = "only_search_results"
-
-def get_path(obj):
-    if hasattr(obj, "type"):
-        return u"/".join((obj.type, obj.reference, obj.revision))
-    elif hasattr(obj, 'name'):
-        return u"Group/%s/-/" % obj.name
-    else:
-        return u"User/%s/-/" % obj.username
-
-
 class FrozenAGraph(pgv.AGraph):
     '''
     A frozen AGraph
@@ -76,6 +67,19 @@ class FrozenAGraph(pgv.AGraph):
         else:
             with file(path, "w") as f:
                 f.write(self.data)
+
+def get_path(obj):
+    if hasattr(obj, "type"):
+        return u"/".join((obj.type, obj.reference, obj.revision))
+    elif hasattr(obj, 'name'):
+        return u"Group/%s/-/" % obj.name
+    else:
+        return u"User/%s/-/" % obj.username
+
+_attrs = ("id", "type", "reference", "revision", "name")
+_plmobjects_attrs = ["plmobject__" + x for x in _attrs]
+_parts_attrs = ["part__" + x for x in _attrs]
+_documents_attrs = ["document__" + x for x in _attrs]
 
 class NavigationGraph(object):
     """
@@ -111,11 +115,11 @@ class NavigationGraph(object):
                             sep="+.1,.1",
                             outputorder="edgesfirst",
                             bgcolor="transparent")
-    NODE_ATTRIBUTES = dict(shape='none', fixedsize='true', fontsize='10',
-                           bgcolor="transparent", color="transparent",
-                           fontname="Sans bold",
-                           fontcolor="#ffffff",
-                           style='filled', width=100./96, height=70./96)
+    NODE_ATTRIBUTES = dict(shape='none',
+                           fixedsize='true',
+                           bgcolor="transparent",
+                           width=100./96,
+                           height=70./96)
     EDGE_ATTRIBUTES = dict(color='#373434',
                            minlen="1.5",
                            len="1.5",
@@ -123,22 +127,17 @@ class NavigationGraph(object):
                            fontname="Sans bold",
                            fontcolor="#373434",
                            fontsize="9")
-    TYPE_TO_ATTRIBUTES = {UserController : dict(
-                            image=os.path.join(icondir, "user.png")),
-                          GroupController : dict(
-                            image=os.path.join(icondir, "user.png")),
-                          PartController : dict(
-                            image=os.path.join(icondir, "part.png")),
-                          DocumentController : dict(
-                            image=os.path.join(icondir, "document.png"))}
-    
-    BUTTON_CLASS = " ui-button ui-widget ui-state-default ui-corner-all "
+    TYPE_TO_IMAGE = {
+            "user" : os.path.join(icondir, "user.png"),
+            "group" : os.path.join(icondir, "user.png"),
+            "part" : os.path.join(icondir, "part.png"),
+            "document" : os.path.join(icondir, "document.png")}
 
     def __init__(self, obj, results=()):
         self.object = obj
         self.results = [r.id for r in results]
         # a PLMObject and an user may have the same id, so we add a variable
-        # which tell if results contains users
+        # which tells if results contains users
         self.users_result = False
         if results:
             self.users_result = hasattr(results[0], "username")
@@ -153,6 +152,7 @@ class NavigationGraph(object):
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
         self.title_to_nodes = {}
+        self._part_to_node = {}
 
     def set_options(self, options):
         """
@@ -240,7 +240,7 @@ class NavigationGraph(object):
     def _create_part_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for link in obj.get_attached_parts():
+        for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs):
             if self.options[OSR] and link.part.id not in self.results:
                 continue
             part = PartController(link.part, None)
@@ -253,7 +253,7 @@ class NavigationGraph(object):
     def _create_doc_edges(self, obj, obj_id=None, *args):
         if self.options[OSR] and self.users_result:
             return
-        for document_item in obj.get_attached_documents():
+        for document_item in obj.get_attached_documents().select_related("document").only(*_documents_attrs):
             if self.options[OSR] and document_item.document.id not in self.results:
                 continue
             document = DocumentController(document_item.document, None)
@@ -274,7 +274,7 @@ class NavigationGraph(object):
         for user, role in users:
             if self.options[OSR] and user.id not in self.results:
                 continue
-            user = UserController(user, None) 
+            user.plmobject_url = "/user/%s/" % user.username
             user_id = role + str(user.id)
             self.graph.add_edge(user_id, obj.id, role.replace("_", "\\n"))
             self._set_node_attributes(user, user_id, role)
@@ -282,26 +282,42 @@ class NavigationGraph(object):
     def _create_object_edges(self, obj, role):
         if self.options[OSR] and self.users_result:
             return
-        part_doc_list = obj.plmobjectuserlink_user.filter(role__istartswith=role)
-        for part_doc_item in part_doc_list:
-            if self.options[OSR] and part_doc_item.plmobject.id not in self.results:
-                continue
-            part_doc_id = str(part_doc_item.role) + str(part_doc_item.plmobject_id)
-            self.graph.add_edge("User%d" % obj.id, part_doc_id,
-                    part_doc_item.role.replace("_", "\\n"))
-            if part_doc_item.plmobject.is_document:
-                part_doc = DocumentController(part_doc_item.plmobject.document, None)
-            else:
-                part_doc = PartController(part_doc_item.plmobject.part, None)
-                if part_doc.id in self.options["doc_parts"]:
-                    self._create_doc_edges(part_doc, part_doc_id)
-                
-            self._set_node_attributes(part_doc, part_doc_id)
+        node = "User%d" % obj.id
+        if role in ("owner", "notified"):
+            qs = obj.plmobjectuserlink_user.filter(role=role)
+            for link in qs.select_related("plmobject").only(*_plmobjects_attrs):
+                if self.options[OSR] and link.plmobject_id not in self.results:
+                    continue
+                part_doc_id = role + str(link.plmobject_id)
+                self.graph.add_edge(node, part_doc_id, role)
+                part_doc = link.plmobject
+                if part_doc.is_part:
+                    if part_doc.id in self.options["doc_parts"]:
+                        part_doc = PartController(link.plmobject.part, None)
+                        self._create_doc_edges(part_doc, part_doc_id)
+                self._set_node_attributes(part_doc, part_doc_id)
+
+        else:
+            # signer roles
+            qs = obj.plmobjectuserlink_user.filter(role__istartswith=role)
+            for link in qs.select_related("plmobject").only("role", *_plmobjects_attrs):
+                if self.options[OSR] and link.plmobject_id not in self.results:
+                    continue
+                part_doc_id = link.role + str(link.plmobject_id)
+                self.graph.add_edge(node, part_doc_id, link.role.replace("_", "\\n"))
+                part_doc = link.plmobject
+                if part_doc.is_part:
+                    if part_doc.id in self.options["doc_parts"]:
+                        part_doc = PartController(link.plmobject.part, None)
+                        self._create_doc_edges(part_doc, part_doc_id)
+                self._set_node_attributes(part_doc, part_doc_id)
 
     def create_edges(self):
         """
         Builds the graph (adds all edges and nodes that respected the options)
         """
+        self.options["doc_parts"] = set(self.options["doc_parts"])
+        self.doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         if isinstance(self.object, UserController):
             id_ = "User%d" % self.object.id
         else:
@@ -313,8 +329,6 @@ class NavigationGraph(object):
         node.attr["image"] = node.attr["image"].replace(".png", "_main.png")
         node.attr["width"] = 110. / 96 
         node.attr["height"] = 80. / 96 
-        #color = node.attr["color"]
-        #node.attr.update(color="#444444", fillcolor=color)
         functions_dic = {'child':(self._create_child_edges, None),
                          'parents':(self._create_parents_edges, None),
                          'doc':(self._create_doc_edges, None),
@@ -328,13 +342,28 @@ class NavigationGraph(object):
                          'to_sign':(self._create_object_edges, 'sign'),
                          'request_notification_from':(self._create_object_edges, 'notified'),
                          }
-        for field, value in self.options.items():
+        for field, value in self.options.iteritems():
             if value and field in functions_dic:
                 function, argument = functions_dic[field]
                 function(self.object, argument)
         if not self.options["doc"] and self.object.id in self.options["doc_parts"]:
             if isinstance(self.object, PartController):
                 self._create_doc_edges(self.object, None)
+
+        # treats the parts to see if they have an attached document
+        if not self.options["doc"]:
+            parts = models.DocumentPartLink.objects.\
+                    filter(part__in=self._part_to_node.keys()).\
+                    values_list("part_id", flat=True)
+            for id_ in parts:
+                data = self._part_to_node[id_]
+                data["show_documents"] = True
+                if id_ not in self.options["doc_parts"]:
+                    data["parts"] = self.doc_parts + "#" + str(id_)
+                    data["doc_img_add"] = True
+                else:
+                    data["doc_img_add"] = False
+                    data["parts"] = "#".join(str(x) for x in self.options["doc_parts"] if x != id_)
 
     def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
         obj_id = obj_id or obj.id
@@ -343,47 +372,43 @@ class NavigationGraph(object):
         # in convert_map
         data = {}
         node = self.graph.get_node(obj_id)
-        node.attr["tooltip"] = str(obj_id)
-        node.attr["URL"] = obj.plmobject_url + "navigate/"
         
         # set node attributes according to its type
-        type_ = type(obj)
-        if issubclass(type_, PartController):
-            type_ = PartController
-        elif issubclass(type_, DocumentController):
-            type_ = DocumentController
-        node.attr.update(self.TYPE_TO_ATTRIBUTES[type_])
-
-        if isinstance(obj, PLMObjectController):
+        if isinstance(obj, (PLMObjectController, models.PLMObject)):
             # display the object's name if it is not empty
-            path = get_path(obj)
-            label = obj.name.strip() or path.replace("/", "\n")
-            data["title"] = path.replace("/", " - ")
-            
-            # add urls to show/hide thumbnails and attached documents
-            if type_ == DocumentController:
-                data["url"] = "/ajax/thumbnails/" + get_path(obj)
-            elif type_ == PartController and not self.options["doc"]:
-                if obj.get_attached_documents():
-                    s = "+" if obj.id not in self.options["doc_parts"] else "-"
-                    data["url"] = s + str(obj.id)
-        elif isinstance(obj, UserController):
-            full_name =  u'%s\n%s' % (obj.first_name, obj.last_name)
+            ref = (obj.type, obj.reference, obj.revision)
+            label = obj.name.strip() or u"\n".join(ref)
+            data["title_"] = u" - ".join(ref)
+            # add data to show/hide thumbnails and attached documents
+            if obj.is_document:
+                data["path"] = get_path(obj)
+                data["thumbnails"] = True
+                type_ = "document"
+            else:
+                type_ = "part"
+                # this will be used later to see if it has an attached document
+                self._part_to_node[obj.id] = data
+        elif isinstance(obj, (User, UserController)):
+            full_name = u'%s\n%s' % (obj.first_name, obj.last_name)
             label = full_name.strip() or obj.username
-            data["title"] = obj.username
+            data["title_"] = obj.username
+            type_ = "user"
         else:
             label = obj.name
-        #node.attr["label"] += "\n" + extra_label
-        node.attr["label"] = ""
-        data["label"] = label + "\n" + extra_label
-        # id is used by the javascript
-        t = type_.__name__.replace("Controller", "")
-        node.attr["id"] = "_".join((str(obj_id), t, str(obj.id)))
-        self.title_to_nodes[node.attr["id"]] = data
+            type_ = "group"
+        id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), obj.id)
+
+        data["label"] = label + "\n" + extra_label if extra_label else label
+        node.attr.update(
+                URL=obj.plmobject_url + "navigate/",
+                label="",
+                image=NavigationGraph.TYPE_TO_IMAGE[type_],
+                id=id_,
+                )
+        self.title_to_nodes[id_] = data
 
     def convert_map(self, map_string):
         elements = []
-        doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
             data = self.title_to_nodes.get(area.get("id"), {})
@@ -393,46 +418,18 @@ class NavigationGraph(object):
             width = x2 - left
             height = y2 - top
             style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
-            
+
             # create a div with a title, and an <a> element
             id_ = "Nav-%s" % area.get("id")
-            div = ET.Element("div", id=id_, style=style)
-            div.set("class", "node" + " main_node" * (self.main_node == area.get("id")))
-            
-            div.append(ET.fromstring(linebreaks(data["label"]).encode("utf-8")))
-            title = data.get("title")
-            if title:
-                div.set("title", title)
-            
-            # add thumbnails and attached documents buttons
-            url = data.get("url", "None")
-            if url.startswith("/ajax/thumbnails/"):
-                thumbnails = ET.SubElement(div, "img", src="/media/img/search.png",
-                        title="Display thumbnails")
-                thumbnails.set("class", "node_thumbnails" + self.BUTTON_CLASS)
-                thumbnails.set("onclick", "display_thumbnails('%s', '%s');" % (id_, url))
-            elif url != "None":
-                if url[0] == "+":
-                    parts = doc_parts + "#" + url[1:]
-                    img = "/media/img/add.png"
-                else:
-                    s = set(self.options["doc_parts"])
-                    img = "/media/img/remove.png"
-                    s.remove(int(url[1:]))
-                    parts = "#".join(str(o) for o in s)
-                show_doc = ET.SubElement(div, "img", src=img,
-                        title="Show related documents")
-                show_doc.set("class", "node_show_docs" + self.BUTTON_CLASS)
-                show_doc.set("onclick", "display_docs('%s', '%s', '%s');" % (id_, ajax_navigate, parts))
-            
-            # add the link
-            a = ET.SubElement(div, "a", href=area.get("href")) 
-            span = ET.SubElement(a, "span")
-            span.text = " "
-            elements.append(div)
+            ctx = data.copy()
+            ctx["style"] = style
+            ctx["id"] = id_
+            ctx["main"] = self.main_node == area.get("id")
+            ctx["href"] = area.get("href")
+            ctx["documents_url"] = ajax_navigate
 
-        s = u"\n".join(ET.tostring(div) for div in elements)
-        return s
+            elements.append(render_to_string("navigate/node.htm", ctx))
+        return u"\n".join(elements)
 
     def render(self):
         """
@@ -441,7 +438,7 @@ class NavigationGraph(object):
         :returns: a tuple (image map data, url of the image, path of the image)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
-        # rebuild a frozen graph with sorted edges to avoid random output
+        # rebuild a graph with sorted edges to avoid random output
         edges = self.graph.edges(keys=True)
         self.graph.remove_edges_from((a, b) for a, b, k in edges)
         s = unicode(self.graph)
@@ -465,6 +462,4 @@ class NavigationGraph(object):
         s.seek(0)
         map_string = s.read()
         self.graph.clear()
-        warnings.simplefilter('default', RuntimeWarning)
         return self.convert_map(map_string), picture_path, picture_path2
-

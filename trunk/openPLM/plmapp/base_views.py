@@ -74,19 +74,10 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
         obj = get_object_or_404(Group, name=obj_ref)
         controller_cls = GroupController
     else:
-        obj = get_object_or_404(models.PLMObject, type=obj_type,
+        model = models.get_all_plmobjects()[obj_type]
+        obj = get_object_or_404(model, type=obj_type,
                                 reference=obj_ref,
                                 revision=obj_revi)
-        # guess what kind of PLMObject (Part, Document) obj is
-        cls = models.PLMObject
-        find = True
-        while find:
-            find = False
-            for c in cls.__subclasses__():
-                if hasattr(obj, c.__name__.lower()):
-                    cls  = c
-                    obj = getattr(obj, c.__name__.lower())
-                    find = True
         controller_cls = get_controller(obj_type)
     return controller_cls(obj, user)
 
