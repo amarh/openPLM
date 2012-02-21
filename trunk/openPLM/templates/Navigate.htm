@@ -10,8 +10,14 @@
 {% block scripts %}
     <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
     <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
+    <script type="text/javascript" src="/media/js/raphael-min.js"></script>
     <script type="text/javascript" src="/media/js/navigate.js"></script>
 
+    <script>
+        $(function () {
+            draw_edges({{edges|safe}}, {{img_width}}, {{img_height}});
+        });
+    </script>
 {% endblock %}
 
 
@@ -60,10 +66,7 @@
             <span class="imgManagement" id="bottomControl">&nbsp;</span>
         </div>
         <div id="DivNav" style="left:{{x_img_position}}px; top:{{y_img_position}}px;width:{{img_width}}px; height:{{img_height}}px;">
-            <!--<img id="ImgNav" src="{{picture_path}}" title="Navigate" alt="Navigate" />-->
-            <div id="ImgNav" style='width:{{img_width}}px; height:{{img_height}}px; background: url("{{picture_path}}") no-repeat 0 0;'>
-            </div>
-
+            <div id="navholder"></div>
             {{map_areas|safe}}
 
         </div>

@@ -24,6 +24,7 @@ div.node {
     text-align:center;
     display: table;
     overflow: hidden;
+    background-repeat: no-repeat;
 }
 
 div.node p {
@@ -106,13 +107,6 @@ img.node_thumbnails, img.node_show_docs {
     z-index:50;
 }
 
-#ImgNav
-{
-    position: absolute;
-    z-index: 1;
-    border-style: none;
-    cursor: crosshair;
-}
 
 /* BUTTONS WE USE TO SLIDE THE NAVIGATE IMAGE UP/DOWN/LEFT/RIGHT */
 div#imgManagement
@@ -124,7 +118,7 @@ div#imgManagement
     height: 100px;
     border-style: none;
     cursor: pointer;
-    z-index: 5;
+    z-index: 50;
 }
 
 span.imgManagement {
@@ -198,9 +192,42 @@ div#FilterNav > form > ul > li
     padding: 5px;
 }
 
+div.node_part {
+    background-image: url("/media/img/navigate/part.png");
+}
+div.node_document {
+    background-image: url("/media/img/navigate/document.png");
+}
+div.node_group {
+    background-image: url("/media/img/navigate/user.png");
+}
+div.node_user {
+    background-image: url("/media/img/navigate/user.png");
+}
+div.node_part.main_node {
+    background-image: url("/media/img/navigate/part_main.png");
+}
+div.node_document.main_node {
+    background-image: url("/media/img/navigate/document_main.png");
+}
+div.node_group.main_node {
+    background-image: url("/media/img/navigate/user_main.png");
+}
+div.node_user.main_node {
+    background-image: url("/media/img/navigate/user_main.png");
+}
+
+.edge p {
+    padding-left: 0.1em;
+    font-weight: bold;
+    font-family:monospace;
+    font-size: 9;
+    color: #373434;
+}
 
 /* Override main_content and ActiveArea to remove margins and paddings */
 #main_content, #ActiveArea {
     margin: 0 !important;
     padding: 0 !important;
 }
+

@@ -121,7 +121,6 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
 def ajax_navigate(request, obj_type, obj_ref, obj_revi):
     context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     data = {
-            "img" : context["picture_path"],
             "width" : context["img_width"],
             "height" : context["img_height"],
             "divs" : context["map_areas"],
@@ -130,6 +129,7 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
             "form" : context["filter_object_form"].as_ul(),
             "center_x" : context["center_x"],
             "center_y" : context["center_y"],
+            "edges" : context["edges"],
             }
     return data
 

@@ -35,16 +35,12 @@ class AjaxTestCase(CommonViewTest):
 
     def test_navigate(self):
         data = self.get("/ajax/navigate/Part/Part1/a/")
-        self.assertTrue("img" in data)
         self.assertTrue(int(data["width"] > 0))
         self.assertTrue(int(data["height"] > 0))
         left = int(data["left"])
         top = int(data["top"])
         self.assertTrue("form" in data)
         self.assertTrue("divs" in data)
-        # load the image
-        image = self.client.get(data["img"])
-        self.assertEqual(image.status_code, 200)
 
     def test_can_add_child_ok(self):
         p2 = self.create("part2")
