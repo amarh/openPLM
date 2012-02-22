@@ -1,0 +1,23 @@
+{% load i18n plmapp_tags highlight %}
+
+
+{% get_current_language as LANGUAGE_CODE %}
+<a href="/user/{{user}}/">{{user.get_full_name}}</a> | {% now "D j N Y, G:i"%}
+<form id="SetLangForm" action="/i18n/setlang/" method="post">
+    <ul>
+        <li>
+        <select name="language">
+
+            {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                {{ lang.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        </li>
+        <li>
+        <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+        </li>
+    </ul>
+</form>
+

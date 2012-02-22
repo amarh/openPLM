@@ -12,7 +12,9 @@
 
         {% block css %} {% endblock %}
 
-        <title>{% block title %} {% endblock %}</title>
+        <title>
+            openPLM - {{user}} - {{object_type}} | {{object_reference}} | {{object_revision}}
+        </title>
         <meta name="Robots" content="none"/>
         <meta name="Author" content="openplm" />
         <meta name="Classification" content="" />
@@ -29,7 +31,7 @@
 
 
         {% block scripts %} {% endblock %}
-
+        {% block extrahead %}{% endblock %}
     </head>
     <body>
 
@@ -43,7 +45,7 @@
                     </a>
                 </div>
                 <div id="LoggedPersonBox">
-                    {% block LoggedPersonBlock %}{% endblock %}
+                    {% include "blocks/user.html" %}
                 </div>
             </div>
 
@@ -73,10 +75,10 @@
                             {% else %}
                                 <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
                             {% endif %}
-                                <a href="{{obj.plmobject_url}}navigate/">
-                                    <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
-                                </a>
-                                </li>
+                            <a href="{{obj.plmobject_url}}navigate/">
+                                <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                            </a>
+                            </li>
                             {% if navigate_bool %}
                                 <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
                             {% else %}
@@ -106,7 +108,7 @@
                                     </ul>
                                 </div>
                             </h2>
-                            {% block CreationBlock %}{% endblock %}
+                            {% include "blocks/creation.html" %}
                         </div>
 
                         <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
@@ -123,9 +125,7 @@
                                     </ul>
                                 </div>
                             </h2>
-                            {% block SearchBlock %}{% endblock %}
-                            <hr/>
-                            {% block ResultBlock %}{% endblock %}
+                            {% include "blocks/search.html" %}
                         </div>
 
 
@@ -133,7 +133,23 @@
                     <div id="center-col" class="heightfix">
 
                         <div id="ActiveBox" class="{{class4div}}">
-                            {% block ObjectBlock %}{% endblock %}
+                            {% include "blocks/reference.html" %}
+                            <div id="ActiveArea">
+                                {% if is_readable %}
+                                    {% if object_menu and not navigate_bool %}
+                                        {% include "blocks/menu.html" %}
+                                    {% endif %}
+                                    <div id="main_content">
+                                        {% block content %}{% endblock %}	
+                                    </div>
+                                {% else %}
+                                    <p>{% trans "You are not allowed to see this object" %}</p>
+                                {% endif %}
+
+                                <div class="clearfix"></div>
+
+                            </div>
+
                         </div>
 
                     </div>
