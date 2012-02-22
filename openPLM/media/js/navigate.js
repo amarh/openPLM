@@ -69,8 +69,10 @@ function display_thumbnails(node_id, ajax_url){
 }
 
 function update_nav(focus_node_id, data){
-    if (focus_node_id != null)
-        var offset = $(focus_node_id).offset();
+    if (focus_node_id === null){
+        focus_node_id = "#" + $("#DivNav div.main_node").attr("id");
+    }
+    var offset = $(focus_node_id).offset();
     var date = new Date();
     var divNav = $("#DivNav");
     divNav.css("width", data.width+"px");
@@ -84,21 +86,14 @@ function update_nav(focus_node_id, data){
     $("#FilterNavUl").append(submit);
     $("#FilterNavUl select").css("width", "12em");
     $("#FilterNavUl select").chosen({disable_search_threshold: 7});
-    $("#FilterNavUl div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all")
-    if (focus_node_id != null){
-        var new_offset = $(focus_node_id).offset();
-        var delta_top = new_offset.top - offset.top;
-        var delta_left = new_offset.left - offset.left;
-        divNav.css({
-            left: '-=' + delta_left + "px",
-            top: '-=' + delta_top + "px"});
-        }
-    else {
-        var nw = $("#Navigate").innerWidth();
-        var nh = $("#Navigate").innerHeight();
-        divNav.css({left: (nw / 2 - data.center_x) + "px",
-                    top: (nh / 2 - data.center_y) + "px"});
-    }
+    $("#FilterNavUl div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all");
+    
+    var new_offset = $(focus_node_id).offset();
+    var delta_top = new_offset.top - offset.top;
+    var delta_left = new_offset.left - offset.left;
+    divNav.css({
+        left: '-=' + delta_left + "px",
+        top: '-=' + delta_top + "px"});
     init();
     draw_edges(data.edges, data.width, data.height);
 }
