@@ -1,9 +1,10 @@
+import os
 
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from openPLM.plmapp.models import GroupInfo
+from openPLM.plmapp.models import GroupInfo, DocumentFile
 from openPLM.plmapp.controllers import PLMObjectController
 
 class BaseTestCase(TestCase):
@@ -43,4 +44,10 @@ class BaseTestCase(TestCase):
         from haystack import backend
         backend.SearchBackend.inmemory_db = None
         super(BaseTestCase, self).tearDown()
+        for df in DocumentFile.objects.all():
+            try:
+                os.remove(df.file.path)
+            except IOError:
+                pass
+
 
