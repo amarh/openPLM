@@ -41,7 +41,7 @@ import pygraphviz as pgv
 
 from openPLM.plmapp import models
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
-                                       DocumentController
+                                       DocumentController, GroupController
 from openPLM.plmapp.controllers.user import UserController
 
 # just a shortcut
@@ -240,25 +240,43 @@ class NavigationGraph(object):
     def _create_part_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs):
-            if self.options[OSR] and link.part.id not in self.results:
-                continue
-            part = PartController(link.part, None)
-            # create a link part -> document:
-            # if layout is dot, the part is on top of the document
-            # cf. tickets #82 and #83
-            self.edges.add((part.id, obj.id, " "))
-            self._set_node_attributes(part)
+        if isinstance(obj, GroupController):
+            node = "Group%d" % obj.id
+            parts = obj.get_attached_parts().only("type", "reference", "revision", "name")
+            for part in parts:
+                if self.options[OSR] and part.id not in self.results:
+                    continue
+                self.edges.add((node, part.id, " "))
+                self._set_node_attributes(part)
+        else:
+            for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs):
+                if self.options[OSR] and link.part.id not in self.results:
+                    continue
+                part = PartController(link.part, None)
+                # create a link part -> document:
+                # if layout is dot, the part is on top of the document
+                # cf. tickets #82 and #83
+                self.edges.add((part.id, obj.id, " "))
+                self._set_node_attributes(part)
     
     def _create_doc_edges(self, obj, obj_id=None, *args):
         if self.options[OSR] and self.users_result:
             return
-        for document_item in obj.get_attached_documents().select_related("document").only(*_documents_attrs):
-            if self.options[OSR] and document_item.document.id not in self.results:
-                continue
-            document = DocumentController(document_item.document, None)
-            self.edges.add((obj_id or obj.id, document.id, " "))
-            self._set_node_attributes(document)
+        if isinstance(obj, GroupController):
+            node = "Group%d" % obj.id
+            docs = obj.get_attached_documents().only("type", "reference", "revision", "name")
+            for doc in docs:
+                if self.options[OSR] and doc.id not in self.results:
+                    continue
+                self.edges.add((node, doc.id, " "))
+                self._set_node_attributes(doc)
+        else:
+            for document_item in obj.get_attached_documents().select_related("document").only(*_documents_attrs):
+                if self.options[OSR] and document_item.document.id not in self.results:
+                    continue
+                document = DocumentController(document_item.document, None)
+                self.edges.add((obj_id or obj.id, document.id, " "))
+                self._set_node_attributes(document)
 
     def _create_user_edges(self, obj, role):
         if self.options[OSR] and not self.users_result:
@@ -271,12 +289,13 @@ class NavigationGraph(object):
         else:
             users = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
             users = ((u.user, u.role) for u in users.all())
+        node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
         for user, role in users:
             if self.options[OSR] and user.id not in self.results:
                 continue
             user.plmobject_url = "/user/%s/" % user.username
             user_id = role + str(user.id)
-            self.edges.add((user_id, obj.id, role.replace("_", "\\n")))
+            self.edges.add((user_id, node, role.replace("_", "\\n")))
             self._set_node_attributes(user, user_id, role)
 
     def _create_object_edges(self, obj, role):
@@ -325,6 +344,8 @@ class NavigationGraph(object):
         self.doc_parts = "#".join(str(o) for o in self.options["doc_parts"])
         if isinstance(self.object, UserController):
             id_ = "User%d" % self.object.id
+        elif isinstance(self.object, GroupController):
+            id_ = "Group%d" % self.object.id
         else:
             id_ = self.object.id
         #self.graph.add_node(id_)
