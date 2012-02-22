@@ -1,0 +1,36 @@
+{% load i18n plmapp_tags %}
+<div id="ReferenceArea">
+    {% if navigation_history %}
+        <div id="navigation_history">
+            <div id="navigation_history_inner">
+                <ul>
+                    {% for url_, type, reference, revision in navigation_history %}
+                        <li>
+                        <a href="{{ url_ }}">
+                            <span class="type">{{type}}</span> 
+                            // <span class="reference">{{reference}}</span>
+                            {% if revision != "-" %}
+                                // <span class="rev">{{revision}}</span>
+                            {% endif %}
+                        </a>
+                        </li>
+                    {% endfor%}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+    <div id="reference-title">
+        <div class="icon {% if obj.is_document %}
+                document_icon
+            {%else %} {% if obj.is_part %}
+                part_icon
+            {% else %} user_icon {% endif %} {% endif %}"></div>
+        <h2>
+            <span class="type">{{object_type}}</span> 
+            {% if object_reference != '-' %}
+                // <span class="reference">{{object_reference}}</span> // <span class="revision">{{object_revision}}</span> // <span class="name">{% firstof obj.name obj.get_full_name%}</span>
+            {% endif%}
+        </h2>
+    </div>
+</div>
+
