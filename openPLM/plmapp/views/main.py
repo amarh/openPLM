@@ -264,9 +264,12 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
         # display history of all revisions
         objects = [o.id for o in obj.get_all_revisions()]
         history = obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')
-        history = history.select_related("plmobject__revision")
+        history = history.select_related("user", "plmobject__revision")
+        ctx["show_revisions"] = True
     else:
         history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
+        ctx["show_revisions"] = False
+        history = history.select_related("user")
     ctx.update({'current_page' : 'history', 
                 'object_history' : list(history)})
     return r2r('DisplayObjectHistory.htm', ctx, request)
@@ -880,8 +883,9 @@ def display_delegation(request, obj_ref):
     if request.method == "POST":
         selected_link_id = request.POST.get('link_id')
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
+    links = obj.get_user_delegation_links().select_related("delegatee")
     ctx.update({'current_page':'delegation', 
-                'user_delegation_link': obj.get_user_delegation_links()})
+                'user_delegation_link': links})
     
     return r2r('DisplayObjectDelegation.htm', ctx, request)
 
