@@ -22,7 +22,7 @@
                     <span class="time">
                         {{histo.date|date:"G:i"}}
                     </span>
-                    {% if histo.plmobject.revision %}
+                    {% if show_revisions %}
                         <span class="revision">{{ histo.plmobject.revision }}</span>
                     {% endif %}
                     <span class="action">
