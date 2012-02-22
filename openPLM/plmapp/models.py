@@ -766,22 +766,22 @@ class DocumentStorage(FileSystemStorage):
             #. a file name with 4 parts:
                 #. the md5 sum of *name*
                 #. a dash separator: ``-``
-                #. a random part with 3 characters in ``[a-z0-9]``
+                #. a random part with 7 characters in ``[a-z0-9]``
                 #. the extension, like :file:`.gz`
             
             For example, if *name* is :file:`my_file.tar.gz`,
             a possible output is:
 
-                :file:`gz/c7bfe8d00ea6e7138215ebfafff187af-jj6.gz`
+                :file:`gz/c7bfe8d00ea6e7138215ebfafff187af-jj6789g.gz`
 
             If *name* is :file:`my_file`, a possible output is:
 
-                :file:`no_ext/59c211e8fc0f14b21c78c87eafe1ab72-dhh`
+                :file:`no_ext/59c211e8fc0f14b21c78c87eafe1ab72-dhh5555`
         """
        
         def rand():
             r = ""
-            for i in xrange(3):
+            for i in xrange(7):
                 r += random.choice(string.ascii_lowercase + string.digits)
             return r
         basename = os.path.basename(name)
