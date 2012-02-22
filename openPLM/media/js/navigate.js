@@ -307,7 +307,14 @@ function init(){
         if (result === null){
             uri_rx = /\/user\/(.*)\/navigate\/?/;
             result = uri_rx.exec(uri);
-            uri = "/ajax/navigate/User/" + (result[1]) + "/-/";
+            if (result === null) {
+                uri_rx = /\/group\/(.*)\/navigate\/?/;
+                result = uri_rx.exec(uri);
+                uri = "/ajax/navigate/Group/" + (result[1]) + "/-/";
+            }
+            else {
+                uri = "/ajax/navigate/User/" + (result[1]) + "/-/";
+            }
         }
         else {
             uri = "/ajax/navigate/" + (result[1])  + "/";

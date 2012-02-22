@@ -274,12 +274,10 @@ class GroupController(Controller):
         update_index.delay("plmapp", "groupinfo", self.object.pk)
 
     def get_attached_parts(self):
-        for obj in self.plmobject_group.all():
-            if obj.is_part:
-                yield obj
+        types = models.get_all_parts().keys()
+        return self.plmobject_group.filter(type__in=types)
 
     def get_attached_documents(self):
-        for obj in self.plmobject_group.all():
-            if obj.is_document:
-                yield obj
+        types = models.get_all_documents().keys()
+        return self.plmobject_group.filter(type__in=types)
 
