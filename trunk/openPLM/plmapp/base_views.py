@@ -260,15 +260,19 @@ def init_ctx(init_type_, init_reference, init_revision):
 ###   Manage html code for Search and Results function and other global parameters     ###
 ##########################################################################################
 def update_navigation_history(request, obj, type_, reference, revision):
-    history = request.session.get("navigation_history", [])
+    old_history = request.session.get("navigation_history", [])
     value = (obj.plmobject_url, type_, reference, revision)
+    history = list(old_history)
     if value in history:
         # move value at the end
         history.remove(value)
     history.append(value)
     if len(history) > 7:
         history = history[-7:]
-    request.session["navigation_history"] = history
+    if old_history != history:
+        request.session["navigation_history"] = history
+        return True
+    return False
 
 
 def get_generic_data(request, type_='-', reference='-', revision='-', search=True):
@@ -292,11 +296,14 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     """
     ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
+    save_session = False
     if type_ == reference == revision == '-':
         obj = request.user
     else:
         obj = get_obj(type_, reference, revision, request.user)
-        update_navigation_history(request, obj, type_, reference, revision)
+        save_session = update_navigation_history(request, obj,
+                type_, reference, revision)
+        
     # Builds, update and treat Search form
     search_needed = "results" not in request.session
     search_id = "search_id_%s" 
@@ -306,6 +313,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         request.session["type"] = request.GET["type"]
         request.session["q"] = request.GET.get("q", "")
         search_needed = True
+        save_session = True
     elif "type" in request.session:
         type_form4creation = TypeFormWithoutUser(request.session)
         search_form = SimpleSearchForm(request.session, auto_id=search_id)
@@ -313,6 +321,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         type_form4creation = TypeFormWithoutUser()
         request.session['type'] = 'Part'
         search_form = SimpleSearchForm(auto_id=search_id)
+        save_session = True
 
     if search and search_needed and search_form.is_valid():
         search_query = search_form.cleaned_data["q"]
@@ -321,6 +330,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         search_count = request.session["search_count"] = qset.count()
         qset = qset[:30]
         request.session["results"] = qset
+        save_session = True
     else:
         qset = request.session.get("results", [])
         search_query = request.session.get("search_query", "")
@@ -344,14 +354,14 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         ctx["is_readable"] = obj.check_readable(False)
     else:
         ctx["is_readable"] = True
-
     # little hack to avoid a KeyError
     # see https://github.com/toastdriven/django-haystack/issues/404
     from haystack import site
     for r in request.session.get("results", []):
         r.searchsite = site
-    
-    request.session.save()
+        
+    if save_session:
+        request.session.save()
     return obj, ctx
 
 coords_rx = re.compile(r'top:(\d+)px;left:(\d+)px;width:(\d+)px;height:(\d+)px;')
