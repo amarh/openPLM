@@ -32,8 +32,6 @@ import functools
 import traceback
 import sys
 
-import Image
-
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import simplejson
@@ -229,9 +227,7 @@ def init_ctx(init_type_, init_reference, init_revision):
     Example::
     
         >>> init_ctx('BiosOs','BI-0044','1.4.3')
-        {'LANGUAGES': (('fr', u'Fran\xc3\xa7ais'), ('en', 'English')),
-         'THUMBNAILS_URL': '/media/thumbnails',
-         'current_date': datetime.datetime(2010, 8, 27, 11, 34, 21, 639171),
+        {'THUMBNAILS_URL': '/media/thumbnails',
          'object_reference': 'BI-0044',
          'object_revision': '1.4.3',
          'object_type': 'BiosOs'}
@@ -244,15 +240,11 @@ def init_ctx(init_type_, init_reference, init_revision):
     :type init_revision: str
     :return: a dictionnary
     """
-    now = datetime.datetime.now()
     return {
-        'current_date': now,
         'object_reference': init_reference,
         'object_revision': init_revision,
         'object_type': init_type_,
-        'search_query' : "",
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
-        'LANGUAGES' : settings.LANGUAGES,
         'can_generate_pdf' : can_generate_pdf(),
         }
 
