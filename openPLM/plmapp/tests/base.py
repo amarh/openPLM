@@ -32,6 +32,14 @@ class BaseTestCase(TestCase):
         self.user.groups.add(self.group)
         self.DATA["group"] = self.group
 
+    def get_contributor(self, username="user2"):
+        """ Returns a new contributor"""
+        user = User(username="user2")
+        user.save()
+        user.get_profile().is_contributor = True
+        user.get_profile().save()
+        return user
+
     def create(self, ref="Part1"):
         return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
 

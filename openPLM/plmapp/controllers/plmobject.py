@@ -207,7 +207,7 @@ class PLMObjectController(Controller):
         
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
-        if not self.is_editable:
+        if not self.is_proposed:
             raise PromotionError()
         state = self.object.state
         lifecycle = self.object.lifecycle

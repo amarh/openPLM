@@ -249,22 +249,12 @@ class DocumentController(PLMObjectController):
         return bool(self.documentpartlink_document.filter(part=part))
 
     def check_attach_part(self, part):
-        self.check_permission("owner")
-        self.check_editable()
         if not (hasattr(part, "is_part") and part.is_part):
             raise TypeError("%s is not a part" % part)
-        if part.is_cancelled: 
-            raise ValueError("Can not attach: part is cancelled.")
-        if part.is_deprecated: 
-            raise ValueError("Can not attach: part is deprecated.")
-        if isinstance(part, PLMObjectController):
-            part.check_readable()
-            part = part.object
-        else:
-            get_controller(part.type)(part, self._user).check_readable()
-        if self.is_part_attached(part):
-            raise ValueError("part is already attached.")
-    
+        if not isinstance(part, PLMObjectController):
+            part = get_controller(part.type)(part, self._user)
+        part.check_attach_document(self)
+       
     def can_attach_part(self, part):
         """
         Returns True if *part* can be attached to the current document.
@@ -277,7 +267,7 @@ class DocumentController(PLMObjectController):
             pass
         return can_attach
 
-    def revise(self, new_revision):
+    def revise(self, new_revision, selected_parts=()):
         # same as PLMObjectController + duplicate files (and their thumbnails)
         rev = super(DocumentController, self).revise(new_revision)
         for doc_file in self.object.files.all():
@@ -297,6 +287,10 @@ class DocumentController(PLMObjectController):
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
+        for part in selected_parts:
+            if part.is_editable:
+                rev.documentpartlink_document.create(part=part)
+
         return rev
 
     def checkin(self, doc_file, new_file, update_attributes=True,

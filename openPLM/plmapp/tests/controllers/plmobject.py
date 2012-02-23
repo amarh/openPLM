@@ -41,15 +41,6 @@ class ControllerTest(BaseTestCase):
     TYPE = "Part"
     DATA = {}
 
-
-    def get_contributor(self, username="user2"):
-        """ Returns a new contributor"""
-        user = User(username="user2")
-        user.save()
-        user.get_profile().is_contributor = True
-        user.get_profile().save()
-        return user
-
     def promote_to_official(self, ctrl):
         ctrl.object.state = ctrl.lifecycle.official_state
         ctrl.set_owner(self.cie, True)

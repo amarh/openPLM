@@ -531,9 +531,17 @@ class PLMObject(models.Model):
     def is_editable(self):
         """
         True if the object is not in a non editable state
-        (for example, in an official or deprecated state).
+        (equivalent to :meth:`is_draft`).
         """
-        if self.is_cancelled:
+        return self.is_draft
+
+    @property
+    def is_proposed(self):
+        """
+        True if the object is in a state prior to the official state
+        but not draft.
+        """
+        if self.is_cancelled or self.is_draft:
             return False
         lcs = self.lifecycle.lifecyclestates_set.only("rank")
         current_rank = lcs.get(state=self.state).rank
