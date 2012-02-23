@@ -835,6 +835,7 @@ class DocumentFile(models.Model):
     locker = models.ForeignKey(User, null=True, blank=True,
                                default=lambda: None)
     document = models.ForeignKey('Document')
+    deprecated = models.BooleanField(default=lambda: False)
 
     def __unicode__(self):
         return u"DocumentFile<%s, %s>" % (self.filename, self.document)
