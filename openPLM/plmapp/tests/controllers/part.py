@@ -317,11 +317,15 @@ class PartControllerTest(ControllerTest):
                                                   self.user, self.DATA)
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
-        self.controller2.add_child(self.controller3, 10, 15)
-        self.controller.add_child(controller4, 10, 15)
+        self.controller2.add_child(self.controller3, 10, 25)
+        self.controller.add_child(controller4, 10, 35)
+        controller4.add_child(self.controller2, 28, 51)
         wanted = [(1, self.controller2.object.pk),
                   (2, self.controller3.object.pk),
-                  (1, controller4.object.pk)]
+                  (1, controller4.object.pk),
+                  (2, self.controller2.object.pk),
+                  (3, self.controller3.object.pk),
+                  ]
         children = [(lvl, lk.child.pk) for lvl, lk in self.controller.get_children(-1)]
         self.assertEqual(children, wanted)
         wanted = [(1, self.controller2.object.pk),
