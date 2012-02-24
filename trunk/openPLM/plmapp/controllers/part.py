@@ -70,12 +70,11 @@ class PartController(PLMObjectController):
         if child.id == self.object.id:
             raise ValueError("Can not add child: child is current object")
         get_controller(child.type)(child, self._user).check_readable()
-        parents = (p.link.parent.pk for p in self.get_parents(-1))
-        if child.pk in parents:
+        if self.is_ancestor(child):
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
         link = self.parentchildlink_parent.filter(child=child, end_time=None)
-        if link:
+        if link.exists():
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
 
@@ -216,44 +215,92 @@ class PartController(PLMObjectController):
                 ext = PCLE(link=link2, **extension_data[name])
                 ext.save()
 
-    def get_children(self, max_level=1, current_level=1, date=None):
+    def get_children(self, max_level=1, date=None,
+            related=("child", "child__state", "child__lifecycle")):
         """
         Returns a list of all children at time *date*.
         
         :rtype: list of :class:`Child`
         """
-
-        if max_level != -1 and current_level > max_level:
-            return []
+        
+        objects = models.ParentChildLink.objects.order_by("-order")\
+                .select_related(*related)
         if not date:
-            links = self.parentchildlink_parent.filter(end_time__exact=None)
+            links = objects.filter(end_time__exact=None)
         else:
-            links = self.parentchildlink_parent.filter(ctime__lt=date).exclude(end_time__lt=date)
+            links = objects.filter(ctime__lt=date).exclude(end_time__lt=date)
         res = []
-        for link in links.order_by("order", "child__reference"):
-            res.append(Child(current_level, link))
-            pc = PartController(link.child, self._user)
-            res.extend(pc.get_children(max_level, current_level + 1, date))
+        parents = [self.object.id]
+        level = 1
+        last_children = []
+        while parents and (max_level < 0 or level <= max_level):
+            qs = links.filter(parent__in=parents)
+            parents = []
+            last = []
+            for link in qs.iterator():
+                parents.append(link.child_id)
+                child = Child(level, link)
+                last.append(child)
+                if level == 1:
+                    res.insert(0, child)
+                else:
+                    for c in last_children:
+                        if c.link.child_id == link.parent_id:
+                            res.insert(res.index(c) +1, child)
+                            break
+            last_children = last 
+            level += 1
         return res
+
+    def is_ancestor(self, part):
+        """
+        Returns True if *part* is an ancestor of the current object.
+        """
+        links = models.ParentChildLink.objects.filter(end_time__exact=None)
+        parents = [part.id]
+        last_children = []
+        while parents:
+            parents = links.filter(parent__in=parents).values_list("child", 
+                    flat=True)
+            if self.id in parents:
+                return True
+        return False
     
-    def get_parents(self, max_level=1, current_level=1, date=None):
+    def get_parents(self, max_level=1, date=None,
+            related=("parent", "parent__state", "parent__lifecycle")):
         """
         Returns a list of all parents at time *date*.
         
         :rtype: list of :class:`Parent`
         """
 
-        if max_level != -1 and current_level > max_level:
-            return []
+        objects = models.ParentChildLink.objects.order_by("-order")\
+                .select_related(*related)
         if not date:
-            links = self.parentchildlink_child.filter(end_time__exact=None)
+            links = objects.filter(end_time__exact=None)
         else:
-            links = self.parentchildlink_child.filter(ctime__lt=date).exclude(end_time__lt=date)
+            links = objects.filter(ctime__lt=date).exclude(end_time__lt=date)
         res = []
-        for link in links:
-            res.append(Parent(current_level, link))
-            pc = PartController(link.parent, self._user)
-            res.extend(pc.get_parents(max_level, current_level + 1, date))
+        children = [self.object.id]
+        level = 1
+        last_parents = []
+        while children and (max_level < 0 or level <= max_level):
+            qs = links.filter(child__in=children)
+            children = []
+            last = []
+            for link in qs.iterator():
+                children.append(link.parent_id)
+                parent = Parent(level, link)
+                last.append(parent)
+                if level == 1:
+                    res.insert(0, parent)
+                else:
+                    for c in last_parents:
+                        if c.link.parent_id == link.child_id:
+                            res.insert(res.index(c) +1, parent)
+                            break
+            last_parents = last 
+            level += 1
         return res
 
     def update_children(self, formset):
