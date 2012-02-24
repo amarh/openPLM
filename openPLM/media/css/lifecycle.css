@@ -30,6 +30,9 @@ div.lifecycle div.state span.state {
     font-weight: 500;
 }
 
+div.lifecycle div.state.active {
+    background: url("../img/lifecycle/proposition_on.png") no-repeat;
+}
 
 div.lifecycle div.draft { 
     background: url("../img/lifecycle/draft_off.png") no-repeat;
