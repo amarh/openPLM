@@ -235,15 +235,36 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+    if obj.is_document:
+        confirmation = obj.get_attached_parts().exists()
+    else:
+        confirmation = False
     if obj.is_revisable():
         if request.method == "POST" and request.POST:
             add_form = AddRevisionForm(request.POST)
+            kwargs = {}
+            if obj.is_document and confirmation:
+                part_formset = forms.SelectPLMObjectFormset(request.POST)
+                parts = []
+                if part_formset.is_valid():
+                    for form in part_formset.forms:
+                        doc = form.cleaned_data["document"]
+                        if doc.pk != obj.pk:
+                            raise ValueError("Bad document")
+                        part = form.cleaned_data["part"]
+                        if form.cleaned_data["selected"] and part.is_editable:
+                            parts.append(part)
+                kwargs["selected_parts"] = parts
             if add_form.is_valid():
-                obj.revise(add_form.cleaned_data["revision"])
+                obj.revise(add_form.cleaned_data["revision"], **kwargs)
         else:
             add_form = AddRevisionForm({"revision" : get_next_revision(obj_revi)})
+            if obj.is_document:
+                qs = obj.get_attached_parts()
+                ctx["part_formset"] = forms.SelectPLMObjectFormset(queryset=qs)
         ctx["add_revision_form"] = add_form
+
+    ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
@@ -451,11 +472,13 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_doc_cad_formset(obj)
+    dforms = dict((form.instance.id, form) for form in formset.forms)
     archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'doc-cad',
-                'object_doc_cad': obj.get_attached_documents(),
+                'all_docs': obj.get_attached_documents(),
+                'forms' : dforms,
                 'archive_form' : archive_form,
-                'doc_cad_formset': formset})
+                'docs_formset': formset})
     return r2r('DisplayObjectDocCad.htm', ctx, request)
 
 
@@ -506,9 +529,12 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_rel_part_formset(obj)
+    forms = dict((form.instance.id, form) for form in formset.forms)
+
     ctx.update({'current_page':'parts', 
-                'object_rel_part': obj.get_attached_parts(),
-                'rel_part_formset': formset})
+                'all_parts': obj.get_attached_parts(),
+                'forms' : forms,
+                'parts_formset': formset})
     return r2r('DisplayObjectRelPart.htm', ctx, request)
 
 ##########################################################################################    

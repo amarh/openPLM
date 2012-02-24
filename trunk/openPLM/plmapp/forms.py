@@ -439,12 +439,8 @@ def get_children_formset(controller, data=None):
 class AddRevisionForm(forms.Form):
     revision = forms.CharField()
     clean_revision = _clean_revision
-    
-class AddRelPartForm(PLMObjectForm):
-    pass
-    
-class ModifyRelPartForm(forms.ModelForm):
-    delete = forms.BooleanField(required=False, initial=False)
+   
+class RelPartForm(forms.ModelForm):
     document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
                                    widget=forms.HiddenInput())
     part = forms.ModelChoiceField(queryset=m.Part.objects.all(),
@@ -452,15 +448,25 @@ class ModifyRelPartForm(forms.ModelForm):
     class Meta:
         model = m.DocumentPartLink
         fields = ["document", "part"]
+
+class SelectPLMObjectForm(RelPartForm):
+    selected = forms.BooleanField(required=False, initial=True)
+        
+SelectPLMObjectFormset = modelformset_factory(m.DocumentPartLink,
+                        form=SelectPLMObjectForm, extra=0)
+
+class AddRelPartForm(PLMObjectForm):
+    pass
+    
+class ModifyRelPartForm(RelPartForm):
+    delete = forms.BooleanField(required=False, initial=False)
         
 RelPartFormset = modelformset_factory(m.DocumentPartLink,
                                       form=ModifyRelPartForm, extra=0)
-def get_rel_part_formset(controller, data=None):
-    if data is None:
-        queryset = controller.get_attached_parts()
-        formset = RelPartFormset(queryset=queryset)
-    else:
-        formset = RelPartFormset(data=data)
+
+def get_rel_part_formset(controller, data=None, **kwargs):
+    queryset = controller.get_detachable_parts()
+    formset = RelPartFormset(queryset=queryset, data=data, **kwargs)
     return formset
 
 class AddFileForm(forms.Form):
@@ -498,12 +504,9 @@ class ModifyDocCadForm(forms.ModelForm):
         
 DocCadFormset = modelformset_factory(m.DocumentPartLink,
                                      form=ModifyDocCadForm, extra=0)
-def get_doc_cad_formset(controller, data=None):
-    if data is None:
-        queryset = controller.get_attached_documents()
-        formset = DocCadFormset(queryset=queryset)
-    else:
-        formset = DocCadFormset(data=data)
+def get_doc_cad_formset(controller, data=None, **kwargs):
+    queryset = controller.get_detachable_documents()
+    formset = DocCadFormset(queryset=queryset, data=data, **kwargs)
     return formset
 
 

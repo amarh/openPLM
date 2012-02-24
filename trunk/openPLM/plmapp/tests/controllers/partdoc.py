@@ -79,41 +79,65 @@ class PartDocControllerTestCase(BaseTestCase):
         ("deprecated","deprecated",True,False,False),
         ("deprecated","deprecated",True,True,False),
 )
-    def test_attach(self):
-        other_owner = self.get_contributor("Otherowner")
-        other_owner.groups.add(self.group)
-        other_owner.save()
+
+    def setUp(self):
+        super(PartDocControllerTestCase, self).setUp()
+        self.other_owner = self.get_contributor("Otherowner")
+        self.other_owner.groups.add(self.group)
+        self.other_owner.save()
         
         lcl = LifecycleList("dpop","official", "draft", 
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
-        states = dict((s, models.State.objects.get(name=s)) for s in lcl) 
-        states["cancelled"] = models.get_cancelled_state()
-        lifecycles = dict.fromkeys(lcl, lc)
-        lifecycles["cancelled"] = models.get_cancelled_lifecycle()
+        self.states = dict((s, models.State.objects.get(name=s)) for s in lcl) 
+        self.states["cancelled"] = models.get_cancelled_state()
+        self.lifecycles = dict.fromkeys(lcl, lc)
+        self.lifecycles["cancelled"] = models.get_cancelled_lifecycle()
         data = self.DATA.copy()
         data["lifecycle"] = lc
-        part = PartController.create("p1","Part", "a", self.user, data,
+        self.part = PartController.create("p1","Part", "a", self.user, data,
                 True, True)
-        doc = DocumentController.create("d1","Document", "a", self.user, data,
-                True, True)
+        self.doc = DocumentController.create("d1","Document", "a",
+                self.user, data, True, True)
+
+
+    def test_attach(self):
         expected = []
         result_part = []
         result_doc = []
         for pstate, dstate, powner, downer, can_attach in self.MATRICE:
-            part.object.state = states[pstate]
-            part.object.lifecycle = lifecycles[pstate]
-            doc.object.state = states[dstate]
-            doc.object.lifecycle = lifecycles[dstate]
-            part.set_owner(self.user if powner else other_owner, True)
-            doc.set_owner(self.user if downer else other_owner, True)
+            self.part.object.state = self.states[pstate]
+            self.part.object.lifecycle = self.lifecycles[pstate]
+            self.doc.object.state = self.states[dstate]
+            self.doc.object.lifecycle = self.lifecycles[dstate]
+            self.part.set_owner(self.user if powner else self.other_owner, True)
+            self.doc.set_owner(self.user if downer else self.other_owner, True)
             
             expected.append(can_attach)
-            pctrl = PartController(part.object, self.user)
-            result_part.append(pctrl.can_attach_document(doc.object))
-            dctrl = DocumentController(doc.object, self.user)
-            result_doc.append(dctrl.can_attach_part(part.object))
-            if expected[-1] != result_doc[-1]:
-                print pstate, dstate, powner, downer, can_attach 
+            pctrl = PartController(self.part.object, self.user)
+            result_part.append(pctrl.can_attach_document(self.doc.object))
+            dctrl = DocumentController(self.doc.object, self.user)
+            result_doc.append(dctrl.can_attach_part(self.part.object))
+        self.assertEqual(expected, result_part)
+        self.assertEqual(expected, result_doc)
+
+    def test_detach(self):
+        expected = []
+        result_part = []
+        result_doc = []
+        self.doc.attach_to_part(self.part)
+        for pstate, dstate, powner, downer, can_detach in self.MATRICE:
+            self.part.object.state = self.states[pstate]
+            self.part.object.lifecycle = self.lifecycles[pstate]
+            self.doc.object.state = self.states[dstate]
+            self.doc.object.lifecycle = self.lifecycles[dstate]
+            self.part.set_owner(self.user if powner else self.other_owner, True)
+            self.doc.set_owner(self.user if downer else self.other_owner, True)
+            
+            expected.append(can_detach)
+            pctrl = PartController(self.part.object, self.user)
+            result_part.append(pctrl.can_detach_document(self.doc.object))
+            dctrl = DocumentController(self.doc.object, self.user)
+            result_doc.append(dctrl.can_detach_part(self.part.object))
         self.assertEqual(expected, result_part)
         self.assertEqual(expected, result_doc)

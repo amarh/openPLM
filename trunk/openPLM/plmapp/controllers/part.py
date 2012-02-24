@@ -318,8 +318,8 @@ class PartController(PLMObjectController):
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         """
-
-        self.check_permission("owner")
+        
+        self.check_attach_document(document, True)
         if isinstance(document, PLMObjectController):
             document = document.object
         link = self.documentpartlink_part.get(document=document)
@@ -333,6 +333,17 @@ class PartController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return self.documentpartlink_part.all()
+
+    def get_detachable_documents(self):
+        """
+        Returns all attached documents the user can detach.
+        """
+        links = []
+        for link in self.get_attached_documents().select_related("document"):
+            doc = link.document
+            if self.can_detach_document(doc):
+                links.append(link.id)
+        return self.documentpartlink_part.filter(id__in=links)
      
     def is_document_attached(self, document):
         """
@@ -343,9 +354,10 @@ class PartController(PLMObjectController):
             document = document.object
         return bool(self.documentpartlink_part.filter(document=document))
     
-    def check_attach_document(self, document):
+    def check_attach_document(self, document, detach=False):
         if not hasattr(document, "is_document") or not document.is_document:
             raise TypeError("%s is not a document" % document)
+        self.check_contributor()
         if not (self.is_draft or document.is_draft):
             raise ValueError("Can not attach: one of the part or document's state must be draft.") 
         if self.is_cancelled: 
@@ -375,8 +387,12 @@ class PartController(PLMObjectController):
             owner_ok = False
         if not owner_ok:
             self.check_permission("owner")
+        
         if self.is_document_attached(document):
-            raise ValueError("Document is already attached to the part.")
+            if not detach:
+                raise ValueError("Document is already attached to the part.")
+        elif detach:
+            raise ValueError("Document is not attached to the part.")
 
     def can_attach_document(self, document):
         """
@@ -390,6 +406,18 @@ class PartController(PLMObjectController):
             pass
         return can_attach
 
+    def can_detach_document(self, document):
+        """
+        Returns True if *document* can be detached.
+        """
+        can_detach = False
+        try:
+            self.check_attach_document(document, True)
+            can_detach = True
+        except StandardError:
+            pass
+        return can_detach
+
     def update_doc_cad(self, formset):
         u"""
         Updates doc_cad informations with data from *formset*
@@ -398,11 +426,10 @@ class PartController(PLMObjectController):
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyChildForm`
         
-        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
-            :attr:`object`.
+        :raises: :exc:`ValueError` if one of the document is not detachable.
         """
-        
-        self.check_permission("owner")
+         
+        docs = set()
         if formset.is_valid():
             for form in formset.forms:
                 part = form.cleaned_data["part"]
@@ -411,7 +438,12 @@ class PartController(PLMObjectController):
                 delete = form.cleaned_data["delete"]
                 document = form.cleaned_data["document"]
                 if delete:
-                    self.detach_document(document)
+                    docs.add(document)
+            if docs:
+                for doc in docs:
+                    self.check_attach_document(doc, True)
+                ids = (d.id for d in docs)
+                self.documentpartlink_part.filter(document__in=ids).delete()
 
     def cancel(self):
         """
