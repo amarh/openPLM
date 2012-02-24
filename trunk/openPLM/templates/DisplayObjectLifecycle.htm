@@ -26,7 +26,7 @@
 
         {% if obj.state != obj.lifecycle.first_state %}
             {% if is_signer_dm %}
-                {% if obj.is_editable %}
+                {% if obj.is_proposed %}
                     <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
                 {% else %}
                     <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
