@@ -201,34 +201,32 @@ class NavigationGraph(object):
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for child_l in obj.get_children(related=("child",)):
+        for child_l in obj.get_children(max_level=-1, related=("child",)):
             link = child_l.link
             if self.options[OSR] and link.child.id not in self.results:
                 continue
-            child = PartController(link.child, None)
+            if link.parent_id not in self._part_to_node:
+                continue
+            child = link.child
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
-            self.edges.add((obj.id, child.id, label))
-            self._set_node_attributes(child)
-            if self.options['doc'] or child.id in self.options["doc_parts"]:
-               self._create_doc_edges(child)
-            self._create_child_edges(child)
+            self.edges.add((link.parent_id, child.id, label))
+            self._set_node_attributes(link.child)
     
     def _create_parents_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for parent_l in obj.get_parents(related=("parent",)):
+        for parent_l in obj.get_parents(max_level=-1, related=("parent",)):
             link = parent_l.link
             if self.options[OSR] and link.parent.id not in self.results:
                 continue
-            parent = PartController(link.parent, None)
+            if link.child_id not in self._part_to_node:
+                continue
+            parent = link.parent
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
             self.edges.add((parent.id, obj.id, label))
             self._set_node_attributes(parent)
-            if self.options['doc'] or parent.id in self.options["doc_parts"]:
-                self._create_doc_edges(parent)
-            self._create_parents_edges(parent)
    
     def _create_part_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
@@ -245,12 +243,11 @@ class NavigationGraph(object):
             for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs):
                 if self.options[OSR] and link.part.id not in self.results:
                     continue
-                part = PartController(link.part, None)
                 # create a link part -> document:
                 # if layout is dot, the part is on top of the document
                 # cf. tickets #82 and #83
-                self.edges.add((part.id, obj.id, " "))
-                self._set_node_attributes(part)
+                self.edges.add((link.part_id, obj.id, " "))
+                self._set_node_attributes(link.part)
     
     def _create_doc_edges(self, obj, obj_id=None, *args):
         if self.options[OSR] and self.users_result:
@@ -349,8 +346,6 @@ class NavigationGraph(object):
         node["height"] = 80. / 96 
         functions_dic = {'child':(self._create_child_edges, None),
                          'parents':(self._create_parents_edges, None),
-                         'doc':(self._create_doc_edges, None),
-                         'cad':(self._create_doc_edges, None),
                          'owner':(self._create_user_edges, 'owner'),
                          'signer':(self._create_user_edges, 'sign'),
                          'notified':(self._create_user_edges, 'notified'),
@@ -364,9 +359,28 @@ class NavigationGraph(object):
             if value and field in functions_dic:
                 function, argument = functions_dic[field]
                 function(self.object, argument)
-        if not self.options["doc"] and self.object.id in self.options["doc_parts"]:
-            if isinstance(self.object, PartController):
+        # now that all parts have been added, we can add the documents
+        if self.options["doc"]:
+            if isinstance(self.object, GroupController):
                 self._create_doc_edges(self.object, None)
+            links = models.DocumentPartLink.objects.\
+                    filter(part__in=self._part_to_node.keys())
+            for link in links.select_related("document"):
+                if self.options[OSR] and link.document_id not in self.results:
+                    continue
+                
+                self.edges.add((link.part_id, link.document_id, " "))
+                self._set_node_attributes(link.document)
+
+        elif not isinstance(self.object, UserController):
+            ids = self.options["doc_parts"].intersection(self._part_to_node.keys()) 
+            links = models.DocumentPartLink.objects.filter(part__in=ids)
+            for link in links.select_related("document"):
+                if self.options[OSR] and link.document_id not in self.results:
+                    continue
+                
+                self.edges.add((link.part_id, link.document_id, " "))
+                self._set_node_attributes(link.document)
 
         # treats the parts to see if they have an attached document
         if not self.options["doc"]:
@@ -385,11 +399,13 @@ class NavigationGraph(object):
 
     def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
         obj_id = obj_id or obj.id
-        
+       
+        if "id" in self.nodes[obj_id]:
+            # already treated
+            return
         # data and title_to_nodes are used to retrieve usefull data (url, tooltip)
         # in convert_map
         data = {}
-        #node = self.graph.get_node(obj_id)
         
         # set node attributes according to its type
         if isinstance(obj, (PLMObjectController, models.PLMObject)):

@@ -528,7 +528,6 @@ class PartNavigateFilterForm(NavigateFilterForm):
     child = forms.BooleanField(initial=True, required=False, label=_("child"))
     parents = forms.BooleanField(initial=True, required=False, label=_("parents"))
     doc = forms.BooleanField(initial=True, required=False, label=_("doc"))
-    cad = forms.BooleanField(required=False, label=_("cad"))
     owner = forms.BooleanField(required=False, label=_("owner"))
     signer = forms.BooleanField(required=False, label=_("signer"))
     notified = forms.BooleanField(required=False, label=_("notified"))
