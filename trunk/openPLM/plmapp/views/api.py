@@ -65,9 +65,9 @@ def login_json(func):
     """
    
     json_func = json_view(func, API_VERSION)
+    @csrf_exempt
     @secure_required
     @api_login_required
-    @csrf_exempt
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         if request.META["HTTP_USER_AGENT"] != "openplm":
