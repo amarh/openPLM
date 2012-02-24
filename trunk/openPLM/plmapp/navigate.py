@@ -123,12 +123,6 @@ class NavigationGraph(object):
                            fontname="Sans bold",
                            fontcolor="transparent",
                            fontsize="9")
-    TYPE_TO_IMAGE = {
-            "user" : "user.png",
-            "group" : "user.png",
-            "part" : "part.png",
-            "document" : "document.png",
-            }
 
     def __init__(self, obj, results=()):
         self.object = obj
@@ -207,14 +201,13 @@ class NavigationGraph(object):
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for child_l in obj.get_children():
+        for child_l in obj.get_children(related=("child",)):
             link = child_l.link
             if self.options[OSR] and link.child.id not in self.results:
                 continue
             child = PartController(link.child, None)
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
-            #self.graph.add_edge(obj.id, child.id, label)
             self.edges.add((obj.id, child.id, label))
             self._set_node_attributes(child)
             if self.options['doc'] or child.id in self.options["doc_parts"]:
@@ -224,7 +217,7 @@ class NavigationGraph(object):
     def _create_parents_edges(self, obj, *args):
         if self.options[OSR] and self.users_result:
             return
-        for parent_l in obj.get_parents():
+        for parent_l in obj.get_parents(related=("parent",)):
             link = parent_l.link
             if self.options[OSR] and link.parent.id not in self.results:
                 continue
