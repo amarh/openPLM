@@ -74,8 +74,8 @@ class GoogleDocumentController(DocumentController):
         else:
             self.client = get_gclient(credential)
 
-    def revise(self, new_revision):
-        rev = super(GoogleDocumentController, self).revise(new_revision)
+    def revise(self, new_revision, *args, **kwargs):
+        rev = super(GoogleDocumentController, self).revise(new_revision, *args, **kwargs)
         # try to copy the document in google docs
         if not hasattr(self, "client"):
             # TODO errors

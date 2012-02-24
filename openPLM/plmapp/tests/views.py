@@ -328,7 +328,9 @@ class DocumentViewTestCase(ViewTest):
         
         response = self.get(self.base_url + "parts/", page="parts")
         self.assertEqual([part.id],
-                         [p.part.id for p in response.context["object_rel_part"]])
+                         [p.part.id for p in response.context["all_parts"]])
+        self.assertEqual([part.id],
+            [f.instance.part.id for f in response.context["parts_formset"].forms])
         
     def test_add_related_part_get(self):
         response = self.get(self.base_url + "parts/add/", link=True)
@@ -450,7 +452,7 @@ class PartViewTestCase(ViewTest):
 
     def test_doc_cad_empty(self):
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
-        self.assertEqual(0, len(list(response.context["object_doc_cad"])))
+        self.assertEqual(0, len(list(response.context["all_docs"])))
     
     def test_doc_cad(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -459,8 +461,12 @@ class PartViewTestCase(ViewTest):
                 self.DATA)
         self.controller.attach_to_document(doc1)
         self.controller.attach_to_document(doc2)
+        doc2.object.state = doc2.object.lifecycle.last_state
+        doc2.object.save()
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
-        self.assertEqual(2, len(list(response.context["object_doc_cad"])))
+        self.assertEqual(2, response.context["all_docs"].count())
+        forms = response.context["forms"]
+        self.assertEqual([doc1.id], [f.instance.document.id for f in forms.values()]) 
 
     def test_doc_add_add_get(self):
         response = self.get(self.base_url + "doc-cad/add/", link=True)

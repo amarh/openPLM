@@ -5,29 +5,38 @@
 
 {% block content %}
     <form method="post" action="">	
-        {{ rel_part_formset.management_form }}
-        {% if is_owner %}
+
+        {% if user.get_profile.is_contributor %}
+            {{ parts_formset.management_form }}
             <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "ADD" %}</span></a>
-            {% if rel_part_formset.forms %}
+            {% if parts_formset.forms %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
             {% endif %}
         {% endif %}
+
         <table class="Content">
-	        {% for form in rel_part_formset.forms %}
-                {{ form.id }}
-                {{ form.document }}
-                {{ form.part }}
+            {% for link in all_parts %}
+
                 <tr class="Content">
-                    {% if is_owner %}
-                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-                    {% endif %}
-			        <td class="Content">{{ form.instance.part.type }}</td>
-			        <td class="Content">
-                        <a href="{{ form.instance.part.plmobject_url }}"/>
-			                {{ form.instance.part.reference }}
-		                </a>
-	                </td>
-			        <td class="Content">{{ form.instance.part.revision }}</td>
+                    {% with link.part as part %}
+                        {% if user.get_profile.is_contributor and link.id in forms %}
+                            {% with forms|key:link.id as form %} 
+                                {{ form.id }}
+                                {{ form.document }}
+                                {{ form.part }}
+                                <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                            {% endwith %}
+                        {% else %}
+                            <td class="Content"> - </td>
+                        {% endif %}
+                        <td class="Content">{{ part.type }}</td>
+                        <td class="Content">
+                            <a href="{{ part.plmobject_url }}"/>
+                                {{ part.reference }}
+                            </a>
+                        </td>
+                        <td class="Content">{{ part.revision }}</td>
+                    {% endwith %}
                 </tr>
             {% empty %}
                 <tr>
@@ -35,8 +44,8 @@
                         {% trans "There are no parts attached to this document" %}
                     </td>
                 </tr>
-	        {% endfor %}
-	    </table>
+            {% endfor %}
+        </table>
     </form>
 {% endblock %}
 

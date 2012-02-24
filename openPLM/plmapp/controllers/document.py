@@ -224,7 +224,8 @@ class DocumentController(PLMObjectController):
         Delete link between *part* (a :class:`.Part`) and
         :attr:`~PLMObjectController.object`.
         """
-
+        
+        self.check_attach_part(part, True)
         if isinstance(part, PLMObjectController):
             part = part.object
         link = self.documentpartlink_document.get(part=part)
@@ -238,7 +239,18 @@ class DocumentController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return self.object.documentpartlink_document.all()
-
+    
+    def get_detachable_parts(self):
+        """
+        Returns all attached parts the user can detach.
+        """
+        links = []
+        for link in self.get_attached_parts().select_related("parts"):
+            part = link.part
+            if self.can_detach_part(part):
+                links.append(link.id)
+        return self.documentpartlink_document.filter(id__in=links)
+    
     def is_part_attached(self, part):
         """
         Returns True if *part* is attached to the current document.
@@ -248,12 +260,12 @@ class DocumentController(PLMObjectController):
             part = part.object
         return bool(self.documentpartlink_document.filter(part=part))
 
-    def check_attach_part(self, part):
+    def check_attach_part(self, part, detach=False):
         if not (hasattr(part, "is_part") and part.is_part):
             raise TypeError("%s is not a part" % part)
         if not isinstance(part, PLMObjectController):
             part = get_controller(part.type)(part, self._user)
-        part.check_attach_document(self)
+        part.check_attach_document(self, detach)
        
     def can_attach_part(self, part):
         """
@@ -266,6 +278,18 @@ class DocumentController(PLMObjectController):
         except StandardError:
             pass
         return can_attach
+       
+    def can_detach_part(self, part):
+        """
+        Returns True if *part* can be detached.
+        """
+        can_detach = False
+        try:
+            self.check_attach_part(part, True)
+            can_detach = True
+        except StandardError:
+            pass
+        return can_detach
 
     def revise(self, new_revision, selected_parts=()):
         # same as PLMObjectController + duplicate files (and their thumbnails)
@@ -349,6 +373,7 @@ class DocumentController(PLMObjectController):
         :type formset: a modelfactory_formset of 
                         :class:`~plmapp.forms.ModifyRelPartForm`
         """
+        parts = set()
         if formset.is_valid():
             for form in formset.forms:
                 document = form.cleaned_data["document"]
@@ -357,7 +382,12 @@ class DocumentController(PLMObjectController):
                 delete = form.cleaned_data["delete"]
                 part = form.cleaned_data["part"]
                 if delete:
+                    parts.add(part)
+            if parts:
+                for part in parts:
                     self.detach_part(part)
+                ids = (p.id for p in parts)
+                self.documentpartlink_document.filter(part__in=ids).delete()
 
     def update_file(self, formset):
         u"""
