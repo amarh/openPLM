@@ -954,3 +954,9 @@ span#select_type {
 .ui-dialog * {
     font-size: medium;
 }
+
+/* deprecated files: small font-size */
+#deprecated_files {
+    margin-top: 2em;
+    font-size: smaller;
+}

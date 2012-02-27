@@ -138,7 +138,7 @@ autoOpen: false
     {% if deprecated_files %}
 
         <div id="deprecated_files">
-            <h6>{% trans "Deprecated_Document:" %}</h6>
+            <h6>{% trans "Deprecated files:" %}</h6>
             {% for doc_file in deprecated_files %}        
                 <p><a href="/file/{{doc_file.id}}/">{{doc_file.filename}}</a></p>            
             {% endfor %}    
