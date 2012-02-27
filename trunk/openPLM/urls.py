@@ -78,8 +78,8 @@ urlpatterns += patterns('',
     (r'^i18n/setlang/', 'openPLM.plmapp.views.main.set_language'),
 
     (r'^(?:home/)?$', display_home_page),
-    (r'^accounts/?$', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
-    (r'^(?:accounts/)?login/', login, {'template_name': 'DisplayLoginPage.htm', 'redirect_field_name': 'next'}),
+    (r'^accounts/?$', login, {'template_name': 'login.html', 'redirect_field_name': 'next'}),
+    (r'^(?:accounts/)?login/', login, {'template_name': 'login.html', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^object/create/$', create_object),
     (r'^comments/', include('django.contrib.comments.urls')),
@@ -207,7 +207,7 @@ from openPLM.plmapp.forms import SimpleSearchForm
 urlpatterns += patterns('haystack.views',
     url(r'^search/', search_view_factory(
         view_class=OpenPLMSearchView,
-        template="search/search.htm",
+        template="search/search.html",
         form_class=SimpleSearchForm
     ), name='haystack_search'),
 )

@@ -2,19 +2,19 @@
 {% load i18n plmapp_tags %}
 
 {% block content %} 
-    <p>{% trans "Refuse invitation ?" %} </p>
+    <p>{% trans "Accept invitation ?" %} </p>
     {% if invitation.guest_asked %}
         <p>{% blocktrans with invitation.guest.username as guest and invitation.group.name as group%}
-            Refuse that {{guest}} join the group {{group}} ?
+            Accept that {{guest}} join the group {{group}} ?
         {% endblocktrans %}</p>
     {% else %}
         <p>{% blocktrans with invitation.group.name as group%}
-            Refuse to join the group {{group}} ?
+            Accept to join the group {{group}} ?
         {% endblocktrans %}</p>
 
     {% endif %}
     {% with invitation_form as form %}
-        {% include "snippets/undo_form.htm" %}
+        {% include "snippets/undo_form.html" %}
      {% endwith %}
 {% endblock %}
 

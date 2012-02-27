@@ -88,7 +88,7 @@ def create_gdoc(request, client):
         'creation_form': creation_form,
         'object_type': "GoogleDocument",
     })
-    return pviews.r2r('DisplayObject4creation.htm', ctx, request)
+    return pviews.r2r('create.html', ctx, request)
 pviews.register_creation_view(GoogleDocument, create_gdoc)
 
 @oauth2_required
@@ -119,7 +119,7 @@ def display_files(request, client, obj_type, obj_ref, obj_revi):
         ctx['error'] = True
     
     ctx['current_page'] = 'files'
-    return pviews.r2r('gdoc_files.htm', ctx, request)
+    return pviews.r2r('gdoc_files.html', ctx, request)
 
 
 @oauth2_required

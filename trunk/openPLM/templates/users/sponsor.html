@@ -10,7 +10,7 @@
             <a href="/import/users/">{% trans "Click here to sponsor several users from a CSV file." %}</a>
 
             {% with sponsor_form as form %}
-                {% include "snippets/undo_form.htm" %}
+                {% include "snippets/undo_form.html" %}
             {% endwith %}
         {% else %}
             <p>{% trans "You can not sponsor a new user since you are not a contributor."%}</p>
