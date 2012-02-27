@@ -158,6 +158,10 @@ BROKER_BACKEND = "memory"
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
+#Gestion native
+ENABLE_NATIVE_FILE_MANAGEMENT=True
+
+
 import djcelery
 djcelery.setup_loader()
 

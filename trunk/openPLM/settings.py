@@ -168,6 +168,11 @@ BROKER_USER = "openplm"
 BROKER_PASSWORD = "secret"
 BROKER_VHOST = "openplm"
 
+
+#Gestion native
+ENABLE_NATIVE_FILE_MANAGEMENT=True
+
+
 # change these settings to True to force https connection 
 #: set to True so that browsers ensure the cookie is only sent under an HTTPS connection
 SESSION_COOKIE_SECURE = False
