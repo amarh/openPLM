@@ -92,7 +92,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
-from openPLM.plmapp.native_file_management import list_relation_native_standar
+from openPLM.plmapp.native_file_management import native_to_standards
 from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
@@ -848,34 +848,36 @@ class DocumentFile(models.Model):
     @property
     def native_related(self):
         """
-        Return the native DocumentFile related to this DocumentFile if settings.ENABLE_NATIVE_FILE_MANAGEMENT is True
-        Return None if DocumentFile has not a native DocumentFile related
+        Returns the native DocumentFile related to this DocumentFile 
+        if :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True.
+
+        Returns False if there are no native DocumentFile related.
         """
 
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):    
-            standarName, standarExtension = os.path.splitext(self.filename)
-            list_doc_files=self.document.files
-            list_doc_files=list(list_doc_files.exclude(id=self.id))
-            for doc in list_doc_files:
-                nativeName, nativeExtension = os.path.splitext(doc.filename)           
-                if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
+            name, ext = os.path.splitext(self.filename)
+            ext = ext.lower()
+            doc_files = self.document.files.exclude(id=self.id)
+            for doc in doc_files:
+                native, native_ext = os.path.splitext(doc.filename)
+                if native == name and ext in native_to_standards[native_ext.lower()]:
                     return doc   
         return None
     
     @property
-    def checkout_valide(self):  
+    def checkout_valid(self):  
         """
-        Return None if DocumentFile has a native file related LOCKED and settings.ENABLE_NATIVE_FILE_MANAGEMENT is True
+        Returns False if DocumentFile has a native related *locked* file
+        and :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True.
         """
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
-            standarName, standarExtension = os.path.splitext(self.filename)
-            list_doc_files=self.document.files
-            list_doc_files=list(list_doc_files.exclude(id=self.id))
-            for doc in list_doc_files:
-                nativeName, nativeExtension = os.path.splitext(doc.filename)                
-                if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
-                    if doc.locked:
-                        return None 
+            name, ext = os.path.splitext(self.filename)
+            ext = ext.lower()
+            doc_files = self.document.files.filter(locked=True).exclude(id=self.id)
+            for doc in doc_files:
+                native, native_ext = os.path.splitext(doc.filename)           
+                if native == name and ext in native_to_standards[native_ext.lower()]:
+                    return False
         return True
         
     def __unicode__(self):
