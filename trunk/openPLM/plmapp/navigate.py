@@ -468,11 +468,17 @@ class NavigationGraph(object):
             ctx = data.copy()
             ctx["style"] = style
             ctx["id"] = id_
-            ctx["main"] = self.main_node == area.get("id")
+            main = self.main_node == area.get("id")
+            ctx["main"] = main
             ctx["href"] = area.get("href")
             ctx["documents_url"] = ajax_navigate
-
-            elements.append(render_to_string("navigate/node.htm", ctx))
+            div = render_to_string("navigate/node.htm", ctx)
+            if main:
+                # the main node must be the first item, since it is
+                # used to center the graph
+                elements.insert(0, div)
+            else:
+                elements.append(div)
         return u"\n".join(elements)
 
     def parse_svg(self, svg):
