@@ -582,11 +582,34 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = get_file_formset(obj)
+        
+        
+        
+        
+        
+        
+        
+    list_doc_for_checkout_valide=[]
+    for form in formset.forms:
+        doc_file_id=form.fields["id"].initial
+        list_doc_for_checkout_valide.append(models.DocumentFile.objects.get(id=doc_file_id)) 
+  
+       
+                
+            
+    deprecated_files=obj.deprecated_files
+            
     archive_form = forms.ArchiveForm()
+    
+    zip_list=zip(formset.forms,list_doc_for_checkout_valide)
     ctx.update({'current_page':'files', 
                 'file_formset': formset,
+                'zip_file_formset_forms_doc_for_checkout_valide':zip_list,
                 'archive_form' : archive_form,
+                'deprecated_files' : deprecated_files,
                })
+               
+               
     return r2r('DisplayObjectFiles.htm', ctx, request)
 
 ##########################################################################################
@@ -1053,7 +1076,6 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
         return response
     return HttpResponseForbidden()
-
 ##########################################################################################
 @handle_errors 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
