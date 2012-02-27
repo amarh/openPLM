@@ -472,7 +472,7 @@ class NavigationGraph(object):
             ctx["main"] = main
             ctx["href"] = area.get("href")
             ctx["documents_url"] = ajax_navigate
-            div = render_to_string("navigate/node.htm", ctx)
+            div = render_to_string("navigate/node.html", ctx)
             if main:
                 # the main node must be the first item, since it is
                 # used to center the graph

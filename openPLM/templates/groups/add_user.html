@@ -6,7 +6,7 @@
         <h3>{% trans "Invite a new user to the group:" %} </h3>
         <p>{% trans "The user will receive an e-mail and could accept your invitation." %}</p>
         {% with add_user_form as form %}
-            {% include "snippets/undo_form.htm" %}
+            {% include "snippets/undo_form.html" %}
          {% endwith %}
     {% else %}
         <p>{% trans "You can not invite an user to this group." %} </p>

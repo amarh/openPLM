@@ -11,5 +11,5 @@ def attributes(request, obj_ref, obj_revi):
         object_attributes.append((item, getattr(obj, attr)))
     ctx.update({'current_page':'attributes', 
                 'object_attributes': object_attributes})
-    return pviews.r2r('DisplayObject.htm', ctx, request)
+    return pviews.r2r('attributes.html', ctx, request)
 

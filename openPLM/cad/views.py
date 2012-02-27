@@ -38,6 +38,6 @@ def freecad(request, obj_ref, obj_revi):
         object_attributes_list.append((item, getattr(obj, attr)))
     ctx.update({'current_page':'attributes', 
         'object_attributes': object_attributes_list})
-    return render_to_response('DisplayObject.htm', ctx,
+    return render_to_response('attributes.html', ctx,
                               context_instance=RequestContext(request))
 

@@ -149,7 +149,7 @@ def display_home_page(request):
     ctx["pending_invitations_guest"] = pending_invitations_guest
     ctx["display_group"] = True
 
-    return r2r("home.htm", ctx, request)
+    return r2r("home.html", ctx, request)
 
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###
@@ -170,7 +170,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
         object_attributes_list.append((item, getattr(obj, attr)))
     ctx.update({'current_page' : 'attributes',
                 'object_attributes': object_attributes_list})
-    return r2r('DisplayObject.htm', ctx, request)
+    return r2r('attributes.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
@@ -223,7 +223,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 'is_signer_dm' : is_signer_dm,
                 'password_form' : password_form,
                 })
-    return r2r('DisplayObjectLifecycle.htm', ctx, request)
+    return r2r('lifecycle.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
@@ -269,7 +269,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
                 })
-    return r2r('DisplayObjectRevisions.htm', ctx, request)
+    return r2r('revisions.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
@@ -293,7 +293,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
         history = history.select_related("user")
     ctx.update({'current_page' : 'history', 
                 'object_history' : list(history)})
-    return r2r('DisplayObjectHistory.htm', ctx, request)
+    return r2r('history.html', ctx, request)
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
@@ -347,7 +347,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
                 'extra_columns' : extra_columns,
                 'extension_data': extension_data,
                 "display_form" : display_form})
-    return r2r('DisplayObjectChild.htm', ctx, request)
+    return r2r('parts/bom.html', ctx, request)
 
 ##########################################################################################
 @handle_errors(undo="..")
@@ -385,7 +385,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
                 'extra_columns' : extra_columns,
                 'extra_fields' : extra_fields,
                 'children_formset': formset, })
-    return r2r('DisplayObjectChildEdit.htm', ctx, request)
+    return r2r('parts/bom_edit.html', ctx, request)
 
 ##########################################################################################    
 @handle_errors
@@ -414,7 +414,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
                 'attach' : (obj, "add_child")})
-    return r2r('DisplayObjectChildAdd.htm', ctx, request)
+    return r2r('parts/bom_add.html', ctx, request)
     
 ##########################################################################################    
 @handle_errors
@@ -448,7 +448,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'parents',
                 'parents' :  parents,
                 'display_form' : display_form, })
-    return r2r('DisplayObjectParents.htm', ctx, request)
+    return r2r('parts/parents.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
@@ -479,7 +479,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
                 'forms' : dforms,
                 'archive_form' : archive_form,
                 'docs_formset': formset})
-    return r2r('DisplayObjectDocCad.htm', ctx, request)
+    return r2r('parts/doccad.html', ctx, request)
 
 
 ##########################################################################################    
@@ -504,7 +504,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     ctx.update({'link_creation': True,
                 'add_doc_cad_form': add_doc_cad_form,
                 'attach' : (obj, "attach_doc")})
-    return r2r('DisplayDocCadAdd.htm', ctx, request)
+    return r2r('parts/doccad_add.html', ctx, request)
     
 #############################################################################################
 ###      All functions which manage the different html pages specific to documents        ###
@@ -535,7 +535,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
                 'all_parts': obj.get_attached_parts(),
                 'forms' : forms,
                 'parts_formset': formset})
-    return r2r('DisplayObjectRelPart.htm', ctx, request)
+    return r2r('documents/parts.html', ctx, request)
 
 ##########################################################################################    
 @handle_errors
@@ -560,7 +560,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     ctx.update({'link_creation': True,
                 'add_rel_part_form': add_rel_part_form,
                 'attach' : (obj, "attach_part") })
-    return r2r('DisplayRelPartAdd.htm', ctx, request)
+    return r2r('documents/parts_add.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
@@ -608,9 +608,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
                 'archive_form' : archive_form,
                 'deprecated_files' : deprecated_files,
                })
-               
-               
-    return r2r('DisplayObjectFiles.htm', ctx, request)
+    return r2r('documents/files.html', ctx, request)
 
 ##########################################################################################
 @handle_errors(undo="..")
@@ -632,7 +630,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     else:
         add_file_form = AddFileForm()
     ctx.update({ 'add_file_form': add_file_form, })
-    return r2r('DisplayFileAdd.htm', ctx, request)
+    return r2r('documents/files_add.html', ctx, request)
 
 #############################################################################################
 ###    All functions which manage the different html pages specific to part and document  ###
@@ -665,7 +663,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'management',
                 'object_management': object_management_list})
     
-    return r2r('DisplayObjectManagement.htm', ctx, request)
+    return r2r('management.html', ctx, request)
 
 ##########################################################################################
 @handle_errors(undo="../..")
@@ -699,7 +697,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                 'replace_management_form': replace_management_form,
                 'link_creation': True,
                 'attach' : (obj, "delegate")})
-    return r2r('DisplayObjectManagementReplace.htm', ctx, request)
+    return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
 @handle_errors(undo="../..")
@@ -727,7 +725,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
                 'replace_management_form': add_management_form,
                 'link_creation': True,
                 "attach" : (obj, "delegate")})
-    return r2r('DisplayObjectManagementReplace.htm', ctx, request)
+    return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
 @handle_errors
@@ -804,7 +802,7 @@ def create_object(request):
         'creation_form': creation_form,
         'object_type': type_form.cleaned_data["type"],
     })
-    return r2r('DisplayObject4creation.htm', ctx, request)
+    return r2r('create.html', ctx, request)
 
 ##########################################################################################
 @handle_errors(undo="../attributes/")
@@ -826,7 +824,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
         modification_form = get_modification_form(cls, instance=obj.object)
     
     ctx['modification_form'] = modification_form
-    return r2r('DisplayObject4modification.htm', ctx, request)
+    return r2r('edit.html', ctx, request)
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
@@ -855,7 +853,7 @@ def modify_user(request, obj_ref):
         modification_form = OpenPLMUserChangeForm(instance=obj.object)
     
     ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
-    return r2r('DisplayObject4modification.htm', ctx, request)
+    return r2r('edit.html', ctx, request)
     
 ##########################################################################################
 @handle_errors
@@ -886,7 +884,7 @@ def change_user_password(request, obj_ref):
     
     ctx.update({'class4div': "ActiveBox4User",
                 'modification_form': modification_form})
-    return r2r('DisplayObject4PasswordModification.htm', ctx, request)
+    return r2r('users/password.html', ctx, request)
 
 #############################################################################################
 @handle_errors
@@ -909,7 +907,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
         'object_user_link': objs
         })
     
-    return r2r('DisplayObjectRelPLMObject.htm', ctx, request)
+    return r2r('users/plmobjects.html', ctx, request)
 
 #############################################################################################
 @handle_errors
@@ -936,7 +934,7 @@ def display_delegation(request, obj_ref):
     ctx.update({'current_page':'delegation', 
                 'user_delegation_link': links})
     
-    return r2r('DisplayObjectDelegation.htm', ctx, request)
+    return r2r('users/delegation.html', ctx, request)
 
 
 ##########################################################################################    
@@ -988,7 +986,7 @@ def delegate(request, obj_ref, role, sign_level):
                 'link_creation': True,
                 'attach' : (obj, "delegate"),
                 'role': role})
-    return r2r('DisplayObjectManagementReplace.htm', ctx, request)
+    return r2r('management_replace.html', ctx, request)
     
     
 ##########################################################################################
@@ -1015,7 +1013,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     else:
         checkin_file_form = AddFileForm()
     ctx['add_file_form'] =  checkin_file_form
-    return r2r('DisplayFileAdd.htm', ctx, request)
+    return r2r('documents/files_add.html', ctx, request)
 
 ##########################################################################################
 @handle_errors 
@@ -1108,7 +1106,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     ctx["edges"] = simplejson.dumps(ctx["edges"])
-    return r2r('Navigate.htm', ctx, request)
+    return r2r('navigate.html', ctx, request)
 
 @handle_errors
 def display_users(request, obj_ref):
@@ -1125,7 +1123,7 @@ def display_users(request, obj_ref):
             state=models.Invitation.PENDING)
     ctx['current_page'] = 'users' 
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
-    return r2r("groups/users.htm", ctx, request)
+    return r2r("groups/users.html", ctx, request)
 
 @handle_errors
 def group_add_user(request, obj_ref):
@@ -1144,7 +1142,7 @@ def group_add_user(request, obj_ref):
         form = forms.SelectUserForm()
     ctx["add_user_form"] = form
     ctx['current_page'] = 'users' 
-    return r2r("groups/add_user.htm", ctx, request)
+    return r2r("groups/add_user.html", ctx, request)
 
 @handle_errors
 def group_ask_to_join(request, obj_ref):
@@ -1157,7 +1155,7 @@ def group_ask_to_join(request, obj_ref):
     ctx["ask_form"] = ""
     ctx['current_page'] = 'users' 
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
-    return r2r("groups/ask_to_join.htm", ctx, request)
+    return r2r("groups/ask_to_join.html", ctx, request)
 
 @handle_errors
 def display_groups(request, obj_ref):
@@ -1168,7 +1166,7 @@ def display_groups(request, obj_ref):
 
     obj, ctx = get_generic_data(request, "User", obj_ref)
     ctx['current_page'] = 'groups' 
-    return r2r("users/groups.htm", ctx, request)
+    return r2r("users/groups.html", ctx, request)
 
 @handle_errors
 def sponsor(request, obj_ref):
@@ -1186,7 +1184,7 @@ def sponsor(request, obj_ref):
         form = SponsorForm(initial={"sponsor":obj.id}, sponsor=obj.id)
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
-    return r2r("users/sponsor.htm", ctx, request)
+    return r2r("users/sponsor.html", ctx, request)
 
 @handle_errors
 def sponsor_resend_mail(request, obj_ref):
@@ -1209,7 +1207,7 @@ def display_plmobjects(request, obj_ref):
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     ctx["objects"] = obj.plmobject_group.all().order_by("type", "reference", "revision")
     ctx['current_page'] = 'groups'
-    return r2r("groups/objects.htm", ctx, request)
+    return r2r("groups/objects.html", ctx, request)
 
 @handle_errors(undo="../../../users/")
 def accept_invitation(request, obj_ref, token):
@@ -1226,7 +1224,7 @@ def accept_invitation(request, obj_ref, token):
     ctx["invitation_form"] = form
     ctx['current_page'] = 'users'
     ctx["invitation"] = inv
-    return r2r("groups/accept_invitation.htm", ctx, request)
+    return r2r("groups/accept_invitation.html", ctx, request)
 
  
 @handle_errors(undo="../../../users/")
@@ -1244,7 +1242,7 @@ def refuse_invitation(request, obj_ref, token):
     ctx["invitation_form"] = form
     ctx["invitation"] = inv
     ctx['current_page'] = 'users'
-    return r2r("groups/refuse_invitation.htm", ctx, request)
+    return r2r("groups/refuse_invitation.html", ctx, request)
 
 @handle_errors
 def send_invitation(request, obj_ref, token):
@@ -1285,7 +1283,7 @@ def import_csv_init(request, target="csv"):
     ctx["csv_form"] = csv_form
     ctx["step"] = 1
     ctx["target"] = target
-    return r2r("import/csv.htm", ctx, request)
+    return r2r("import/csv.html", ctx, request)
 
 @handle_errors(undo="../..")
 def import_csv_apply(request, target, filename, encoding):
@@ -1331,13 +1329,13 @@ def import_csv_apply(request, target, filename, encoding):
     ctx["csv_form"] = CSVForm(initial={"encoding" : encoding})
     ctx["step"] = 2
     ctx["target"] = target
-    return r2r("import/csv.htm", ctx, request)
+    return r2r("import/csv.html", ctx, request)
 
 
 @handle_errors
 def import_csv_done(request):
     obj, ctx = get_generic_data(request)
-    return r2r("import/done.htm", ctx, request)
+    return r2r("import/done.html", ctx, request)
 
 class OpenPLMSearchView(SearchView):
 

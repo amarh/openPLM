@@ -116,15 +116,15 @@ class SubversionRepositoryTestCase(ViewTest):
 
     def test_files_get(self):
         response = self.get(self.base_url + "files/", page="files")
-        self.assertTemplateUsed(response, "subversion_files.htm")
+        self.assertTemplateUsed(response, "subversion_files.html")
 
     def test_logs_get(self):
         response = self.get(self.base_url + "logs/", page="logs")
-        self.assertTemplateUsed(response, "logs.htm")
+        self.assertTemplateUsed(response, "logs.html")
     
     def test_logs_ajax(self):
         response = self.get(self.base_url + "logs/ajax/", page="logs")
-        self.assertTemplateUsed(response, "ajax_logs.htm")
+        self.assertTemplateUsed(response, "ajax_logs.html")
         self.assertFalse(response.context["error"])
         logs = response.context["logs"]
         self.assertEqual(20, len(logs))

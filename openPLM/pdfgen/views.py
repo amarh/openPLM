@@ -269,7 +269,7 @@ def select_pdf_document(request, ctx, obj):
     else:
         formset = get_pdf_formset(obj)
     ctx["pdf_formset"] = formset
-    return r2r("select_pdf_doc.htm", ctx, request)
+    return r2r("select_pdf_doc.html", ctx, request)
 
 
 def select_pdf_part(request, ctx, obj):
@@ -312,7 +312,7 @@ def select_pdf_part(request, ctx, obj):
         if valid:
             return download_merged_pdf(obj, files) 
     ctx["children"] = formsets
-    return r2r("select_pdf_part.htm", ctx, request)
+    return r2r("select_pdf_part.html", ctx, request)
 
 @handle_errors
 def select_pdf(request, obj_type, obj_ref, obj_revi):

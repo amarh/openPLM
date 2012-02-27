@@ -177,7 +177,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
                 return
         ctx = unserialize(ctx)
         ctx["site"] = Site.objects.get_current()
-        html_content = render_to_string(template + ".htm", ctx)
+        html_content = render_to_string(template + ".html", ctx)
         message = render_to_string(template + ".txt", ctx)
         msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
             emails)
