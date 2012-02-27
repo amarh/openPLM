@@ -36,7 +36,7 @@ from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
-from openPLM.plmapp.native_file_management import list_relation_native_standar
+from openPLM.plmapp.native_file_management import native_to_standards
 
 
 class DocumentController(PLMObjectController):
@@ -48,22 +48,25 @@ class DocumentController(PLMObjectController):
     :class:`.Document` to a :class:`.Part`.
     """
    
-    def has_standar_related_locked(self,new_filename):
+    def has_standard_related_locked(self, new_filename):
         """
-        Return True if settings.ENABLE_NATIVE_FILE_MANAGEMENT is True and exits a File standar locked in the Document related with the 
+        Returns True if :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True
+        and exits the document contains a standard locked file related to the
         file that we want to add.
-        We use it to avoid to add a native file while a relate standar file locked is present in the Document
-         
-        :param new_filename:
-        """    
 
+        We use it to avoid to add a native file while a related standard locked
+        file is present in the document.
+         
+        :param new_filename: name of the added file
+        """    
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
-            nativeName, nativeExtension = os.path.splitext(new_filename)
-            list_doc_files=self.files
-            for doc in list_doc_files:
-                standarName, standarExtension = os.path.splitext(doc.filename)            
-                if standarName==nativeName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar and doc.locked:
-                    return True      
+            name, ext = os.path.splitext(new_filename)
+            ext = ext.lower()
+            doc_files = self.files.filter(locked=True)
+            for doc in doc_files:
+                standard, standard_ext = os.path.splitext(doc.filename)           
+                if standard == name and standard_ext.lower() in native_to_standards[ext]:
+                    return True
         return False
             
     def lock(self, doc_file):
@@ -84,10 +87,10 @@ class DocumentController(PLMObjectController):
         """
         self.check_permission("owner")
         self.check_editable()
-        if not doc_file.checkout_valide:
-            raise ValueError("DocumentFile: check-out not possible , native related is locked") 
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
+        if not doc_file.checkout_valid:
+            raise ValueError("Check-out impossible, native related file is locked") 
         if not doc_file.locked:
             doc_file.locked = True
             doc_file.locker = self._user
@@ -151,8 +154,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         
         f.name = f.name.encode("utf-8")     
-        if self.has_standar_related_locked(f.name):
-            raise ValueError("File Native has a related Standar File locked")        
+        if self.has_standard_related_locked(f.name):
+            raise ValueError("Native file has a standard related locked file.")        
       
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
                         file=models.docfs.save(f.name, f), document=self.object)                                     

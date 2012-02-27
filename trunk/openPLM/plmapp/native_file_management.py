@@ -1,1 +1,6 @@
-list_relation_native_standar=[[u".FCSTD",u".STP"],[u".FCSTD",u".STEP"]]
+from collections import defaultdict
+native_to_standards = defaultdict(tuple)
+native_to_standards.update(
+    (
+    (u'.fcstd', (u'.step', u'.stp')),
+))
