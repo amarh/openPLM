@@ -36,8 +36,6 @@ from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
-
-
 from openPLM.plmapp.native_file_management import list_relation_native_standar
 
 
@@ -49,8 +47,6 @@ class DocumentController(PLMObjectController):
     It provides methods to add or delete files, (un)lock them and attach a
     :class:`.Document` to a :class:`.Part`.
     """
-    
-    
    
     def has_standar_related_locked(self,new_filename):
         """
@@ -61,16 +57,14 @@ class DocumentController(PLMObjectController):
         :param new_filename:
         """    
 
-        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:
+        if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
             nativeName, nativeExtension = os.path.splitext(new_filename)
             list_doc_files=self.files
             for doc in list_doc_files:
                 standarName, standarExtension = os.path.splitext(doc.filename)            
                 if standarName==nativeName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar and doc.locked:
                     return True      
-    
-    
-        return None
+        return False
             
     def lock(self, doc_file):
         """
