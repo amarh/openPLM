@@ -37,6 +37,10 @@ from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
 
+
+from openPLM.plmapp.native_file_management import list_relation_native_standar
+
+
 class DocumentController(PLMObjectController):
     """
     A :class:`PLMObjectController` which manages 
@@ -45,23 +49,49 @@ class DocumentController(PLMObjectController):
     It provides methods to add or delete files, (un)lock them and attach a
     :class:`.Document` to a :class:`.Part`.
     """
+    
+    
+   
+    def has_standar_related_locked(self,new_filename):
+        """
+        Return True if settings.ENABLE_NATIVE_FILE_MANAGEMENT is True and exits a File standar locked in the Document related with the 
+        file that we want to add.
+        We use it to avoid to add a native file while a relate standar file locked is present in the Document
+         
+        :param new_filename:
+        """    
 
+        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:
+            nativeName, nativeExtension = os.path.splitext(new_filename)
+            list_doc_files=self.files
+            for doc in list_doc_files:
+                standarName, standarExtension = os.path.splitext(doc.filename)            
+                if standarName==nativeName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar and doc.locked:
+                    return True      
+    
+    
+        return None
+            
     def lock(self, doc_file):
         """
         Lock *doc_file* so that it can not be modified or deleted
-        
+        if *doc_file* has a native related file this will be deprecated
+          
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
             * :exc:`.PermissionError` if :attr:`object` is not editable.
             * :exc:`.LockError` if *doc_file* is already locked
+            * :exc:`ValueError` if *doc_file* has a native related file locked
 
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
         """
         self.check_permission("owner")
         self.check_editable()
+        if not doc_file.checkout_valide:
+            raise ValueError("DocumentFile: check-out not possible , native related is locked") 
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.locked:
@@ -70,6 +100,13 @@ class DocumentController(PLMObjectController):
             doc_file.save()
             self._save_histo("Locked",
                              "%s locked by %s" % (doc_file.filename, self._user))
+                             
+            doc_to_deprecated=doc_file.native_related
+            if doc_to_deprecated:
+                doc_to_deprecated.deprecated = True
+                doc_to_deprecated.save()
+                self._save_histo("Deprecated",
+                                 "file : %s" % doc_to_deprecated.filename)                 
         else:
             raise LockError("File already locked")
 
@@ -112,14 +149,19 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         :raises: :exc:`ValueError` if the file size is superior to
                  :attr:`settings.MAX_FILE_SIZE`
+        :raises: :exc:`ValueError` if we try to add a native file while a relate standar file locked is present in the Document
         """
         self.check_permission("owner")
         self.check_editable()
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
-        f.name = f.name.encode("utf-8")
+        
+        f.name = f.name.encode("utf-8")     
+        if self.has_standar_related_locked(f.name):
+            raise ValueError("File Native has a related Standar File locked")        
+      
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
-                        file=models.docfs.save(f.name, f), document=self.object)
+                        file=models.docfs.save(f.name, f), document=self.object)                                     
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
@@ -348,6 +390,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("Checkin document and document already in plm have different names")
         if settings.MAX_FILE_SIZE != -1 and new_file.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
+            
+            
         if doc_file.locked:
             self.unlock(doc_file)   
         os.chmod(doc_file.file.path, 0700)
@@ -413,6 +457,12 @@ class DocumentController(PLMObjectController):
                 if delete:
                     self.delete_file(filename)
 
+
+
+
+    
+    
+    
     def cancel(self):
         """
         Cancels the object:

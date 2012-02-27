@@ -92,7 +92,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
-
+from openPLM.plmapp.native_file_management import list_relation_native_standar
 from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
@@ -844,7 +844,47 @@ class DocumentFile(models.Model):
                                default=lambda: None)
     document = models.ForeignKey('Document')
     deprecated = models.BooleanField(default=lambda: False)
+    
 
+        
+    @property
+    def native_related(self):
+        """
+        Return the native DocumentFile related to this DocumentFile if settings.ENABLE_NATIVE_FILE_MANAGEMENT is True
+        Return None if DocumentFile has not a native DocumentFile related
+        """
+
+        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:    
+            standarName, standarExtension = os.path.splitext(self.filename)
+            list_doc_files=self.document.files
+            list_doc_files=list(list_doc_files.exclude(id=self.id))
+            for doc in list_doc_files:
+                nativeName, nativeExtension = os.path.splitext(doc.filename)           
+                if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
+                    return doc   
+    
+        return None
+    
+    @property
+    def checkout_valide(self):  
+        """
+        Return None if DocumentFile has a native file related LOCKED and settings.ENABLE_NATIVE_FILE_MANAGEMENT is True
+        """
+        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:
+            standarName, standarExtension = os.path.splitext(self.filename)
+            list_doc_files=self.document.files
+            list_doc_files=list(list_doc_files.exclude(id=self.id))
+            for doc in list_doc_files:
+                nativeName, nativeExtension = os.path.splitext(doc.filename)                
+                if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
+                    if doc.locked:
+                        return None 
+
+
+        
+        return True
+        
+        
     def __unicode__(self):
         return u"DocumentFile<%s, %s>" % (self.filename, self.document)
 
@@ -855,9 +895,15 @@ class Document(PLMObject):
 
     @property
     def files(self):
-        "Queryset of all :class:`DocumentFile` linked to self"
-        return self.documentfile_set.all()
-
+        "Queryset of all no deprecated :class:`DocumentFile` linked to self"
+        return self.documentfile_set.exclude(deprecated=True)
+        
+    @property
+    def deprecated_files(self):
+        "Queryset of all deprecated :class:`DocumentFile` linked to self"
+        return self.documentfile_set.filter(deprecated=True)
+        
+        
     def is_promotable(self):
         """
         Returns True if the object is promotable. A documentt is promotable
