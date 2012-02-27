@@ -844,8 +844,6 @@ class DocumentFile(models.Model):
                                default=lambda: None)
     document = models.ForeignKey('Document')
     deprecated = models.BooleanField(default=lambda: False)
-    
-
         
     @property
     def native_related(self):
@@ -854,7 +852,7 @@ class DocumentFile(models.Model):
         Return None if DocumentFile has not a native DocumentFile related
         """
 
-        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:    
+        if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):    
             standarName, standarExtension = os.path.splitext(self.filename)
             list_doc_files=self.document.files
             list_doc_files=list(list_doc_files.exclude(id=self.id))
@@ -862,7 +860,6 @@ class DocumentFile(models.Model):
                 nativeName, nativeExtension = os.path.splitext(doc.filename)           
                 if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
                     return doc   
-    
         return None
     
     @property
@@ -870,7 +867,7 @@ class DocumentFile(models.Model):
         """
         Return None if DocumentFile has a native file related LOCKED and settings.ENABLE_NATIVE_FILE_MANAGEMENT is True
         """
-        if settings.ENABLE_NATIVE_FILE_MANAGEMENT:
+        if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
             standarName, standarExtension = os.path.splitext(self.filename)
             list_doc_files=self.document.files
             list_doc_files=list(list_doc_files.exclude(id=self.id))
@@ -879,11 +876,7 @@ class DocumentFile(models.Model):
                 if nativeName==standarName and [nativeExtension.upper(),standarExtension.upper()] in list_relation_native_standar:
                     if doc.locked:
                         return None 
-
-
-        
         return True
-        
         
     def __unicode__(self):
         return u"DocumentFile<%s, %s>" % (self.filename, self.document)
