@@ -11,21 +11,16 @@
 modal: true,
 autoOpen: false
 });
-                $("span.check-out").click(function(e) {
+                $("a.check-out").click(function(e) {
                     e.preventDefault();
-                    var id = $(this).attr('id');
+                    var url = $(this).attr("href");
                     $("#dialog_check-out").dialog('option', 'buttons', {
 
                         "CANCEL": function() {
                         $(this).dialog("close");
 
                         },
-                        "NEW REVISION AND CHECK-OUT": function() {
-                        $(this).dialog("close");
-                        }
-                        ,
                         "CHECK-OUT": function() {
-                        url = "./checkout/"+id+"/";  
                         $(location).attr('href',url); 
                         $(this).dialog("close");
                         }
@@ -96,17 +91,11 @@ autoOpen: false
 
                                     {% if instance.checkout_valid %}
 
-                                        {% if instance.native_related %}
-
-                                            <a class="{{"Button"|button}}">
-                                                <span id="{{instance.id}}" class="ui-button-text check-out">{% trans "CHECK-OUT" %}</span>
-                                            </a>                                                                
-                                        {% else %}
-                                            <a class="{{"Button"|button}}" href="./checkout/{{instance.id}}/">
-                                                <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                            </a>                                    
-
-                                        {% endif %}
+                                        <a class="{{"Button"|button}}
+                                            {% if instance.native_related %}check-out {% endif %}"
+                                            href="./checkout/{{instance.id}}/">
+                                            <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                        </a>                                    
 
 
                                     {% else %}
