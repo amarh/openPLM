@@ -330,6 +330,31 @@ class DocumentController(PLMObjectController):
             pass
         return can_detach
 
+    def get_suggested_parts(self):
+        """
+        Returns a QuerySet of parts an user may want to attach to
+        a future revision.
+        """
+        attached_parts = self.get_attached_parts().select_related("part",
+                "part__state", "part__lifecycle").only("part")
+        parts = []
+        for link in attached_parts:
+            part = link.part
+            try:
+                new = models.RevisionLink.objects.get(old=part).new
+                if new.is_draft:
+                    parts.append(new)
+                while models.RevisionLink.objects.filter(old=new).exists():
+                    new = models.RevisionLink.objects.get(old=new).new
+                    if new.is_draft:
+                        parts.append(new)
+            except models.RevisionLink.DoesNotExist:
+                if not part.is_deprecated:
+                    parts.append(part)
+        qs = models.Part.objects.filter(id__in=(p.id for p in parts))
+        qs = qs.select_related('type', 'reference', 'revision', 'name')
+        return qs
+
     def revise(self, new_revision, selected_parts=()):
         # same as PLMObjectController + duplicate files (and their thumbnails)
         rev = super(DocumentController, self).revise(new_revision)
@@ -350,9 +375,9 @@ class DocumentController(PLMObjectController):
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
+        # attach the given parts
         for part in selected_parts:
-            if part.is_editable:
-                rev.documentpartlink_document.create(part=part)
+            rev.documentpartlink_document.create(part=part)
 
         return rev
 
@@ -454,12 +479,6 @@ class DocumentController(PLMObjectController):
                 if delete:
                     self.delete_file(filename)
 
-
-
-
-    
-    
-    
     def cancel(self):
         """
         Cancels the object:

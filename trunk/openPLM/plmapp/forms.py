@@ -449,11 +449,13 @@ class RelPartForm(forms.ModelForm):
         model = m.DocumentPartLink
         fields = ["document", "part"]
 
-class SelectPLMObjectForm(RelPartForm):
+class SelectPartForm(forms.ModelForm):
     selected = forms.BooleanField(required=False, initial=True)
+    class Meta:
+        model = m.Part
+        fields = ["selected"]
         
-SelectPLMObjectFormset = modelformset_factory(m.DocumentPartLink,
-                        form=SelectPLMObjectForm, extra=0)
+SelectPartFormset = modelformset_factory(m.Part, form=SelectPartForm, extra=0)
 
 class AddRelPartForm(PLMObjectForm):
     pass

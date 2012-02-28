@@ -235,33 +235,39 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    if obj.is_document:
-        confirmation = obj.get_attached_parts().exists()
-    else:
-        confirmation = False
+    confirmation = False
     if obj.is_revisable():
+        if obj.is_document:
+            parts = obj.get_suggested_parts()
+            confirmation = bool(parts)
         if request.method == "POST" and request.POST:
             add_form = AddRevisionForm(request.POST)
             kwargs = {}
+            valid_forms = True
             if obj.is_document and confirmation:
-                part_formset = forms.SelectPLMObjectFormset(request.POST)
-                parts = []
+                part_formset = forms.SelectPartFormset(request.POST)
+                selected_parts = []
                 if part_formset.is_valid():
                     for form in part_formset.forms:
-                        doc = form.cleaned_data["document"]
-                        if doc.pk != obj.pk:
-                            raise ValueError("Bad document")
-                        part = form.cleaned_data["part"]
-                        if form.cleaned_data["selected"] and part.is_editable:
-                            parts.append(part)
-                kwargs["selected_parts"] = parts
-            if add_form.is_valid():
+                        part = form.instance
+                        if part not in parts: 
+                            # invalid data
+                            # an user should not be able to go here if he 
+                            # does not write by hand its post request
+                            # so we do not need to generate an error message
+                            valid_forms = False
+                            break
+                        if form.cleaned_data["selected"]:
+                            selected_parts.append(part)
+                    kwargs["selected_parts"] = selected_parts
+                else:
+                    valid_forms = False
+            if add_form.is_valid() and valid_forms:
                 obj.revise(add_form.cleaned_data["revision"], **kwargs)
         else:
             add_form = AddRevisionForm({"revision" : get_next_revision(obj_revi)})
-            if obj.is_document:
-                qs = obj.get_attached_parts()
-                ctx["part_formset"] = forms.SelectPLMObjectFormset(queryset=qs)
+            if obj.is_document and confirmation:
+                ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
         ctx["add_revision_form"] = add_form
 
     ctx["confirmation"] = confirmation
