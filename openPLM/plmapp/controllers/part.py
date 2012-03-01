@@ -334,12 +334,162 @@ class PartController(PLMObjectController):
                     self.modify_child(child, quantity, order, unit,
                             **form.extensions)
 
-    def revise(self, new_revision):
+    def revise(self, new_revision, child_links=None, documents=(),
+            parents=()):
+        """
+        Revises the part. Does the same thing as :meth:`.PLMObjectController.revise`
+        and:
+            
+            * copies all :class:`.ParentChildLink` of *child_links*, with the
+              new revision as the new parent. If *child_links* is None (the
+              default), all current children are copied. If an empty sequence
+              is given, no links are copied.
+
+            * attaches all document of *documents*, by default, no documents
+              are attached. The method :meth:`get_suggested_documents` returns a
+              list of documents that should be interesting.
+
+            * replaces all parent links in *parents*. This arguments must be
+              a list of tuples (link (an instance of :class:`.ParentChildLink`),
+              parent (an instance of :class:`.PLMObject`)) where *parent* is
+              the parent whose the bom will be modified and *link* is the
+              source of data (quantity, unit, order...). *link* will be
+              ended if *parent* is a parent of the current part.
+              The method :meth:`get_suggested_parents` returns a list of
+              tuples that may interest the user who revises this part.
+        """
         # same as PLMObjectController + add children
         new_controller = super(PartController, self).revise(new_revision)
-        for level, link in self.get_children(1):
+        # adds the children
+        if child_links is None:
+            child_links = (x.link for x in self.get_children(1))
+        for link in child_links:
             link.clone(save=True, parent=new_controller.object)
+        # attach the documents
+        for doc in documents:
+            models.DocumentPartLink.objects.create(part=new_controller.object,
+                    document=doc)
+        # for each parent, replace its child with the new revision
+        now = datetime.datetime.today()
+        for link, parent in parents:
+            link.clone(save=True, parent=parent, child=new_controller.object)
+            if link.parent_id == parent.id:
+                link.end_time = now
+                link.save()
         return new_controller
+
+    def get_suggested_documents(self):
+        """
+        Returns a QuerySet of documents that should be suggested when the
+        user revises the part.
+
+        A document is suggested if:
+        
+            a. it is attached to the current part and:
+             
+                1. it is a *draft* and its superior revisions, if they exist,
+                   are *not* attached to the part 
+
+                   or
+
+                2. it is *official* and its superior revisions, if they exist,
+                   are *not* attached to the part
+
+                   or
+
+                3. it is *official* and a superior revision is attached *and*
+                   another superior revision is not attached to the part
+
+            b. it is *not* attached to the current part, an inferior revision
+               is attached to the part and:
+
+                1. it is a draft
+
+                   or
+
+                2. it is official
+                
+        """
+        docs = []
+        links = self.get_attached_documents()
+        attached_documents = set(link.document_id for link in links)
+        for link in links:
+            document = link.document
+            ctrl = PLMObjectController(document, self._user)
+            revisions = ctrl.get_next_revisions()
+            attached_revisions = [d for d in revisions if d.id in attached_documents]
+            other_revisions = set(revisions).difference(attached_revisions)
+            if not attached_revisions:
+                if document.is_draft or document.is_official:
+                    docs.append(document.id)
+            else:
+                if document.is_official and not other_revisions:
+                    docs.append(document.id)
+            for rev in other_revisions:
+                if rev.is_official or rev.is_draft:
+                    docs.append(rev.id)
+        return models.Document.objects.filter(id__in=docs)
+
+    def get_suggested_parents(self):
+        """
+        Returns a list of suggested parents that should be suggested
+        when the part is revised.
+
+        This method returns a list of tuple (link (an instance of
+        :class:`.ParentChildLink`), parent (an instance of :class:`.PLMObject`)).
+        It does not returns a list of links, since it may suggest a part
+        that is not a parent but whose one of its previous revision is a parent.
+        We need a link to copy its data (order, quantity, unit and extensions).
+
+        A part is suggested as a parent if:
+
+            a. it is already a parent and:
+
+                1. no superior revisions are a parent and its state is draft
+                   or official
+    
+                   or
+                
+                2. no superior revisions exist and its state is proposed.
+
+            b. it is not a parent, a previous revision is a parent, its state
+               is a draft or a parent. In that case, the link of the most
+               superior parent revision is used.
+
+        """
+        parents = self.get_parents(1)
+        links = []
+        ids = set(p.link.parent_id for p in parents)
+        for level, link in parents:
+            parent = link.parent
+            ctrl = PLMObjectController(parent, self._user)
+            revisions = ctrl.get_next_revisions()
+            attached_revisions = [d for d in revisions if d.id in ids]
+            other_revisions = set(revisions).difference(attached_revisions)
+            if not attached_revisions:
+                if parent.is_draft or parent.is_official or \
+                    (parent.is_proposed and not other_revisions):
+                    links.append((link, parent))
+            for p in other_revisions:
+                if p.is_draft or p.is_official:
+                    links.append((link, p))
+        # it is possible that some parts are suggested twice or more
+        # if they are not a parent (they are a superior revision of a parent)
+        # so we must clean up links
+        links2 = dict() # id -> (link, parent)
+        for link, parent in links:
+            if parent.id in ids:
+                links2[parent.id] = (link, parent)
+            else:
+                # it is not a parent
+                try:
+                    l, p = links2[parent.id]
+                    if l.parent.ctime < link.parent.ctime:
+                        # true if parent is a superior revision
+                        links2[parent.id] = (link, parent)
+                except KeyError:
+                    links2[parent.id] = (link, parent)
+        return links2.values()
 
     def attach_to_document(self, document):
         """

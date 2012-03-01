@@ -470,4 +470,351 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(part.get_attached_documents())
         self.assertFalse(doc.get_attached_parts())
 
+    def test_get_suggested_documents_official(self):
+        # self.document is official and has not been revised
+        # self.controller and self.controller2 must suggest it
+        self.assertTrue(self.document.is_official)
+        for ctrl in (self.controller, self.controller2):
+            suggested = ctrl.get_suggested_documents()
+            self.assertEqual(1, suggested.count())
+            self.assertTrue(self.document.object in suggested)
+        # self.controller3 has no document attached: it suggests an empty list
+        suggested = self.controller3.get_suggested_documents()
+        self.assertFalse(suggested)
+
+    def test_get_suggested_documents_draft(self):
+        self.document.object.state = self.document.lifecycle.first_state
+        self.document.object.save()
+        self.assertTrue(self.document.is_draft)
+        # self.controller and self.controller2 must suggest it
+        for ctrl in (self.controller, self.controller2):
+            suggested = ctrl.get_suggested_documents()
+            self.assertEqual(1, suggested.count())
+            self.assertTrue(self.document.object in suggested)
+        # self.controller3 has no document attached: it suggests an empty list
+        suggested = self.controller3.get_suggested_documents()
+        self.assertFalse(suggested)
+
+    def test_get_suggested_documents_proposed(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.document.object.lifecycle = lc
+        self.document.object.state = models.State.objects.get(name="proposed")
+        self.document.object.save()
+        self.assertTrue(self.document.is_proposed)
+        for ctrl in (self.controller, self.controller2, self.controller3):
+            suggested = ctrl.get_suggested_documents()
+            self.assertFalse(suggested)
+
+    def test_get_suggested_documents_deprecated(self):
+        self.document.promote()
+        self.assertTrue(self.document.is_deprecated)
+        for ctrl in (self.controller, self.controller2, self.controller3):
+            suggested = ctrl.get_suggested_documents()
+            self.assertFalse(suggested)
+
+    def test_get_suggested_documents_revision_attached(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.document.object.lifecycle = lc
+        self.document.object.state = lc.first_state
+        self.document.object.save()
+        rev = self.document.revise('b')
+        self.controller.attach_to_document(rev)
+        for state in lcl:
+            self.document.object.state = models.State.objects.get(name=state)
+            self.document.object.save()
+            suggested = self.controller.get_suggested_documents()
+            if state == "official":
+                self.assertEqual(2, suggested.count())
+                self.assertTrue(rev.object in suggested)
+                self.assertTrue(self.document.object in suggested)
+            else:
+                self.assertEqual(1, suggested.count())
+                self.assertTrue(rev.object in suggested)
+                self.assertFalse(self.document.object in suggested)
+
+    def test_get_suggested_documents_revision_not_attached(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.document.object.lifecycle = lc
+        self.document.object.state = lc.first_state
+        self.document.object.save()
+        rev = self.document.revise('b')
+        for state in lcl:
+            self.document.object.state = models.State.objects.get(name=state)
+            self.document.object.save()
+            for rev_state in lcl:
+                rev.object.state = models.State.objects.get(name=rev_state)
+                rev.object.save()
+
+                suggested = self.controller.get_suggested_documents()
+                if state in ("draft", "official"):
+                    self.assertTrue(self.document.object in suggested)
+                else:
+                    self.assertFalse(self.document.object in suggested)
+                if rev_state in ("draft", "official"):
+                    self.assertTrue(rev.object in suggested)
+                else:
+                    self.assertFalse(rev.object in suggested)
+   
+    def test_get_suggested_documents_two_revisions(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.document.object.lifecycle = lc
+        self.document.object.state = lc.first_state
+        self.document.object.save()
+        revb = self.document.revise('b')
+        revc = revb.revise('c')
+        revb.attach_to_part(self.controller)
+        for state in lcl:
+            self.document.object.state = models.State.objects.get(name=state)
+            self.document.object.save()
+            for revb_state in lcl:
+                revb.object.state = models.State.objects.get(name=revb_state)
+                revb.object.save()
+                for revc_state in lcl:
+                    revc.object.state = models.State.objects.get(name=revc_state)
+                    revc.object.save()
+
+                    suggested = self.controller.get_suggested_documents()
+                    self.assertFalse(self.document.object in suggested)
+                    if revb_state in ("draft", "official"):
+                        self.assertTrue(revb.object in suggested)
+                    else:
+                        self.assertFalse(revb.object in suggested)
+
+                    if revc_state in ("draft", "official"):
+                        self.assertTrue(revc.object in suggested)
+                    else:
+                        self.assertFalse(revc.object in suggested)
+
+    def test_revise_attached_documents(self):
+        """
+        Revises a part with two attached documents, both are selected.
+        """
+        document = DocumentController.create("DocDSDS", "Document", "a",
+                self.user, self.DATA)
+        document.attach_to_part(self.controller)
+
+        rev = self.controller.revise("b", documents=(self.document.object,
+            document.object))
+        attached1 = self.controller.get_attached_documents()
+        attached2 = rev.get_attached_documents()
+        for attached in (attached1, attached2):
+            self.assertEqual(2, attached.count())
+            docs = attached.values_list("document", flat=True)
+            self.assertTrue(self.document.id in docs)
+            self.assertTrue(document.id in docs)
+
+    def test_revise_attached_documents_one_selected(self):
+        """
+        Revises a part with two attached documents, one is selected.
+        """
+        document = DocumentController.create("DocDSDS", "Document", "a",
+                self.user, self.DATA)
+        document.attach_to_part(self.controller)
+
+        rev = self.controller.revise("b", documents=(self.document.object, ))
+            
+        attached1 = self.controller.get_attached_documents()
+        docs = attached1.values_list("document", flat=True)
+
+        self.assertEqual(2, attached1.count())
+        self.assertTrue(self.document.id in docs)
+        self.assertTrue(document.id in docs)
+
+        attached2 = rev.get_attached_documents()
+        docs = attached2.values_list("document", flat=True)
+        self.assertEqual(1, attached2.count())
+        self.assertTrue(self.document.id in docs)
+        self.assertFalse(document.id in docs)
+
+    def test_revise_attached_documents_none_selected(self):
+        """
+        Revises a part with two attached documents, none are selected.
+        """
+        document = DocumentController.create("DocDSDS", "Document", "a",
+                self.user, self.DATA)
+        document.attach_to_part(self.controller)
+
+        rev = self.controller.revise("b", documents=())
+            
+        attached1 = self.controller.get_attached_documents()
+        docs = attached1.values_list("document", flat=True)
+
+        self.assertEqual(2, attached1.count())
+        self.assertTrue(self.document.id in docs)
+        self.assertTrue(document.id in docs)
+
+        attached2 = rev.get_attached_documents()
+        self.assertFalse(attached2)
+
+    def test_revise_no_child(self):
+        """
+        Revises a part and chooses to not add current children.
+        """
+        self.add_child()
+        rev = self.controller.revise("b", child_links=())
+        self.assertFalse(rev.get_children())
+
+    def test_revise_one_child(self):
+        """
+        Revises a part and chooses to only add one child.
+        """
+        self.controller.add_child(self.controller2, 10, 15, "m")
+        self.controller.add_child(self.controller3, 20, 35, "kg")
+        links = [c.link for c in self.controller.get_children(1)]
+        rev = self.controller.revise('b', child_links=(links[0],))
+        links2 = [c.link for c in rev.get_children(1)]
+        self.assertEqual(1, len(links2))
+        self.assertEqual(links[0].child, links2[0].child)
+        self.assertEqual(links[0].quantity, links2[0].quantity)
+        self.assertEqual(links[0].order, links2[0].order)
+        self.assertEqual(links[0].unit, links2[0].unit)
+
+    def test_get_suggested_parents_no_revision(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.add_child()
+        self.controller.object.lifecycle = lc
+        for state in lcl[:-1]:
+            self.controller.object.state = models.State.objects.get(name=state)
+            self.controller.object.save()
+
+            suggested = self.controller2.get_suggested_parents()
+            self.assertEqual(1, len(suggested))
+            link, parent = suggested[0]
+            self.assertEqual(parent.id, self.controller.id)
+            self.assertEqual(link, self.controller.get_children(1)[0].link)
+        # deprecated state
+        self.controller.object.state = models.State.objects.get(name="deprecated")
+        self.controller.object.save()
+        suggested = self.controller2.get_suggested_parents()
+        self.assertFalse(suggested)
+
+    def test_get_suggested_parents_revision_attached(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.controller.object.lifecycle = lc
+        self.controller.object.state = lc.first_state
+        self.controller.object.save()
+        self.add_child()
+        rev = self.controller.revise('b')
+        self.assertEqual(1, len(rev.get_children(1)))
+        for state in lcl:
+            self.controller.object.state = models.State.objects.get(name=state)
+            self.controller.object.save()
+            suggested = self.controller2.get_suggested_parents()
+            self.assertEqual(1, len(suggested))
+            link, parent = suggested[0]
+            self.assertEqual(parent.id, rev.id)
+
+    def test_get_suggested_parents_revision_not_attached(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.controller.object.lifecycle = lc
+        self.controller.object.state = lc.first_state
+        self.controller.object.save()
+        self.add_child()
+        rev = self.controller.revise('b', child_links=())
+        for state in lcl:
+            self.controller.object.state = models.State.objects.get(name=state)
+            self.controller.object.save()
+            for rev_state in lcl:
+                rev.object.state = models.State.objects.get(name=rev_state)
+                rev.object.save()
+
+                suggested = self.controller2.get_suggested_parents()
+                parents = set(p[1].id for p in suggested)
+                if state in ("draft", "official"):
+                    self.assertTrue(self.controller.id in parents)
+                else:
+                    self.assertFalse(self.controller.id in parents)
+                if rev_state in ("draft", "official"):
+                    self.assertTrue(rev.id in parents)
+                else:
+                    self.assertFalse(rev.id in parents)
+   
+    def test_get_suggested_parents_two_revisions(self):
+        lcl = LifecycleList("dpop","official", "draft", 
+               "proposed", "official", "deprecated")
+        lc = models.Lifecycle.from_lifecyclelist(lcl)
+        self.controller.object.lifecycle = lc
+        self.controller.object.state = lc.first_state
+        self.controller.object.save()
+        self.add_child()
+        revb = self.controller.revise('b')
+        revc = revb.revise('c', child_links=())
+        expected_link = models.ParentChildLink.objects.get(parent=revb.id,
+                child=self.controller2.id)
+        for state in lcl:
+            self.controller.object.state = models.State.objects.get(name=state)
+            self.controller.object.save()
+            for revb_state in lcl:
+                revb.object.state = models.State.objects.get(name=revb_state)
+                revb.object.save()
+                for revc_state in lcl:
+                    revc.object.state = models.State.objects.get(name=revc_state)
+                    revc.object.save()
+
+                    suggested = self.controller2.get_suggested_parents()
+                    parents = set(p[1].id for p in suggested)
+                    self.assertFalse(self.controller.id in parents)
+                    if revb_state in ("draft", "official"):
+                        self.assertTrue(revb.id in parents)
+                    else:
+                        self.assertFalse(revb.id in parents)
+
+                    if revc_state in ("draft", "official"):
+                        self.assertTrue(revc.id in parents)
+                        link = [p[0] for p in suggested if p[1].id == revc.id][0]
+                        self.assertEqual(link, expected_link)
+                    else:
+                        self.assertFalse(revc.id in parents)
+
+    def test_revise_no_parent(self):
+        """
+        Revises a part and chooses to not change parents links.
+        """
+        self.add_child()
+        rev = self.controller2.revise("b", child_links=())
+        self.assertFalse(rev.get_children())
+        links = [c.link for c in self.controller.get_children(1)]
+        self.assertEqual(1, len(links))
+        self.assertEqual(self.controller.id, links[0].parent_id)
+        self.assertEqual(self.controller2.id, links[0].child_id)
+
+    def test_revise_one_parent(self):
+        """
+        Revises a part and chooses to change one parent.
+        """
+        self.controller.add_child(self.controller3, 10, 15, "m")
+        self.controller2.add_child(self.controller3, 20, 35, "kg")
+        links = [c.link for c in self.controller.get_children(1)]
+        if links[0].id == self.controller.id:
+            parent, other = self.controller, self.controller2
+        else:
+            parent, other = self.controller2, self.controller
+        rev = self.controller3.revise('b', parents=((links[0], parent.object),))
+    
+        parents = [p.link for p in rev.get_parents(1)]
+        self.assertEqual(1, len(parents))
+        self.assertEqual(parents[0].child_id, rev.id)
+        self.assertEqual(parents[0].parent_id, parent.id)
+        
+        children = [c.link for c in parent.get_children(1)]
+        self.assertEqual(1, len(children))
+        self.assertEqual(children[0].child_id, rev.id)
+
+        children_o = [c.link for c in other.get_children(1)]
+        self.assertEqual(1, len(children))
+        self.assertEqual(children_o[0].child_id, self.controller3.id)
 
