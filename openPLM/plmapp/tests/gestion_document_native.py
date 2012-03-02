@@ -1,8 +1,7 @@
 
 from openPLM.plmapp.controllers.document import DocumentController
+from openPLM.plmapp.exceptions import LockError
 from openPLM.plmapp.tests.base import BaseTestCase
-
-
 class DocNativeTestCase(BaseTestCase):
 
 
@@ -36,7 +35,7 @@ class DocNativeTestCase(BaseTestCase):
         standar=self.document.add_file(self.get_file("test.stp"))
 
         self.document.lock(native)
-        self.assertRaises(ValueError, self.document.lock, standar)
+        self.assertRaises(LockError, self.document.lock, standar)
         self.assertEqual(native.locked, True)
         self.assertFalse(standar.locked)
 
