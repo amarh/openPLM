@@ -90,7 +90,7 @@ class DocumentController(PLMObjectController):
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.checkout_valid:
-            raise ValueError("Check-out impossible, native related file is locked") 
+            raise LockError("Check-out impossible, native related file is locked") 
         if not doc_file.locked:
             doc_file.locked = True
             doc_file.locker = self._user
