@@ -214,16 +214,17 @@ class ViewTest(CommonViewTest):
         self.assertEqual(lifecycles, wanted)
         self.assertFalse(response.context["password_form"].is_valid())
 
-    def test_revisions(self):
+    def test_revisions_get(self):
         response = self.get(self.base_url + "revisions/")
         revisions = response.context["revisions"]
         self.assertEqual(revisions, [self.controller.object])
-        # check add_revision_form
-        add_revision_form = response.context["add_revision_form"]
-        self.assertEqual(add_revision_form.data, {"revision": "b"})
-        response = self.post(self.base_url + "revisions/", {"revision" :"b"})
-        m.get_all_plmobjects()[self.TYPE].objects.get(reference=self.controller.reference,
-                revision="b")
+        self.assertTrue("add_revision_form" in response.context)
+        # add a new revision
+        rev = self.controller.revise("jf")
+        response = self.get(self.base_url + "revisions/")
+        revisions = response.context["revisions"]
+        self.assertEqual(revisions, [self.controller.object, rev.plmobject_ptr])
+        self.assertFalse("add_revision_form" in response.context)
     
     def test_history(self):
         response = self.get(self.base_url + "history/")
@@ -739,7 +740,602 @@ class PartViewTestCase(ViewTest):
         document = self.controller.get_attached_documents()[0].document
         self.assertEqual(doc1.object, document)
         
+    def test_revise_no_attached_document_get(self):
+        """
+        Tests the "revisions/" page and checks that if the part has no
+        attached documents, it is not necessary to confirm the form.
+        """
+        response = self.get(self.base_url + "revisions/")
+        # checks that is not necessary to confirm the revision 
+        self.assertFalse(response.context["confirmation"])
 
+    def test_revise_no_attached_document_post(self):
+        """
+        Tests a post request to revise a part which has no attached documents.
+        """
+        response = self.post(self.base_url + "revisions/",
+                {"revision" : "b"})
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0]
+        self.assertEqual("b", rev.revision)
+
+    def test_revise_one_attached_document_get(self):
+        """
+        Tests a get request to revise a part which has one attached document.
+        This document must be suggested when the user revises the part.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["doc_formset"]
+        self.assertEqual(1, formset.total_form_count())
+        form = formset.forms[0]
+        self.assertTrue(form.fields["selected"].initial)
+        self.assertEqual(document.id, form.initial["document"].id)
+
+    def test_revise_one_attached_document_post_selected(self):
+        """
+        Tests a post request to revise a part with one attached document which
+        is selected.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "1",
+                 "documents-INITIAL_FORMS" : "1",
+                 "documents-0-selected" : "on",
+                 "documents-0-document" : document.id,
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure document is still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual([document.id], list(documents))
+        # ensure document is attached to the new revision
+        documents = rev.documentpartlink_part.values_list("document", flat=True)
+        self.assertEqual([document.id], list(documents))
+        # ensure both documents are attached to the document
+        self.assertEqual([self.controller.id, rev.id],
+            sorted(document.get_attached_parts().values_list("part", flat=True)))
+
+    def test_revise_one_attached_document_post_unselected(self):
+        """
+        Tests a post request to revise a part with one attached document which
+        is not selected.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "1",
+                 "documents-INITIAL_FORMS" : "1",
+                 "documents-0-selected" : "",
+                 "documents-0-document" : document.id,
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure document is still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual([document.id], list(documents))
+        # ensure document is not attached to the new revision
+        self.assertFalse(bool(rev.documentpartlink_part.all()))
+        # ensure only the old revision is attached to document 
+        self.assertEqual([self.controller.id],
+            list(document.get_attached_parts().values_list("part", flat=True)))
+
+    def test_revise_two_attached_documents_get(self):
+        """
+        Tests a get request to revise a part with two attached documents.
+        One document is a draft, the other is official.
+        """
+        d1 = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(d1)
+        d2 = DocumentController.create("document_2", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(d2)
+        d2.object.is_promotable = lambda: True
+        d2.promote()
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["doc_formset"]
+        self.assertEqual(2, formset.total_form_count())
+        form1, form2 = formset.forms
+        self.assertTrue(form1.fields["selected"].initial)
+        self.assertTrue(form2.fields["selected"].initial)
+        self.assertEqual([d1.id, d2.id],
+                sorted([form1.initial["document"].id, form2.initial["document"].id]))
+
+    def test_revise_two_attached_documents_post(self):
+        """
+        Tests a post request to revise a part with two attached documents.
+        One document is a draft and not selected, the other is official and selected.
+        """
+        d1 = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(d1)
+        d2 = DocumentController.create("document_2", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(d2)
+        d2.object.is_promotable = lambda: True
+        d2.promote()
+        data = {
+            "revision" : "b",
+             "parents-TOTAL_FORMS" : "0",
+             "parents-INITIAL_FORMS" : "0",
+             "children-TOTAL_FORMS" : "0",
+             "children-INITIAL_FORMS" : "0",
+             "documents-TOTAL_FORMS" : "2",
+             "documents-INITIAL_FORMS" : "2",
+             "documents-0-selected" : "",
+             "documents-0-document" : d1.id,
+             "documents-1-selected" : "on",
+             "documents-1-document" : d2.id,
+             }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure d1 and d2 are still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual([d1.id, d2.id], sorted(documents))
+        # ensure d2 is attached to the new revision
+        documents = rev.documentpartlink_part.values_list("document", flat=True)
+        self.assertEqual([d2.id], list(documents))
+        # ensure both documents are attached to d2
+        self.assertEqual([self.controller.id, rev.id],
+            sorted(d2.get_attached_parts().values_list("part", flat=True)))
+
+    def test_revise_one_deprecated_document_attached_get(self):
+        """
+        Tests a get request to revise a part which has one deprecated 
+        attached document.
+        This document must not be suggested when the user revises the part.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        document.object.state = document.lifecycle.last_state
+        document.object.save()
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertFalse(response.context["confirmation"])
+
+    def test_revise_one_deprecated_document_attached_post(self):
+        """
+        Tests a post request to revise a part which has one deprecated 
+        attached document.
+        This document must not be suggested when the user revises the part.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        document.object.state = document.lifecycle.last_state
+        document.object.save()
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "1",
+                 "documents-INITIAL_FORMS" : "1",
+                 "documents-0-selected" : "",
+                 "documents-0-document" : document.id,
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        # even if we submit a formset, it should not be parsed
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        # ensure document is still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual([document.id], list(documents))
+        # ensure document is not attached to the new revision
+        self.assertFalse(bool(rev.documentpartlink_part.all()))
+        # ensure only the old revision is attached to document 
+        self.assertEqual([self.controller.id],
+            list(document.get_attached_parts().values_list("part", flat=True)))
+
+    def test_revise_one_attached_revised_document_get(self):
+        """
+        Tests a get request to revise a part which has one attached document.
+        The document has been revised and so its revision must be suggested and
+        the document must not be suggested when the user revises the oart.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        d2 = document.revise("b")
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["doc_formset"]
+        self.assertEqual(2, formset.total_form_count())
+
+    def test_revise_one_attached_revised_document_post(self):
+        """
+        Tests a post request to revise a part which has one attached document.
+        The document has been revised and its revision is selected.
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        d2 = document.revise("b")
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "1",
+                 "documents-INITIAL_FORMS" : "1",
+                 "documents-0-selected" : "on",
+                 "documents-0-document" : d2.id,
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure document is still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual([document.id], list(documents))
+        # ensure d2 is attached to the new revision
+        documents = rev.documentpartlink_part.values_list("document", flat=True)
+        self.assertEqual([d2.id], list(documents))
+
+    def test_revise_one_attached_revised_document_post_error(self):
+        """
+        Tests a post request to revise a part which has one attached document.
+        The document has been revised and has been selected instead of its revision. 
+        """
+        document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
+        self.controller.attach_to_document(document)
+        d2 = document.revise("b")
+        self.controller.attach_to_document(d2)
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "1",
+                 "documents-INITIAL_FORMS" : "1",
+                 "documents-0-selected" : "on",
+                 "documents-0-document" : document.id,
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        # no revisions have been created
+        self.assertEqual([], revisions)
+        # ensure documents are still attached to the old revision
+        documents = self.controller.get_attached_documents().values_list("document", flat=True)
+        self.assertEqual(set((document.id, d2.id)), set(documents))
+
+    def test_revise_one_child_get(self):
+        """
+        Tests a get request to revise a part which has one child.
+        This child must be suggested when the user revises the part.
+        """
+        child = PartController.create("RefChild", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child, 10, 25, "-")
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["children_formset"]
+        self.assertEqual(1, formset.total_form_count())
+        form = formset.forms[0]
+        self.assertTrue(form.fields["selected"].initial)
+        self.assertEqual(child.id, form.initial["link"].child_id)
+
+    def test_revise_one_child_post_selected(self):
+        """
+        Tests a post request to revise a part with one child which is selected.
+        """
+        child = PartController.create("RefChild", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child, 10, 25, "-")
+        link = self.controller.get_children(1)[0].link
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "1",
+                 "children-INITIAL_FORMS" : "1",
+                 "children-0-selected" : "on",
+                 "children-0-link" : link.id,
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the part is still a child of the old revision
+        children = self.controller.get_children(1)
+        self.assertEqual([(1, link)], children)
+        # ensure the part is a child of the new revision
+        children = PartController(rev, self.user).get_children(1)
+        self.assertEqual(1, len(children))
+        link2 = children[0].link
+        self.assertEqual(link2.child, link.child)
+        self.assertEqual(link2.order, link.order)
+        self.assertEqual(link2.quantity, link.quantity)
+        self.assertEqual(link2.unit, link.unit)
+
+    def test_revise_one_child_post_unselected(self):
+        """
+        Tests a post request to revise a part with child which is not selected.
+        """
+        child = PartController.create("RefChild", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child, 10, 25, "-")
+        link = self.controller.get_children(1)[0].link
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "1",
+                 "children-INITIAL_FORMS" : "1",
+                 "children-0-selected" : "",
+                 "children-0-link" : link.id,
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the part is still a child of the old revision
+        children = self.controller.get_children(1)
+        self.assertEqual([(1, link)], children)
+        # ensure the part is not a child of the new revision
+        children = PartController(rev, self.user).get_children(1)
+        self.assertEqual(0, len(children))
+
+    def test_revise_two_childrens_get(self):
+        """
+        Tests a get request to revise a part with two children.
+        """
+        child1 = PartController.create("RefChild1", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child1, 10, 25, "-")
+        child2 = PartController.create("RefChild2", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child2, 10, 55, "-")
+
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["children_formset"]
+
+        self.assertEqual(2, formset.total_form_count())
+        form1, form2 = formset.forms
+        self.assertTrue(form1.fields["selected"].initial)
+        self.assertTrue(form1.initial["link"].child_id in (child1.id, child2.id))
+        self.assertTrue(form2.fields["selected"].initial)
+        self.assertTrue(form2.initial["link"].child_id in (child1.id, child2.id))
+        self.assertNotEqual(form2.initial["link"], form1.initial["link"])
+
+    def test_revise_two_childrens_post(self):
+        """
+        Tests a post request to revise a part with two children.
+        Only one child is selected.
+        """
+        child1 = PartController.create("RefChild1", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child1, 10, 25, "-")
+        child2 = PartController.create("RefChild2", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child2, 10, 55, "-")
+
+        link1, link2 = [c.link for c in self.controller.get_children(1)]
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "0",
+                 "parents-INITIAL_FORMS" : "0",
+                 "children-TOTAL_FORMS" : "1",
+                 "children-INITIAL_FORMS" : "1",
+                 "children-0-selected" : "on",
+                 "children-0-link" : link1.id,
+                 "children-1-selected" : "",
+                 "children-1-link" : link2.id,
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the part is still a child of the old revision
+        children = self.controller.get_children(1)
+        self.assertEqual(set(((1, link1), (1, link2))), set(children))
+        children = PartController(rev, self.user).get_children(1)
+        self.assertEqual(1, len(children))
+
+        link = children[0].link
+        self.assertEqual(link1.child, link.child)
+        self.assertEqual(link1.order, link.order)
+        self.assertEqual(link1.quantity, link.quantity)
+        self.assertEqual(link1.unit, link.unit)
+
+
+    def test_revise_one_parent_get(self):
+        """
+        Tests a get request to revise a part which has one parent.
+        This parent must be suggested when the user revises the part.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent.add_child(self.controller, 10, 25, "-")
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["parents_formset"]
+        self.assertEqual(1, formset.total_form_count())
+        form = formset.forms[0]
+        self.assertFalse(form.fields["selected"].initial)
+        self.assertEqual(parent.id, form.initial["link"].parent_id)
+        self.assertEqual(parent.id, form.initial["new_parent"].id)
+   
+    def test_revise_one_parent_post_unselected(self):
+        """
+        Tests a post request to revise a part which has one parent.
+        This parent is not selected, and so its bom should not change.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent.add_child(self.controller, 10, 25, "-")
+        link = parent.get_children(1)[0].link
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "1",
+                 "parents-INITIAL_FORMS" : "1",
+                 "parents-0-selected" : "",
+                 "parents-0-link" : link.id,
+                 "parents-0-new_parent" : parent.id,
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the old revision is still a child of the parent
+        children = parent.get_children(1)
+        self.assertEqual([(1, link)], children)
+        self.assertFalse(PartController(rev, self.user).get_parents())
+
+    def test_revise_one_parent_post_selected(self):
+        """
+        Tests a post request to revise a part which has one parent.
+        This parent is selected, and so its bom must be updated.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent.add_child(self.controller, 10, 25, "-")
+        link = parent.get_children(1)[0].link
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "1",
+                 "parents-INITIAL_FORMS" : "1",
+                 "parents-0-selected" : "on",
+                 "parents-0-link" : link.id,
+                 "parents-0-new_parent" : parent.id,
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the old revision is still a child of the parent
+        children = parent.get_children(1)
+        self.assertNotEqual([(1, link)], children)
+        self.assertEqual(1, len(children))
+        level, link2 = children[0]
+        self.assertEqual(parent.id, link2.parent_id)
+        self.assertEqual(link.order, link2.order)
+        self.assertEqual(link.quantity, link2.quantity)
+        self.assertEqual(link.unit, link2.unit)
+        self.assertEqual(rev.id, link2.child_id)
+        self.assertFalse(self.controller.get_parents())
+
+    def test_revise_one_revised_parent_get(self):
+        """
+        Tests a get request to revise a part which has one parent which has been
+        revised.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent.add_child(self.controller, 10, 25, "-")
+        parent2 = parent.revise("the game")
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["parents_formset"]
+        self.assertEqual(1, formset.total_form_count())
+        form = formset.forms[0]
+        self.assertFalse(form.fields["selected"].initial)
+        self.assertEqual(parent2.id, form.initial["link"].parent_id)
+        self.assertEqual(parent2.id, form.initial["new_parent"].id)
+
+    def test_revise_one_revised_parent_get2(self):
+        """
+        Tests a get request to revise a part which has one parent which has been
+        revised before the bom was built.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent2 = parent.revise("the game")
+        parent.add_child(self.controller, 10, 25, "-")
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["parents_formset"]
+        self.assertEqual(2, formset.total_form_count())
+        form1, form2 = formset.forms
+        self.assertFalse(form1.fields["selected"].initial)
+        self.assertEqual(parent.id, form1.initial["link"].parent_id)
+        self.assertEqual(parent.id, form1.initial["new_parent"].id)
+        self.assertFalse(form2.fields["selected"].initial)
+        self.assertEqual(parent.id, form2.initial["link"].parent_id)
+        self.assertEqual(parent2.id, form2.initial["new_parent"].id)
+
+    def test_revise_one_revised_parent_post2(self):
+        """
+        Tests a post request to revise a part which has one parent which has been
+        revised before the bom was built.
+        """
+        parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
+        parent2 = parent.revise("the game")
+        parent.add_child(self.controller, 10, 25, "-")
+        link = parent.get_children(1)[0].link
+        response = self.get(self.base_url + "revisions/")
+        # checks that it is necessary to confirm the revision 
+        self.assertTrue(response.context["confirmation"])
+        formset = response.context["parents_formset"]
+        self.assertEqual(2, formset.total_form_count())
+        data = { "revision" : "b",
+                 "parents-TOTAL_FORMS" : "2",
+                 "parents-INITIAL_FORMS" : "2",
+                 "parents-0-selected" : "",
+                 "parents-0-link" : link.id,
+                 "parents-0-new_parent" : parent.id,
+                 "parents-1-selected" : "on",
+                 "parents-1-link" : link.id,
+                 "parents-1-new_parent" : parent2.id,
+                 "children-TOTAL_FORMS" : "0",
+                 "children-INITIAL_FORMS" : "0",
+                 "documents-TOTAL_FORMS" : "0",
+                 "documents-INITIAL_FORMS" : "0",
+                 }
+        response = self.post(self.base_url + "revisions/", data)
+        revisions = self.controller.get_next_revisions()
+        self.assertEqual(1, len(revisions))
+        rev = revisions[0].part
+        self.assertEqual("b", rev.revision)
+        # ensure the old revision is still a child of the parent
+        children = parent.get_children(1)
+        self.assertEqual(1, len(children))
+        level, link2 = children[0]
+        self.assertEqual(parent.id, link2.parent_id)
+        self.assertEqual(link.order, link2.order)
+        self.assertEqual(link.quantity, link2.quantity)
+        self.assertEqual(link.unit, link2.unit)
+        self.assertEqual(self.controller.id, link2.child_id)
+        # ensure the new reviison is a child of the parent
+        children = parent2.get_children(1)
+        self.assertEqual(1, len(children))
+        level, link2 = children[0]
+        self.assertEqual(parent2.id, link2.parent_id)
+        self.assertEqual(link.order, link2.order)
+        self.assertEqual(link.quantity, link2.quantity)
+        self.assertEqual(link.unit, link2.unit)
+        self.assertEqual(rev.id, link2.child_id)
+
+    
 class UserViewTestCase(CommonViewTest):
 
     def setUp(self):

@@ -457,6 +457,29 @@ class SelectPartForm(forms.ModelForm):
         
 SelectPartFormset = modelformset_factory(m.Part, form=SelectPartForm, extra=0)
 
+
+class SelectDocumentForm(forms.Form):
+    selected = forms.BooleanField(required=False, initial=True)
+    document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
+                                   widget=forms.HiddenInput())
+        
+SelectDocumentFormset = formset_factory(form=SelectDocumentForm, extra=0)
+
+class SelectChildForm(forms.Form):
+    selected = forms.BooleanField(required=False, initial=True)
+    link = forms.ModelChoiceField(queryset=m.ParentChildLink.objects.all(),
+                                   widget=forms.HiddenInput())
+SelectChildFormset = formset_factory(form=SelectChildForm, extra=0)
+
+
+class SelectParentForm(SelectChildForm):
+    selected = forms.BooleanField(required=False, initial=False)
+    new_parent = forms.ModelChoiceField(queryset=m.Part.objects.all(),
+                                   widget=forms.HiddenInput())
+SelectParentFormset = formset_factory(form=SelectParentForm, extra=0)
+
+
+
 class AddRelPartForm(PLMObjectForm):
     pass
     

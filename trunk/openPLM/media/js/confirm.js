@@ -14,8 +14,8 @@ function confirm_submit(form, e) {
     e.preventDefault();
     $("#" + form.attr("id") + "-dialog" ).dialog({
 			resizable: false,
-			height:300,
 			modal: true,
+            width: 600,
 			buttons: {
 				Cancel: function() {
 					$( this ).dialog( "close" );

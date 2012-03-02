@@ -472,7 +472,7 @@ class PartController(PLMObjectController):
                     links.append((link, parent))
             for p in other_revisions:
                 if p.is_draft or p.is_official:
-                    links.append((link, p))
+                    links.append((link, p.part))
         # it is possible that some parts are suggested twice or more
         # if they are not a parent (they are a superior revision of a parent)
         # so we must clean up links
