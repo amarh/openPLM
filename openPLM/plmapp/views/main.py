@@ -1284,8 +1284,8 @@ def display_plmobjects(request, obj_ref):
     """
     
     obj, ctx = get_generic_data(request, "Group", obj_ref)
-    ctx["objects"] = obj.plmobject_group.all().order_by("type", "reference", "revision")
-    ctx['current_page'] = 'groups'
+    ctx["objects"] = obj.plmobject_group.order_by("type", "reference", "revision")
+    ctx['current_page'] = 'objects'
     return r2r("groups/objects.html", ctx, request)
 
 @handle_errors(undo="../../../users/")
