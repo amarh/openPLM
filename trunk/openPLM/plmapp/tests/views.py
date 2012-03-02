@@ -402,6 +402,15 @@ class DocumentViewTestCase(ViewTest):
         self.assertFalse(df.locked)
         self.assertEqual("robert", df.file.read())
 
+    def test_checkout(self):
+        df1 = self.controller.add_file(self.get_file(data="oh oh oh"))
+        response = self.client.get(self.base_url + "files/checkout/%d/" % df1.id)
+        files = self.controller.files
+        self.assertEqual(1, files.count())
+        df = files[0]
+        self.assertTrue(df.locked)
+        self.assertEqual("oh oh oh", response.content)
+
     def test_add_file_get(self):
         response = self.get(self.base_url + "files/add/")
         self.assertTrue(isinstance(response.context["add_file_form"],
