@@ -32,7 +32,7 @@ from openPLM.plmapp import forms
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import DocumentController, PartController, \
-        UserController
+        UserController, GroupController
 from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.base import BaseTestCase
@@ -1493,6 +1493,52 @@ class UserViewTestCase(CommonViewTest):
             role = level_to_sign_str(level)
             m.DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
+
+
+class GroupViewTestCase(CommonViewTest):
+
+    def setUp(self):
+        super(GroupViewTestCase, self).setUp()
+        self.part_controller = self.controller
+        self.group_url = "/group/%s/" % self.group.name
+        self.controller = GroupController(self.group, self.user)
+        
+    def test_group_attributes(self):
+        response = self.get(self.group_url + "attributes/", page="attributes")
+        attributes = dict((x.capitalize(), y) for (x,y) in 
+                          response.context["object_attributes"])
+        self.assertEqual(attributes["Description"], self.group.description)
+        self.assertTrue(response.context["is_owner"])
+
+    def test_users(self):
+        response = self.get(self.group_url + "users/", page="users")
+        user_formset = response.context["user_formset"]
+        self.assertEqual(0, user_formset.total_form_count())
+        self.assertTrue(response.context["in_group"])
+
+    def test_plmobjects(self):
+        response = self.get(self.group_url + "objects/", page="objects")
+        objects = response.context["objects"]
+        self.assertEqual([self.part_controller.plmobject_ptr], list(objects))
+        # create a new group
+        group = m.GroupInfo(name="grp2", owner=self.user, creator=self.user,
+                description="grp")
+        group.save()
+        self.user.groups.add(group)
+        # create another part which bellows to another group
+        p2 = PartController.create("Part2", "Part", "a", self.user,
+                dict(group=group))
+        response = self.get(self.group_url + "objects/", page="objects")
+        objects = response.context["objects"]
+        self.assertEqual([self.part_controller.plmobject_ptr], list(objects))
+        
+    def test_history(self):
+        response = self.get(self.group_url + "history/", page="history")
+        
+    def test_navigate(self):
+        response = self.get(self.group_url + "navigate/")
+
+
     
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
