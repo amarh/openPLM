@@ -381,6 +381,27 @@ class DocumentViewTestCase(ViewTest):
         response = self.post(self.base_url + "files/", data)
         self.assertEqual([df2.id], [df.id for df in self.controller.files])
 
+    def test_checkin_get(self):
+        df1 = self.controller.add_file(self.get_file())
+        self.controller.lock(df1)
+        response = self.get(self.base_url + "files/checkin/%d/" % df1.id)
+        form = response.context["add_file_form"]
+
+    def test_checkin_post(self):
+        df1 = self.controller.add_file(self.get_file())
+        self.controller.lock(df1)
+        mock_file = self.get_file(data="robert")
+        # plop is here so that django see a post request
+        # it's not a problem since a real browser will also send a
+        # csrf token
+        response = self.post(self.base_url + "files/checkin/%d/" % df1.id,
+                dict(filename=mock_file, plop="m"))
+        files = self.controller.files
+        self.assertEqual(1, files.count())
+        df = files[0]
+        self.assertFalse(df.locked)
+        self.assertEqual("robert", df.file.read())
+
     def test_add_file_get(self):
         response = self.get(self.base_url + "files/add/")
         self.assertTrue(isinstance(response.context["add_file_form"],
