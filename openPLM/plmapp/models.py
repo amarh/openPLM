@@ -878,6 +878,9 @@ class DocumentFile(models.Model):
                 native, native_ext = os.path.splitext(doc.filename)           
                 if native == name and ext in native_to_standards[native_ext.lower()]:
                     return False
+                    
+        if self.locked:
+            return False       
         return True
         
     def __unicode__(self):
