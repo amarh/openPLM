@@ -218,13 +218,13 @@ class ViewTest(CommonViewTest):
         response = self.get(self.base_url + "revisions/")
         revisions = response.context["revisions"]
         self.assertEqual(revisions, [self.controller.object])
-        self.assertTrue("add_revision_form" in response.context)
+        self.assertTrue(response.context["add_revision_form"] is not None)
         # add a new revision
         rev = self.controller.revise("jf")
         response = self.get(self.base_url + "revisions/")
         revisions = response.context["revisions"]
         self.assertEqual(revisions, [self.controller.object, rev.plmobject_ptr])
-        self.assertFalse("add_revision_form" in response.context)
+        self.assertTrue(response.context["add_revision_form"] is None)
     
     def test_history(self):
         response = self.get(self.base_url + "history/")

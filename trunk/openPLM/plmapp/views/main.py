@@ -235,6 +235,7 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    ctx["add_revision_form"] = None
     if obj.is_document:
         return revise_document(obj, ctx, request)
     else:
