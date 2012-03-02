@@ -1,0 +1,34 @@
+{% extends "revisions.html" %}
+{% load i18n plmapp_tags %}
+
+
+{% block confirmation %}
+    <div id="form-revision-dialog"
+        title="{% trans "Are you sure?" %}"
+        {% if part_formset.is_bound and not part_formset.is_valid %} 
+            class="c-error action-{{ action }}"
+        {% endif %}
+        >
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{% trans "Here is the list of parts you may want to attach to the new revision. Select parts you want to attach and validate to make a new revision." %}</p>
+        <div class="parts">
+            {{ part_formset.management_form }}
+
+            <table class="Content">
+                {% for form in part_formset.forms %}
+                    {{ form.plmobject_ptr }}
+                    <tr class="Content">
+                        {% with form.instance as part %}
+                            <td class="Content" style="width:50px; text-align:center">{{ form.selected }}</td>
+                            <td class="Content">{{ part.type }}</td>
+                            <td class="Content">{{ part.reference }} </td>
+                            <td class="Content">{{ part.revision }}</td>
+                            <td class="Content">{{ part.name }}</td>
+                        {% endwith %}
+                    </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
+
+{% endblock %}

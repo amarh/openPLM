@@ -225,7 +225,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 })
     return r2r('lifecycle.html', ctx, request)
 
-##########################################################################################
+
 @handle_errors
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """
@@ -235,18 +235,24 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if obj.is_document:
+        return revise_document(obj, ctx, request)
+    else:
+        return revise_part(obj, ctx, request)
+
+def revise_document(obj, ctx, request):
+    """ View to revise a document. """
     confirmation = False
     if obj.is_revisable():
-        if obj.is_document:
-            parts = obj.get_suggested_parts()
-            confirmation = bool(parts)
+        parts = obj.get_suggested_parts()
+        confirmation = bool(parts)
+       
         if request.method == "POST" and request.POST:
             add_form = AddRevisionForm(request.POST)
-            kwargs = {}
+            selected_parts = []
             valid_forms = True
-            if obj.is_document and confirmation:
+            if confirmation:
                 part_formset = forms.SelectPartFormset(request.POST)
-                selected_parts = []
                 if part_formset.is_valid():
                     for form in part_formset.forms:
                         part = form.instance
@@ -259,14 +265,14 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
                             break
                         if form.cleaned_data["selected"]:
                             selected_parts.append(part)
-                    kwargs["selected_parts"] = selected_parts
                 else:
                     valid_forms = False
             if add_form.is_valid() and valid_forms:
-                obj.revise(add_form.cleaned_data["revision"], **kwargs)
+                obj.revise(add_form.cleaned_data["revision"], selected_parts)
+                return HttpResponseRedirect(".")
         else:
-            add_form = AddRevisionForm({"revision" : get_next_revision(obj_revi)})
-            if obj.is_document and confirmation:
+            add_form = AddRevisionForm({"revision" : get_next_revision(obj.revision)})
+            if confirmation:
                 ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
         ctx["add_revision_form"] = add_form
 
@@ -275,7 +281,91 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
                 })
-    return r2r('revisions.html', ctx, request)
+    return r2r('documents/revisions.html', ctx, request)
+
+def revise_part(obj, ctx, request):
+    """ View to revise a part. """
+    confirmation = False
+    if obj.is_revisable():
+        children = [c.link for c in obj.get_children(1)]
+        parents = obj.get_suggested_parents()
+        documents = obj.get_suggested_documents()
+        confirmation = bool(children or parents or documents)
+
+        if request.method == "POST" and request.POST:
+            add_form = AddRevisionForm(request.POST)
+            valid_forms = True
+            selected_children = []
+            selected_parents = []
+            selected_documents = []
+            if confirmation:
+                # children
+                children_formset = forms.SelectChildFormset(request.POST,
+                        prefix="children")
+                if children_formset.is_valid():
+                    for form in children_formset.forms:
+                        link = form.cleaned_data["link"]
+                        if link not in children: 
+                            valid_forms = False
+                            break
+                        if form.cleaned_data["selected"]:
+                            selected_children.append(link)
+                else:
+                    valid_forms = False
+                if valid_forms:
+                    # documents
+                    doc_formset = forms.SelectDocumentFormset(request.POST,
+                            prefix="documents")
+                    if doc_formset.is_valid():
+                        for form in doc_formset.forms:
+                            doc = form.cleaned_data["document"]
+                            if doc not in documents: 
+                                valid_forms = False
+                                break
+                            if form.cleaned_data["selected"]:
+                                selected_documents.append(doc)
+                    else:
+                        valid_forms = False
+                if valid_forms:
+                    # parents
+                    parents_formset = forms.SelectParentFormset(request.POST,
+                            prefix="parents")
+                    if parents_formset.is_valid():
+                        for form in parents_formset.forms:
+                            parent = form.cleaned_data["new_parent"]
+                            link = form.cleaned_data["link"]
+                            if (link, parent) not in parents: 
+                                valid_forms = False
+                                break
+                            if form.cleaned_data["selected"]:
+                                selected_parents.append((link, parent))
+                    else:
+                        valid_forms = False
+            if add_form.is_valid() and valid_forms:
+                obj.revise(add_form.cleaned_data["revision"], selected_children,
+                        selected_documents, selected_parents)
+                return HttpResponseRedirect(".")
+        else:
+            add_form = AddRevisionForm({"revision" : get_next_revision(obj.revision)})
+            if confirmation:
+                initial = [dict(link=link) for link in children]
+                ctx["children_formset"] = forms.SelectChildFormset(prefix="children",
+                        initial=initial)
+                initial = [dict(document=d) for d in documents]
+                ctx["doc_formset"] = forms.SelectDocumentFormset(prefix="documents",
+                        initial=initial)
+                initial = [dict(link=p[0], new_parent=p[1]) for p in parents]
+                ctx["parents_formset"] = forms.SelectParentFormset(prefix="parents",
+                        initial=initial)
+
+        ctx["add_revision_form"] = add_form
+
+    ctx["confirmation"] = confirmation
+    revisions = obj.get_all_revisions()
+    ctx.update({'current_page' : 'revisions',
+                'revisions' : revisions,
+                })
+    return r2r('parts/revisions.html', ctx, request)
 
 ##########################################################################################
 @handle_errors
