@@ -22,18 +22,8 @@
 #    Pierre Cosquer : pierre.cosquer@insa-rennes.fr
 ################################################################################
 
-import re
-from collections import defaultdict
-
 from django import forms
-from django.conf import settings
-from django.forms.formsets import formset_factory, BaseFormSet
-from django.forms.models import modelform_factory, inlineformset_factory, \
-        BaseModelFormSet
-from django.forms import ValidationError
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
-from django.utils.functional import memoize
+from django.forms.models import inlineformset_factory
 
 import openPLM.plmapp.models as m
 
@@ -45,7 +35,7 @@ class SelectPdfForm(forms.ModelForm):
         fields = ["document"]       
 
 SelectPdfFormset = inlineformset_factory(m.Document, m.DocumentFile,
-        form=SelectPdfForm, extra=0)
+        form=SelectPdfForm, extra=0, can_delete=False)
 
 def get_pdf_formset(controller, data=None, **kwargs):
     instance = controller
