@@ -271,6 +271,11 @@ def select_pdf_document(request, ctx, obj):
     ctx["pdf_formset"] = formset
     return r2r("select_pdf_doc.html", ctx, request)
 
+class FakeLink(object):
+
+    def __init__(self, id, child):
+        self.id = id
+        self.child = child
 
 def select_pdf_part(request, ctx, obj):
     """
@@ -282,8 +287,7 @@ def select_pdf_part(request, ctx, obj):
     # retrieve all pdf files (from documents attached to children parts)
     children = obj.get_children(-1)
     formsets = []
-    self_link = ParentChildLink(child=obj.object)
-    self_link.id = "self"
+    self_link = FakeLink("self", child=obj.object)
     for level, link in [(0, self_link)] + list(children):
         link.formsets = []
         for l in link.child.documentpartlink_part.all():
