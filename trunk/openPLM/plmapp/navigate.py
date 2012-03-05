@@ -41,7 +41,7 @@ import pygraphviz as pgv
 
 from openPLM.plmapp import models
 from openPLM.plmapp.controllers import PLMObjectController, PartController,\
-                                       DocumentController, GroupController
+                                       GroupController
 from openPLM.plmapp.controllers.user import UserController
 
 # just a shortcut
@@ -132,10 +132,10 @@ class NavigationGraph(object):
         self.users_result = False
         if results:
             self.users_result = hasattr(results[0], "username")
-        self.options_list = ("child", "parents", "doc", "cad", "owner", "signer",
-                             "notified", "part", "owned", "to_sign",
-                             "request_notification_from", OSR) 
-        self.options = dict.fromkeys(self.options_list, False)
+        options = ("child", "parents", "doc", "owner", "signer",
+                   "notified", "part", "owned", "to_sign",
+                   "request_notification_from", OSR) 
+        self.options = dict.fromkeys(options, False)
         self.options["prog"] = "dot"
         self.options["doc_parts"] = []
         self.nodes = defaultdict(dict)
@@ -144,7 +144,7 @@ class NavigationGraph(object):
         self.graph.graph_attr.update(self.GRAPH_ATTRIBUTES)
         self.graph.node_attr.update(self.NODE_ATTRIBUTES)
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
-        self.title_to_nodes = {}
+        self._title_to_node = {}
         self._part_to_node = {}
 
     def set_options(self, options):
@@ -163,7 +163,6 @@ class NavigationGraph(object):
              child      If True, adds recursively all children of the root
              parents    If True, adds recursively all parents of the root
              doc        If True, adds documents attached to the parts
-             cad        Not yet implemented
              owner      If True, adds the owner of the root
              signer     If True, adds the signers of the root
              notified   If True, adds the notified of the root
@@ -261,12 +260,12 @@ class NavigationGraph(object):
                 self.edges.add((node, doc.id, " "))
                 self._set_node_attributes(doc)
         else:
-            for document_item in obj.get_attached_documents().select_related("document").only(*_documents_attrs):
-                if self.options[OSR] and document_item.document.id not in self.results:
+            links = obj.get_attached_documents().select_related("document")
+            for link in links.only(*_documents_attrs):
+                if self.options[OSR] and link.document_id not in self.results:
                     continue
-                document = DocumentController(document_item.document, None)
-                self.edges.add((obj_id or obj.id, document.id, " "))
-                self._set_node_attributes(document)
+                self.edges.add((obj_id or obj.id, link.document_id, " "))
+                self._set_node_attributes(link.document)
 
     def _create_user_edges(self, obj, role):
         if self.options[OSR] and not self.users_result:
@@ -338,26 +337,26 @@ class NavigationGraph(object):
             id_ = "Group%d" % self.object.id
         else:
             id_ = self.object.id
-        #self.graph.add_node(id_)
         node = self.nodes[id_]
         self._set_node_attributes(self.object, id_)
         self.main_node = node["id"]
         node["width"] = 110. / 96 
         node["height"] = 80. / 96 
-        functions_dic = {'child':(self._create_child_edges, None),
-                         'parents':(self._create_parents_edges, None),
-                         'owner':(self._create_user_edges, 'owner'),
-                         'signer':(self._create_user_edges, 'sign'),
-                         'notified':(self._create_user_edges, 'notified'),
-                         'user':(self._create_user_edges, 'member'),
-                         'part': (self._create_part_edges, None),
-                         'owned':(self._create_object_edges, 'owner'),
-                         'to_sign':(self._create_object_edges, 'sign'),
-                         'request_notification_from':(self._create_object_edges, 'notified'),
-                         }
+        opt_to_meth = {
+            'child' : (self._create_child_edges, None),
+            'parents' : (self._create_parents_edges, None),
+            'owner' : (self._create_user_edges, 'owner'),
+            'signer' : (self._create_user_edges, 'sign'),
+            'notified' : (self._create_user_edges, 'notified'),
+            'user' : (self._create_user_edges, 'member'),
+            'part' : (self._create_part_edges, None),
+            'owned' : (self._create_object_edges, 'owner'),
+            'to_sign' : (self._create_object_edges, 'sign'),
+            'request_notification_from' : (self._create_object_edges, 'notified'),
+        }
         for field, value in self.options.iteritems():
-            if value and field in functions_dic:
-                function, argument = functions_dic[field]
+            if value and field in opt_to_meth:
+                function, argument = opt_to_meth[field]
                 function(self.object, argument)
         # now that all parts have been added, we can add the documents
         if self.options["doc"]:
@@ -403,8 +402,8 @@ class NavigationGraph(object):
         if "id" in self.nodes[obj_id]:
             # already treated
             return
-        # data and title_to_nodes are used to retrieve usefull data (url, tooltip)
-        # in convert_map
+        # data and _title_to_node are used to retrieve usefull data (url, tooltip)
+        # in _convert_map
         data = {}
         
         # set node attributes according to its type
@@ -438,9 +437,9 @@ class NavigationGraph(object):
                 URL=obj.plmobject_url + "navigate/",
                 id=id_,
                 )
-        self.title_to_nodes[id_] = data
+        self._title_to_node[id_] = data
 
-    def convert_map(self, map_string):
+    def _convert_map(self, map_string):
         elements = []
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         for area in ET.fromstring(map_string).findall("area"):
@@ -455,7 +454,7 @@ class NavigationGraph(object):
                         elements.append(div)
                 continue
 
-            data = self.title_to_nodes.get(area.get("id"), {})
+            data = self._title_to_node.get(area.get("id"), {})
             
             # compute css position of the div
             left, top, x2, y2 = map(int, area.get("coords").split(","))
@@ -481,7 +480,7 @@ class NavigationGraph(object):
                 elements.append(div)
         return u"\n".join(elements)
 
-    def parse_svg(self, svg):
+    def _parse_svg(self, svg):
         # TODO: optimize this function
         edges = []
         arrows = []
@@ -511,9 +510,9 @@ class NavigationGraph(object):
 
     def render(self):
         """
-        Renders an image of the graph
+        Renders an image of the graph.
 
-        :returns: a tuple (image map data, url of the image, path of the image)
+        :returns: a tuple (html content, javascript content)
         """
         warnings.simplefilter('ignore', RuntimeWarning)
         # builds the graph
@@ -535,4 +534,6 @@ class NavigationGraph(object):
         s.seek(0)
         map_string = s.read()
         self.graph.clear()
-        return self.convert_map(map_string), self.parse_svg(svg.read())
+        warnings.simplefilter('default', RuntimeWarning)
+        return self._convert_map(map_string), self._parse_svg(svg.read())
+
