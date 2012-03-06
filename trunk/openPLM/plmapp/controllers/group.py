@@ -61,10 +61,10 @@ class GroupController(Controller):
 
     HISTORY = models.GroupHistory
 
-    def __init__(self, obj, user):
+    def __init__(self, obj, user, block_mails=False, no_index=False):
         if hasattr(obj, "groupinfo"):
             obj = obj.groupinfo
-        super(GroupController, self).__init__(obj, user)
+        super(GroupController, self).__init__(obj, user, block_mails, no_index)
    
     @classmethod
     def create(cls, name, description, user, data={}):

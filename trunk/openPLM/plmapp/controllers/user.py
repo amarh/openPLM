@@ -65,8 +65,8 @@ class UserController(Controller):
 
     __slots__ = Controller.__slots__ + ("creator", "owner", "mtime", "ctime")
 
-    def __init__(self, obj, user):
-        super(UserController, self).__init__(obj, user)
+    def __init__(self, obj, user, block_mails=False, no_index=False):
+        super(UserController, self).__init__(obj, user, block_mails, no_index)
         self.creator = obj
         self.owner = obj
         self.mtime = obj.last_login
