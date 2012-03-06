@@ -742,7 +742,7 @@ class Part(PLMObject):
         return False
 
 def _get_all_subclasses(base, d):
-    if base.__name__ not in d:
+    if base.__name__ not in d and not base._deferred:
         d[base.__name__] = base
     for part in base.__subclasses__():
         _get_all_subclasses(part, d)
