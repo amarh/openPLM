@@ -161,12 +161,28 @@ class ViewTest(CommonViewTest):
         self.assertEqual(attributes["Owner"], self.user)
         self.assertEqual(attributes["Creator"], self.user)
 
-    def test_edit_attributes(self):
+    def test_edit_attributes_get(self):
+        response = self.get(self.base_url + "modify/")
+        form = response.context["modification_form"]
+        self.assertTrue("name" in form.fields)
+
+    def test_edit_attributes_post(self):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
         response = self.post(self.base_url + "modify/", data)
         obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, data["name"])
+
+    def test_edit_attrobites_post_error(self):
+        # the name is too looonnnnnnngggggg
+        name = self.controller.name
+        data = self.DATA.copy()
+        data.update(type=self.TYPE, name="new_name" * 300)
+        response = self.post(self.base_url + "modify/", data)
+        obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
+        self.assertEqual(obj.name, name)
+        form = response.context["modification_form"]
+        self.assertFalse(form.is_valid())
 
     def test_lifecycle(self):
         self.attach_to_official_document()
