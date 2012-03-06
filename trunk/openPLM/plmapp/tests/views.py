@@ -1719,7 +1719,66 @@ class GroupViewTestCase(CommonViewTest):
         self.client.login(username="Brian", password="life")
         self._do_test_refuse_invitation_post()
 
+    def _do_test_send_invitation_get(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        response = self.get(self.group_url + "invitation/send/%s/" % inv.token,
+                page="users")
+        # check that brian does not belong to the group
+        self.assertFalse(self.brian.groups.count())
+        self.assertFalse(mail.outbox)
+    
+    def test_send_invitation_from_guest_get(self):
+        """
+        Tests the page to send an invitation, get version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_send_invitation_get()
 
+    def _do_test_send_invitation_post(self, from_owner):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.post(self.group_url + "invitation/send/%s/" % inv.token,
+                page="users", data=data)
+        # checks that brian does not belong to the group
+        self.assertEqual([inv], list(response.context["pending_invitations"]))
+        self.assertFalse(response.context["user_formset"].forms)
+        self.assertFalse(self.brian.groups.filter(id=self.group.id).exists())
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.PENDING, inv.state)
+        # check a mail has been sent to the right user
+        self.assertEqual(1, len(mail.outbox))
+        email = self.brian.email if from_owner else self.user.email
+        self.assertEqual(mail.outbox[0].to, [email])
+
+    def test_send_invitation_from_guest_post(self):
+        """
+        Tests the page to send an invitation, post version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_send_invitation_post(False)
+    
+    def test_send_invitation_from_owner_get(self):
+        """
+        Tests the page to send an invitation, get version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_send_invitation_get()
+
+    def test_send_invitation_from_owner_post(self):
+        """
+        Tests the page to send an invitation, post version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_send_invitation_post(True)
+
+ 
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
 
