@@ -25,6 +25,7 @@
 """
 This module contains some tests for openPLM.
 """
+import datetime
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
@@ -1495,6 +1496,45 @@ class UserViewTestCase(CommonViewTest):
             role = level_to_sign_str(level)
             m.DelegationLink.objects.get(role=role, delegator=self.user,
                     delegatee=self.brian)
+
+    def test_resend_sponsor_mail(self):
+        user = User(username="dede", email="dede@example.net")
+        self.controller.sponsor(user)
+        link = m.DelegationLink.objects.get(role="sponsor", delegatee=user)
+        pwd = user.password
+        mail.outbox = []
+        self.post(self.user_url + 'delegation/sponsor/mail/',
+                {"link_id" : link.id})
+        self.assertEqual(1, len(mail.outbox))
+        self.assertEqual(mail.outbox[0].to, [user.email])
+        user = User.objects.get(username="dede")
+        self.assertNotEqual(user.password, pwd)
+
+    def test_resend_sponsor_error_user_connected(self):
+        user = User(username="dede", email="dede@example.net")
+        self.controller.sponsor(user)
+        user.last_login = datetime.datetime.now()
+        user.save()
+        link = m.DelegationLink.objects.get(role="sponsor", delegatee=user)
+        pwd = user.password
+        mail.outbox = []
+        self.post(self.user_url + 'delegation/sponsor/mail/',
+                {"link_id" : link.id}, status_code=403)
+        self.assertEqual(0, len(mail.outbox))
+        user = User.objects.get(username="dede")
+        self.assertEqual(user.password, pwd)
+
+    def test_resend_sponsor_error_not_sponsor(self):
+        user = User(username="dede", email="dede@example.net")
+        UserController(self.cie, self.cie).sponsor(user)
+        link = m.DelegationLink.objects.get(role="sponsor", delegatee=user)
+        pwd = user.password
+        mail.outbox = []
+        self.post(self.user_url + 'delegation/sponsor/mail/',
+                {"link_id" : link.id}, status_code=403)
+        self.assertEqual(0, len(mail.outbox))
+        user = User.objects.get(username="dede")
+        self.assertEqual(user.password, pwd)
 
 
 class GroupViewTestCase(CommonViewTest):
