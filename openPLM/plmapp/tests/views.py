@@ -173,7 +173,7 @@ class ViewTest(CommonViewTest):
         obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, data["name"])
 
-    def test_edit_attrobites_post_error(self):
+    def test_edit_attributes_post_error(self):
         # the name is too looonnnnnnngggggg
         name = self.controller.name
         data = self.DATA.copy()
