@@ -224,7 +224,7 @@ class NavigationGraph(object):
             parent = link.parent
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
                     link.get_shortened_unit(), link.order) 
-            self.edges.add((parent.id, obj.id, label))
+            self.edges.add((parent.id, link.child_id, label))
             self._set_node_attributes(parent)
    
     def _create_part_edges(self, obj, *args):
@@ -306,7 +306,7 @@ class NavigationGraph(object):
                 self.edges.add((node, part_doc_id, role))
                 if plmobject.is_part:
                     if plmobject.id in self.options["doc_parts"]:
-                        plmobject = PartController(plmobject.part, None)
+                        plmobject = PartController(plmobject.part, None, True, True)
                         self._create_doc_edges(plmobject, part_doc_id)
                 self._set_node_attributes(plmobject, part_doc_id)
 
@@ -321,7 +321,7 @@ class NavigationGraph(object):
                 part_doc = link.plmobject
                 if part_doc.is_part:
                     if part_doc.id in self.options["doc_parts"]:
-                        part_doc = PartController(part_doc.part, None)
+                        part_doc = PartController(part_doc.part, None, True, True)
                         self._create_doc_edges(part_doc, part_doc_id)
                 self._set_node_attributes(part_doc, part_doc_id)
 
