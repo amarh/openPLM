@@ -7,92 +7,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-27 13:56+0100\n"
+"POT-Creation-Date: 2012-03-06 18:20+0100\n"
 "PO-Revision-Date: 2011-11-21 11:12+0100\n"
 "Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 
-#: computer/models.py:48
+#: computer/models.py:48 phone/models.py:48
 msgid "supplier"
 msgstr "fournisseur"
 
-#: computer/models.py:48
+#: computer/models.py:48 phone/models.py:48
 msgid "tech_details"
-msgstr "détail technique"
+msgstr "détails techniques"
 
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."
-msgstr ""
+msgstr "Vous ne pouvez pas télécharger un fichier dans un GoogleDocument"
 
 #: gdoc/templates/gdoc_files.html:12
 msgid ""
 "\n"
-"            You cannot access to this Google Document. If you did not "
-"created\n"
-"            this document, you can ask its owner to grant you the "
-"permission\n"
-"            to read this file in Google Document.\n"
-"        "
+"You cannot access to this Google Document. If you did not created\n"
+"this document, you can ask its owner to grant you the permission\n"
+"to read this file in Google Document.\n"
 msgstr ""
+"\n"
+"Vous ne pouvez pas avoir accès à ce document Google. Si vous n'avez pas créé\n"
+"ce document, vous pouvez demander à son propriétaire de vous donner la permission\n"
+"de lire ce fichier dans Google Document.\n"
 
 #: gdoc/templates/gdoc_files.html:21
 msgid "Click here to edit the file in Google Document ."
-msgstr ""
+msgstr "Cliquez ici pour éditer le fichier dans Google Document."
 
 #: gdoc/templates/gdoc_files.html:24
 msgid "Click here to download the file from Google."
-msgstr ""
-
-#: pdfgen/templates/attributes.xhtml:19
-#, fuzzy
-msgid "User"
-msgstr "Identifiant"
-
-#: pdfgen/templates/attributes.xhtml:21
-#: templates/groups/pending_invitations.html:7
-msgid "Group"
-msgstr ""
+msgstr "Cliquez ici pour télécharger le fichier depuis Google."
 
 #: pdfgen/templates/select_pdf.html:8
 msgid ""
 "\n"
-"            Select PDF files that will be merged into a unique PDF\n"
-"            and click on the Download button.\n"
-"        "
+"Select PDF files that will be merged into a unique PDF\n"
+"and click on the Download button.\n"
 msgstr ""
+"\n"
+"Sélectionnez les fichiers pdf qui seront fusionnés dans un pdf unique\n"
+"et cliquez sur le bouton Télécharger.\n"
 
 #: pdfgen/templates/select_pdf.html:17
 msgid "Download"
-msgstr ""
+msgstr "Télécharger"
 
 #: pdfgen/templates/select_pdf_doc.html:16
 msgid "There are no PDF files."
-msgstr ""
+msgstr "Il n'y a pas de fichiers pdf."
 
 #: pdfgen/templates/select_pdf_part.html:19
 msgid "Level:"
-msgstr ""
-
-#: pdfgen/templates/summary.xhtml:18
-msgid "File"
-msgstr ""
-
-#: pdfgen/templates/summary.xhtml:34
-#, fuzzy
-msgid "State"
-msgstr "état"
-
-#: pdfgen/templates/summary.xhtml:35
-msgid "User who promoted/demoted the object"
-msgstr ""
-
-#: pdfgen/templates/summary.xhtml:36
-msgid "Date"
-msgstr ""
+msgstr "Niveau:"
 
 #: plmapp/base_views.py:128
 msgid "Internal error"
@@ -514,132 +490,132 @@ msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
 msgstr ""
+"Mauvais groupe, vérifiez que ce groupe existe et que vous faites bien parti "
+"de ce groupe."
 
 #: plmapp/forms.py:158
-#, fuzzy
 msgid "An object with the same type, reference and revision already exists"
-msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+msgstr "Un objet avec le même type, la même référence et la même révision existe déjà"
 
 #: plmapp/forms.py:160
-#, fuzzy
 msgid ""
-"An object with the same type and revision exists, you may consider to revise "
-"it."
-msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+"An object with the same type and revision exists, you may consider to revise it."
+msgstr "Un objet avec le même type, la même référence et la même révision existe, vous devriez réfléchir à le réviser."
 
 #: plmapp/forms.py:222
 msgid "Select a type"
-msgstr ""
+msgstr "Sélectionnez un type"
 
 #: plmapp/forms.py:317
 msgid "Query"
 msgstr "Requête"
 
-#: plmapp/forms.py:515
+#: plmapp/forms.py:540
 msgid "only search results"
 msgstr "seulement les résultats de recherche"
 
-#: plmapp/forms.py:516
+#: plmapp/forms.py:541
 msgid "Hierarchical"
 msgstr "Hiérarchique"
 
-#: plmapp/forms.py:517
+#: plmapp/forms.py:542
 msgid "Radial 1"
 msgstr ""
 
-#: plmapp/forms.py:518
+#: plmapp/forms.py:543
 msgid "Radial 2"
 msgstr ""
 
-#: plmapp/forms.py:521
+#: plmapp/forms.py:546
 msgid "layout"
 msgstr "disposition"
 
-#: plmapp/forms.py:528
+#: plmapp/forms.py:553
 msgid "child"
 msgstr "enfants"
 
-#: plmapp/forms.py:529 plmapp/models.py:684
+#: plmapp/forms.py:554 plmapp/models.py:684
 msgid "parents"
 msgstr "parents"
 
-#: plmapp/forms.py:530 plmapp/forms.py:550
+#: plmapp/forms.py:555 plmapp/forms.py:575
 msgid "doc"
 msgstr "doc"
 
-#: plmapp/forms.py:531 plmapp/forms.py:537 plmapp/forms.py:547
+#: plmapp/forms.py:556 plmapp/forms.py:562 plmapp/forms.py:572
 #: plmapp/models.py:177 plmapp/models.py:230 plmapp/models.py:468
-#: plmapp/models.py:649 plmapp/controllers/user.py:92 todolist/models.py:33
+#: plmapp/models.py:649 plmapp/controllers/user.py:92
 msgid "owner"
 msgstr "propriétaire"
 
-#: plmapp/forms.py:532 plmapp/forms.py:538
+#: plmapp/forms.py:557 plmapp/forms.py:563
 msgid "signer"
 msgstr "signataire"
 
-#: plmapp/forms.py:533 plmapp/forms.py:539 plmapp/views/main.py:982
+#: plmapp/forms.py:558 plmapp/forms.py:564 plmapp/views/main.py:1061
 msgid "notified"
 msgstr "notifié"
 
-#: plmapp/forms.py:536 plmapp/forms.py:549
+#: plmapp/forms.py:561 plmapp/forms.py:574
 msgid "part"
 msgstr "part"
 
-#: plmapp/forms.py:542
+#: plmapp/forms.py:567
 msgid "owned"
 msgstr "dont on est propriétaire"
 
-#: plmapp/forms.py:543
+#: plmapp/forms.py:568
 msgid "to sign"
 msgstr "à signer"
 
-#: plmapp/forms.py:544
+#: plmapp/forms.py:569
 msgid "request notification from"
 msgstr "dont on a demandé à être notifié"
 
-#: plmapp/forms.py:548
+#: plmapp/forms.py:573
 msgid "user"
-msgstr ""
+msgstr "utilisateur"
 
-#: plmapp/forms.py:571 templates/create.html:11 templates/edit.html:11
+#: plmapp/forms.py:596 templates/create.html:11 templates/edit.html:11
 #: templates/users/password.html:11
 msgid "Type"
 msgstr "Type"
 
-#: plmapp/forms.py:572 templates/groups/pending_invitations.html:9
+#: plmapp/forms.py:597 templates/groups/pending_invitations.html:9
 #: templates/groups/users.html:28 templates/users/delegation.html:32
 msgid "Username"
 msgstr "Identifiant"
 
-#: plmapp/forms.py:616
+#: plmapp/forms.py:641
 msgid "The new user will belong to the selected groups"
 msgstr "Le nouvel utilisateur appartiendra aux groupes sélectionnés"
 
-#: plmapp/forms.py:624
+#: plmapp/forms.py:649
 msgid "Email address must be unique."
-msgstr ""
+msgstr "L'adresse mail doit être unique."
 
-#: plmapp/forms.py:631
+#: plmapp/forms.py:656
 msgid "Email's domain not valid"
-msgstr ""
+msgstr "Doé maine du mail non valide"
 
-#: plmapp/forms.py:646
+#: plmapp/forms.py:671
 #, python-format
 msgid "Warning! There are homonyms: %s!"
-msgstr ""
+msgstr "Attention ! Il y a des homonymes: %s!"
 
-#: plmapp/forms.py:678
+#: plmapp/forms.py:703
 msgid "Columns must have distinct headers."
-msgstr ""
+msgstr "Chaque colonne doit avoir un entête différent."
 
-#: plmapp/forms.py:697
-#, fuzzy
+#: plmapp/forms.py:722
 msgid "Password"
 msgstr "Mot de passe :"
 
-#: plmapp/forms.py:710
+#: plmapp/forms.py:735
 msgid "Your password was entered incorrectly. Please enter it again."
 msgstr ""
+"Votre mot de passe a été saisi de façon incorrect. SVP veuillez le saisir à "
+"nouveau."
 
 #: plmapp/models.py:135
 msgid "administrator"
@@ -653,13 +629,12 @@ msgstr "contributeur"
 msgid "viewer"
 msgstr "lecteur"
 
-#: plmapp/models.py:179 plmapp/models.py:470 plmapp/models.py:1496
+#: plmapp/models.py:179 plmapp/models.py:470 plmapp/models.py:1492
 #: plmapp/controllers/user.py:89
 msgid "date of creation"
 msgstr "date de création"
 
 #: plmapp/models.py:181 plmapp/models.py:472 plmapp/controllers/user.py:88
-#: todolist/models.py:36
 msgid "date of last modification"
 msgstr "date de la dernière modification"
 
@@ -706,7 +681,7 @@ msgstr "état"
 
 #: plmapp/models.py:507
 msgid "The object is at its last state."
-msgstr ""
+msgstr "L'objet est à son dernier état"
 
 #: plmapp/models.py:612
 msgid "attributes"
@@ -726,7 +701,7 @@ msgstr "gestion"
 
 #: plmapp/models.py:650
 msgid "group"
-msgstr ""
+msgstr "groupe"
 
 #: plmapp/models.py:684
 msgid "BOM-child"
@@ -738,53 +713,51 @@ msgstr "doc-cao"
 
 #: plmapp/models.py:720
 msgid "Some children are at a lower or draft state."
-msgstr ""
+msgstr "Des parts enfants sont à un statut inférieur ou au statut brouillon."
 
 #: plmapp/models.py:732
-#, fuzzy
 msgid "There are no official documents attached."
 msgstr "Il n'y a pas de document attaché à cette part"
 
-#: plmapp/models.py:916
+#: plmapp/models.py:912
 msgid "This document has no files."
-msgstr ""
+msgstr "Ce document n'a pas de fichier."
 
-#: plmapp/models.py:919
+#: plmapp/models.py:915
 msgid "Some files are locked."
-msgstr ""
+msgstr "Des fichiers sont verrouillés."
 
-#: plmapp/models.py:926
+#: plmapp/models.py:922
 msgid "files"
 msgstr "fichiers"
 
-#: plmapp/models.py:927
+#: plmapp/models.py:923
 msgid "parts"
 msgstr "parts"
 
-#: plmapp/models.py:1498
-#, fuzzy
+#: plmapp/models.py:1494
 msgid "date of validation"
-msgstr "date de création"
+msgstr "date de validation"
 
-#: plmapp/models.py:1499
+#: plmapp/models.py:1495
 msgid "True if guest created the invitation"
-msgstr ""
+msgstr "Vrai si l'invité a créé l'invitation"
 
 #: plmapp/units.py:5
 msgid "Amounts"
-msgstr ""
+msgstr "Montants"
 
 #: plmapp/units.py:6
 msgid "Each"
-msgstr ""
+msgstr "Pièce"
 
 #: plmapp/units.py:7
 msgid "mol"
-msgstr ""
+msgstr "Mole"
 
 #: plmapp/units.py:10
 msgid "Lengths"
-msgstr ""
+msgstr "Longueurs"
 
 #: plmapp/units.py:11
 msgid "mm"
@@ -860,46 +833,47 @@ msgstr "rôle dans le PLM"
 
 #: plmapp/management/commands/createcompany.py:27
 msgid "Enter a valid e-mail address."
-msgstr ""
+msgstr "Veuillez saisir une adresse mail valide."
 
-#: plmapp/views/main.py:978
+#: plmapp/views/main.py:1057
 msgid "signer level"
 msgstr "signataire niveau"
 
-#: plmapp/views/main.py:980
+#: plmapp/views/main.py:1059
 msgid "signer all levels"
 msgstr "signataire tous niveaux"
 
 #: subversion/models.py:19
 msgid "Valid value are HEAD, a number or a date between brackets"
-msgstr ""
+msgstr "Les valeurs correctes sont HEAD, un nombre ou une date entre crochets"
 
 #: subversion/templates/ajax_logs.html:6
 msgid ""
 "\n"
-"            Sorry, openPLM cannot access to this repository.\n"
-"        "
+"Sorry, openPLM cannot access to this repository.\n"
 msgstr ""
+"\n"
+"Désolé, openPLM ne peut pas accéder à ce dépot.\n"
 
 #: subversion/templates/ajax_logs.html:11
 msgid "Last changelogs:"
-msgstr ""
+msgstr "Derniers changelogs"
 
 #: subversion/templates/logs.html:28
 msgid "Loading..."
-msgstr ""
+msgstr "Chargement..."
 
 #: subversion/templates/subversion_files.html:8
 msgid "You cannot add a file to a SubversionRepository."
-msgstr ""
+msgstr "Vous ne pouvez pas ajouter un fichier à un SubversionRepository"
 
 #: subversion/templates/subversion_files.html:12
 msgid "To check-out this repository, run the following command:"
-msgstr ""
+msgstr "Pour télécharger ce répertoire, exécutez la commande suivante :"
 
 #: subversion/templates/subversion_files.html:19
 msgid "To export this repository, run the following command:"
-msgstr ""
+msgstr "Pour exporter ce répertoire, exécutez la commande suivante :"
 
 #: templates/404.html:17
 msgid "Error 404: page not found"
@@ -916,42 +890,43 @@ msgstr "MOT DE PASSE"
 
 #: templates/attributes.html:39
 msgid "Download PDF file"
-msgstr ""
+msgstr "Télécharger fichier pdf"
 
 #: templates/attributes.html:46
 msgid "Comments"
-msgstr ""
+msgstr "Commentaires"
 
 #: templates/attributes.html:52
 msgid ""
 "\n"
-"                        One comment has been posted.\n"
-"                    "
+"One comment has been posted.\n"
 msgstr ""
+"\n"
+"Un commentaire a été posté.\n"
 
 #: templates/attributes.html:56
-#, python-format
 msgid ""
 "\n"
-"                        %(comment_count)s comments have been posted.\n"
-"                    "
+"%(comment_count)s comments have been posted.\n"
 msgstr ""
+"\n"
+"%(comment_count)s commentaires ont été postés.\n"
 
 #: templates/attributes.html:66
 msgid "Posted by:"
-msgstr ""
+msgstr "Posté par:"
 
 #: templates/attributes.html:70
 msgid "Date:"
-msgstr ""
+msgstr "Date:"
 
 #: templates/attributes.html:80
 msgid "No comments have been posted yet."
-msgstr ""
+msgstr "Aucun commentaire n'a encore été posté."
 
 #: templates/attributes.html:86
 msgid "Post a comment"
-msgstr ""
+msgstr "Poster un commentaire"
 
 #: templates/attributes.html:116
 msgid "Post"
@@ -959,12 +934,11 @@ msgstr ""
 
 #: templates/base.html:44
 msgid "Home page"
-msgstr ""
+msgstr "Page d'accueil"
 
 #: templates/base.html:61
-#, fuzzy
 msgid "SEARCH"
-msgstr "RECHERCHER !"
+msgstr "RECHERCHER"
 
 #: templates/base.html:67 templates/create.html:36
 msgid "CREATE"
@@ -979,23 +953,20 @@ msgid "STUDY"
 msgstr "ETUDIER"
 
 #: templates/base.html:94
-#, fuzzy
 msgid "EXIT"
 msgstr "SORTIR"
 
 #: templates/base.html:105
-#, fuzzy
 msgid "Create"
-msgstr "créateur"
+msgstr "Créer"
 
 #: templates/base.html:115
-#, fuzzy
 msgid "Search"
 msgstr "Recherche pour:"
 
 #: templates/base.html:146
 msgid "You are not allowed to see this object"
-msgstr ""
+msgstr "Vous n'êtes pas autorisé à voir cet objet"
 
 #: templates/create.html:7
 msgid "OBJECT CREATION:"
@@ -1019,7 +990,6 @@ msgid "openPLM LOGIN PAGE"
 msgstr "PAGE D'ACCES à OpenPLM"
 
 #: templates/error.html:18
-#, fuzzy
 msgid "Error :"
 msgstr "Erreur :"
 
@@ -1029,55 +999,58 @@ msgstr "revenir en arrière"
 
 #: templates/home.html:19
 msgid "Your account"
-msgstr ""
+msgstr "Votre compte"
 
 #: templates/home.html:22
 msgid "Click here to edit your personal information."
-msgstr ""
+msgstr "Cliquez ici pour éditer vos informations personnelles."
 
 #: templates/home.html:28
 msgid "Last edited objects"
-msgstr ""
+msgstr "Derniers objets édités"
 
 #: templates/home.html:61
 msgid "Groups that you own: pending invitations"
-msgstr ""
+msgstr "Les groupes dont vous êtes propriétaire: invitations en attente"
 
 #: templates/home.html:72
 msgid "Groups that you may join: pending invitations"
-msgstr ""
+msgstr "Les groupes que vous pouvez rejoindre: invitations en attente"
 
-#: templates/lifecycle.html:16 templates/revisions.html:17
+#: templates/lifecycle.html:16 templates/documents/revisions.html:7
+#: templates/parts/revisions.html:7
 msgid "Are you sure?"
-msgstr ""
+msgstr "Êtes-vous sur ?"
 
 #: templates/lifecycle.html:21
 msgid ""
 "If you promote or demote this object, you may not be allowed to undo this "
 "action."
 msgstr ""
+"Si vous validez ou refusez cet objet, vous pouvez ne plus être autorisé à "
+"annuler cette action."
 
 #: templates/lifecycle.html:32
-#, fuzzy
 msgid ""
 "You can not demote this object since its state is official or more advanced."
-msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+msgstr ""
+"Vous ne pouvez pas refuser cet objet car son statut est officiel ou encore plus avancé."
 
 #: templates/lifecycle.html:35
 msgid "You do not have the permission to demote this object."
-msgstr ""
+msgstr "Vous n'avez pas la permission de refuser cet objet."
 
 #: templates/lifecycle.html:42
 msgid "You can not promote this object:"
-msgstr ""
+msgstr "Vous ne pouvez pas valider cet objet:"
 
 #: templates/lifecycle.html:46
 msgid "You do not have the permission to promote this object."
-msgstr ""
+msgstr "Vous n'avez pas la permission de valider cet objet."
 
 #: templates/login.html:28
 msgid "Welcome to openPLM"
-msgstr ""
+msgstr "Bienvenue dans openPLM"
 
 #: templates/login.html:38 templates/blocks/user.html:19
 msgid "Go"
@@ -1085,12 +1058,14 @@ msgstr "Go"
 
 #: templates/login.html:45
 msgid "is the first genuine open source PLM based on"
-msgstr ""
+msgstr "est le premier véritable PLM open source s'appuyant sur"
 
 #: templates/login.html:46
 msgid ""
 "intended to provide a starting point for companies CMS/PLM/BIM projects."
 msgstr ""
+"avec l'intention de fournir une base de départ pour les projets CMS/PLM/BIM "
+"des sociétés."
 
 #: templates/login.html:47
 msgid ""
@@ -1098,15 +1073,17 @@ msgid ""
 "of the things that companies have in common, it lets you focus on what makes "
 "your company different."
 msgstr ""
+"En intégrant de nombreuses fonctionalités standards et réutilisables pour "
+"prendre en charge les choses que les sociétés ont en commun, cela vous "
+"permet de vous concentrer sur ce qui fait votre spécificité."
 
 #: templates/login.html:51
 msgid "For more information about openPLM, see"
-msgstr ""
+msgstr "Pour plus d'information concernant openPLM, voir"
 
 #: templates/login.html:54
-#, fuzzy
 msgid "openPLM connexion :"
-msgstr "Connexion à OpenPLM"
+msgstr "Connexion à OpenPLM :"
 
 #: templates/login.html:63
 msgid "Login :"
@@ -1120,10 +1097,17 @@ msgstr "Mot de passe :"
 msgid "LOGIN"
 msgstr "ENTRER"
 
+#: templates/login.html:77
+msgid ""
+"If you have any trouble logging in to your account, contact your "
+"administrator"
+msgstr ""
+"Si vous aves des difficultés à vous loguer, contactez votre "
+"administrateur"
+
 #: templates/login.html:79
-#, fuzzy
 msgid "Professionals"
-msgstr "révisions"
+msgstr "Professionels"
 
 #: templates/login.html:82
 msgid ""
@@ -1131,23 +1115,26 @@ msgid ""
 "want to work with other professionals for your project management, for other "
 "solutions plugins, for openPLM software maintenance, "
 msgstr ""
+"Vous prévoyez d'utiliser openPLM dans un contexte professionnel. Si vous "
+"voulez travailler avec d'autres professionnels pour votre gestion de projet, "
+"pour des interfaces avec d'autres solutions, pour une maintenance logiciel "
+"d'openPLM,"
 
 #: templates/login.html:84
 msgid "contact us"
-msgstr ""
+msgstr "contactez-nous"
 
 #: templates/management.html:13
 msgid "Notify"
-msgstr ""
+msgstr "Notifier"
 
 #: templates/management.html:18
-#, fuzzy
 msgid "Unnotify me"
-msgstr "notifié"
+msgstr "Ne plus me notifiez"
 
 #: templates/management.html:23
 msgid "Notify me"
-msgstr ""
+msgstr "Notifiez moi"
 
 #: templates/management.html:51
 msgid "REPLACE"
@@ -1155,7 +1142,7 @@ msgstr "REMPLACER"
 
 #: templates/management.html:58
 msgid "Delete"
-msgstr "Effacer ?"
+msgstr "Effacer"
 
 #: templates/management_replace.html:7
 msgid "Select a user for your delegation as : "
@@ -1163,15 +1150,15 @@ msgstr "Sélectionez un utilisateur pour déléguer votre rôle de : "
 
 #: templates/navigate.html:38
 msgid "Attach document?"
-msgstr ""
+msgstr "Attacher le document ?"
 
 #: templates/navigate.html:41
 msgid "Attach the selected document?"
-msgstr ""
+msgstr "Attacher le document sélectionné ?"
 
 #: templates/navigate.html:56
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: templates/navigate.html:75 templates/parts/bom.html:23
 #: templates/parts/parents.html:9
@@ -1182,23 +1169,17 @@ msgstr "Afficher :"
 msgid "FILTER"
 msgstr "FILTRER"
 
-#: templates/revisions.html:22
-msgid ""
-"Here is the list of parts connected to the original document. Do you want to "
-"connect them to new document?"
-msgstr ""
-
-#: templates/revisions.html:52
+#: templates/revisions.html:15
 msgid "NEW"
 msgstr "NOUVEAU"
 
-#: templates/revisions.html:56
+#: templates/revisions.html:19
 msgid "You can not revise this object since a revision already exist."
 msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
 
 #: templates/blocks/creation.html:12
 msgid "Click here to create a new object."
-msgstr ""
+msgstr "Cliquez ici pour créer un nouvel objet."
 
 #: templates/blocks/creation.html:13
 msgid "CREATE !"
@@ -1206,16 +1187,15 @@ msgstr "CREER !"
 
 #: templates/blocks/creation.html:19
 msgid "Import"
-msgstr ""
+msgstr "Importer"
 
 #: templates/blocks/creation.html:24
 msgid "Import a BOM"
-msgstr ""
+msgstr "Importer un nomenclature"
 
 #: templates/blocks/creation.html:30
-#, fuzzy
 msgid "You can not create an object since you are not a contributor."
-msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+msgstr "Vous ne pouvez pas créer un objet car vous n'êtes pas contributeur."
 
 #: templates/blocks/search.html:7
 msgid "SEARCH !"
@@ -1223,30 +1203,29 @@ msgstr "RECHERCHER !"
 
 #: templates/blocks/search.html:14
 msgid "Results for link creation:"
-msgstr ""
+msgstr "Résultats pour la création de lien:"
 
 #: templates/blocks/search.html:21
 msgid "Results"
-msgstr ""
+msgstr "Résultats"
 
 #: templates/blocks/search.html:23
-#, python-format
 msgid ""
 "\n"
-"                    (1 - %(count)s on %(total)s)\n"
-"                "
+"(1 - %(count)s on %(total)s)\n"
 msgstr ""
+"\n"
+"(1 - %(count)s sur %(total)s)\n"
 
 #: templates/blocks/search.html:35
 msgid "Attach"
-msgstr ""
+msgstr "Attacher"
 
 #: templates/blocks/search.html:36
-#, fuzzy
 msgid "Add child"
-msgstr "enfants"
+msgstr "Ajouter enfants"
 
-#: templates/blocks/search.html:50 templates/documents/files.html:54
+#: templates/blocks/search.html:50 templates/documents/files.html:53
 #: templates/documents/parts.html:11 templates/parts/bom.html:19
 msgid "ADD"
 msgstr "AJOUTER"
@@ -1255,41 +1234,62 @@ msgstr "AJOUTER"
 msgid "No result matching given query"
 msgstr "Aucun résultat ne correspond à la recherche"
 
-#: templates/documents/files.html:46 templates/parts/doccad.html:10
+#: templates/documents/files.html:45 templates/parts/doccad.html:10
 msgid "Download all files"
-msgstr ""
+msgstr "Télécharger tous les fichiers"
 
-#: templates/documents/files.html:57
+#: templates/documents/files.html:56
 msgid "DELETE"
 msgstr "DETRUIRE"
 
-#: templates/documents/files.html:72
+#: templates/documents/files.html:71
 msgid "Locked"
-msgstr ""
+msgstr "Verrouillé"
 
-#: templates/documents/files.html:74
+#: templates/documents/files.html:73
 msgid "Unlocked"
-msgstr ""
+msgstr "Déverrouillé"
 
-#: templates/documents/files.html:81
+#: templates/documents/files.html:80
 msgid "DOWNLOAD"
 msgstr "TELECHARGER"
 
-#: templates/documents/files.html:90
+#: templates/documents/files.html:88
 msgid "CHECK-IN"
 msgstr "CHECK-IN"
 
-#: templates/documents/files.html:99 templates/documents/files.html.py:103
+#: templates/documents/files.html:97
 msgid "CHECK-OUT"
 msgstr "CHECK-OUT"
 
-#: templates/documents/files.html:132
+#: templates/documents/files.html:102
+msgid "Native related file is locked"
+msgstr "Le fichier natif lié est verrouillé"
+
+#: templates/documents/files.html:116
 msgid "No thumbnail available"
 msgstr "Aucun aperçu disponible"
 
-#: templates/documents/files.html:146 templates/parts/doccad.html:16
+#: templates/documents/files.html:128 templates/parts/doccad.html:16
 msgid "Download merged PDF files"
+msgstr "Télécharger les fichiers pdf fusionnés"
+
+#: templates/documents/files.html:134
+msgid "Confirm CHECK-OUT"
+msgstr "Confirmez CHECK-OUT"
+
+#: templates/documents/files.html:135
+msgid ""
+"You'are checking out a standardfile while a native file is available. Your "
+"native file will be deprecated and will not be usable anymore."
 msgstr ""
+"Vous êtes en train de télécharger un fichier standard alors qu'un fichier "
+"natif est disponible. Votrefichier natif sera déprécié et ne sera plus "
+"utilisable."
+
+#: templates/documents/files.html:141
+msgid "Deprecated files:"
+msgstr "Fichiers dépréciés:"
 
 #: templates/documents/files_add.html:7
 msgid "Add new file / Check-in file :"
@@ -1303,154 +1303,168 @@ msgstr "DECONNECTER"
 msgid "There are no parts attached to this document"
 msgstr "Il n'y a pas de part attachée à ce document"
 
+#: templates/documents/revisions.html:12
+msgid ""
+"Here is the list of parts you may want to attach to the new revision. Select "
+"parts you want to attach and validate to make a new revision."
+msgstr ""
+"Ceci est la liste des parts que vous pourriez attacher à la nouvelle "
+"révision. Selectionnezles parts que vous voulez attacher et validez pour "
+"créer une nouvelle révision."
+
 #: templates/groups/accept_invitation.html:5
 msgid "Accept invitation ?"
-msgstr ""
+msgstr "Accepter l'invitation ?"
 
 #: templates/groups/accept_invitation.html:7
-#, python-format
 msgid ""
 "\n"
-"            Accept that %(guest)s join the group %(group)s ?\n"
-"        "
+"Accept that %(guest)s join the group %(group)s ?\n"
 msgstr ""
+"\n"
+"Accepter que %(guest)s rejoigne le groupe %(group)s ?\n"
 
 #: templates/groups/accept_invitation.html:11
-#, python-format
 msgid ""
 "\n"
-"            Accept to join the group %(group)s ?\n"
-"        "
+"Accept to join the group %(group)s ?\n"
 msgstr ""
+"\n"
+"Accepter de rejoindre le groupe %(group)s ?\n"
 
 #: templates/groups/add_user.html:6
 msgid "Invite a new user to the group:"
-msgstr ""
+msgstr "Inviter un nouvel utilisateur dans le groupe:"
 
 #: templates/groups/add_user.html:7
 msgid "The user will receive an e-mail and could accept your invitation."
-msgstr ""
+msgstr "L'utilisateur va recevoir un mail et pourra accepter votre invitation."
 
 #: templates/groups/add_user.html:12
 msgid "You can not invite an user to this group."
-msgstr ""
+msgstr "Vous ne pouvez pas inviter un utilisateur à ce groupe."
 
 #: templates/groups/ask_to_join.html:6
 msgid "You are already in this group."
-msgstr ""
+msgstr "Vous êtes déjà dans ce groupe."
 
 #: templates/groups/ask_to_join.html:8
 msgid "Join this group ?"
-msgstr ""
+msgstr "Rejoindre ce groupe ?"
+
+#: templates/groups/pending_invitations.html:7
+msgid "Group"
+msgstr "Groupe"
 
 #: templates/groups/pending_invitations.html:10 templates/groups/users.html:29
 msgid "First name"
 msgstr "Prénom"
 
 #: templates/groups/pending_invitations.html:11 templates/groups/users.html:30
-#, fuzzy
 msgid "Last name"
 msgstr "Prénom"
 
 #: templates/groups/pending_invitations.html:12
-#, fuzzy
 msgid "Date of the invitation"
-msgstr "date de création"
+msgstr "Date de l'invitation"
 
 #: templates/groups/pending_invitations.html:37
 msgid "Resend"
-msgstr ""
+msgstr "Renvoyer"
 
 #: templates/groups/pending_invitations.html:45
 msgid "Accept"
-msgstr ""
+msgstr "Accepter"
 
 #: templates/groups/pending_invitations.html:50
 msgid "Refuse"
-msgstr ""
+msgstr "Refuser"
 
 #: templates/groups/refuse_invitation.html:5
 msgid "Refuse invitation ?"
-msgstr ""
+msgstr "Refuser l'invitation ?"
 
 #: templates/groups/refuse_invitation.html:7
-#, python-format
 msgid ""
 "\n"
-"            Refuse that %(guest)s join the group %(group)s ?\n"
-"        "
+"Refuse that %(guest)s join the group %(group)s ?\n"
 msgstr ""
+"\n"
+"Refuser que %(guest)s rejoigne le groupe %(group)s ?\n"
 
 #: templates/groups/refuse_invitation.html:11
-#, python-format
 msgid ""
 "\n"
-"            Refuse to join the group %(group)s ?\n"
-"        "
+"Refuse to join the group %(group)s ?\n"
 msgstr ""
+"\n"
+" Refuser de rejoindre le groupe %(group)s ?\n"
 
 #: templates/groups/users.html:8
-#, fuzzy
 msgid "Users"
-msgstr "Identifiant"
+msgstr "Utilisateurs"
 
 #: templates/groups/users.html:13
 msgid "Invite another user"
-msgstr ""
+msgstr "Inviter un autre utilisateur"
 
 #: templates/groups/users.html:15
 msgid "Remove selected users"
-msgstr ""
+msgstr "Retirer les utilisateurs sélectionnés"
 
 #: templates/groups/users.html:19
 msgid "Ask to join this group"
-msgstr ""
+msgstr "Demander de rejoindre ce groupe"
 
 #: templates/groups/users.html:71
 msgid "Pending invitations"
-msgstr ""
+msgstr "Invitations en attente"
 
 #: templates/groups/users.html:72
 msgid ""
 "The following invitations have been sent but guests have not yet accepted "
 "them."
 msgstr ""
+"Les invitations suivantes ont été envoyées mais les destinataires ne les ont "
+"pas encore acceptées."
 
 #: templates/import/csv.html:6
 msgid "Import of a csv file"
-msgstr ""
+msgstr "Importer un fichier csv"
 
 #: templates/import/csv.html:16
-#, fuzzy
 msgid "Error"
-msgstr "Erreur :"
+msgstr "Erreur"
 
 #: templates/import/csv.html:22
 #, python-format
 msgid " Line %(line)s "
-msgstr ""
+msgstr "Ligne %(line)s"
 
 #: templates/import/csv.html:32
 msgid "Error while reading the CSV file. Try upload a new file."
 msgstr ""
+"Erreur de lecture du fichier csv. Essayez de télécharger un nouveau fichier."
 
 #: templates/import/csv.html:35
 msgid ""
 "The given encoding seems wrong. Try upload a new file with the right "
 "encoding."
 msgstr ""
+"L'encodage fourni ne semble pas correct. Essayez de télécharger un nouveau "
+"fichier avec l'encodage correct."
 
 #: templates/import/csv.html:50
 msgid "Field"
-msgstr ""
+msgstr "Champ"
 
 #: templates/import/csv.html:51
 msgid "Header"
-msgstr ""
+msgstr "Entête"
 
 #: templates/import/csv.html:53
 msgid "Row"
-msgstr ""
+msgstr "Ligne"
 
 #: templates/import/csv.html:68 templates/parts/bom_edit.html:48
 #: templates/snippets/undo_form.html:13
@@ -1459,104 +1473,102 @@ msgstr "Valider"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
-msgstr ""
+msgstr "Les données ont été importées avec succès."
 
 #: templates/import/done.html:8
 msgid "Click here to import a new CSV file."
-msgstr ""
+msgstr "Cliquez ici pour importer un nouveau fichier csv."
 
 #: templates/import/done.html:9
 msgid "Click here to import a new BOM."
-msgstr ""
+msgstr "Cliquez ici pour importer une nouvelle nomenclature."
 
 #: templates/import/done.html:10
 msgid "Click here to sponsor more users."
-msgstr ""
+msgstr "Cliquez ici pour parrainer plus d'utilisateurs."
 
 #: templates/mails/history.html:6
 msgid "Message from openPLM"
-msgstr ""
+msgstr "Message venant d'openPLM"
 
 #: templates/mails/history.html:8
 msgid "Object:"
-msgstr ""
+msgstr "Objet:"
 
 #: templates/mails/history.html:11
 msgid "A new action has been done:"
-msgstr ""
+msgstr "Une nouvelle action a été exécutée:"
 
 #: templates/mails/history.html:14
-#, fuzzy
 msgid "Details"
-msgstr "détail technique"
+msgstr "Détails"
 
 #: templates/mails/history.html:32
 msgid "Click here to see more details."
-msgstr ""
+msgstr "Cliquez ici pour avoir plus de détails."
 
 #: templates/mails/invitation1.html:5 templates/mails/invitation2.html:5
-#, python-format
 msgid ""
 "\n"
-"        %(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
 "the group %(group)s.\n"
-"        "
 msgstr ""
+"\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s) vous demande de rejoindre "
+"le groupe %(group)s.\n"
 
 #: templates/mails/invitation1.html:11 templates/mails/invitation2.html:11
 msgid "Click here to accept the invitation"
-msgstr ""
+msgstr "Cliquez ici pour accepter l'invitation"
 
 #: templates/mails/invitation1.html:12 templates/mails/invitation2.html:12
 msgid "Accept invitation"
-msgstr ""
+msgstr "Accepter l'invitation"
 
 #: templates/mails/invitation1.html:14 templates/mails/invitation2.html:14
 msgid "Click here to refuse the invitation"
-msgstr ""
+msgstr "Cliquez ici pour refuser l'invitation"
 
 #: templates/mails/invitation1.html:15 templates/mails/invitation2.html:15
 msgid "Refuse invitation"
-msgstr ""
+msgstr "Refuser l'invitation"
 
 #: templates/mails/new_account.html:5
-#, python-format
 msgid ""
 "\n"
-"            Welcome %(first_name)s %(last_name)s!\n"
-"            "
+"Welcome %(first_name)s %(last_name)s!\n"
 msgstr ""
+"\n"
+" Bienvenue %(first_name)s %(last_name)s!\n"
 
 #: templates/mails/new_account.html:10
-#, python-format
 msgid ""
 "\n"
-"        %(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
 "OpenPLM.\n"
-"        "
 msgstr ""
+"\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s) vous a ajouté à openPLM.\n"
 
 #: templates/mails/new_account.html:16
 msgid "Your credentials:"
-msgstr ""
+msgstr "Vos informations d'identification"
 
 #: templates/mails/new_account.html:21
-#, fuzzy
 msgid "Username:"
-msgstr "Identifiant"
+msgstr "Identifiant:"
 
 #: templates/mails/new_account.html:25
-#, fuzzy
 msgid "Password:"
 msgstr "Mot de passe :"
 
 #: templates/mails/new_account.html:30
 msgid "You should change your password!"
-msgstr ""
+msgstr "Vous devez changer votre mot de passe!"
 
 #: templates/mails/new_account.html:32
 msgid "Click here to change your password"
-msgstr ""
+msgstr "Cliquez ici pour changer votre mot de passe"
 
 #: templates/parts/bom.html:27 templates/parts/parents.html:13
 msgid "GO !"
@@ -1564,7 +1576,7 @@ msgstr "GO !"
 
 #: templates/parts/bom.html:31
 msgid "Level"
-msgstr ""
+msgstr "Niveau"
 
 #: templates/parts/bom.html:32
 msgid "Ord."
@@ -1576,7 +1588,7 @@ msgstr "Qté"
 
 #: templates/parts/bom.html:34 templates/parts/bom_edit.html:13
 msgid "Unit"
-msgstr ""
+msgstr "Unité"
 
 #: templates/parts/bom_edit.html:11
 msgid "Order"
@@ -1591,17 +1603,41 @@ msgid "Delete ?"
 msgstr "Effacer ?"
 
 #: templates/parts/doccad.html:49
-#, fuzzy
 msgid "There are no documents attached to this part."
-msgstr "Il n'y a pas de document attaché à cette part"
+msgstr "Il n'y a pas de document attaché à cette part."
 
 #: templates/parts/doccad.html:58
 msgid "Attach another document"
-msgstr ""
+msgstr "Attacher un autre document"
 
 #: templates/parts/doccad_add.html:7
 msgid "Connect new document :"
 msgstr "Connecter nouveau document :"
+
+#: templates/parts/revisions.html:13
+msgid ""
+"Here is the list of documents you may want to attach to the new revision. "
+"Select documents you want to attach."
+msgstr ""
+"Voici la liste des documents que vous pourriez attacher à la nouvelle "
+"révision.Sélectionnez les documents que vous voulez attacher."
+
+#: templates/parts/revisions.html:35
+msgid ""
+"Here is the list of parts you may want to add to the new revision. Select "
+"parts you want to add."
+msgstr ""
+"Voici la liste des parts que vous pourriez attacher à la nouvelle révision. "
+"Sélectionnez les parts que vous voulez attacher."
+
+#: templates/parts/revisions.html:57
+msgid ""
+"Here is the list of the current parents you may want to update to link to "
+"the new revision. Select parts you want to update."
+msgstr ""
+"Voici la liste des parents actuels que vous pourriez vouloir mettre à jour "
+"en les liantà la nouvelle révision. Sélectionnez les parts que vous voulez "
+"mettre à jour."
 
 #: templates/users/delegation.html:8
 msgid "START DELEGATE :"
@@ -1629,7 +1665,7 @@ msgstr "NOTIFICATIONS"
 
 #: templates/users/delegation.html:26
 msgid "Sponsor"
-msgstr ""
+msgstr "Parrain"
 
 #: templates/users/delegation.html:33
 msgid "First Name"
@@ -1649,7 +1685,7 @@ msgstr "ARRETER DELEGATION"
 
 #: templates/users/delegation.html:56
 msgid "Resend mail"
-msgstr ""
+msgstr "Envoyer le mail à nouveau"
 
 #: templates/users/password.html:7
 msgid "PASSWORD MODIFICATION:"
@@ -1666,70 +1702,12 @@ msgstr "Sponsoriser un nouvel utilisateur"
 #: templates/users/sponsor.html:10
 msgid "Click here to sponsor several users from a CSV file."
 msgstr ""
+"Cliquez ici pour parrainer plusieurs utilisateurs en utilisant un fichier "
+"csv."
 
 #: templates/users/sponsor.html:16
 msgid "You can not sponsor a new user since you are not a contributor."
 msgstr ""
+"Vous ne pouvez pas parrainer un nouvel utilisateur car vous n'êtes pas un "
+"contributeur"
 
-#: todolist/models.py:10
-msgid "defect"
-msgstr ""
-
-#: todolist/models.py:11
-#, fuzzy
-msgid "enhancement"
-msgstr "gestion"
-
-#: todolist/models.py:12
-msgid "task"
-msgstr ""
-
-#: todolist/models.py:16
-msgid "blocker"
-msgstr ""
-
-#: todolist/models.py:17
-msgid "critical"
-msgstr ""
-
-#: todolist/models.py:18
-msgid "major"
-msgstr ""
-
-#: todolist/models.py:19
-msgid "minor"
-msgstr ""
-
-#: todolist/models.py:20
-msgid "trivial"
-msgstr ""
-
-#~ msgid "cad"
-#~ msgstr "cao"
-
-#~ msgid "FIND"
-#~ msgstr "TROUVER"
-
-#~ msgid "Reference"
-#~ msgstr "Référence"
-
-#~ msgid "Rev."
-#~ msgstr "Rév."
-
-#~ msgid "Name"
-#~ msgstr "Nom"
-
-#~ msgid "active,inactive"
-#~ msgstr "actif,inactif"
-
-#~ msgid "Revision"
-#~ msgstr "Révision"
-
-#~ msgid "e-mail."
-#~ msgstr "e-mail."
-
-#~ msgid "e-mail"
-#~ msgstr "e-mail"
-
-#~ msgid "Add"
-#~ msgstr "Ajouter"
