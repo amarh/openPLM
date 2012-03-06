@@ -339,3 +339,22 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual("beer", child2.link.extensions[0].custom_attribute)
         self.assertEqual(3, models.ParentChildLink.objects.count())
         self.assertEqual(2, MockExtension.objects.count())
+
+    def test_bom_view(self):
+        """
+        Tests the bom view with a custom attribute.
+        """
+        fname = mockext + "_custom_attribute"
+        self.controller.add_child(self.controller2, 10, 15, "-",
+                **{mockext:{"custom_attribute":"val1"}})
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get(self.controller.plmobject_url + "BOM-child/")
+        children = response.context["children"]
+        self.assertEqual(1, len(children))
+        extra_columns = response.context["extra_columns"]
+        self.assertEqual([(u"custom_attribute", "custom attribute")], extra_columns)
+        extension_data = response.context["extension_data"]
+        link = self.controller.get_children()[0].link
+        self.assertEqual({link : {u"custom_attribute" : "val1"}}, extension_data)
+        
+
