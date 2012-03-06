@@ -52,7 +52,7 @@ class CommonViewTest(BaseTestCase):
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
                                               self.controller.reference,
                                               self.controller.revision)
-        brian = User.objects.create(username="Brian", password="life",
+        brian = User.objects.create_user(username="Brian", password="life",
                 email="brian@example.net")
         brian.get_profile().is_contributor = True
         brian.get_profile().save()
@@ -1567,7 +1567,37 @@ class GroupViewTestCase(CommonViewTest):
         # check a mail has been sent to brian
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual(mail.outbox[0].to, [self.brian.email])
-        
+    
+    def test_user_join_get(self):
+        """
+        Tests the page to ask to join the group, get version.
+        """
+        authenticated = self.client.login(username="Brian", password="life")
+        self.assertTrue(authenticated)
+        response = self.get(self.group_url + "users/join/", page="users")
+        self.assertFalse(response.context["in_group"])
+
+    def test_user_join_post(self):
+        """
+        Tests the page to ask to join the group, post version.
+        """
+        mail.outbox = []
+        self.client.login(username="Brian", password="life")
+        data = {"type" : "User", "username" : self.brian.username}
+        response = self.post(self.group_url + "users/join/", data=data)
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertTrue(inv.guest_asked)
+        self.assertEqual(m.Invitation.PENDING, inv.state)
+        self.assertFalse(self.brian.groups.count())
+        # get the users page
+        response = self.get(self.group_url + "users/")
+        pending = response.context["pending_invitations"]
+        self.assertEqual([inv], list(pending))
+        # check a mail has been sent to brian
+        self.assertEqual(1, len(mail.outbox))
+        self.assertEqual(mail.outbox[0].to, [self.user.email])
+             
     
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
