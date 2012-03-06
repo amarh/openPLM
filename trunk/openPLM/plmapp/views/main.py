@@ -1221,6 +1221,7 @@ def group_add_user(request, obj_ref):
         form = forms.SelectUserForm()
     ctx["add_user_form"] = form
     ctx['current_page'] = 'users' 
+    ctx['link_creation'] = True
     return r2r("groups/add_user.html", ctx, request)
 
 @handle_errors
