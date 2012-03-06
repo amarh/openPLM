@@ -1597,8 +1597,72 @@ class GroupViewTestCase(CommonViewTest):
         # check a mail has been sent to brian
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual(mail.outbox[0].to, [self.user.email])
-             
+
+    def _do_test_accept_invitation_get(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        response = self.get(self.group_url + "invitation/accept/%s/" % inv.token,
+                page="users")
+        self.assertEqual(inv, response.context["invitation"])
+        form = response.context["invitation_form"]
+        self.assertEqual(form.initial["invitation"], inv)
+        # check that brian does not belong to the group
+        self.assertFalse(self.brian.groups.count())
+        self.assertFalse(mail.outbox)
     
+    def test_accept_invitation_from_guest_get(self):
+        """
+        Tests the page to accept an invitation, get version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_accept_invitation_get()
+
+    def _do_test_accept_invitation_post(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.post(self.group_url + "invitation/accept/%s/" % inv.token,
+                page="users", data=data)
+        # checks that brian belongs to the group
+        self.assertFalse(response.context["pending_invitations"])
+        form = response.context["user_formset"].forms[0]
+        self.assertEqual(self.brian, form.initial["user"])
+        self.assertTrue(self.brian.groups.filter(id=self.group.id).exists())
+        self.assertEqual(1, len(mail.outbox))
+        # a notification is sent to the owner and to the guest
+        self.assertEqual(set(mail.outbox[0].to), 
+                set([self.user.email, self.brian.email]))
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.ACCEPTED, inv.state)
+
+    def test_accept_invitation_from_guest_post(self):
+        """
+        Tests the page to accept an invitation, post version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_accept_invitation_post()
+    
+    def test_accept_invitation_from_owner_get(self):
+        """
+        Tests the page to accept an invitation, get version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_accept_invitation_get()
+
+    def test_accept_invitation_from_owner_post(self):
+        """
+        Tests the page to accept an invitation, post version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_accept_invitation_post()
+
+
+
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
 
