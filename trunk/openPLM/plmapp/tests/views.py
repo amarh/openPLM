@@ -1661,6 +1661,63 @@ class GroupViewTestCase(CommonViewTest):
         self.client.login(username="Brian", password="life")
         self._do_test_accept_invitation_post()
 
+    def _do_test_refuse_invitation_get(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        response = self.get(self.group_url + "invitation/refuse/%s/" % inv.token,
+                page="users")
+        self.assertEqual(inv, response.context["invitation"])
+        form = response.context["invitation_form"]
+        self.assertEqual(form.initial["invitation"], inv)
+        # check that brian does not belong to the group
+        self.assertFalse(self.brian.groups.count())
+        self.assertFalse(mail.outbox)
+    
+    def test_refuse_invitation_from_guest_get(self):
+        """
+        Tests the page to refuse an invitation, get version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_refuse_invitation_get()
+
+    def _do_test_refuse_invitation_post(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.post(self.group_url + "invitation/refuse/%s/" % inv.token,
+                page="users", data=data)
+        # checks that brian does not belong to the group
+        self.assertFalse(response.context["pending_invitations"])
+        self.assertFalse(response.context["user_formset"].forms)
+        self.assertFalse(self.brian.groups.filter(id=self.group.id).exists())
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.REFUSED, inv.state)
+
+    def test_refuse_invitation_from_guest_post(self):
+        """
+        Tests the page to refuse an invitation, post version.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_refuse_invitation_post()
+    
+    def test_refuse_invitation_from_owner_get(self):
+        """
+        Tests the page to refuse an invitation, get version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_refuse_invitation_get()
+
+    def test_refuse_invitation_from_owner_post(self):
+        """
+        Tests the page to refuse an invitation, post version.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_refuse_invitation_post()
 
 
 def sorted_objects(l):
