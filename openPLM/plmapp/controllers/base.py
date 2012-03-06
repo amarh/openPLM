@@ -133,8 +133,8 @@ class Controller(object):
 
     HISTORY = models.AbstractHistory
 
-    def __init__(self, obj, user):
-        self._mail_blocked = False
+    def __init__(self, obj, user, block_mails=False, no_index=False):
+        self._mail_blocked = block_mails
         self._pending_mails = deque()
         self._user = user
         # variable to store attribute changes
@@ -142,6 +142,8 @@ class Controller(object):
         # cache for permissions (dict(role->bool)) 
         self.__permissions = {}
         self.object = obj
+        if no_index:
+            obj.no_index = True
 
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly
