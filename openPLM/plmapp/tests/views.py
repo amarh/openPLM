@@ -1574,6 +1574,48 @@ class GroupViewTestCase(CommonViewTest):
         self.assertEqual(0, user_formset.total_form_count())
         self.assertTrue(response.context["in_group"])
 
+    def test_users_get(self):
+        self.brian.groups.add(self.group)
+        response = self.get(self.group_url + "users/", page="users")
+        user_formset = response.context["user_formset"]
+        self.assertEqual(1, user_formset.total_form_count())
+        form = user_formset.forms[0]
+        self.assertFalse(form.fields["delete"].initial)
+        self.assertEqual(self.brian, form.initial["user"])
+        self.assertEqual(self.group, form.initial["group"])
+
+    def test_users_post(self):
+        self.brian.groups.add(self.group)
+        data = {
+            'form-TOTAL_FORMS' : '1',
+            'form-INITIAL_FORMS' : '1',
+            'form-MAX_NUM_FORMS' : 1,
+            'form-0-group' : self.group.id,
+            'form-0-user' : self.brian.id,
+            'form-0-delete' : 'on',
+            }
+        response = self.post(self.group_url + "users/", data)
+        self.assertEqual([], list(self.brian.groups.all()))
+    
+    def test_users_post_nodeletetion(self):
+        self.brian.groups.add(self.group)
+        data = {
+            'form-TOTAL_FORMS' : '1',
+            'form-INITIAL_FORMS' : '1',
+            'form-MAX_NUM_FORMS' : 1,
+            'form-0-group' : self.group.id,
+            'form-0-user' : self.brian.id,
+            'form-0-delete' : '',
+            }
+        response = self.post(self.group_url + "users/", data)
+        self.assertTrue(self.brian.groups.filter(id=self.group.id).exists())
+        user_formset = response.context["user_formset"]
+        self.assertEqual(1, user_formset.total_form_count())
+        form = user_formset.forms[0]
+        self.assertFalse(form.fields["delete"].initial)
+        self.assertEqual(self.brian, form.initial["user"])
+        self.assertEqual(self.group, form.initial["group"])
+
     def test_plmobjects(self):
         response = self.get(self.group_url + "objects/", page="objects")
         objects = response.context["objects"]
