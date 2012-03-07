@@ -46,9 +46,14 @@ First, you must install some dependencies:
     #. ``easy_install django-celery``
     #. ``easy_install 'django-haystack<2'``
     #. ``apt-get install postgresql python-psycopg2``
-    #. ``apt-get install tracker-extract``
     #. ``easy_install lepl``
     #. ``apt-get install python-pisa``
+
+To enable plain text search on files, you need to install the following
+dependencies:
+
+    #. ``apt-get install poppler-utils html2text odt2txt antiword catdoc``
+    #. ``easy_install openxmllib``
    
 Check applications are ok
 ===============================
