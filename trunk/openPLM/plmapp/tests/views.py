@@ -2126,6 +2126,25 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("NOT nothing", self.TYPE)
         self.assertEqual([self.controller.object], results)
 
+    def test_search_invalid_type(self):
+        results = self.search("NOT nothing", "InvalidType")
+        self.assertEqual([], results)
+
+    def test_search_in_file(self):
+        doc = DocumentController.create("doccc", "Document", "d",
+                self.user, self.DATA)
+        df = doc.add_file(self.get_file(name="pppp.txt", data="monocle monocle"))
+        results = self.search("monocle", "Document")
+        self.assertEqual([df], results)
+        results = self.search("monocl*", "Document")
+        self.assertEqual([df], results)
+        results = self.search("file:monocl*", "Document")
+        self.assertEqual([df], results)
+        results = self.search("dfdf", "Document")
+        self.assertEqual([], results)
+        results = self.search("pppp.txt", "Document")
+        self.assertEqual([df], results)
+
 
 class MechantUserViewTest(TestCase):
     """
