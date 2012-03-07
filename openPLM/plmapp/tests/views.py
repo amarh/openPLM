@@ -1716,6 +1716,38 @@ class GroupViewTestCase(CommonViewTest):
         GroupController(self.group, self.brian).ask_to_join()
         self._do_test_accept_invitation_get()
 
+    def _do_test_accept_invitation_post_error(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.client.post(self.group_url + "invitation/accept/%s/" % inv.token,
+                data=data)
+        self.assertTemplateUsed(response, "error.html")
+        # checks that brian does not belong to the group
+        self.assertFalse(self.brian.groups.filter(id=self.group.id).exists())
+        self.assertEqual(0, len(mail.outbox))
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.PENDING, inv.state)
+
+    def test_accept_invitation_from_guest_post_error(self):
+        """
+        Tests the page to accept an invitation, post version,
+        Error: not the guest asks and accepts.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self.client.login(username="Brian", password="life")
+        self._do_test_accept_invitation_post_error()
+
+    def test_accept_invitation_from_owner_post_error(self):
+        """
+        Tests the page to accept an invitation, post version.
+        Error: the owner adds and accepts.
+        """
+        self.controller.add_user(self.brian)
+        self._do_test_accept_invitation_post_error()
+
     def _do_test_accept_invitation_post(self):
         mail.outbox = []
         inv = m.Invitation.objects.get(group=self.group,
@@ -1817,6 +1849,70 @@ class GroupViewTestCase(CommonViewTest):
         self.client.login(username="Brian", password="life")
         self._do_test_refuse_invitation_post()
 
+    def _do_test_refuse_invitation_post_error(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.client.post(self.group_url + "invitation/refuse/%s/" % inv.token,
+                data=data)
+        self.assertTemplateUsed(response, "error.html")
+        # checks that brian does not belong to the group
+        self.assertFalse(self.brian.groups.filter(id=self.group.id).exists())
+        self.assertEqual(0, len(mail.outbox))
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.PENDING, inv.state)
+
+    def test_refuse_invitation_from_guest_post_error(self):
+        """
+        Tests the page to refuse an invitation, post version,
+        Error: not the guest asks and refuses.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self.client.login(username="Brian", password="life")
+        self._do_test_refuse_invitation_post_error()
+
+    def test_refuse_invitation_from_owner_post_error(self):
+        """
+        Tests the page to refuse an invitation, post version.
+        Error: the owner adds and refuses.
+        """
+        self.controller.add_user(self.brian)
+        self._do_test_refuse_invitation_post_error()
+
+    def _do_test_send_invitation_post_error(self):
+        mail.outbox = []
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        data = {"invitation" : inv.pk }
+        response = self.client.post(self.group_url + "invitation/send/%s/" % inv.token,
+                data=data)
+        self.assertTemplateUsed(response, "error.html")
+        # checks that brian does not belong to the group
+        self.assertFalse(self.brian.groups.filter(id=self.group.id).exists())
+        self.assertEqual(0, len(mail.outbox))
+        inv = m.Invitation.objects.get(group=self.group,
+                guest=self.brian, owner=self.user)
+        self.assertEqual(m.Invitation.PENDING, inv.state)
+
+    def test_send_invitation_from_guest_post_error(self):
+        """
+        Tests the page to send an invitation, post version,
+        Error: not the guest asks and sends.
+        """
+        GroupController(self.group, self.brian).ask_to_join()
+        self._do_test_send_invitation_post_error()
+
+    def test_send_invitation_from_owner_post_error(self):
+        """
+        Tests the page to send an invitation, post version.
+        Error: the owner adds and sends.
+        """
+        self.controller.add_user(self.brian)
+        self.client.login(username="Brian", password="life")
+        self._do_test_send_invitation_post_error()
+
     def _do_test_send_invitation_get(self):
         mail.outbox = []
         inv = m.Invitation.objects.get(group=self.group,
@@ -1832,6 +1928,7 @@ class GroupViewTestCase(CommonViewTest):
         Tests the page to send an invitation, get version.
         """
         GroupController(self.group, self.brian).ask_to_join()
+        self.client.login(username="Brian", password="life")
         self._do_test_send_invitation_get()
 
     def _do_test_send_invitation_post(self, from_owner):
@@ -1858,6 +1955,7 @@ class GroupViewTestCase(CommonViewTest):
         Tests the page to send an invitation, post version.
         """
         GroupController(self.group, self.brian).ask_to_join()
+        self.client.login(username="Brian", password="life")
         self._do_test_send_invitation_post(False)
     
     def test_send_invitation_from_owner_get(self):
@@ -1865,7 +1963,6 @@ class GroupViewTestCase(CommonViewTest):
         Tests the page to send an invitation, get version.
         """
         self.controller.add_user(self.brian)
-        self.client.login(username="Brian", password="life")
         self._do_test_send_invitation_get()
 
     def test_send_invitation_from_owner_post(self):
@@ -1873,7 +1970,6 @@ class GroupViewTestCase(CommonViewTest):
         Tests the page to send an invitation, post version.
         """
         self.controller.add_user(self.brian)
-        self.client.login(username="Brian", password="life")
         self._do_test_send_invitation_post(True)
 
  
