@@ -344,7 +344,6 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         """
         Tests the bom view with a custom attribute.
         """
-        fname = mockext + "_custom_attribute"
         self.controller.add_child(self.controller2, 10, 15, "-",
                 **{mockext:{"custom_attribute":"val1"}})
         self.client.login(username=self.user.username, password="password")
@@ -357,4 +356,56 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         link = self.controller.get_children()[0].link
         self.assertEqual({link : {u"custom_attribute" : "val1"}}, extension_data)
         
+    def test_bom_edit_post(self):
+        fname = mockext + "_custom_attribute"
+        self.controller.add_child(self.controller2, 10, 15, "-",
+                **{mockext:{"custom_attribute":"val1"}})
+        self.client.login(username=self.user.username, password="password")
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'1',
+            'form-MAX_NUM_FORMS': u'',
+            'form-0-child' : self.controller2.id,
+            'form-0-id' : self.controller.get_children()[0].link.id,
+            'form-0-order' : 45,
+            'form-0-parent': self.controller.id,
+            'form-0-quantity' : '45.0',
+            'form-0-unit' : 'cm',
+            'form-0-%s' % fname : 'new_value',
+        }
+        response = self.client.post(self.controller.plmobject_url + "BOM-child/edit/",
+                data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        link = self.controller.get_children()[0].link
+        self.assertEqual(45.0, link.quantity)
+        self.assertEqual(45, link.order)
+        self.assertEqual('cm', link.unit)
+        self.assertEqual("new_value", link.extensions[0].custom_attribute)
+
+    def test_bom_edit_post_error_invalid_value(self):
+        fname = mockext + "_custom_attribute"
+        self.controller.add_child(self.controller2, 10, 15, "-",
+                **{mockext:{"custom_attribute":"val1"}})
+        self.client.login(username=self.user.username, password="password")
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'1',
+            'form-MAX_NUM_FORMS': u'',
+            'form-0-child' :   self.controller2.id,
+            'form-0-id'  : self.controller.get_children()[0].link.id,
+            'form-0-order'  :  45,
+            'form-0-parent' :  self.controller.id,
+            'form-0-quantity' :  '45.0',
+            'form-0-unit' :  'cm',
+            'form-0-%s' % fname : 'new_value' * 10, # too long value
+        }
+        formset = forms.get_children_formset(self.controller, data)
+        response = self.client.post(self.controller.plmobject_url + "BOM-child/edit/",
+                data, follow=True)
+        link = self.controller.get_children()[0].link
+        self.assertEqual(10, link.quantity)
+        self.assertEqual(15, link.order)
+        self.assertEqual('-', link.unit)
+        self.assertEqual("val1", link.extensions[0].custom_attribute)
+        self.assertFalse(response.context["children_formset"].is_valid())
 

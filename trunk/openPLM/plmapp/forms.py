@@ -367,7 +367,11 @@ class AddChildForm(PLMObjectForm):
             data = {}
             for field in fields:
                 field_name = "%s_%s" % (PCLE._meta.module_name, field)
-                data[field] = self.cleaned_data[field_name]
+                try:
+                    data[field] = self.cleaned_data[field_name]
+                except KeyError:
+                    # the form is invalid
+                    pass
             self.extensions[PCLE._meta.module_name] = data
         return self.cleaned_data
 
@@ -399,7 +403,11 @@ class ModifyChildForm(forms.ModelForm):
             data = {}
             for field in fields:
                 field_name = "%s_%s" % (PCLE._meta.module_name, field)
-                data[field] = self.cleaned_data[field_name]
+                try:
+                    data[field] = self.cleaned_data[field_name]
+                except KeyError:
+                    # the form is invalid
+                    pass
             self.extensions[PCLE._meta.module_name] = data
         return self.cleaned_data
 
