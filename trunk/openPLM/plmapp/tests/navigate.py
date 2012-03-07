@@ -2,7 +2,7 @@ import lxml.html
 
 from django.contrib.auth.models import User
 
-from openPLM.plmapp.navigate import NavigationGraph
+from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.controllers import PartController, DocumentController,\
         UserController, GroupController
 
@@ -24,8 +24,8 @@ class NavigateTestCase(BaseTestCase):
         self.user.save()
         self.root = self.json = None
 
-    def get_graph_data(self, options):
-        graph = NavigationGraph(self.controller)
+    def get_graph_data(self, options, results=()):
+        graph = NavigationGraph(self.controller, results)
         graph.set_options(options)
         graph.create_edges()
         html, json = graph.render()
@@ -68,41 +68,53 @@ class PLMObjectNavigateTestCase(NavigateTestCase):
         """
         Tests a navigate with the "owner" option set.
         """
-        self.get_graph_data({"owner" : True })
-        self.assertCount(2, 1)
-        main, owner = self.nodes
-        self.assertEqual("owner", self.edges[0].text_content())
-        text = owner.text_content().strip()
-        self.assertTrue(self.user.first_name in text)
-        self.assertTrue(self.user.last_name in text)
+        for osr, results in ((False, ()), (True, (self.user,))):
+            self.get_graph_data({"owner" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, owner = self.nodes
+            self.assertEqual("owner", self.edges[0].text_content())
+            text = owner.text_content().strip()
+            self.assertTrue(self.user.first_name in text)
+            self.assertTrue(self.user.last_name in text)
+        for result in (self.cie, self.group, self.controller.object):
+            self.get_graph_data({"owner" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
        
     def test_navigate_signer(self):
         """
         Tests a navigate with the "signer" option set.
         """
-        self.get_graph_data({"signer" : True })
-        self.assertCount(3, 2)
-        main, signer1, signer2 = self.nodes
-        for edge in self.edges:
-            self.assertTrue("sign" in edge.text_content())
-        for node in (signer1, signer2):
-            text = node.text_content().strip()
-            self.assertTrue(self.user.first_name in text)
-            self.assertTrue(self.user.last_name in text)
-        self.assertNotEqual(signer1.attrib["id"], signer2.attrib["id"])
+        for osr, results in ((False, ()), (True, (self.user,))):
+            self.get_graph_data({"signer" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+            main, signer1, signer2 = self.nodes
+            for edge in self.edges:
+                self.assertTrue("sign" in edge.text_content())
+            for node in (signer1, signer2):
+                text = node.text_content().strip()
+                self.assertTrue(self.user.first_name in text)
+                self.assertTrue(self.user.last_name in text)
+            self.assertNotEqual(signer1.attrib["id"], signer2.attrib["id"])
+        for result in (self.cie, self.group, self.controller.object):
+            self.get_graph_data({"signer" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_notified(self):
         """
         Tests a navigate with the "notified" option set.
         """
         self.controller.set_role(self.cie, "notified")
-        self.get_graph_data({"notified" : True })
-        self.assertCount(2, 1)
-        main, owner = self.nodes
-        self.assertEqual("notified", self.edges[0].text_content())
-        text = owner.text_content().strip()
-        self.assertTrue(self.cie.username in text)
-       
+        for osr, results in ((False, ()), (True, (self.cie,))):
+            self.get_graph_data({"notified" : True })
+            self.assertCount(2, 1)
+            main, owner = self.nodes
+            self.assertEqual("notified", self.edges[0].text_content())
+            text = owner.text_content().strip()
+            self.assertTrue(self.cie.username in text)
+        for result in (self.user, self.group, self.controller.object):
+            self.get_graph_data({"notified" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
+    
 
 class PartNavigateTestCase(NavigateTestCase):
 
@@ -115,28 +127,37 @@ class PartNavigateTestCase(NavigateTestCase):
         child1 = PartController.create("c1", "Part", "k",
                 self.user, data, True, True)
         self.controller.add_child(child1, 15, 789, "kg")
-        self.get_graph_data({"child" : True })
-        self.assertCount(2, 1)
-        main, child_node = self.nodes
-        # check the edge
-        self.assertTrue("789" in self.edges[0].text_content())
-        self.assertTrue("15" in self.edges[0].text_content())
-        self.assertTrue("kg" in self.edges[0].text_content())
-        text = child_node.text_content().strip()
-        self.assertTrue(data["name"] in text)
+        for osr, results in ((False, ()), (True, (child1.object,))):
+            self.get_graph_data({"child" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, child_node = self.nodes
+            # check the edge
+            self.assertTrue("789" in self.edges[0].text_content())
+            self.assertTrue("15" in self.edges[0].text_content())
+            self.assertTrue("kg" in self.edges[0].text_content())
+            text = child_node.text_content().strip()
+            self.assertTrue(data["name"] in text)
         # add another child to child1
         child2 = PartController.create("c2", "Part", "k",
                 self.user, data, True, True)
         child1.add_child(child2, 15, 789, "kg")
-        self.get_graph_data({"child" : True })
-        self.assertCount(3, 2)
+        for osr, results in ((False, ()), (True, (child1.object, child2.object))):
+            self.get_graph_data({"child" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+        # empty graph is child1 is not found
+        self.get_graph_data({"child" : True, OSR : True }, (child2.object,))
+        self.assertCount(1, 0)
         # add child2 to the controller
         # we should have 3 nodes (controller, child1, child2)
         # and 3 edges (controller -> child1, controller -> child2 and 
         # child1 -> child2)
         self.controller.add_child(child2, 15, 789, "kg")
-        self.get_graph_data({"child" : True })
-        self.assertCount(3, 3)
+        for osr, results in ((False, ()), (True, (child1.object, child2.object))):
+            self.get_graph_data({"child" : True, OSR : osr }, results)
+            self.assertCount(3, 3)
+        for result in (self.cie, self.group, self.user, self.controller.object):
+            self.get_graph_data({"child" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_parents(self):
         """
@@ -147,24 +168,32 @@ class PartNavigateTestCase(NavigateTestCase):
         parent1 = PartController.create("c1", "Part", "k",
                 self.user, data, True, True)
         parent1.add_child(self.controller, 15, 789, "kg")
-        self.get_graph_data({"parents" : True })
-        self.assertCount(2, 1)
-        main, parent_node = self.nodes
-        self.assertTrue("789" in self.edges[0].text_content())
-        self.assertTrue("15" in self.edges[0].text_content())
-        self.assertTrue("kg" in self.edges[0].text_content())
-        text = parent_node.text_content().strip()
-        self.assertTrue(data["name"] in text)
+        for osr, results in ((False, ()), (True, (parent1.object, ))):
+            self.get_graph_data({"parents" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, parent_node = self.nodes
+            self.assertTrue("789" in self.edges[0].text_content())
+            self.assertTrue("15" in self.edges[0].text_content())
+            self.assertTrue("kg" in self.edges[0].text_content())
+            text = parent_node.text_content().strip()
+            self.assertTrue(data["name"] in text)
         # add another parent to parent1
         parent2 = PartController.create("c2", "Part", "k",
                 self.user, data, True, True)
         parent2.add_child(parent1, 15, 789, "kg")
-        self.get_graph_data({"parents" : True })
-        self.assertCount(3, 2)
+        for osr, results in ((False, ()), (True, (parent1.object, parent2.object))):
+            self.get_graph_data({"parents" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+        self.get_graph_data({"parents" : True, OSR : True }, (parent2.object,))
+        self.assertCount(1, 0)
         # add the controller to parent2
         parent2.add_child(self.controller, 5, 79, "kg")
-        self.get_graph_data({"parents" : True })
-        self.assertCount(3, 3)
+        for osr, results in ((False, ()), (True, (parent1.object, parent2.object))):
+            self.get_graph_data({"parents" : True, OSR : osr }, results)
+            self.assertCount(3, 3)
+        for result in (self.cie, self.group, self.user, self.controller.object):
+            self.get_graph_data({"parents" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_documents(self):
         """
@@ -175,11 +204,15 @@ class PartNavigateTestCase(NavigateTestCase):
         doc = DocumentController.create("doc", "Document", "d",
                 self.user, data, True, True)
         self.controller.attach_to_document(doc)
-        self.get_graph_data({"doc" : True })
-        self.assertCount(2, 1)
-        main, doc_node = self.nodes
-        text = doc_node.text_content().strip()
-        self.assertTrue(data["name"] in text)
+        for osr, results in ((False, ()), (True, (doc.object,))):
+            self.get_graph_data({"doc" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, doc_node = self.nodes
+            text = doc_node.text_content().strip()
+            self.assertTrue(data["name"] in text)
+        for result in (self.cie, self.group, self.user, self.controller.object):
+            self.get_graph_data({"doc" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_doc_parts(self):
         """
@@ -190,12 +223,13 @@ class PartNavigateTestCase(NavigateTestCase):
         doc = DocumentController.create("doc", "Document", "d",
                 self.user, data, True, True)
         self.controller.attach_to_document(doc)
-        self.get_graph_data({"doc" : False,
-            "doc_parts" : [self.controller.id] })
-        self.assertCount(2, 1)
-        main, doc_node = self.nodes
-        text = doc_node.text_content().strip()
-        self.assertTrue(data["name"] in text)
+        for osr, results in ((False, ()), (True, (doc.object,))):
+            self.get_graph_data({"doc" : False, OSR : osr,
+                "doc_parts" : [self.controller.id] }, results)
+            self.assertCount(2, 1)
+            main, doc_node = self.nodes
+            text = doc_node.text_content().strip()
+            self.assertTrue(data["name"] in text)
 
     def test_navigate_documents2(self):
         """
@@ -211,8 +245,9 @@ class PartNavigateTestCase(NavigateTestCase):
                 self.user, data, True, True)
         self.controller.attach_to_document(doc)
         child1.attach_to_document(doc)
-        self.get_graph_data({"doc" : True, "child" : True})
-        self.assertCount(3, 3)
+        for osr, results in ((False, ()), (True, (doc.object, child1.object))):
+            self.get_graph_data({"doc" : True, "child" : True})
+            self.assertCount(3, 3)
 
 
 class DocumentNavigateTestCase(NavigateTestCase):
@@ -228,41 +263,54 @@ class DocumentNavigateTestCase(NavigateTestCase):
         part = PartController.create("part", "Part", "d",
                 self.user, data, True, True)
         self.controller.attach_to_part(part)
-        self.get_graph_data({"part" : True})
-        self.assertCount(2, 1)
-        main, part_node = self.nodes
-        text = part_node.text_content().strip()
-        self.assertTrue(data["name"] in text)
+        for osr, results in ((False, ()), (True, (part.object,))):
+            self.get_graph_data({"part" : True, OSR: osr}, results)
+            self.assertCount(2, 1)
+            main, part_node = self.nodes
+            text = part_node.text_content().strip()
+            self.assertTrue(data["name"] in text)
+        for result in (self.cie, self.group, self.user, self.controller.object):
+            self.get_graph_data({"part" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
 class GroupNavigateTestCase(NavigateTestCase):
     
     def setUp(self):
         super(GroupNavigateTestCase, self).setUp()
+        self.part = self.controller.object
         self.controller = GroupController(self.group, self.user)
 
     def test_navigate_owner(self):
         """
         Tests a navigate with the "owner" option set.
         """
-        self.get_graph_data({"owner" : True })
-        self.assertCount(2, 1)
-        main, owner = self.nodes
-        self.assertEqual("owner", self.edges[0].text_content())
-        text = owner.text_content().strip()
-        self.assertTrue(self.user.first_name in text)
-        self.assertTrue(self.user.last_name in text)
+        for osr, results in ((False, ()), (True, (self.user,))):
+            self.get_graph_data({"owner" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, owner = self.nodes
+            self.assertEqual("owner", self.edges[0].text_content())
+            text = owner.text_content().strip()
+            self.assertTrue(self.user.first_name in text)
+            self.assertTrue(self.user.last_name in text)
+        for result in (self.cie, self.group, self.part):
+            self.get_graph_data({"owner" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_member(self):
         """
         Tests a navigate with the "member" option set.
         """
-        self.get_graph_data({"user" : True })
-        self.assertCount(2, 1)
-        main, owner = self.nodes
-        self.assertEqual("member", self.edges[0].text_content())
-        text = owner.text_content().strip()
-        self.assertTrue(self.user.first_name in text)
-        self.assertTrue(self.user.last_name in text)
+        for osr, results in ((False, ()), (True, (self.user,))):
+            self.get_graph_data({"user" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, owner = self.nodes
+            self.assertEqual("member", self.edges[0].text_content())
+            text = owner.text_content().strip()
+            self.assertTrue(self.user.first_name in text)
+            self.assertTrue(self.user.last_name in text)
+        for result in (self.cie, self.group, self.part):
+            self.get_graph_data({"member" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_two_members(self):
         """
@@ -275,23 +323,39 @@ class GroupNavigateTestCase(NavigateTestCase):
         brian.get_profile().save()
         brian.groups.add(self.group)
         brian.save()
-        self.get_graph_data({"user" : True })
-        self.assertCount(3, 2)
-        for edge in self.edges:
-            self.assertEqual("member", edge.text_content())
-        for node in self.nodes[1:]:
-            text = node.text_content().strip()
-            self.assertTrue(self.user.first_name in text or brian.username in text)
+        for osr, results in ((False, ()), (True, (self.user, brian))):
+            self.get_graph_data({"user" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+            for edge in self.edges:
+                self.assertEqual("member", edge.text_content())
+            for node in self.nodes[1:]:
+                text = node.text_content().strip()
+                self.assertTrue(self.user.first_name in text or brian.username in text)
+        # only brian
+        self.get_graph_data({"user" : True, OSR : True }, (brian,))
+        self.assertCount(2, 1)
+        self.assertEqual("member", self.edges[0].text_content())
+        text = self.nodes[1].text_content().strip()
+        self.assertTrue(brian.username in text)
+        for result in (self.cie, self.group, self.part):
+            self.get_graph_data({"member" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_part(self):
         """
         Tests a navigate with the "part" option set.
         """
         # we already have one part
-        self.get_graph_data({"part" : True })
-        self.assertCount(2, 1)
-        main, part_node = self.nodes
-        self.assertEqual([part_node], self.root.find_class("node_part"))
+        for osr, results in ((False, ()), (True, (self.part,))):
+            self.get_graph_data({"part" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, part_node = self.nodes
+            self.assertEqual([part_node], self.root.find_class("node_part"))
+        doc = DocumentController.create("d", "Document", "doc",
+                self.user, self.DATA, True, True)
+        for result in (self.cie, self.group, self.user, doc.object):
+            self.get_graph_data({"part" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_doc(self):
         """
@@ -299,10 +363,14 @@ class GroupNavigateTestCase(NavigateTestCase):
         """
         doc = DocumentController.create("d", "Document", "doc",
                 self.user, self.DATA, True, True)
-        self.get_graph_data({"doc" : True })
-        self.assertCount(2, 1)
-        main, doc_node = self.nodes
-        self.assertEqual([doc_node], self.root.find_class("node_document"))
+        for osr, results in ((False, ()), (True, (doc.object,))):
+            self.get_graph_data({"doc" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+            main, doc_node = self.nodes
+            self.assertEqual([doc_node], self.root.find_class("node_document"))
+        for result in (self.cie, self.group, self.part, self.user):
+            self.get_graph_data({"doc" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
 class UserNavigateTestCase(NavigateTestCase):
     
@@ -316,8 +384,17 @@ class UserNavigateTestCase(NavigateTestCase):
         Tests a navigate with the "owned" option set.
         """
         # we already own self.part
-        self.get_graph_data({"owned" : True })
-        self.assertCount(2, 1)
+        for osr, results in ((False, ()), (True, (self.part.object,))):
+            self.get_graph_data({"owned" : True, OSR : osr }, results)
+            self.assertCount(2, 1)
+        doc = DocumentController.create("d", "Document", "doc",
+                self.user, self.DATA, True, True)
+        for osr, results in ((False, ()), (True, (self.part.object, doc.object))):
+            self.get_graph_data({"owned" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+        for result in (self.cie, self.group, self.user):
+            self.get_graph_data({"owned" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
     def test_navigate_doc_parts(self):
         """
@@ -330,9 +407,14 @@ class UserNavigateTestCase(NavigateTestCase):
         doc = DocumentController.create("doc", "Document", "d",
                 self.cie, data, True, True)
         self.part.attach_to_document(doc)
-        self.get_graph_data({"owned" : True,
-            "doc_parts" : [self.part.id] })
-        self.assertTrue(3, 2)
+        for osr, results in ((False, ()), (True, (doc.object,))):
+            self.get_graph_data({"owned" : True, OSR : osr,
+                "doc_parts" : [self.part.id] }, results)
+            self.assertTrue(3, 2)
+        for result in (self.cie, self.group, self.user):
+            self.get_graph_data({"owned" : True, OSR : True,
+                "doc_parts" : [self.part.id]  }, (result,))
+            self.assertCount(1, 0)
         
     def test_navigate_notified(self):
         """
@@ -341,15 +423,21 @@ class UserNavigateTestCase(NavigateTestCase):
         self.get_graph_data({"request_notification_from" : True })
         self.assertCount(1, 0)
         self.part.set_role(self.user, "notified")
-        self.get_graph_data({"request_notification_from" : True })
-        self.assertCount(2, 1)
+        for osr, results in ((False, ()), (True, (self.part.object,))):
+            self.get_graph_data({"request_notification_from" : True, OSR : osr },
+                    results)
+            self.assertCount(2, 1)
 
     def test_navigate_signer(self):
         """
         Tests a navigate with the "to_sign" option set.
         """
-        self.get_graph_data({"to_sign" : True })
-        self.assertCount(3, 2)
-        roles = set(e.text_content().strip() for e in self.edges)
-        self.assertEqual(set(("sign1stlevel", "sign2ndlevel")), roles)
+        for osr, results in ((False, ()), (True, (self.part.object,))):
+            self.get_graph_data({"to_sign" : True, OSR : osr }, results)
+            self.assertCount(3, 2)
+            roles = set(e.text_content().strip() for e in self.edges)
+            self.assertEqual(set(("sign1stlevel", "sign2ndlevel")), roles)
+        for result in (self.cie, self.group, self.user):
+            self.get_graph_data({"to_sign" : True, OSR : True }, (result,))
+            self.assertCount(1, 0)
 
