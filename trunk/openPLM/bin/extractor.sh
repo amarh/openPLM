@@ -6,6 +6,40 @@
 # prints them to stdout
 # errors are silently passed
 
-# TODO: remove noise ("nieXXX:")
-/usr/lib/tracker/tracker-extract  -v 1 -f $1 2> /dev/null
+filename=$1
+ext=${filename##*.}
+ext=`echo $ext | tr '[:upper:]' '[:lower:]'`
+
+case "$ext" in 
+    pdf)
+        pdftotext -nopgbrk "$filename" - 2> /dev/null
+        ;;
+    
+    html|xhtml|htm)
+        html2text "$filename" 2> /dev/null
+        ;;
+
+    odt|ods|odp|odg)
+        odt2txt "$filename" 2> /dev/null
+        ;;
+
+    docx|xlsx|pptx)
+        openxmlinfo words "$filename" 2> /dev/null
+        ;;
+    
+    doc)
+        antiword "$filename" 2> /dev/null
+        ;;
+
+    xls)
+        xls2csv "$filename" 2> /dev/null
+        ;;
+    ppt)
+        catppt "$filename" 2> /dev/null
+        ;;
+    stp|step)
+        grep -P -o "(?<=PRODUCT\(')([^']+)" $filename
+        ;;
+    *) ;;
+esac
 
