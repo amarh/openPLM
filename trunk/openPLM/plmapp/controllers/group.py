@@ -215,11 +215,13 @@ class GroupController(Controller):
         """
         if invitation.state != models.Invitation.PENDING:
             raise ValueError("Invalid invitation")
+        if self._user != invitation.guest:
+            raise PermissionError("You can not send this invitation.")
         ctx = { "group" : self.object,
                 "invitation" : invitation,
                 "guest" : self._user,
                 }
-        subject = "[PLM] %s ask you to join the group %s" % (self._user, self.name) 
+        subject = "[PLM] %s asks you to join the group %s" % (self._user, self.name) 
         self._send_mail(send_mail, subject, [self.owner], ctx, "mails/invitation2")
 
     def send_invitation_to_guest(self, invitation):
@@ -234,6 +236,8 @@ class GroupController(Controller):
         """
         if invitation.state != models.Invitation.PENDING:
             raise ValueError("Invalid invitation")
+        if self._user != invitation.owner:
+            raise PermissionError("You can not send this invitation.")
         ctx = { "group" : self.object,
                 "invitation" : invitation,
                 }
