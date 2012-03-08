@@ -352,6 +352,84 @@ class DocumentViewTestCase(ViewTest):
                          [p.part.id for p in response.context["all_parts"]])
         self.assertEqual([part.id],
             [f.instance.part.id for f in response.context["parts_formset"].forms])
+
+    def test_related_parts_update_post(self):
+        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
+        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        self.controller.attach_to_part(part1)
+        self.controller.attach_to_part(part2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : part1.get_attached_documents()[0].id,
+                'form-0-part' : part1.id,
+                'form-0-document' : self.controller.id,
+                'form-0-delete' : 'on',
+
+                'form-1-id' : part2.get_attached_documents()[0].id,
+                'form-1-part' : part2.id,
+                'form-1-document' : self.controller.id,
+                'form-1-delete' : '',
+            }
+        response = self.post(self.base_url + "parts/", data, page="parts")
+        self.assertEqual(1, response.context["all_parts"].count())
+        self.assertEqual(list(part2.get_attached_documents()), 
+                         list(response.context["all_parts"]))
+        forms_ = response.context["forms"]
+        self.assertEqual([part2.id],
+                [f.instance.part.id for f in forms_.values()]) 
+
+    def test_parts_update_post_empty_selection(self):
+        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
+        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        self.controller.attach_to_part(part1)
+        self.controller.attach_to_part(part2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : part1.get_attached_documents()[0].id,
+                'form-0-part' : part1.id,
+                'form-0-document' : self.controller.id,
+                'form-0-delete' : '',
+
+                'form-1-id' : part2.get_attached_documents()[0].id,
+                'form-1-part' : part2.id,
+                'form-1-document' : self.controller.id,
+                'form-1-delete' : '',
+            }
+        response = self.post(self.base_url + "parts/", data, page="parts")
+        self.assertEqual(2, response.context["all_parts"].count())
+        forms_ = response.context["forms"]
+        self.assertEqual(set((part1.id, part2.id)), 
+                set(f.instance.part.id for f in forms_.values())) 
+
+    def test_doc_cad_update_post_all_selected(self):
+        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
+        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        self.controller.attach_to_part(part1)
+        self.controller.attach_to_part(part2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : part1.get_attached_documents()[0].id,
+                'form-0-part' : part1.id,
+                'form-0-document' : self.controller.id,
+                'form-0-delete' : 'on',
+
+                'form-1-id' : part2.get_attached_documents()[0].id,
+                'form-1-part' : part2.id,
+                'form-1-document' : self.controller.id,
+                'form-1-delete' : 'on',
+            }
+        response = self.post(self.base_url + "parts/", data, page="parts")
+        self.assertEqual(0, response.context["all_parts"].count())
+        self.assertFalse(response.context["forms"])
         
     def test_add_related_part_get(self):
         response = self.get(self.base_url + "parts/add/", link=True)
@@ -774,8 +852,8 @@ class PartViewTestCase(ViewTest):
         doc2.object.save()
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
         self.assertEqual(2, response.context["all_docs"].count())
-        forms = response.context["forms"]
-        self.assertEqual([doc1.id], [f.instance.document.id for f in forms.values()]) 
+        forms_ = response.context["forms"]
+        self.assertEqual([doc1.id], [f.instance.document.id for f in forms_.values()]) 
 
     def test_doc_add_add_get(self):
         response = self.get(self.base_url + "doc-cad/add/", link=True)
@@ -816,8 +894,8 @@ class PartViewTestCase(ViewTest):
         self.assertEqual(1, response.context["all_docs"].count())
         self.assertEqual(list(doc2.get_attached_parts()), 
                          list(response.context["all_docs"]))
-        forms = response.context["forms"]
-        self.assertEqual([doc2.id], [f.instance.document.id for f in forms.values()]) 
+        forms_ = response.context["forms"]
+        self.assertEqual([doc2.id], [f.instance.document.id for f in forms_.values()]) 
         
     def test_doc_cad_update_post_empty_selection(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -843,9 +921,9 @@ class PartViewTestCase(ViewTest):
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
         self.assertEqual(2, response.context["all_docs"].count())
-        forms = response.context["forms"]
+        forms_ = response.context["forms"]
         self.assertEqual(set((doc1.id, doc2.id)), 
-                set(f.instance.document.id for f in forms.values())) 
+                set(f.instance.document.id for f in forms_.values())) 
 
     def test_doc_cad_update_post_all_selected(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -871,8 +949,7 @@ class PartViewTestCase(ViewTest):
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
         self.assertEqual(0, response.context["all_docs"].count())
-        forms = response.context["forms"]
-        self.assertFalse(forms)
+        self.assertFalse(response.context["forms"])
 
     def test_revise_no_attached_document_get(self):
         """
