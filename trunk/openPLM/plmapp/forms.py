@@ -221,8 +221,6 @@ class TypeFormWithoutUser(forms.Form):
     type = forms.TypedChoiceField(choices=LIST_WO_USER,
             label=_("Select a type"))
 
-class TypeSearchForm(TypeForm):
-    pass
 
 class FakeItems(object):
     def __init__(self, values):
