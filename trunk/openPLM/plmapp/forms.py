@@ -593,10 +593,12 @@ def get_navigate_form(obj):
 
 
 class OpenPLMUserChangeForm(forms.ModelForm):
-    #username = forms.RegexField(widget=forms.HiddenInput())
+
     class Meta:
         model = User
-        exclude = ('username','is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'password')
+        exclude = ('username','is_staff', 'is_active', 'is_superuser',
+                'last_login', 'date_joined', 'groups', 'user_permissions',
+                'password')
 
 class SelectUserForm(forms.Form):
     type = forms.CharField(label=_("Type"), initial="User")
