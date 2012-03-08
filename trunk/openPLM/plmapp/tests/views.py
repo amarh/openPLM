@@ -29,6 +29,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
+from django.core.files.base import File
 
 from openPLM.plmapp import forms
 from openPLM.plmapp.utils import level_to_sign_str
@@ -788,7 +789,91 @@ class PartViewTestCase(ViewTest):
         response = self.post(self.base_url + "doc-cad/add/", data)
         document = self.controller.get_attached_documents()[0].document
         self.assertEqual(doc1.object, document)
+
+    def test_doc_cad_update_post(self):
+        doc1 = DocumentController.create("doc1", "Document", "a", self.user,
+                self.DATA)
+        doc2 = DocumentController.create("doc2", "Document", "a", self.user,
+                self.DATA)
+        self.controller.attach_to_document(doc1)
+        self.controller.attach_to_document(doc2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : doc1.get_attached_parts()[0].id,
+                'form-0-part' : self.controller.id,
+                'form-0-document' : doc1.id,
+                'form-0-delete' : 'on',
+
+                'form-1-id' : doc2.get_attached_parts()[0].id,
+                'form-1-part' : self.controller.id,
+                'form-1-document' : doc2.id,
+                'form-1-delete' : '',
+            }
+        response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
+        self.assertEqual(1, response.context["all_docs"].count())
+        self.assertEqual(list(doc2.get_attached_parts()), 
+                         list(response.context["all_docs"]))
+        forms = response.context["forms"]
+        self.assertEqual([doc2.id], [f.instance.document.id for f in forms.values()]) 
         
+    def test_doc_cad_update_post_empty_selection(self):
+        doc1 = DocumentController.create("doc1", "Document", "a", self.user,
+                self.DATA)
+        doc2 = DocumentController.create("doc2", "Document", "a", self.user,
+                self.DATA)
+        self.controller.attach_to_document(doc1)
+        self.controller.attach_to_document(doc2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : doc1.get_attached_parts()[0].id,
+                'form-0-part' : self.controller.id,
+                'form-0-document' : doc1.id,
+                'form-0-delete' : '',
+
+                'form-1-id' : doc2.get_attached_parts()[0].id,
+                'form-1-part' : self.controller.id,
+                'form-1-document' : doc2.id,
+                'form-1-delete' : '',
+            }
+        response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
+        self.assertEqual(2, response.context["all_docs"].count())
+        forms = response.context["forms"]
+        self.assertEqual(set((doc1.id, doc2.id)), 
+                set(f.instance.document.id for f in forms.values())) 
+
+    def test_doc_cad_update_post_all_selected(self):
+        doc1 = DocumentController.create("doc1", "Document", "a", self.user,
+                self.DATA)
+        doc2 = DocumentController.create("doc2", "Document", "a", self.user,
+                self.DATA)
+        self.controller.attach_to_document(doc1)
+        self.controller.attach_to_document(doc2)
+        data = {
+                'form-TOTAL_FORMS' : '2',
+                'form-INITIAL_FORMS' : '2',
+                'form-MAX_NUM_FORMS' : '',
+                
+                'form-0-id' : doc1.get_attached_parts()[0].id,
+                'form-0-part' : self.controller.id,
+                'form-0-document' : doc1.id,
+                'form-0-delete' : 'on',
+
+                'form-1-id' : doc2.get_attached_parts()[0].id,
+                'form-1-part' : self.controller.id,
+                'form-1-document' : doc2.id,
+                'form-1-delete' : 'on',
+            }
+        response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
+        self.assertEqual(0, response.context["all_docs"].count())
+        forms = response.context["forms"]
+        self.assertFalse(forms)
+
     def test_revise_no_attached_document_get(self):
         """
         Tests the "revisions/" page and checks that if the part has no
@@ -1374,7 +1459,7 @@ class PartViewTestCase(ViewTest):
         self.assertEqual(link.quantity, link2.quantity)
         self.assertEqual(link.unit, link2.unit)
         self.assertEqual(self.controller.id, link2.child_id)
-        # ensure the new reviison is a child of the parent
+        # ensure the new revisison is a child of the parent
         children = parent2.get_children(1)
         self.assertEqual(1, len(children))
         level, link2 = children[0]
@@ -2144,6 +2229,14 @@ class SearchViewTestCase(CommonViewTest):
         self.assertEqual([], results)
         results = self.search("pppp.txt", "Document")
         self.assertEqual([df], results)
+
+    def test_search_in_odt(self):
+        doc = DocumentController.create("doccc", "Document", "d",
+                self.user, self.DATA)
+        df = doc.add_file(File(open("datatests/office_a4_3p.odt", "rb")))
+        results = self.search("find me", "Document")
+        self.assertEqual([df], results)
+
 
 
 class MechantUserViewTest(TestCase):
