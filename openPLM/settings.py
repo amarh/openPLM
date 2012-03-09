@@ -75,6 +75,7 @@ LANGUAGES = (
       ('fr', u'Français'),
       ('en', 'English'),
       ('es', u'Español'),
+      ('ja', u'日本語'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
