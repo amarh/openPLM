@@ -1,0 +1,24 @@
+        {% for type, atributes , names in zip %}
+
+        <tr id= "{{names.0}}">
+        <td>{{ type.type_part }}</td>
+                                
+                {% for field in atributes.0 %}           
+                <td>{{ field }}</td>
+                {% endfor %} 
+
+
+        </tr>   
+              
+        <tr id= "{{names.1}}">
+        <td>{{ type.type_document3D }}</td>
+
+
+                {% for field in atributes.1 %}           
+                <td>{{ field }}</td>
+                {% endfor %} 
+
+        </tr>          
+        
+  
+        {% endfor %}

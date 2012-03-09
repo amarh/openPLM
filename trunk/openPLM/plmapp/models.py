@@ -1456,6 +1456,8 @@ def _get_all_subclasses_with_level(base, lst, level):
     for part in base.__subclasses__():
         _get_all_subclasses_with_level(part, lst, level)
 
+get_all_subclasses_with_level = _get_all_subclasses_with_level
+
 @memoize_noarg
 def get_all_plmobjects_with_level():
     u"""
@@ -1469,6 +1471,13 @@ def get_all_plmobjects_with_level():
     if lst: del lst[0]
     lst.append(("Group", "Group"))
     return lst
+
+@memoize_noarg
+def get_all_plmparts_with_level():
+    lst = []
+    level=">>"
+    _get_all_subclasses_with_level(Part, lst , level)
+    return lst   
 
 @memoize_noarg
 def get_all_users_and_plmobjects_with_level():

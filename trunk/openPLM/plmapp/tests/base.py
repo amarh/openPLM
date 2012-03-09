@@ -55,7 +55,7 @@ class BaseTestCase(TestCase):
         for df in DocumentFile.objects.all():
             try:
                 os.remove(df.file.path)
-            except IOError:
+            except (IOError, OSError):
                 pass
 
 

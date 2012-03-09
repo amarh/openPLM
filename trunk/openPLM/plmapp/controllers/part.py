@@ -132,6 +132,7 @@ class PartController(PLMObjectController):
         # records creation in history
         self._save_histo(link.ACTION_NAME,
                          "parent : %s\nchild : %s" % (self.object, child))
+        return link
 
     def delete_child(self, child):
         u"""
@@ -214,6 +215,7 @@ class PartController(PLMObjectController):
                 and PCLE.one_per_link()):
                 ext = PCLE(link=link2, **extension_data[name])
                 ext.save()
+        return link2
 
     def get_children(self, max_level=1, date=None,
             related=("child", "child__state", "child__lifecycle")):

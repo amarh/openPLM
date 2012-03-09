@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block scripts %}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+                $("#dialog_check-out").dialog({
+modal: true,
+autoOpen: false
+});
+                $("a.check-out").click(function(e) {
+                    e.preventDefault();
+                    var url = $(this).attr("href");
+                    $("#dialog_check-out").dialog('option', 'buttons', {
+
+                        "CANCEL": function() {
+                        $(this).dialog("close");
+
+                        },
+                        "CHECK-OUT": function() {
+                        $(location).attr('href',url); 
+                        $(this).dialog("close");
+                        }
+
+                        });
+                    $("#dialog_check-out").dialog();
+                    $("#dialog_check-out").dialog("open");
+                    return false;
+                });
+
+
+});
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+
+    {% if file_formset.total_form_count %}
+        <form class="archive_form" method="GET" action="./archive/">
+            {{ archive_form.as_p }}
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
+        </form>
+    {% endif %}
+    <form method="POST" action="">
+        {% if is_owner and obj.is_editable %}
+            {{ file_formset.management_form }}
+            <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
+                <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
+                <span class="ui-button-text">{% trans "ADD" %}</span>
+            </a>
+            {% if file_formset.total_form_count %}
+                <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
+            {% endif %}
+        {% else %}
+            {# placeholder since archive_form: float is right #}
+            <span>&nbsp;</span>
+        {% endif %}
+        <table class="Content">
+            {% for form in file_formset.forms %}
+                <tr class="Content">
+                    {{ form.id }}
+                    {{ form.document }}
+                    {% with form.instance as instance %}
+                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                        <td class="Content ui-state-default ui-state-corner-all">
+                            {% if instance.locked %}
+                                <span class="ui-icon ui-icon-locked">{% trans "Locked" %}</span>
+                            {% else %}
+                                <span class="ui-icon ui-icon-unlocked">{% trans "Unlocked" %}</span>
+                            {% endif %}
+                        </td>
+                        <td class="Content">
+                            <a href="/file/3D/{{instance.id}}/{{instance.filename}}">{{instance.filename}}</a></td>
+                        <td class="Content">{{instance.size|filesizeformat}}</td>
+                        <td class="Content">
+                            <a class="{{"Button"|button}}" href="/file/3D/{{instance.id}}/{{instance.filename}}/"><span class="ui-button-text">{% trans "DOWNLOAD" %}</span></a>
+                        </td>
+                        <td class="Content">
+
+                            {% if is_owner and obj.is_editable %}
+
+                                {% if instance.locked %}
+                                    <a class="{{"Button"|button}}" href="./checkin/{{instance.id}}/">
+                                        <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                                    </a>
+                                {% else %}
+
+                                    {% if instance.checkout_valid %}
+
+                                        <a class="{{"Button"|button}}
+                                            {% if instance.native_related %}check-out {% endif %}"
+                                            href="./checkout/{{instance.id}}/">
+                                            <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                        </a>                                    
+
+
+                                    {% else %}
+                                        {% trans "Native related file is locked" %}
+                                    {% endif %}
+                                {% endif %} 
+
+                            {% else %}
+                                {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
+                            {% endif %}
+
+                        </td>
+                        <td class="Content">
+                            {% if instance.thumbnail %}
+                                <img class="thumbnail" src="{{instance.thumbnail.url}}"
+                                alt="Thumbnail"/>
+                            {% else %}
+                                {% trans "No thumbnail available" %}
+                            {% endif %}
+                        </td>
+                    {% endwith %}
+                </tr>
+            {% endfor %}	    
+        </table>
+
+    </form>
+    {% if can_generate_pdf %}
+        <div>
+            <a href="../pdf/" class="{{"Button"|button}}">
+                <span class="ui-button-text">{% trans "Download merged PDF files"%}</span>
+            </a>
+        </div>
+
+    {% endif %}
+
+    <div id="dialog_check-out" title="{% trans "Confirm CHECK-OUT" %}">
+        {% trans "You'are checking out a standardfile while a native file is available. Your native file will be deprecated and will not be usable anymore." %}
+    </div>
+
+    {% if deprecated_files %}
+
+        <div id="deprecated_files">
+            <h6>{% trans "Deprecated files:" %}</h6>
+            {% for doc_file in deprecated_files %}        
+                <p><a href="/file/{{doc_file.id}}/">{{doc_file.filename}}</a></p>            
+            {% endfor %}    
+        </div>
+    {% endif %}
+{% endblock %}
+
+
