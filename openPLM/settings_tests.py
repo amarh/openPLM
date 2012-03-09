@@ -111,6 +111,9 @@ INSTALLED_APPS = (
     'openPLM.plmapp.tests',
 )
 
+if os.environ.get("openPLM3D", "") == "enabled":
+    INSTALLED_APPS += ("openPLM.document3D", )
+
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'

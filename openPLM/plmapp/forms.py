@@ -126,7 +126,7 @@ def get_initial_creation_data(cls, start=0):
         data = {}
     return data
 
-def get_creation_form(user, cls=m.PLMObject, data=None, start=0):
+def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
     u"""
     Returns a creation form suitable to creates an object
     of type *cls*.
@@ -162,9 +162,9 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0):
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
     if data is None:
-        form = Form(initial=get_initial_creation_data(cls, start))
+        form = Form(initial=get_initial_creation_data(cls, start), **kwargs)
     else:
-        form = Form(data=data)
+        form = Form(data=data, **kwargs)
     if issubclass(cls, m.PLMObject):
         # display only valid groups
         groups = user.groups.all().values_list("id", flat=True)

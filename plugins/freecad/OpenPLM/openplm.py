@@ -5,6 +5,7 @@ import urllib
 import webbrowser
 import tempfile
 
+
 # poster makes it possible to send http request with files
 # sudo easy_install poster
 from poster.encode import multipart_encode
@@ -17,6 +18,7 @@ import PyQt4.QtGui as qt
 from PyQt4 import QtCore
 
 import FreeCAD, FreeCADGui
+import Part
 
 connect = QtCore.QObject.connect
 
@@ -113,13 +115,26 @@ class OpenPLMPluginInstance(object):
                 pass
             gdoc = FreeCAD.ActiveDocument
             path = os.path.join(rep, filename)
+            fileName, fileExtension = os.path.splitext(filename)
+            path_stp=os.path.join(rep, (fileName+".stp"))
+            #create temporal file stp  
+            Part.export(gdoc.Objects,path_stp)
             gdoc.FileName = path
             save(gdoc)
-            doc_file = self.upload_file(doc, path)
+            
+            #upload stp and freecad object
+            doc_step_file=self.upload_file(doc, path_stp) # XXX
+            doc_file = self.upload_file(doc, path) # XXX
+            
+            #remove temporal file stp  
+            os.remove(path_stp)
+            
+            
             self.add_managed_file(doc, doc_file, path)
             self.load_file(doc, doc_file["id"], path, gdoc)
             if not unlock:
-                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"])) # XXX
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step_file["id"])) # XXX
             else:
                 self.send_thumbnail(gdoc)
                 self.forget(gdoc)
@@ -148,8 +163,15 @@ class OpenPLMPluginInstance(object):
         request = urllib2.Request(url, datagen, headers)
         res = json.load(self.opener.open(request))
         return res["doc_file"]
+        
+        
+
+        
 
     def download(self, doc, doc_file):
+    
+    
+    
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
         rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
                            doc["revision"])
@@ -178,6 +200,16 @@ class OpenPLMPluginInstance(object):
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
         self.download(doc, doc_file)
+        
+
+        #on va locker fichier step associe
+        url= "api/object/%s/files/all/" % doc["id"] 
+        res = PLUGIN.get_data(url)
+        fileName, fileExtension = os.path.splitext(doc_file["filename"])
+        doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
+        if not len(doc_step)==0:    
+            self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step[0]["id"]))
+        #end locker    
 
     def add_managed_file(self, document, doc_file, path):
         data = self.get_conf_data()
@@ -239,6 +271,18 @@ class OpenPLMPluginInstance(object):
             if not  data["documents"][str(doc["id"])]["files"]:
                 del data["documents"][str(doc["id"])]
             self.save_conf(data)
+            #on va unlocker
+            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id)) 
+            url= "api/object/%s/files/all/" % doc["id"] 
+            res = PLUGIN.get_data(url)
+            root, f_name = os.path.split(path)
+            fileName, fileExtension = os.path.splitext(f_name)
+            doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
+            if not len(doc_step)==0:    
+                self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_step[0]["id"]))
+  
+            #end unlocker    
+                          
             if delete and os.path.exists(path):
                 os.remove(path)
             if close_doc:
@@ -264,17 +308,52 @@ class OpenPLMPluginInstance(object):
         if gdoc and gdoc in self.documents:
             doc = self.documents[gdoc]["openplm_doc"]
             doc_file_id = self.documents[gdoc]["openplm_file_id"]
+            #doc_file_name = self.documents[gdoc]["openplm_file_name"]
             path = self.documents[gdoc]["openplm_path"]
             def func():
                 # headers contains the necessary Content-Type and Content-Length>
                 # datagen is a generator object that yields the encoded parameters
                 datagen, headers = multipart_encode({"filename": open(path, "rb")})
                 # Create the Request object
-                url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id)
-                request = urllib2.Request(url, datagen, headers)
+                
+                
+                #check-in fichier step asscocies if exists
+                #api/doc_id/files/[all/]
+                url= "api/object/%s/files/all/" % doc["id"] 
+                res = PLUGIN.get_data(url)
+                root, f_name = os.path.split(path)
+                fileName, fileExtension = os.path.splitext(f_name)
+                doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
+                
+                if len(doc_step)==0:    #il faut generer un nouvelle fichier step
+
+                    fileName, fileExtension = os.path.splitext(path)
+                    path_stp=fileName+".stp"
+                    Part.export(gdoc.Objects,path_stp)
+                    doc_step_file=self.upload_file(doc,path_stp) # XXX
+                    doc_step.append(doc_step_file)
+
+                else:                   #il faut un check-in
+ 
+                    fileName, fileExtension = os.path.splitext(path)
+                    Part.export(gdoc.Objects,fileName+".stp")
+                    datagen, headers = multipart_encode({"filename": open(fileName+".stp", "rb")})
+                    url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_step[0]["id"]) # XXX
+                    request = urllib2.Request(url, datagen, headers)
+                    res = self.opener.open(request)
+                    os.remove(fileName+".stp")                 
+                
+                
+                
+                url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id) # XXX
+                request = urllib2.Request(url, datagen, headers)                
                 res = self.opener.open(request)
+                
+
+                
                 if not unlock:
-                    self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id))
+                    self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id)) # XXX
+                    self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step[0]["id"])) # XXX
                 else:
                     self.send_thumbnail(gdoc)
                     self.forget(gdoc)

@@ -1,0 +1,657 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load comments %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<style>
+
+.ajustar {
+clear: both;
+}
+.menu {
+	margin: 10px;
+	height: 100px;
+	font-size: 9pt;
+	font-family: roman;
+}
+.menu ul {
+
+	margin: 0pt;
+	padding: 0pt;
+	position: relative;
+	z-index: 500;
+	list-style-type: none;
+	width: 11em;
+
+}
+.menu li {
+
+	background-color: #cccc99;
+	float: left;
+}
+.menu li.sub {
+	background-color: #cccc99;
+}
+
+.menu a, .menu a:visited {
+	border: 1px solid #ffffff;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block;
+	text-decoration: none;
+	height: 2em;
+	line-height: 2em;
+	width: 11em;
+	color: #000000;
+	padding-left: 1em;
+	font-weight: normal;
+	font-style: normal;
+	font-variant: normal;
+	text-transform: none;
+}
+.menu b {
+	float: right;
+	margin-right: 5px;
+}
+* html .menu a, * html .menu a:visited {
+	width: 11em;
+}
+* html .menu a:hover {
+	color: #ccff66;
+	background-color: #999966;
+	position: relative;
+	font-weight: normal;
+	font-style: normal;
+	font-variant: normal;
+	text-decoration: none;
+	text-transform: none;
+}
+.menu li:hover {
+	position: relative;
+}
+.menu a:active, .menu a:focus {
+	color: #ccff66;
+	background-color: #999966;
+	font-weight: normal;
+	font-style: normal;
+	font-variant: normal;
+	text-decoration: none;
+	text-transform: none;
+}
+.menu li:hover > a {
+	color: #ccff66;
+	background-color: #999966;
+	font-weight: normal;
+	font-style: normal;
+	font-variant: normal;
+	text-decoration: none;
+	text-transform: none;
+}
+.menu li ul {
+	padding: 2em;
+	visibility: hidden;
+	position: absolute;
+	top: -2em;
+	left: 7em;
+	background-color: transparent;
+}
+.menu li:hover > ul {
+	visibility: visible;
+}
+.menu ul a:hover ul ul {
+	visibility: hidden;
+}
+.menu ul a:hover ul a:hover ul ul {
+	visibility: hidden;
+}
+.menu ul a:hover ul a:hover ul a:hover ul ul {
+	visibility: hidden;
+}
+.menu ul a:hover ul {
+	visibility: visible;
+}
+.menu ul a:hover ul a:hover ul {
+	visibility: visible;
+}
+.menu ul a:hover ul a:hover ul a:hover ul {
+	visibility: visible;
+}
+.menu ul a:hover ul a:hover ul a:hover ul a:hover ul {
+	visibility: visible;
+}
+.trans{
+    
+      
+      position:absolute;
+      width:40;
+      height:15;
+      z-index:10;
+      
+    }
+    .
+    fond{
+      
+      position:relative;
+      z-index:1;  
+    }
+   
+
+</style>
+
+
+        <div class="trans" >
+                    <form method="post" action="" id="from_stp_form">
+                    {% for form in select_stp_form %}
+                        <ul><li>{{ form }}</li></ul>
+                    {% endfor %}
+                    </form>
+  
+                    <div class="menu" id="menu_">   </div>
+        </div> 
+   
+           
+                        
+        <div class="fond" id="container">
+        
+        <div id="webgl_warning" class="main" style="display:none;">
+    <div class="warning_container">
+      <div class="warning">
+
+        <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
+        <ul>
+          <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
+          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
+
+          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
+        </ul>
+        <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
+      </div>
+    </div>
+  </div>
+  
+  </div>
+
+
+		
+
+       
+
+{% endblock %}
+
+
+{% block scripts %} 
+		<script>
+
+
+
+		
+		
+
+
+
+
+    //Me faltan los margenes para cuadrar bien todo
+    //Me falta desactivar la rueda dentro de la division
+    //No hacer todo el rato las comprobaciones para centrar, en cada loop, sino solo cuando pulse el boton
+    //donde pongo el media , estoy pasando el path completo y eso no es bueno para la seguridad
+    //el upload too no hace nada
+    
+    //Probar con orthographical camera
+    //ver si se muestra tmb en la franja superior
+    //si estoy en 3D y pulso 3D , lo que hago es llevar el objeto a su posicion inicial
+    //posibilidad partes sin nombre nom=''
+    
+    
+    // y si tengo al mismo tiempo para una parte shapes simples y conjuntos con sus propios shapes, es decir tendria un hijo shape y otro hijo que seria una parte
+    // tiene que estar antes el items aue el lacaca.js    *
+    // si changepart(atrib)  atrib = ''cambia el estado, sino pone cada parte el valor pasado como atributo
+         
+
+        </script>
+        
+        <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
+
+        
+        
+        
+        
+		<script type="text/javascript" src="/media/js/Three.js"></script> 
+		{% for item in GeometryFiles %}
+		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
+		{% endfor %}
+
+
+ 
+ 
+     
+
+		<script type="text/javascript">
+		
+		
+            {% if javascript_arborescense %}
+        	{{javascript_arborescense|safe}}		
+            {% endif %}
+            
+            
+		    var camera, scene, renderer;//object3D;
+		    var geometry ;
+		    var container;
+		    var main_content;
+		    
+		      var targetXRotation             = 0;
+		      
+  var targetXRotationOnMouseDown  = 0;
+  var mouseX                      = 0;
+  var mouseXOnMouseDown           = 0;
+
+  var targetYRotation             = 0;
+  var targetYRotationOnMouseDown  = 0;
+  var mouseY                      = 0;
+  var mouseYOnMouseDown           = 0;
+
+  var mouseDown                  = false;
+  var mouseOver                  = false;
+                        var targetRotation = 0;
+                        var targetRotationOnMouseDown = 0;
+                        var targetRotationY = 0;
+                        var targetRotationYOnMouseDown = 0;
+                        var mouseX = 0;
+                        var mouseXOnMouseDown = 0;
+                        var mouseY = 0;
+                        var mouseYOnMouseDown = 0;
+
+            
+            var width ;
+            var height ;
+            var deep ;
+
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+		
+
+            
+			var targetXRotation             = 0;
+            var targetXRotationOnMouseDown  = 0;
+            var mouseX                      = 0;
+            var mouseXOnMouseDown           = 0;
+            var targetYRotation             = 0;
+            var targetYRotationOnMouseDown  = 0;
+
+
+            var mouseDown                  = false;
+            var mouseOver                  = false;
+	
+			
+			
+			$(document.getElementById( 'container' )).ready(init);
+			
+			
+
+			function init() {
+			
+			
+			
+			    if (!has_webgl()){
+
+                document.getElementById("webgl_warning").style.display = 'block'; 
+
+                }
+ 
+
+
+			
+			
+			
+
+				main_content = document.getElementById('main_content');
+				container=document.getElementById('container');
+
+				
+				scene = new THREE.Scene();
+                //object3D = new THREE.Object3D();
+
+				//object3D.overdraw = true;
+
+				
+                scene.add( new THREE.AmbientLight( 0x0ff20 ) );
+                light1 = new THREE.PointLight( 0xff0040 );
+				scene.add( light1 );
+				scene.add( object3D);
+				
+				
+				   
+				//{% for item in multi_image3D %}
+                //object{{item.id}}.overdraw = true;
+                //object3D.add(object{{item.id}});
+                //{% endfor %}
+                
+
+			    centrer_objet(object3D);
+                camera = new THREE.PerspectiveCamera( 50, $(main_content).width() / $(main_content).height(), 0.1, deep*30 );
+                camera.position.z = deep*4;
+                
+				renderer = new THREE.WebGLRenderer();
+				
+
+				renderer.setSize( $(main_content).width(), $(main_content).height() );
+
+				container.appendChild( renderer.domElement );
+				//container.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  
+                //container.addEventListener( 'mousedown', onDocumentMouseDown, false );
+                container.addEventListener('DOMMouseScroll', wheel, false);
+                
+                window.addEventListener('mousemove',      onRendererMouseMove,     false);    
+                renderer.domElement.addEventListener('mouseover',      onRendererMouseOver,     false);
+                renderer.domElement.addEventListener('mouseout',       onRendererMouseOut,      false);
+  	            renderer.domElement.addEventListener('mousedown',      onRendererMouseDown,     false);
+    // renderer.domElement.addEventListener('mouseup',        onRendererMouseUp,       false);
+                window.addEventListener('mouseup',        onRendererMouseUp,       false);
+  	            //renderer.domElement.addEventListener('touchstart',     onRendererTouchStart,    false);
+  	            //renderer.domElement.addEventListener('touchend',       onRendererTouchEnd,      false);
+  	            //renderer.domElement.addEventListener('touchmove',      onRendererTouchMove,     false);
+
+                //renderer.domElement.addEventListener('DOMMouseScroll', onRendererScroll,        false);
+  	            //renderer.domElement.addEventListener('mousewheel',     onRendererScroll,        false);
+  	            //renderer.domElement.addEventListener('gesturechange',  onRendererGestureChange, false);
+                container.focus() 
+                setInterval( loop, 1000 / 60 );
+
+                menu();
+                //alert(object6.rotation.x+" "+object6.rotation.y+" "+object6.rotation.z); 
+                //object3D.rotation.y+=1.5707963267948966;
+
+			}
+
+            function has_webgl(){
+            return !!window.WebGLRenderingContext;
+            }
+			
+			function centrer_objet(object3D_){		
+			boundingBox=computeGroupBoundingBox(object3D_);  			        
+            width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
+            height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
+            deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
+ 
+            
+            object3D_.position.x=-(boundingBox.x[ 1 ]+boundingBox.x[ 0 ])/2;
+            object3D_.position.y=-(boundingBox.y[ 1 ]+boundingBox.y[ 0 ])/2;  
+			object3D_.position.z=-(boundingBox.z[ 1 ]+boundingBox.z[ 0 ])/2;    
+
+            }
+            
+function wheel(event){
+			    
+				var delta = 0;
+				if (!event) event = window.event;
+				if (event.wheelDelta) {
+					delta = event.wheelDelta/120;
+					if (window.opera) delta = -delta;
+				} else if (event.detail) {
+				delta = -event.detail/3;
+				}
+				if (delta)
+				handle(delta);
+				
+				return cancelEvent(event);
+			}
+
+			function handle(delta) {
+        			if (delta <0){
+                		object3D.scale.x = object3D.scale.y = object3D.scale.z = object3D.scale.z * 1.01;
+					
+
+        			}
+				else{
+				//alert('boundRadius');
+                		object3D.scale.x = object3D.scale.y = object3D.scale.z = object3D.scale.z * 0.99;
+				}	
+				}
+
+						
+function onDocumentMouseDown( event ) {
+
+                                                        event.preventDefault();
+
+                                                        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                                                        document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+                                                        document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+
+                                                        mouseXOnMouseDown = event.clientX - windowHalfX;
+                                                        mouseYOnMouseDown = event.clientY - windowHalfY;
+                                                        targetRotationOnMouseDown = targetRotation;
+                                                }
+
+                                                function onDocumentMouseMove( event ) {
+
+                                                        mouseX = event.clientX - windowHalfX;
+                                                        mouseY = event.clientY - windowHalfY;
+
+                                                        targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+                                                        targetRotationY = targetRotationYOnMouseDown + ( mouseY - mouseYOnMouseDown ) * 0.02;
+                                                }
+
+                                                function onDocumentMouseUp( event ) {
+
+                                                        document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+                                                        document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+                                                        document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+                                                }
+
+                                                function onDocumentMouseOut( event ) {
+
+                                                        document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+                                                        document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+                                                        document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+                                                }
+function loop() {
+
+                                var time = new Date().getTime() * 0.0005;
+
+
+                                 object3D.rotation.y = (targetXRotation - object3D.rotation.y) * 0.2;
+                                 object3D.rotation.x = (targetYRotation - object3D.rotation.x) * 0.2;
+                                //object3D.rotation.y += ( targetRotation - object3D.rotation.y ) * 0.02;
+                                //object3D.rotation.x += ( targetRotationY - object3D.rotation.x ) * 0.02;
+                        //camera.updateMatrix();
+                        //object3D.updateMatrix();
+                                                                
+                                renderer.render(scene, camera);
+
+                        }
+
+
+			function cancelEvent(e)
+            {
+    
+            e = e ? e : window.event;
+            if(e.stopPropagation)
+                e.stopPropagation();
+            if(e.preventDefault)
+                e.preventDefault();
+            e.cancelBubble = true;
+            e.cancel = true;
+            e.returnValue = false;
+            return false;
+            }
+            
+            
+            
+function computeGroupBoundingBox(Object_Group) {
+
+
+   
+   if(Object_Group.children.length >  0 ){
+   
+        
+ 
+        var boundingBox;
+
+        
+      
+        for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
+
+        Object_Group.children[ v ].geometry.computeBoundingBox();
+        
+        if(Object_Group.children[ v ].geometry.boundingBox){
+        
+        
+        if(!boundingBox){
+        boundingBox= { 
+        'x': [ Object_Group.children[ v ].geometry.boundingBox.x[ 0 ], Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] ],
+        'y': [ Object_Group.children[ v ].geometry.boundingBox.y[ 0 ], Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] ],
+        'z': [ Object_Group.children[ v ].geometry.boundingBox.z[ 0 ], Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] ]}; 
+        }
+        
+        
+        
+        
+
+        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 0 ] < boundingBox.x[ 0 ] ) {
+
+        boundingBox.x[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] > boundingBox.x[ 1 ] ) {
+
+        boundingBox.x[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 1 ];
+
+        }
+        
+        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 0 ] < boundingBox.y[ 0 ] ) {
+
+        boundingBox.y[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] > boundingBox.y[ 1 ] ) {
+
+        boundingBox.y[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 1 ];
+
+        }
+        
+        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 0 ] < boundingBox.z[ 0 ] ) {
+
+        boundingBox.z[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] > boundingBox.z[ 1 ] ) {
+
+        boundingBox.z[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 1 ];
+
+        }
+        
+        }
+        }
+
+   
+   }
+   return boundingBox;
+   }
+
+
+
+
+
+  onRendererMouseOver = function(event) {
+    mouseOver = true;
+    // targetRotation = object.rotation.z;
+
+  }
+
+  onRendererMouseDown = function(event) {
+    // log("down");
+
+    event.preventDefault();
+  	mouseDown = true;
+    
+
+    
+  	mouseXOnMouseDown = event.clientX - windowHalfX;
+  	mouseYOnMouseDown = event.clientY - windowHalfY;
+
+  	targetXRotationOnMouseDown = targetXRotation;
+  	targetYRotationOnMouseDown = targetYRotation;
+  }
+
+  onRendererMouseMove = function(event) {
+    // log("move");
+
+    if (mouseDown) {
+  	  mouseX = event.clientX - windowHalfX;
+      // targetXRotation = targetXRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
+  	  xrot = targetXRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
+
+  	  mouseY = event.clientY - windowHalfY;
+      // targetYRotation = targetYRotationOnMouseDown + (mouseY - mouseYOnMouseDown) * 0.02;
+  	  yrot = targetYRotationOnMouseDown + (mouseY - mouseYOnMouseDown) * 0.02;
+  	  
+  	  targetXRotation = xrot;
+  	  targetYRotation = yrot;
+	  }
+  }
+
+  onRendererMouseUp = function(event) {
+    // log("up");
+    if (mouseDown) {
+      mouseDown = false;
+      if (!mouseOver) {
+
+      }
+
+    }
+  }
+
+  onRendererMouseOut = function(event) {
+
+    mouseOver = false;
+  }
+
+  onRendererTouchStart = function(event) {
+    targetXRotation = object.rotation.z;
+    targetYRotation = object.rotation.x;
+
+
+
+  	if (event.touches.length == 1) {
+  		event.preventDefault();
+
+  		mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
+  		targetXRotationOnMouseDown = targetXRotation;
+
+  		mouseYOnMouseDown = event.touches[0].pageY - windowHalfY;
+  		targetYRotationOnMouseDown = targetYRotation;
+  	}
+  }
+
+  onRendererTouchEnd = function(event) {
+
+    // targetXRotation = object.rotation.z;
+    // targetYRotation = object.rotation.x;
+  }
+
+  onRendererTouchMove = function(event) {
+  	if (event.touches.length == 1) {
+  		event.preventDefault();
+
+  		mouseX = event.touches[0].pageX - windowHalfX;
+  		targetXRotation = targetXRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+
+  		mouseY = event.touches[0].pageY - windowHalfY;
+  		targetYRotation = targetYRotationOnMouseDown + (mouseY - mouseYOnMouseDown) * 0.05;
+  	}
+  }
+
+
+		
+
+
+</script>
+
+{% endblock %}
