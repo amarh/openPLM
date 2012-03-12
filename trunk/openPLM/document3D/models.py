@@ -85,7 +85,7 @@ class Document3DController(DocumentController):
             if self.object.files.filter(is_stp).exclude(id=doc_file.id):
                 self.delete_file(doc_file)
                 raise ValueError("Only one step documentfile allowed for each document3D")  
-            handle_step_file(doc_file.pk,self.object.id,self._user.id)
+            handle_step_file.delay(doc_file.pk,self.object.id,self._user.id)
            
               
         
