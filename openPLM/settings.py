@@ -105,6 +105,9 @@ INSTALLED_APPS = (
     'openPLM.computer',
     'openPLM.cae',
     'openPLM.office',
+    # document3D requires pythonOCC, uncomment this line to enable it
+    # also decomment the line CELERY_ROUTES!
+    # 'openPLM.document3D',
 )
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
@@ -115,6 +118,9 @@ CELERY_ROUTES = {
     "openPLM.plmapp.tasks.update_indexes": {"queue": "index"},
     "openPLM.plmapp.mail.do_send_histories_mail" : {"queue" : "mails"},
     "openPLM.plmapp.mail.do_send_mail" : {"queue" : "mails"},
+    # uncomment this line if you enable document3D
+    # "openPLM.document3d.handle_step_file": {"queue": "step"},
+
 }
 
 EMAIL_HOST = 'localhost'
