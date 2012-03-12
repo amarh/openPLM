@@ -385,12 +385,12 @@ def generate_part_doc_links(prepare_list,links,obj):
     for ord_quantity , part_doc_create_form  in prepare_list:
 
         try: 
-            part_controller=obj.create_from_form(part_doc_create_form[0],obj._user,False,True)
+            part_controller=obj.create_from_form(part_doc_create_form[0],obj._user, True, True)
             instances.append((part_controller.object._meta.app_label,part_controller.object._meta.module_name, part_controller.object._get_pk_val())) 
 
             ParentChildLink = obj.add_child(part_controller.object,ord_quantity[1],ord_quantity[0],ord_quantity[2])                
             generate_extra_location_links(links[index],ParentChildLink) 
-            doc_controller=obj.create_from_form(part_doc_create_form[1],obj._user,False,True)            
+            doc_controller=obj.create_from_form(part_doc_create_form[1],obj._user, True, True)            
             instances.append((doc_controller.object._meta.app_label,doc_controller.object._meta.module_name, doc_controller.object._get_pk_val()))
             part_controller.attach_to_document(doc_controller.object)
             controller_cls = get_controller(doc_controller.object.type)
@@ -600,6 +600,7 @@ def decomposer_stp(stp_file,options,links,obj):
     list_doc3D_controller , instances =generate_part_doc_links(options,links,obj)                          
     my_step_importer=decomposer_all(stp_file,list_doc3D_controller,links,obj._user)                    
     update_indexes.delay(instances)
+    # TODO: send one mail listing all created objects
  
     
 
