@@ -80,10 +80,11 @@ class Document3DController(DocumentController):
     def handle_added_file(self, doc_file):
 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
-        if self.object.files.filter(is_stp).exclude(id=doc_file.id):
-            self.delete_file(doc_file)
-            raise ValueError("Only one step documentfile allowed for each document3D")                        
+                      
         if fileExtension.upper() in ('.STP', '.STEP'):
+            if self.object.files.filter(is_stp).exclude(id=doc_file.id):
+                self.delete_file(doc_file)
+                raise ValueError("Only one step documentfile allowed for each document3D")  
             handle_step_file(doc_file.pk,self.object.id,self._user.id)
            
               
