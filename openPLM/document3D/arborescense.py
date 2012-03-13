@@ -199,7 +199,8 @@ def get_step_related(user,doc_file,locations=None):
                             stp_related.append(STP_file[0])
                             list_loc.append(locations)
                         else:
-                            raise Document3D_link_Error
+                            pass
+                            #raise Document3D_link_Error
                             
                         break
 
@@ -313,11 +314,11 @@ NewMaterial.color.setRGB(%(red)f,%(green)f,%(blue)f);
 var object%(object_numeration)s=new THREE.Mesh( new _%(reference)s_%(part_id)s(),NewMaterial );
 object3D.add(object%(object_numeration)s);        
 """         
-  
+ 
 
 
 
-
+#var NewMaterial=new THREE.MeshFaceMaterial({opacity:0.5,shading:THREE.SmoothShading});
   
     
     

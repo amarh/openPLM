@@ -27,8 +27,6 @@ from OCC.TopAbs import *
 from OCC.Bnd import *
 from OCC.BRepBndLib import *
 from OCC.gp import *
-
-# For OCC Triangle Mesh
 from OCC.BRepMesh import *
 from OCC.BRep import *
 from OCC.BRepTools import *
@@ -38,15 +36,10 @@ from OCC.BRepBuilderAPI import *
 from OCC.StdPrs import *
 from OCC.TColgp import *
 from OCC.Poly import *
-# for debugging and optimization
 import time
 import os, os.path
-
+from kjbuckets import  kjDict
 import time
-
-
-
-
 
 def mesh_shape(shape):
     """ Take a topods_shape instance, returns the tesselated object"""
@@ -59,8 +52,8 @@ def mesh_shape(shape):
     By default, this argument is set to 1 : the default precision of the mesher is used.
     '''
     quality_factor=0.3
-    #a_mesh = QuickTriangleMesh(DISPLAY_LIST=True)
-    a_mesh = QuickTriangleMesh()
+    a_mesh = QuickTriangleMesh(DISPLAY_LIST=True)
+    #a_mesh = QuickTriangleMesh()
     a_mesh.set_shape(shape)
     a_mesh.set_precision(a_mesh.get_precision()/quality_factor)
     a_mesh.compute()
@@ -123,7 +116,6 @@ def mesh_to_3js(mesh,filename,name,shape_nom):
         output.close()
         return True
     except IOError as (errno, strerror):
-        print "I/O error({0}): {1}".format(errno, strerror)
         return False
     
 
@@ -139,8 +131,7 @@ of available meshes.'''
         self._faces = []
         self._normals = []
         self._uvs = []
-        self._DISPLAY_LIST = DISPLAY_LIST
-    
+        self._DISPLAY_LIST = DISPLAY_LIST  
     #return False si shape est vide
     def set_shape(self,shape):
         ''' @param shape: the TopoDS_Shape to mesh
@@ -151,40 +142,30 @@ of available meshes.'''
     def get_vertices(self):
         ''' Returns the list of vertices coordinates
 '''
-        return self._vertices
-    
+        return self._vertices   
     def get_normals(self):
-        return self._normals
-    
+        return self._normals    
     def get_nb_nodes(self):
         return len(self._vertices)
-
     def get_nb_faces(self):
-        return len(self._faces)
-    
+        return len(self._faces)    
     def get_faces(self):
         ''' Returns the face indices list
 '''
-        return self._faces
-    
+        return self._faces    
     def get_precision(self):
-        return self._precision
-    
+        return self._precision    
     def set_precision(self, precision):
-        self._precision = precision
-        
+        self._precision = precision       
     def compute_default_precision(self):
         ''' The default precision is a float number. It's computed from the bounding box of the shape.
 default_precision = bounding_box_diagonal / 10.
 This default precision enables to quickly mesh a shape.
 '''
-        # from this shape, determine a default precision from the bounding box
         bbox = Bnd_Box()
         BRepBndLib_Add(self._shape, bbox) 
         x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
-        # compute diagonal length
         diagonal_length = gp_Vec(gp_Pnt(x_min,y_min,z_min),gp_Pnt(x_max,y_max,z_max)).Magnitude()
-        #print diagonal_length
         self._precision = diagonal_length / 20.
         return True
     
@@ -211,16 +192,11 @@ class QuickTriangleMesh(MeshBase):
             if V1.SquareMagnitude()>1e-10:
                 return True
             else:
-                #print 'Not valid!'
                 return False
         else:
-            #print 'Not valid!'
             return False
 
     def compute(self):
-        ''' Compute the mesh
-'''
-        print 'start mesh computation...'
         init_time = time.time()
         if self._shape is None:
             raise "Error: first set a shape"
@@ -228,82 +204,57 @@ class QuickTriangleMesh(MeshBase):
         BRepMesh_Mesh(self._shape,self.get_precision())
         points = []
         faces = []
+        _points = kjDict()
         normals = []
         uv = []
-        faces_iterator = Topo(self._shape).faces()
-        
+        faces_iterator = Topo(self._shape).faces()  
+        index=0      
         for F in faces_iterator:
-  
-            #face_location = F.Location()
             face_location = TopLoc_Location()
             triangulation = BRep_Tool_Triangulation(F,face_location)
             if triangulation.IsNull() == False: 
                 facing = triangulation.GetObject()
-
                 tab = facing.Nodes()
-
                 if self._compute_uv:
-
                     uvnodes = facing.UVNodes()
-                   
                 tri = facing.Triangles()
-                  
-                # Compute normal
-                the_normal = TColgp_Array1OfDir(tab.Lower(), tab.Upper())
- 
+                the_normal = TColgp_Array1OfDir(tab.Lower(), tab.Upper()) 
                 StdPrs_ToolShadedShape_Normal(F, Poly_Connect(facing.GetHandle()), the_normal)
-                """
-                if self._compute_uv:
-                    umin, umax, vmin, vmax = BRepTools_uvbounds(F)
-                    dUmax = umax - umin
-                    dVmax = vmax - vmin
-                """
                 for i in range(1,facing.NbTriangles()+1):
-
                     trian = tri.Value(i)
                     if F.Orientation() == TopAbs_REVERSED:
                         index1, index3, index2 = trian.Get()
                     else:
                         index1, index2, index3 = trian.Get()
-                    # Transform points
                     P1 = tab.Value(index1).Transformed(face_location.Transformation())
                     P2 = tab.Value(index2).Transformed(face_location.Transformation())
-                    P3 = tab.Value(index3).Transformed(face_location.Transformation())
-                    
+                    P3 = tab.Value(index3).Transformed(face_location.Transformation())     
                     p1_coord = P1.XYZ().Coord()
                     p2_coord = P2.XYZ().Coord()
                     p3_coord = P3.XYZ().Coord()
-                    if self.triangle_is_valid(P1, P2, P3):
-                    #if True:
-                        if not self._DISPLAY_LIST:
+                    if self.triangle_is_valid(P1, P2, P3):                
+                        if not _points.has_key(p1_coord):
+                            _points.add(p1_coord,index)
                             points.append(p1_coord)
+                            index+=1
+                        if not _points.has_key(p2_coord):
+                            _points.add(p2_coord,index)
                             points.append(p2_coord)
+                            index+=1
+                        if not _points.has_key(p3_coord):
+                            _points.add(p3_coord,index)
                             points.append(p3_coord)
-                            
-                        else:
-                            if not (p1_coord in points):
-                                points.append(p1_coord)
-                            if not (p2_coord in points):
-                                points.append(p2_coord)
-                            if not (p3_coord in points):
-                                points.append(p3_coord)
-                            faces.append(points.index(p1_coord))
-                            faces.append(points.index(p2_coord))
-                            faces.append(points.index(p3_coord))
+                            index+=1
+                        faces.append(_points.neighbors(p1_coord)[0])
+                        faces.append(_points.neighbors(p2_coord)[0])
+                        faces.append(_points.neighbors(p3_coord)[0])
                         
                         normals.append([the_normal(index1).X(),the_normal(index1).Y(), the_normal(index1).Z()])
                         normals.append([the_normal(index2).X(),the_normal(index2).Y(), the_normal(index2).Z()])
                         normals.append([the_normal(index3).X(),the_normal(index3).Y(), the_normal(index3).Z()])
-
         self._vertices = points
-        if not self._DISPLAY_LIST:
-            self._faces = range(len(self._vertices))
-        
-        else:
-            self._faces = faces
-        
+        self._faces = faces        
         self._normals = normals
-        print 'Finisehd mesh computation in %fs'%(time.time()-init_time)
         return True
 
 
