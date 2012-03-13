@@ -12,13 +12,16 @@ from openPLM.plmapp.controllers import get_controller
 
 
 def decomposer_all(doc_file,list_document_controller,links,user):
-    my_step_importer = NEW_STEP_Import(doc_file) 
-    product=my_step_importer.generate_product_arbre()
-    to_delete=[]
-    for i,link in enumerate(product.links):
-        diviser(link.product,list_document_controller[i],doc_file,to_delete)
-    decomposer_product(my_step_importer,doc_file,user,to_delete)                                
-
+    
+    try:	
+		my_step_importer = NEW_STEP_Import(doc_file) 
+		product=my_step_importer.generate_product_arbre()
+		to_delete=[]
+		for i,link in enumerate(product.links):
+			diviser(link.product,list_document_controller[i],doc_file,to_delete)
+		decomposer_product(my_step_importer,doc_file,user,to_delete)                                
+    except:
+        raise  Document3D_decomposer_Error(to_delete)
 
 
 def diviser(product,Doc_controller,doc_file,to_delete):
