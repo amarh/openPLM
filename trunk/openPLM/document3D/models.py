@@ -126,6 +126,12 @@ class GeometryFile(models.Model):
     stp = models.ForeignKey(DocumentFile)
     index = models.IntegerField()
 
+    def __unicode__(self):
+        return u"GeometryFile<%d:%s, %d>" % (self.stp.id,
+            self.stp.filename, self.index)
+ 
+admin.site.register(GeometryFile)
+
 def delete_GeometryFiles(doc_file):
 
 
