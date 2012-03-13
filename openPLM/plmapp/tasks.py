@@ -35,6 +35,10 @@ def synchronized(cls=None, lock=None):
         with cls.lock:
             cls.unsynchronized_run(*args, **kwargs)
     cls.run = wrapper
+    # cls.__class__.__call__ is set by recent versions of celery (2.5)
+    def call(self, *args, **kwargs):
+        return wrapper(*args, **kwargs)
+    cls.__class__.__call__ = call
     return cls
 
 @synchronized
