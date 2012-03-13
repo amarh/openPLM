@@ -40,7 +40,6 @@ def add_labels(product,lr,st):
     for link in product.links:
         if link.product.doc_id!= product.doc_id:
             q1=DocumentFile.objects.get(id=link.product.doc_id)
-            print q1
             my_step_importer = NEW_STEP_Import(q1)
 
             lr_2= TDF_LabelSequence()

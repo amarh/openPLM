@@ -261,7 +261,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         try:
                         
                         
-                            decomposer_stp(stp_file,options,links,obj)
+                            instances=decomposer_stp(stp_file,options,links,obj)
                         
                         
                             
@@ -270,6 +270,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                                 delete_files(excep.to_delete)
                             extra_errors=excep.__unicode__()                                                       
                         else:
+                            update_indexes.delay(instances)
                             ctrl=get_controller(stp_file.document.type)
                             ctrl=ctrl(stp_file.document,obj._user)
                             ctrl.deprecate_file(stp_file)
@@ -598,8 +599,9 @@ def display_files(request,  obj_ref, obj_revi):
 def decomposer_stp(stp_file,options,links,obj):  
   
     list_doc3D_controller , instances =generate_part_doc_links(options,links,obj)                          
-    my_step_importer=decomposer_all(stp_file,list_doc3D_controller,links,obj._user)                    
-    update_indexes.delay(instances)
+    my_step_importer=decomposer_all(stp_file,list_doc3D_controller,links,obj._user) 
+    return instances                   
+    
     # TODO: send one mail listing all created objects
  
     

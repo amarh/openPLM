@@ -18,7 +18,7 @@
 
 
 import os, os.path
-import time
+
 
 from OCC.TDataStd import *
 from OCC.STEPCAFControl import *
@@ -81,7 +81,8 @@ class NEW_STEP_Import(object):
                 if t.number_of_vertices() > 0:
                     self.shapes_simples.append(simple_shape(GetLabelNom(shapes.Value(i+1)),compShape))
                 else:
-                    print "Not information found for shape : ", GetLabelNom(shapes.Value(i+1))        
+                    pass
+                    #print "Not information found for shape : ", GetLabelNom(shapes.Value(i+1))        
 
            
     def procesing_geometrys(self):
@@ -89,17 +90,14 @@ class NEW_STEP_Import(object):
         
 
 
-        fileName, fileExtension = os.path.splitext(self.doc_file.filename)
-        init_time = time.time()    
+        fileName, fileExtension = os.path.splitext(self.doc_file.filename)   
         for i, shape in enumerate(self.shapes_simples):
                 new_GeometryFile= GeometryFile()
                 new_GeometryFile.stp = self.doc_file
-                print "processing mesh " ,shape.nom ,   " " , i+1 , "/" ,len(self.shapes_simples)
                 my_mesh = mesh_shape(shape.shape)
                 name = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
                 path = os.path.join(new_GeometryFile.file.storage.location, name)
                 if(not mesh_to_3js(my_mesh,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id),shape.nom)):
-                    print "Error generating file .geo for shape : " ,shape.nom 
                     return False    
                 else:
 
@@ -107,7 +105,7 @@ class NEW_STEP_Import(object):
                     new_GeometryFile.index = i
                     new_GeometryFile.save()
                     
-        print '\n\nFinisehd computation of all shapes in %fs'%(time.time()-init_time)           
+     
 
 
     def generate_product_arbre(self):
