@@ -2311,6 +2311,16 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("monocle", "Document")
         self.assertEqual([], results)
 
+    def test_search_deprecated_file(self):
+        doc = DocumentController.create("doccc", "Document", "d",
+                self.user, self.DATA)
+        df = doc.add_file(self.get_file(name="pppp.txt", data="monocle monocle"))
+        results = self.search("monocle", "Document")
+        df.deprecated = True
+        df.save()
+        results = self.search("monocle", "Document")
+        self.assertEqual([], results)
+
     def test_search_in_odt(self):
         doc = DocumentController.create("doccc", "Document", "d",
                 self.user, self.DATA)
