@@ -14,21 +14,23 @@ from openPLM.plmapp.controllers import get_controller
 def decomposer_all(doc_file,list_document_controller,links,user):
     
     try:	
-	    my_step_importer = NEW_STEP_Import(doc_file) 
-	    product=my_step_importer.generate_product_arbre()
-	    to_delete=[]
-	    for i,link in enumerate(product.links):
-		    diviser(link.product,list_document_controller[i],doc_file,to_delete)
-	    decomposer_product(my_step_importer,doc_file,user,to_delete)                                
+        my_step_importer = NEW_STEP_Import(doc_file) 
+        product=my_step_importer.generate_product_arbre()
+        to_delete=[]
+        to_index=[]
+        for i,link in enumerate(product.links):
+            diviser(link.product,list_document_controller[i],doc_file,to_delete,to_index)
+        decomposer_product(my_step_importer,doc_file,user,to_delete,to_index)
+        return to_index                                 
     except:
         raise  Document3D_decomposer_Error(to_delete)
 
 
-def diviser(product,Doc_controller,doc_file,to_delete):
+def diviser(product,Doc_controller,doc_file,to_delete,to_index):
 
 
 
-    new_doc_file=generate_DocumentFile(product,Doc_controller,product.label_reference,product.name+".stp".encode("utf-8"),to_delete)
+    new_doc_file=generate_DocumentFile(product,Doc_controller,product.label_reference,product.name+".stp".encode("utf-8"),to_delete,to_index)
   
     index_reference=[0]
     assigned_index=[]
@@ -113,7 +115,7 @@ def copy_js(product,old_doc_file,new_doc_file,index_reference,assigned_index,to_
 
 
 
-def decomposer_product(my_step_importer,stp_file,user,to_delete):
+def decomposer_product(my_step_importer,stp_file,user,to_delete,to_index):
 
     product=my_step_importer.generate_product_arbre()
     shape_tool=my_step_importer.shape_tool
@@ -137,7 +139,7 @@ def decomposer_product(my_step_importer,stp_file,user,to_delete):
                 shape_tool.RemoveComponent(l_c.Value(e+1))
 
 
-    new_doc_file=generate_DocumentFile(product,Doc_controller,labels_roots.Value(1),stp_file.filename,to_delete)
+    new_doc_file=generate_DocumentFile(product,Doc_controller,labels_roots.Value(1),stp_file.filename,to_delete,to_index)
     product.links=[]
     product.doc_id=new_doc_file.id
     to_delete.append(write_ArbreFile(product,new_doc_file))    
@@ -147,7 +149,7 @@ def decomposer_product(my_step_importer,stp_file,user,to_delete):
 
     
     
-def generate_DocumentFile(product,Doc_controller,label,new_name,to_delete):
+def generate_DocumentFile(product,Doc_controller,label,new_name,to_delete,to_index):
 
     new_doc_file=DocumentFile()
     name = new_doc_file.file.storage.get_available_name(product.name+".stp")
@@ -173,12 +175,14 @@ def generate_DocumentFile(product,Doc_controller,label,new_name,to_delete):
     if Doc_controller.has_standard_related_locked(f.name):
         raise ValueError("Native file has a standard related locked file.") 
    
-             
+    new_doc_file.no_index=True        
     new_doc_file.filename=new_name
     new_doc_file.size=f.size
     new_doc_file.file=name
     new_doc_file.document=Doc_controller.object
     new_doc_file.save()
+    
+    to_index.append((new_doc_file._meta.app_label,new_doc_file._meta.module_name, new_doc_file._get_pk_val()))
     to_delete.append(new_doc_file.file.path)       
     os.chmod(new_doc_file.file.path, 0400)
 
