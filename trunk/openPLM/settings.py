@@ -116,6 +116,7 @@ CELERY_CREATE_MISSING_QUEUES = True
 CELERY_ROUTES = {
     "openPLM.plmapp.tasks.update_index": {"queue": "index"},
     "openPLM.plmapp.tasks.update_indexes": {"queue": "index"},
+    "openPLM.plmapp.tasks.remove_index": {"queue": "index"},
     "openPLM.plmapp.mail.do_send_histories_mail" : {"queue" : "mails"},
     "openPLM.plmapp.mail.do_send_mail" : {"queue" : "mails"},
     # uncomment this line if you enable document3D

@@ -2306,6 +2306,10 @@ class SearchViewTestCase(CommonViewTest):
         self.assertEqual([], results)
         results = self.search("pppp.txt", "Document")
         self.assertEqual([df], results)
+        # ensure a delete file is not matched
+        doc.delete_file(df)
+        results = self.search("monocle", "Document")
+        self.assertEqual([], results)
 
     def test_search_in_odt(self):
         doc = DocumentController.create("doccc", "Document", "d",
