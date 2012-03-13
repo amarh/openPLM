@@ -167,5 +167,15 @@ class DocumentFileIndex(QueuedModelSearchIndex):
             content = p.stdout.read()
         return content
 
+    def index_queryset(self):
+        return models.DocumentFile.objects.filter(deprecated=False)
+    
+    def should_update(self, instance, **kwargs):
+        if instance.deprecated:
+            # this method is called by a task, so we should not acquire a lock
+            # or delay this deletion
+            self.remove_object(instance)
+        return not instance.deprecated
+    
 site.register(models.DocumentFile, DocumentFileIndex)
 
