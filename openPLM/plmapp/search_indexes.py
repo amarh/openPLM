@@ -2,15 +2,15 @@ import datetime
 
 from django.conf import settings
 from django.db.models import signals
-from django.db.models.loading import get_model
 
 from haystack import site
 from haystack import indexes
 from haystack.indexes import *
 from haystack.models import SearchResult
+from haystack.utils import get_identifier
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.tasks import update_index
+from openPLM.plmapp.tasks import update_index, remove_index
 
 # just a hack to prevent a KeyError
 def get_state(self):
@@ -25,18 +25,10 @@ SearchResult.__getstate__ = get_state
 # from https://github.com/mixcloud/django-celery-haystack-SearchIndex/
 # by sdcooke
 
-def remove_instance_from_index(instance):
-    model_class = get_model(instance._meta.app_label, instance._meta.module_name)
-    search_index = site.get_index(model_class)
-    search_index.remove_object(instance)
-
 class QueuedSearchIndex(indexes.SearchIndex):
     """
-A ``SearchIndex`` subclass that enqueues updates for later processing.
-
-Deletes are handled instantly since a reference, not the instance, is put on the queue. It would not be hard
-to update this to handle deletes as well (with a delete task).
-"""
+    A ``SearchIndex`` subclass that enqueues updates for later processing.
+    """
     # We override the built-in _setup_* methods to connect the enqueuing operation.
     def _setup_save(self, model):
         signals.post_save.connect(self.enqueue_save, sender=model)
@@ -56,7 +48,8 @@ to update this to handle deletes as well (with a delete task).
                     instance._meta.module_name, instance._get_pk_val())
 
     def enqueue_delete(self, instance, **kwargs):
-        remove_instance_from_index(instance)
+        remove_index.delay(instance._meta.app_label,
+                instance._meta.module_name, get_identifier(instance))
 
 ##################
 

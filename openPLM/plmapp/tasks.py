@@ -60,6 +60,18 @@ def update_indexes(instances):
         search_index.update_object(instance)
 update_indexes = synchronized(update_indexes, update_index.lock)
 
+
+@task(default_retry_delay = 60, max_retries = 10)
+def remove_index(app_name, model_name, identifier):
+    from haystack import site
+    import openPLM.plmapp.search_indexes
+
+    model_class = get_model(app_name, model_name)
+    search_index = site.get_index(model_class)
+    search_index.remove_object(identifier)
+remove_index = synchronized(remove_index, update_index.lock)
+
+
 @task
 def add(a, b):
     u"""Simple task, to test the queue ;-)"""
