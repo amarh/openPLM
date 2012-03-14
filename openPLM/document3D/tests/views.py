@@ -4,7 +4,7 @@ unittest). These will both pass when you run "manage.py test".
 
 Replace these with more appropriate tests for your application.
 """
-#./manage.py test document3D --settings=settings_tests
+#openPLM$ openPLM3D="enabled" ./manage.py test document3D --settings=settings_tests
 from django.http import HttpResponse ,HttpResponseRedirect , HttpRequest
 from django.test import TestCase
 from openPLM.document3D.views import *

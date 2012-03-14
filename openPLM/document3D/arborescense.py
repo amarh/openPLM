@@ -40,7 +40,7 @@ def generate_javascript(product,numeration,javascript,loc,javascript_menu,old_nu
 
     javascript_menu[0]+="<ul>"
         
-    if  not product.geometry:
+    if not product.geometry:
         parts_generated=[]
              
         for link in product.links:
@@ -91,10 +91,10 @@ def generate_functions_visibilty_parts(numeration,parts_generated):
 def generate_functions_visibilty_object(numeration,object_numeration,product,loc):
 
 
-        red=product.geometry.red
-        green=product.geometry.green
-        blue=product.geometry.blue
-        reference=product.geometry.reference
+        red=1
+        green=1
+        blue=1
+        reference=product.geometry
         part_id=str(product.doc_id)        
                                
         object_generate=str(function_generate_objects % (locals()))        
@@ -207,9 +207,10 @@ def get_step_related(user,doc_file,locations=None):
     return stp_related , list_loc
                             
                                                        
-def generate_product(arbre):    
-
-    product=Product(arbre[0][0],arbre[0][1],False,arbre[0][2])
+def generate_product(arbre):
+    # no vamos a coger label cuando leemos de la bd    
+    label_reference=False
+    product=Product(arbre[0][0],arbre[0][1],label_reference,arbre[0][2])
     for i in range(len(arbre)-1):
         product.links.append(generate_link(arbre[i+1]))     
     return product
@@ -254,12 +255,9 @@ def write_ArbreFile(product,doc_file):
                 
 def data_for_product(product):
     output=[]
-    
-    if product.geometry:
-          
-        output.append([product.name,product.doc_id,product.geometry.reference])        
-    else: 
-        output.append([product.name,product.doc_id,None])
+
+    output.append([product.name,product.doc_id,product.geometry])        
+
         
     for link in product.links:
         output.append(data_for_link(link))    

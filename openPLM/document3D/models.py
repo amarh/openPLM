@@ -179,21 +179,20 @@ class Document_part_doc_links_Error(Exception):
         
 class Product(object):
 
-    __slots__ = ("label_reference","name","doc_id","links","geometry")
+    __slots__ = ("label_reference","name","doc_id","links","geometry","color")
     
     
-    def __init__(self,name,doc_id,label_reference=False,geometry_ref=None):
+    def __init__(self,name,doc_id,label_reference=False,geometry_ref=False,color=False):
         #no tiene location
         self.links = []
         self.label_reference=label_reference
         self.name=name
         self.doc_id=doc_id   #cambiar por step product id
-        if not geometry_ref==None:
-            self.geometry=Geometry(False,geometry_ref)
-        else:
-            self.geometry=False
-    def set_shape_geometry_related(self,geometry_ref):
         self.geometry=geometry_ref
+        self.color=color
+    def set_shape_geometry_related(self,geometry_ref,color):
+        self.geometry=geometry_ref
+        self.color=color        
     
 class Link(object):
 
@@ -263,7 +262,8 @@ class Matrix_rotation(object):
         
     def to_array(self):    
         return [self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4] 
-                    
+
+"""                    
 class Geometry(object):
     
     __slots__ = ("reference", "red", "green", "blue")
@@ -276,7 +276,7 @@ class Geometry(object):
             self.blue=colour.Blue()
         else:
             self.red = self.green = self.blue = 0        
-
+"""
 
 class Location_link(ParentChildLinkExtension):
 
