@@ -142,8 +142,7 @@ def display_bomb_child(request, obj_type, obj_ref, obj_revi):
     
     
     
-    is_children_decomposable=[]
-    index=0  
+    is_children_decomposable=[] 
     for level, link in children:
         is_children_decomposable.append(False)
         part_controller=PartController(link.child, request.user)
@@ -153,10 +152,10 @@ def display_bomb_child(request, obj_type, obj_ref, obj_revi):
                 Doc3D=Document3D.objects.get(id=Doc_Part_Link.document_id)
             #controller=DocumentController(Doc_Part_Link.document,request.user)
                 if not Doc3D.PartDecompose and is_decomposable(Doc3D):       
-                    is_children_decomposable[index]=True
+                    is_children_decomposable[-1]=True
             except:
                 pass        
-        index+=1
+
              
     children = zip(children,is_children_decomposable)     
 
@@ -226,7 +225,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     
 
         extra_errors=""
-        links=elements_decomposable(stp_file)       
+        product=read_ArbreFile(stp_file)     
         Select_Doc_Part_types = formset_factory(Doc_Part_type_Form)
         Select_Order_Quantity_types = formset_factory(Order_Quantity_Form)
         form_Doc_Part_types = Select_Doc_Part_types(request.POST)
@@ -249,7 +248,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             if options:
 
                 # y si tiene un nativo   que hago con el
-                if  same_time(old_modification_data_time,old_modification_data_microsecond,document_controller.mtime) and links and len(links)==len(options) and stp_file.checkout_valid: 
+                if  same_time(old_modification_data_time,old_modification_data_microsecond,document_controller.mtime) and product and len(product.links)==len(options) and stp_file.checkout_valid: 
 
 
                     try:
@@ -261,7 +260,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         try:
                         
                         
-                            instances=decomposer_stp(stp_file,options,links,obj)
+                            instances=decomposer_stp(stp_file,options,product,obj)
                         
                         
                             
@@ -309,19 +308,19 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         last_time_modification=Form_save_time_last_modification()
         last_time_modification.fields["last_modif_time"].initial=document_controller.mtime
 
-        last_time_modification.fields["last_modif_microseconds"].initial=document_controller.mtime.microsecond             
-        links=elements_decomposable(stp_file)
-        if not links:
+        last_time_modification.fields["last_modif_microseconds"].initial=document_controller.mtime.microsecond
+        product=read_ArbreFile(stp_file)                 
+        if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")              
         Select_Doc_Part_types = formset_factory(Doc_Part_type_Form)
         Select_Order_Quantity_types = formset_factory(Order_Quantity_Form)
         data = {
-        'form-TOTAL_FORMS': u'%s'%len(links),
-        'form-INITIAL_FORMS': u'%s'%len(links),
-        'form-MAX_NUM_FORMS': u'%s'%len(links),
+        'form-TOTAL_FORMS': u'%s'%len(product.links),
+        'form-INITIAL_FORMS': u'%s'%len(product.links),
+        'form-MAX_NUM_FORMS': u'%s'%len(product.links),
         }
         index=0 
-        for link in links:
+        for link in product.links:
             order=(index+1)*10
             data.update({'form-%s-order'%index :u'%s'%order,
                          'form-%s-quantity'%index : u'%s'%link.quantity,
@@ -347,10 +346,10 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             part_attributes=get_creation_form(request.user,models.get_all_plmobjects()["Part"],None, index)
             part_attributes.prefix=index*2
             part_attributes.fields["group"].initial=obj.object.group
-            part_attributes.fields["name"].initial=links[index].product.name
+            part_attributes.fields["name"].initial=product.links[index].product.name
             doc_attributes=get_creation_form(request.user,models.get_all_plmobjects()["Document3D"],None,index)
             doc_attributes.prefix=index*2+1
-            doc_attributes.fields["name"].initial=links[index].product.name
+            doc_attributes.fields["name"].initial=product.links[index].product.name
             doc_attributes.fields["group"].initial=obj.object.group
             form_Doc_Part_attributes.append([part_attributes,doc_attributes])            
             index=index+1
@@ -571,7 +570,7 @@ def display_files(request,  obj_ref, obj_revi):
     """
     Manage html page which displays the files (:class:`DocumentFile`) uploaded in the selected object.
     It computes a context dictionnary based on
-    
+    add new donwload for stp decomposed
     .. include:: views_params.txt 
     """
     obj_type="Document3D"
@@ -597,10 +596,10 @@ def display_files(request,  obj_ref, obj_revi):
     return r2r('displayfiles3D.html', ctx, request)
 ########################################################################     
 @transaction.commit_on_success        
-def decomposer_stp(stp_file,options,links,obj):  
+def decomposer_stp(stp_file,options,product,obj):  
   
-    list_doc3D_controller , instances =generate_part_doc_links(options,links,obj)                          
-    instances+=decomposer_all(stp_file,list_doc3D_controller,links,obj._user) 
+    list_doc3D_controller , instances =generate_part_doc_links(options,product.links,obj)                          
+    instances+=decomposer_all(stp_file,list_doc3D_controller,obj._user) 
     return instances                   
     
     # TODO: send one mail listing all created objects

@@ -88,6 +88,7 @@ class NEW_STEP_Import(object):
     def procesing_geometrys(self):
         from openPLM.document3D.models import GeometryFile
         
+        
 
 
         fileName, fileExtension = os.path.splitext(self.doc_file.filename)   
@@ -102,7 +103,7 @@ class NEW_STEP_Import(object):
                 else:
 
                     new_GeometryFile.file = name
-                    new_GeometryFile.index = i
+                    new_GeometryFile.index = i+1 # to evade product.geometry=0
                     new_GeometryFile.save()
                     
      
@@ -170,9 +171,9 @@ def parcour_product_relationship_arbre(label,shape_tool,product,color_tool,shape
     else:            
         compShape=shape_tool.GetShape(label)
         #nous cherchons sa correspondance dans la liste de shapes simples / si le shape navais pas de vertices on ne trouvera aucun shape                         
-        for s in range(len(shapes_simples)):
-            if compShape.IsPartner(shapes_simples[s].shape):
-                product.set_shape_geometry_related(Geometry(colour_chercher(label,color_tool,shape_tool),s)) 
+        for index in range(len(shapes_simples)):
+            if compShape.IsPartner(shapes_simples[index].shape):
+                product.set_shape_geometry_related(index+1,colour_chercher(label,color_tool,shape_tool)) # to evade product.geometry=0
                  
                    
 
