@@ -43,9 +43,14 @@ admin.site.register(Document3D)
 
 
 from celery.task import task
-@task
+@task(soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk,object_id,user_id):
-
+    """
+    try:
+        do_work()
+    except SoftTimeLimitExceeded:
+        clean_up_in_a_hurry()
+    """
     import logging
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
     from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import
@@ -182,7 +187,7 @@ class Product(object):
     __slots__ = ("label_reference","name","doc_id","links","geometry","color")
     
     
-    def __init__(self,name,doc_id,label_reference=False,geometry=False,color=False):
+    def __init__(self,name,doc_id,label_reference=False,geometry=None,color=False):
         #no tiene location
         self.links = []
         self.label_reference=label_reference

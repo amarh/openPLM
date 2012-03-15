@@ -108,31 +108,4 @@ class decomposer_Test(CommonViewTest):
         
         
 
-"""        
-def decomposer_product(product,my_step_importer,stp_file,user,to_delete,to_index):
-
-
-
-    
-    
-    Doc_controller=get_controller(stp_file.document.type)
-    Doc_controller=Doc_controller(stp_file.document,user)
-
-
-
-
-       
-    
-    for i in range(labels_roots.Length()):
-        if shape_tool.IsAssembly(labels_roots.Value(i+1)):
-            l_c = TDF_LabelSequence()
-            shape_tool.GetComponents(labels_roots.Value(i+1),l_c)
-            for e in range(l_c.Length()):
-                shape_tool.RemoveComponent(l_c.Value(e+1))
-
-
-    doc_file=generate_DocumentFile(product,Doc_controller,labels_roots.Value(1),stp_file.filename,to_delete,to_index)
-    product.links=[]
-    product.doc_id=doc_file.id
-    to_delete.append(write_ArbreFile(product,doc_file))
-"""   
+   

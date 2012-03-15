@@ -33,7 +33,7 @@ def diviser(product,Doc_controller,to_delete,to_index):
 
     doc_file=generate_DocumentFile(product,Doc_controller,product.label_reference,product.name+".stp".encode("utf-8"),to_delete,to_index)
   
-    index_reference=[1] # to evade product.geometry=0
+    index_reference=[0] # to evade product.geometry=0
     assigned_index=[]
     update_product(product,doc_file,index_reference,assigned_index,to_delete)
     to_delete.append(write_ArbreFile(product,doc_file))
@@ -64,7 +64,7 @@ def update_product(product,doc_file,index_reference,assigned_index,to_delete):
 
     
    
-    if product.geometry:
+    if not product.geometry==None:
         copy_js(product,doc_file,index_reference,assigned_index,to_delete)           
       
     else:            
