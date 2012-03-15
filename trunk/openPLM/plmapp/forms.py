@@ -162,7 +162,9 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
     if data is None:
-        form = Form(initial=get_initial_creation_data(cls, start), **kwargs)
+        initial = get_initial_creation_data(cls, start)
+        initial.update(kwargs.pop("initial", {}))
+        form = Form(initial=initial, **kwargs)
     else:
         form = Form(data=data, **kwargs)
     if issubclass(cls, m.PLMObject):

@@ -9,7 +9,7 @@ from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
 
 import openPLM.plmapp.views.main as pviews
-from openPLM.plmapp.base_views import handle_errors, get_generic_data
+from openPLM.plmapp.base_views import handle_errors, get_generic_data, register_creation_view
 
 from openPLM.gdoc.models import CredentialsModel, FlowModel
 from openPLM.gdoc.models import GoogleDocument, GoogleDocumentController
@@ -89,7 +89,7 @@ def create_gdoc(request, client):
         'object_type': "GoogleDocument",
     })
     return pviews.r2r('create.html', ctx, request)
-pviews.register_creation_view(GoogleDocument, create_gdoc)
+register_creation_view(GoogleDocument, create_gdoc)
 
 @oauth2_required
 @handle_errors
