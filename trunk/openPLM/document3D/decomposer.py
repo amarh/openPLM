@@ -46,11 +46,13 @@ def diviser(product,Doc_controller,to_delete,to_index):
 
 def is_decomposable(Document3D):
 
-
-    STP_file=Document3D.files.filter(is_stp) #solo abra uno pero por si las moscas
+    try:
+        STP_file=Document3D.files.get(is_stp) #solo abra uno pero por si las moscas
+    except:
+        return False
     product=read_ArbreFile(STP_file)   
-    if product and product.links and STP_file[0].checkout_valid and not STP_file[0].locked:
-        return STP_file[0]      
+    if product and product.links and STP_file.checkout_valid and not STP_file.locked:
+        return STP_file      
     return False
 
 

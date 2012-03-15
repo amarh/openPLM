@@ -182,16 +182,16 @@ class Product(object):
     __slots__ = ("label_reference","name","doc_id","links","geometry","color")
     
     
-    def __init__(self,name,doc_id,label_reference=False,geometry_ref=False,color=False):
+    def __init__(self,name,doc_id,label_reference=False,geometry=False,color=False):
         #no tiene location
         self.links = []
         self.label_reference=label_reference
         self.name=name
         self.doc_id=doc_id   #cambiar por step product id
-        self.geometry=geometry_ref
+        self.geometry=geometry
         self.color=color
-    def set_shape_geometry_related(self,geometry_ref,color):
-        self.geometry=geometry_ref
+    def set_shape_geometry_related(self,geometry,color):
+        self.geometry=geometry
         self.color=color        
     
 class Link(object):
