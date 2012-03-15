@@ -95,16 +95,13 @@ class NEW_STEP_Import(object):
         for i, shape in enumerate(self.shapes_simples):
                 new_GeometryFile= GeometryFile()
                 new_GeometryFile.stp = self.doc_file
-                my_mesh = mesh_shape(shape.shape)
+                
                 name = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
                 path = os.path.join(new_GeometryFile.file.storage.location, name)
-                if(not mesh_to_3js(my_mesh,path.encode(),"_"+str(i+1)+"_"+str(self.doc_file.id),shape.nom)):
-                    return False    
-                else:
-
-                    new_GeometryFile.file = name
-                    new_GeometryFile.index = i+1 # to evade product.geometry=0
-                    new_GeometryFile.save()
+                mesh_shape(shape.shape,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id),shape.nom)
+                new_GeometryFile.file = name
+                new_GeometryFile.index = i # to evade product.geometry=0
+                new_GeometryFile.save()
                     
      
 
@@ -131,7 +128,7 @@ class simple_shape():
     def __init__(self, nom,TopoDS_Shape):
         self.nom = nom
         self.shape = TopoDS_Shape
-
+ 
 
 
 
@@ -173,7 +170,7 @@ def parcour_product_relationship_arbre(label,shape_tool,product,color_tool,shape
         #nous cherchons sa correspondance dans la liste de shapes simples / si le shape navais pas de vertices on ne trouvera aucun shape                         
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
-                product.set_shape_geometry_related(index+1,colour_chercher(label,color_tool,shape_tool)) # to evade product.geometry=0
+                product.set_shape_geometry_related(index,colour_chercher(label,color_tool,shape_tool)) # to evade product.geometry=0
                  
                    
 
