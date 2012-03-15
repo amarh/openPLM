@@ -26,7 +26,6 @@
 
 
 import re
-import datetime
 from functools import wraps
 import functools
 import traceback
@@ -411,4 +410,25 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     })
     return ctx
 
+_creation_views = {}
+def register_creation_view(type_, view):
+    """
+    Register a creation view for *type_* (a subclass of :class:`.PLMObject`).
+    
+    Most of the applications does not need to call this function which is 
+    available for special cases which cannot be handled by :func:`create_object`.
+
+    .. note::
+        
+        You must ensure that the module that calls this function has been imported.
+        For example, you can import it in your :file:`urls.py` file.
+    """
+    _creation_views[type_] = view
+
+def get_creation_view(type_):
+    """
+    Returns a registed view for *type_* (a subclass of :class:`.PLMObject`)
+    or None if no views are registered.
+    """
+    return _creation_views.get(type_)
 

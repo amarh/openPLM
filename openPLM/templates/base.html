@@ -52,105 +52,113 @@
 
 
             <div id="content-box" class="clearfix">
-                <div id="DisplayBox">
-                    <ul>
+                {% block toolbar %}
+                    <div id="DisplayBox">
+                        <ul>
 
-                        <li>
-                        <input type="checkbox" id="SearchButton" />
-                        <label for="SearchButton">
-                            {% trans "SEARCH" %}
-                        </label>
-                        </li>
-                        <li>
-                        <input type="checkbox" id="CreationButton" />
-                        <label for="CreationButton">
-                            {% trans "CREATE" %}
-                        </label>
-                        </li>
+                            <li>
+                            <input type="checkbox" id="SearchButton" />
+                            <label for="SearchButton">
+                                {% trans "SEARCH" %}
+                            </label>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="CreationButton" />
+                            <label for="CreationButton">
+                                {% trans "CREATE" %}
+                            </label>
+                            </li>
 
 
-                        {% if object_reference != "-" %}
-                            {% if navigate_bool %}
-                                <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
-                            {% else %}
-                                <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
+                            {% if object_reference != "-" %}
+                                {% if navigate_bool %}
+                                    <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
+                                {% else %}
+                                    <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
+                                {% endif %}
+                                <a href="{{obj.plmobject_url}}navigate/">
+                                    <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                                </a>
+                                </li>
+                                {% if navigate_bool %}
+                                    <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
+                                {% else %}
+                                    <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButton">
+                                {% endif %}
+                                <a href="{{obj.plmobject_url}}attributes/">
+                                    <span class="ui-button-text">{% trans "STUDY" %}</span>
+                                </a>
+                                </li>
                             {% endif %}
-                            <a href="{{obj.plmobject_url}}navigate/">
-                                <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                            <li class="{{"Button"|button}}" id="QuitButton">
+                            <a href="/logout/">
+                                <span class="ui-button-text">{% trans "EXIT" %}</span>
                             </a>
                             </li>
-                            {% if navigate_bool %}
-                                <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
-                            {% else %}
-                                <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}"  id="StudyButton">
-                            {% endif %}
-                            <a href="{{obj.plmobject_url}}attributes/">
-                                <span class="ui-button-text">{% trans "STUDY" %}</span>
-                            </a>
-                            </li>
-                        {% endif %}
-                        <li class="{{"Button"|button}}" id="QuitButton">
-                        <a href="/logout/">
-                            <span class="ui-button-text">{% trans "EXIT" %}</span>
-                        </a>
-                        </li>
-                    </ul>
-                </div>
+                        </ul>
+                    </div>
+                {% endblock %}
 
                 <div class="clearfix">
+                    {% block leftcolumn %}
+                        <div id="left-col">
 
-                    <div id="left-col">
-
-                        <div id="CreationBox">
-                            <h2>{% trans "Create" %}
-                                <div class="toolbar">
-                                    <ul>
-                                    </ul>
+                            {% block creation %}
+                                <div id="CreationBox">
+                                    <h2>{% trans "Create" %}
+                                        <div class="toolbar">
+                                            <ul>
+                                            </ul>
+                                        </div>
+                                    </h2>
+                                    {% include "blocks/creation.html" %}
                                 </div>
-                            </h2>
-                            {% include "blocks/creation.html" %}
-                        </div>
+                            {% endblock %}
 
-                        <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
-                            <h2>{% trans "Search" %}
-                                <div class="toolbar">
-                                    <ul>
-                                        <li>
-                                        <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
-                                            href="/media/help/{{LANGUAGE_CODE}}/search.html" target="_blank">
-                                            <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
-                                            <span class="ui-button-text">?</span>
-                                        </a>
-                                        </li>
-                                    </ul>
+                            {% block search %}
+                                <div id="SearchBox" class="{{link_creation|yesno:"link_creation,"}}">
+                                    <h2>{% trans "Search" %}
+                                        <div class="toolbar">
+                                            <ul>
+                                                <li>
+                                                <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
+                                                    href="/media/help/{{LANGUAGE_CODE}}/search.html" target="_blank">
+                                                    <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
+                                                    <span class="ui-button-text">?</span>
+                                                </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </h2>
+                                    {% include "blocks/search.html" %}
                                 </div>
-                            </h2>
-                            {% include "blocks/search.html" %}
+                            {% endblock %}
                         </div>
+                    {% endblock %}
 
-
-                    </div>
                     <div id="center-col" class="heightfix">
 
-                        <div id="ActiveBox" class="{{class4div}}">
-                            {% include "blocks/reference.html" %}
-                            <div id="ActiveArea">
-                                {% if is_readable %}
-                                    {% if object_menu and not navigate_bool %}
-                                        {% include "blocks/menu.html" %}
+                        {% block main %}
+                            <div id="ActiveBox" class="{{class4div}}">
+                                {% include "blocks/reference.html" %}
+                                <div id="ActiveArea">
+                                    {% if is_readable %}
+                                        {% if object_menu and not navigate_bool %}
+                                            {% include "blocks/menu.html" %}
+                                        {% endif %}
+                                        <div id="main_content">
+                                            {% block content %}{% endblock %}	
+                                        </div>
+                                    {% else %}
+                                        <p>{% trans "You are not allowed to see this object" %}</p>
                                     {% endif %}
-                                    <div id="main_content">
-                                        {% block content %}{% endblock %}	
-                                    </div>
-                                {% else %}
-                                    <p>{% trans "You are not allowed to see this object" %}</p>
-                                {% endif %}
 
-                                <div class="clearfix"></div>
+                                    <div class="clearfix"></div>
+
+                                </div>
 
                             </div>
-
-                        </div>
+                        {% endblock %}
 
                     </div>
 

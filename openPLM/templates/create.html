@@ -2,41 +2,63 @@
 {% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
+{% block creation %} {% endblock %}
+{% block toolbar %} {% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
+
+    <script type="text/javascript" src="/media/js/create.js"></script>
+{% endblock %}
 
 {% block content %}
-	<h3>{% trans "OBJECT CREATION:" %}</h3>
-		<form method="post" action="." >	
-	<table class="Content">
-		<tr class="Content">
-			<th class="Content">{% trans "Type" %}</th>
-			<td class="Content">{{ object_type }}</td>
-		</tr>
-		<tr class="Content hidden">
-			<th><label for="id_type">&nbsp;</label></th>
-			<td><input id="id_type" type="hidden" name="type" value="{{object_type}}" /></td>
-		</tr>
-        {% for attribute in creation_form.visible_fields %}
-                    {# Include the hidden fields in the form #}
-              {% if forloop.first %}
-                    {% for hidden in form.hidden_fields %}
-                        {{ hidden }}
-                    {% endfor %}
-              {% endif %}
-			<tr class="Content">
-				<th class="Content">{{attribute.label_tag}}</th>
-				<td class="Content">{{attribute}}</td>
-				<td>{{ attribute.errors }}</td>
-			</tr>
-		{% endfor %}
-        <tr class="Content">
-            {% for error in creation_form.non_field_errors %}
-                <td> {{ error }} </td>
-            {% endfor %}
-			<td></td>
-			<td><input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE" %}" /></td>
-		</tr>
-	</table>
-		</form>
+    {% if user.get_profile.is_contributor %}
+        <div>
+        <h3>{% trans "OBJECT CREATION:" %}</h3>
+            <form id="creation_form" method="post" action="." >	
+                <table class="Content">
+                    <col width="20%" />
+                    <col width="80%" />
+                    <tbody>
+                        <tr class="Content">
+                            <th class="Content">{% trans "Type" %}</th>
+                            <td>{{ type_form4creation.visible_fields.0 }}</td>
+                        </tr>
+                        {{ creation_form }}
+                    </tbody>
+                </table>
+                <div style="width:100%; text-align:center; padding:0.5em;">
+                    <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE" %}" />
+                </div>
+            </form>
+                </div>
+        <div>
+        <h3>{% trans "Other creation tools:" %}</h3>
+            <ul>
+                <li>
+                <a href="/import/csv/" >
+                    {% trans "Import several parts or documents from CSV file." %}
+                </a>
+                </li>
+                <li>
+                <a href="/import/bom/">
+                    {% trans "Import a BOM from a CSV file." %}</a>
+                </li>
+                <li>
+                <a href="/user/{{user.username}}/delegation/sponsor/">
+                    {% trans "Sponsor a new user" %}
+                <li>
+                <a href="/import/users/">
+                    {% trans "Sponsor several users from a CSV file." %}
+                </a>
+                </li>
+            </ul>
+        </div>
+    {% else %}
+        <p>{% trans "You can not create an object since you are not a contributor."%}</p>
+    {% endif %}
 {% endblock %}
 
 

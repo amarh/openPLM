@@ -287,6 +287,18 @@ div#CreationBox, div#SearchBox {
     background-image: url("../img/dark/h2_bg_2.png");
 }
 
+h3 {
+    color: #eee;
+    font-size: 100%;
+    padding-left: 1em;
+    font-weight: 600;
+    background-repeat: no-repeat;
+    text-shadow: 1px 1px #000;
+    background-size: cover;
+    background-image: url("../img/dark/h2_bg_2.png");
+
+}
+
 div#ActiveBox
 {
     min-height: 420px;
@@ -573,14 +585,10 @@ td.open span.expander:hover {
 div.Result {
     display: block;
     background-color: #e4e3e2;
-    /*max-height: 30em;*/
 }
 
 ul.Result {
     display: block;
-    /*background-color: #e4e3e2;*/
-    /*margin: 0.5em;*/
-    /*margin: 0.5em;*/
     overflow-y: auto;
     max-height: 30em;
 }

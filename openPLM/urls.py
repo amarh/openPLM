@@ -91,6 +91,7 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns2('', 'ajax/', 
     (r'search/$', ajax_search_form),
+    (r'create/$', ajax_creation_form),
     (r'complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
     (r'thumbnails/%s?$' % object_pattern, ajax_thumbnails),
     (r'navigate/%s?$' % object_pattern, ajax_navigate),

@@ -1,0 +1,16 @@
+ul.Result {
+    overflow: none;
+    max-height: none;
+}
+
+li.Result {
+    list-style: none !important;
+}
+
+#inline_search_form > * {
+    vertical-align: middle;
+}
+
+#results {
+    margin: 0.5em;
+}
