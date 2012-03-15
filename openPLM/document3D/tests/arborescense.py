@@ -8,25 +8,27 @@ class arborescense_Test(CommonViewTest):
         super(arborescense_Test, self).setUp()
         self.document = Document3DController.create('doc1', 'Document3D',
                 'a', self.user, self.DATA)
-        f=open("document3D/data_test/test2.stp")
+        f=open("document3D/data_test/test.stp")
         myfile = File(f)
         self.stp=self.document.add_file(myfile)
+        self.controller.attach_to_document(self.document.object)
         self.data_to_decompose = data
         self.data_to_decompose.update({u'last_modif_time': [u'%s-%s-%s %s:%s:%s'%(self.document.mtime.year,self.document.mtime.month,self.document.mtime.day,self.document.mtime.hour,self.document.mtime.minute,self.document.mtime.second)],
            u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
            })
-        self.controller.attach_to_document(self.document.object)  
+          
 
                
                       
                        
     def test_read_ArbreFile(self):
         """
-        We verify if the structure of the tree is the same for a file without decompose  and the same file once decomposed
+        We verify if the structure of the tree is the same for a file without decompose  and the new file generated once decomposed
         """
         product=read_ArbreFile(self.stp)
-        self.post(self.base_url+"decompose/"+str(self.stp.id)+"/",self.data_to_decompose) 
-        product2=read_ArbreFile(self.stp,self.user)  
+        reponse=self.post(self.base_url+"decompose/"+str(self.stp.id)+"/",self.data_to_decompose)
+        doc_file=self.document.files[0] 
+        product2=read_ArbreFile(doc_file,self.user)  
         self.assertTrue(same_estructure(product,product2))
     
 

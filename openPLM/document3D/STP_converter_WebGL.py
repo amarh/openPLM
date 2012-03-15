@@ -98,7 +98,7 @@ class NEW_STEP_Import(object):
                 my_mesh = mesh_shape(shape.shape)
                 name = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
                 path = os.path.join(new_GeometryFile.file.storage.location, name)
-                if(not mesh_to_3js(my_mesh,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id),shape.nom)):
+                if(not mesh_to_3js(my_mesh,path.encode(),"_"+str(i+1)+"_"+str(self.doc_file.id),shape.nom)):
                     return False    
                 else:
 

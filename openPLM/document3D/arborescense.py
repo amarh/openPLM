@@ -145,7 +145,6 @@ def read_ArbreFile(doc_file,user=None):
     if user:
         add_child_ArbreFile(user,doc_file,product)        
             
-
         
     return product
     
