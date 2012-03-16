@@ -225,6 +225,9 @@ clear: both;
             var width ;
             var height ;
             var deep ;
+            var mwidth ;
+            var mheight ;
+            var mdeep ;
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 			var controls;	
@@ -253,11 +256,12 @@ clear: both;
             light1 = new THREE.PointLight( 0xff0040 );
 			scene.add( light1 );
 		    centrer_objet(object3D);
+		    //muestra(object4D);
 			scene.add( object3D);
 
 
 		    
-            camera = new THREE.PerspectiveCamera( 50, $(main_content).width() / $(main_content).height(), 0.1, radius*7 );
+            camera = new THREE.PerspectiveCamera( 50, $(main_content).width() / $(main_content).height(), 0.1, radius*200 );
             camera.position.z = radius*1.5;
             
 
@@ -273,11 +277,11 @@ clear: both;
             controls.noPan = false;
             controls.staticMoving = false;
             controls.dynamicDampingFactor = 0.3;
-            controls.minDistance = radius * 1.1;
+            controls.minDistance = 0;
             controls.maxDistance = radius * 100;
-            controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ]                
+            controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
                 
-            var g 	= new THREE.CubeGeometry( width, height, deep );
+            var g 	= new THREE.CubeGeometry( mwidth, mheight, mdeep );
 			var ma 	= new THREE.MeshNormalMaterial();
 			var me	= new THREE.Mesh( g, ma );     
 
@@ -299,17 +303,30 @@ clear: both;
 			}
 			
 
+function muestra(object4D){
+object4D.geometry.computeBoundingBox();   
+boundingBox=object4D.geometry.boundingBox;
+mwidth =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
+mheight =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
+mdeep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
+alert(mwidth+" , "+mheight+" , "+mdeep)
 
+
+}
 function has_webgl(){
 return !!window.WebGLRenderingContext;
 }
 
-function centrer_objet(object3D){		
-object3D.geometry.computeBoundingBox();
-boundingBox=object3D.geometry.boundingBox;  			        
+function centrer_objet(object3D){
+//object3D.updateMatrix(); 		
+boundingBox=computeGroupBoundingBox(object3D);
+//boundingBox=BB;
+//alert(object3D.children.length) 
+ 			        
 width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
 height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
 deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
+//alert(width+" , "+height+" , "+deep)
 radius=width
 if(height>radius){
 radius=height
@@ -328,10 +345,6 @@ object3D.updateMatrix();
 
 
 
-
-//object3D.matrixAutoUpdate=;
-
-
 }
             
             
@@ -345,9 +358,88 @@ renderer.render( scene, camera );
 };
 
             
+function updateBoundingBox(object){
+
+object.geometry.computeBoundingBox();
+boundingBox=object.geometry.boundingBox;
+if (!BB){
+BB= { 
+'x': [ boundingBox.x[ 0 ], boundingBox.x[ 1 ] ],
+'y': [ boundingBox.y[ 0 ], boundingBox.y[ 1 ] ],
+'z': [ boundingBox.z[ 0 ], boundingBox.z[ 1 ] ]}; 
+
+alert("left : "+BB.y[ 0 ]+"    right : "+BB.y[ 1 ]+"    height : "+Math.abs(BB.y[ 1 ]-BB.y[ 0 ]))
+
+}
+else{
+alert("left : "+boundingBox.y[ 0 ]+"    right : "+boundingBox.y[ 1 ]+"    height : "+Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]))
+if ( boundingBox.x[ 0 ] < BB.x[ 0 ] ) {
+BB.x[ 0 ] = boundingBox.x[ 0 ];
+}
+if ( boundingBox.x[ 1 ] > BB.x[ 1 ] ) {
+BB.x[ 1 ] = boundingBox.x[ 1 ];
+}        
+if ( boundingBox.y[ 0 ] < BB.y[ 0 ] ) {
+alert("update inf "+BB.y[ 0 ]+" to "+boundingBox.y[ 0])
+BB.y[ 0 ] = boundingBox.y[ 0 ];
+}
+if ( boundingBox.y[ 1 ] > BB.y[ 1 ] ) {
+alert("update top "+BB.y[ 1 ]+" to "+boundingBox.y[ 1])
+BB.y[ 1 ] = boundingBox.y[ 1 ];
+}
+if ( boundingBox.z[ 0 ] < BB.z[ 0 ] ) {
+BB.z[ 0 ] = boundingBox.z[ 0 ];
+}
+if ( boundingBox.z[ 1 ] > BB.z[ 1 ] ) {
+BB.z[ 1 ] = boundingBox.z[ 1 ];
+}
+
+
+}
+}
+
+
+
 
 						
+function computeGroupBoundingBox(Object_Group) {   
+   if(Object_Group.children.length >  0 ){ 
+        var boundingBox;    
+        for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
+        
+        Object_Group.children[ v ].geometry.computeBoundingBox();        
+        if(Object_Group.children[ v ].geometry.boundingBox){
+        //alert(v);   
+        if(!boundingBox){
+        boundingBox= { 
+        'x': [ Object_Group.children[ v ].geometry.boundingBox.x[ 0 ], Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] ],
+        'y': [ Object_Group.children[ v ].geometry.boundingBox.y[ 0 ], Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] ],
+        'z': [ Object_Group.children[ v ].geometry.boundingBox.z[ 0 ], Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] ]}; 
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 0 ] < boundingBox.x[ 0 ] ) {
+        boundingBox.x[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] > boundingBox.x[ 1 ] ) {
+        boundingBox.x[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 1 ];
+        }        
+        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 0 ] < boundingBox.y[ 0 ] ) {
+        boundingBox.y[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] > boundingBox.y[ 1 ] ) {
+        boundingBox.y[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 1 ];
 
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 0 ] < boundingBox.z[ 0 ] ) {
+        boundingBox.z[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 0 ];
+        }
+        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] > boundingBox.z[ 1 ] ) {
+        boundingBox.z[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 1 ];
+        }      
+}
+}
+}
+return boundingBox;
+}
             
             
             
