@@ -10,8 +10,9 @@ def generate_javascript_for_3D(product):
 
     if product:
         numeration=[0]
-        
-        javascript=['var mergedGeo    = new THREE.Geometry();\n']
+        javascript=['var object3D = new THREE.Object3D();\n']        
+        #javascript[0]+='var mergedGeo    = new THREE.Geometry();\n'
+        javascript[0]+="var BB;\n"
         
         javascript_menu=['function menu() {\nelement = document.createElement("div");\nelement.id="root";\nelement.innerHTML ="']
 
@@ -24,7 +25,7 @@ def generate_javascript_for_3D(product):
         
         javascript_menu[0]+='</li></ul>' 
         javascript_menu[0]+='";\ndocument.getElementById("menu_").appendChild(element);\n}\n'
-        javascript[0]+="var object3D=new THREE.Mesh(mergedGeo,new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading}));\n"
+        #javascript[0]+="var object4D=new THREE.Mesh(mergedGeo,new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading}));\n"
         #javascript[0]+="object3D.matrixAutoUpdate = false;\n" 
         #javascript[0]+="object3D.updateMatrix();\n"
         return javascript_menu[0]+javascript[0]
@@ -123,13 +124,19 @@ def locate_object(loc,numeration):
                 
         a ,b =transformation.GetRotation(gp)
         t=transformation.TranslationPart()
-    
+
+        locate+="object%s.matrixAutoUpdate = false;\n"%numeration
         if a:        
             locate+="object%s.matrix.setRotationAxis(new THREE.Vector3( %s, %s, %s ), %s);\n"%(numeration,gp.X(),gp.Y(),gp.Z(),b)
                             
-        locate+="object%s.matrix.setPosition(new THREE.Vector3( %s, %s, %s ));\n"%(numeration,t.X(),t.Y(),t.Z())
-        locate+="object%s.matrixAutoUpdate = false;\n"%numeration
-        locate+="THREE.GeometryUtils.merge(mergedGeo, object%s)"%numeration;                   
+        locate+="object%s.matrix.setPosition(new THREE.Vector3( %s, %s, %s ));\n"%(numeration,t.X(),t.Y(),t.Z()) 
+
+
+        #locate+="updateBoundingBox(object%s);\n"%numeration
+        #
+
+        locate+="object3D.add(object%s);\n"%numeration    
+        #locate+="THREE.GeometryUtils.merge(mergedGeo, object%s)"%numeration                  
         
     
      
@@ -306,12 +313,13 @@ function_change_part = """
 function_change_object = """
     object%(object_numeration)s.visible=part%(numeration)s.visible;   
 """                                    
+    
 function_generate_objects= """
 var NewMaterial=new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading});
 NewMaterial.color.setRGB(%(red)f,%(green)f,%(blue)f);
-var object%(object_numeration)s=new THREE.Mesh( _%(reference)s_%(part_id)s,NewMaterial );      
-"""         
- 
+var object%(object_numeration)s=new THREE.Mesh( _%(reference)s_%(part_id)s,NewMaterial );
+//object3D.add(object%(object_numeration)s);        
+"""   
 
 
 
