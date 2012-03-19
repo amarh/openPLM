@@ -206,7 +206,7 @@ div#left-col {
 }
 
 div#center-col {
-    margin-left:330px;
+    /*margin-left:330px;*/
 }
 
 .clearfix:after {
@@ -229,7 +229,7 @@ div#center-col {
 /*                          STYLE FOR THE MAIN BOXES                                       */
 /* *************************************************************************************** */
 /* FOR ALL BOXES */
-div#CreationBox, div#SearchBox, div#ActiveBox, div#LoginBox
+div.Box, div#ActiveBox, div#LoginBox
 {
     background-color: #C8C6C5;
     margin: 8px;
@@ -237,7 +237,7 @@ div#CreationBox, div#SearchBox, div#ActiveBox, div#LoginBox
     text-align: left;
 }
 
-div#CreationBox > *, div#SearchBox > *,
+div.Box > *,
 div#ActiveArea > *{
     padding: 5px;
 }
@@ -256,7 +256,7 @@ div#DisplayBox {
 }
 
 /* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
-div#CreationBox, div#SearchBox {
+div.Box {
     display: none;
     font-size: 14px;
     /*float: left;*/
@@ -265,7 +265,7 @@ div#CreationBox, div#SearchBox {
     padding: 0;
 }
 
-#CreationBox h2, #SearchBox h2 {
+div.Box h2 {
     color: #eee;
     font-size: 100%;
     padding-left: 1em;
@@ -280,11 +280,25 @@ div#CreationBox, div#SearchBox {
     text-shadow: 1px 1px #000;
 }
 
-#CreationBox h2 {
+#SuperMenuBox h2 {
     background-image: url("../img/dark/h2_bg_1.png");
 }
 #SearchBox h2 {
     background-image: url("../img/dark/h2_bg_2.png");
+}
+
+#ToggleBoxButton {
+    position: fixed;
+    left: 0;
+    top: 150px;
+}
+
+
+#ToggleBoxButton label {
+    width: 20px;
+}
+#ToggleBoxButton span {
+    padding: 0;
 }
 
 h3 {
@@ -323,6 +337,7 @@ div#LoggedPersonBox {
     font-size: 14px;
     margin-bottom: 0px;
     margin-left: 300px;
+    padding-right: 1em;
 
     background: -moz-linear-gradient(left,  rgba(55,52,52,0) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(55,52,52,0)), color-stop(100%,rgba(0,0,0,0.8))); /* Chrome,Safari4+ */
@@ -351,14 +366,20 @@ li#NavigateButton {
     margin-left: 5em;
 }
 
-#SetLangForm * {
-    line-height: 1em;
+#SetLangForm *,
+.Button.small,
+.Button.small * {
+    line-height: 0.9em;
     font-size: 1em;
     margin-top: auto;
     margin-bottom: auto;
 }
+a.Button.small span{
+    padding: 0.3em;
+}
 
-#SetLangForm .Button {
+#SetLangForm .Button,
+.Button.small {
     margin: 0;
     padding: 3px;
 }
@@ -705,12 +726,6 @@ div.chzn-container-single > *
 div.chzn-container-single select *{
     font-size: 1em;
 }
-
-ul#createbar > li ,
-ul#importbar > li {
-    margin: 0.2em 0;
-}
-
 #SearchBox td > * {
     width: 90%;
     max-width: 90%;
@@ -720,10 +735,6 @@ ul#importbar > li {
 
 #id_type_chzn {
     max-width: 65%;
-}
-
-#create_button {
-    width: 30%;
 }
 
 #search_button {
@@ -968,3 +979,82 @@ span#select_type {
     margin-top: 2em;
     font-size: smaller;
 }
+
+/* supermenu -- homepage */
+#supermenuholder {
+    box-shadow: 0 0 115px 80px #888 inset;
+    padding: 3em;
+}
+#supermenu {
+    width: 100%;
+}
+div.menurow {
+    text-align: center;
+}
+div.menuitem {
+    width: 200px;
+    display:inline-block;
+    margin: auto;
+    line-height: 72px;
+    background-image: url("../img/menuitem_home.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-shadow: 1px 1px #000;
+    margin-top: 0.2em;
+    vertical-align: middle;
+    box-shadow: 2px 2px 5px #000;
+    border-radius: 4px;
+}
+
+div.menuitem * {
+    color: #ececec;
+    text-decoration: none;
+}
+div.menuitem > a {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+div#mi_homepage {
+    background-image: url("../img/dark/logo_openplm.png");
+    width: 260px;
+    height: 180px;
+    box-shadow: none;
+}
+
+.tooltip span.info {
+    display: none;
+    width: 180px;
+    background-color: #F9EF89;
+    color: black;
+    box-shadow: 3px 3px 5px #555;
+    position: absolute;
+    text-shadow: none;
+    font-size: 14px;
+    line-height: 1em;
+    font-weight: normal;
+    padding: 10px;
+    border-radius: 0.4em;
+    border: solid 1px #999;
+    text-align: left;
+    margin-top: 3px;
+    margin-left: 50px;
+}
+
+.tooltip span.triangle {
+    width: 16px;
+    height: 16px;
+    display: none;
+    background-image: url("../img/triangle.png");
+    margin-top: -12px;
+    margin-left: 92px;
+    z-index: 99;
+    position: absolute;
+}
+
+.tooltip:hover span {
+    display: block;
+}
+

@@ -7,76 +7,65 @@
     <link rel="stylesheet" type="text/css" href="/media/css/search.css" />
 {% endblock %}
 {% block leftcolumn %} {% endblock %}
-{% block toolbar %} {% endblock %}
 
-{% block main  %}
-    <div id="ActiveBox">
-        <div id="ReferenceArea">
-            <h2>Search</h2>
-        </div>
-        <div id="ActiveArea">
-
-            <div id="main_content">
-
-                <form id="inline_search_form" method="get" action=".">
-                    {% for field in form %}
-                        {{ field }}
-                    {% endfor %}
-                    <input id="search_button" type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/>
-                </form>
-
-                {% if query %}
-                    <h3>Results</h3>
-
-                    {% for result in page.object_list %}
-                        {% if forloop.first %}
-                            <p id="results">
-                            {% trans "Results" %}
-                            <span id="numresults">
-                                {% blocktrans with page.start_index as start and page.end_index as end and paginator.count as total %}
-                                    ({{start}} - {{end}} on {{total}})
-                                {% endblocktrans %}
-                            </span> 
-                            </p>
-                            <ul class="Result">
-                            {% endif %}
+{% block content  %}
 
 
-                            <li class="Result">
-                            <div class="reference">
-                                {{result.rendered|safe}}
-                            </div>
-                            <div class="summary">
-                                {{ result.highlighted.text|safe }}
-                            </div>
-                            </li>
+    <form id="inline_search_form" method="get" action=".">
+        {% for field in form %}
+            {{ field }}
+        {% endfor %}
+        <input id="search_button" type="submit" class="{{"Button"|button}}" value="{% trans "SEARCH !" %}"/>
+    </form>
 
-                            {% if forloop.last %}
-                            </ul>
-                        {% endif %}
+    {% if query %}
+        <h3>Results</h3>
+
+        {% for result in page.object_list %}
+            {% if forloop.first %}
+                <p id="results">
+                {% trans "Results" %}
+                <span id="numresults">
+                    {% blocktrans with page.start_index as start and page.end_index as end and paginator.count as total %}
+                        ({{start}} - {{end}} on {{total}})
+                    {% endblocktrans %}
+                </span> 
+                </p>
+                <ul class="Result">
+                {% endif %}
 
 
-                    {% empty %}
-                        <p>{% trans "No result matching given query" %}</p>
-                    {% endfor %}
+                <li class="Result">
+                <div class="reference">
+                    {{result.rendered|safe}}
+                </div>
+                <div class="summary">
+                    {{ result.highlighted.text|safe }}
+                </div>
+                </li>
+
+                {% if forloop.last %}
+                </ul>
+            {% endif %}
 
 
-                    {% if page.has_previous or page.has_next %}
-                        <div>
-                            {% if page.has_previous %}
-                                <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>
-                            {% endif %}
-                            |
-                            {% if page.has_next %}
-                                <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% else %}
-                    {# Show some example queries to run, maybe query syntax, something else? #}
+        {% empty %}
+            <p>{% trans "No result matching given query" %}</p>
+        {% endfor %}
+
+
+        {% if page.has_previous or page.has_next %}
+            <div>
+                {% if page.has_previous %}
+                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>
+                {% endif %}
+                |
+                {% if page.has_next %}
+                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>
                 {% endif %}
             </div>
-            <div class="clearfix"></div>
-        </div>
-    </div>
+        {% endif %}
+    {% else %}
+        {# Show some example queries to run, maybe query syntax, something else? #}
+    {% endif %}
 {% endblock %}

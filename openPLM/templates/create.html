@@ -2,8 +2,6 @@
 {% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
-{% block creation %} {% endblock %}
-{% block toolbar %} {% endblock %}
 {% block css %}
     <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
 {% endblock %}
@@ -24,7 +22,7 @@
                     <tbody>
                         <tr class="Content">
                             <th class="Content">{% trans "Type" %}</th>
-                            <td>{{ type_form4creation.visible_fields.0 }}</td>
+                            <td>{{ creation_type_form.visible_fields.0 }}</td>
                         </tr>
                         {{ creation_form }}
                     </tbody>
@@ -33,7 +31,7 @@
                     <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE" %}" />
                 </div>
             </form>
-                </div>
+        </div>
         <div>
         <h3>{% trans "Other creation tools:" %}</h3>
             <ul>

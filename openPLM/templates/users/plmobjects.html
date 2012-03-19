@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n plmapp_tags %}
+{% load i18n plmapp_tags humanize %}
 
 {% block css %}
     <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
@@ -11,6 +11,37 @@
 
 {% block content %}
 
+    <div>
+        <h3>{% trans "Last edited objects" %}</h3>
+
+        <div class="timeline">
+
+            <dl>
+                {% for histo in last_edited_objects %}
+                    <dt class="changeset">
+                    <span class="time">
+                        {{ histo.date|naturalday|capfirst }} - {{histo.date|date:"G:i"}}
+                    </span>
+                    <span class="action"> {{histo.action}} </span>
+                    {% with histo.plmobject as plmobject %}
+                        <span class="type">{{ plmobject.type }}</span>
+                        {% spaceless %}
+                            <a href="{{ plmobject.plmobject_url }}">
+                                <span class="reference">{{ plmobject.reference }}</span>
+                            </a>
+                        {% endspaceless %}
+                        <span class="revision">{{ plmobject.revision }}</span>
+                    {% endwith %}
+                    </dt>
+                    <dd>
+                    <div class="details">
+                        {{ histo.details|linebreaks }}
+                    </div>
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
     {% regroup object_user_link by role as links %}
 
     {% for group in links %}

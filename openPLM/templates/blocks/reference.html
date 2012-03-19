@@ -28,7 +28,11 @@
         <h2>
             <span class="type">{{object_type}}</span> 
             {% if object_reference != '-' %}
-                // <span class="reference">{{object_reference}}</span> // <span class="revision">{{object_revision}}</span> // <span class="name">{% firstof obj.name obj.get_full_name%}</span>
+                // <span class="reference">{{object_reference}}</span> 
+                {% if obj.is_document or obj.is_part %}
+                    // <span class="revision">{{object_revision}}</span> 
+                {% endif %}    
+              // <span class="name">{% firstof obj.name obj.get_full_name%}</span>
             {% endif%}
         </h2>
     </div>
