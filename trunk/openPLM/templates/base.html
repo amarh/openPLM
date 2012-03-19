@@ -70,11 +70,13 @@
                             </li>
 
 
-                            <li class="{{"Button"|button}}">
-                            <a href="/object/create/?type={{request.session.type}}">
-                                <span class="ui-button-text">{% trans "CREATE" %}</span>
-                            </a>
-                            </li>
+                            {% if user.get_profile.is_contributor %}
+                                <li class="{{"Button"|button}}">
+                                <a href="/object/create/?type={{request.session.type}}">
+                                    <span class="ui-button-text">{% trans "CREATE" %}</span>
+                                </a>
+                                </li>
+                            {% endif %}
 
                             {% if object_reference != "-" and  navigate_bool %}
                                 <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
