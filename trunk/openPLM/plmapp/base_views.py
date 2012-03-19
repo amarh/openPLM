@@ -299,17 +299,14 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     search_needed = "results" not in request.session
     search_id = "search_id_%s" 
     if request.method == "GET" and "type" in request.GET:
-        type_form4creation = TypeFormWithoutUser(request.GET)
         search_form = SimpleSearchForm(request.GET, auto_id=search_id)
         request.session["type"] = request.GET["type"]
         request.session["q"] = request.GET.get("q", "")
         search_needed = True
         save_session = True
     elif "type" in request.session:
-        type_form4creation = TypeFormWithoutUser(request.session)
         search_form = SimpleSearchForm(request.session, auto_id=search_id)
     else:
-        type_form4creation = TypeFormWithoutUser()
         request.session['type'] = 'Part'
         search_form = SimpleSearchForm(auto_id=search_id)
         save_session = True
@@ -330,7 +327,6 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     ctx.update({'results' : qset, 
                 'search_query' : search_query,
                 'search_count' : search_count,
-                'type_form4creation' : type_form4creation,
                 'search_form' : search_form,
                 'link_creation' : False,
                 'attach' : (obj, False),

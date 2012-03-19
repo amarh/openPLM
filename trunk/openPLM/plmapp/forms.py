@@ -314,7 +314,8 @@ class SimpleSearchForm(SearchForm):
    
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
-    q = forms.CharField(label=_("Query"), required=False)
+    q = forms.CharField(label=_("Query"), required=False,
+            initial="*")
 
     def __init__(self, *args, **kwargs):
         super(SimpleSearchForm, self).__init__(*args, **kwargs)

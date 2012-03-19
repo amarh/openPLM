@@ -46,76 +46,58 @@ function show_search_box(){
     $.cookie("search_box", "true", { path: '/' });
 }
 
-function hide_create_box(){
-    $("#CreationBox").hide();
-    $("label[for=CreationButton]").removeClass("ui-state-active");
-    if ($("#SearchBox").is(":hidden")){
-        hide_left_panel();
-    }
-    $.cookie("create_box", "false", { path: '/' });
-}
-
 function hide_search_box(){
     $("#SearchBox").hide();
     $("label[for=SearchButton]").removeClass("ui-state-active");
-    if ($("#CreationBox").is(":hidden")){
         hide_left_panel();
-    }
     $.cookie("search_box", "false", { path: '/' });
 }
 
-function toggle_create_box(){
-    if ($("#CreationBox").is(":hidden")){
-        show_create_box();
-    }
-    else {
-        hide_create_box();
-    }
-}
-
-
-
 function toggle_search_box(){
+    var icon = "plus";
     if ($("#SearchBox").is(":hidden")){
         show_search_box();
+        icon = "minus";
     }
     else {
         hide_search_box();
     }
+    $("#SearchButton").button("option", {
+        icons: {
+            primary: "ui-icon-" + icon
+        },
+    });
+
 }
 
 
 
 $(function (){
-
+    if ($("#left-col").size() === 0){
+        // do not read/set the cookie if the left panel is not present
+        hide_left_panel();
+        return;
+    }
     var search = $.cookie("search_box") === "true";
-    var create = $.cookie("create_box") === "true";
 
     $("#SearchButton").attr("checked", search);
-    $("#CreationButton").attr("checked", create);
-    $("#SearchButton").button().click(toggle_search_box);
-    $("#CreationButton").button().click(toggle_create_box);
-
-
-    var close_creation_box = $("<button>close</button>");
-    var button = close_creation_box.button({
+    var tb = $("#SearchButton").button( {
         icons: {
-                primary: "ui-icon-close"
+            primary: "ui-icon-"+(search ? "minus": "plus")
         },
         text:false
-        }).click(toggle_create_box);
-    var li = $("<li/>");
-    li.append(button);
-    $("#CreationBox h2>div.toolbar>ul").append(li);
+    });
+    tb.click(toggle_search_box);
+    $("#ToggleBoxButton > label").addClass("ui-corner-right").removeClass("ui-corner-all");
 
     var close_search_box = $("<button>close</button>");
-    button = close_search_box.button({
+    var button = close_search_box.button({
         icons: {
                 primary: "ui-icon-close"
         },
         text:false
         }).click(toggle_search_box);
-    li = $("<li/>");
+    var li = $("<li/>");
     li.append(button);
     $("#SearchBox h2>div.toolbar>ul").append(li);
 
@@ -126,11 +108,6 @@ $(function (){
     else{
         hide_search_box();
     }
-    if (create){
-        show_create_box();
-    }
-    else{
-        hide_create_box();
-    }
+
 
 });

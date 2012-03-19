@@ -141,8 +141,6 @@ def display_home_page(request):
     obj, ctx = get_generic_data(request, "User", request.user.username)
     del ctx["object_menu"]
 
-    ctx["last_edited_objects"] = get_last_edited_objects(obj.object)
-
     pending_invitations_owner = obj.invitation_inv_owner. \
             filter(state=models.Invitation.PENDING).order_by("group__name")
     ctx["pending_invitations_owner"] = pending_invitations_owner
@@ -869,6 +867,7 @@ def create_object(request):
     ctx.update({
         'creation_form': creation_form,
         'object_type': type_form.cleaned_data["type"],
+        'creation_type_form' : type_form,
     })
     return r2r('create.html', ctx, request)
 
@@ -972,7 +971,8 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     objs = objs.only("role", "plmobject__type", "plmobject__reference",
             "plmobject__revision", "plmobject__name")
     ctx.update({'current_page':'parts-doc-cad',
-        'object_user_link': objs
+        'object_user_link': objs,
+        'last_edited_objects':  get_last_edited_objects(obj.object),
         })
     
     return r2r('users/plmobjects.html', ctx, request)
@@ -1412,8 +1412,26 @@ class OpenPLMSearchView(SearchView):
         extra = super(OpenPLMSearchView, self).extra_context()
         obj, ctx = get_generic_data(self.request, search=False)
         ctx["type"] = self.request.session["type"]
+        ctx["object_type"] = "Search"
         extra.update(ctx)
         return extra
+
+    def get_query(self):
+        query = super(OpenPLMSearchView, self).get_query() or "*"
+        self.request.session["search_query"] = query
+        return query
+
+    def get_results(self):
+        results = super(OpenPLMSearchView, self).get_results()
+        # update request.session so that the left panel displays
+        # the same results
+        self.request.session["results"] = results[:30]
+        self.request.session["search_count"] = results.count()
+        from haystack import site
+        for r in self.request.session.get("results"):
+            r.searchsite = site
+        self.request.session.save()
+        return results
 
     @method_decorator(handle_errors)
     def __call__(self, request):
