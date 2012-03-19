@@ -188,7 +188,7 @@ z-index:10;
         
         
         
-		<script type="text/javascript" src="/media/js/Three.js"></script> 
+		<script type="text/javascript" src="/media/js/3D/NEWThree.js"></script> 
 		{% for item in GeometryFiles %}
 		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
 		{% endfor %}
@@ -268,7 +268,7 @@ container.appendChild( renderer.domElement );
 zoom = document.createElement("div");
 zoom.id = 'zoom';
 container.appendChild( zoom );
-//renderer.domElement.appendChild(newDiv);
+
 
 	
 controls = new THREE.TrackballControls( camera, renderer.domElement );
