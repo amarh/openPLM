@@ -168,7 +168,21 @@ z-index:10;
 </div> 
 
 
+ <div id="webgl_warning" class="main" style="display:none;">
+    <div class="warning_container">
+      <div class="warning">
 
+        <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
+        <ul>
+          <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
+          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
+
+          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
+        </ul>
+        <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}
 
@@ -188,7 +202,7 @@ z-index:10;
         
         
         
-		<script type="text/javascript" src="/media/js/3D/NEWThree.js"></script> 
+		<script type="text/javascript" src="/media/js/3D/terete.js"></script> 
 		{% for item in GeometryFiles %}
 		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
 		{% endfor %}
@@ -241,10 +255,7 @@ if (!has_webgl()){
 document.getElementById("webgl_warning").style.display = 'block'; 
 
 }
-
-
-
-
+else{
 container=document.getElementById('main_content');
 	
 scene = new THREE.Scene();
@@ -319,7 +330,7 @@ $(function() {
 
 
 }
-			
+}			
 
 
 function has_webgl(){
@@ -364,18 +375,18 @@ function computeGroupBoundingBox(Object_Group) {
     if (BB){    
     if(!boundingBox){
     boundingBox= { 
-    'x':[BB.x[0], BB.x[1]],
-    'y':[BB.y[0], BB.y[1]],
-    'z':[BB.z[0], BB.z[1]]
+    'x':[BB.min.x, BB.max.x],
+    'y':[BB.min.y, BB.max.y],
+    'z':[BB.min.z, BB.max.z]
     }; 
     }
     else{
-    boundingBox.x[0]=Math.min(BB.x[0], boundingBox.x[0]);
-    boundingBox.y[0]=Math.min(BB.y[0], boundingBox.y[0]);
-    boundingBox.z[0]=Math.min(BB.z[0], boundingBox.z[0]);
-    boundingBox.x[1]=Math.max(BB.x[1], boundingBox.x[1]);
-    boundingBox.y[1]=Math.max(BB.y[1], boundingBox.y[1]);
-    boundingBox.z[1]=Math.max(BB.z[1], boundingBox.z[1]);
+    boundingBox.x[0]=Math.min(BB.min.x, boundingBox.x[0]);
+    boundingBox.y[0]=Math.min(BB.min.y, boundingBox.y[0]);
+    boundingBox.z[0]=Math.min(BB.min.z, boundingBox.z[0]);
+    boundingBox.x[1]=Math.max(BB.max.x, boundingBox.x[1]);
+    boundingBox.y[1]=Math.max(BB.max.y, boundingBox.y[1]);
+    boundingBox.z[1]=Math.max(BB.max.z, boundingBox.z[1]);
     }
     }   
     }
@@ -383,21 +394,7 @@ return boundingBox;
 }
         
         
-/* <div id="webgl_warning" class="main" style="display:none;">
-    <div class="warning_container">
-      <div class="warning">
 
-        <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
-        <ul>
-          <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
-          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
-
-          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
-        </ul>
-        <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
-      </div>
-    </div>
-  </div>*/
 </script>
 
 {% endblock %}
