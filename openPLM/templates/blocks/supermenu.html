@@ -16,34 +16,36 @@
     {# study, homepage, navigate #}
     <div class="menurow">
         <div class="menuitem"> 
-            <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}{% else %}/user/{{user}}/{% endif %}">
-                {% trans "Study" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
-            </a>
+        <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}{% else %}/user/{{user}}/{% endif %}">
+            {% trans "Study" %}
+            <span class="triangle">&nbsp;</span>
+            <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
+        </a>
 
-        </div>
-        <div class="menuitem" id="mi_homepage"> 
-        </div>
-        <div class="menuitem"> 
-            <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user}}/navigate/{% endif %}">
-                {% trans "Navigate" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
-            </a>
-        </div>
+    </div>
+    <div class="menuitem" id="mi_homepage"> 
+    </div>
+    <div class="menuitem"> 
+    <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user}}/navigate/{% endif %}">
+        {% trans "Navigate" %}
+        <span class="triangle">&nbsp;</span>
+        <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
+    </a>
+</div>
 
     </div>
 
     {# Create #}
-    <div class="menurow">
-        <div class="menuitem"> 
-            <a class="tooltip" href="/object/create/?type={{request.session.type}}">
-                {% trans "Create" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
-            </a>
+    {% if user.get_profile.is_contributor %}
+        <div class="menurow">
+            <div class="menuitem"> 
+                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
+                </a>
+            </div>
         </div>
-    </div>
+    {% endif %}
 
 </div>
