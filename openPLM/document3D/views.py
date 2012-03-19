@@ -69,11 +69,12 @@ def display_3d(request, obj_ref, obj_revi):
             ctx.update({'select_stp_form': form, 'GeometryFiles' : GeometryFiles,'javascript_arborescense' : javascript_arborescense, })    
             return r2r('Display3D.htm', ctx, request)
         
-    else:
-        form = Form3D(document=obj)#important Document3DController.files dont return step_original , Document3D.files will return step_original
+    
+    
+    form = Form3D(document=obj)#important Document3DController.files dont return step_original , Document3D.files will return step_original
        
         
-  
+    
     doc_file = form.fields["Display"].initial
 
     
