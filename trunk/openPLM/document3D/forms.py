@@ -35,13 +35,13 @@ class Order_Quantity_Form(forms.Form):
 class Form3D(forms.ModelForm):
 
 
-    Display = forms.ModelChoiceField(queryset=GeometryFile.objects.none(), empty_label=None)
+    Display = forms.ModelChoiceField(queryset=Document3D.objects.none(), empty_label=None)
     Display.widget.attrs["onchange"]="this.form.submit()"
     
     class Meta:
 
         model = DocumentFile
-        exclude = ('filename', 'file' , 'size' ,'thumbnail' ,'locked' ,'locker' ,'document' ,)
+        exclude = ('filename', 'file' , 'size' ,'thumbnail' ,'locked' ,'locker' ,'document')
 
 
         
@@ -50,7 +50,7 @@ class Form3D(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         document3D = kwargs.pop("document", None)
         super(Form3D, self).__init__(*args, **kwargs)
-        queryset = document3D.files.filter(Q(filename__iendswith=".stp") | Q(filename__iendswith=".step"))
+        queryset = document3D.files.filter(is_stp)
         self.fields["Display"].queryset= queryset
         self.fields["Display"].label_from_instance = lambda obj: "%s " % (obj.filename)
         

@@ -3,14 +3,6 @@
 {% load comments %}
 
 {% block css %}
-
-{% endblock %}
-
-{% block content %}
-
-
-
-
 <style>
 
 .ajustar {
@@ -127,41 +119,271 @@ clear: both;
 .menu ul a:hover ul a:hover ul a:hover ul a:hover ul {
 	visibility: visible;
 }
-.trans{
-    
-      
-      position:absolute;
-      width:40;
-      height:15;
-      z-index:10;
-      
-    }
-    .
-    fond{
-      
-      position:relative;
-      z-index:1;  
-    }
-   
+.trans{    
+position:absolute;
+z-index:10;      
+}  
+#zoom {
+  position:absolute;
+  height:40%;
+  top: 30%;
+  right: 5%;
+  z-index:10;  
+}
 
+ 
 </style>
+     
+{% endblock %}
+
+{% block content %}
 
 
-        <div class="trans" >
-                    <form method="post" action="" id="from_stp_form">
-                    {% for form in select_stp_form %}
-                        <ul><li>{{ form }}</li></ul>
-                    {% endfor %}
-                    </form>
-  
-                    <div class="menu" id="menu_">   </div>
-        </div> 
+
+<script type="text/javascript">
+/*
+.ui-slider-handle {
+   outline: none;
+}
    
-           
-                        
-        <div class="fond" id="container">
+
+#zoom {
+  position:absolute;
+  height:40%;
+  top: 0%;
+  right: 5%;
+
+}                   
+*/</script>        
+
+  
+<div class="trans" >
+                <form method="post" action="" id="from_stp_form">
+                {% for form in select_stp_form %}
+                    <ul><li>{{ form }}</li></ul>
+                {% endfor %}
+                </form>
+
+                <div class="menu" id="menu_">   </div>
+</div> 
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+{% block scripts %} 
+  
+        <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
+
+
         
-        <div id="webgl_warning" class="main" style="display:none;">
+        
+        
+        
+		<script type="text/javascript" src="/media/js/Three.js"></script> 
+		{% for item in GeometryFiles %}
+		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
+		{% endfor %}
+		<script type="text/javascript">
+
+
+
+
+
+if ( !window.requestAnimationFrame ) {
+
+    window.requestAnimationFrame = ( function() {
+
+        return window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+
+            window.setTimeout( callback, 1000 / 60 );
+
+        };
+
+} )();
+
+}  		
+
+{% if javascript_arborescense %}
+{{javascript_arborescense|safe}}		
+{% endif %}
+
+var zoom_var=50	
+var camera, scene, renderer;
+var container;
+var main_content;            
+var width ;
+var height ;
+var deep ;
+var controls;	
+$(document.getElementById( 'main_content' )).ready(init);
+animate();
+//animate();
+
+function init() {
+
+
+
+if (!has_webgl()){
+
+document.getElementById("webgl_warning").style.display = 'block'; 
+
+}
+
+
+
+
+container=document.getElementById('main_content');
+	
+scene = new THREE.Scene();
+scene.add( new THREE.AmbientLight( 0x0ff20 ) );
+light1 = new THREE.PointLight( 0xff0040 );
+scene.add( light1 );
+centrer_objet(object3D);
+
+scene.add( object3D);
+
+
+
+camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(), 0.1, radius*200 );
+camera.position.z = radius*1.5;
+
+
+renderer = new THREE.WebGLRenderer();
+renderer.setSize( $(container).width(), $(container).height() );
+container.appendChild( renderer.domElement );
+
+zoom = document.createElement("div");
+zoom.id = 'zoom';
+container.appendChild( zoom );
+//renderer.domElement.appendChild(newDiv);
+
+	
+controls = new THREE.TrackballControls( camera, renderer.domElement );
+controls.rotateSpeed = 1.0;
+controls.zoomSpeed = 1.2;
+controls.panSpeed = 0.2;
+controls.noZoom = true;
+controls.noPan = false;
+controls.staticMoving = false;
+controls.dynamicDampingFactor = 0.3;
+controls.minDistance = 0;
+controls.maxDistance = radius * 100;
+controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
+    
+menu();
+container.focus()
+    
+
+renderer.render(scene, camera); 
+
+
+
+$(function() {
+	$( "#zoom" ).slider({
+		orientation: "vertical",
+		min: 0,
+		max: 100,
+		value: 50,
+	    start: function() { /*$('#zoom_bar').data('sliding', true )*/ },
+        stop:  function() {  },
+		slide: function( event, ui ) {
+            total=zoom_var-ui.value;
+            zoom_var=ui.value;
+		    camera.translateZ(1.49999*radius*(total/50));
+		    if($('#zoom_bar .ui-slider-handle:focus').length){
+		    }
+            else{
+            }
+
+		}
+		
+
+		
+		
+	});
+	
+});  
+
+
+}
+			
+
+
+function has_webgl(){
+return !!window.WebGLRenderingContext;
+}
+
+function centrer_objet(object3D){ 	
+	
+boundingBox=computeGroupBoundingBox(object3D);
+		        
+width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
+height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
+deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
+
+radius=Math.max(width,height,deep);
+
+object3D.position.x=-(boundingBox.x[ 0 ]+boundingBox.x[ 1 ])/2;
+object3D.position.y=-(boundingBox.y[ 0 ]+boundingBox.y[ 1 ])/2;  
+object3D.position.z=-(boundingBox.z[ 0 ]+boundingBox.z[ 1 ])/2; 
+
+}
+                        
+function animate() {
+
+requestAnimationFrame(animate);
+
+controls.update();
+renderer.render( scene, camera );
+
+
+};
+
+
+				
+function computeGroupBoundingBox(Object_Group) {   
+    var boundingBox;
+    for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
+    var geo=THREE.GeometryUtils.clone(Object_Group.children[v].geometry);
+    geo.applyMatrix(Object_Group.children[v].matrix);
+    geo.computeBoundingBox();
+    BB=geo.boundingBox;
+    if (BB){    
+    if(!boundingBox){
+    boundingBox= { 
+    'x':[BB.x[0], BB.x[1]],
+    'y':[BB.y[0], BB.y[1]],
+    'z':[BB.z[0], BB.z[1]]
+    }; 
+    }
+    else{
+    boundingBox.x[0]=Math.min(BB.x[0], boundingBox.x[0]);
+    boundingBox.y[0]=Math.min(BB.y[0], boundingBox.y[0]);
+    boundingBox.z[0]=Math.min(BB.z[0], boundingBox.z[0]);
+    boundingBox.x[1]=Math.max(BB.x[1], boundingBox.x[1]);
+    boundingBox.y[1]=Math.max(BB.y[1], boundingBox.y[1]);
+    boundingBox.z[1]=Math.max(BB.z[1], boundingBox.z[1]);
+    }
+    }   
+    }
+return boundingBox;
+}
+        
+        
+/* <div id="webgl_warning" class="main" style="display:none;">
     <div class="warning_container">
       <div class="warning">
 
@@ -175,279 +397,7 @@ clear: both;
         <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
       </div>
     </div>
-  </div>
-  
-  </div>
-
-
-		
-
-       
-
-{% endblock %}
-
-
-{% block scripts %} 
-		<script>
-
-
-			         
-
-        </script>
-        
-        <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
-
-        
-        
-        
-        
-		<script type="text/javascript" src="/media/js/Three.js"></script> 
-		{% for item in GeometryFiles %}
-		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
-		{% endfor %}
-
-
- 
- 
-     
-
-		<script type="text/javascript">
-		
-		
-            {% if javascript_arborescense %}
-        	{{javascript_arborescense|safe}}		
-            {% endif %}
-            
-            
-		    var camera, scene, renderer;
-		    var container;
-		    var main_content;            
-            var width ;
-            var height ;
-            var deep ;
-            var mwidth ;
-            var mheight ;
-            var mdeep ;
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-			var controls;	
-			$(document.getElementById( 'container' )).ready(init);
-            setInterval( animate, 1000 / 30 );
-			//animate();
-
-			function init() {
-			
-			
-			
-	        if (!has_webgl()){
-
-            document.getElementById("webgl_warning").style.display = 'block'; 
-
-            }
-
-
-
-			main_content = document.getElementById('main_content');
-			container=document.getElementById('container');
-
-				
-			scene = new THREE.Scene();
-            scene.add( new THREE.AmbientLight( 0x0ff20 ) );
-            light1 = new THREE.PointLight( 0xff0040 );
-			scene.add( light1 );
-		    centrer_objet(object3D);
-		    //muestra(object4D);
-			scene.add( object3D);
-
-
-		    
-            camera = new THREE.PerspectiveCamera( 50, $(main_content).width() / $(main_content).height(), 0.1, radius*200 );
-            camera.position.z = radius*1.5;
-            
-
-			renderer = new THREE.WebGLRenderer();
-			renderer.setSize( $(main_content).width(), $(main_content).height() );
-            container.appendChild( renderer.domElement );
-				
-            controls = new THREE.TrackballControls( camera, renderer.domElement );
-            controls.rotateSpeed = 1.0;
-            controls.zoomSpeed = 1.2;
-            controls.panSpeed = 0.2;
-            controls.noZoom = false;
-            controls.noPan = false;
-            controls.staticMoving = false;
-            controls.dynamicDampingFactor = 0.3;
-            controls.minDistance = 0;
-            controls.maxDistance = radius * 100;
-            controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
-                
-            var g 	= new THREE.CubeGeometry( mwidth, mheight, mdeep );
-			var ma 	= new THREE.MeshNormalMaterial();
-			var me	= new THREE.Mesh( g, ma );     
-
-		    
-		    
-			me.matrixAutoUpdate = false;
-			me.updateMatrix();
-			//scene.add( me );
-            menu();
-            container.focus()
-                
-
-            renderer.render(scene, camera); 
-
-
-                
-
-
-			}
-			
-
-function muestra(object4D){
-object4D.geometry.computeBoundingBox();   
-boundingBox=object4D.geometry.boundingBox;
-mwidth =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
-mheight =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
-mdeep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
-alert(mwidth+" , "+mheight+" , "+mdeep)
-
-
-}
-function has_webgl(){
-return !!window.WebGLRenderingContext;
-}
-
-function centrer_objet(object3D){
-//object3D.updateMatrix(); 		
-boundingBox=computeGroupBoundingBox(object3D);
-//boundingBox=BB;
-//alert(object3D.children.length) 
- 			        
-width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
-height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
-deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
-//alert(width+" , "+height+" , "+deep)
-radius=width
-if(height>radius){
-radius=height
-}
-if(deep>radius){
-radius=deep
-}
-
-object3D.position.x=-(boundingBox.x[ 0 ]+boundingBox.x[ 1 ])/2;
-object3D.position.y=-(boundingBox.y[ 0 ]+boundingBox.y[ 1 ])/2;  
-object3D.position.z=-(boundingBox.z[ 0 ]+boundingBox.z[ 1 ])/2; 
-
-
-object3D.matrixAutoUpdate = false;   
-object3D.updateMatrix(); 
-
-
-
-}
-            
-            
-function animate() {
-
-//requestAnimationFrame( animate );
-controls.update();
-renderer.render( scene, camera );
-
-
-};
-
-            
-function updateBoundingBox(object){
-
-object.geometry.computeBoundingBox();
-boundingBox=object.geometry.boundingBox;
-if (!BB){
-BB= { 
-'x': [ boundingBox.x[ 0 ], boundingBox.x[ 1 ] ],
-'y': [ boundingBox.y[ 0 ], boundingBox.y[ 1 ] ],
-'z': [ boundingBox.z[ 0 ], boundingBox.z[ 1 ] ]}; 
-
-alert("left : "+BB.y[ 0 ]+"    right : "+BB.y[ 1 ]+"    height : "+Math.abs(BB.y[ 1 ]-BB.y[ 0 ]))
-
-}
-else{
-alert("left : "+boundingBox.y[ 0 ]+"    right : "+boundingBox.y[ 1 ]+"    height : "+Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]))
-if ( boundingBox.x[ 0 ] < BB.x[ 0 ] ) {
-BB.x[ 0 ] = boundingBox.x[ 0 ];
-}
-if ( boundingBox.x[ 1 ] > BB.x[ 1 ] ) {
-BB.x[ 1 ] = boundingBox.x[ 1 ];
-}        
-if ( boundingBox.y[ 0 ] < BB.y[ 0 ] ) {
-alert("update inf "+BB.y[ 0 ]+" to "+boundingBox.y[ 0])
-BB.y[ 0 ] = boundingBox.y[ 0 ];
-}
-if ( boundingBox.y[ 1 ] > BB.y[ 1 ] ) {
-alert("update top "+BB.y[ 1 ]+" to "+boundingBox.y[ 1])
-BB.y[ 1 ] = boundingBox.y[ 1 ];
-}
-if ( boundingBox.z[ 0 ] < BB.z[ 0 ] ) {
-BB.z[ 0 ] = boundingBox.z[ 0 ];
-}
-if ( boundingBox.z[ 1 ] > BB.z[ 1 ] ) {
-BB.z[ 1 ] = boundingBox.z[ 1 ];
-}
-
-
-}
-}
-
-
-
-
-						
-function computeGroupBoundingBox(Object_Group) {   
-   if(Object_Group.children.length >  0 ){ 
-        var boundingBox;    
-        for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
-        
-        Object_Group.children[ v ].geometry.computeBoundingBox();        
-        if(Object_Group.children[ v ].geometry.boundingBox){
-        //alert(v);   
-        if(!boundingBox){
-        boundingBox= { 
-        'x': [ Object_Group.children[ v ].geometry.boundingBox.x[ 0 ], Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] ],
-        'y': [ Object_Group.children[ v ].geometry.boundingBox.y[ 0 ], Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] ],
-        'z': [ Object_Group.children[ v ].geometry.boundingBox.z[ 0 ], Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] ]}; 
-        }
-        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 0 ] < boundingBox.x[ 0 ] ) {
-        boundingBox.x[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 0 ];
-        }
-        if ( Object_Group.children[ v ].geometry.boundingBox.x[ 1 ] > boundingBox.x[ 1 ] ) {
-        boundingBox.x[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.x[ 1 ];
-        }        
-        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 0 ] < boundingBox.y[ 0 ] ) {
-        boundingBox.y[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 0 ];
-        }
-        if ( Object_Group.children[ v ].geometry.boundingBox.y[ 1 ] > boundingBox.y[ 1 ] ) {
-        boundingBox.y[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.y[ 1 ];
-
-        }
-        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 0 ] < boundingBox.z[ 0 ] ) {
-        boundingBox.z[ 0 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 0 ];
-        }
-        if ( Object_Group.children[ v ].geometry.boundingBox.z[ 1 ] > boundingBox.z[ 1 ] ) {
-        boundingBox.z[ 1 ] = Object_Group.children[ v ].geometry.boundingBox.z[ 1 ];
-        }      
-}
-}
-}
-return boundingBox;
-}
-            
-            
-            
-
-
-		
-
-
+  </div>*/
 </script>
 
 {% endblock %}
