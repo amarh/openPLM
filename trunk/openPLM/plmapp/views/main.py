@@ -75,6 +75,7 @@ from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.forms import *
 import openPLM.plmapp.forms as forms
+from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view
@@ -427,6 +428,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
         maximum = max(children, key=attrgetter("level")).level
         children = (c for c in children if c.level == maximum)
     children = list(children)
+    # pcle
     extra_columns = []
     extension_data = defaultdict(dict)
     for PCLE in models.get_PCLEs(obj.object):
@@ -442,11 +444,20 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
                         extension_data[link][field] = getattr(e, field)
                     except PCLE.DoesNotExist:
                         extension_data[link][field] = ""
-    ctx.update({'current_page':'BOM-child',
-                'children': children,
+    # decomposition
+    if DecomposersManager.count() > 0:
+        is_decomposable = DecomposersManager.is_decomposable
+        children = [(c, is_decomposable(c.link.child)) for c in children]
+        decomposition_msg = DecomposersManager.get_decomposition_message(obj)
+    else:
+        children = [(c, False) for c in children]
+        decomposition_msg = ""
+    ctx.update({'current_page' : 'BOM-child',
+                'children' : children,
                 'extra_columns' : extra_columns,
-                'extension_data': extension_data,
-                "display_form" : display_form})
+                'extension_data' : extension_data,
+                'decomposition_msg' : decomposition_msg,
+                "display_form" : display_form, })
     return r2r('parts/bom.html', ctx, request)
 
 ##########################################################################################

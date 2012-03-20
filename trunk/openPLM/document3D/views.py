@@ -20,7 +20,8 @@ from openPLM.document3D.composer import composer
 from openPLM.plmapp.controllers import get_controller
 import openPLM.plmapp.forms as forms
 from django.conf import settings
-
+from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
+from django.template.loader import render_to_string
 
 def r2r(template, dictionary, request):
     """
@@ -94,103 +95,31 @@ def display_3d(request, obj_ref, obj_revi):
  
     return r2r('Display3D.htm', ctx, request)
 
+    
+class StepDecomposer(Decomposer):
 
-def display_bomb_child(request, obj_type, obj_ref, obj_revi):     
-    """
-    Manage html page which displays the chidren of the selected object.
-    It computes a context dictionnary based on
-    
-    .. include:: views_params.txt 
-    """
-    
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    def is_decomposable(self):
+        decompose_valid = []
+        if not Document3D.objects.filter(PartDecompose=self.part):     
+            for link in self.part.documentpartlink_part.all():
+                try:
+                    doc = Document3D.objects.get(id=link.document_id)
+                    if not doc.PartDecompose: 
+                        file_stp = is_decomposable(doc)
+                        if file_stp:             
+                            decompose_valid.append((link.document, file_stp))
+                except:
+                    pass  
+        self.decompose_valid = decompose_valid
+        return len(decompose_valid) > 0
 
-    if not hasattr(obj, "get_children"):
-        # TODO
-        raise TypeError()
-    date = None
-    level = "first"
-    if request.GET:
-        display_form = DisplayChildrenForm(request.GET)
-        if display_form.is_valid():
-            date = display_form.cleaned_data["date"]
-            level = display_form.cleaned_data["level"]
-    else:
-        display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
-                                                    "level" : "first"})
-    max_level = 1 if level == "first" else -1
-    children = obj.get_children(max_level, date=date)
-    if level == "last" and children:
-        maximum = max(children, key=attrgetter("level")).level
-        children = (c for c in children if c.level == maximum)
-    children = list(children)
-    extra_columns = []
-    extension_data = defaultdict(dict)
-    for PCLE in models.get_PCLEs(obj.object):
-        fields = PCLE.get_visible_fields()
-        if fields:
-            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
-                    for f in fields)
-            for child in children:
-                link = child.link
-                for field in fields:
-                    try:
-                        e = PCLE.objects.get(link=link)
-                        extension_data[link][field] = getattr(e, field)
-                    except PCLE.DoesNotExist:
-                        extension_data[link][field] = ""
-    
-    
-    
-    
-    is_children_decomposable=[] 
-    for level, link in children:
-        is_children_decomposable.append(False)
-        part_controller=PartController(link.child, request.user)
-        list_doc=part_controller.get_attached_documents()
-        for Doc_Part_Link in list_doc:
-            try:
-                Doc3D=Document3D.objects.get(id=Doc_Part_Link.document_id)
-            #controller=DocumentController(Doc_Part_Link.document,request.user)
-                if not Doc3D.PartDecompose and is_decomposable(Doc3D):       
-                    is_children_decomposable[-1]=True
-            except:
-                pass        
+    def get_message(self):
+        if self.decompose_valid:
+            return render_to_string("decompose_msg.html", { "part" : self.part, 
+                "decomposable_docs" : self.decompose_valid })
+        return ""
 
-             
-    children = zip(children,is_children_decomposable)     
-
-                        
-                     
-                        
-
-    decompose_valid=[]
-    if not Document3D.objects.filter(PartDecompose=obj.object):     
-        list_doc=obj.get_attached_documents()
-        for Doc_Part_Link in list_doc:
-            try:
-                Doc3D=Document3D.objects.get(id=Doc_Part_Link.document_id)
-                if not Doc3D.PartDecompose: 
-                    file_stp =is_decomposable(Doc3D)
-                    if file_stp:             
-                        decompose_valid.append((Doc_Part_Link.document,file_stp))
-            except:
-                pass  
-
-                            
- 
-
-    ctx.update({'current_page':'BOM-child',
-                'children': children,
-                'extra_columns' : extra_columns,
-                'extension_data': extension_data,
-                'decomposable_valide' : decompose_valid ,
-                "display_form" : display_form})   
-  
-    
-    return r2r('DisplayObjectChild3D.htm', ctx, request)
-    
-    
+DecomposersManager.register(StepDecomposer)
 #posibilidades , el objeto a sido modificado despues de acceder al formulario    
            
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):    
