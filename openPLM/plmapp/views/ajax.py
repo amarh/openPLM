@@ -73,8 +73,15 @@ def ajax_creation_form(request):
         view = get_creation_view(cls)
         if view is not None:
             return {"reload" : True}
-        form = forms.get_creation_form(request.user, cls,
-                initial=dict(request.GET.iteritems()))
+        initial = dict(request.GET.iteritems())
+        if "reference" in initial:
+            # gets a new reference if the type switches from a part to a document
+            # and vice versa, see ticket #99
+            ref = initial["reference"]
+            if (ref.startswith("DOC_") and type_ in models.get_all_parts()) or \
+               (ref.startswith("PART_") and type_ in models.get_all_documents()):
+                del initial["reference"]
+        form = forms.get_creation_form(request.user, cls, initial=initial)
         return {"reload" : False, "form" : form.as_table(),
                 "type" : type_}
     else:

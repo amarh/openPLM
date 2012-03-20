@@ -19,6 +19,27 @@ class AjaxTestCase(CommonViewTest):
             response = self.client.get("/ajax/search/", {"type" : t})
             self.assertEqual(response.status_code, 200)
 
+    def test_creation_form(self):
+        for t in ("Part", "Document", "Group"):
+            response = self.get("/ajax/create/", type=t)
+            self.assertFalse(response["reload"])
+            self.assertEqual(t, response["type"])
+            form = response["form"]
+
+    def test_creation_form_update_reference(self):
+        """ Tests that references are updated when the type switches from a
+        part and a document. Related ticket: #99"""
+        response = self.get("/ajax/create/", type="Part")
+        self.assertFalse(response["reload"])
+        self.assertTrue("PART_0" in response["form"])
+        response = self.get("/ajax/create/", type="Document", reference="PART_00001")
+        self.assertFalse("PART_0" in response["form"])
+        self.assertTrue("DOC_0" in response["form"])
+        # if the type does not change, the reference must not change
+        response = self.get("/ajax/create/", type="Document", reference="DOC_00150")
+        self.assertFalse("PART_0" in response["form"])
+        self.assertTrue("DOC_00150" in response["form"])
+
     def test_auto_complete_part(self):
         self.create("Other")
         completions = self.get("/ajax/complete/Part/reference/", term="Pa")
