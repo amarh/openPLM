@@ -218,7 +218,8 @@ class PartController(PLMObjectController):
         return link2
 
     def get_children(self, max_level=1, date=None,
-            related=("child", "child__state", "child__lifecycle")):
+            related=("child", "child__state", "child__lifecycle"),
+            only_official=False):
         """
         Returns a list of all children at time *date*.
         
@@ -227,14 +228,15 @@ class PartController(PLMObjectController):
         
         objects = models.ParentChildLink.objects.order_by("-order")\
                 .select_related(*related)
-        if not date:
+        if date is None:
             links = objects.filter(end_time__exact=None)
         else:
-            links = objects.filter(ctime__lt=date).exclude(end_time__lt=date)
+            links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
         res = []
         parents = [self.object.id]
         level = 1
         last_children = []
+        children_ids = []
         while parents and (max_level < 0 or level <= max_level):
             qs = links.filter(parent__in=parents)
             parents = []
@@ -243,6 +245,7 @@ class PartController(PLMObjectController):
                 parents.append(link.child_id)
                 child = Child(level, link)
                 last.append(child)
+                children_ids.append(link.child_id)
                 if level == 1:
                     res.insert(0, child)
                 else:
@@ -252,6 +255,28 @@ class PartController(PLMObjectController):
                             break
             last_children = last 
             level += 1
+        if only_official:
+            # retrieves all official children at *date* and then prunes the
+            # tree so that we only run one query
+            res2 = []
+            sh = models.StateHistory.objects.filter(plmobject__in=children_ids,
+                    state_category=models.StateHistory.OFFICIAL)
+            if date is None:
+                sh = sh.filter(end_time__exact=None)
+            else:
+                sh = sh.filter(start_time__lte=date).exclude(end_time__lt=date)
+            valid_children = set(sh.values_list("plmobject_id", flat=True))
+            # level_threshold is used to cut a "branch" of the tree
+            level_threshold = len(res) + 1 # all levels are inferior to this value
+            for child in res:
+                if child.level > level_threshold:
+                    continue
+                if child.link.child_id in valid_children:
+                    res2.append(child)
+                    level_threshold = len(res) + 1
+                else:
+                    level_threshold = child.level
+            res = res2
         return res
 
     def is_ancestor(self, part):
@@ -269,7 +294,8 @@ class PartController(PLMObjectController):
         return False
     
     def get_parents(self, max_level=1, date=None,
-            related=("parent", "parent__state", "parent__lifecycle")):
+            related=("parent", "parent__state", "parent__lifecycle"),
+            only_official=False):
         """
         Returns a list of all parents at time *date*.
         
@@ -281,11 +307,12 @@ class PartController(PLMObjectController):
         if not date:
             links = objects.filter(end_time__exact=None)
         else:
-            links = objects.filter(ctime__lt=date).exclude(end_time__lt=date)
+            links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
         res = []
         children = [self.object.id]
         level = 1
         last_parents = []
+        parents_ids = []
         while children and (max_level < 0 or level <= max_level):
             qs = links.filter(child__in=children)
             children = []
@@ -294,6 +321,7 @@ class PartController(PLMObjectController):
                 children.append(link.parent_id)
                 parent = Parent(level, link)
                 last.append(parent)
+                parents_ids.append(link.parent_id)
                 if level == 1:
                     res.insert(0, parent)
                 else:
@@ -303,6 +331,28 @@ class PartController(PLMObjectController):
                             break
             last_parents = last 
             level += 1
+        if only_official:
+            # retrieves all official children at *date* and then prunes the
+            # tree so that we only run one query
+            res2 = []
+            sh = models.StateHistory.objects.filter(plmobject__in=parents_ids,
+                    state_category=models.StateHistory.OFFICIAL)
+            if date is None:
+                sh = sh.filter(end_time__exact=None)
+            else:
+                sh = sh.filter(start_time__lte=date).exclude(end_time__lt=date)
+            valid_parents = set(sh.values_list("plmobject_id", flat=True))
+            # level_threshold is used to cut a "branch" of the tree
+            level_threshold = len(res) + 1 # all levels are inferior to this value
+            for parent in res:
+                if parent.level > level_threshold:
+                    continue
+                if parent.link.parent_id in valid_parents:
+                    res2.append(parent)
+                    level_threshold = len(res) + 1
+                else:
+                    level_threshold = parent.level
+            res = res2
         return res
 
     def update_children(self, formset):

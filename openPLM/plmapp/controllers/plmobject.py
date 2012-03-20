@@ -25,6 +25,7 @@
 """
 """
 
+import datetime
 import re
 
 from django.conf import settings
@@ -34,7 +35,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
     PromotionError
 from openPLM.plmapp.utils import level_to_sign_str
-from openPLM.plmapp.controllers.base import Controller, permission_required
+from openPLM.plmapp.controllers.base import Controller
 
 rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class PLMObjectController(Controller):
@@ -124,6 +125,8 @@ class PLMObjectController(Controller):
         for i in range(1, obj.lifecycle.nb_states - 1):
             models.PLMObjectUserLink.objects.create(plmobject=obj, user=sponsor,
                                                     role=level_to_sign_str(i))
+
+        res._update_state_history()
         return res
         
     @classmethod
@@ -170,6 +173,7 @@ class PLMObjectController(Controller):
                 self._save_histo("Promote", details, roles=["sign_"])
                 if self.object.state == lifecycle.official_state:
                     self._officialize()
+                self._update_state_history()
             except IndexError:
                 # FIXME raises it ?
                 pass
@@ -193,12 +197,31 @@ class PLMObjectController(Controller):
                     ctrl = type(self)(rev.get_leaf_object(), self._user)
                     ctrl._deprecate()
 
+    def _update_state_history(self):
+        """ Updates the :class:`.StateHistory` table of the object."""
+        now = datetime.datetime.now()
+        try:
+            # ends previous StateHistory if it exists
+            # here we do not try to see if the state has not changed since
+            # we are sure it is not the case and it would not be a problem
+            # if it has not changed
+            sh = models.StateHistory.objects.get(plmobject__id=self.object.id,
+                    end_time=None)
+            sh.end_time = now
+            sh.save()
+        except models.StateHistory.DoesNotExist:
+            pass
+        models.StateHistory.objects.create(plmobject=self.object,
+                start_time=now, end_time=None, state=self.state,
+                lifecycle=self.lifecycle)
+
     def _deprecate(self):
         """ Deprecate the object. """
         cie = models.User.objects.get(username=settings.COMPANY)
         self.state = self.lifecycle.last_state
         self.set_owner(cie, True)
         self.save()
+        self._update_state_history()
 
     def demote(self):
         u"""
@@ -220,6 +243,7 @@ class PLMObjectController(Controller):
             details = "change state from %(first)s to %(second)s" % \
                     {"first" :state.name, "second" : new_state}
             self._save_histo("Demote", details, roles=["sign_"])
+            self._update_state_history()
         except IndexError:
             # FIXME raises it ?
             pass
@@ -519,4 +543,5 @@ class PLMObjectController(Controller):
         self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).delete()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
+        self._update_state_history()
 

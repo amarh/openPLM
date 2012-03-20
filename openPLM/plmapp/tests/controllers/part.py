@@ -319,6 +319,9 @@ class PartControllerTest(ControllerTest):
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 25)
         self.controller.add_child(controller4, 10, 35)
+        self.controller2.object.is_promotable = lambda *args: True
+        date2 = datetime.datetime.now()
+        self.controller2.promote()
         controller4.add_child(self.controller2, 28, 51)
         wanted = [(1, self.controller2.object.pk),
                   (2, self.controller3.object.pk),
@@ -335,7 +338,30 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(children, wanted)
         # date
         wanted = [(1, self.controller2.object.pk)]
-        children = [(lvl, lk.child.pk) for lvl, lk in self.controller.get_children(date=date)]
+        children = [(lvl, lk.child.pk) for lvl, lk in self.controller.get_children(-1, date=date)]
+        self.assertEqual(children, wanted)
+        # only_official=True
+        wanted = [(1, self.controller2.object.pk)]
+        children = [(lvl, lk.child.pk) for lvl, lk in
+                self.controller.get_children(-1, only_official=True)]
+        self.assertEqual(children, wanted)
+        children = [(lvl, lk.child.pk) for lvl, lk
+                in self.controller.get_children(-1, only_official=True, date=date2)]
+        self.assertEqual(children, [])
+        # promote controller4 to official
+        controller4.object.is_promotable = lambda *args: True
+        controller4.promote()
+        # -> at date2, only controller2 is official
+        wanted = [(1, self.controller2.object.pk)]
+        children = [(lvl, lk.child.pk) for lvl, lk in
+                self.controller.get_children(-1, only_official=True,
+            date=date2)]
+        wanted = [(1, self.controller2.object.pk),
+                  (1, controller4.object.pk),
+                  (2, self.controller2.object.pk),
+                  ]
+        children = [(lvl, lk.child.pk) for lvl, lk in
+                self.controller.get_children(-1, only_official=True)]
         self.assertEqual(children, wanted)
 
     def test_get_parents(self):
@@ -344,6 +370,9 @@ class PartControllerTest(ControllerTest):
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 15)
+        self.controller2.object.is_promotable = lambda *args: True
+        date2 = datetime.datetime.now()
+        self.controller2.promote()
         self.controller.add_child(controller4, 10, 15)
         wanted = [(1, self.controller2.object.pk),
                   (2, self.controller.object.pk),]
@@ -356,6 +385,26 @@ class PartControllerTest(ControllerTest):
         # date
         parents = [(lvl, lk.parent.pk) for lvl, lk in self.controller3.get_parents(date=date)]
         self.assertEqual(parents, [])
+        # only_official=True
+        wanted = [(1, self.controller2.object.pk)]
+        parents = [(lvl, lk.parent.pk) for lvl, lk in
+                self.controller3.get_parents(-1, only_official=True)]
+        self.assertEqual(parents, wanted)
+        parents = [(lvl, lk.parent.pk) for lvl, lk in
+                self.controller3.get_parents(-1, only_official=True, date=date2)]
+        self.assertEqual(parents, [])
+        # promote controller4 to official
+        self.controller.object.is_promotable = lambda *args: True
+        self.controller.promote()
+        parents = [(lvl, lk.parent.pk) for lvl, lk in
+                self.controller3.get_parents(-1, only_official=True, date=date2)]
+        self.assertEqual(parents, [])
+        wanted = [(1, self.controller2.object.pk),
+                  (2, self.controller.object.pk),
+                  ]
+        parents = [(lvl, lk.parent.pk) for lvl, lk in
+                self.controller3.get_parents(-1, only_official=True)]
+        self.assertEqual(parents, wanted)
 
     def test_is_promotable1(self):
         """Tests promotion from draft state, an official document is attached."""
