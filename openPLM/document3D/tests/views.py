@@ -124,7 +124,8 @@ class view_bomb_childTest(CommonViewTest):
         self.controller.add_child(child2, 10, 20)
         response = self.get(self.base_url + "BOM-child/", page="BOM-child")
         self.assertEqual(2, len(list(response.context["children"])))
-        self.assertEqual(0, len(list(response.context["decomposable_valide"]))) 
+        msg = response.context["decomposition_msg"]
+        self.assertFalse(msg)
         
         
     def test_decompose_bomb_child(self):
@@ -134,7 +135,8 @@ class view_bomb_childTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)
         response = self.get(self.base_url + "BOM-child/", page="BOM-child")  
         self.assertEqual(0, len(list(response.context["children"])))
-        self.assertEqual(1, len(list(response.context["decomposable_valide"])))
+        msg = response.context["decomposition_msg"]
+        self.assertTrue(msg)
         
         
     def test_decompose_bomb_child_whit_child_decomposable(self):
@@ -147,7 +149,8 @@ class view_bomb_childTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)
         response = self.get(self.base_url + "BOM-child/", page="BOM-child")  
         self.assertEqual(1, len(list(response.context["children"])))
-        self.assertEqual(1, len(list(response.context["decomposable_valide"])))
+        msg = response.context["decomposition_msg"]
+        self.assertTrue(msg)
         self.assertEqual(True, response.context["children"][0][1])        
         
     def test_try_decompose_bomb_child_whit_no_links(self):

@@ -26,6 +26,9 @@
         </ul>
         <input type="submit" class="{{"Button"|button}}" value="{% trans "GO !" %}"/>
     </form>
+    <div id="decompose">
+        {{ decomposition_msg|safe }}
+    </div>
     <table class="Content">
         <tr class="Content">
             <th class="Content" style="width:50px"> {% trans "Level" %} </th>
@@ -41,27 +44,32 @@
             {% endfor %}
             <th class="Content"> {{ obj.state.name }} </th>
         </tr>
-        {% for level, link in children %}
-            <tr class="Content"> 
-                <td class="Content expander open level{{level}}" style="padding-left:{{level|add:"-1"}}0px;" >
-                    <span class="expander">{{level}}</span>
-                </td>
+        {% for c, is_decomposable in children %}
 
-                <td class="Content"> {{ link.order }} </td>
-                <td class="Content"> {{ link.quantity }} </td>
-                <td class="Content"> {{ link.get_unit_display }} </td>
-                <td class="Content"> 
-                    <a href="/object/{{link.child.type}}/{{link.child.reference}}/{{link.child.revision}}/">
-                        {{ link.child.reference }}
-                    </a>
+            <tr class="Content"> 
+                <td class="Content expander open level{{c.level}}" style="padding-left:{{level|add:"-1"}}0px;" >
+                    <span class="expander">{{c.level}}</span>
                 </td>
-                <td class="Content"> {{ link.child.revision }} </td>
-                <td class="Content"> {{ link.child.type }} </td>
-                <td class="Content"> {{ link.child.name }} </td>
-                {% for field, verbose_name in extra_columns %}
-                    <td class="Content"> {{ extension_data|key:link|key:field }} </td>
-                {% endfor %}
-                <td class="Content"> {{ link.child.state.name }} </td>
+                {% with c.link as link %}
+                    <td class="Content"> {{ link.order }} </td>
+                    <td class="Content"> {{ link.quantity }} </td>
+                    <td class="Content"> {{ link.get_unit_display }} </td>
+                    {% with link.child as child %}
+                        <td class="Content"> 
+                            <a href="{{child.plmobject_url}}"
+                                {% if is_decomposable %}class="decomposable"{% endif %}>
+                                {{ child.reference }}
+                            </a>
+                        </td>
+                        <td class="Content"> {{ child.revision }} </td>
+                        <td class="Content"> {{ child.type }} </td>
+                        <td class="Content"> {{ child.name }} </td>
+                        {% for field, verbose_name in extra_columns %}
+                            <td class="Content"> {{ extension_data|key:link|key:field }} </td>
+                        {% endfor %}
+                        <td class="Content"> {{ child.state.name }} </td>
+                    {% endwith %}
+                {% endwith %}
             </tr>
         {% endfor %}
     </table>

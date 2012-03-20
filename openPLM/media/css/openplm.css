@@ -1058,3 +1058,6 @@ div#mi_homepage {
     display: block;
 }
 
+a.decomposable {
+    color: #0051a9 !important;
+}
