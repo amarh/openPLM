@@ -377,11 +377,14 @@ class AddChildForm(PLMObjectForm):
         return self.cleaned_data
 
 class DisplayChildrenForm(forms.Form):
-    LEVELS = (("all", "All levels",),
-              ("first", "First level",),
-              ("last", "Last level"),)
+    LEVELS = (("all", _("All levels")),
+              ("first", _("First level")),
+              ("last", _("Last level")),)
+    STATES = (("all" , _("All status")),
+              ("official", _("Official")),)
     level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
     date = forms.SplitDateTimeField(required=False)
+    state = forms.ChoiceField(choices=STATES, initial="all")
 
 class ModifyChildForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)

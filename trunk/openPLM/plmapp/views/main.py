@@ -410,16 +410,19 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
         raise TypeError()
     date = None
     level = "first"
+    state = "all"
     if request.GET:
         display_form = DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
+            state = display_form.cleaned_data["state"]
     else:
         display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
-                                                    "level" : "first"})
+            "level" : "first", "state":"all"})
     max_level = 1 if level == "first" else -1
-    children = obj.get_children(max_level, date=date)
+    only_official = state == "official"
+    children = obj.get_children(max_level, date=date, only_official=only_official)
     if level == "last" and children:
         maximum = max(children, key=attrgetter("level")).level
         children = (c for c in children if c.level == maximum)
@@ -529,16 +532,19 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
         raise TypeError()
     date = None
     level = "first"
+    state = "all"
     if request.GET:
         display_form = DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
+            state = display_form.cleaned_data["state"]
     else:
         display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
-                                                    "level" : "first"})
+            "level" : "first", "state" : "all"})
     max_level = 1 if level == "first" else -1
-    parents = obj.get_parents(max_level, date=date)
+    only_official = state == "official"
+    parents = obj.get_parents(max_level, date=date, only_official=only_official)
     if level == "last" and parents:
         maximum = max(parents, key=attrgetter("level")).level
         parents = (c for c in parents if c.level == maximum)
