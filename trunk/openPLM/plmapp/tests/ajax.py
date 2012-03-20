@@ -58,8 +58,6 @@ class AjaxTestCase(CommonViewTest):
         data = self.get("/ajax/navigate/Part/Part1/a/")
         self.assertTrue(int(data["width"] > 0))
         self.assertTrue(int(data["height"] > 0))
-        left = int(data["left"])
-        top = int(data["top"])
         self.assertTrue("form" in data)
         self.assertTrue("divs" in data)
 

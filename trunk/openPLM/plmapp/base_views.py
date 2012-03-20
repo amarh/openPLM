@@ -383,24 +383,13 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         request.session.update(dict(doc_parts = ""))
     graph.set_options(options)
     graph.create_edges()
-    map_string,  edges = graph.render()
-    top, left, w, h = map(int, re.search(coords_rx, map_string).groups())
-    x_part_node_position = (2 * left + w) // 2
-    y_part_node_position = (2 * top + h) // 2
-    x_img_position_corrected = 1172 // 2 - x_part_node_position
-    y_img_position_corrected = 500 // 2 - y_part_node_position
-    #img = Image.open(path)
+    map_string, edges = graph.render()
     width, height = edges["width"], edges["height"]
     ctx.update({
         'filter_object_form': form,
         'map_areas': map_string,
-        #'picture_path': "/"+url,
-        'x_img_position': x_img_position_corrected,
-        'y_img_position': y_img_position_corrected,
         'img_width' : width,
         'img_height' : height,
-        'center_x' : left + w // 2,
-        'center_y' : top + h //2,
         'navigate_bool': True,
         'edges' : edges,
     })

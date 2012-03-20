@@ -73,7 +73,6 @@ function update_nav(focus_node_id, data){
         focus_node_id = "#" + $("#DivNav div.main_node").attr("id");
     }
     var offset = $(focus_node_id).offset();
-    var date = new Date();
     var divNav = $("#DivNav");
     divNav.css("width", data.width+"px");
     divNav.css("height", data.height+"px");
@@ -84,9 +83,7 @@ function update_nav(focus_node_id, data){
     var submit = $("#FilterNav").find("li").last().clone();
     $("#FilterNavUl").html(data.form);
     $("#FilterNavUl").append(submit);
-    $("#FilterNavUl select").css("width", "12em");
-    $("#FilterNavUl select").chosen({disable_search_threshold: 7});
-    $("#FilterNavUl div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all");
+    make_combobox();
     
     var new_offset = $(focus_node_id).offset();
     var delta_top = new_offset.top - offset.top;
@@ -327,9 +324,24 @@ function init(){
 }
 
 function center(){
+    var divNav = $("#DivNav")
+    var main = $("#DivNav div.main_node");
     var nw = $("#Navigate").width();
-    var dw = $("#DivNav").width();
-    $("#DivNav").css({"left":((nw-dw)/2)+"px"});  
+    var dw = divNav.width();
+    var mw = main.width();
+    var left = parseInt(main.css("left"));
+    var l = (nw - mw) / 2;
+
+    var nh= $("#Navigate").height();
+    var dh = divNav.height();
+    var mh = main.height();
+    var top = parseInt(main.css("top"));
+    var t = (nh - mh) / 2;
+
+    divNav.css({
+        "left" : (l - left) + "px",
+        top: (t - top) + "px"
+    });
 
 };
 
