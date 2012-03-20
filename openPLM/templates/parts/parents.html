@@ -3,6 +3,17 @@
 
 <!-- Manage html display in the Content div which correspond to the "parents" menu -->
 
+{% block scripts %}
+
+    <script type="text/javascript" src="/media/js/bom.js"></script>
+    <script>
+        $(function() {
+            $( "#id_date_0" ).datepicker();
+        });
+    </script>
+
+{% endblock %}
+
 {% block content %}
 
     <form method="GET" action="">
