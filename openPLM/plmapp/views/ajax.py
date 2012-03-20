@@ -157,11 +157,7 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
             "width" : context["img_width"],
             "height" : context["img_height"],
             "divs" : context["map_areas"],
-            "left" : context["x_img_position"],
-            "top" : context["y_img_position"],
             "form" : context["filter_object_form"].as_ul(),
-            "center_x" : context["center_x"],
-            "center_y" : context["center_y"],
             "edges" : context["edges"],
             }
     return data
