@@ -72,23 +72,13 @@ def create_gdoc(request, client):
     """
     Creation view of a :class:`.GoogleDocument`.
     """
-
-    obj, ctx = get_generic_data(request)
     
     if request.method == 'GET':
         creation_form = get_gdoc_creation_form(request.user, client)
     elif request.method == 'POST':
         creation_form = get_gdoc_creation_form(request.user, client,
                 request.POST)
-        if creation_form.is_valid():
-            user = request.user
-            ctrl = GoogleDocumentController.create_from_form(creation_form, user)
-            return HttpResponseRedirect(ctrl.plmobject_url)
-    ctx.update({
-        'creation_form': creation_form,
-        'object_type': "GoogleDocument",
-    })
-    return pviews.r2r('create.html', ctx, request)
+    return pviews.create_object(request, True, creation_form)
 register_creation_view(GoogleDocument, create_gdoc)
 
 @oauth2_required

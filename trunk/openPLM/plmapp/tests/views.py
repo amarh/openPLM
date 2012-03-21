@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
 from django.core.files.base import File
+from django.contrib import messages
 
 from openPLM.plmapp import forms
 from openPLM.plmapp.utils import level_to_sign_str
@@ -123,6 +124,33 @@ class ViewTest(CommonViewTest):
         response = self.post("/object/create/", data, page=page)
         obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual(obj.id, response.context["obj"].id)
+        self.assertEqual("MaPart", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+
+    def test_create_redirect_get(self):
+        response = self.get("/object/create/", {"type" : self.TYPE,
+            "__next__" : "/home/"})
+        self.assertEqual("/home/", response.context["next"])
+       
+    def test_create_redirect_post(self):
+        data = self.DATA.copy()
+        data.update({
+                "__next__" : "/home/",
+                "type" : self.TYPE,
+                "reference" : "mapart",
+                "revision" : "a",
+                "name" : "MaPart",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        page = "files" if issubclass(model_cls, m.Document) else "attributes"
+        response = self.post("/object/create/", data, follow=False,
+                status_code=302)
+        self.assertRedirects(response, "/home/")
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual("MaPart", obj.name)
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
@@ -783,8 +811,138 @@ class DocumentViewTestCase(ViewTest):
         parts = self.controller.get_attached_parts().values_list("part", flat=True)
         self.assertEqual([part.id], list(parts))
 
+    def test_create_and_attach_get(self):
+        """
+        Tests a create request with a related part set.
+        """
+        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        response = self.get("/object/create/", {"type" : self.TYPE,
+            "__next__" : "/home/", "related_part" : part.id})
+        self.assertEqual("/home/", response.context["next"])
+        self.assertEqual(part.object, response.context["related"].object)
+        self.assertEqual(str(part.id), str(response.context["related_part"]))
+        self.assertTrue(isinstance(response.context["creation_type_form"],
+            forms.DocumentTypeForm))
+
+    def test_create_and_attach_post(self):
+        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        data = self.DATA.copy()
+        data.update({
+                "__next__" : "/home/",
+                "related_part" : part.id,
+                "type" : self.TYPE,
+                "reference" : "doc2",
+                "revision" : "a",
+                "name" : "Docc",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data, follow=False,
+                status_code=302)
+        self.assertRedirects(response, "/home/")
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="doc2", revision="a")
+        self.assertEqual("Docc", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+        link = m.DocumentPartLink.objects.get(document=obj, part=part.id)
+
+    def test_create_and_attach_post_error(self):
+        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        # cancels the part so that it can not be attached
+        part.cancel()
+        data = self.DATA.copy()
+        data.update({
+                "__next__" : "/home/",
+                "related_part" : part.id,
+                "type" : self.TYPE,
+                "reference" : "doc2",
+                "revision" : "a",
+                "name" : "Docc",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data, follow=True, page="parts")
+        self.assertEqual(1, len(response.context["messages"]))
+        msg = list(response.context["messages"])[0]
+        self.assertEqual(messages.ERROR, msg.level)
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="doc2", revision="a")
+        self.assertEqual("Docc", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+        self.assertFalse(m.DocumentPartLink.objects.filter(
+            document=obj, part=part.id).exists())
+
 
 class PartViewTestCase(ViewTest):
+
+    def test_create_and_attach_get(self):
+        """
+        Tests a create request with a related document set.
+        """
+        doc = self.attach_to_official_document()
+        response = self.get("/object/create/", {"type" : self.TYPE,
+            "__next__" : "/home/", "related_doc" : doc.id})
+        self.assertEqual("/home/", response.context["next"])
+        self.assertEqual(doc.object, response.context["related"].object)
+        self.assertEqual(str(doc.id), str(response.context["related_doc"]))
+        self.assertTrue(isinstance(response.context["creation_type_form"],
+            forms.PartTypeForm))
+
+    def test_create_and_attach_post(self):
+        doc = self.attach_to_official_document()
+        data = self.DATA.copy()
+        data.update({
+                "__next__" : "/home/",
+                "related_doc" : doc.id,
+                "type" : self.TYPE,
+                "reference" : "mapart",
+                "revision" : "a",
+                "name" : "MaPart",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data, follow=False,
+                status_code=302)
+        self.assertRedirects(response, "/home/")
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
+        self.assertEqual("MaPart", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+        link = m.DocumentPartLink.objects.get(document=doc.object, part=obj)
+
+    def test_create_and_attach_post_error(self):
+        doc = self.attach_to_official_document()
+        # cancels the doc so that it can not be attached
+        doc.cancel()
+        data = self.DATA.copy()
+        data.update({
+                "__next__" : "/home/",
+                "related_doc" : doc.id,
+                "type" : self.TYPE,
+                "reference" : "mapart",
+                "revision" : "a",
+                "name" : "MaPart",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data, follow=True, page="doc-cad")
+        self.assertEqual(1, len(response.context["messages"]))
+        msg = list(response.context["messages"])[0]
+        self.assertEqual(messages.ERROR, msg.level)
+        obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
+        self.assertEqual("MaPart", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+        self.assertFalse(m.DocumentPartLink.objects.filter(
+            document=doc.object, part=obj).exists())
 
     def test_children(self):
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)

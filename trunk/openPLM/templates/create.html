@@ -16,6 +16,17 @@
         <div>
         <h3>{% trans "OBJECT CREATION:" %}</h3>
             <form id="creation_form" method="post" action="." >	
+                {# hidden fields from a "create an attach" button #}
+                {% if next %}
+                    <input type="hidden" name="__next__" value="{{next}}"/>
+                {% endif %}
+                {% if related_doc %}
+                    <input type="hidden" name="related_doc" value="{{related_doc}}"/>
+                {% endif %}
+                {% if related_part %}
+                    <input type="hidden" name="related_part" value="{{related_part}}"/>
+                {% endif %}
+
                 <table class="Content">
                     <col width="20%" />
                     <col width="80%" />
@@ -28,6 +39,21 @@
                     </tbody>
                 </table>
                 <div style="width:100%; text-align:center; padding:0.5em;">
+                    {% if related %}
+                        {# inform that the object will be attached #}
+                        <p>
+                        {% if related_doc %}
+                            {% blocktrans with related.type as related_type and related.reference as related_reference and related.revision as related_revision and related.name as related_name %} 
+This part will be attached to the document {{related_type}} // {{ related_reference }} // {{ related_revision }} // {{ related_name }}.
+    {% endblocktrans %}
+                        {% else %}
+                            {% blocktrans with related.type as related_type and related.reference as related_reference and related.revision as related_revision and related.name as related_name %} 
+This document will be attached to the part {{related_type}} // {{ related_reference }} // {{ related_revision }} // {{ related_name }}.
+    {% endblocktrans %}
+
+                        {% endif %}
+                        </p>
+                    {% endif %}
                     <input type="submit" class="{{"Button"|button}}" value="{% trans "CREATE" %}" />
                 </div>
             </form>

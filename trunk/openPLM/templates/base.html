@@ -49,6 +49,15 @@
                 </div>
             </div>
 
+            {% if messages %}
+                <div id="messages">
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
 
 
             <div id="content-box" class="clearfix">

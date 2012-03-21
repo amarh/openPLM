@@ -8,7 +8,7 @@ from django.forms.formsets import formset_factory
 from openPLM.plmapp.units import UNITS
             
 class Doc_Part_type_Form(forms.Form):
-    LIST_parts = group_types(get_all_plmparts_with_level())
+    LIST_parts = group_types(get_all_parts_with_level())
     type_part = forms.TypedChoiceField(choices=LIST_parts,label='')
     type_part.widget.attrs["onchange"]="update_form(this,'doc_show')"
     type_part.widget.attrs["class"]="selector"

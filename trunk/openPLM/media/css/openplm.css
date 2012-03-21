@@ -1061,3 +1061,16 @@ div#mi_homepage {
 a.decomposable {
     color: #0051a9 !important;
 }
+
+#messages {
+    margin: 0.5em auto;
+    width: 40em;
+    border: 1px solid #c6c5c5;
+}
+
+#messages li.error {
+    background-color: #F03838;
+    padding: 0.5em;
+    color: #000;
+    width: 39em;
+}

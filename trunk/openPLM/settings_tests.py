@@ -70,6 +70,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
 )
 
@@ -78,6 +79,7 @@ LANGUAGES = (
       ('fr', u'Français'),
       ('en', 'English'),
       ('es', u'Español'),
+      ('ja', u'日本語'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
@@ -97,6 +99,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.comments',
     'django.contrib.humanize',
+    'django.contrib.messages',
     'djcelery',
     'haystack',
     'openPLM.plmapp',
@@ -129,6 +132,7 @@ THUMBNAILS_URL = MEDIA_URL + "thumbnails/"
 
 # Cookie used for session is temporary and is deleted when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Add user, messages and perms variables in RequestContext
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -137,6 +141,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.i18n",
         "django.core.context_processors.media",
         "django.core.context_processors.request",
+        "django.contrib.messages.context_processors.messages",
 )
 
 #: expeditor's mail used when sending notification emails

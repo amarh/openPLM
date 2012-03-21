@@ -223,6 +223,13 @@ class TypeFormWithoutUser(forms.Form):
     type = forms.TypedChoiceField(choices=LIST_WO_USER,
             label=_("Select a type"))
 
+class PartTypeForm(forms.Form):
+    LIST = group_types(m.get_all_parts_with_level())
+    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
+
+class DocumentTypeForm(forms.Form):
+    LIST = group_types(m.get_all_documents_with_level())
+    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
 
 class FakeItems(object):
     def __init__(self, values):
