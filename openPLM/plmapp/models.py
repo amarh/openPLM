@@ -1473,10 +1473,17 @@ def get_all_plmobjects_with_level():
     return lst
 
 @memoize_noarg
-def get_all_plmparts_with_level():
+def get_all_parts_with_level():
     lst = []
-    level=">>"
+    level=">"
     _get_all_subclasses_with_level(Part, lst , level)
+    return lst   
+
+@memoize_noarg
+def get_all_documents_with_level():
+    lst = []
+    level=">"
+    _get_all_subclasses_with_level(Document, lst , level)
     return lst   
 
 @memoize_noarg

@@ -65,6 +65,7 @@ from django.utils.decorators import method_decorator
 from django.utils import simplejson
 from django.forms import HiddenInput
 from django.views.i18n import set_language as dj_set_language
+from django.contrib import messages
 
 from haystack.views import SearchView
 
@@ -847,7 +848,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 ##########################################################################################
 
 @handle_errors
-def create_object(request):
+def create_object(request, from_registered_view=False, creation_form=None):
     """
     Manage html page for the creation of an instance of `models.PLMObject` subclass.
     It computes a context dictionnary based on
@@ -857,33 +858,74 @@ def create_object(request):
     """
 
     obj, ctx = get_generic_data(request)
+    Form = forms.TypeFormWithoutUser
+    # it is possible that the created object must be attached to a part
+    # or a document
+    # related_doc and related_part should be a plmobject id
+    # If the related_doc/part is not a doc/part, we let python raise
+    # an AttributeError, since an user should not play with the URL
+    # and openPLM must be smart enough to produce valid URLs
+    attach = None
+    if "related_doc" in request.REQUEST:
+        Form = forms.PartTypeForm
+        doc = get_obj_by_id(int(request.REQUEST["related_doc"]), request.user)
+        attach = doc.attach_to_part
+        ctx["related_doc"] = request.REQUEST["related_doc"]
+        ctx["related"] = doc
+    elif "related_part" in request.REQUEST:
+        Form = forms.DocumentTypeForm
+        part = get_obj_by_id(int(request.REQUEST["related_part"]), request.user)
+        attach = part.attach_to_document
+        ctx["related_part"] = request.REQUEST["related_part"]
+        ctx["related"] = part
+    if "__next__" in request.REQUEST:
+        redirect_to = request.REQUEST["__next__"]
+        ctx["next"] = redirect_to
+    else:
+        # will redirect to the created object
+        redirect_to = None
 
-    if request.method == 'GET':
-        type_form = TypeFormWithoutUser(request.GET)
-        if type_form.is_valid():
-            type_ = type_form.cleaned_data["type"]
-            cls = models.get_all_plmobjects()[type_]
+    type_form = Form(request.REQUEST)
+    if type_form.is_valid():
+        type_ = type_form.cleaned_data["type"]
+        cls = models.get_all_plmobjects()[type_]
+        if not from_registered_view:
             view = get_creation_view(cls)
             if view is not None:
+                # view has been registered to create an object of type 'cls'
                 return view(request)
-            creation_form = get_creation_form(request.user, cls)
+    else:
+        ctx["creation_type_form"] = type_form
+        return r2r('create.html', ctx, request)
+
+    if request.method == 'GET' and creation_form is None:
+        creation_form = get_creation_form(request.user, cls)
     elif request.method == 'POST':
-        type_form = TypeFormWithoutUser(request.POST)
-        if type_form.is_valid():
-            type_name = type_form.cleaned_data["type"]
-            cls = models.get_all_plmobjects()[type_name]
-            view = get_creation_view(cls)
-            if view is not None:
-                return view(request)
+        if creation_form is None:
             creation_form = get_creation_form(request.user, cls, request.POST)
-            if creation_form.is_valid():
-                user = request.user
-                controller_cls = get_controller(type_name)
-                controller = controller_cls.create_from_form(creation_form, user)
-                return HttpResponseRedirect(controller.plmobject_url)
+        if creation_form.is_valid():
+            ctrl_cls = get_controller(type_)
+            ctrl = ctrl_cls.create_from_form(creation_form, request.user)
+            if attach is not None:
+                try:
+                    attach(ctrl)
+                except (ControllerError, ValueError) as e: 
+                    # crtl cannot be attached (maybe the state of the
+                    # related object as changed)
+                    # alerting the user using the messages framework since
+                    # the response is redirected
+                    message = _(u"Error: %(details)s") % dict(details=unicode(e))
+                    messages.error(request, message)
+                    # redirecting to the ctrl page that least its attached
+                    # objects
+                    if ctrl.is_document:
+                        return HttpResponseRedirect(ctrl.plmobject_url + "parts/")
+                    else:
+                        return HttpResponseRedirect(ctrl.plmobject_url + "doc-cad/")
+            return HttpResponseRedirect(redirect_to or ctrl.plmobject_url)
     ctx.update({
-        'creation_form': creation_form,
-        'object_type': type_form.cleaned_data["type"],
+        'creation_form' : creation_form,
+        'object_type' : type_,
         'creation_type_form' : type_form,
     })
     return r2r('create.html', ctx, request)

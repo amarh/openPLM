@@ -57,6 +57,15 @@
             <a class="{{"Button"|button}}" href="./add/">
                 <span class="ui-button-text">{% trans "Attach another document" %}</span>
             </a>
+
+            {% if obj.is_draft or obj.is_official %}
+                {# action valid if the part is a draft or official, since the user will own the document #}
+                <a class="{{"Button"|button}}"
+                    href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
+                    <span class="ui-button-text">{% trans "Create a document and attach it to the part." %}</span>
+                </a>
+            {% endif %}
+
             {% if forms %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
             {% endif %}
