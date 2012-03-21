@@ -1,5 +1,4 @@
-from operator import attrgetter
-from openPLM.plmapp.base_views import handle_errors , get_generic_data
+from openPLM.plmapp.base_views import handle_errors, secure_required, get_generic_data
 from openPLM.document3D.forms import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -10,18 +9,16 @@ from openPLM.plmapp.forms import *
 import openPLM.plmapp.models as models
 from django.db import transaction
 from django.forms.formsets import formset_factory
-from django.forms.models import modelform_factory
 from django.http import HttpResponse ,HttpResponseRedirect
-from django.core.files import File
 from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.exceptions import LockError
 from mimetypes import guess_type
 from openPLM.document3D.composer import composer
 from openPLM.plmapp.controllers import get_controller
 import openPLM.plmapp.forms as forms
-from django.conf import settings
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 def r2r(template, dictionary, request):
     """
@@ -34,7 +31,7 @@ def r2r(template, dictionary, request):
                               context_instance=RequestContext(request))
   
 
-
+@handle_errors
 def display_3d(request, obj_ref, obj_revi):
 
     """ Manage html page for 3D 
@@ -121,7 +118,8 @@ class StepDecomposer(Decomposer):
 
 DecomposersManager.register(StepDecomposer)
 #posibilidades , el objeto a sido modificado despues de acceder al formulario    
-           
+
+@handle_errors
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):    
     
     #incluir los script para autocompletar nombres y esos ole1
@@ -400,7 +398,10 @@ def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_att
         return zip(order_quantity_extra_links,form_Doc_Part_attributes)
     else:
         return valid         
-              
+
+
+@secure_required
+@login_required
 def ajax_decompose_form(request):
 
 
