@@ -269,7 +269,6 @@ def generate_part_doc_links(prepare_list,links,obj):
     return list_document_controller , instances
 
 
-@handle_errors
 def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_attributes):
     valid=True
     if form_Order_Quantity.is_valid():
