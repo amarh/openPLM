@@ -2,7 +2,7 @@ from django import forms
 from openPLM.document3D.models import *
 from django.db.models import Q
 from django.db import models
-from openPLM.plmapp.models import get_all_plmparts_with_level
+from openPLM.plmapp.models import get_all_parts_with_level
 from openPLM.plmapp.forms import group_types
 from django.forms.formsets import formset_factory
 from openPLM.plmapp.units import UNITS
