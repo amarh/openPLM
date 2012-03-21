@@ -350,7 +350,7 @@ def generate_part_doc_links(prepare_list,links,obj):
 
 
 
-              
+@handle_errors 
 def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_attributes):
         
     
