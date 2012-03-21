@@ -16,7 +16,7 @@
     {# study, homepage, navigate #}
     <div class="menurow">
         <div class="menuitem"> 
-        <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}{% else %}/user/{{user}}/{% endif %}">
+        <a class="tooltip" href="/user/{{user}}/parts-doc-cad/">
             {% trans "Study" %}
             <span class="triangle">&nbsp;</span>
             <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
@@ -26,7 +26,7 @@
     <div class="menuitem" id="mi_homepage"> 
     </div>
     <div class="menuitem"> 
-    <a class="tooltip" href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user}}/navigate/{% endif %}">
+    <a class="tooltip" href="/user/{{user}}/navigate/">
         {% trans "Navigate" %}
         <span class="triangle">&nbsp;</span>
         <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
