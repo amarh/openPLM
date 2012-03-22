@@ -317,6 +317,8 @@ function init(){
                 $("#FilterNav").find("form").serialize(),
                 function (data) {
                     update_nav(null, data);
+                    // center the graph to be sure it is visible
+                    center();
                     $("#Navigate").hideLoading();
                 });
             } );
