@@ -226,7 +226,7 @@ class ViewTest(CommonViewTest):
         # promote
         self.assertTrue(self.controller.is_promotable())
         response = self.post(self.base_url + "lifecycle/apply/", 
-                {"action" : "PROMOTE", "password":"password"})
+                {"promote" : "on", "password" : "password"})
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", False, u'user'),
                   ("official", True, u'user'),
@@ -242,7 +242,7 @@ class ViewTest(CommonViewTest):
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
         response = self.post(self.base_url + "lifecycle/apply/", 
-                {"action" : "DEMOTE", "password":"password"})
+                {"demote" : "on", "password":"password"})
         lifecycles = tuple(response.context["object_lifecycle"])
         wanted = (("draft", True, u'user'),
                   ("issue1", False, u'user'),
@@ -298,7 +298,7 @@ class ViewTest(CommonViewTest):
         self.assertEqual(lifecycles, wanted)
         # try to promote
         response = self.post(self.base_url + "lifecycle/apply/", 
-                {"action" : "PROMOTE", "password":"wrong_password"})
+                {"promote" : "on", "password":"wrong_password"})
         lifecycles = tuple(response.context["object_lifecycle"])
         self.assertEqual(lifecycles, wanted)
         self.assertFalse(response.context["password_form"].is_valid())
@@ -595,6 +595,11 @@ class DocumentViewTestCase(ViewTest):
         # ensures the controller is promotable
         self.controller.add_file(self.get_file())
         super(DocumentViewTestCase, self).test_lifecycle()
+
+    def test_lifecycle_bad_password(self):
+        # ensures the controller is promotable
+        self.controller.add_file(self.get_file())
+        super(DocumentViewTestCase, self).test_lifecycle_bad_password()
 
     def test_revise_no_attached_part_get(self):
         """

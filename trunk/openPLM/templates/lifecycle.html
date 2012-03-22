@@ -57,7 +57,7 @@
         {% if obj.state != obj.lifecycle.first_state %}
             {% if is_signer_dm %}
                 {% if obj.is_proposed %}
-                    <input name="action" type="submit" class="{{"Button"|button}}" value="DEMOTE" />
+                    <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
                 {% else %}
                     <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
                 {% endif %}
@@ -67,7 +67,7 @@
         {% endif %}
         {% if is_signer %}
             {% if obj.is_promotable %}
-                <input name="action" type="submit" class="{{"Button"|button}}" value="PROMOTE" />
+                <input name="promote" type="submit" class="{{"Button"|button}}" value="{% trans "PROMOTE" %}" />
             {% else %}
                 <p>{% trans "You can not promote this object:" %}</p>
                 {{ obj.promotion_errors.as_ul }}

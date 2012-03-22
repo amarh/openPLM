@@ -202,11 +202,14 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
-        ctx["action"] = request.POST["action"]
+        if "demote" in request.POST:
+            ctx["action"] = "demote"
+        elif "promote" in request.POST:
+            ctx["action"] = "promote"
         if password_form.is_valid():
-            if request.POST["action"] == "DEMOTE":
+            if "demote" in request.POST:
                 obj.demote()
-            elif request.POST["action"] == "PROMOTE":
+            elif "promote" in request.POST:
                 obj.promote()
             return HttpResponseRedirect("..")
     else: 
