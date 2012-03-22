@@ -214,11 +214,26 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     state = obj.state.name
     object_lifecycle = []
     roles = dict(obj.plmobjectuserlink_plmobject.values_list("role", "user__username"))
-    for i, st in enumerate(obj.lifecycle):
+    lcs = obj.lifecycle.to_states_list()
+    for i, st in enumerate(lcs):
         signer = roles.get(level_to_sign_str(i))
         object_lifecycle.append((st, st == state, signer))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
+
+    # warning if a previous revision will be cancelled/deprecated
+    cancelled = []
+    deprecated = []
+    if is_signer:
+        if lcs.next_state(state) == obj.lifecycle.official_state.name:
+            for rev in obj.get_previous_revisions():
+                if rev.is_official:
+                    deprecated.append(rev)
+                elif rev.is_draft or rev.is_proposed:
+                    cancelled.append(rev)
+    ctx["cancelled_revisions"] = cancelled
+    ctx["deprecated_revisions"] = deprecated
+
     ctx.update({'current_page':'lifecycle', 
                 'object_lifecycle': object_lifecycle,
                 'is_signer' : is_signer, 
