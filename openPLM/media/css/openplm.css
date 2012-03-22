@@ -25,8 +25,6 @@ time, mark, audio, video {
 	padding: 0;
     font-family: sans-serif;
 	border: 0;
-	/*font-size: 100%;*/
-	/*font: inherit;*/
 	vertical-align: baseline;
     color: #eee;
     color: #575454;
@@ -82,13 +80,18 @@ h2 {
 }
 
 h3 {
-    background: #7f7c7c;
-    font-size: 110%;
     margin: 0.5em 0 .5em;
     padding: 0.5em 1em;
-    color: white;
-    font-weight:normal;
+    color: #eee;
+    font-size: 100%;
+    font-weight: 600;
+    text-shadow: 1px 1px #000;
+    background: #7f7c7c;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("../img/dark/h2_bg_2.png");
 }
+
 
 h3 + p,
 h3 ~ * {
@@ -113,6 +116,11 @@ h4 ~ * {
 
 .clear {
     clear: both;
+}
+
+.center {
+    text-align: center;
+    width: 100%;
 }
 
 hr {
@@ -153,7 +161,7 @@ div.main-box {
 }
 
 div.top-box {
-    background: url("/media/img/dark/banner.png") no-repeat #343434 right top;
+    background: url("../img/dark/banner.png") no-repeat #343434 right top;
     height: 70px;
     min-width: 100%;
     padding-top: 1em;
@@ -172,7 +180,7 @@ div#LoggedPersonBox {
 
 div#bottom-box {
     background-color: #343434;
-    background:  url("/media/img/dark/footer.png") no-repeat #343434 right bottom;
+    background:  url("../img/dark/footer.png") no-repeat #343434 right bottom;
     height: 50px;
     margin-top: -1em;
 
@@ -183,12 +191,6 @@ div.center-box {
     margin-top: 100px;
 }
 
-div.reset-box {
-    position:relative;
-    width:100%;
-    left:100%;
-    margin-left:-300px;
-} 
 
 div#content-box {
     background-color: #7f7d7d;
@@ -203,10 +205,6 @@ div#content-box {
 div#left-col {
     float:left;
     width:300px;
-}
-
-div#center-col {
-    /*margin-left:330px;*/
 }
 
 .clearfix:after {
@@ -249,7 +247,6 @@ div#DisplayBox {
     margin-bottom: 0px;
     padding: 0.2em 0em;
     vertical-align: middle;
-    /*line-height: 30px;*/
     font-size: 14px;
     text-align: center;
     background-color: #c8c7c5;
@@ -259,7 +256,6 @@ div#DisplayBox {
 div.Box {
     display: none;
     font-size: 14px;
-    /*float: left;*/
     width: 100%;
     margin-right: 0px;
     padding: 0;
@@ -276,15 +272,9 @@ div.Box h2 {
     background-position: left center;
     background-size: cover;
     background-repeat: no-repeat;
+    background-image: url("../img/dark/h2_bg_2.png");
     
     text-shadow: 1px 1px #000;
-}
-
-#SuperMenuBox h2 {
-    background-image: url("../img/dark/h2_bg_1.png");
-}
-#SearchBox h2 {
-    background-image: url("../img/dark/h2_bg_2.png");
 }
 
 #ToggleBoxButton {
@@ -293,24 +283,11 @@ div.Box h2 {
     top: 150px;
 }
 
-
 #ToggleBoxButton label {
     width: 20px;
 }
 #ToggleBoxButton span {
     padding: 0;
-}
-
-h3 {
-    color: #eee;
-    font-size: 100%;
-    padding-left: 1em;
-    font-weight: 600;
-    background-repeat: no-repeat;
-    text-shadow: 1px 1px #000;
-    background-size: cover;
-    background-image: url("../img/dark/h2_bg_2.png");
-
 }
 
 div#ActiveBox
@@ -326,9 +303,6 @@ div#ReferenceArea {
     margin: 0;
 }
 
-div#SearchBox {
-    min-height: 200px;
-}
 
 /* BOX WHICH DISPLAY INFO ABOUT LOGGED-IN USER, LANGUAGE, TIME, ... */
 div#LoggedPersonBox {
@@ -349,14 +323,12 @@ div#LoggedPersonBox {
 }
 
 
-
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
 li#NavigateButton {
     margin-right: -5px;
 }
 
-#SetLangForm
-{
+#SetLangForm {
     display: inline;
     padding-right: 1em;
 }
@@ -374,7 +346,7 @@ li#NavigateButton {
     margin-top: auto;
     margin-bottom: auto;
 }
-a.Button.small span{
+a.Button.small span {
     padding: 0.3em;
 }
 
@@ -463,10 +435,6 @@ ul#MenuList li:hover
     background-size: 100% 100%;
 }
 
-li#fake_menu_item_right {
-    clear: both;
-}
-
 ul#MenuList li a
 {
     text-decoration: none;
@@ -498,8 +466,6 @@ table.Content th,
 table.Content td
 {
     padding: 3px;
-    /*border-top: 2px solid #7f7c7c;*/
-    /*border-bottom: solid 2px #7f7c7c;*/
 }
 
 table.Content th
@@ -588,17 +554,17 @@ td.expander span.expander {
 }
 
 td.expanded span.expander {
-    background-image: url("/media/img/expander_normal_puce.png");
+    background-image: url("../img/expander_normal_puce.png");
 }
 td.expanded span.expander:hover {
-    background-image: url("/media/img/expander_normal_hover_puce.png");
+    background-image: url("../img/expander_normal_hover_puce.png");
 }
 
 td.open span.expander {
-    background-image: url("/media/img/expander_open_puce.png");
+    background-image: url("../img/expander_open_puce.png");
 }
 td.open span.expander:hover {
-    background-image: url("/media/img/expander_open_hover_puce.png");
+    background-image: url("../img/expander_open_hover_puce.png");
 }
 
 /** simple search **/
@@ -676,16 +642,14 @@ textarea {
     width: 100%;
 }
 
-/* LINKS HAS APPEARANCE CLOSED TO BUTTONS */
-a.Button, input.Button
-{
+a.Button, input.Button {
     padding-left: 5px;
     padding-right: 5px;
     text-decoration: none;
     font-weight: normal;
 }
 
-input.Button{
+input.Button {
     margin: 0;
     color: #343434;
 }
@@ -712,6 +676,18 @@ a.Button > span {
     line-height: 1.3 !important;
 }
 
+
+li.ui-button:hover,
+a.ui-button:hover,
+input.ui-button:hover,
+.ui-state-hover {
+    background: url("../css/openplm/images/bg_hover.png") no-repeat scroll 50% 50% ,
+        url("../css/openplm/images/hover.png") repeat-x scroll left center;
+    background-size: auto 100%, auto;
+
+}
+
+
 div.chzn-container-single {
     padding-left: 0px;
 }
@@ -726,6 +702,7 @@ div.chzn-container-single > *
 div.chzn-container-single select *{
     font-size: 1em;
 }
+
 #SearchBox td > * {
     width: 90%;
     max-width: 90%;
@@ -775,8 +752,7 @@ h2 div.toolbar > ul > li > button {
 #help-dialog ul,
 #help-dialog ol,
 #main_content ul,
-#main_content ol
-{
+#main_content ol {
     display: block;
 }
 #help-dialog ul li,
@@ -796,7 +772,7 @@ tt.docutils.literal {
     background-color: #fffcb6 !important;
 }
 
-/* lifecycle */
+/* table */
 table.Content td.status {
     text-align: center;
     color: #eee;
@@ -909,32 +885,15 @@ a#linobject {
     height: 33px;
 }
 
-
-
-li.ui-button:hover,
-a.ui-button:hover,
-input.ui-button:hover,
-.ui-state-hover {
-    background: url("/media/css/openplm/images/bg_hover.png") no-repeat scroll 50% 50% , url("/media/css/openplm/images/hover.png") repeat-x scroll left center;
-    background-size: auto 100%, auto;
-
+/** dialog */
+.ui-dialog * {
+    font-size: medium;
 }
-
-.center {
-    text-align: center;
-    width: 100%;
-}
-
 
 .ui-dialog-title,
 .ui-datepicker-title span {
     color: white;
 }
-
-span#select_type {
-    display: block;
-}
-
 
 /* navigation history */
 
@@ -966,10 +925,6 @@ span#select_type {
     content: "»";
     padding: 0.2em;
     font-size: small;
-}
-
-.ui-dialog * {
-    font-size: medium;
 }
 
 /* deprecated files: small font-size */
