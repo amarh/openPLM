@@ -57,7 +57,7 @@ $(
                 var actions = $.grep(cls, function(x){return /^action-/.test(x);});
                 if (actions.length > 0) {
                     var action = actions[0].replace(/^action-/, ""); 
-                    form.find("input[type=submit][value=" + action +"]").click();
+                    form.find("input[type=submit][name=" + action +"]").click();
                 }
             }
         });
