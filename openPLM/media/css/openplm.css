@@ -780,12 +780,10 @@ h2 div.toolbar > ul > li > button {
     display: block;
 }
 #help-dialog ul li,
+.ui-dialog-content ul li,
 #main_content ul li {
     display: list-item;
     list-style-type: square;
-}
-#help-dialog li,
-#main_content li {
     margin-left: 2em;
 }
 

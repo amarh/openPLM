@@ -220,8 +220,11 @@ class ViewTest(CommonViewTest):
         wanted = (("draft", True, u'user'),
                   ("official", False, u'user'),
                   ("deprecated", False, None))
+        self.assertFalse(response.context["cancelled_revisions"])
+        self.assertFalse(response.context["deprecated_revisions"])
         self.assertEqual(lifecycles, wanted)
         # promote
+        self.assertTrue(self.controller.is_promotable())
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"action" : "PROMOTE", "password":"password"})
         lifecycles = tuple(response.context["object_lifecycle"])
@@ -246,6 +249,44 @@ class ViewTest(CommonViewTest):
                   ("official", False, None),
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
+
+    def test_lifecycle_warn_previous_revisions(self):
+        """
+        Tests that warnings about previous revisions are correctly set
+        when a newer revision is revised.
+        """
+        doc = self.attach_to_official_document()
+        revb = self.controller.revise("b")
+        revc = revb.revise("c")
+        if self.controller.is_part:
+            revb.attach_to_document(doc)
+            revc.attach_to_document(doc)
+        self.controller.object.state = m.State.objects.get(name="official")
+        self.controller.object.save()
+        # rev ai -> no previous revisions
+        response = self.get(self.base_url + "lifecycle/")
+        self.assertFalse(response.context["cancelled_revisions"])
+        self.assertFalse(response.context["deprecated_revisions"])
+
+        # rev b -> a is deprecated 
+        response = self.get(revb.plmobject_url + "lifecycle/")
+        self.assertFalse(response.context["cancelled_revisions"])
+        self.assertEqual([self.controller.object.plmobject_ptr],
+                response.context["deprecated_revisions"])
+
+        # rev c -> a is deprecated, b is cancelled
+        response = self.get(revc.plmobject_url + "lifecycle/")
+        self.assertEqual([revb.object.plmobject_ptr],
+                response.context["cancelled_revisions"])
+        self.assertEqual([self.controller.object.plmobject_ptr],
+                response.context["deprecated_revisions"])
+        # rev c, nothing if c is official
+        revc.object.state = revc.lifecycle.official_state
+        revc.object.save()
+        response = self.get(revc.plmobject_url + "lifecycle/")
+        self.assertFalse(response.context["cancelled_revisions"])
+        self.assertFalse(response.context["deprecated_revisions"])
+
 
     def test_lifecycle_bad_password(self):
         self.attach_to_official_document()
@@ -551,6 +592,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual("crumble", df.file.read())
 
     def test_lifecycle(self):
+        # ensures the controller is promotable
         self.controller.add_file(self.get_file())
         super(DocumentViewTestCase, self).test_lifecycle()
 
