@@ -90,9 +90,7 @@ def generate_functions_visibilty_parts(numeration,parts_generated):
 def generate_functions_visibilty_object(numeration,object_numeration,product,loc):
 
 
-        red=1
-        green=1
-        blue=1
+            
         reference=product.geometry
         part_id=str(product.doc_id)        
                                                
@@ -106,9 +104,9 @@ def generate_functions_visibilty_object(numeration,object_numeration,product,loc
 def generate_object(loc,numeration,reference,part_id):
 
     
-    locate=""
-    locate+="var NewMaterial=new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading});\n"
-    locate+="var object%s=new THREE.Mesh(_%s_%s,NewMaterial );\n"%(numeration,reference,part_id)
+
+
+    locate="var object%s=new THREE.Mesh(_%s_%s,material_for_%s_%s );\n"%(numeration,reference,part_id,reference,part_id)
     locate+="object%s.matrixAutoUpdate = false;\n"%numeration
     if len(loc)>0:
         transformation=gp_Trsf()

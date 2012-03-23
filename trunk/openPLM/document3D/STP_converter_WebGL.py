@@ -70,7 +70,7 @@ class NEW_STEP_Import(object):
         h_shape_tool = XCAFDoc.XCAFDoc_DocumentTool_ShapeTool(doc.Main())
         h_colors_tool = XCAFDoc.XCAFDoc_DocumentTool_ColorTool(doc.Main())
         self.shape_tool = h_shape_tool.GetObject()
-        self.color_tool=h_colors_tool.GetObject()
+        color_tool=h_colors_tool.GetObject()
 
         shapes = TDF_LabelSequence()
         self.shape_tool.GetShapes(shapes)        
@@ -79,7 +79,7 @@ class NEW_STEP_Import(object):
                 compShape=self.shape_tool.GetShape(shapes.Value(i+1))
                 t=Topo(compShape)
                 if t.number_of_vertices() > 0:
-                    self.shapes_simples.append(simple_shape(GetLabelNom(shapes.Value(i+1)),compShape))
+                    self.shapes_simples.append(simple_shape(GetLabelNom(shapes.Value(i+1)),compShape,colour_chercher(shapes.Value(i+1),color_tool,self.shape_tool)))
                 else:
                     pass
                     #print "Not information found for shape : ", GetLabelNom(shapes.Value(i+1))        
@@ -98,7 +98,7 @@ class NEW_STEP_Import(object):
                 
                 name = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
                 path = os.path.join(new_GeometryFile.file.storage.location, name)
-                mesh_shape(shape.shape,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id),shape.nom)
+                mesh_shape(shape,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id))
                 new_GeometryFile.file = name
                 new_GeometryFile.index = i # to evade product.geometry=0
                 new_GeometryFile.save()
@@ -113,7 +113,7 @@ class NEW_STEP_Import(object):
             
         for i in range(roots.Length()):
             self.product_relationship_arbre=Product(GetLabelNom(roots.Value(i+1)),self.doc_file.id,roots.Value(i+1)) 
-            parcour_product_relationship_arbre(roots.Value(i+1),self.shape_tool,self.product_relationship_arbre,self.color_tool,self.shapes_simples,self.doc_file.id)
+            parcour_product_relationship_arbre(roots.Value(i+1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,self.doc_file.id)
        
         return self.product_relationship_arbre
         
@@ -125,10 +125,10 @@ class NEW_STEP_Import(object):
          
 class simple_shape():
 
-    def __init__(self, nom,TopoDS_Shape):
-        self.nom = nom
+    def __init__(self, name,TopoDS_Shape,color):
+        self.name = name
         self.shape = TopoDS_Shape
- 
+        self.color = color
 
 
 
@@ -139,7 +139,7 @@ class simple_shape():
     
     
     
-def parcour_product_relationship_arbre(label,shape_tool,product,color_tool,shapes_simples,doc_id):
+def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,doc_id):
 
 
 
@@ -163,14 +163,14 @@ def parcour_product_relationship_arbre(label,shape_tool,product,color_tool,shape
                     product.links.append(Link(Product(GetLabelNom(label_reference),doc_id,label_reference)))
                     product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))
                                 
-                    parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,color_tool,shapes_simples,doc_id)
+                    parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,shapes_simples,doc_id)
 
     else:            
         compShape=shape_tool.GetShape(label)
         #nous cherchons sa correspondance dans la liste de shapes simples / si le shape navais pas de vertices on ne trouvera aucun shape                         
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
-                product.set_shape_geometry_related(index,colour_chercher(label,color_tool,shape_tool)) # to evade product.geometry=0
+                product.set_geometry(index) # to evade product.geometry=0
                  
                    
 

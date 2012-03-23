@@ -41,7 +41,7 @@ import os, os.path
 from kjbuckets import  kjDict
 import time
 
-def mesh_shape(shape,filename,name,shape_nom):
+def mesh_shape(shape,filename,name):
     """ Take a topods_shape instance, returns the tesselated object"""
     ''' Connect a ode.Trimesh to this body. The mesh is generated from the MSH subpackage. vertices lits
     and faces indices are passed to the trimesh.
@@ -52,7 +52,7 @@ def mesh_shape(shape,filename,name,shape_nom):
     By default, this argument is set to 1 : the default precision of the mesher is used.
     '''
     quality_factor=0.3
-    a_mesh = QuickTriangleMesh(shape,quality_factor)
+    a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
 
     
     
@@ -62,11 +62,18 @@ def mesh_shape(shape,filename,name,shape_nom):
         os.makedirs(directory)
 
     output = open(filename,"w")
-    output.write("//Computation for : %s\n"%shape_nom)
+    output.write("//Computation for : %s\n"%shape.name)
+    
     output.write("var %s = new THREE.Geometry();\n"%name) 
-
-
+    output.write("var material_for%s = new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading});\n"%name)
+    
+    if shape.color:
+        output.write("material_for%s.color.setRGB(%f,%f,%f);\n"%(name,shape.color.Red(),shape.color.Green(),shape.color.Blue()))
+     
     a_mesh.compute(output,name)
+    
+    output.close()
+
     return a_mesh       
 
 
@@ -104,27 +111,33 @@ class QuickTriangleMesh(object):
             raise "Error: first set a shape"
             return False
         BRepMesh_Mesh(self._shape,self._precision)
-
+        
         _points = kjDict()
 
         uv = []
         faces_iterator = Topo(self._shape).faces()  
-        index=0      
+        index=0
+              
         for F in faces_iterator:
             face_location = TopLoc_Location()
             triangulation = BRep_Tool_Triangulation(F,face_location)
+        
             if triangulation.IsNull() == False: 
                 facing = triangulation.GetObject()
                 tab = facing.Nodes()
                 tri = facing.Triangles()
                 the_normal = TColgp_Array1OfDir(tab.Lower(), tab.Upper()) 
                 StdPrs_ToolShadedShape_Normal(F, Poly_Connect(facing.GetHandle()), the_normal)
+                
                 for i in range(1,facing.NbTriangles()+1):
+                    
                     trian = tri.Value(i)
+                    
                     if F.Orientation() == TopAbs_REVERSED:
                         index1, index3, index2 = trian.Get()
                     else:
                         index1, index2, index3 = trian.Get()
+                    
                     P1 = tab.Value(index1).Transformed(face_location.Transformation())
                     P2 = tab.Value(index2).Transformed(face_location.Transformation())
                     P3 = tab.Value(index3).Transformed(face_location.Transformation())     
@@ -146,7 +159,7 @@ class QuickTriangleMesh(object):
                             index+=1
                         output.write("%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"%(name,_points.neighbors(p1_coord)[0],_points.neighbors(p2_coord)[0],_points.neighbors(p3_coord)[0],the_normal(index1).X(),the_normal(index1).Y(), the_normal(index1).Z(),the_normal(index2).X(),the_normal(index2).Y(), the_normal(index2).Z(),the_normal(index3).X(),the_normal(index3).Y(), the_normal(index3).Z()))                            
 
-
+                    
         return True
 
 
