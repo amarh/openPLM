@@ -12,7 +12,7 @@ class Migration(DataMigration):
         then delete draft_official"""
         try:
             draft_official = orm.Lifecycle.objects.get(name="draft_official")
-        except orm.Lifecycle.DoesNotExists:
+        except orm.Lifecycle.DoesNotExist:
             # nothing to do
             pass
         else:
