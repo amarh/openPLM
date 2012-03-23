@@ -45,12 +45,6 @@ admin.site.register(Document3D)
 from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk,object_id,user_id):
-    """
-    try:
-        do_work()
-    except SoftTimeLimitExceeded:
-        clean_up_in_a_hurry()
-    """
     import logging
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
     from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import
@@ -89,9 +83,9 @@ class Document3DController(DocumentController):
         if fileExtension.upper() in ('.STP', '.STEP'):
             if self.object.files.filter(is_stp).exclude(id=doc_file.id):
                 self.delete_file(doc_file)
-                raise ValueError("Only one step documentfile allowed for each document3D")  
+                raise ValueError("Only one step documentfile allowed for each document3D") 
             handle_step_file.delay(doc_file.pk,self.object.id,self._user.id)
-           
+     
               
         
                     
@@ -195,9 +189,9 @@ class Product(object):
         self.doc_id=doc_id   #cambiar por step product id
         self.geometry=geometry
         self.color=color
-    def set_shape_geometry_related(self,geometry,color):
+    def set_geometry(self,geometry):
         self.geometry=geometry
-        self.color=color        
+       
     
 class Link(object):
 
