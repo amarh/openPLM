@@ -48,7 +48,7 @@
         <div class="timeline">
             <h3>{{ group.grouper|capfirst}}</h3>
 
-                {% regroup group.list by plmobject.type as groups %}
+                {% regroup group.list by plmobject__type as groups %}
 
                 {% for gp in groups %}
 
@@ -59,11 +59,11 @@
                         <ul>
                             {% for link in gp.list %}
                                 <li>
-                                <span>{{link.plmobject.type}}</span>
-                                <a href={{link.plmobject.plmobject_url}}>
-                                    <span>{{link.plmobject.reference}}</span>
+                                <span>{{link.plmobject__type}}</span>
+                                <a href="/object/{{link.plmobject__type}}/{{link.plmobject__reference}}/{{link.plmobject__revision}}/">
+                                    <span>{{link.plmobject__reference}}</span>
                                 </a>
-                                <span>{{link.plmobject.revision}}</span>
+                                <span>{{link.plmobject__revision}}</span>
                                 </li>
                             {% endfor %}
                         </ul>

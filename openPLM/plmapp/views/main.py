@@ -82,6 +82,7 @@ from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
     get_creation_view
 
 import openPLM.plmapp.csvimport as csvimport
+from openPLM.plmapp.cadformats import is_cad_file
 
 def r2r(template, dictionary, request):
     """
@@ -1034,8 +1035,8 @@ def change_user_password(request, obj_ref):
 @handle_errors
 def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the related parts and related documents of (:class:`PLMObjectUserLink` with) the selected :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionnary based on
+    View listing the related parts and documents of
+    the selected :class:`~django.contrib.auth.models.User`.
     
     .. include:: views_params.txt 
     """
@@ -1045,13 +1046,12 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
         # TODO
         raise TypeError()
     objs = obj.get_object_user_links().select_related("plmobject")
-    objs = objs.only("role", "plmobject__type", "plmobject__reference",
+    objs = objs.values("role", "plmobject__type", "plmobject__reference",
             "plmobject__revision", "plmobject__name")
     ctx.update({'current_page':'parts-doc-cad',
         'object_user_link': objs,
         'last_edited_objects':  get_last_edited_objects(obj.object),
-        })
-    
+    })
     return r2r('users/plmobjects.html', ctx, request)
 
 #############################################################################################
@@ -1184,6 +1184,26 @@ def download(request, docfile_id, filename=""):
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
 
+def get_cad_files(part):
+    """
+    Returns an iterable of all :class:`.DocumentFile` related
+    to *part* that contains a CAD file. It retrieves all non deprecated
+    files of all documents parts to *part* and its children and
+    filters these files according to their extension (see :meth:`.is_cad_file`).
+    """
+    children = part.get_children(-1, related=("child",))
+    children_ids = set(c.link.child_id for c in children)
+    children_ids.add(part.id)
+    links = models.DocumentPartLink.objects.filter(part__in=children_ids)
+    docs = links.values_list("document", flat=True)
+    d_o_u = "document__owner__username"
+    files = models.DocumentFile.objects.filter(deprecated=False,
+                document__in=set(docs))
+    # XXX : maybe its faster to build a complex query than retrieving
+    # each file and testing their extension
+    return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
+
+
 @handle_errors 
 def download_archive(request, obj_type, obj_ref, obj_revi):
     """
@@ -1198,6 +1218,8 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
     d_o_u = "document__owner__username"
     if obj.is_document:
         files = obj.files.select_related(d_o_u)
+    elif obj.is_part and "cad" in request.GET:
+        files = get_cad_files(obj)
     elif obj.is_part:
         links = obj.get_attached_documents()
         docs = (link.document for link in links)
