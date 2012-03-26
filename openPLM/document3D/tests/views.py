@@ -27,17 +27,6 @@ class view_3dTest(CommonViewTest):
            u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
            })
                    
-    def test_3D_form(self):
-        """
-        Verifies that the form for the view 3D is correct
-        """
-        f=open("document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)     
-        response = self.get(self.document.object.plmobject_url+"3D/")
-        form=Form3D(document=self.document)
-        self.assertEqual(response.context["select_stp_form"].as_table(), form.as_table())
-
     def test_view3D_stp_decompose(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -48,36 +37,7 @@ class view_3dTest(CommonViewTest):
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data) 
         response = self.get(self.document.object.plmobject_url+"3D/")        
         self.assertEqual(len(response.context["GeometryFiles"]), 3)
-        #self.assertEqual(response.context["select_stp_form"].as_table(), form.as_table())    
-            
-    def test_3D_form_post(self):
-        """
-        Verifies that the form for the view 3D is correct when we post
-        """
-        f=open("document3D/data_test/test2.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)          
-        form=Form3D(document=self.document)
-        data={u'csrfmiddlewaretoken': [u'6a0951fed02461061f796c63d98bb430'], u'Display': [new_doc_file.id]}
-        response_post = self.post(self.document.object.plmobject_url+"3D/", 
-                            data)     
-        self.assertEqual(5, len(response_post.context["GeometryFiles"]))
-        self.assertNotEqual(response_post.context["javascript_arborescense"],False)        
-               
-    def test_3D_form_post_no_arborescense(self):
-        """
-        Verifies that the form for the view 3D is correct (nothing to show) when we try show stp file without a file arborescense linked
-        """
-        f=open("document3D/data_test/test2.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)          
-        form=Form3D(document=self.document)
-        ArbreFile.objects.get(stp=new_doc_file).delete()
-        data={u'csrfmiddlewaretoken': [u'6a0951fed02461061f796c63d98bb430'], u'Display': [new_doc_file.id],u'select_stp_form' : form}
-        response_post = self.post(self.document.object.plmobject_url+"3D/",data)  
-        self.assertEqual(5, len(list(response_post.context["GeometryFiles"])))
-        self.assertEqual(response_post.context["javascript_arborescense"], False)        
-        
+         
     def test_3D_no_stp_associe(self):   
     
         response = self.get(self.document.object.plmobject_url+"3D/")

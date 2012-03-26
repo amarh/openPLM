@@ -32,33 +32,3 @@ class Order_Quantity_Form(forms.Form):
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'size':'4'}))
     unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
 
-class Form3D(forms.ModelForm):
-
-
-    Display = forms.ModelChoiceField(queryset=Document3D.objects.none(), empty_label=None)
-    Display.widget.attrs["onchange"]="this.form.submit()"
-    
-    class Meta:
-
-        model = DocumentFile
-        exclude = ('filename', 'file' , 'size' ,'thumbnail' ,'locked' ,'locker' ,'document')
-
-
-        
-
-           
-    def __init__(self, *args, **kwargs):
-        document3D = kwargs.pop("document", None)
-        super(Form3D, self).__init__(*args, **kwargs)
-        queryset = document3D.files.filter(is_stp)
-        self.fields["Display"].queryset= queryset
-        self.fields["Display"].label_from_instance = lambda obj: "%s " % (obj.filename)
-        
-        if queryset.count()>0:
-            self.fields["Display"].initial = queryset[0]
-        
-
-
-
-    
-       
