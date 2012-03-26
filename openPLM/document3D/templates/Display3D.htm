@@ -139,70 +139,48 @@ z-index:10;
 {% block content %}
 
 
+    {% if not javascript_arborescense %}
+        <p>
+        {% trans "This document has no 3D data. Maybe it does not have a STEP file or openPLM has not yet converted its STEP file." %}
 
-<script type="text/javascript">
-/*
-.ui-slider-handle {
-   outline: none;
-}
-   
-
-#zoom {
-  position:absolute;
-  height:40%;
-  top: 0%;
-  right: 5%;
-
-}                   
-*/</script>        
-
-  
-<div class="trans" >
-      <div class="menu" id="menu_">   </div>
-</div> 
+        </p>
+    {% else %}
+    <div class="trans" >
+        <div class="menu" id="menu_">   </div>
+    </div> 
 
 
- <div id="webgl_warning" class="main" style="display:none;">
-    <div class="warning_container">
-      <div class="warning">
+    <div id="webgl_warning" class="main" style="display:none;">
+        <div class="warning_container">
+            <div class="warning">
 
-        <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
-        <ul>
-          <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
-          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
+                <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
+                <ul>
+                    <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
+                    <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
 
-          <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
-        </ul>
-        <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
-      </div>
+                    <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
+                </ul>
+                <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
+            </div>
+        </div>
     </div>
-  </div>
 
+    {% endif %}
 {% endblock %}
-
-
-
-
 
 
 
 
 {% block scripts %} 
   
-        <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
-
-
-        
-        
-        
-        
-		<script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
-		{% for item in GeometryFiles %}
-		<script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
-		{% endfor %}
-		<script type="text/javascript">
-
-
+    <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
+    
+    <script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
+    {% for item in GeometryFiles %}
+        <script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
+    {% endfor %}
+    <script type="text/javascript">
 
 
 
@@ -238,7 +216,6 @@ var deep ;
 var controls;	
 $(document.getElementById( 'main_content' )).ready(init);
 animate();
-//animate();
 
 function init() {
 
