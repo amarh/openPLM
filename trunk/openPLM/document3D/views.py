@@ -34,22 +34,10 @@ def display_3d(request, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = '3D'
 
-    if request.method == 'POST':
-        form = Form3D(request.POST, document=obj) #important Document3DController.files dont return step_original , Document3D.files will return step_original
-        if form.is_valid():
-            options = form.cleaned_data
-            doc_file = options["Display"]
-            GeometryFiles=list(GeometryFile.objects.filter(stp=doc_file))
-            add_child_GeometryFiles(request.user,doc_file,GeometryFiles)
-            product=read_ArbreFile(doc_file,request.user)
-            javascript_arborescense=generate_javascript_for_3D(product)
-
-            ctx.update({'select_stp_form': form, 'GeometryFiles' : GeometryFiles,'javascript_arborescense' : javascript_arborescense, })
-            return r2r('Display3D.htm', ctx, request)
-
-    form = Form3D(document=obj)#important Document3DController.files dont return step_original , Document3D.files will return step_original
-
-    doc_file = form.fields["Display"].initial
+    try:
+        doc_file = obj.files.filter(is_stp)[0]
+    except IndexError:
+        doc_file = None
 
     if doc_file is None:
         GeometryFiles=[]
@@ -60,9 +48,9 @@ def display_3d(request, obj_ref, obj_revi):
         product=read_ArbreFile(doc_file,request.user)
         javascript_arborescense=generate_javascript_for_3D(product)
 
-    ctx.update({'select_stp_form': form,
-                'GeometryFiles' : GeometryFiles ,
-                'javascript_arborescense' : javascript_arborescense , })
+    ctx.update({
+        'GeometryFiles' : GeometryFiles ,
+        'javascript_arborescense' : javascript_arborescense , })
 
     return r2r('Display3D.htm', ctx, request)
 
