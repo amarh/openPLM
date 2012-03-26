@@ -1,3 +1,5 @@
+.. _subversion-admin:
+
 ===============================================
 subversion -- Subversion Repository Application
 ===============================================
@@ -23,7 +25,7 @@ To enable the *subversion* application, it must be enabled in the settings file:
 Synchronize the database
 ========================
 
-Run ``./manage.py migate subversion``.
+Run ``./manage.py migrate subversion``.
 
 Testing
 =========

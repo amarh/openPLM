@@ -25,3 +25,4 @@ If you are a core developper, you may want to read:
     modules
     applications
     bom
+    testing
