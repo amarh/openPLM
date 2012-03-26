@@ -183,7 +183,7 @@ def get_step_related(user,doc_file,locations=None):
     part=Doc3D.PartDecompose
     
     if part:
-        list_link=ParentChildLink.objects.filter(parent=part)
+        list_link=ParentChildLink.objects.filter(parent=part, end_time=None)
         for i in range(len(list_link)):
             locations=list(Location_link.objects.filter(link=list_link[i]))
             if locations: 
