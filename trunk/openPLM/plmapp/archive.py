@@ -336,11 +336,13 @@ def generate_tarfile(files):
         filename = get_available_name(df.filename, filenames)
         filenames.add(filename)
         info = tf.gettarinfo(df.file.path, filename)
+        f, size = df.document.get_leaf_object().get_content_and_size(df)
         # change the name of the owner
         info.uname = info.gname = df.document.owner.username
+        info.size = size
         yield info.tobuf()
         # yields the content of the file
-        with open(df.file.path, "rb") as f:
+        try:
             s = f.read(512)
             while s:
                 yield s
@@ -349,6 +351,8 @@ def generate_tarfile(files):
             blocks, remainder = divmod(info.size, tarfile.BLOCKSIZE)
             if remainder > 0:
                 yield (tarfile.NUL * (tarfile.BLOCKSIZE - remainder))
+        finally:
+            f.close()
     # yields the nul blocks that mark the end of the tar file
     yield (tarfile.NUL * tarfile.BLOCKSIZE * 2)
 
@@ -369,8 +373,13 @@ def generate_zipfile(files):
     for df in files:
         filename = get_available_name(df.filename, filenames)
         filenames.add(filename)
-        for s in zf.write(df.file.path, filename):
-            yield s
+        f, size = df.document.get_leaf_object().get_content_and_size(df)
+        path = f.name
+        try:
+            for s in zf.write(path, filename):
+                yield s
+        finally:
+            f.close()
     for s in zf.close():
         yield s
 

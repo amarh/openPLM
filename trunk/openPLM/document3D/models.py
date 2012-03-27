@@ -32,7 +32,18 @@ class Document3D(Document):
         items.extend(["3D"])
         return items
 
-        
+    def get_content_and_size(self, doc_file):
+        from openPLM.document3D.composer import composer
+        fileName, fileExtension = os.path.splitext(doc_file.filename)
+        if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
+            tempfile = composer(doc_file, self.owner)
+            size = os.path.getsize(tempfile.name)
+            return tempfile, size
+        else:
+            return super(Document3D, self).get_content_and_size(doc_file)
+
+
+  
         
         
         
@@ -113,9 +124,6 @@ class Document3DController(DocumentController):
         doc_file.save()
         self._save_histo("File deprecated", "file : %s" % doc_file.filename)           
      
-
-
-  
 media3DGeometryFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")      
 class GeometryFile(models.Model):
     u"""
@@ -357,17 +365,6 @@ def generate_extra_location_links(link,ParentChildLink):
                
                    
         loc.save()       
-
-class TemplateFiletoDownload(object):
-    def __init__(self, path): 
-        self.path = path
-    def __iter__(self):  
-        try: 
-            with open(self.path, "rb") as f:
-                for line in f:
-                    yield line 
-        finally:
-            os.remove(self.path)                   
 
 @memoize_noarg
 def get_all_plmDocument3Dtypes_with_level():

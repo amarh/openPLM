@@ -31,7 +31,8 @@ def composer(doc_file,user):
     f = NamedTemporaryFile(delete=False)
         
     status = writer.Write(f.name) 
-    return TemplateFiletoDownload(f.name)
+    f.seek(0)
+    return f
     
    
     
