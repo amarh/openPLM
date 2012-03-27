@@ -57,7 +57,7 @@
         </table>
 
         {% if user.get_profile.is_contributor  %}
-            {{ docs_dormset.management_form }}
+            {{ docs_formset.management_form }}
             <a class="{{"Button"|button}}" href="./add/">
                 <span class="ui-button-text">{% trans "Attach another document" %}</span>
             </a>
