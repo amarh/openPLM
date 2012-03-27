@@ -17,8 +17,6 @@ object_url = r'^object/' + object_pattern
 urlpatterns = patterns('',
     (r'^object/Document3D/([^/]+)/([^/]+)/3D/$', views.display_3d),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/decompose/([^/]+)/$', views.display_decompose),
-    (r'^object/Document3D/([^/]+)/([^/]+)/files/$', views.display_files),
-    (r'^file/3D/(?P<docfile_id>\d+)/(?P<filename>.*)$', views.download),
     (r'^ajax/decompose/$', views.ajax_decompose_form),
 )
 

@@ -898,7 +898,9 @@ class Document(PLMObject):
     def deprecated_files(self):
         "Queryset of all deprecated :class:`DocumentFile` linked to self"
         return self.documentfile_set.filter(deprecated=True)
-        
+       
+    def get_content_and_size(self, doc_file):
+        return open(doc_file.file.path, "rb"), doc_file.file.size
         
     def is_promotable(self):
         """

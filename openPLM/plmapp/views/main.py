@@ -1178,8 +1178,9 @@ def download(request, docfile_id, filename=""):
     mimetype = guess_type(name, False)[0]
     if not mimetype:
         mimetype = 'application/octet-stream'
-    response = HttpResponse(file(doc_file.file.path), mimetype=mimetype)
-    response["Content-Length"] = doc_file.file.size
+    f, size = ctrl.get_content_and_size(doc_file)
+    response = HttpResponse(f, mimetype=mimetype)
+    response["Content-Length"] = size
     if not filename:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
