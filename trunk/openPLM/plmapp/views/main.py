@@ -456,18 +456,14 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
         if fields:
             extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
                     for f in fields)
-            for child in children:
-                link = child.link
-                for field in fields:
-                    try:
-                        e = PCLE.objects.get(link=link)
-                        extension_data[link][field] = getattr(e, field)
-                    except PCLE.DoesNotExist:
-                        extension_data[link][field] = ""
+            pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
+            pcles = pcles.values("link_id", *fields)
+            for pcle in pcles:
+                extension_data[pcle["link_id"]].update(pcle)
     # decomposition
     if DecomposersManager.count() > 0:
         is_decomposable = DecomposersManager.is_decomposable
-        children = [(c, is_decomposable(c.link.child)) for c in children]
+        children = [(c, is_decomposable(c.link.child_id, msg=False)) for c in children]
         decomposition_msg = DecomposersManager.get_decomposition_message(obj)
     else:
         children = [(c, False) for c in children]

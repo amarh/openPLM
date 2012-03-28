@@ -354,7 +354,8 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual([(u"custom_attribute", "custom attribute")], extra_columns)
         extension_data = response.context["extension_data"]
         link = self.controller.get_children()[0].link
-        self.assertEqual({link : {u"custom_attribute" : "val1"}}, extension_data)
+        self.assertEqual({link.id : {u"custom_attribute" : "val1", "link_id" : 1}},
+                extension_data)
         
     def test_bom_edit_post(self):
         fname = mockext + "_custom_attribute"

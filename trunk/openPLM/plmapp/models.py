@@ -857,7 +857,8 @@ class DocumentFile(models.Model):
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):    
             name, ext = os.path.splitext(self.filename)
             ext = ext.lower()
-            doc_files = self.document.files.exclude(id=self.id)
+            doc_files = DocumentFile.objects.filter(document__id=self.document_id)\
+                    .exclude(deprecated=True, id=self.id)
             for doc in doc_files:
                 native, native_ext = os.path.splitext(doc.filename)
                 if native == name and ext in native_to_standards[native_ext.lower()]:
@@ -873,7 +874,8 @@ class DocumentFile(models.Model):
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
             name, ext = os.path.splitext(self.filename)
             ext = ext.lower()
-            doc_files = self.document.files.filter(locked=True).exclude(id=self.id)
+            doc_files = DocumentFile.objects.filter(document__id=self.document_id, locked=True)\
+                    .exclude(deprecated=True, id=self.id)
             for doc in doc_files:
                 native, native_ext = os.path.splitext(doc.filename)           
                 if native == name and ext in native_to_standards[native_ext.lower()]:
