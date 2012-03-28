@@ -7,13 +7,10 @@ from openPLM.plmapp.forms import *
 import openPLM.plmapp.models as models
 from django.db import transaction
 from django.forms.formsets import formset_factory
-from django.http import HttpResponse ,HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.exceptions import LockError
-from mimetypes import guess_type
-from openPLM.document3D.composer import composer
 from openPLM.plmapp.controllers import get_controller
-import openPLM.plmapp.forms as forms
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -81,6 +78,8 @@ class StepDecomposer(Decomposer):
 DecomposersManager.register(StepDecomposer)
 #posibilidades , el objeto a sido modificado despues de acceder al formulario
 
+Select_Doc_Part_types = formset_factory(Doc_Part_type_Form, extra=0)
+Select_Order_Quantity_types = formset_factory(Order_Quantity_Form, extra=0)
 @handle_errors
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
@@ -112,25 +111,28 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
         extra_errors=""
         product=read_ArbreFile(stp_file)
-        Select_Doc_Part_types = formset_factory(Doc_Part_type_Form)
-        Select_Order_Quantity_types = formset_factory(Order_Quantity_Form)
-        form_Doc_Part_types = Select_Doc_Part_types(request.POST)
-        form_Order_Quantity = Select_Order_Quantity_types(request.POST)
-        form_Doc_Part_attributes = []
+        part_type_formset = Select_Doc_Part_types(request.POST)
+        bom_formset = Select_Order_Quantity_types(request.POST)
+        creation_formset = []
         last_time_modification=Form_save_time_last_modification(request.POST)
         #comprobar que la parte no ha sido descompuesta con anterioridad
+        obj.block_mails()
 
         if last_time_modification.is_valid():
             old_modification_data_time=last_time_modification.cleaned_data['last_modif_time']
             old_modification_data_microsecond=last_time_modification.cleaned_data['last_modif_microseconds']
 
-            options=clear_form(request ,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_attributes)
+            options=clear_form(request ,part_type_formset,bom_formset,creation_formset)
             document_controller=DocumentController(stp_file.document,request.user)
 
             if options:
 
                 # y si tiene un nativo   que hago con el
-                if  same_time(old_modification_data_time,old_modification_data_microsecond,document_controller.mtime) and product and len(product.links)==len(options) and stp_file.checkout_valid:
+                if (same_time(old_modification_data_time, 
+                              old_modification_data_microsecond,
+                              document_controller.mtime)
+                    and product and len(product.links) == len(options)
+                    and stp_file.checkout_valid):
 
                     try:
                         native_related=stp_file.native_related
@@ -141,9 +143,9 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         try:
                             instances=decomposer_stp(stp_file,options,product,obj)
                         except Exception as excep:
-                            if type(excep) == Document3D_decomposer_Error:
+                            if isinstance(excep, Document3D_decomposer_Error):
                                 delete_files(excep.to_delete)
-                            extra_errors=excep.__unicode__()
+                            extra_errors = unicode(excep)
                         else:
                             update_indexes.delay(instances)
                             ctrl=get_controller(stp_file.document.type)
@@ -157,7 +159,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             document_controller.unlock(stp_file)
 
                     except LockError as excep:
-                                extra_errors="Documentfile is locked"
+                        extra_errors="Documentfile is locked"
                     finally:
 
                         if native_related:
@@ -167,8 +169,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                 else:
                     extra_errors="The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process"
         else:
-
-                    extra_errors="Mistake reading of the last modification of the document, please restart the task"
+            extra_errors="Mistake reading of the last modification of the document, please restart the task"
 
     else:
 
@@ -181,48 +182,35 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         product=read_ArbreFile(stp_file)
         if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
-        Select_Doc_Part_types = formset_factory(Doc_Part_type_Form)
-        Select_Order_Quantity_types = formset_factory(Order_Quantity_Form)
-        data = {
-        'form-TOTAL_FORMS': u'%s'%len(product.links),
-        'form-INITIAL_FORMS': u'%s'%len(product.links),
-        'form-MAX_NUM_FORMS': u'%s'%len(product.links),
-        }
-        index=0
-        for link in product.links:
-            order=(index+1)*10
-            data.update({'form-%s-order'%index :u'%s'%order,
-                         'form-%s-quantity'%index : u'%s'%link.quantity,
-                         'form-%s-type_part'%index :u'Part',
-                         'form-%s-type_document3D'%index : u'Document3D',
-                        })
-            index=index+1
+        
+        initial_bom_values = []
+        for index, link in enumerate(product.links):
+            order = (index + 1) * 10
+            initial_bom_values.append({"order": order, "quantity" : link.quantity })
 
-        form_Doc_Part_types = Select_Doc_Part_types(data)
-        form_Order_Quantity = Select_Order_Quantity_types(data)
-        extra_errors=""
-        form_Doc_Part_attributes = []
-        names=[]
-        index=0
-        for form in form_Doc_Part_types.forms:
-            part_attributes=get_creation_form(request.user,models.get_all_plmobjects()["Part"],None, index)
-            part_attributes.prefix=index*2
-            part_attributes.fields["group"].initial=obj.object.group
-            part_attributes.fields["name"].initial=product.links[index].product.name
-            doc_attributes=get_creation_form(request.user,models.get_all_plmobjects()["Document3D"],None,index)
-            doc_attributes.prefix=index*2+1
-            doc_attributes.fields["name"].initial=product.links[index].product.name
-            doc_attributes.fields["group"].initial=obj.object.group
-            form_Doc_Part_attributes.append([part_attributes,doc_attributes])
-            index=index+1
+        part_type_formset = Select_Doc_Part_types(initial=[{} for i in range(len(product.links))])
+        bom_formset = Select_Order_Quantity_types(initial=initial_bom_values)
+        extra_errors = ""
+        creation_formset = []
+        group = obj.group
+        for index, form in enumerate(part_type_formset.forms):
+            name = product.links[index].product.name
+            part_cform = get_creation_form(request.user, Part, None, index)
+            part_cform.prefix = str(index*2)
+            part_cform.fields["group"].initial = group
+            part_cform.fields["name"].initial = name
+            doc_cforms = get_creation_form(request.user, Document3D, None, index)
+            doc_cforms.prefix = str(index*2+1)
+            doc_cforms.fields["name"].initial = name 
+            doc_cforms.fields["group"].initial = group
+            creation_formset.append([part_cform, doc_cforms])
 
-    zip_list=zip(form_Doc_Part_types.forms,form_Doc_Part_attributes,form_Order_Quantity.forms)
+    forms = zip(part_type_formset.forms, creation_formset, bom_formset.forms)
 
     ctx.update({'current_page':'decomposer',  # aqui cambiar
-                'object_type': 'Document3D',
-                'zip' : zip_list,
-                'form_Doc_Part_types' : form_Doc_Part_types,
-                'form_Order_Quantity' : form_Order_Quantity,
+                'forms' : forms,
+                'part_type_formset' : part_type_formset,
+                'bom_formset' : bom_formset,
                 'extra_errors' :  extra_errors ,
                 'last_time_modification' : last_time_modification
 
@@ -231,37 +219,39 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     return r2r('DisplayDecompose.htm', ctx, request)
 
 
-def generate_part_doc_links(prepare_list,links,obj):
-    index=0
-    list_document_controller=[]
+def generate_part_doc_links(prepare_list, links, parent_ctrl):
+    index = 0
+    doc_controllers = []
     instances = []
-    for ord_quantity , part_doc_create_form  in prepare_list:
+    user = parent_ctrl._user
+    for ord_quantity, (part_form, doc_form)  in prepare_list:
 
         try:
-            part_controller=obj.create_from_form(part_doc_create_form[0],obj._user, True, True)
-            instances.append((part_controller.object._meta.app_label,part_controller.object._meta.module_name, part_controller.object._get_pk_val()))
+            part_ctrl = parent_ctrl.create_from_form(part_form, user, True, True)
+            instances.append((part_ctrl.object._meta.app_label,
+                part_ctrl.object._meta.module_name, part_ctrl.object._get_pk_val()))
 
-            ParentChildLink = obj.add_child(part_controller.object,ord_quantity[1],ord_quantity[0],ord_quantity[2])
-            generate_extra_location_links(links[index],ParentChildLink)
-            form = part_doc_create_form[1]
-            controller_cls = get_controller(form.Meta.model.__name__)
-            doc_controller=controller_cls.create_from_form(part_doc_create_form[1],obj._user, True, True)
-            instances.append((doc_controller.object._meta.app_label,doc_controller.object._meta.module_name, doc_controller.object._get_pk_val()))
-            part_controller.attach_to_document(doc_controller.object)
-            list_document_controller.append(doc_controller)
+            link = parent_ctrl.add_child(part_ctrl.object,ord_quantity[1],ord_quantity[0],ord_quantity[2])
+            generate_extra_location_links(links[index], link)
+            doc_ctrl = Document3DController.create_from_form(doc_form,
+                    user, True, True)
+            instances.append((doc_ctrl.object._meta.app_label,
+                doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
+            part_ctrl.attach_to_document(doc_ctrl.object)
+            doc_controllers.append(doc_ctrl)
 
             index+=1
         except :
-            raise  Document_part_doc_links_Error
+            raise Document_part_doc_links_Error()
 
-    return list_document_controller , instances
+    return doc_controllers , instances
 
 
-def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_attributes):
+def clear_form(request, part_type_formset, bom_formset, creation_formset):
     valid=True
-    if form_Order_Quantity.is_valid():
+    if bom_formset.is_valid():
         order_quantity_extra_links=[]
-        for form in form_Order_Quantity.forms:
+        for form in bom_formset.forms:
             if form.is_valid():
 
                 options=form.cleaned_data
@@ -272,19 +262,19 @@ def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_att
 
         valid=False
 
-    if form_Doc_Part_types.is_valid():
+    if part_type_formset.is_valid():
         index=0
-        for form in form_Doc_Part_types.forms:
+        for form in part_type_formset.forms:
             options=form.cleaned_data
             part = options["type_part"]
             cls = models.get_all_plmobjects()[part]
-            part_form = get_creation_form(request.user, cls, request.POST,0,prefix=index*2)
+            part_form = get_creation_form(request.user, cls, request.POST,
+                    prefix=str(index*2))
             if not part_form.is_valid():#son necesarios?
                 valid=False
-            doc = options["type_document3D"]
-            cls = models.get_all_plmobjects()[doc]
-            doc_form = get_creation_form(request.user, cls, request.POST,0,prefix=index*2+1)
-            form_Doc_Part_attributes.append([part_form,doc_form])
+            doc_form = get_creation_form(request.user, Document3D,
+                    request.POST, prefix=str(index*2+1))
+            creation_formset.append([part_form,doc_form])
 
             if not doc_form.is_valid(): #son necesarios?
                 valid=False
@@ -294,47 +284,23 @@ def clear_form(request,form_Doc_Part_types,form_Order_Quantity,form_Doc_Part_att
         valid=False
 
     if valid:
-        return zip(order_quantity_extra_links,form_Doc_Part_attributes)
+        return zip(order_quantity_extra_links,creation_formset)
     else:
         return valid
 
-
 @secure_required
 @login_required
-def ajax_decompose_form(request):
-    Select_Doc_Part_types = formset_factory(Doc_Part_type_Form)
-    form_Doc_Part_types = Select_Doc_Part_types(request.GET)
-    Select_Order_Quantity_types = formset_factory(Order_Quantity_Form)
-    form_Order_Quantity = Select_Order_Quantity_types(request.GET)
-    last_time_modification=Form_save_time_last_modification(request.GET)
-
-    form_Doc_Part_attributes = []
-    index=0
-    if form_Doc_Part_types.is_valid():
-        for form in form_Doc_Part_types.forms:
-            if form.is_valid(): # es necesario este valid?
-                options=form.cleaned_data
-                part = options["type_part"]
-                part_attributes=get_creation_form(request.user,models.get_all_plmobjects()[part])
-                part_attributes.prefix=index*2
-                doc= options["type_document3D"]
-                doc_attributes=get_creation_form(request.user,models.get_all_plmobjects()[doc])
-                doc_attributes.prefix=index*2+1
-                form_Doc_Part_attributes.append([part_attributes,doc_attributes])
-                index=index+1
-
-        zip_list=zip(form_Doc_Part_types.forms,form_Doc_Part_attributes,form_Order_Quantity.forms)
-
-        ctx={
-                'current_page':'BOM-child',  # aqui cambiar
-                'object_type': 'Document3D',
-                'zip' : zip_list,
-                'form_Doc_Part_types' : form_Doc_Part_types,
-                'form_Order_Quantity' : form_Order_Quantity,
-                'last_time_modification' : last_time_modification,
-                }
-
-        return r2r('GenerateSimple.htm', ctx, request)
+def ajax_part_creation_form(request, prefix):
+    tf = Doc_Part_type_Form(request.GET, prefix=prefix)
+    if tf.is_valid():
+        cls = get_all_parts()[tf.cleaned_data["type_part"]]
+        prefix = prefix.replace("form-", "")
+        cf = get_creation_form(request.user, cls, prefix=str(int(prefix) * 2 ),
+                data=dict(request.GET.iteritems()))
+        return r2r("extra_attributes.html", {"creation_form" : cf}, request)
+    return HttpResponseForbidden()
+    
+    
 
 def same_time(old_modification_data,old_modification_data_microsecond,mtime):
 

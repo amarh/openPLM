@@ -17,7 +17,7 @@ object_url = r'^object/' + object_pattern
 urlpatterns = patterns('',
     (r'^object/Document3D/([^/]+)/([^/]+)/3D/$', views.display_3d),
     (r'^object/([^/]+)/([^/]+)/([^/]+)/decompose/([^/]+)/$', views.display_decompose),
-    (r'^ajax/decompose/$', views.ajax_decompose_form),
+    (r'^ajax/decompose/([^/]+)/$', views.ajax_part_creation_form),
 )
 
 
