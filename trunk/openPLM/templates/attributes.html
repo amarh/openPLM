@@ -17,29 +17,26 @@
         </table>
     </div>
 
-    {% if is_owner %}
-        <div class="center">
+    <div class="center">
+        {% if is_owner %}
             {% ifequal object_type 'User' %}
-                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/modify/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
-                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/password/"><span class="ui-button-text">{% trans "PASSWORD" %}</span></a>
+                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
+                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
             {% else %}
                 {% if obj.is_editable %}
                     <a class="{{"Button"|button}}" 
                         href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
-                        <span class="ui-button-text">{% trans "EDIT" %}</span>
+                        <span class="ui-button-text">{% trans "Edit this information" %}</span>
                     </a>
                 {% endif %}
             {% endifequal %}
-        </div>
-    {% endif %}
-
-    {% if can_generate_pdf %}
-        <div>
+        {% endif %}
+        {% if can_generate_pdf %}
             <a href="/pdf{{obj.plmobject_url}}attributes/" class="{{"Button"|button}}">
-                <span class="ui-button-text">{% trans "Download PDF file"%}</span>
+                <span class="ui-button-text">{% trans "Download as PDF"%}</span>
             </a>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 
 
     <div id="comments">
