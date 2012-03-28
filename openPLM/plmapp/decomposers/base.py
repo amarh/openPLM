@@ -57,13 +57,13 @@ class DecomposersManager(object):
         return ""
 
     @classmethod
-    def is_decomposable(cls, part):
+    def is_decomposable(cls, part, msg=True):
         """
         Returns True if *part* is decomposable.
         """
         for decomposer in cls._decomposers:
             d = decomposer(part)
-            if d.is_decomposable():
+            if d.is_decomposable(msg):
                 return True
         return False
 
@@ -78,7 +78,7 @@ class Decomposer(object):
     def __init__(self, part):
         self.part = part
 
-    def is_decomposable(self):
+    def is_decomposable(self, msg=True):
         """
         Returns True if the part is decomposable.
         """

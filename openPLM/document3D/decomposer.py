@@ -44,15 +44,19 @@ def diviser(product,Doc_controller,to_delete,to_index):
        
 
 
-def is_decomposable(Document3D):
+def is_decomposable(doc3d):
 
     try:
-        STP_file=Document3D.files.get(is_stp) #solo abra uno pero por si las moscas
+        stp_file=doc3d.files.get(is_stp, locked=False) #solo abra uno pero por si las moscas
     except:
         return False
-    product=read_ArbreFile(STP_file)   
-    if product and product.links and STP_file.checkout_valid and not STP_file.locked:
-        return STP_file      
+    if not stp_file.checkout_valid:
+        return False
+    # TODO: store in a table decomposable step files
+    # to not read its content
+    product=read_ArbreFile(stp_file)   
+    if product and product.links:
+        return stp_file      
     return False
 
 

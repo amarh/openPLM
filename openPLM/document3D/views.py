@@ -54,16 +54,18 @@ def display_3d(request, obj_ref, obj_revi):
 
 class StepDecomposer(Decomposer):
 
-    def is_decomposable(self):
+    def is_decomposable(self, msg=True):
         decompose_valid = []
         if not Document3D.objects.filter(PartDecompose=self.part):
-            for link in self.part.documentpartlink_part.all():
+            links = DocumentPartLink.objects.filter(part=self.part).values_list("document", flat=True)
+            for doc_id in links:
                 try:
-                    doc = Document3D.objects.get(id=link.document_id)
-                    if not doc.PartDecompose:
-                        file_stp = is_decomposable(doc)
-                        if file_stp:
-                            decompose_valid.append((link.document, file_stp))
+                    doc = Document3D.objects.get(id=doc_id, PartDecompose=None)
+                    file_stp = is_decomposable(doc)
+                    if file_stp and msg:
+                        decompose_valid.append((doc, file_stp))
+                    elif file_stp:
+                        return True
                 except:
                     pass
         self.decompose_valid = decompose_valid
