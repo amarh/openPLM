@@ -5,22 +5,15 @@ from openPLM.plmapp.units import UNITS
             
 class Doc_Part_type_Form(forms.Form):
     LIST_parts = get_all_parts_with_level()
-    type_part = forms.TypedChoiceField(choices=LIST_parts,label='')
-    type_part.widget.attrs["onchange"]="update_form(this,'doc_show')"
-    type_part.widget.attrs["class"]="selector"
-    #type_part.widget.attrs["onchange"]="this.options[this.selectedIndex].selected"
-
-      
-    LIST_document3D = get_all_plmDocument3Dtypes_with_level()  
-    type_document3D = forms.TypedChoiceField(choices=LIST_document3D,label='')
-    type_part.widget.attrs["onchange"]="update_form(this,'part_show')"
+    type_part = forms.TypedChoiceField(choices=LIST_parts,
+            label='', initial="Part")
     
 class Form_save_time_last_modification(forms.Form):
 
-    last_modif_time = forms.DateTimeField(label='') 
-    last_modif_time.widget.attrs["style"]='display:none'   
-    last_modif_microseconds = forms.FloatField(label='') 
-    last_modif_microseconds.widget.attrs["style"]='display:none'   
+    last_modif_time = forms.DateTimeField()
+    last_modif_time.widget.attrs["style"] = 'display:none;'
+    last_modif_microseconds = forms.FloatField() 
+    last_modif_microseconds.widget.attrs["style"] = 'display:none;'
     
 class Order_Quantity_Form(forms.Form):
 

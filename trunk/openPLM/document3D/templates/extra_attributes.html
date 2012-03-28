@@ -1,0 +1,17 @@
+<table>
+    {% for field in creation_form %} 
+        {% if field.name != "reference" and field.name != "name" and field.name != "revision" %} 
+            <tr>
+
+                <td class="cell_label">
+                    {{ field.label }}
+                </td>
+                <td>{{ field }}
+                    {{ field.errors }}
+                </td>
+                
+            </tr>
+
+        {% endif %}
+    {% endfor %} 
+</table>

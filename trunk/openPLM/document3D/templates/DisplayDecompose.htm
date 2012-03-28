@@ -1,351 +1,148 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
 
-<!-- Manage html display in the Content div which correspond to the "children" menu -->
 
 {% block scripts %}
 
-    <script type="text/javascript" src="/media/js/bom.js"></script>
-    <script>
-        $(function() {
-            $( "#id_date_0" ).datepicker();
-        });
-        
-    //<td class="{{ field.label }}" onclick="muestra_oculta('hide_show_{{forloop.parentloop.counter}}')">{{ field }}</td> 
-    </script>
-    
+
     <script type="text/javascript" src="/media/js/3D/ajax3D.js"></script>
-    
-    
-    
 
-<style type="text/css">
-table.decompose_form {
-    table-layout: fixed;
+    <style type="text/css">
+        table.decompose_form {
+            table-layout: fixed;
 
-}
-table.table_qty_ord {
-    table-layout: fixed;
-}
+        }
+        table.table_qty_ord {
+            table-layout: fixed;
+        }
 
+    </style>
 
-
-
-col.col_attributes{
-    width:100%;
-}
-
-</style>
-
-    
-    
-<script>
-
-function show(id,button){
-
-var elements = document.getElementsByClassName(id); //se define la variable "el" igual a nuestro div
-
-
-for(var i=0; i<elements.length; i++){
-elements[i].style.display = (elements[i].style.display == 'none') ? '' : 'none';
-}
-
-
-if (button.value=="+")
-button.value="-"
-else
-button.value="+"
-
-}
-
-
-
-
-</script>    
-    
-    
-    
-    
-    
-    
-    
-    
 {% endblock %}
 
 {% block content %}
 
-
-
-
- 
     <form method="post" action="" id="decompose_form">
-    
 
-
-
-
-        
-<table class="decompose_form">
         {% csrf_token %} 
-        {{ form_Doc_Part_types.management_form }}
-        {{ form_Order_Quantity.management_form }}
-        {{last_time_modification}}
+        {{ part_type_formset.management_form }}
+        {{ bom_formset.management_form }}
+        <div style="display:none;">
+            {{last_time_modification}}
+        </div>
+
+        <table class="Content">
+
+            <thead>
+                <th>{% trans "Order" %}</th>
+                <th>{% trans "Quantity" %}</th>
+                <th>{% trans "Unit" %}</th>
+
+                <th>{% trans "Type" %}</th>
 
 
-    <colgroup>
-        <col class="col_order_quantity"/>
-        <col class="col_label"/>
-        <col class="col_attributes"/>
-    </colgroup>
-    
-    <tr>
-        <td >
-            <table>        
-                <col class="col_order"/>
-                <col class="col_quantity"/>
-                <col class="col_unit"/>
-                    <td ><th>Order</th></td>
-                    <td ><th>Quantity</th></td>
-                    <td ><th>Unit</th></td>
-            </table>
-        </td>
-            
+                <th class="Reference">{% trans "Reference" %} </th>
+                <th class="Revision">{% trans "Revision" %} </th>
+                <th class="Nom">{% trans "Name" %}  </th>
+            </thead>
 
-        <th>Type</th>
+            <tr class="extra_errors">
+                {{extra_errors}}
+            </tr>
 
-        
-        <td>
-            <table>
-                <td><th class="Reference">Reference </th></td>
-                <td><th class="Revision"> Revision </th></td>
-                <td><th class="Nom">   Name   </th></td>
-            </table>
-        </td>
-    </tr>
-    
-    <tr class="extra_errors">
-        {{extra_errors}}
-    </tr>
+            {% for type, part_doc_cforms, ord_qty in forms %} 
 
-    {% for type, atributes , ord_qty in zip %} 
-    
-    
-    <tr>
-        <td class="cell_order_quantity" >
-            <table class="table_qty_ord">
-                <col class="col_order"/>
-                <col class="col_quantity"/>
-                <col class="col_unit"/>
-                    <tr>
-                        <td class="order" >{{ord_qty.order}}</td>
-                        <td class="quantity">{{ord_qty.quantity}}</td>
-                        <td class="quantity">{{ord_qty.unit}}</td>
-                    </tr>
-                    <tr>
-                        <td class="order_error" >{{ord_qty.order.errors}}</td>
-                        <td class="quantity_error" >{{ord_qty.quantity.errors}}</td>
-                    </tr>
-            </table>
-        </td>
-        
-        <td class="cell_label">
-            {{ type.type_part }}
-        </td>
-        
-        <td class="cell_attributes_fixed">
-            <table>
-                <tr>   
-                    {% for field in atributes.0 %} 
-               
-                    {% if field.label == "Reference" or field.label == "Nom" or field.label == "Revision" %}
-                    <td class="{{ field.label }}">{{ field }}</td> 
-                    {% endif %}
 
-                    {% endfor %}
-                    
-                    
-                        {% if atributes.0.errors %} 
- 
-                    <td><input type="button" onclick="show('part_show{{forloop.counter}}',this)" value="-" id="part_show{{forloop.counter}}"><td>
-    
-                        {% else %}
-        
-                    <td><input type="button" onclick="show('part_show{{forloop.counter}}',this)" value="+" id="part_show{{forloop.counter}}"><td>
-     
+                <tr>
+                    <td class="order" >{{ord_qty.order}}{{ord_qty.order.errors }}</td>
+                    <td class="quantity">{{ord_qty.quantity}}{{ord_qty.quantity.errors}}</td>
+                    <td class="quantity">{{ord_qty.unit}}{{ord_qty.unit.errors}}</td>
+
+                    <td class="cell_label part_type_form">
+                        {{ type.type_part }}
+                    </td>
+
+
+                    {% for field in part_doc_cforms.0 %} 
+
+                        {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
+                            <td class="{{ field.label }}">{{ field }} {{ field.errors }}</td> 
                         {% endif %}
-                    
-                </tr>
-                <tr>   
-                    {% for field in atributes.0 %} 
-                    {% if field.label == "Reference" or field.label == "Revision" %}
-                    <td class="error_attibutes_fixes">{{ field.errors }} 
-                    {% for fieldname, errormsgs in atributes.0.errors.items %}
-                    {% if fieldname == "__all__" %}     
-                    {{errormsgs}}
-                    {% endif %}
-                    {% endfor %}
-                     </td>     
-                    {% endif %}
-                    {% if field.label == "Nom" %}
-                    <td class="error_attibutes_fixes">{{ field.errors }}</td> 
-                    {% endif %}
-                    {% endfor %}
-                </tr>
-            </table>
-        </td>     
-    </tr>
-    
-    
-    
-        {% for field in atributes.0 %} 
-            {% if field.label != "Reference" and field.label != "Nom" and field.label != "Revision" %} 
 
-        
-            {% if atributes.0.errors %} 
- 
-    <tr class="part_show{{forloop.parentloop.counter}} show_hide" style="display:;" id="part_show{{forloop.parentloop.counter}}_{{forloop.counter}}">
-    
-        {% else %}
-        
-    <tr class="part_show{{forloop.parentloop.counter}} show_hide" style="display:none;" id="part_show{{forloop.parentloop.counter}}_{{forloop.counter}}"> 
-     
-        {% endif %}
-        <td class="vide">
-        </td>
-        
-        <td class="cell_label">
-        {{ field.label }}
-        </td>
-        
-        <td class="cell_attributes">
-            <table>
-                <tr>
-                    <td>{{ field }}</td>
-                    <td class="error_attibutes_variables">{{field.errors}}</td>
+                    {% endfor %}
+
+
+                    <td>
+                        <input type="button"
+                        value="{{part_doc_cforms.0.errors|yesno:"-,+"}}" 
+                        class="toggle_extra_attributes_button"
+                        id="part_show{{forloop.counter0}}"/>
+                    </td>
+                </tr>
+
+
+
+
+                <tr class="part_show{{forloop.counter0}} show_hide" 
+                    {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
+                    >
+
+                    <td class="vide" colspan="3">
+                    </td>
+                    <td colspan="5" id="extra_part_form-{{forloop.counter0}}">
+                        {% with part_doc_cforms.0 as creation_form %}
+                            {% include "extra_attributes.html" %}
+                        {% endwith %}
+                    </td>
 
                 </tr> 
-            </table>
-        </td> 
-            
-    </tr> 
-            {% endif %}
-        {% endfor %} 
-        
-        
 
 
-    <tr>
-        <td class="vide">
-        </td>
-        
-        <td class="cell_label">
-            {{ type.type_document3D }}
-        </td>
-        
-        <td class="cell_attributes_fixed" >
-            <table>
-                <tr>   
-                    {% for field in atributes.1 %} 
-               
-                    {% if field.label == "Reference" or field.label == "Nom" or field.label == "Revision" %}
-                    <td class="{{ field.label }}">{{ field }}</td> 
-                    {% endif %}
-
-                    {% endfor %}
-                    
-                        {% if atributes.1.errors %} 
- 
-                    <td><input type="button" onclick="show('doc_show{{forloop.counter}}',this)" value="-" id="doc_show{{forloop.counter}}"><td>
-    
-                        {% else %}
-        
-                    <td><input type="button" onclick="show('doc_show{{forloop.counter}}',this)" value="+" id="doc_show{{forloop.counter}}"><td>
-     
-                        {% endif %}                 
-                    
-                    
-                </tr>
-                <tr>   
-                    {% for field in atributes.1 %} 
-                    {% if field.label == "Reference" or field.label == "Revision" %}
-                    <td class="error_attibutes_fixes">{{ field.errors }} 
-                    {% for fieldname, errormsgs in atributes.1.errors.items %}
-                    {% if fieldname == "__all__" %}     
-                    {{errormsgs}}
-                    {% endif %}
-                    {% endfor %}
-                     </td>     
-                    {% endif %}
-                    {% if field.label == "Nom" %}
-                    <td class="error_attibutes_fixes">{{ field.errors }}</td> 
-                    {% endif %}
-                    {% endfor %}
-                </tr>
-            </table>
-        </td>     
-    </tr>
-    
-    
-    
-        {% for field in atributes.1 %} 
-            {% if field.label != "Reference" and field.label != "Nom" and field.label != "Revision" %} 
-            
-            
-         {% if atributes.1.errors %} 
- 
-    <tr class="doc_show{{forloop.parentloop.counter}} show_hide" style="display:;" id="doc_show{{forloop.parentloop.counter}}_{{forloop.counter}}">
-    
-        {% else %}
-        
-    <tr class="doc_show{{forloop.parentloop.counter}} show_hide" style="display:none;" id="doc_show{{forloop.parentloop.counter}}_{{forloop.counter}}">
-     
-        {% endif %}
-
-    
-        
-    
-        <td class="vide" >
-        </td>
-        
-        <td class="cell_label">
-        {{ field.label }}
-        </td>
-        
-        <td class="cell_attributes">
-            <table>
                 <tr>
-                    <td>{{ field }}</td>
-                    <td class="error_attibutes_variables">{{field.errors}}</td>
+                    <td class="vide" colspan="3">
+                    </td>
+
+                    <td class="cell_label">
+                        <p>Document3D</p>
+                    </td>
+                    {% for field in part_doc_cforms.1 %} 
+
+                        {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
+                            <td class="{{ field.label }}">{{ field }} {{ field.errors }}</td> 
+                        {% endif %}
+
+                    {% endfor %}
+
+                    <td>
+                        <input type="button"
+                        value="{{part_doc_cforms.1.errors|yesno:"-,+"}}" 
+                        class="toggle_extra_attributes_button"
+                        id="doc_show{{forloop.counter0}}"/>
+                    </td>
+
+                </tr>
+
+                <tr class="doc_show{{forloop.counter0}} show_hide" 
+                    {% if not part_doc_cforms.1.errors %} style="display:none;" {% endif %}
+                    >
+
+                    <td class="vide" colspan="3">
+                    </td>
+                    <td colspan="5">
+                        {% with part_doc_cforms.1 as creation_form %}
+                            {% include "extra_attributes.html" %}
+                        {% endwith %}
+                    </td>
 
                 </tr> 
-            </table>
-        </td> 
-            
-    </tr> 
-            {% endif %}
-        {% endfor %} 
 
 
+            {% endfor %} 
 
-      
-    {% endfor %} 
-    
-    
-</table> 
-<input type="button" onclick="this.form.submit()" value="Create"> 
-
-
+        </table> 
+        <input type="submit" value="{% trans "Create" %}"/> 
 
     </form>       
- 
-   
-    
-    
-   
-
-
-
-
 
 
 {% endblock %}
