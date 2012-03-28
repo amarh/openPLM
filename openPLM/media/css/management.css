@@ -1,0 +1,13 @@
+ul.management li {
+    list-style: none !important;
+    display: inline !important;
+}
+
+ul.management li > * {
+    display: inline-block;
+}
+
+dd.management {
+    list-style: none !important;
+
+}
