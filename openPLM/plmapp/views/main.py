@@ -884,19 +884,19 @@ def create_object(request, from_registered_view=False, creation_form=None):
     # If the related_doc/part is not a doc/part, we let python raise
     # an AttributeError, since an user should not play with the URL
     # and openPLM must be smart enough to produce valid URLs
-    attach = None
+    attach = related = None
     if "related_doc" in request.REQUEST:
         Form = forms.PartTypeForm
         doc = get_obj_by_id(int(request.REQUEST["related_doc"]), request.user)
         attach = doc.attach_to_part
         ctx["related_doc"] = request.REQUEST["related_doc"]
-        ctx["related"] = doc
+        related = ctx["related"] = doc
     elif "related_part" in request.REQUEST:
         Form = forms.DocumentTypeForm
         part = get_obj_by_id(int(request.REQUEST["related_part"]), request.user)
         attach = part.attach_to_document
         ctx["related_part"] = request.REQUEST["related_part"]
-        ctx["related"] = part
+        related = ctx["related"] = part
     if "__next__" in request.REQUEST:
         redirect_to = request.REQUEST["__next__"]
         ctx["next"] = redirect_to
@@ -919,6 +919,9 @@ def create_object(request, from_registered_view=False, creation_form=None):
 
     if request.method == 'GET' and creation_form is None:
         creation_form = get_creation_form(request.user, cls)
+        if related is not None:
+            creation_form.fields["group"].initial = related.group
+            creation_form.fields["lifecycle"].initial = related.lifecycle
     elif request.method == 'POST':
         if creation_form is None:
             creation_form = get_creation_form(request.user, cls, request.POST)
