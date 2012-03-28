@@ -2,7 +2,7 @@ var make_combobox = function () {
 /* 
      * Convert the ===> items to indented items
      */
-    $("select[name=type]").each(
+    $("select[name=type], select[name$=type_part]").each(
         function (index) {
             $(this).find("option").each(
                 function(i) {
