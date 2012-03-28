@@ -1,19 +1,28 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
 
-
 {% block scripts %}
-
-
+    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
     <script type="text/javascript" src="/media/js/3D/ajax3D.js"></script>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
 
     <style type="text/css">
-        table.decompose_form {
-            table-layout: fixed;
-
+        table.Content tr.part td {
+            background-color: #ccc;
+            color: #000;
         }
-        table.table_qty_ord {
-            table-layout: fixed;
+        table.Content tr td.errors {
+            background-color: #F03838;
+            color: #000;
+        }
+        tr.extra_errors td {
+            padding: 0.5em;
+        }
+        .toggle_extra_attributes_button span {
+            width: 1em;
         }
 
     </style>
@@ -37,23 +46,23 @@
                 <th>{% trans "Order" %}</th>
                 <th>{% trans "Quantity" %}</th>
                 <th>{% trans "Unit" %}</th>
-
                 <th>{% trans "Type" %}</th>
-
-
-                <th class="Reference">{% trans "Reference" %} </th>
-                <th class="Revision">{% trans "Revision" %} </th>
-                <th class="Nom">{% trans "Name" %}  </th>
+                <th>{% trans "Reference" %} </th>
+                <th>{% trans "Revision" %} </th>
+                <th>{% trans "Name" %}  </th>
+                <th>&nbsp;</th>
             </thead>
 
-            <tr class="extra_errors">
-                {{extra_errors}}
-            </tr>
+            {% if extra_errors %}
+                <tr class="extra_errors">
+                    <td class="errors" colspan="8">{{extra_errors}}</td>
+                </tr>
+            {% endif %}
 
             {% for type, part_doc_cforms, ord_qty in forms %} 
 
 
-                <tr>
+                <tr class="part"> 
                     <td class="order" >{{ord_qty.order}}{{ord_qty.order.errors }}</td>
                     <td class="quantity">{{ord_qty.quantity}}{{ord_qty.quantity.errors}}</td>
                     <td class="quantity">{{ord_qty.unit}}{{ord_qty.unit.errors}}</td>
@@ -62,28 +71,24 @@
                         {{ type.type_part }}
                     </td>
 
-
                     {% for field in part_doc_cforms.0 %} 
 
                         {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
-                            <td class="{{ field.label }}">{{ field }} {{ field.errors }}</td> 
+                            <td class="{{field.errors|yesno:"errors,valid"}}">
+                                {{  field }} {{ field.errors }}
+                            </td> 
                         {% endif %}
 
                     {% endfor %}
 
-
                     <td>
-                        <input type="button"
-                        value="{{part_doc_cforms.0.errors|yesno:"-,+"}}" 
-                        class="toggle_extra_attributes_button"
-                        id="part_show{{forloop.counter0}}"/>
+                        <button class="toggle_extra_attributes_button"
+                            id="part_show{{forloop.counter0}}"
+                            >{{part_doc_cforms.0.errors|yesno:"-,+"}}</button> 
                     </td>
                 </tr>
 
-
-
-
-                <tr class="part_show{{forloop.counter0}} show_hide" 
+                <tr class="part part_show{{forloop.counter0}} show_hide" 
                     {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
                     >
 
@@ -98,7 +103,7 @@
                 </tr> 
 
 
-                <tr>
+                <tr class="document">
                     <td class="vide" colspan="3">
                     </td>
 
@@ -108,21 +113,22 @@
                     {% for field in part_doc_cforms.1 %} 
 
                         {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
-                            <td class="{{ field.label }}">{{ field }} {{ field.errors }}</td> 
+                            <td class="{{field.errors|yesno:"errors,valid"}}">
+                                {{  field }} {{ field.errors }}
+                            </td> 
                         {% endif %}
 
                     {% endfor %}
 
                     <td>
-                        <input type="button"
-                        value="{{part_doc_cforms.1.errors|yesno:"-,+"}}" 
-                        class="toggle_extra_attributes_button"
-                        id="doc_show{{forloop.counter0}}"/>
+                        <button class="toggle_extra_attributes_button"
+                            id="doc_show{{forloop.counter0}}"
+                            >{{part_doc_cforms.1.errors|yesno:"-,+"}}</button> 
                     </td>
 
                 </tr>
 
-                <tr class="doc_show{{forloop.counter0}} show_hide" 
+                <tr class="document doc_show{{forloop.counter0}} show_hide" 
                     {% if not part_doc_cforms.1.errors %} style="display:none;" {% endif %}
                     >
 

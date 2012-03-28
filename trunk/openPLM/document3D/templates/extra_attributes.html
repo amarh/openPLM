@@ -3,10 +3,11 @@
         {% if field.name != "reference" and field.name != "name" and field.name != "revision" %} 
             <tr>
 
-                <td class="cell_label">
-                    {{ field.label }}
-                </td>
-                <td>{{ field }}
+                <th class="cell_label">
+                    <label for="{{field.id}}"> {{ field.label }}</label>
+                </th>
+                <td class="{{field.errors|yesno:"errors,valid"}}">
+                    {{ field }}
                     {{ field.errors }}
                 </td>
                 
