@@ -42,14 +42,14 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
 
+from openPLM import get_version
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph
-from openPLM.plmapp.forms import TypeFormWithoutUser, get_navigate_form, \
-        SimpleSearchForm
+from openPLM.plmapp.forms import get_navigate_form, SimpleSearchForm
 from openPLM.plmapp.utils import can_generate_pdf
 
 def get_obj(obj_type, obj_ref, obj_revi, user):
@@ -216,6 +216,7 @@ def handle_errors(func=None, undo=".."):
         return decorator(func)
     return decorator
 
+_version = get_version()
 def init_ctx(init_type_, init_reference, init_revision):
     """
     Initiate the context dictionnary we used to transfer parameters to html pages.
@@ -245,6 +246,7 @@ def init_ctx(init_type_, init_reference, init_revision):
         'object_type': init_type_,
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         'can_generate_pdf' : can_generate_pdf(),
+        'openPLM_version' : _version,
         }
 
 ##########################################################################################
