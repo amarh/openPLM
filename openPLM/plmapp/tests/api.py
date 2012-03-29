@@ -51,7 +51,7 @@ class ApiTestCase(CommonViewTest):
     def test_search(self):
         for url in ("/api/search/", "/api/search/false/",
                 "/api/search/false/false/"):
-            data = self.get("/api/search/", type="Part", reference="Pa*")
+            data = self.get("/api/search/", type="Part", q="reference=Pa*")
             self.assertEqual("ok", data["result"])
             self.assertEqual(1, len(data["objects"]))
             part = data["objects"][0]
@@ -62,7 +62,7 @@ class ApiTestCase(CommonViewTest):
     def test_search_editable_only(self):
         self.attach_to_official_document()
         self.controller.promote()
-        data = self.get("/api/search/true/", type="Part", reference="Pa*")
+        data = self.get("/api/search/true/", type="Part", q="reference=Pa*")
         self.assertEqual("ok", data["result"])
         self.assertEqual(0, len(data["objects"]))
 
@@ -87,28 +87,13 @@ class ApiTestCase(CommonViewTest):
         self.assertEqual(doc.id, d["id"])
         self.assertEqual(doc.revision, d["revision"])
 
-    def test_get_search_fields_part(self):
+    def test_get_search_fields(self):
         data = self.get("/api/search_fields/Part/")
         self.assertEqual("ok", data["result"])
         fields = data["fields"]
-        name_field = [f for f in fields if f["name"] == "name"][0]
-        self.assertEqual("text", name_field["type"])
-        reference_field = [f for f in fields if f["name"] == "reference"][0]
+        reference_field = [f for f in fields if f["name"] == "q"][0]
         self.assertEqual("text", reference_field["type"])
-    
-    def test_get_search_fields_harddisk(self):
-        data = self.get("/api/search_fields/HardDisk/")
-        self.assertEqual("ok", data["result"])
-        fields = data["fields"]
-        name_field = [f for f in fields if f["name"] == "name"][0]
-        self.assertEqual("text", name_field["type"])
-        capacity_field = [f for f in fields if f["name"] == "capacity_in_go"][0]
-        self.assertEqual("int", capacity_field["type"])
-
-    def test_get_search_unknown_type(self):
-        data = self.get("/api/search_fields/UnknownType/")
-        self.assertEqual("error", data["result"])
-
+   
     def test_get_creation_fields_part(self):
         data = self.get("/api/creation_fields/Part/")
         self.assertEqual("ok", data["result"])

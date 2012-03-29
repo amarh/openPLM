@@ -44,14 +44,6 @@ from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.widgets import JQueryAutoComplete
 from openPLM.plmapp.encoding import ENCODINGS
 
-class PLMObjectForm(forms.Form):
-    u"""
-    A formulaire that identifies a :class:`PLMObject`.
-    """
-
-    type = forms.CharField()
-    reference = forms.CharField()
-    revision = forms.CharField()
 
 
 def _clean_reference(self):
@@ -194,16 +186,6 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
         return Form()
 get_modification_form.cache = {}
 
-def integerfield_clean(value):
-    if value:
-        value = value.replace(" ", "")
-        value_validated = re.search(r'^([><]?)(\-?\d*)$',value)
-        if value_validated:
-            return value_validated.groups()
-        else:
-            raise ValidationError("Number or \"< Number\" or \"> Number\"")
-    return None
-
 def group_types(types):
     res = []
     group = []
@@ -230,90 +212,6 @@ class PartTypeForm(forms.Form):
 class DocumentTypeForm(forms.Form):
     LIST = m.get_all_documents_with_level()
     type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
-
-class FakeItems(object):
-    def __init__(self, values):
-        self.values = values
-    def items(self):
-        return self.values
-
-def get_search_form(cls=m.PLMObject, data=None):
-    Form = get_search_form.cache.get(cls)
-    if Form is None:
-        if issubclass(cls, (m.PLMObject, m.GroupInfo)):
-            fields = set(cls.get_creation_fields())
-            fields.update(set(cls.get_modification_fields()))
-            fields.difference_update(("type", "lifecycle", "group"))
-        else:
-            fields = set(["username", "first_name", "last_name"])
-        fields_dict = {}
-        for field in fields:
-            model_field = cls._meta.get_field(field)
-            form_field = model_field.formfield()
-            form_field.help_text = ""
-            if isinstance(form_field.widget, forms.Textarea):
-                form_field.widget = forms.TextInput(attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
-            if isinstance(form_field.widget, forms.TextInput):
-                source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
-                form_field.widget = JQueryAutoComplete(source,
-                    attrs={'title':"You can use * charactere(s) to enlarge your research.", 'value':"*"})
-            if isinstance(form_field, forms.fields.IntegerField) and isinstance(form_field.widget, forms.TextInput):
-                form_field.widget = forms.TextInput(attrs={'title':"Please enter a whole number. You can use < or > to enlarge your research."})
-            form_field.required = False
-            fields_dict[field] = form_field
-            if isinstance(form_field, forms.fields.IntegerField):
-                form_field.clean = integerfield_clean
-
-        def search(self, query_set=None):
-            if self.is_valid():
-                query = {}
-                for field in self.changed_data:
-                    model_field = cls._meta.get_field(field)
-                    form_field = model_field.formfield()
-                    value =  self.cleaned_data[field]
-                    if value is None or (isinstance(value, basestring) and value.isspace()):
-                        continue
-                    if isinstance(form_field, forms.fields.CharField)\
-                                    and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
-                        value_list = re.split(r"\s*\*\s*", value)
-                        if len(value_list)==1:
-                            query["%s__iexact"%field]=value_list[0]
-                        else :
-                            if value_list[0]:
-                                query["%s__istartswith"%field]=value_list[0]
-                            if value_list[-1]:
-                                query["%s__iendswith"%field]=value_list[-1]
-                            for value_item in value_list[1:-1]:
-                                if value_item:
-                                    query["%s__icontains"%field]=value_item
-                    elif isinstance(form_field, forms.fields.IntegerField)\
-                                    and isinstance(form_field.widget, (forms.TextInput, forms.Textarea)):
-                        sign, value_str = self.cleaned_data[field]
-                        cr = "%s__%s" %(field, {"" : "exact", ">" : "gt", "<" : "lt"}[sign])
-                        query[cr]= int(value_str)
-                    else:
-                        query[field] = self.cleaned_data[field]
-                    query_set = query_set.filter(**query)
-                if query_set is not None:
-                    return query_set
-                else:
-                    return []
-        fields_list = fields_dict.items()
-        for ref, field in fields_list:
-            if ref=='reference':
-                fields_list.remove((ref, field))
-                fields_list.insert(0, (ref, field))
-                break
-        ordered_fields_list = FakeItems(fields_list)
-        Form = type("Search%sForm" % cls.__name__,
-                    (forms.BaseForm,),
-                    {"base_fields" : ordered_fields_list, "search" : search})
-        get_search_form.cache[cls] = Form
-    if data is not None:
-        return Form(data=data, empty_permitted=True)
-    else:
-        return Form(empty_permitted=True)
-get_search_form.cache = {}    
 
 
 from haystack.forms import SearchForm
@@ -351,6 +249,15 @@ class SimpleSearchForm(SearchForm):
         else:
             return EmptySearchQuerySet()
         
+
+class PLMObjectForm(forms.Form):
+    u"""
+    A form that identifies a :class:`PLMObject`.
+    """
+
+    type = forms.CharField()
+    reference = forms.CharField()
+    revision = forms.CharField()
 
 class AddChildForm(PLMObjectForm):
     quantity = forms.FloatField()

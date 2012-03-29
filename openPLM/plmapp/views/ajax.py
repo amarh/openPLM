@@ -38,24 +38,6 @@ import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
         json_view, get_navigate_data, secure_required, get_creation_view 
 
-@secure_required
-@login_required
-def ajax_search_form(request):
-    """
-    Simple view which returns the html of a search form with the data
-    of :attr:`request.GET` as initial values.
-    
-    The request must contains a get parameter *type* with a valid type,
-    otherwise, a :class:`.HttpResponseForbidden` is returned.
-    """
-    tf = forms.TypeForm(request.GET)
-    if tf.is_valid():
-        cls = models.get_all_users_and_plmobjects()[tf.cleaned_data["type"]]
-        form = forms.get_search_form(cls, request.GET)
-        return HttpResponse(form.as_table())
-    else:
-        return HttpResponseForbidden()
-
 @login_required
 @json_view
 def ajax_creation_form(request):
