@@ -115,26 +115,27 @@ def search(request, editable_only="true", with_file_only="true"):
     :implements: :func:`http_api.search`
     """
     if request.GET and "type" in request.GET:
-        attributes_form = forms.TypeForm(request.GET)
-        if attributes_form.is_valid():
-            query_dict = {}
-            cls = models.get_all_plmobjects()[attributes_form.cleaned_data["type"]]
-            extra_attributes_form = forms.get_search_form(cls, request.GET)
-            results = cls.objects.all()
-            if extra_attributes_form.is_valid():
-                results = extra_attributes_form.search(results)
-                objects = []
-                for res in results:
-                    if editable_only == "false" or res.is_editable:
-                        if with_file_only == "true" and hasattr(res, "files") \
-                           and not bool(res.files):
+        form = forms.SimpleSearchForm(request.GET)
+        if form.is_valid():
+            results = [r.object for r in form.search().load_all()[:30]]
+            objects = []
+            ids = set()
+            for res in results:
+                if isinstance(res, models.DocumentFile):
+                    res = res.document.get_leaf_object()
+                if res.id in ids: # avoiding duplicated results
+                    continue
+                if editable_only == "false" or res.is_editable:
+                    if with_file_only == "true" and hasattr(res, "files") \
+                       and not bool(res.files):
+                        continue
+                    if editable_only == "true":
+                        obj = DocumentController(res, request.user)
+                        if not obj.check_permission("owner", False):
                             continue
-                        if editable_only == "true":
-                            obj = DocumentController(res, request.user)
-                            if not obj.check_permission("owner", False):
-                                continue
-                        objects.append(object_to_dict(res))
-                return {"objects" : objects} 
+                    ids.add(res.id)
+                    objects.append(object_to_dict(res))
+            return {"objects" : objects} 
     return {"result": "error"}
 
 @login_json
@@ -287,7 +288,7 @@ def get_fields_from_form(form):
         if hasattr(initial, "pk"):
             initial = initial.pk
         data = dict(name=field_name,
-                    label=field.label.capitalize(),
+                    label=(field.label or field_name).capitalize(),
                     initial=initial,
                )
         data["type"] = field_to_type(field)
@@ -306,11 +307,8 @@ def get_search_fields(request, typename):
 
     :implements: :func:`http_api.search_fields`
     """
-    try:
-        form = forms.get_search_form(models.get_all_plmobjects()[typename])
-    except KeyError:
-        return {"result" : "error", "fields" : []}
-    return {"fields" : get_fields_from_form(form)}
+    form = forms.SimpleSearchForm()
+    return {"fields" : get_fields_from_form(form)[1:]}
 
 @login_json
 def get_creation_fields(request, typename):

@@ -14,11 +14,6 @@ class AjaxTestCase(CommonViewTest):
     def post(self, url, **post):
         return JSONDecoder().decode(self.client.post(url, post).content)
 
-    def test_search_form(self):
-        for t in ("Part", "Document", "User", "Group"):
-            response = self.client.get("/ajax/search/", {"type" : t})
-            self.assertEqual(response.status_code, 200)
-
     def test_creation_form(self):
         for t in ("Part", "Document", "Group"):
             response = self.get("/ajax/create/", type=t)
