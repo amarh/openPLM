@@ -1274,7 +1274,7 @@ msgstr "接受邀请？"
 #: templates/groups/accept_invitation.html:7
 #, python-format
 msgid "\n Accept that %(guest)s join the group %(group)s ?\n"
-msgstr "\n 接受 %(guest)s 加入群组 %(group)s？\n"
+msgstr "\n 接受 di%(guest)s 加入群组 %(group)s？\n"
 
 #: templates/groups/accept_invitation.html:11
 #, python-format
