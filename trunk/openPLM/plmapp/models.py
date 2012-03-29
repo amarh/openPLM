@@ -875,9 +875,9 @@ class DocumentFile(models.Model):
             name, ext = os.path.splitext(self.filename)
             ext = ext.lower()
             doc_files = DocumentFile.objects.filter(document__id=self.document_id, locked=True)\
-                    .exclude(deprecated=True, id=self.id)
-            for doc in doc_files:
-                native, native_ext = os.path.splitext(doc.filename)           
+                    .exclude(deprecated=True, id=self.id).values_list("filename", flat=True)
+            for filename in doc_files:
+                native, native_ext = os.path.splitext(filename)           
                 if native == name and ext in native_to_standards[native_ext.lower()]:
                     return False
      
