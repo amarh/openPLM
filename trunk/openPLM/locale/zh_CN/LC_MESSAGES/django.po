@@ -1676,7 +1676,7 @@ msgstr "编辑"
 
 #: templates/parts/bom.html:27 templates/parts/parents.html:24
 msgid "GO !"
-msgstr "前进！"
+msgstr "继续 ！"
 
 #: templates/parts/bom.html:34
 msgid "Level"
