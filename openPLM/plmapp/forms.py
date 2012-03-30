@@ -250,6 +250,11 @@ class SimpleSearchForm(SearchForm):
             return EmptySearchQuerySet()
         
 
+OBJECT_DOES_NOT_EXISTS_MSG = _(
+"""The object %(type)s // %(reference)s // %(revision)s does not exist.
+Note that all fields are case-sensitive.
+"""
+)
 class PLMObjectForm(forms.Form):
     u"""
     A form that identifies a :class:`PLMObject`.
@@ -258,6 +263,19 @@ class PLMObjectForm(forms.Form):
     type = forms.CharField()
     reference = forms.CharField()
     revision = forms.CharField()
+
+    def clean(self):
+        cleaned_data = super(PLMObjectForm, self).clean()
+        type_ = cleaned_data.get("type")
+        reference = cleaned_data.get("reference")
+        revision = cleaned_data.get("revision")
+        if type_ and reference and revision:
+            d = dict(type=type_, reference=reference, revision=revision)
+            if not m.PLMObject.objects.filter(**d).exists():
+                raise ValidationError(OBJECT_DOES_NOT_EXISTS_MSG % d)
+        return cleaned_data
+
+    
 
 class AddChildForm(PLMObjectForm, PartTypeForm):
     quantity = forms.FloatField()
