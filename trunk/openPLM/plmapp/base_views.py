@@ -48,7 +48,7 @@ from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
-from openPLM.plmapp.navigate import NavigationGraph
+from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.forms import get_navigate_form, SimpleSearchForm
 from openPLM.plmapp.utils import can_generate_pdf
 
@@ -374,8 +374,12 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         request.session.update(initial)
     if not form.is_valid():
         raise ValueError("Invalid form")
-    graph = NavigationGraph(obj, [r.object for r in ctx.get("results", [])])
     options = form.cleaned_data
+    if options[OSR]:
+        results = [r.object for r in ctx.get("results", [])]
+    else:
+        results = []
+    graph = NavigationGraph(obj, results)
     if options["update"]:
         options["doc_parts"] = [int(o)
                                 for o in options["doc_parts"].split("#")
