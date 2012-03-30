@@ -121,7 +121,8 @@ CELERY_ROUTES = {
     "openPLM.plmapp.mail.do_send_histories_mail" : {"queue" : "mails"},
     "openPLM.plmapp.mail.do_send_mail" : {"queue" : "mails"},
     # uncomment this line if you enable document3D
-    # "openPLM.document3d.handle_step_file": {"queue": "step"},
+    # "openPLM.document3d.models.handle_step_file": {"queue": "step"},
+    # "openPLM.document3d.decomposer.decomposer_all": {"queue": "step"},
 
 }
 
