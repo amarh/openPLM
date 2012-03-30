@@ -80,6 +80,7 @@ import random
 import hashlib
 import fnmatch
 import datetime
+from functools import wraps
 
 import kjbuckets
 from django.db import models
@@ -403,6 +404,36 @@ def get_default_state(lifecycle=None):
     return state
 
 # PLMobjects
+def _cache_lifecycle_stuff(func):
+    """
+    A decorator that caches the result of *func*.
+
+    *func* must take one argument: a :class:`PLMObject` and
+    its returned value should only depends on the state and the 
+    lifecycle of the given PLMObject (and not its type).
+
+    The maximum cache size will be the number of 
+    :class:`LifecycleStates`. Each key of the cache is
+    a tuple (state's name, lifecycle's name).
+    """
+    func.__doc__ += """
+    
+        .. note::
+            
+            The result of this function is cached with :func:`._cache_lifecycle_stuff`.
+    """
+    @wraps(func)
+    def wrapper(plmobject):
+        key = (plmobject.state_id, plmobject.lifecycle_id)
+        if key in func.cache:
+            return func.cache[key]
+        else:
+            value = func(plmobject)
+            func.cache[key] = value
+            return value
+    func.cache = {}
+    return wrapper
+    
 
 class PLMObject(models.Model):
     u"""
@@ -536,6 +567,7 @@ class PLMObject(models.Model):
         return self.is_draft
 
     @property
+    @_cache_lifecycle_stuff
     def is_proposed(self):
         """
         True if the object is in a state prior to the official state
@@ -549,25 +581,30 @@ class PLMObject(models.Model):
         return current_rank < official_rank
     
     @property
+    @_cache_lifecycle_stuff
     def is_cancelled(self):
         """ True if the object is cancelled. """
         return self.lifecycle == get_cancelled_lifecycle()
 
     @property
+    @_cache_lifecycle_stuff
     def is_deprecated(self):
         """ True if the object is deprecated. """
         return not self.is_cancelled and self.state == self.lifecycle.last_state
     
     @property
+    @_cache_lifecycle_stuff
     def is_official(self):
         u"Returns True if object is official."""
         return not self.is_cancelled and self.state == self.lifecycle.official_state
 
     @property
+    @_cache_lifecycle_stuff
     def is_draft(self):
         u""" Returns True if the object is a draft. """
         return not self.is_cancelled and self.state == self.lifecycle.first_state
 
+    @_cache_lifecycle_stuff
     def get_current_sign_level(self):
         """
         Returns the current sign level that an user must have to promote this
@@ -577,6 +614,7 @@ class PLMObject(models.Model):
                             lifecycle=self.lifecycle).rank
         return level_to_sign_str(rank) 
     
+    @_cache_lifecycle_stuff
     def get_previous_sign_level(self):
         """
         Returns the current sign level that an user must have to demote this

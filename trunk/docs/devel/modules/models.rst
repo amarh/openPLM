@@ -6,4 +6,4 @@
 .. automodule::  openPLM.plmapp.models
     :members:
     :show-inheritance:
-  
+    :private-members: 
