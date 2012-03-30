@@ -14,8 +14,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'openplm'             # Or path to database file if using sqlite3.
+DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = '/var/django/openPLM/trunk/openPLM/openplm.sql'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'django'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'django#6'         # Not used with sqlite3.
 DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
@@ -76,7 +76,7 @@ LANGUAGES = (
       ('en', 'English'),
       ('es', u'Español'),
       ('ja', u'日本語'),
-      ('cn', u'中文'),
+      ('zh_CN', u'中文'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
