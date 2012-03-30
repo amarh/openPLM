@@ -1,6 +1,7 @@
 from django import template
 from django.contrib.auth.models import User
 from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.models import PLMObject
 
 register = template.Library()
 
@@ -64,4 +65,11 @@ def attr(o, attr_name):
     from django.conf import settings
     return getattr(o, attr_name, settings.TEMPLATE_STRING_IF_INVALID)
 attr = register.filter('attr', attr)
+
+@register.filter
+def is_plmobject(result):
+    """
+    Returns True if the object behind *result* is an instance of :class:`PLMObject.`
+    """
+    return issubclass(result.model, PLMObject)
 

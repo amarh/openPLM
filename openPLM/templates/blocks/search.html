@@ -31,7 +31,7 @@
 
             <li class="Result">
             {% if navigate_bool %}
-                {% if result.object.is_part or result.object.is_document %}
+                {% if result|is_plmobject %}
                     <div class="toolbar">
                         <button class="attach">{% trans "Attach" %}</button>
                         <button class="add_child">{% trans "Add child" %}</button>
