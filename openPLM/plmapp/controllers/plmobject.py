@@ -272,7 +272,7 @@ class PLMObjectController(Controller):
         users = models.DelegationLink.get_delegators(self._user, role)
         qset = self.plmobjectuserlink_plmobject.filter(user__in=users,
                                                           role=role)
-        return bool(qset)
+        return qset.exists()
 
     def check_editable(self):
         """
@@ -522,7 +522,7 @@ class PLMObjectController(Controller):
             return True
         if self.owner == self._user:
             return True
-        if bool(self.group.user_set.filter(id=self._user.id)):
+        if self.group.user_set.filter(id=self._user.id).exists():
             return True
         if raise_:
             raise PermissionError("You can not see this object.")
