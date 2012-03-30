@@ -3,32 +3,33 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-30 09:52+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2012-03-30 11:20+0200\n"
+"PO-Revision-Date: 2011-11-21 11:12+0100\n"
+"Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 
 #: computer/models.py:48
 msgid "supplier"
-msgstr ""
+msgstr "提供者"
 
 #: computer/models.py:48
 msgid "tech_details"
-msgstr ""
+msgstr "技术细节"
 
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."
-msgstr ""
+msgstr "您不能在谷歌文件中下载文件"
 
 #: gdoc/templates/gdoc_files.html:12
+#, fuzzy
 msgid ""
 "\n"
 "            You cannot access to this Google Document. If you did not "
@@ -38,38 +39,45 @@ msgid ""
 "            to read this file in Google Document.\n"
 "        "
 msgstr ""
+"\n"
+" 您没有权力进入此谷歌文件。如果不是您创建的此文件，请您询问文件的创建者以便获"
+"权在谷歌文件中读取此文件 \n"
 
 #: gdoc/templates/gdoc_files.html:21
 msgid "Click here to edit the file in Google Document ."
-msgstr ""
+msgstr "点击这里可以在谷歌文件里编辑文件"
 
 #: gdoc/templates/gdoc_files.html:24
 msgid "Click here to download the file from Google."
-msgstr ""
+msgstr "点击这里可以从谷歌里下载文件"
 
 #: pdfgen/templates/select_pdf.html:8
+#, fuzzy
 msgid ""
 "\n"
 "            Select PDF files that will be merged into a unique PDF\n"
 "            and click on the Download button.\n"
 "        "
 msgstr ""
+"\n"
+" 选择多个PDF文件可以集成为一个PDF文件\n"
+"点击下载键 \n"
 
 #: pdfgen/templates/select_pdf.html:17
 msgid "Download"
-msgstr ""
+msgstr "下载"
 
 #: pdfgen/templates/select_pdf_doc.html:16
 msgid "There are no PDF files."
-msgstr ""
+msgstr "没有PDF文件"
 
 #: pdfgen/templates/select_pdf_part.html:19
 msgid "Level:"
-msgstr ""
+msgstr "层次水平"
 
 #: plmapp/base_views.py:127
 msgid "Internal error"
-msgstr ""
+msgstr "内部错误"
 
 #: plmapp/encoding.py:4
 msgid "Ascii"
@@ -477,46 +485,47 @@ msgstr ""
 
 #: plmapp/forms.py:52
 msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
-msgstr ""
+msgstr "错误的引用：符号'#', '?', '/' and '..'不被允许"
 
 #: plmapp/forms.py:58
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
-msgstr ""
+msgstr "错误的更改：符号'#', '?', '/' and '..'不被允许"
 
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
-msgstr ""
+msgstr "错误的组别，请检查该组别是否存在以及您是否隶属于该组别"
 
 #: plmapp/forms.py:150
 msgid "An object with the same type, reference and revision already exists"
-msgstr ""
+msgstr "您不能修改，因为一个拥有相同类型、引用及更改的对象已经存在"
 
 #: plmapp/forms.py:152
+#, fuzzy
 msgid ""
 "An object with the same type and revision exists, you may consider to revise "
 "it."
-msgstr ""
+msgstr "一个拥有相同类型和更改的对象已经存在。您可以考虑更改该对象"
 
 #: plmapp/forms.py:206 plmapp/forms.py:210 plmapp/forms.py:214
 msgid "Select a type"
-msgstr ""
+msgstr "选择一个类型"
 
 #: plmapp/forms.py:222
 msgid "Query"
-msgstr ""
+msgstr "问询"
 
 #: plmapp/forms.py:294
 msgid "All levels"
-msgstr ""
+msgstr "所有层次的签名者"
 
 #: plmapp/forms.py:295
 msgid "First level"
-msgstr ""
+msgstr "签名者层级"
 
 #: plmapp/forms.py:296
 msgid "Last level"
-msgstr ""
+msgstr "层级"
 
 #: plmapp/forms.py:297
 msgid "All status"
@@ -528,11 +537,11 @@ msgstr ""
 
 #: plmapp/forms.py:466
 msgid "only search results"
-msgstr ""
+msgstr "仅有的搜索结果"
 
 #: plmapp/forms.py:467
 msgid "Hierarchical"
-msgstr ""
+msgstr "分层"
 
 #: plmapp/forms.py:468
 msgid "Radial 1"
@@ -544,238 +553,238 @@ msgstr ""
 
 #: plmapp/forms.py:472
 msgid "layout"
-msgstr ""
+msgstr "布局"
 
 #: plmapp/forms.py:479
 msgid "child"
-msgstr ""
+msgstr "儿童"
 
 #: plmapp/forms.py:480 plmapp/models.py:684
 msgid "parents"
-msgstr ""
+msgstr "父母"
 
 #: plmapp/forms.py:481 plmapp/forms.py:501
 msgid "doc"
-msgstr ""
+msgstr "文档"
 
 #: plmapp/forms.py:482 plmapp/forms.py:488 plmapp/forms.py:498
 #: plmapp/models.py:177 plmapp/models.py:230 plmapp/models.py:468
 #: plmapp/models.py:649 plmapp/controllers/user.py:92
 msgid "owner"
-msgstr ""
+msgstr "所有者"
 
 #: plmapp/forms.py:483 plmapp/forms.py:489
 msgid "signer"
-msgstr ""
+msgstr "签名者"
 
 #: plmapp/forms.py:484 plmapp/forms.py:490 plmapp/views/main.py:1126
 msgid "notified"
-msgstr ""
+msgstr "已被通告"
 
 #: plmapp/forms.py:487 plmapp/forms.py:500
 msgid "part"
-msgstr ""
+msgstr "部分"
 
 #: plmapp/forms.py:493
 msgid "owned"
-msgstr ""
+msgstr "拥有者"
 
 #: plmapp/forms.py:494
 msgid "to sign"
-msgstr ""
+msgstr "签名"
 
 #: plmapp/forms.py:495
 msgid "request notification from"
-msgstr ""
+msgstr "请求通告"
 
 #: plmapp/forms.py:499
 msgid "user"
-msgstr ""
+msgstr "用户"
 
 #: plmapp/forms.py:524 templates/create.html:35 templates/edit.html:11
 #: templates/users/password.html:11
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: plmapp/forms.py:525 templates/groups/pending_invitations.html:9
 #: templates/groups/users.html:28 templates/users/delegation.html:32
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: plmapp/forms.py:569
 msgid "The new user will belong to the selected groups"
-msgstr ""
+msgstr "新用户将隶属于被选择的组别"
 
 #: plmapp/forms.py:577
 msgid "Email address must be unique."
-msgstr ""
+msgstr "电子邮件地址必须是唯一的"
 
 #: plmapp/forms.py:584
 msgid "Email's domain not valid"
-msgstr ""
+msgstr "电子邮件域名不合法"
 
 #: plmapp/forms.py:599
 #, python-format
 msgid "Warning! There are homonyms: %s!"
-msgstr ""
+msgstr "警告！存在同音词：%s"
 
 #: plmapp/forms.py:631
 msgid "Columns must have distinct headers."
-msgstr ""
+msgstr "每一列必须有不一样的表头"
 
 #: plmapp/forms.py:650
 msgid "Password"
-msgstr ""
+msgstr "密码"
 
 #: plmapp/forms.py:663
 msgid "Your password was entered incorrectly. Please enter it again."
-msgstr ""
+msgstr "您的密码输入不正确。请您重新输入"
 
 #: plmapp/models.py:135
 msgid "administrator"
-msgstr ""
+msgstr "管理员"
 
 #: plmapp/models.py:137
 msgid "contributor"
-msgstr ""
+msgstr "贡献者"
 
 #: plmapp/models.py:139
 msgid "viewer"
-msgstr ""
+msgstr "浏览者"
 
 #: plmapp/models.py:179 plmapp/models.py:470 plmapp/models.py:1512
 #: plmapp/controllers/user.py:89
 msgid "date of creation"
-msgstr ""
+msgstr "创建日期"
 
 #: plmapp/models.py:181 plmapp/models.py:472 plmapp/controllers/user.py:88
 msgid "date of last modification"
-msgstr ""
+msgstr "最后一次修改的日期"
 
 #: plmapp/models.py:229 plmapp/models.py:463
 msgid "name"
-msgstr ""
+msgstr "名字"
 
 #: plmapp/models.py:229 plmapp/models.py:466 plmapp/models.py:648
 #: plmapp/controllers/user.py:91
 msgid "creator"
-msgstr ""
+msgstr "创建者"
 
 #: plmapp/models.py:230 plmapp/models.py:648 plmapp/models.py:649
 msgid "ctime"
-msgstr ""
+msgstr "创建日期"
 
 #: plmapp/models.py:231 plmapp/models.py:650
 msgid "mtime"
-msgstr ""
+msgstr "修改日期"
 
 #: plmapp/models.py:458 plmapp/models.py:646
 msgid "reference"
-msgstr ""
+msgstr "引用"
 
 #: plmapp/models.py:459 plmapp/models.py:646
 msgid "type"
-msgstr ""
+msgstr "类型"
 
 #: plmapp/models.py:460 plmapp/models.py:647
 msgid "revision"
-msgstr ""
+msgstr "更改"
 
 #: plmapp/models.py:464
 msgid "Name of the product"
-msgstr ""
+msgstr "产品名称"
 
 #: plmapp/models.py:476 plmapp/models.py:612
 msgid "lifecycle"
-msgstr ""
+msgstr "寿命周期"
 
 #: plmapp/models.py:479
 msgid "state"
-msgstr ""
+msgstr "状态"
 
 #: plmapp/models.py:507
 msgid "The object is at its last state."
-msgstr ""
+msgstr "该对象处于最终状态"
 
 #: plmapp/models.py:612
 msgid "attributes"
-msgstr ""
+msgstr "属性"
 
 #: plmapp/models.py:613
 msgid "revisions"
-msgstr ""
+msgstr "更改"
 
 #: plmapp/models.py:613
 msgid "history"
-msgstr ""
+msgstr "历史"
 
 #: plmapp/models.py:614
 msgid "management"
-msgstr ""
+msgstr "管理"
 
 #: plmapp/models.py:650
 msgid "group"
-msgstr ""
+msgstr "组别"
 
 #: plmapp/models.py:684
 msgid "BOM-child"
-msgstr ""
+msgstr "命名法"
 
 #: plmapp/models.py:685
 msgid "doc-cad"
-msgstr ""
+msgstr "doc-cao"
 
 #: plmapp/models.py:720
 msgid "Some children are at a lower or draft state."
-msgstr ""
+msgstr "儿童部分处于低级别的状态或者是草稿状态"
 
 #: plmapp/models.py:732
 msgid "There are no official documents attached."
-msgstr ""
+msgstr "正式文件未被附上"
 
 #: plmapp/models.py:916
 msgid "This document has no files."
-msgstr ""
+msgstr "此文档没有文件"
 
 #: plmapp/models.py:919
 msgid "Some files are locked."
-msgstr ""
+msgstr "一些文件被加锁"
 
 #: plmapp/models.py:926
 msgid "files"
-msgstr ""
+msgstr "文件"
 
 #: plmapp/models.py:927
 msgid "parts"
-msgstr ""
+msgstr "部件"
 
 #: plmapp/models.py:1514
 msgid "date of validation"
-msgstr ""
+msgstr "创建日期"
 
 #: plmapp/models.py:1515
 msgid "True if guest created the invitation"
-msgstr ""
+msgstr "如果客人账户创建了该邀请，则为真"
 
 #: plmapp/models.py:1580
 msgid "date of promotion"
-msgstr ""
+msgstr "创建日期"
 
 #: plmapp/units.py:5
 msgid "Amounts"
-msgstr ""
+msgstr "数目"
 
 #: plmapp/units.py:6
 msgid "Each"
-msgstr ""
+msgstr "每一个零件"
 
 #: plmapp/units.py:7
 msgid "mol"
-msgstr ""
+msgstr "摩尔"
 
 #: plmapp/units.py:10
 msgid "Lengths"
-msgstr ""
+msgstr "长度"
 
 #: plmapp/units.py:11
 msgid "mm"
@@ -799,35 +808,35 @@ msgstr ""
 
 #: plmapp/units.py:18
 msgid "Volumes"
-msgstr ""
+msgstr "体积"
 
 #: plmapp/units.py:19
 msgid "m³"
-msgstr ""
+msgstr "立方米"
 
 #: plmapp/units.py:20
 msgid "mL"
-msgstr ""
+msgstr "毫升"
 
 #: plmapp/units.py:21
 msgid "cL"
-msgstr ""
+msgstr "厘升"
 
 #: plmapp/units.py:22
 msgid "dL"
-msgstr ""
+msgstr "分升"
 
 #: plmapp/units.py:23
 msgid "L"
-msgstr ""
+msgstr "升"
 
 #: plmapp/units.py:26
 msgid "Masses"
-msgstr ""
+msgstr "’重量"
 
 #: plmapp/units.py:27
 msgid "mg"
-msgstr ""
+msgstr "毫克"
 
 #: plmapp/units.py:28
 msgid "cg"
@@ -847,11 +856,11 @@ msgstr ""
 
 #: plmapp/controllers/user.py:90
 msgid "role in PLM"
-msgstr ""
+msgstr "PLM中的作用"
 
 #: plmapp/management/commands/createcompany.py:27
 msgid "Enter a valid e-mail address."
-msgstr ""
+msgstr "请输入一个正确的电子邮件地址"
 
 #: plmapp/views/main.py:935
 #, python-format
@@ -860,46 +869,49 @@ msgstr ""
 
 #: plmapp/views/main.py:1122
 msgid "signer level"
-msgstr ""
+msgstr "签名者层级"
 
 #: plmapp/views/main.py:1124
 msgid "signer all levels"
-msgstr ""
+msgstr "所有层次的签名者"
 
 #: subversion/models.py:19
 msgid "Valid value are HEAD, a number or a date between brackets"
-msgstr ""
+msgstr "正确值为HEAD，括号中的一个数字或者一个日期"
 
 #: subversion/templates/ajax_logs.html:6
+#, fuzzy
 msgid ""
 "\n"
 "            Sorry, openPLM cannot access to this repository.\n"
 "        "
 msgstr ""
+"\n"
+"对不起，openPLM无法进入此仓库\n"
 
 #: subversion/templates/ajax_logs.html:11
 msgid "Last changelogs:"
-msgstr ""
+msgstr "最后一个changelogs:"
 
 #: subversion/templates/logs.html:28
 msgid "Loading..."
-msgstr ""
+msgstr "载入中⋯⋯"
 
 #: subversion/templates/subversion_files.html:8
 msgid "You cannot add a file to a SubversionRepository."
-msgstr ""
+msgstr "您不能在一个SubversionRepository中加入文件"
 
 #: subversion/templates/subversion_files.html:12
 msgid "To check-out this repository, run the following command:"
-msgstr ""
+msgstr "请运行以下指令，以便下载仓库:"
 
 #: subversion/templates/subversion_files.html:19
 msgid "To export this repository, run the following command:"
-msgstr ""
+msgstr "请输入以下指令，以便导出此仓库:"
 
 #: templates/404.html:17
 msgid "Error 404: page not found"
-msgstr ""
+msgstr "错误404：无法找到网页"
 
 #: templates/attributes.html:23 templates/attributes.html.py:29
 msgid "Edit this information"
@@ -907,15 +919,15 @@ msgstr ""
 
 #: templates/attributes.html:24
 msgid "Change my password"
-msgstr ""
+msgstr "点击此处更改密码"
 
 #: templates/attributes.html:36
 msgid "Download as PDF"
-msgstr ""
+msgstr "下载PDF文件"
 
 #: templates/attributes.html:43
 msgid "Comments"
-msgstr ""
+msgstr "评论"
 
 #: templates/attributes.html:49
 msgid ""
@@ -925,56 +937,58 @@ msgid ""
 msgstr ""
 
 #: templates/attributes.html:53
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "                        %(comment_count)s comments have been posted.\n"
 "                    "
 msgstr ""
+"\n"
+" %(comment_count)s条评论已经被提交\n"
 
 #: templates/attributes.html:63
 msgid "Posted by:"
-msgstr ""
+msgstr "提交者:"
 
 #: templates/attributes.html:67
 msgid "Date:"
-msgstr ""
+msgstr "发表日期:"
 
 #: templates/attributes.html:77
 msgid "No comments have been posted yet."
-msgstr ""
+msgstr "尚无评论被提交"
 
 #: templates/attributes.html:83
 msgid "Post a comment"
-msgstr ""
+msgstr "提交一条评论"
 
 #: templates/attributes.html:113
 msgid "Post"
-msgstr ""
+msgstr "提交"
 
 #: templates/base.html:44
 msgid "Home page"
-msgstr ""
+msgstr "首页"
 
 #: templates/base.html:71
 msgid "HOME"
-msgstr ""
+msgstr "首页"
 
 #: templates/base.html:77
 msgid "SEARCH"
-msgstr ""
+msgstr "搜索"
 
 #: templates/base.html:85 templates/create.html:57
 msgid "CREATE"
-msgstr ""
+msgstr "创建"
 
 #: templates/base.html:96
 msgid "NAVIGATE"
-msgstr ""
+msgstr "导航"
 
 #: templates/base.html:105
 msgid "STUDY"
-msgstr ""
+msgstr "学习"
 
 #: templates/base.html:116
 msgid "Toggle the left panel"
@@ -982,15 +996,15 @@ msgstr ""
 
 #: templates/base.html:123 templates/blocks/supermenu.html:9
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: templates/base.html:159
 msgid "You are not allowed to see this object"
-msgstr ""
+msgstr "您不被允许查看此对象"
 
 #: templates/create.html:17
 msgid "OBJECT CREATION:"
-msgstr ""
+msgstr "创建对象:"
 
 #: templates/create.html:46
 #, python-format
@@ -1016,72 +1030,72 @@ msgstr ""
 
 #: templates/create.html:66
 msgid "Import several parts or documents from CSV file."
-msgstr ""
+msgstr "点击此处来支持来自CSV文件的用户"
 
 #: templates/create.html:71
 msgid "Import a BOM from a CSV file."
-msgstr ""
+msgstr "导入一个csv文件"
 
 #: templates/create.html:75 templates/users/sponsor.html:9
 msgid "Sponsor a new user"
-msgstr ""
+msgstr "领入一个新用户"
 
 #: templates/create.html:78
 msgid "Sponsor several users from a CSV file."
-msgstr ""
+msgstr "点击此处来支持来自CSV文件的用户"
 
 #: templates/create.html:84
 msgid "You can not create an object since you are not a contributor."
-msgstr ""
+msgstr "您无法创建对象，因为一个更新的修改已经存在"
 
 #: templates/edit.html:7
 msgid "OBJECT MODIFICATION:"
-msgstr ""
+msgstr "修改对象:"
 
 #: templates/edit.html:26
 msgid "MODIFY"
-msgstr ""
+msgstr "修改"
 
 #: templates/edit.html:28 templates/import/csv.html:69
 #: templates/parts/bom_edit.html:49 templates/snippets/undo_form.html:14
 msgid "Undo"
-msgstr ""
+msgstr "撤销"
 
 #: templates/error.html:9 templates/login.html:17
 msgid "openPLM LOGIN PAGE"
-msgstr ""
+msgstr "openPLM登陆页"
 
 #: templates/error.html:18
 msgid "Error :"
-msgstr ""
+msgstr "错误 :"
 
 #: templates/error.html:20
 msgid "go back"
-msgstr ""
+msgstr "返回"
 
 #: templates/home.html:13
-#, python-format
+#, fuzzy, python-format
 msgid "Welcome %(full_name)s"
-msgstr ""
+msgstr "欢迎您，%(full_name)s"
 
 #: templates/home.html:29
 msgid "Groups that you own: pending invitations"
-msgstr ""
+msgstr "您所拥有的群组：申请待批准"
 
 #: templates/home.html:40
 msgid "Groups that you may join: pending invitations"
-msgstr ""
+msgstr "您能够加入的组群，申请待批准"
 
 #: templates/lifecycle.html:17 templates/documents/revisions.html:7
 #: templates/parts/revisions.html:7
 msgid "Are you sure?"
-msgstr ""
+msgstr "您确定么？"
 
 #: templates/lifecycle.html:22
 msgid ""
 "If you promote or demote this object, you may not be allowed to undo this "
 "action."
-msgstr ""
+msgstr "如果您确认或拒绝此对象，您可能会被禁止撤销此操作"
 
 #: templates/lifecycle.html:27
 msgid "The following revisions will be cancelled:"
@@ -1101,45 +1115,46 @@ msgstr ""
 
 #: templates/lifecycle.html:60
 msgid "DEMOTE"
-msgstr ""
+msgstr "删除"
 
 #: templates/lifecycle.html:62
+#, fuzzy
 msgid ""
 "You can not demote this object since its state is official or more advanced."
-msgstr ""
+msgstr "您无法修改因为一个更新的版本存在"
 
 #: templates/lifecycle.html:65
 msgid "You do not have the permission to demote this object."
-msgstr ""
+msgstr "您没有拒绝此对象的权限"
 
 #: templates/lifecycle.html:70
 msgid "PROMOTE"
-msgstr ""
+msgstr "确认"
 
 #: templates/lifecycle.html:72
 msgid "You can not promote this object:"
-msgstr ""
+msgstr "您无法确认此对象:"
 
 #: templates/lifecycle.html:76
 msgid "You do not have the permission to promote this object."
-msgstr ""
+msgstr "您没有确认此对象的权限"
 
 #: templates/login.html:28
 msgid "Welcome to openPLM"
-msgstr ""
+msgstr "欢迎来到openPLM"
 
 #: templates/login.html:38 templates/blocks/user.html:19
 msgid "Go"
-msgstr ""
+msgstr "继续"
 
 #: templates/login.html:45
 msgid "is the first genuine open source PLM based on"
-msgstr ""
+msgstr "是第一个真正的基于⋯⋯的开源PLM"
 
 #: templates/login.html:46
 msgid ""
 "intended to provide a starting point for companies CMS/PLM/BIM projects."
-msgstr ""
+msgstr "旨在为公司CMS/PLM/BIM项目提供一个起点和基础"
 
 #: templates/login.html:47
 msgid ""
@@ -1147,30 +1162,32 @@ msgid ""
 "of the things that companies have in common, it lets you focus on what makes "
 "your company different."
 msgstr ""
+"通过整合无数标准可复用PLM功能，来处理公司共有的问题，它让您专注于使您的公司与"
+"众不同"
 
 #: templates/login.html:51
 msgid "For more information about openPLM, see"
-msgstr ""
+msgstr "更多关于openPLM的信息，请看"
 
 #: templates/login.html:54
 msgid "openPLM connexion :"
-msgstr ""
+msgstr "openPLM连接 :"
 
 #: templates/login.html:63
 msgid "Login :"
-msgstr ""
+msgstr "登录："
 
 #: templates/login.html:67
 msgid "Password :"
-msgstr ""
+msgstr "密码："
 
 #: templates/login.html:72
 msgid "LOGIN"
-msgstr ""
+msgstr "登录"
 
 #: templates/login.html:79
 msgid "Professionals"
-msgstr ""
+msgstr "职业人士"
 
 #: templates/login.html:82
 msgid ""
@@ -1178,75 +1195,77 @@ msgid ""
 "want to work with other professionals for your project management, for other "
 "solutions plugins, for openPLM software maintenance, "
 msgstr ""
+"您正准备在职业环境下使用openPLM。如果您希望和其它项目管理人员协作，为了其它解"
+"决方案，为了openPLM软件的维护"
 
 #: templates/login.html:84
 msgid "contact us"
-msgstr ""
+msgstr "联系我们"
 
 #: templates/management.html:14
 msgid "Notify"
-msgstr ""
+msgstr "通告"
 
 #: templates/management.html:19
 msgid "Unnotify me"
-msgstr ""
+msgstr "不再通知我"
 
 #: templates/management.html:24
 msgid "Notify me"
-msgstr ""
+msgstr "通知我"
 
 #: templates/management.html:51
 msgid "REPLACE"
-msgstr ""
+msgstr "替换"
 
 #: templates/management.html:58
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: templates/management_replace.html:7
 msgid "Select a user for your delegation as : "
-msgstr ""
+msgstr "选择一个使用者来代替您的作用"
 
 #: templates/navigate.html:38
 msgid "Attach document?"
-msgstr ""
+msgstr "添加附件？"
 
 #: templates/navigate.html:41
 msgid "Attach the selected document?"
-msgstr ""
+msgstr "添加被选中的附件？"
 
 #: templates/navigate.html:56
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: templates/navigate.html:75 templates/parts/bom.html:23
 #: templates/parts/parents.html:20
 msgid "Display :"
-msgstr ""
+msgstr "显示 :"
 
 #: templates/navigate.html:79
 msgid "FILTER"
-msgstr ""
+msgstr "过滤"
 
 #: templates/revisions.html:15
 msgid "NEW"
-msgstr ""
+msgstr "新建"
 
 #: templates/revisions.html:19
 msgid "You can not revise this object since a revision already exist."
-msgstr ""
+msgstr "您无法更改此对象，因为一个更新的更改已经存在"
 
 #: templates/blocks/search.html:7 templates/search/search.html:18
 msgid "SEARCH !"
-msgstr ""
+msgstr "搜索！"
 
 #: templates/blocks/search.html:14
 msgid "Results for link creation:"
-msgstr ""
+msgstr "连接创建的结果:"
 
 #: templates/blocks/search.html:21 templates/search/search.html:27
 msgid "Results"
-msgstr ""
+msgstr "结果"
 
 #: templates/blocks/search.html:23
 #, python-format
@@ -1258,24 +1277,24 @@ msgstr ""
 
 #: templates/blocks/search.html:26
 msgid "All results"
-msgstr ""
+msgstr "结果"
 
 #: templates/blocks/search.html:36
 msgid "Attach"
-msgstr ""
+msgstr "添加附件"
 
 #: templates/blocks/search.html:37
 msgid "Add child"
-msgstr ""
+msgstr "添加儿童"
 
 #: templates/blocks/search.html:51 templates/documents/files.html:53
 #: templates/documents/parts.html:12 templates/parts/bom.html:19
 msgid "ADD"
-msgstr ""
+msgstr "添加"
 
 #: templates/blocks/search.html:63 templates/search/search.html:53
 msgid "No result matching given query"
-msgstr ""
+msgstr "您的问讯没有任何结果"
 
 #: templates/blocks/supermenu.html:11
 msgid "Search for a part, a document, a file and more."
@@ -1283,7 +1302,7 @@ msgstr ""
 
 #: templates/blocks/supermenu.html:20
 msgid "Study"
-msgstr ""
+msgstr "学习"
 
 #: templates/blocks/supermenu.html:22
 msgid "See/edit your personal data and explore your parts and document."
@@ -1291,7 +1310,7 @@ msgstr ""
 
 #: templates/blocks/supermenu.html:30
 msgid "Navigate"
-msgstr ""
+msgstr "验证"
 
 #: templates/blocks/supermenu.html:32
 msgid "Graphically explore your parts and documents."
@@ -1299,7 +1318,7 @@ msgstr ""
 
 #: templates/blocks/supermenu.html:43
 msgid "Create"
-msgstr ""
+msgstr "创建"
 
 #: templates/blocks/supermenu.html:45
 msgid "Create a new part, a new document or a new group."
@@ -1307,35 +1326,35 @@ msgstr ""
 
 #: templates/blocks/user.html:24
 msgid "EXIT"
-msgstr ""
+msgstr "离开"
 
 #: templates/documents/files.html:45 templates/parts/doccad.html:11
 msgid "Download all files"
-msgstr ""
+msgstr "下载全部文件"
 
 #: templates/documents/files.html:56
 msgid "DELETE"
-msgstr ""
+msgstr "删除"
 
 #: templates/documents/files.html:71
 msgid "Locked"
-msgstr ""
+msgstr "锁定"
 
 #: templates/documents/files.html:73
 msgid "Unlocked"
-msgstr ""
+msgstr "开锁"
 
 #: templates/documents/files.html:80
 msgid "DOWNLOAD"
-msgstr ""
+msgstr "下载"
 
 #: templates/documents/files.html:88
 msgid "CHECK-IN"
-msgstr ""
+msgstr "登入"
 
 #: templates/documents/files.html:97
 msgid "CHECK-OUT"
-msgstr ""
+msgstr "登出"
 
 #: templates/documents/files.html:102
 msgid "Native related file is locked"
@@ -1343,15 +1362,15 @@ msgstr ""
 
 #: templates/documents/files.html:116
 msgid "No thumbnail available"
-msgstr ""
+msgstr "没有可用的缩略图"
 
 #: templates/documents/files.html:128 templates/parts/doccad.html:19
 msgid "Download merged PDF files"
-msgstr ""
+msgstr "下载合并后的PDF文件"
 
 #: templates/documents/files.html:134
 msgid "Confirm CHECK-OUT"
-msgstr ""
+msgstr "登出"
 
 #: templates/documents/files.html:135
 msgid ""
@@ -1365,19 +1384,19 @@ msgstr ""
 
 #: templates/documents/files_add.html:7
 msgid "Add new file / Check-in file :"
-msgstr ""
+msgstr "添加新文件/登入文件:"
 
 #: templates/documents/parts.html:18
 msgid "Create a part and attach it to the document."
-msgstr ""
+msgstr "此文件未被绑定任何部件"
 
 #: templates/documents/parts.html:23 templates/parts/doccad.html:74
 msgid "DISCONNECT"
-msgstr ""
+msgstr "断开连接"
 
 #: templates/documents/parts.html:54
 msgid "There are no parts attached to this document"
-msgstr ""
+msgstr "此文件未被绑定任何部件"
 
 #: templates/documents/revisions.html:12
 msgid ""
@@ -1387,311 +1406,325 @@ msgstr ""
 
 #: templates/groups/accept_invitation.html:5
 msgid "Accept invitation ?"
-msgstr ""
+msgstr "接受邀请？"
 
 #: templates/groups/accept_invitation.html:7
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Accept that %(guest)s join the group %(group)s ?\n"
 "        "
 msgstr ""
+"\n"
+" 接受%(guest)s 加入群组 %(group)s？\n"
 
 #: templates/groups/accept_invitation.html:11
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Accept to join the group %(group)s ?\n"
 "        "
 msgstr ""
+"\n"
+" 接受加入群组%(group)s？\n"
 
 #: templates/groups/add_user.html:6
 msgid "Invite a new user to the group:"
-msgstr ""
+msgstr "邀请一个新用户至群组:"
 
 #: templates/groups/add_user.html:7
 msgid "The user will receive an e-mail and could accept your invitation."
-msgstr ""
+msgstr "用户会收到一封邮件，以便接受您的邀请"
 
 #: templates/groups/add_user.html:12
 msgid "You can not invite an user to this group."
-msgstr ""
+msgstr "您无法邀请用户加入此群组"
 
 #: templates/groups/ask_to_join.html:6
 msgid "You are already in this group."
-msgstr ""
+msgstr "您已经在此群组中"
 
 #: templates/groups/ask_to_join.html:8
 msgid "Join this group ?"
-msgstr ""
+msgstr "加入此群组？"
 
 #: templates/groups/pending_invitations.html:7
 msgid "Group"
-msgstr ""
+msgstr "组别"
 
 #: templates/groups/pending_invitations.html:10 templates/groups/users.html:29
 msgid "First name"
-msgstr ""
+msgstr "名"
 
 #: templates/groups/pending_invitations.html:11 templates/groups/users.html:30
 msgid "Last name"
-msgstr ""
+msgstr "姓"
 
 #: templates/groups/pending_invitations.html:12
 msgid "Date of the invitation"
-msgstr ""
+msgstr "邀请日期"
 
 #: templates/groups/pending_invitations.html:37
 msgid "Resend"
-msgstr ""
+msgstr "重新发送"
 
 #: templates/groups/pending_invitations.html:45
 msgid "Accept"
-msgstr ""
+msgstr "接受"
 
 #: templates/groups/pending_invitations.html:50
 msgid "Refuse"
-msgstr ""
+msgstr "拒绝"
 
 #: templates/groups/refuse_invitation.html:5
 msgid "Refuse invitation ?"
-msgstr ""
+msgstr "拒绝邀请？"
 
 #: templates/groups/refuse_invitation.html:7
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Refuse that %(guest)s join the group %(group)s ?\n"
 "        "
 msgstr ""
+"\n"
+" 拒绝%(guest)s加入群组%(group)s？\n"
 
 #: templates/groups/refuse_invitation.html:11
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Refuse to join the group %(group)s ?\n"
 "        "
 msgstr ""
+"\n"
+" 拒绝加入群组%(group)s？\n"
 
 #: templates/groups/users.html:8
 msgid "Users"
-msgstr ""
+msgstr "用户"
 
 #: templates/groups/users.html:13
 msgid "Invite another user"
-msgstr ""
+msgstr "邀请别的用户"
 
 #: templates/groups/users.html:15
 msgid "Remove selected users"
-msgstr ""
+msgstr "移除被选择的用户"
 
 #: templates/groups/users.html:19
 msgid "Ask to join this group"
-msgstr ""
+msgstr "申请加入此群组"
 
 #: templates/groups/users.html:71
 msgid "Pending invitations"
-msgstr ""
+msgstr "待批准的申请"
 
 #: templates/groups/users.html:72
 msgid ""
 "The following invitations have been sent but guests have not yet accepted "
 "them."
-msgstr ""
+msgstr "下列邀请已经被发出，但客人用户尚未接受它们"
 
 #: templates/import/csv.html:6
 msgid "Import of a csv file"
-msgstr ""
+msgstr "导入一个csv文件"
 
 #: templates/import/csv.html:16
 msgid "Error"
-msgstr ""
+msgstr "错误"
 
 #: templates/import/csv.html:22
 #, python-format
 msgid " Line %(line)s "
-msgstr ""
+msgstr "行%(line)s"
 
 #: templates/import/csv.html:32
 msgid "Error while reading the CSV file. Try upload a new file."
-msgstr ""
+msgstr "读取CSV文件时发生错误。请尝试下载一个新文件"
 
 #: templates/import/csv.html:35
 msgid ""
 "The given encoding seems wrong. Try upload a new file with the right "
 "encoding."
-msgstr ""
+msgstr "给出的编码似乎是错误的，请尝试下载含有正确编码的新文件"
 
 #: templates/import/csv.html:50
 msgid "Field"
-msgstr ""
+msgstr "域"
 
 #: templates/import/csv.html:51
 msgid "Header"
-msgstr ""
+msgstr "表头"
 
 #: templates/import/csv.html:53
 msgid "Row"
-msgstr ""
+msgstr "行"
 
 #: templates/import/csv.html:68 templates/parts/bom_edit.html:48
 #: templates/snippets/undo_form.html:13
 msgid "Validate"
-msgstr ""
+msgstr "验证"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
-msgstr ""
+msgstr "数据被成功导入"
 
 #: templates/import/done.html:8
 msgid "Click here to import a new CSV file."
-msgstr ""
+msgstr "点击此处导入一个新的CSV文件"
 
 #: templates/import/done.html:9
 msgid "Click here to import a new BOM."
-msgstr ""
+msgstr "点击此处导入一个新的目录表"
 
 #: templates/import/done.html:10
 msgid "Click here to sponsor more users."
-msgstr ""
+msgstr "点击此处以便带入更多的使用者"
 
 #: templates/mails/history.html:6
 msgid "Message from openPLM"
-msgstr ""
+msgstr "来自openPLM的消息"
 
 #: templates/mails/history.html:8
 msgid "Object:"
-msgstr ""
+msgstr "对象："
 
 #: templates/mails/history.html:11
 msgid "A new action has been done:"
-msgstr ""
+msgstr "一项新的操作被执行:"
 
 #: templates/mails/history.html:14
 msgid "Details"
-msgstr ""
+msgstr "技术细节"
 
 #: templates/mails/history.html:32
 msgid "Click here to see more details."
-msgstr ""
+msgstr "点击此处查看更多细节"
 
 #: templates/mails/invitation1.html:5 templates/mails/invitation2.html:5
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "        %(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
 "the group %(group)s.\n"
 "        "
 msgstr ""
+"\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s)邀请您加入群组%(group)s\n"
 
 #: templates/mails/invitation1.html:11 templates/mails/invitation2.html:11
 msgid "Click here to accept the invitation"
-msgstr ""
+msgstr "点击此处接受邀请"
 
 #: templates/mails/invitation1.html:12 templates/mails/invitation2.html:12
 msgid "Accept invitation"
-msgstr ""
+msgstr "接受邀请"
 
 #: templates/mails/invitation1.html:14 templates/mails/invitation2.html:14
 msgid "Click here to refuse the invitation"
-msgstr ""
+msgstr "点击此处拒绝邀请"
 
 #: templates/mails/invitation1.html:15 templates/mails/invitation2.html:15
 msgid "Refuse invitation"
-msgstr ""
+msgstr "拒绝邀请"
 
 #: templates/mails/new_account.html:5
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Welcome %(first_name)s %(last_name)s!\n"
 "            "
 msgstr ""
+"\n"
+" 欢迎您，%(first_name)s %(last_name)s！\n"
 
 #: templates/mails/new_account.html:10
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "        %(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
 "OpenPLM.\n"
 "        "
 msgstr ""
+"\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s)将您加入了openPLM\n"
 
 #: templates/mails/new_account.html:16
 msgid "Your credentials:"
-msgstr ""
+msgstr "您的认证信息:"
 
 #: templates/mails/new_account.html:21
 msgid "Username:"
-msgstr ""
+msgstr "用户名："
 
 #: templates/mails/new_account.html:25
 msgid "Password:"
-msgstr ""
+msgstr "密码："
 
 #: templates/mails/new_account.html:30
 msgid "You should change your password!"
-msgstr ""
+msgstr "您应该更改您的密码！"
 
 #: templates/mails/new_account.html:32
 msgid "Click here to change your password"
-msgstr ""
+msgstr "点击此处更改密码"
 
 #: templates/parts/bom.html:20
 msgid "EDIT"
-msgstr ""
+msgstr "编辑"
 
 #: templates/parts/bom.html:27 templates/parts/parents.html:24
 msgid "GO !"
-msgstr ""
+msgstr "前进！"
 
 #: templates/parts/bom.html:34
 msgid "Level"
-msgstr ""
+msgstr "层级"
 
 #: templates/parts/bom.html:35
 msgid "Ord."
-msgstr ""
+msgstr "条例"
 
 #: templates/parts/bom.html:36
 msgid "Qty"
-msgstr ""
+msgstr "数量"
 
 #: templates/parts/bom.html:37 templates/parts/bom_edit.html:13
 msgid "Unit"
-msgstr ""
+msgstr "单位"
 
 #: templates/parts/bom_edit.html:11
 msgid "Order"
-msgstr ""
+msgstr "命令"
 
 #: templates/parts/bom_edit.html:12
 msgid "Quantity"
-msgstr ""
+msgstr "数量"
 
 #: templates/parts/bom_edit.html:22
 msgid "Delete ?"
-msgstr ""
+msgstr "删除？"
 
 #: templates/parts/doccad.html:12
 msgid "Download all CAD files"
-msgstr ""
+msgstr "下载全部文件"
 
 #: templates/parts/doccad.html:53
 msgid "There are no documents attached to this part."
-msgstr ""
+msgstr "此部件未被联系到任何文件"
 
 #: templates/parts/doccad.html:62
 msgid "Attach another document"
-msgstr ""
+msgstr "添加别的附件"
 
 #: templates/parts/doccad.html:69
 msgid "Create a document and attach it to the part."
-msgstr ""
+msgstr "此部件未被联系到任何文件"
 
 #: templates/parts/doccad_add.html:7
 msgid "Connect new document :"
-msgstr ""
+msgstr "连接新的文件 :"
 
 #: templates/parts/revisions.html:13
 msgid ""
@@ -1721,68 +1754,152 @@ msgstr ""
 
 #: templates/users/delegation.html:8
 msgid "START DELEGATE :"
-msgstr ""
+msgstr "开始代理 :"
 
 #: templates/users/delegation.html:10
 msgid "OWNERSHIP"
-msgstr ""
+msgstr "所有权"
 
 #: templates/users/delegation.html:13
 msgid "SIGNATURE 1st LEVEL"
-msgstr ""
+msgstr "第一层签名"
 
 #: templates/users/delegation.html:16
 msgid "SIGNATURE 2nd LEVEL"
-msgstr ""
+msgstr "第二层签名"
 
 #: templates/users/delegation.html:19
 msgid "ALL SIGNATURES"
-msgstr ""
+msgstr "所有签名"
 
 #: templates/users/delegation.html:22
 msgid "NOTIFICATIONS"
-msgstr ""
+msgstr "通知"
 
 #: templates/users/delegation.html:26
 msgid "Sponsor"
-msgstr ""
+msgstr "领入者"
 
 #: templates/users/delegation.html:33
 msgid "First Name"
-msgstr ""
+msgstr "名"
 
 #: templates/users/delegation.html:34
 msgid "Last Name"
-msgstr ""
+msgstr "姓"
 
 #: templates/users/delegation.html:35
 msgid "Role"
-msgstr ""
+msgstr "角色"
 
 #: templates/users/delegation.html:48
 msgid "STOP DELEGATION"
-msgstr ""
+msgstr "停止代理"
 
 #: templates/users/delegation.html:56
 msgid "Resend mail"
-msgstr ""
+msgstr "重新发送信件"
 
 #: templates/users/password.html:7
 msgid "PASSWORD MODIFICATION:"
-msgstr ""
+msgstr "密码修改:"
 
 #: templates/users/password.html:16
 msgid "CHANGE PASSWORD"
-msgstr ""
+msgstr "修改密码"
 
 #: templates/users/plmobjects.html:15
 msgid "Last edited objects"
-msgstr ""
+msgstr "最后被编辑的对象"
 
 #: templates/users/sponsor.html:10
 msgid "Click here to sponsor several users from a CSV file."
-msgstr ""
+msgstr "点击此处来支持来自CSV文件的用户"
 
 #: templates/users/sponsor.html:16
 msgid "You can not sponsor a new user since you are not a contributor."
-msgstr ""
+msgstr "您无法领入用户，因为您不是一名贡献者"
+
+#, fuzzy
+#~ msgid "User"
+#~ msgstr "用户名"
+
+#~ msgid "File"
+#~ msgstr "文件"
+
+#, fuzzy
+#~ msgid "State"
+#~ msgstr "状态"
+
+#~ msgid "User who promoted/demoted the object"
+#~ msgstr "使用者确认或者拒绝目标"
+
+#~ msgid "Date"
+#~ msgstr "日期"
+
+#~ msgid "PASSWORD"
+#~ msgstr "密码"
+
+#~ msgid ""
+#~ "\n"
+#~ "One comment has been posted.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "一条评论已经被提交\n"
+
+#~ msgid "Your account"
+#~ msgstr "您的账户"
+
+#~ msgid "Click here to edit your personal information."
+#~ msgstr "点击此处编辑您的个人信息"
+
+#~ msgid ""
+#~ "Here is the list of parts connected to the original document. Do you want "
+#~ "to connect them to new document?"
+#~ msgstr "以下是连接到原始文件的部件列表。您希望连接它们至新的文件么？"
+
+#~ msgid "Click here to create a new object."
+#~ msgstr "点击此处来创建新的对象"
+
+#~ msgid "CREATE !"
+#~ msgstr "创建！"
+
+#~ msgid "Import"
+#~ msgstr "导入"
+
+#~ msgid "Import a BOM"
+#~ msgstr "导入一个命名"
+
+#, fuzzy
+#~ msgid "enhancement"
+#~ msgstr "管理"
+
+#~ msgid "cad"
+#~ msgstr "cao"
+
+#~ msgid "FIND"
+#~ msgstr "寻找"
+
+#~ msgid "Reference"
+#~ msgstr "引用"
+
+#~ msgid "Rev."
+#~ msgstr "更改"
+
+#~ msgid "Name"
+#~ msgstr "名"
+
+#~ msgid "active,inactive"
+#~ msgstr "活跃，不活跃"
+
+#~ msgid "Revision"
+#~ msgstr "更改"
+
+#~ msgid "e-mail."
+#~ msgstr "电子邮件"
+
+#~ msgid "e-mail"
+#~ msgstr "电子邮件"
+
+#~ msgid "Add"
+#~ msgstr "添加"
