@@ -499,7 +499,7 @@ class PLMObjectController(Controller):
         if self._user.username == settings.COMPANY:
             # the company is like a super user
             return True
-        if not bool(self.group.user_set.filter(id=self._user.id)):
+        if not self.group.user_set.filter(id=self._user.id).exists():
             if raise_:
                 raise PermissionError("action not allowed for %s" % self._user)
             else:
