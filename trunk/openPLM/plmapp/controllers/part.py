@@ -601,7 +601,7 @@ class PartController(PLMObjectController):
 
         if isinstance(document, PLMObjectController):
             document = document.object
-        return bool(self.documentpartlink_part.filter(document=document))
+        return self.documentpartlink_part.filter(document=document).exists()
     
     def check_attach_document(self, document, detach=False):
         if not hasattr(document, "is_document") or not document.is_document:

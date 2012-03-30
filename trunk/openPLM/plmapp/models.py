@@ -912,10 +912,10 @@ class Document(PLMObject):
         """
         if not self._is_promotable():
             return False
-        if not bool(self.files):
+        if not self.files.exists():
             self._promotion_errors.append(_("This document has no files."))
             return False
-        if bool(self.files.filter(locked=True)):
+        if self.files.filter(locked=True).exists():
             self._promotion_errors.append(_("Some files are locked."))
             return False
         return True
