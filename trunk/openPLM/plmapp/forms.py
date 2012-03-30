@@ -259,7 +259,7 @@ class PLMObjectForm(forms.Form):
     reference = forms.CharField()
     revision = forms.CharField()
 
-class AddChildForm(PLMObjectForm):
+class AddChildForm(PLMObjectForm, PartTypeForm):
     quantity = forms.FloatField()
     order = forms.IntegerField()
     unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
@@ -406,7 +406,7 @@ SelectParentFormset = formset_factory(form=SelectParentForm, extra=0)
 
 
 
-class AddRelPartForm(PLMObjectForm):
+class AddRelPartForm(PLMObjectForm, PartTypeForm):
     pass
     
 class ModifyRelPartForm(RelPartForm):
@@ -440,7 +440,7 @@ def get_file_formset(controller, data=None):
         formset = FileFormset(data=data)
     return formset
 
-class AddDocCadForm(PLMObjectForm):
+class AddDocCadForm(PLMObjectForm, DocumentTypeForm):
     pass
     
 class ModifyDocCadForm(forms.ModelForm):

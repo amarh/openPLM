@@ -28,6 +28,7 @@ import urlparse
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.forms import widgets
 from django.utils.simplejson import JSONEncoder
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponse, HttpResponseForbidden
@@ -163,6 +164,7 @@ def ajax_add_child(request, part_id):
         else:
             data["result"] = "error"
             data["error"] = "invalid form"
+    form.fields["type"].widget = widgets.TextInput()
     for field in ("type", "reference", "revision"):
         form.fields[field].widget.attrs['readonly'] = 'on' 
     data.update({
@@ -194,9 +196,9 @@ def ajax_attach(request, plmobject_id):
     plmobject = get_obj_by_id(plmobject_id, request.user)
     data = {}
     if request.GET:
-        form = forms.AddRelPartForm(initial=request.GET)
+        form = forms.PLMObjectForm(initial=request.GET)
     else:
-        form = forms.AddRelPartForm(request.POST)
+        form = forms.PLMObjectForm(request.POST)
         if form.is_valid():
             attached = get_obj_from_form(form, request.user)
             if hasattr(plmobject, "attach_to_document"):
@@ -226,7 +228,8 @@ def ajax_can_attach(request, plmobject_id):
     plmobject = get_obj_by_id(plmobject_id, request.user)
     data = {"can_attach" : False}
     if isinstance(plmobject, PLMObjectController) and request.GET:
-        form = forms.AddRelPartForm(request.GET)
+        form = forms.PLMObjectForm(request.GET)
+        
         if form.is_valid():
             attached = get_obj_from_form(form, request.user)
             if attached.check_readable(False):
