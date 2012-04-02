@@ -18,24 +18,17 @@
 
 
 import os, os.path
-
-
-from OCC.TDataStd import *
-from OCC.STEPCAFControl import *
-
-from OCC import XCAFApp, TDocStd, XCAFDoc, gp
+from OCC.STEPCAFControl import STEPCAFControl_Reader
+from OCC import XCAFApp, TDocStd , XCAFDoc
+from OCC.TCollection import TCollection_ExtendedString , TCollection_AsciiString
+from OCC.TDF import TDF_LabelSequence , TDF_Tool , TDF_Label
 from OCC.Utils.Topology import Topo
-from OCC.Quantity import *
-
-
-from OCC.TCollection import *
-from OCC.TopoDS import *
-from OCC.XSControl import *
-from OCC.STEPControl import *
-from OCC.TopLoc import TopLoc_Location
-from OCC.TDF import *
-from openPLM.document3D.mesh import *
-from openPLM.document3D.models import *
+from OCC.TDataStd import Handle_TDataStd_Name ,TDataStd_Name_GetID
+from OCC.Quantity import Quantity_Color
+from mesh import *
+from classes import *
+from OCC.GarbageCollector import garbage
+#from openPLM.document3D.models import media3DGeometryFile
 """
 l_SubShapes = TDF_LabelSequence()
 shape_tool.GetSubShapes(label,l_SubShapes)
@@ -47,73 +40,79 @@ class NEW_STEP_Import(object):
 
    
     
-    def __init__(self, doc_file):
-        self.doc_file = doc_file
+    def __init__(self, file_path,id=None):
+
+        self.file =file_path.encode("utf-8")
+        self.id =id
         self.shapes_simples = [] #an empty string
         self.product_relationship_arbre=None
         self.shapes_simples=[]
+        basefile=os.path.basename(self.file)
+        fileName, fileExtension = os.path.splitext(basefile)
+        self.fileName=fileName
 
        
-        STEPReader = STEPCAFControl_Reader()        
-        
-        if not STEPReader.ReadFile(self.doc_file.file.path.encode()) is 1:
-            return False
+        self.STEPReader = STEPCAFControl_Reader()  
+
+        if not self.STEPReader.ReadFile(self.file) == 1:
+            print "False"
                
-        h_doc = TDocStd.Handle_TDocStd_Document()
-        app = XCAFApp.GetApplication().GetObject()
-        app.NewDocument(TCollection_ExtendedString("MDTV-CAF"),h_doc)
+        self.h_doc = TDocStd.Handle_TDocStd_Document()
+        self.app = XCAFApp.GetApplication().GetObject()
+        self.app.NewDocument(TCollection_ExtendedString("XmlXCAF"),self.h_doc)
+        """
+          Formats.Append(TCollection_ExtendedString ("MDTV-XCAF"));  
+          Formats.Append(TCollection_ExtendedString ("XmlXCAF"));
+          Formats.Append(TCollection_ExtendedString ("XmlOcaf"));
+          Formats.Append(TCollection_ExtendedString ("MDTV-Standard"));
+        """
 
-        
-        STEPReader.Transfer(h_doc)
+        self.STEPReader.Transfer(self.h_doc)
 
-        doc = h_doc.GetObject()
-        h_shape_tool = XCAFDoc.XCAFDoc_DocumentTool_ShapeTool(doc.Main())
-        h_colors_tool = XCAFDoc.XCAFDoc_DocumentTool_ColorTool(doc.Main())
-        self.shape_tool = h_shape_tool.GetObject()
-        color_tool=h_colors_tool.GetObject()
+        self.doc = self.h_doc.GetObject()
+        self.h_shape_tool = XCAFDoc.XCAFDoc_DocumentTool_ShapeTool(self.doc.Main())
+        self.h_colors_tool = XCAFDoc.XCAFDoc_DocumentTool_ColorTool(self.doc.Main())
+        self.shape_tool = self.h_shape_tool.GetObject()
+        self.color_tool=self.h_colors_tool.GetObject()
 
-        shapes = TDF_LabelSequence()
-        self.shape_tool.GetShapes(shapes)        
-        for i in range(shapes.Length()):
-            if self.shape_tool.IsSimpleShape(shapes.Value(i+1)):
-                compShape=self.shape_tool.GetShape(shapes.Value(i+1))
+        self.shapes = TDF_LabelSequence()
+        self.shape_tool.GetShapes(self.shapes)        
+        for i in range(self.shapes.Length()):
+            if self.shape_tool.IsSimpleShape(self.shapes.Value(i+1)):
+                compShape=self.shape_tool.GetShape(self.shapes.Value(i+1))
                 t=Topo(compShape)
                 if t.number_of_vertices() > 0:
-                    self.shapes_simples.append(simple_shape(GetLabelNom(shapes.Value(i+1)),compShape,colour_chercher(shapes.Value(i+1),color_tool,self.shape_tool)))
+                    self.shapes_simples.append(simple_shape(GetLabelNom(self.shapes.Value(i+1)),compShape,colour_chercher(self.shapes.Value(i+1),self.color_tool,self.shape_tool)))
                 else:
                     pass
                     #print "Not information found for shape : ", GetLabelNom(shapes.Value(i+1))        
 
-           
-    def procesing_geometrys(self):
-        from openPLM.document3D.models import GeometryFile
-        
-        
+        ws=self.STEPReader.Reader().WS().GetObject()
+        model=ws.Model().GetObject()
+        model.Clear()          
+    def procesing_geometrys(self,location):
 
+        files_index=""
 
-        fileName, fileExtension = os.path.splitext(self.doc_file.filename)   
-        for i, shape in enumerate(self.shapes_simples):
-                new_GeometryFile= GeometryFile()
-                new_GeometryFile.stp = self.doc_file
-                
-                name = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
-                path = os.path.join(new_GeometryFile.file.storage.location, name)
-                mesh_shape(shape,path.encode(),"_"+str(i)+"_"+str(self.doc_file.id))
-                new_GeometryFile.file = name
-                new_GeometryFile.index = i # to evade product.geometry=0
-                new_GeometryFile.save()
-                    
+        for index, shape in enumerate(self.shapes_simples):
+                name=get_available_name(location,self.fileName+".geo")
+                path=os.path.join(location, name)
+                mesh_shape(shape,path,"_"+str(index)+"_"+str(self.id))
+                files_index+="GEO:"+name+" , "+str(index)+"\n"
+             
      
-
+        return files_index        
 
     def generate_product_arbre(self):
     
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
-            
+        deep=0
         for i in range(roots.Length()):
-            self.product_relationship_arbre=Product(GetLabelNom(roots.Value(i+1)),self.doc_file.id,roots.Value(i+1)) 
-            parcour_product_relationship_arbre(roots.Value(i+1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,self.doc_file.id)
+            
+            self.product_relationship_arbre=Product(GetLabelNom(roots.Value(i+1)),deep,roots.Value(i+1),self.id,self.file) 
+            parcour_product_relationship_arbre(roots.Value(i+1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
+            (deep+1),self.id,self.product_relationship_arbre)
        
         return self.product_relationship_arbre
         
@@ -139,12 +138,12 @@ class simple_shape():
     
     
     
-def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,doc_id):
+def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,deep,doc_id,product_root):
 
 
-
+    #colour_chercher(label,color_tool,shape_tool)
     if shape_tool.IsAssembly(label):
-
+        
         l_c = TDF_LabelSequence()
         shape_tool.GetComponents(label,l_c)
         for i in range(l_c.Length()):
@@ -159,23 +158,31 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
                 if reference_found:
                         link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))
                 else:
-                        
-                    product.links.append(Link(Product(GetLabelNom(label_reference),doc_id,label_reference)))
-                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))
-                                
-                    parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,shapes_simples,doc_id)
+                    
 
+                    product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root)        
+                    if product_assembly:
+                        product.links.append(Link(product_assembly))
+         
+                    else:      
+                        product.links.append(Link(Product(GetLabelNom(label_reference),deep,label_reference,doc_id)))                               
+                        parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,shapes_simples,deep+1,doc_id,product_root)
+                        
+                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))  
     else:            
         compShape=shape_tool.GetShape(label)
-        #nous cherchons sa correspondance dans la liste de shapes simples / si le shape navais pas de vertices on ne trouvera aucun shape                         
+
+        #nous cherchons sa correspondance dans la liste de shapes simples / si le shape n avais pas de vertices on ne trouvera aucun shape                         
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
                 product.set_geometry(index) # to evade product.geometry=0
-                 
                    
 
                
 
+
+              
+    
 
         
         
@@ -217,10 +224,4 @@ def colour_chercher(label,color_tool,shape_tool):
         return c
 
     return False
-                   
-
-
-            
-            
-           
 

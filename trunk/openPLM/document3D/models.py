@@ -2,19 +2,19 @@ from django.db import models
 from django.contrib import admin
 from openPLM.plmapp.controllers import DocumentController
 from openPLM.plmapp.models import *
-#from openPLM.plmapp.filehandlers import HandlersManager
 from OCC.gp import *
 from django.db.models import Q
+from openPLM.document3D.classes import *
+import subprocess
+import tempfile
+import time
 
 
 
-#from django.db.models import get_model
 
 
 
 
-#eliminar navegabilidad
-#delete del model elimina el stp de docs/stp/ ??
 
 
 
@@ -33,51 +33,85 @@ class Document3D(Document):
         return items
 
     def get_content_and_size(self, doc_file):
-        from openPLM.document3D.composer import composer
+        from openPLM.document3D.arborescense import read_ArbreFile  
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
-            tempfile = composer(doc_file, self.owner)
-            size = os.path.getsize(tempfile.name)
-            return tempfile, size
+            
+
+            product=read_ArbreFile(doc_file,recursif=True)# last True to generate arbre whit doc_file_path insteant doc_file_id
+            
+            if product and product.is_decomposed:
+                temp_file = tempfile.NamedTemporaryFile(delete=True)
+                temp_file.write(json.dumps(data_for_product(product)))
+                temp_file.seek(0)   
+                if subprocess.call(["python", "document3D/composer.py",temp_file.name]) == 0:
+                    size =os.path.getsize(temp_file.name) 
+                    return temp_file, size                   
+                else:
+                    raise Document3D_link_Error 
+                
+            else:
+                return super(Document3D, self).get_content_and_size(doc_file)
+            
+            pass                
         else:
             return super(Document3D, self).get_content_and_size(doc_file)
 
-
-  
-        
-        
-        
-
-
-admin.site.register(Document3D)
+#admin.site.register(Document3D)
 
 
 
 from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
-def handle_step_file(doc_file_pk,object_id,user_id):
+def handle_step_file(doc_file_pk):
+
+
+
     import logging
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
-    from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import
-    from openPLM.document3D.arborescense import write_ArbreFile
     doc_file = DocumentFile.objects.get(pk=doc_file_pk)
-    user=User.objects.get(id=user_id)
-    object=Document3D.objects.get(id=object_id)
-    controller=Document3DController(object,user) 
+    temp_file = tempfile.TemporaryFile()
+    stdout = temp_file.fileno()
+    if subprocess.call(["python", "document3D/generate3D.py",doc_file.file.path,str(doc_file.id),settings.MEDIA_ROOT+"3D/"],stdout=stdout) == 0:
+        delete_ArbreFile(doc_file)
+        delete_GeometryFiles(doc_file)
+        generate_relations_BD(doc_file,stdout,temp_file)
 
+    else:
+        raise Document3D_link_Error
+        pass
 
-    delete_GeometryFiles(doc_file)
-
-    my_step_importer = NEW_STEP_Import(doc_file) 
-    my_step_importer.procesing_geometrys()
-    product_arbre=my_step_importer.generate_product_arbre()
-    write_ArbreFile(product_arbre,doc_file)
     
-   
-    return True
-            
-                           
+    
+    
 
+        
+def generate_relations_BD(doc_file,stdout,temp_file):              
+             
+    os.lseek(stdout, 0, 0)
+    for line in temp_file.readlines():
+        line=line.rstrip("\n")
+        if str.startswith(line,"GEO:"):
+            generateGeometry(line.lstrip("GEO:").split(" , "),doc_file)
+        if str.startswith(line,"ARB:"):
+            generateArborescense(line.lstrip("ARB:"),doc_file)
+
+
+def generateGeometry(name_index,doc_file):
+
+    new_GeometryFile= GeometryFile()
+    new_GeometryFile.stp = doc_file
+    new_GeometryFile.file = name_index[0]
+    new_GeometryFile.index = name_index[1]
+    new_GeometryFile.save()
+
+def generateArborescense(name,doc_file):
+
+    new_ArbreFile= ArbreFile()
+    new_ArbreFile.stp = doc_file
+    new_ArbreFile.file = name
+    new_ArbreFile.save()
+ 
 
 is_stp=Q(filename__iendswith=".stp") | Q(filename__iendswith=".step") 
 
@@ -95,8 +129,8 @@ class Document3DController(DocumentController):
             if self.object.files.filter(is_stp).exclude(id=doc_file.id):
                 self.delete_file(doc_file)
                 raise ValueError("Only one step documentfile allowed for each document3D") 
-            handle_step_file.delay(doc_file.pk,self.object.id,self._user.id)
-     
+            handle_step_file.delay(doc_file.pk)
+            #handle_step_file(doc_file.pk)    
               
         
                     
@@ -112,7 +146,7 @@ class Document3DController(DocumentController):
         super(Document3DController, self).delete_file(doc_file)
         
 
-    def deprecate_file(self, doc_file):
+    def deprecate_file(self, doc_file,by_decomposition=False):
     
     
     
@@ -122,8 +156,10 @@ class Document3DController(DocumentController):
         delete_ArbreFile(doc_file)          
         doc_file.deprecated=True
         doc_file.save()
-        self._save_histo("File deprecated", "file : %s" % doc_file.filename)           
-     
+        if by_decomposition:
+            self._save_histo("File deprecated for decomposition", "file : %s" % doc_file.filename)           
+        else:
+            self._save_histo("File deprecated", "file : %s" % doc_file.filename)    
 media3DGeometryFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")      
 class GeometryFile(models.Model):
     u"""
@@ -137,14 +173,14 @@ class GeometryFile(models.Model):
         return u"GeometryFile<%d:%s, %d>" % (self.stp.id,
             self.stp.filename, self.index)
  
-admin.site.register(GeometryFile)
+#admin.site.register(GeometryFile)
 
 def delete_GeometryFiles(doc_file):
 
 
     to_delete=GeometryFile.objects.filter(stp=doc_file) 
     list_files=list(to_delete.values_list("file", flat=True))
-    delete_files(list_files,media3DGeometryFile.location)
+    delete_files(list_files,media3DGeometryFile.location+"/")
     to_delete.delete()
     
  
@@ -159,7 +195,7 @@ def delete_ArbreFile(doc_file):
 
     to_delete=ArbreFile.objects.filter(stp=doc_file) 
     list_files=list(to_delete.values_list("file", flat=True))
-    delete_files(list_files,media3DArbreFile.location)
+    delete_files(list_files,media3DArbreFile.location+"/")
     to_delete.delete()   
     
 def delete_files(list_files,ext=""):
@@ -181,109 +217,13 @@ class Document3D_decomposer_Error(Exception):
         return u"Error while the file step was decomposed"
         
 class Document_part_doc_links_Error(Exception):
+    def __init__(self, to_delete=None):
+        self.to_delete=to_delete
+            
     def __unicode__(self):
         return u"Columns reference, type, revision are not unique"        
         
-class Product(object):
 
-    __slots__ = ("label_reference","name","doc_id","links","geometry","color")
-    
-    
-    def __init__(self,name,doc_id,label_reference=False,geometry=None,color=False):
-        #no tiene location
-        self.links = []
-        self.label_reference=label_reference
-        self.name=name
-        self.doc_id=doc_id   #cambiar por step product id
-        self.geometry=geometry
-        self.color=color
-    def set_geometry(self,geometry):
-        self.geometry=geometry
-       
-    
-class Link(object):
-
-    __slots__ = ("names","locations","product","quantity")
-    
-    
-    def __init__(self,product):
-  
-        self.names=[]           
-        self.locations=[]
-        self.product=product
-        self.quantity=0
-
-
-    def add_occurrence(self,name,Matrix_rotation):
-        if name==u' ' or name==u'':
-            self.names.append(self.product.name)    
-        else:
-            self.names.append(name)
-        self.locations.append(Matrix_rotation)
-        self.quantity=self.quantity+1
-
-        
-class Matrix_rotation(object):
-
-    __slots__ = ("x1","x2","x3","x4","y1","y2","y3","y4","z1","z2","z3","z4")
-    
-    
-    def __init__(self,transformation,list_coord=False):
-    
-        if list_coord:
-            self.x1=list_coord[0]           
-            self.x2=list_coord[1] 
-            self.x3=list_coord[2] 
-            self.x4=list_coord[3] 
-            self.y1=list_coord[4]         
-            self.y2=list_coord[5] 
-            self.y3=list_coord[6] 
-            self.y4=list_coord[7] 
-            self.z1=list_coord[8]         
-            self.z2=list_coord[9] 
-            self.z3=list_coord[10] 
-            self.z4=list_coord[11]    
-
-        else:   
-
-            m=transformation.VectorialPart()
-            gp=m.Row(1)
-            self.x1=gp.X()           
-            self.x2=gp.Y()
-            self.x3=gp.Z()
-            self.x4=transformation.Transforms()[0]
-            gp=m.Row(2)
-            self.y1=gp.X()          
-            self.y2=gp.Y()
-            self.y3=gp.Z()
-            self.y4=transformation.Transforms()[1]
-            gp=m.Row(3)
-            self.z1=gp.X()         
-            self.z2=gp.Y()
-            self.z3=gp.Z()
-            self.z4=transformation.Transforms()[2]   
-    def Transformation(self):
-        transformation=gp_Trsf()
-        transformation.SetValues(self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4,1,1)
-        return transformation     
-        
-    def to_array(self):    
-        return [self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4] 
-
-"""                    
-class Geometry(object):
-    
-    __slots__ = ("reference", "red", "green", "blue")
-    
-    def __init__(self,colour,ref):
-        self.reference=ref
-        if colour:
-            self.red=colour.Red()
-            self.green=colour.Green()
-            self.blue=colour.Blue()
-        else:
-            self.red = self.green = self.blue = 0        
-"""
 
 class Location_link(ParentChildLinkExtension):
 
@@ -337,7 +277,7 @@ class Location_link(ParentChildLinkExtension):
         return clone
         
         
-admin.site.register(Location_link)
+#admin.site.register(Location_link)
 register_PCLE(Location_link)
 
 def generate_extra_location_links(link,ParentChildLink):
@@ -371,5 +311,7 @@ def get_all_plmDocument3Dtypes_with_level():
     lst = []
     level=">>"
     get_all_subclasses_with_level(Document3D, lst , level)
-    return lst            
+    return lst 
+    
+               
     
