@@ -1,7 +1,7 @@
 from django import template
 from django.contrib.auth.models import User
 from openPLM.plmapp.controllers.user import UserController
-from openPLM.plmapp.models import PLMObject
+from openPLM.plmapp import models
 
 register = template.Library()
 
@@ -71,5 +71,35 @@ def is_plmobject(result):
     """
     Returns True if the object behind *result* is an instance of :class:`PLMObject.`
     """
-    return issubclass(result.model, PLMObject)
+    return issubclass(result.model, models.PLMObject)
+
+@models._cache_lifecycle_stuff
+def get_state_class(plmobject):
+    """
+    Returns the state class ("cancelled", "draft", "proposed", "official",
+    or "deprecated") of *plmobject*.
+    """
+    state, lifecycle = (plmobject.state_id, plmobject.lifecycle_id)
+    if lifecycle == models.get_cancelled_lifecycle().name:
+        return "cancelled"
+    lc = models.Lifecycle.objects.get(name=lifecycle)
+    if state == lc.official_state_id:
+        return "official"
+    if state == lc.first_state.name:
+        return "draft"
+    if state == lc.last_state.name:
+        return "deprecated"
+    return "proposed"
+
+@register.filter
+def result_class(result):
+    """
+    Returns a css class according to result.
+    """
+    if issubclass(result.model, models.PLMObject):
+        result.state_id = result.state
+        result.lifecycle_id = result.lifecycle
+        return "state-" + get_state_class(result)
+    return ""
+
 
