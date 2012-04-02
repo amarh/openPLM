@@ -40,7 +40,7 @@ import time
 import os, os.path
 from kjbuckets import  kjDict
 import time
-
+from OCC.GarbageCollector import garbage
 def mesh_shape(shape,filename,name):
     """ Take a topods_shape instance, returns the tesselated object"""
     ''' Connect a ode.Trimesh to this body. The mesh is generated from the MSH subpackage. vertices lits
@@ -51,6 +51,9 @@ def mesh_shape(shape,filename,name):
     - if quality_factor<1, the mesh will be less precise.
     By default, this argument is set to 1 : the default precision of the mesher is used.
     '''
+    #print "entro" 
+    #garbage.smart_purge()
+    #print "salgo"   
     quality_factor=0.3
     a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
 
@@ -63,7 +66,6 @@ def mesh_shape(shape,filename,name):
 
     output = open(filename,"w")
     output.write("//Computation for : %s\n"%shape.name)
-    
     output.write("var %s = new THREE.Geometry();\n"%name) 
     output.write("var material_for%s = new THREE.MeshBasicMaterial({opacity:0.5,shading:THREE.SmoothShading});\n"%name)
     
@@ -83,6 +85,7 @@ class QuickTriangleMesh(object):
 '''
     def __init__(self,shape,quality_factor):
         self._shape = shape
+        #self._shape.was_purged
         bbox = Bnd_Box()
         BRepBndLib_Add(self._shape, bbox) 
         x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
@@ -159,10 +162,9 @@ class QuickTriangleMesh(object):
                             index+=1
                         output.write("%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"%(name,_points.neighbors(p1_coord)[0],_points.neighbors(p2_coord)[0],_points.neighbors(p3_coord)[0],the_normal(index1).X(),the_normal(index1).Y(), the_normal(index1).Z(),the_normal(index2).X(),the_normal(index2).Y(), the_normal(index2).Z(),the_normal(index3).X(),the_normal(index3).Y(), the_normal(index3).Z()))                            
 
-                    
+         
         return True
 
 
 
- 
 

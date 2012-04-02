@@ -1,11 +1,15 @@
 from OCC.TopLoc import TopLoc_Location
 from OCC.TDF import *
 import os, os.path
-import django.utils.simplejson as json
 from OCC.gp import *
 from openPLM.plmapp.controllers.part import PartController
-from openPLM.document3D.models import * 
-   
+from openPLM.document3D.classes import *
+import openPLM.document3D.classes as classes 
+from openPLM.document3D.models import Document3D , ArbreFile , Location_link , is_stp , GeometryFile
+from openPLM.plmapp.models import *
+from openPLM.plmapp.models import DocumentFile
+import django.utils.simplejson as json
+    
 def generate_javascript_for_3D(product):
 
     if product:
@@ -25,8 +29,7 @@ def generate_javascript_for_3D(product):
         
         javascript_menu[0]+='</li></ul>' 
         javascript_menu[0]+='";\ndocument.getElementById("menu_").appendChild(element);\n}\n'
-        #javascript[0]+="object3D.matrixAutoUpdate = false;\n" 
-        #javascript[0]+="object3D.updateMatrix();\n"
+
         return javascript_menu[0]+javascript[0]
     else:
         return False
@@ -76,13 +79,13 @@ def generate_javascript(product,numeration,javascript,loc,javascript_menu,old_nu
 def generate_functions_visibilty_parts(numeration,parts_generated):
 
 
-        parts_definition=""
-        function=str(function_head % (locals()))
-        for part_numeration_child in parts_generated:
-            parts_definition+="var part%s=new THREE.Object3D();\n"%part_numeration_child
-            function+=str(function_change_part % (locals()))
-        function+="}\n"
-        return parts_definition+function        
+    parts_definition=""
+    function=str(function_head % (locals()))
+    for part_numeration_child in parts_generated:
+        parts_definition+="var part%s=new THREE.Object3D();\n"%part_numeration_child
+        function+=str(function_change_part % (locals()))
+    function+="}\n"
+    return parts_definition+function        
 
 
 
@@ -91,12 +94,12 @@ def generate_functions_visibilty_object(numeration,object_numeration,product,loc
 
 
             
-        reference=product.geometry
-        part_id=str(product.doc_id)        
-                                               
-        function=str(function_head % (locals()))+str(function_change_object % (locals()))+"}\n"
-      
-        return generate_object(loc,object_numeration,reference,part_id)+function     
+    reference=product.geometry
+    part_id=str(product.doc_id)        
+                                           
+    function=str(function_head % (locals()))+str(function_change_object % (locals()))+"}\n"
+  
+    return generate_object(loc,object_numeration,reference,part_id)+function     
 
 
 
@@ -134,49 +137,55 @@ def generate_object(loc,numeration,reference,part_id):
      
     return locate
     
-def read_ArbreFile(doc_file,user=None):
+def read_ArbreFile(doc_file,recursif=None):
 
  
-    try:     
+    try:
         new_ArbreFile=ArbreFile.objects.get(stp=doc_file)
     except:
         return False
-    product=generate_product(json.loads(new_ArbreFile.file.read()))
-    if user:
-        add_child_ArbreFile(user,doc_file,product)        
+
+    product=generateArbre(json.loads(new_ArbreFile.file.read()))
+    if recursif:
+        add_child_ArbreFile(doc_file,product,product,deep=1)        
             
-        
     return product
     
-     
-def add_child_GeometryFiles(user,doc_file,files_to_add):
 
-    stp_related ,list_loc=get_step_related(user,doc_file)
+    
+    
+def add_child_GeometryFiles(doc_file,files_to_add):
+#ahora puede tener 2 veces el mismo recorrido
+    stp_related ,list_loc=get_step_related(doc_file)
     for stp in stp_related: 
         files_to_add+=list(GeometryFile.objects.filter(stp=stp))
-        add_child_GeometryFiles(user,stp,files_to_add)
+        add_child_GeometryFiles(stp,files_to_add)
                         
                             
                             
-def add_child_ArbreFile(user,doc_file,product):
+def add_child_ArbreFile(doc_file,product,product_root,deep):
 
 
-    stp_related,list_loc=get_step_related(user,doc_file)
+    stp_related,list_loc=get_step_related(doc_file)
 
     for i,stp in enumerate(stp_related):    
-        try:
-            new_ArbreFile=ArbreFile.objects.get(stp=stp)
-            new_product=generate_product(json.loads(new_ArbreFile.file.read()))                                                      
-            product.links.append(Link(new_product))                           
-            for location in list_loc[i]:
-                product.links[-1].add_occurrence(location.name,Matrix_rotation(location.Transforms()))
-            add_child_ArbreFile(user,stp,new_product)                       
-        except:
-            pass
+        #try:
+        
+        new_ArbreFile=ArbreFile.objects.get(stp=stp)
+        new_product=generateArbre(json.loads(new_ArbreFile.file.read()),deep,product_root)                                                      
+        product.links.append(classes.Link(new_product))                             
+        for location in list_loc[i]:
+            product.links[-1].add_occurrence(location.name,Matrix_rotation(location.Transforms()))
+            
+    
+        add_child_ArbreFile(stp,new_product,product_root,deep+1)                       
+        #except:
 
-                                
+            #pass
 
-def get_step_related(user,doc_file,locations=None):
+                             
+
+def get_step_related(doc_file,locations=None):
     stp_related=[]
     list_loc=[]
     Doc3D=Document3D.objects.get(id=doc_file.document.id)
@@ -188,7 +197,7 @@ def get_step_related(user,doc_file,locations=None):
             locations=list(Location_link.objects.filter(link=list_link[i]))
             if locations: 
                 part_child=list_link[i].child
-                part_controller=PartController(part_child,user)
+                part_controller=PartController(part_child,None)
                 list_doc=part_controller.get_attached_documents()
                 
                 for Doc_Part_Link in list_doc:
@@ -206,30 +215,16 @@ def get_step_related(user,doc_file,locations=None):
     return stp_related , list_loc
                             
                                                        
-def generate_product(arbre):
-    # no vamos a coger label cuando leemos de la bd    
-    label_reference=False
-    product=Product(arbre[0][0],arbre[0][1],label_reference,arbre[0][2])
-    for i in range(len(arbre)-1):
-        product.links.append(generate_link(arbre[i+1]))     
-    return product
+
+    
+    
 
         
-def generate_link(arbre):
-  
-    product=generate_product(arbre[1])
-    link=Link(product)
-    for i in range(len(arbre[0])):
-        link.add_occurrence(arbre[0][i][0],Matrix_rotation(False,arbre[0][i][1]))     
-    return link
-    
-    
-    
-def write_ArbreFile(product,doc_file):
+def generate_ArbreFile(product,doc_file):
 
 
 
-    delete_ArbreFile(doc_file)
+    #delete_ArbreFile(doc_file)
     
     
     data=data_for_product(product)
@@ -252,29 +247,7 @@ def write_ArbreFile(product,doc_file):
     
     
                 
-def data_for_product(product):
-    output=[]
-
-    output.append([product.name,product.doc_id,product.geometry])        
-
-        
-    for link in product.links:
-        output.append(data_for_link(link))    
-    return output            
-
-               
-def data_for_link(link):
-
-    
-    output=[]    
-    name_loc=[]
-    for i in range(link.quantity):             
-        name_loc.append([link.names[i],link.locations[i].to_array()]) 
-               
-    output.append(name_loc)        
-    output.append(data_for_product(link.product))
-        
-    return output    
+ 
     
    
 

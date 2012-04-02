@@ -7,7 +7,8 @@ class Doc_Part_type_Form(forms.Form):
     LIST_parts = get_all_parts_with_level()
     type_part = forms.TypedChoiceField(choices=LIST_parts,
             label='', initial="Part")
-    
+    #deep = forms.IntegerField(label='')
+    #deep.widget.attrs["style"] = 'display:none;'    
 class Form_save_time_last_modification(forms.Form):
 
     last_modif_time = forms.DateTimeField()
