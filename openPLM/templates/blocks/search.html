@@ -29,7 +29,7 @@
             <ul class="Result">
             {% endif %}
 
-            <li class="Result">
+            <li class="Result {{result|result_class}}">
             {% if navigate_bool %}
                 {% if result|is_plmobject %}
                     <div class="toolbar">
