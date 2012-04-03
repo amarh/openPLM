@@ -1,9 +1,9 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController , ArbreFile ,GeometryFile
+from openPLM.document3D.models import  Document3DController , ArbreFile ,GeometryFile , is_decomposable
 from openPLM.plmapp.models import  DocumentFile
 from django.core.files import File
 from openPLM.document3D.arborescense import read_ArbreFile
-from openPLM.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
+#from openPLM.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
 from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import ,GetLabelNom
 from OCC.TDF import *
 class decomposer_Test(CommonViewTest):

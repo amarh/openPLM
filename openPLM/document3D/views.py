@@ -3,9 +3,8 @@ from openPLM.document3D.forms import *
 from openPLM.document3D.models import *
 from openPLM.document3D.arborescense import *
 from openPLM.document3D.classes import *
-from openPLM.document3D.decomposer import *
 from openPLM.plmapp.forms import *
-import openPLM.plmapp.models as models
+from openPLM.plmapp.models import get_all_plmobjects
 from django.db import transaction
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponseForbidden
@@ -41,6 +40,7 @@ def display_3d(request, obj_ref, obj_revi):
         GeometryFiles=[]
         javascript_arborescense=False
     else:
+        #puede haberlos repetidos, arreglar
         GeometryFiles=list(GeometryFile.objects.filter(stp=doc_file))
         add_child_GeometryFiles(doc_file,GeometryFiles)
         product=read_ArbreFile(doc_file,True)
@@ -163,7 +163,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             native_related.save(False)
                     else:
 
-                        decomposer_all(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
+                        decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
   
 
@@ -330,7 +330,7 @@ def clear_form(request, part_type_formset, bom_formset, creation_formset):
         for form in part_type_formset.forms:
             options=form.cleaned_data
             part = options["type_part"]
-            cls = models.get_all_plmobjects()[part]
+            cls = get_all_plmobjects()[part]
             part_form = get_creation_form(request.user, cls, request.POST,
                     prefix=str(index*2))
             if not part_form.is_valid():#son necesarios?

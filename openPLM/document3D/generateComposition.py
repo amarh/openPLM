@@ -18,7 +18,7 @@ from classes import generateArbre
 def composer(temp_file_name):
 
 
-
+    
     output = open(temp_file_name.encode(),"r")
     product=generateArbre(json.loads(output.read()))
     output.close()

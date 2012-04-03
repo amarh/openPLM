@@ -127,8 +127,6 @@ def generateArbre(arbre,deep=0,product_root=None):
     label_reference=False
     product_assembly=search_assembly(arbre[0][0],label_reference,arbre[0][1],product_root)            
     if product_assembly:
-        print "encontrado"
-
         return product_assembly 
     else:    
         product=Product(arbre[0][0],deep,label_reference,arbre[0][1],arbre[0][3],arbre[0][2])
@@ -191,4 +189,5 @@ def data_for_link(link):
     output.append(name_loc)        
     output.append(data_for_product(link.product))
         
-    return output   
+    return output
+ 
