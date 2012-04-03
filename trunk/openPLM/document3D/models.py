@@ -1,3 +1,5 @@
+import os.path
+
 from django.db import models
 from django.contrib import admin
 from openPLM.plmapp.controllers import DocumentController
@@ -5,14 +7,19 @@ from openPLM.plmapp.models import *
 from OCC.gp import *
 from django.db.models import Q
 from openPLM.document3D.classes import *
+from openPLM.document3D.arborescense import *
 import subprocess
 import tempfile
 import time
+from django.core.files import File
+import django.utils.simplejson as json
+from openPLM.plmapp.controllers import get_controller
+from OCC.GarbageCollector import garbage
 
+def new_collect_object(self, obj_deleted):
+        self._kill_pointed()
 
-
-
-
+garbage.collect_object=new_collect_object
 
 
 
@@ -32,8 +39,7 @@ class Document3D(Document):
         items.extend(["3D"])
         return items
 
-    def get_content_and_size(self, doc_file):
-        from openPLM.document3D.arborescense import read_ArbreFile  
+    def get_content_and_size(self, doc_file): 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
             
@@ -43,8 +49,10 @@ class Document3D(Document):
             if product and product.is_decomposed:
                 temp_file = tempfile.NamedTemporaryFile(delete=True)
                 temp_file.write(json.dumps(data_for_product(product)))
-                temp_file.seek(0)   
-                if subprocess.call(["python", "document3D/composer.py",temp_file.name]) == 0:
+                temp_file.seek(0)
+                dirname = os.path.dirname(__file__)
+                composer = os.path.join(dirname, "generateComposition.py")
+                if subprocess.call(["python", composer, temp_file.name]) == 0:
                     size =os.path.getsize(temp_file.name) 
                     return temp_file, size                   
                 else:
@@ -57,7 +65,7 @@ class Document3D(Document):
         else:
             return super(Document3D, self).get_content_and_size(doc_file)
 
-#admin.site.register(Document3D)
+admin.site.register(Document3D)
 
 
 
@@ -173,7 +181,7 @@ class GeometryFile(models.Model):
         return u"GeometryFile<%d:%s, %d>" % (self.stp.id,
             self.stp.filename, self.index)
  
-#admin.site.register(GeometryFile)
+admin.site.register(GeometryFile)
 
 def delete_GeometryFiles(doc_file):
 
@@ -226,7 +234,7 @@ class Document_part_doc_links_Error(Exception):
 
 
 class Location_link(ParentChildLinkExtension):
-
+    #redefinir el garbage collector
     x1=models.FloatField(default=lambda: 0)          
     x2=models.FloatField(default=lambda: 0) 
     x3=models.FloatField(default=lambda: 0) 
@@ -277,7 +285,7 @@ class Location_link(ParentChildLinkExtension):
         return clone
         
         
-#admin.site.register(Location_link)
+admin.site.register(Location_link)
 register_PCLE(Location_link)
 
 def generate_extra_location_links(link,ParentChildLink):
@@ -311,7 +319,163 @@ def get_all_plmDocument3Dtypes_with_level():
     lst = []
     level=">>"
     get_all_subclasses_with_level(Document3D, lst , level)
-    return lst 
+    return lst
     
+     
+@task(soft_time_limit=60*25,time_limit=60*25)
+def decomposer_all(stp_file_pk,old_product,part_pk,native_related_pk,user_pk):
+#old product debe estar actualizado con los path de los ghots y las id
+
+    
+    try:
+        stp_file = DocumentFile.objects.get(pk=stp_file_pk)
+        ctrl=get_controller(stp_file.document.type)
+        user=User.objects.get(pk=user_pk)
+        ctrl=ctrl(stp_file.document,user)
+        
+        product=generateArbre(json.loads(old_product))   
+
+        new_stp_file=DocumentFile()
+        name = new_stp_file.file.storage.get_available_name(product.name+".stp".encode("utf-8"))
+        new_stp_path = os.path.join(new_stp_file.file.storage.location, name)
+        f = File(open(new_stp_path, 'w'))   
+        f.close()
+        
+        
+        temp_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_file.write(old_product)
+        temp_file.seek(0)   
+        if subprocess.call(["python", "document3D/generateDecomposition.py",stp_file.file.path,temp_file.name,f.name]) == 0:
+            update_child_files_BD(product,user) 
+            update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part_pk)
                
+        else:
+
+            raise Document3D_link_Error      
+    
+    except Exception as excep:
+        print unicode(excep)
+        raise excep
+        
+    finally:
+        if not native_related_pk==None:
+            native_related = DocumentFile.objects.get(pk=native_related_pk)            
+            native_related.deprecated=False
+            native_related.save(False)
+        stp_file.locked = False
+        stp_file.locker = None
+        stp_file.save(False)
+ 
+        
+    
+    
+def update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part_pk):
+    
+    new_stp_file.filename=product.name+".stp".encode("utf-8")
+    new_stp_file.file=name
+    new_stp_file.size=f.size
+    new_stp_file.document=ctrl.object
+    new_stp_file.save()
+    os.chmod(new_stp_file.file.path, 0400)  
+    ctrl._save_histo("File generated by decomposition", "file : %s" % new_stp_file.filename)    
+    product.links=[]
+    product.doc_id=new_stp_file.id
+    product.doc_path=new_stp_file.file.path
+    generate_ArbreFile(product,new_stp_file)
+     
+    ctrl.deprecate_file(stp_file,by_decomposition=True)                          
+    Doc3D=Document3D.objects.get(id=ctrl.object.id)
+    Doc3D.PartDecompose=Part.objects.get(pk=part_pk)
+    Doc3D.save()
+    
+def update_child_files_BD(product,user):
+
+    for link in product.links:
+          
+        doc_file=DocumentFile.objects.get(id=link.product.doc_id)
+        doc_file.filename=link.product.name+".stp".encode("utf-8")
+        doc_file.no_index=False 
+        doc_file.size=os.path.getsize(doc_file.file.path) 
+        doc_file.locked = False
+        doc_file.locker = None
+        doc_file.save()
+        os.chmod(doc_file.file.path, 0400)   
+        index_reference=[0]
+        assigned_index=[]
+        
+        update_product(link.product,doc_file,index_reference,assigned_index,product.doc_id)
+        generate_ArbreFile(link.product,doc_file)
+                
+        ctrl=get_controller(doc_file.document.type)
+        ctrl=ctrl(doc_file.document,user)
+        ctrl._save_histo("File generated by decomposition", "file : %s" % doc_file.filename)
+    
+def is_decomposable(doc3d):
+
+    try:
+        stp_file=doc3d.files.get(is_stp, locked=False) #solo abra uno pero por si las moscas
+    except:
+        return False
+    if not stp_file.checkout_valid:
+        return False
+    # TODO: store in a table decomposable step files
+    # to not read its content
+    product=read_ArbreFile(stp_file,recursif=None)   
+    if product and product.links:
+        return stp_file      
+    return False
+
+
+def update_product(product,doc_file,index_reference,assigned_index,old_doc_id):
+
+    
+   
+    if not product.geometry==None:
+        copy_js(product,doc_file,index_reference,assigned_index,old_doc_id)           
+      
+    else:            
+        for link in product.links:
+            update_product(link.product,doc_file,index_reference,assigned_index,old_doc_id)
+            
+    product.doc_id=doc_file.id
+    product.deep-=1
+      
+    return True
+
+
+def copy_js(product,doc_file,index_reference,assigned_index,old_doc_id):
+    
+
+
+
+    if not assigned_index.count(product.geometry):
+
+        old_GeometryFile=GeometryFile.objects.get(stp__id=old_doc_id,index=product.geometry)
+        new_GeometryFile= GeometryFile()           
+
+        fileName, fileExtension = os.path.splitext(doc_file.filename)
+        
+           
+        new_GeometryFile.file = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
+        new_GeometryFile.stp = doc_file
+        new_GeometryFile.index = index_reference[0]
+        new_GeometryFile.save() 
+
+        
+        
+                       
+        infile = open(old_GeometryFile.file.path,"r")
+        outfile = open(new_GeometryFile.file.path,"w")
+        
+        for line in infile.readlines(): 
+            new_line=line.replace("_%s_%s"%(product.geometry,old_doc_id),"_%s_%s"%(index_reference[0],doc_file.id))
+            outfile.write(new_line)
+            
+            
+        assigned_index.append(product.geometry)
+        product.geometry=index_reference[0]
+        index_reference[0]+=1
+
+    else:
+        product.geometry=assigned_index.index(product.geometry)                 
     

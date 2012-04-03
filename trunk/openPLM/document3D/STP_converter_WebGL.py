@@ -34,7 +34,17 @@ l_SubShapes = TDF_LabelSequence()
 shape_tool.GetSubShapes(label,l_SubShapes)
 if(l_SubShapes.Length()>0):
     print "SubShapeDetectado ###################"#tengo un ejemplo en shapes con color
-"""    
+"""
+
+
+
+
+def new_collect_object(self, obj_deleted):
+        self._kill_pointed()
+
+garbage.collect_object=new_collect_object
+
+    
 class NEW_STEP_Import(object):
 
 

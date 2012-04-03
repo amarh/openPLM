@@ -3,9 +3,8 @@ from OCC.TDF import *
 import os, os.path
 from OCC.gp import *
 from openPLM.plmapp.controllers.part import PartController
-from openPLM.document3D.classes import *
-import openPLM.document3D.classes as classes 
-from openPLM.document3D.models import Document3D , ArbreFile , Location_link , is_stp , GeometryFile
+from classes import *
+import classes as classes 
 from openPLM.plmapp.models import *
 from openPLM.plmapp.models import DocumentFile
 import django.utils.simplejson as json
@@ -139,7 +138,7 @@ def generate_object(loc,numeration,reference,part_id):
     
 def read_ArbreFile(doc_file,recursif=None):
 
- 
+    from models import  ArbreFile 
     try:
         new_ArbreFile=ArbreFile.objects.get(stp=doc_file)
     except:
@@ -156,6 +155,7 @@ def read_ArbreFile(doc_file,recursif=None):
     
 def add_child_GeometryFiles(doc_file,files_to_add):
 #ahora puede tener 2 veces el mismo recorrido
+    from models import  GeometryFile
     stp_related ,list_loc=get_step_related(doc_file)
     for stp in stp_related: 
         files_to_add+=list(GeometryFile.objects.filter(stp=stp))
@@ -165,7 +165,7 @@ def add_child_GeometryFiles(doc_file,files_to_add):
                             
 def add_child_ArbreFile(doc_file,product,product_root,deep):
 
-
+    from models import  ArbreFile
     stp_related,list_loc=get_step_related(doc_file)
 
     for i,stp in enumerate(stp_related):    
@@ -186,6 +186,7 @@ def add_child_ArbreFile(doc_file,product,product_root,deep):
                              
 
 def get_step_related(doc_file,locations=None):
+    from models import Document3D ,Location_link , is_stp
     stp_related=[]
     list_loc=[]
     Doc3D=Document3D.objects.get(id=doc_file.document.id)
@@ -223,7 +224,7 @@ def get_step_related(doc_file,locations=None):
 def generate_ArbreFile(product,doc_file):
 
 
-
+    from models import  ArbreFile
     #delete_ArbreFile(doc_file)
     
     
