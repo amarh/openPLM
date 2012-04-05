@@ -1,8 +1,10 @@
+var arrows;
+var edges;
+var paper;
 function draw_edges(data, width, height){
     var r = Raphael("navholder", width, height);
-    
     var s = r.set();
-    var arrows = r.set();
+    arrows = r.set();
     $.each(data.edges, function (i,v) {
         var e = r.path(v);
         s.push(e);
@@ -26,9 +28,62 @@ function draw_edges(data, width, height){
     s.attr("stroke", "#343434");
     s.attr("stroke-width", 1.5);
     arrows.attr("stroke-width", 1.5);
+    edges = s;
+    paper = r;
 } 
 
 
+function scale_fit_all(){
+    var divnav = $("#DivNav");
+    var nav = $("#Navigate");
+    var nw = nav.width();
+    var nh = nav.height();
+    var dw = divnav.width();
+    var dh = divnav.height();
+    var factor = Math.min(Math.min((1.0*(nh-50))/dh, (1.0*(nw-50))/dw), 1);
+    scale(factor);
+    var origin = "50% 50%";
+
+    divnav.css({
+            "left" : (nw - dw) / 2 + "px",
+            top: (nh - dh) / 2 + "px",
+            "-moz-transform-origin" : origin,
+            "-o-transform-origin" : origin,
+            "-wevkit-transform-origin" : origin,
+            "-ms-transform-origin" : origin,
+            "transform-origin" : origin
+    });
+}
+
+var scale_level = 1;
+function scale(new_factor) {
+    var divnav = $("#DivNav");
+    var nav = $("#Navigate");
+    var nw = nav.width();
+    var left = parseFloat(divnav.css("left"));
+
+    var nh = nav.height();
+    var top = parseFloat(divnav.css("top"));
+    var orig_x = (nw / 2) - left;
+    var orig_y = (nh/2) - top;
+    var scale = 'scale(' + new_factor + ')';
+    var origin = orig_x + "px " + orig_y + "px"; 
+    divnav.css({
+            "-moz-transform" : scale,
+            "-o-transform" : scale,
+            "-webkit-transform" : scale,
+            "-ms-transform" : scale,
+            "transform" : scale,
+
+            "-moz-transform-origin" : origin,
+            "-o-transform-origin" : origin,
+            "-wevkit-transform-origin" : origin,
+            "-ms-transform-origin" : origin,
+            "transform-origin" : origin
+    });
+    scale_level = new_factor;
+    $("#slider-scale").slider('value', scale_level*100);
+}
 
 function show_thumbnails_panel(node){
     if ($("#navThumbnails").is(":hidden")) {
@@ -215,9 +270,11 @@ function show_attach(plmobject, form_child){
 }
 
 function init(){
+
+
         $("div.node").mouseenter(
         function () {
-            if (! ($(this).hasClass("drop_active") || $(this).hasClass("drop_hover"))){
+            if (scale_level >= 0.5){
                 $(this).find(".node_thumbnails").show();
                 $(this).find(".node_show_docs").show();
             }
@@ -326,23 +383,30 @@ function init(){
 }
 
 function center(){
-    var divNav = $("#DivNav")
-    var main = $("#DivNav div.main_node");
-    var nw = $("#Navigate").width();
+    var divNav = $("#DivNav");
+    var nav = $("#Navigate");
+    var main = divNav.children("div.main_node:first");
+    var nw = nav.width();
     var dw = divNav.width();
     var mw = main.width();
     var left = parseInt(main.css("left"));
     var l = (nw - mw) / 2;
 
-    var nh= $("#Navigate").height();
+    var nh= nav.height();
     var dh = divNav.height();
     var mh = main.height();
     var top = parseInt(main.css("top"));
     var t = (nh - mh) / 2;
+    var origin = "50% 50%";
 
     divNav.css({
-        "left" : (l - left) + "px",
-        top: (t - top) + "px"
+            "left" : (l - left) + "px",
+            top: (t - top) + "px",
+            "-moz-transform-origin" : origin,
+            "-o-transform-origin" : origin,
+            "-wevkit-transform-origin" : origin,
+            "-ms-transform-origin" : origin,
+            "transform-origin" : origin
     });
 
 };
@@ -418,6 +482,29 @@ cursor: 'crosshair'
         $.Topic("hide_left_panel").subscribe(function (){
                 $("#DivNav").css({left : "+=330px"});
         });
+
+		$( "#slider-scale" ).slider({
+			orientation: "vertical",
+			range: "min",
+			min: 5,
+            step: 5,
+			max: 200,
+			value: 100,
+			slide: function( event, ui ) {
+				scale(ui.value / 100);
+			}
+		});
+        $("#zoom-fit-all").button().click(scale_fit_all);
+        $("#zoom-original").button().click(function (){ center(); scale(1);});
+        $("#zoom-in").button().click(function () {
+                if (scale_level < 1.95){
+                    scale(scale_level + 0.05);
+                }});
+        $("#zoom-out").button().click(function () {
+                if (scale_level > 0.1){
+                    scale(scale_level - 0.05);
+                }});
+
         init();
         center();
 });
