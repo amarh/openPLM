@@ -452,7 +452,7 @@ class NavigationGraph(object):
                     title = area.get("title")
                     if title:
                         left, top, x2, y2 = map(int, area.get("coords").split(","))
-                        s = "position:absolute;z-index:3;top:%dpx;left:%dpx;" % (top, left)
+                        s = "top:%dpx;left:%dpx;" % (top, left)
                         title = linebreaks(title.replace("\\n", "\n"))
                         div = "<div class='edge' style='%s'>%s</div>" % (s, title)
                         elements.append(div)
@@ -462,9 +462,7 @@ class NavigationGraph(object):
             
             # compute css position of the div
             left, top, x2, y2 = map(int, area.get("coords").split(","))
-            width = x2 - left
-            height = y2 - top
-            style = "position:absolute;z-index:5;top:%dpx;left:%dpx;width:%dpx;height:%dpx;" % (top, left, width, height)
+            style = "top:%dpx;left:%dpx;" % (top, left)
 
             # create a div with a title, and an <a> element
             id_ = "Nav-%s" % area.get("id")
