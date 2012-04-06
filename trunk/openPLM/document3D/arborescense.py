@@ -231,7 +231,7 @@ def generate_ArbreFile(product,doc_file):
     data=data_for_product(product)
 
     fileName, fileExtension = os.path.splitext(doc_file.filename) 
-    new_ArbreFile= ArbreFile()
+    new_ArbreFile= ArbreFile(decomposable=bool(product.links))
     new_ArbreFile.stp = doc_file
     name = new_ArbreFile.file.storage.get_available_name(fileName+".arb")
     path = os.path.join(new_ArbreFile.file.storage.location, name)

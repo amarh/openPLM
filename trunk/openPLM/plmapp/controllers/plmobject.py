@@ -520,7 +520,7 @@ class PLMObjectController(Controller):
         if self._user.username == settings.COMPANY:
             # the company is like a super user
             return True
-        if self.owner == self._user:
+        if self.owner_id == self._user.id:
             return True
         if self.group.user_set.filter(id=self._user.id).exists():
             return True
