@@ -190,5 +190,8 @@ SESSION_COOKIE_SECURE = False
 #: Force HTTPS connections
 FORCE_HTTPS = False
 
+#: set to True to hide emails
+HIDE_EMAILS = False
+
 COMPANY = "company"
 

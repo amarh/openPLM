@@ -39,10 +39,10 @@
                 {% endif %}
             {% endif %}
             <div class="reference">
-                {{result.rendered|safe}}
+                {{result.rendered|hide_emails|safe}}
             </div>
             <div class="summary">
-                {{ result.highlighted.text|safe }}
+                {{ result.highlighted.text|hide_emails|safe }}
             </div>
             {% if link_creation or navigate_bool %}
                 <form method="post" action="." enctype="multipart/form-data">

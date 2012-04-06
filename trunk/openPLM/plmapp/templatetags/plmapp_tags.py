@@ -1,3 +1,5 @@
+import re
+
 from django import template
 from django.contrib.auth.models import User
 from openPLM.plmapp.controllers.user import UserController
@@ -102,4 +104,17 @@ def result_class(result):
         return "state-" + get_state_class(result)
     return ""
 
+# yes, this is a really bad way to detect an email
+# but we may have to hide something like user@<em>domain</em>
+# it is only use to hide an email
+_email_rx = re.compile(r"\b[\w.>_<%+-]+@[\w_<>]+\.[\w_><]+\b")
+@register.filter
+def hide_emails(text):
+    """
+    Returns *text* with all emails removed.
+    """
+    from django.conf import settings
+    if getattr(settings, "HIDE_EMAILS", False):
+        text = _email_rx.sub("", text)
+    return text
 
