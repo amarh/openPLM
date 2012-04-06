@@ -349,7 +349,7 @@ class GroupNavigateTestCase(NavigateTestCase):
             self.get_graph_data({"part" : True, OSR : osr }, results)
             self.assertCount(2, 1)
             main, part_node = self.nodes
-            self.assertEqual([part_node], self.root.find_class("node_part"))
+            self.assertEqual([part_node], self.root.find_class("n_part"))
         doc = DocumentController.create("d", "Document", "doc",
                 self.user, self.DATA, True, True)
         for result in (self.cie, self.group, self.user, doc.object):
@@ -366,7 +366,7 @@ class GroupNavigateTestCase(NavigateTestCase):
             self.get_graph_data({"doc" : True, OSR : osr }, results)
             self.assertCount(2, 1)
             main, doc_node = self.nodes
-            self.assertEqual([doc_node], self.root.find_class("node_document"))
+            self.assertEqual([doc_node], self.root.find_class("n_document"))
         for result in (self.cie, self.group, self.part, self.user):
             self.get_graph_data({"doc" : True, OSR : True }, (result,))
             self.assertCount(1, 0)

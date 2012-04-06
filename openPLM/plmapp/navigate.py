@@ -36,6 +36,7 @@ from collections import defaultdict
 from django.contrib.auth.models import User, Group
 from django.template.loader import render_to_string
 from django.utils.html import linebreaks
+from django.utils.encoding import iri_to_uri
 
 import pygraphviz as pgv
 
@@ -76,6 +77,9 @@ _attrs = ("id", "type", "reference", "revision", "name")
 _plmobjects_attrs = ["plmobject__" + x for x in _attrs]
 _parts_attrs = ["part__" + x for x in _attrs]
 _documents_attrs = ["document__" + x for x in _attrs]
+
+def is_part(plmobject):
+    return plmobject["type"] in models.get_all_parts()
 
 class NavigationGraph(object):
     """
@@ -262,11 +266,12 @@ class NavigationGraph(object):
                 self.edges.add((node, doc.id, " "))
                 self._set_node_attributes(doc)
         else:
-            links = obj.get_attached_documents().select_related("document")
+            # obj is the part id
+            links = models.DocumentPartLink.objects.filter(part__id=obj).select_related("document")
             for link in links.only(*_documents_attrs):
                 if self.options[OSR] and link.document_id not in self.results:
                     continue
-                self.edges.add((obj_id or obj.id, link.document_id, " "))
+                self.edges.add((obj_id or obj, link.document_id, " "))
                 self._set_node_attributes(link.document)
 
     def _create_user_edges(self, obj, role):
@@ -300,17 +305,16 @@ class NavigationGraph(object):
                 qs = obj.plmobjectuserlink_user.filter(role=role)
                 qs = qs.values_list("plmobject_id", flat=True).order_by()
                 qs = models.PLMObject.objects.filter(id__in=qs)
-            links = qs.only("id", "type", "reference", "revision", "name")
+            links = qs.values("id", "type", "reference", "revision", "name").order_by()
             for plmobject in links:
-                if self.options[OSR] and plmobject.id not in self.results:
+                if self.options[OSR] and plmobject["id"] not in self.results:
                     continue
-                part_doc_id = role + str(plmobject.id)
+                part_doc_id = role + str(plmobject["id"])
                 self.edges.add((node, part_doc_id, role))
-                if plmobject.is_part:
-                    if plmobject.id in self.options["doc_parts"]:
-                        plmobject = PartController(plmobject.part, None, True, True)
-                        self._create_doc_edges(plmobject, part_doc_id)
-                self._set_node_attributes(plmobject, part_doc_id)
+                if is_part(plmobject):
+                    if plmobject["id"] in self.options["doc_parts"]:
+                        self._create_doc_edges(plmobject["id"], part_doc_id)
+                self._set_node_attributes(plmobject, part_doc_id, type_="plmobject")
 
         else:
             # signer roles
@@ -323,8 +327,7 @@ class NavigationGraph(object):
                 part_doc = link.plmobject
                 if part_doc.is_part:
                     if part_doc.id in self.options["doc_parts"]:
-                        part_doc = PartController(part_doc.part, None, True, True)
-                        self._create_doc_edges(part_doc, part_doc_id)
+                        self._create_doc_edges(part_doc.id, part_doc_id)
                 self._set_node_attributes(part_doc, part_doc_id)
 
     def create_edges(self):
@@ -400,8 +403,12 @@ class NavigationGraph(object):
                     data["doc_img_add"] = False
                     data["parts"] = "#".join(str(x) for x in self.options["doc_parts"] if x != id_)
 
-    def _set_node_attributes(self, obj, obj_id=None, extra_label=""):
-        obj_id = obj_id or obj.id
+    def _set_node_attributes(self, obj, obj_id=None, extra_label="", type_=None):
+        if isinstance(obj, dict):
+            id_ = obj["id"]
+        else:
+            id_ = obj.id
+        obj_id = obj_id or id_
        
         if "id" in self.nodes[obj_id]:
             # already treated
@@ -409,9 +416,24 @@ class NavigationGraph(object):
         # data and _title_to_node are used to retrieve usefull data (url, tooltip)
         # in _convert_map
         data = {}
-        
+        url = None 
         # set node attributes according to its type
-        if isinstance(obj, (PLMObjectController, models.PLMObject)):
+        if type_ == "plmobject":
+            ref = (obj["type"], obj["reference"], obj["revision"])
+            label = obj["name"].strip() or u"\n".join(ref)
+            url = iri_to_uri(u"/object/%s/%s/%s/" % ref)
+            data["title_"] = u" - ".join(ref)
+            # add data to show/hide thumbnails and attached documents
+            if is_part(obj):
+                type_ = "part"
+                # this will be used later to see if it has an attached document
+                self._part_to_node[id_] = data
+            else:
+                data["path"] = url
+                data["thumbnails"] = True
+                type_ = "document"
+
+        elif isinstance(obj, (PLMObjectController, models.PLMObject)):
             # display the object's name if it is not empty
             ref = (obj.type, obj.reference, obj.revision)
             label = obj.name.strip() or u"\n".join(ref)
@@ -424,7 +446,7 @@ class NavigationGraph(object):
             else:
                 type_ = "part"
                 # this will be used later to see if it has an attached document
-                self._part_to_node[obj.id] = data
+                self._part_to_node[id_] = data
         elif isinstance(obj, (User, UserController)):
             full_name = u'%s\n%s' % (obj.first_name, obj.last_name)
             label = full_name.strip() or obj.username
@@ -433,12 +455,12 @@ class NavigationGraph(object):
         else:
             label = obj.name
             type_ = "group"
-        id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), obj.id)
+        id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), id_)
 
         data["label"] = label + "\n" + extra_label if extra_label else label
         data["type"] = type_
         self.nodes[obj_id].update(
-                URL=obj.plmobject_url + "navigate/",
+                URL=(url or obj.plmobject_url) + "navigate/",
                 id=id_,
                 )
         self._title_to_node[id_] = data
@@ -508,12 +530,12 @@ class NavigationGraph(object):
         for grp in graph:
             if grp.get("class") != "edge":
                 continue
-            e = {"edges" : [], "id" : grp.get("id")}
+            e = {"id" : grp.get("id")}
             for path in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}path"):
-                e["edges"].append(path.get("d"))
+                e["p"] = path.get("d")
                 
             for poly in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}polygon"):
-                e["arrow"] = poly.get("points")
+                e["a"] = poly.get("points")
             edges.append(e)
         return dict(width=width, height=height, scale=scale, translate=translate, 
                 edges=edges)

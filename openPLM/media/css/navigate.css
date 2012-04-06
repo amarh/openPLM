@@ -224,28 +224,28 @@ div#FilterNav > form > ul > li
     padding: 5px;
 }
 
-div.node_part {
+div.n_part {
     background-image: url("/media/img/navigate/part.png");
 }
-div.node_document {
+div.n_document {
     background-image: url("/media/img/navigate/document.png");
 }
-div.node_group {
+div.n_group {
     background-image: url("/media/img/navigate/user.png");
 }
-div.node_user {
+div.n_user {
     background-image: url("/media/img/navigate/user.png");
 }
-div.node_part.main_node {
+div.n_part.main_node {
     background-image: url("/media/img/navigate/part_main.png");
 }
-div.node_document.main_node {
+div.n_document.main_node {
     background-image: url("/media/img/navigate/document_main.png");
 }
-div.node_group.main_node {
+div.n_group.main_node {
     background-image: url("/media/img/navigate/user_main.png");
 }
-div.node_user.main_node {
+div.n_user.main_node {
     background-image: url("/media/img/navigate/user_main.png");
 }
 
