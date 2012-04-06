@@ -175,6 +175,8 @@ djcelery.setup_loader()
 
 COMPANY = "company"
 
+HIDE_EMAILS = False
+
 TEST_RUNNER = "openPLM.plmapp.tests.runner.OpenPLMTestSuiteRunner"
 TEST_OUTPUT_DIR = "tests_results"
 

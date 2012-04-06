@@ -168,7 +168,11 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     object_attributes_list = []
-    for attr in obj.attributes:
+    attrs = obj.attributes
+    if getattr(settings, "HIDE_EMAILS", False):
+        if not ctx["is_owner"]:
+            attrs = (attr for attr in attrs if attr != "email")
+    for attr in attrs:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
     ctx.update({'current_page' : 'attributes',

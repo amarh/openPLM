@@ -37,10 +37,10 @@
 
                 <li class="Result {{result|result_class}}">
                 <div class="reference">
-                    {{result.rendered|safe}}
+                    {{result.rendered|hide_emails|safe}}
                 </div>
                 <div class="summary">
-                    {{ result.highlighted.text|safe }}
+                    {{ result.highlighted.text|hide_emails|safe }}
                 </div>
                 </li>
 

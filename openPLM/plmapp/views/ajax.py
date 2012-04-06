@@ -99,6 +99,8 @@ def ajax_autocomplete(request, obj_type, field):
     elif cls == models.User:
         if field not in ("email", "first_name", "last_name"):
             return HttpResponseForbidden()
+        if getattr(settings, "HIDE_EMAILS", False) and field == "email":
+            return HttpResponseForbidden()
     if field not in cls._meta.get_all_field_names():
         return HttpResponseForbidden()
     results = cls.objects.filter(**{"%s__icontains" % field : term})
