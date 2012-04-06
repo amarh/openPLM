@@ -263,7 +263,8 @@ div.node_user.main_node {
     color: #373434;
 }
 
-.edge p:hover {
+.edge p:hover,
+.edge.hover p {
     z-index: 50;
     color: #d214c5;
 }

@@ -1,33 +1,39 @@
-var arrows;
 var edges;
 var paper;
 function draw_edges(data, width, height){
     var r = Raphael("navholder", width, height);
     var s = r.set();
-    arrows = r.set();
     $.each(data.edges, function (i,v) {
-        var e = r.path(v);
-        s.push(e);
-        e.hover( function(){
-            e.attr("stroke-width", 3);
-            e.attr("stroke", "#d214c5");
-        }, function (){
-            e.attr("stroke-width", 1.5);
-            e.attr("stroke", "#343434");
+        var t = r.set()
+        var hover_in = function(){
+            t.attr("stroke-width", 2);
+            t.attr("stroke", "#d214c5");
+            $("#" + v.id).addClass("hover");
+        };
+        var hover_out = function (){
+            t.attr("stroke-width", 1.5);
+            t.attr("stroke", "#343434");
+            $("#" + v.id).removeClass("hover");
+        };
+        if (v.arrow !== undefined ){
+            var a = r.path("M"+v.arrow+"z");
+            a.attr("fill", "#343434");
+            a.hover(hover_in, hover_out);
+            t.push(a);
+        }
+        $("#" + v.id).hover(hover_in, hover_out);
+        $.each(v.edges, function(j, d) {
+        var e = r.path(d);
+        e.hover(hover_in, hover_out);
+        t.push(e);
         });
+        s.push(t);
 
-    });
-    $.each(data.arrows, function (i,v) {
-        arrows.push(r.path("M"+v+"z"));
     });
     s.scale(data.scale[0], data.scale[1], 0, 0);
     s.translate(data.translate[0], data.translate[1]);
-    arrows.scale(data.scale[0], data.scale[1], 0, 0);
-    arrows.translate(data.translate[0], data.translate[1]);
-    arrows.attr("fill", "#343434");
     s.attr("stroke", "#343434");
     s.attr("stroke-width", 1.5);
-    arrows.attr("stroke-width", 1.5);
     edges = s;
     paper = r;
 } 
