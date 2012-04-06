@@ -451,10 +451,11 @@ class NavigationGraph(object):
                 if area.get("shape") == "rect":
                     title = area.get("title")
                     if title:
+                        id_ =  area.get("id")
                         left, top, x2, y2 = map(int, area.get("coords").split(","))
                         s = "top:%dpx;left:%dpx;" % (top, left)
                         title = linebreaks(title.replace("\\n", "\n"))
-                        div = "<div class='edge' style='%s'>%s</div>" % (s, title)
+                        div = "<div id='%s' class='edge' style='%s'>%s</div>" % (id_, s, title)
                         elements.append(div)
                 continue
 
@@ -485,9 +486,9 @@ class NavigationGraph(object):
     def _parse_svg(self, svg):
         # TODO: optimize this function
         edges = []
-        arrows = []
         root = ET.fromstring(svg)
-        transform = root.getchildren()[0].get("transform")
+        graph = root.getchildren()[0]
+        transform = graph.get("transform")
         
         m = re.search(r"scale\((.*?)\)", transform)
         if m:
@@ -503,12 +504,19 @@ class NavigationGraph(object):
 
         width = root.get("width").replace("pt", "")
         height = root.get("height").replace("pt", "")
-        for path in root.findall(".//{http://www.w3.org/2000/svg}path"):
-            edges.append(path.get("d"))
-        for poly in root.findall(".//{http://www.w3.org/2000/svg}polygon"):
-            arrows.append(poly.get("points"))
+        
+        for grp in graph:
+            if grp.get("class") != "edge":
+                continue
+            e = {"edges" : [], "id" : grp.get("id")}
+            for path in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}path"):
+                e["edges"].append(path.get("d"))
+                
+            for poly in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}polygon"):
+                e["arrow"] = poly.get("points")
+            edges.append(e)
         return dict(width=width, height=height, scale=scale, translate=translate, 
-                edges=edges, arrows=arrows)
+                edges=edges)
 
     def render(self):
         """

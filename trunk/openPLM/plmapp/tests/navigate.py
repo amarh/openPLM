@@ -51,7 +51,6 @@ class NavigateTestCase(BaseTestCase):
         self.assertEqual(nb_nodes, len(self.nodes))
         self.assertEqual(nb_edges, len(self.edges))
         self.assertEqual(nb_edges, len(self.json["edges"]))
-        self.assertEqual(nb_edges, len(self.json["arrows"]))
 
     def test_navigate_empty(self):
         """ Tests that a graph with all options set to false contains only
