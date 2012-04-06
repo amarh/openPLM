@@ -57,7 +57,7 @@ class DecomposersManager(object):
         return ""
 
     @classmethod
-    def is_decomposable(cls, part, msg=True):
+    def is_decomposable(cls, part, msg=False):
         """
         Returns True if *part* is decomposable.
         """
@@ -66,6 +66,24 @@ class DecomposersManager(object):
             if d.is_decomposable(msg):
                 return True
         return False
+   
+    @classmethod
+    def get_decomposable_parts(cls, part_ids):
+        """
+        Returns all part of *part_ids* (an iterable of part ids) that
+        are decomposable by the registered decomposers.
+        """
+        decomposable = set()
+        not_decomposable = set(part_ids)
+        for decomposer in cls._decomposers:
+            if not not_decomposable:
+                break
+            d = decomposer(None)
+            s = d.get_decomposable_parts(not_decomposable)
+            decomposable.update(s)
+            not_decomposable.difference_update(s)
+        return decomposable
+
 
 class Decomposer(object):
     """
@@ -92,4 +110,11 @@ class Decomposer(object):
         be explicit.
         """
         return ""
+
+    def get_decomposable_parts(self, part_ids):
+        """
+        Returns all part of *part_ids* (an iterable of part ids) that
+        are decomposable by this decomposer.
+        """
+        return [p for p in part_ids if type(self)(p).is_decomposable(False)]
 

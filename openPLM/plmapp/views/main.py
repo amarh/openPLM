@@ -462,17 +462,18 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
                 extension_data[pcle["link_id"]].update(pcle)
     # decomposition
     if DecomposersManager.count() > 0:
-        is_decomposable = DecomposersManager.is_decomposable
-        children = [(c, is_decomposable(c.link.child_id, msg=False)) for c in children]
+        children_ids = (c.link.child_id for c in children)
+        decomposable_children = DecomposersManager.get_decomposable_parts(children_ids)
         decomposition_msg = DecomposersManager.get_decomposition_message(obj)
     else:
-        children = [(c, False) for c in children]
         decomposition_msg = ""
+        decomposable_children = []
     ctx.update({'current_page' : 'BOM-child',
                 'children' : children,
                 'extra_columns' : extra_columns,
                 'extension_data' : extension_data,
                 'decomposition_msg' : decomposition_msg,
+                'decomposable_children' : decomposable_children,
                 "display_form" : display_form, })
     return r2r('parts/bom.html', ctx, request)
 

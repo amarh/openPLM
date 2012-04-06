@@ -44,10 +44,10 @@
             {% endfor %}
             <th class="Content"> {{ obj.state.name }} </th>
         </tr>
-        {% for c, is_decomposable in children %}
+        {% for c in children %}
 
             <tr class="Content"> 
-                <td class="Content expander open level{{c.level}}" style="padding-left:{{level|add:"-1"}}0px;" >
+                <td class="Content expander open level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
                     <span class="expander">{{c.level}}</span>
                 </td>
                 {% with c.link as link %}
@@ -57,7 +57,7 @@
                     {% with link.child as child %}
                         <td class="Content"> 
                             <a href="{{child.plmobject_url}}"
-                                {% if is_decomposable %}class="decomposable"{% endif %}>
+                                {% if child.id in decomposable_children %}class="decomposable"{% endif %}>
                                 {{ child.reference }}
                             </a>
                         </td>

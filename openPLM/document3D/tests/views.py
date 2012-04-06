@@ -70,13 +70,13 @@ class view_3dTest(CommonViewTest):
         self.assertEqual([], response.context["GeometryFiles"])
         self.assertNotEqual(response.context["javascript_arborescense"], False)  
        
-class view_bomb_childTest(CommonViewTest):
+class Document3DBomViewTestCase(CommonViewTest):
     def setUp(self):
-        super(view_bomb_childTest, self).setUp()
+        super(Document3DBomViewTestCase, self).setUp()
         self.document = Document3DController.create('doc1', 'Document3D',
                 'a', self.user, self.DATA)
 
-    def test_bomb_child(self):
+    def test_bom_child(self):
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child1, 10 , 20)
         child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
@@ -88,7 +88,7 @@ class view_bomb_childTest(CommonViewTest):
         self.assertFalse(msg)
         
         
-    def test_decompose_bomb_child(self):
+    def test_decompose_bom_child(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
@@ -99,7 +99,7 @@ class view_bomb_childTest(CommonViewTest):
         self.assertTrue(msg)
         
         
-    def test_decompose_bomb_child_whit_child_decomposable(self):
+    def test_decompose_bom_child_whit_child_decomposable(self):
         child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child2, 10, 20)
         f=open("document3D/data_test/test.stp")
@@ -111,9 +111,11 @@ class view_bomb_childTest(CommonViewTest):
         self.assertEqual(1, len(list(response.context["children"])))
         msg = response.context["decomposition_msg"]
         self.assertTrue(msg)
-        self.assertEqual(True, response.context["children"][0][1])        
+        decomposable_children = response.context["decomposable_children"]
+        self.assertTrue(response.context["children"][0].link.child.id
+            in decomposable_children)
         
-    def test_try_decompose_bomb_child_whit_no_links(self):
+    def test_try_decompose_bom_child_whit_no_links(self):
         f=open("document3D/data_test/valid_sans_information.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 

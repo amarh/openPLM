@@ -31,10 +31,9 @@ def write_ArbreFile(product,fileName,location):
         os.makedirs(directory)
     output = open(path.encode(),"w")
     output.write(json.dumps(data))        
-    output.close()
-    
-    
-    return "ARB:"+name+"\n" 
+    output.close() 
+    decomposable = "true" if product.links and not product.is_decomposed else "false"
+    return "ARB:%s\nDecomposable:%s\n" % (name, decomposable) 
     
     
 generateGeometry(sys.argv[1],sys.argv[2],sys.argv[3])            

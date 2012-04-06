@@ -55,13 +55,20 @@ def display_3d(request, obj_ref, obj_revi):
 
 class StepDecomposer(Decomposer):
 
+    __slots__ = ("part", "decompose_valid")
+
     def is_decomposable(self, msg=True):
         decompose_valid = []
-        if not Document3D.objects.filter(PartDecompose=self.part):
-            links = DocumentPartLink.objects.filter(part=self.part).values_list("document", flat=True)
+        if not Document3D.objects.filter(PartDecompose=self.part).exists():
+            links = DocumentPartLink.objects.filter(part=self.part,
+                    document__type="Document3D",
+                    document__document3d__PartDecompose=None).values_list("document", flat=True)
             for doc_id in links:
                 try:
-                    doc = Document3D.objects.get(id=doc_id, PartDecompose=None)
+                    if msg:
+                        doc = Document3D.objects.get(id=doc_id)
+                    else:
+                        doc = doc_id
                     file_stp = is_decomposable(doc)
                     if file_stp and msg:
                         decompose_valid.append((doc, file_stp))
@@ -71,6 +78,28 @@ class StepDecomposer(Decomposer):
                     pass
         self.decompose_valid = decompose_valid
         return len(decompose_valid) > 0
+
+    def get_decomposable_parts(self, parts):
+        decomposable = set()
+        # invalid parts are parts already decomposed by a StepDecomposer
+        invalid_parts = Document3D.objects.filter(PartDecompose__in=parts)\
+                .values_list("PartDecompose", flat=True)
+        links = list(DocumentPartLink.objects.filter(part__in=parts,
+                document__type="Document3D", # Document3D has no subclasses
+                document__document3d__PartDecompose=None). \
+                exclude(part__in=invalid_parts).values_list("document", "part"))
+        docs = [l[0] for l in links]
+        # valid documents are document with a step file that is decomposable
+        valid_docs = dict(ArbreFile.objects.filter(stp__document__in=docs,
+            stp__deprecated=False, stp__locked=False,
+            decomposable=True).values_list("stp__document", "stp"))
+        for doc_id, part_id in links:
+            if (doc_id not in valid_docs) or (part_id in decomposable):
+                continue
+            stp = DocumentFile.objects.only("document", "filename").get(id=valid_docs[doc_id])
+            if stp.checkout_valid:
+                decomposable.add(part_id)
+        return decomposable
 
     def get_message(self):
         if self.decompose_valid:
