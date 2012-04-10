@@ -11,7 +11,14 @@
             {% for description,attribute in object_attributes %}
                 <tr class="Content">
                     <td class="Content description">{{description|capfirst}}</td>
-                    <td class="Content">{{attribute|linebreaks}}</td>
+                    <td class="Content">
+                        {% if attribute.year %}
+                            {{ attribute|date:"DATETIME_FORMAT" }} — 
+                            {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                        {% else %}
+                            {{attribute|linebreaks}}
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </table>
