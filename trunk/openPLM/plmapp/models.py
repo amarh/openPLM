@@ -142,8 +142,8 @@ class UserProfile(models.Model):
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
-        return ["first_name", "last_name", "email",  "creator", "owner",
-                "ctime", "mtime", "rank"]
+        return ["first_name", "last_name", "email", 
+                "date_joined", "last_login", "rank"]
 
     @property
     def menu_items(self):
@@ -154,7 +154,7 @@ class UserProfile(models.Model):
     @classmethod
     def excluded_creation_fields(cls):
         "Returns fields which should not be available in a creation form"
-        return ["owner", "creator", "ctime", "mtime"]
+        return ["date_joined", "last_login"]
    
 
 def add_profile(sender, instance, created, **kwargs):

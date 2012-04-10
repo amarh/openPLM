@@ -63,14 +63,12 @@ class UserController(Controller):
 
     HISTORY = models.UserHistory
 
-    __slots__ = Controller.__slots__ + ("creator", "owner", "mtime", "ctime")
+    __slots__ = Controller.__slots__ + ("creator", "owner",)
 
     def __init__(self, obj, user, block_mails=False, no_index=False):
         super(UserController, self).__init__(obj, user, block_mails, no_index)
         self.creator = obj
         self.owner = obj
-        self.mtime = obj.last_login
-        self.ctime = obj.date_joined
 
     def get_verbose_name(self, attr_name):
         """
@@ -78,15 +76,14 @@ class UserController(Controller):
 
         Example::
 
-            >>> ctrl.get_verbose_name("ctime")
-            u'date of creation'
+            >>> ctrl.get_verbose_nam("rank")
+            u'role in PLM'
         """
 
         try:
             item = unicode(self.object._meta.get_field(attr_name).verbose_name)
         except FieldDoesNotExist:
-            names = {"mtime" : _("date of last modification"),
-                     "ctime" : _("date of creation"),
+            names = {
                      "rank" : _("role in PLM"),
                      "creator" : _("creator"),
                      "owner" : _("owner")}
