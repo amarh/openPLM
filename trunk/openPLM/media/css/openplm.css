@@ -840,6 +840,25 @@ span.user_bullet, span.group_bullet {
     color: rgb(230, 0, 126);
 }
 
+li.Result div.reference div.bullet {
+    width: 24px;
+    height: 24px;
+    display: block;
+    float: left;
+}
+li.Result.state-draft div.reference div.bullet {
+    background-image: url("../img/lifecycle/draft_small.png");
+}
+li.Result.state-proposed div.reference div.bullet {
+    background-image: url("../img/lifecycle/proposition_small.png");
+}
+li.Result.state-official div.reference div.bullet {
+    background-image: url("../img/lifecycle/official_small.png");
+}
+li.Result.state-deprecated div.reference div.bullet {
+    background-image: url("../img/lifecycle/deprecated_small.png");
+}
+
 li.Result span.name,
 li.Result span.username {
     display: block;
