@@ -8,10 +8,9 @@
     <div id="ActiveBox">
 
         <div id="ActiveArea">
-            <h3>{% trans "Error 404" %}</h3>
-            <p style="padding:2em;">
+            <h3>{% trans "Error 500" %}</h3>
             {% blocktrans with request_path as request_path %}
-                Error 404: it seems {{request_path}} is not a valid url.
+                Internal server error.
             {% endblocktrans %}
             </p>
 

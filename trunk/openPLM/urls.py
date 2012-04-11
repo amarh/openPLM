@@ -33,7 +33,7 @@ for app in settings.INSTALLED_APPS:
 
 import openPLM.plmapp.search_indexes
 
-from django.conf.urls.defaults import include, patterns, url
+from django.conf.urls.defaults import *
 from openPLM.plmapp.views import *
 import openPLM.plmapp.views.api as api
 from django.contrib.auth.views import login, logout
