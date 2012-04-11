@@ -1338,6 +1338,9 @@ def display_groups(request, obj_ref):
     """
 
     obj, ctx = get_generic_data(request, "User", obj_ref)
+    ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all())\
+            .order_by("name").values("name", "description")
+
     ctx['current_page'] = 'groups' 
     return r2r("users/groups.html", ctx, request)
 

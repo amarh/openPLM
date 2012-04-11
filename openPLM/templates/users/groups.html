@@ -1,17 +1,51 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+    <style>
+        dd.inter { border-bottom: 1px dashed #444; }
+        div#groups p { padding: 1em;}
+    </style>
+{% endblock %}
+
+
 <!-- Manage html display in the Content div which correspond to the "history" menu -->
 
 {% block content %}
-	<table class="Content">
-	    {% for group in obj.groups.all %}
-		    <tr class="Content">
-			    <td class="Content">
-                    <a href="/group/{{group.name}}/"> {{group.name}} </a>
-		        </td>
-		    </tr>
-	    {% endfor %}
-	</table>
+    <div id="groups">
+        <h3>{% trans "You are in the following groups:" %}</h3>
+        <div class="timeline">
+            <dl>
+                {% for group in groups %}
+                    <dt class="changeset">
+                    {% spaceless %}
+                        <a href="/group/{{group.name|urlencode}}/">
+                            <span class="group_name">
+                                {{ group.name }} 
+                            </span>
+                        </a>
+                    {% endspaceless %}
+
+                    </dt>
+                    <dd {% if not forloop.last %} class="inter"{% endif %}>
+                    <div class="details">
+                        {{ group.description|linebreaks }}
+                    </div>
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+
+    {% if user.get_profile.is_contributor %}
+        <div>
+            <p>
+            <a href="/object/create/?type=Group">{% trans "Click here to create another group." %}</a>
+            </p>
+        </div>
+    {% endif %}
+
+    </div>
+
 {% endblock %}
 
