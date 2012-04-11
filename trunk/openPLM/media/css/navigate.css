@@ -5,7 +5,6 @@
 div#Navigate
 {
     position: relative;
-    width: 100;
     height: 500px;
     margin: 0;
     overflow: hidden;
@@ -26,9 +25,12 @@ div.node {
     overflow: hidden;
     background-repeat: no-repeat;
     position: absolute;
-    z-index: 5;
     width: 100px;
     height: 70px;
+}
+
+div.node, div.node * {
+    z-index: 5;
 }
 
 div.main_node {
@@ -268,10 +270,12 @@ div.n_user.main_node {
     color: #373434;
 }
 
+.edge:hover,
 .edge p:hover,
 .edge.hover p {
-    z-index: 50;
-    color: #d214c5;
+    z-index: 100;
+    color: #095b7f;
+    text-shadow: 1px 1px #ccc;
 }
 
 /* Override main_content and ActiveArea to remove margins and paddings */
