@@ -158,9 +158,13 @@ function update_nav(focus_node_id, data){
 function display_docs(node_id, ajax_url, doc_parts){
     $("#id_doc_parts").attr("value", doc_parts);
     $("#id_update").attr("value", "on");
+    $("#Navigate").showLoading();
     $.post(ajax_url,
            $("#FilterNav").find("form").serialize(),
-           function(data) {update_nav("#" + node_id, data);});
+           function(data) {
+            update_nav("#" + node_id, data);
+            $("#Navigate").hideLoading();
+            });
 }
 dd = display_docs;
 
