@@ -254,7 +254,7 @@ def init_ctx(init_type_, init_reference, init_revision):
 ##########################################################################################
 def update_navigation_history(request, obj, type_, reference, revision):
     old_history = request.session.get("navigation_history", [])
-    value = (obj.plmobject_url, type_, reference, revision)
+    value = (obj.plmobject_url, type_, reference, revision, tuple(obj.menu_items))
     history = list(old_history)
     if value in history:
         # move value at the end
