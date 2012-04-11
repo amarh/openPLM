@@ -63,6 +63,11 @@ def key(d, key_name):
     return value
 key = register.filter('key', key)
 
+def indice(l, index):
+    return l[index]
+
+indice = register.filter('indice', indice)
+
 def attr(o, attr_name):
     from django.conf import settings
     return getattr(o, attr_name, settings.TEMPLATE_STRING_IF_INVALID)

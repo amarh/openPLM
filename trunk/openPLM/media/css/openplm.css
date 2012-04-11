@@ -541,6 +541,19 @@ div#comment_form {
     margin-top: 1em;
 }
 
+td.expander span.not_expander {
+    margin-top: auto;
+    margin-bottom: auto;
+    display:block; min-width:36px; height:16px;
+    text-indent: 36px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    padding-left:4px;
+    margin-left:6px;
+    color:black;
+    text-align:right;
+    background-image: url("../img/puce.png");
+}
 
 td.expander span.expander {
     cursor: pointer;

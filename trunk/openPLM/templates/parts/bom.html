@@ -48,7 +48,19 @@
 
             <tr class="Content"> 
                 <td class="Content expander open level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
+		{% if forloop.last %}
+		    <span class="not_expander">{{c.level}}</span>
+		{% else %}
+			{% with forloop.counter as next %}
+			{% with children|indice:next as ci%}
+			{% if ci.level > c.level %}
                     <span class="expander">{{c.level}}</span>
+			{% else %}
+		    <span class="not_expander">{{c.level}}</span>
+			{% endif %}
+			{% endwith %}
+			{% endwith %}
+		{% endif %}
                 </td>
                 {% with c.link as link %}
                     <td class="Content"> {{ link.order }} </td>
