@@ -901,12 +901,15 @@ a#linobject {
 /* navigation history */
 
 #navigation_history {
-    padding: 0.2em;
     position: relative;
     overflow-x: hidden;
-    height: 1em;
+    height: 1.4em;
     margin: 0.2em;
     border-bottom: 1px solid #ccc;
+    padding: 0.2em;
+}
+#navigation_history:hover {
+    overflow-x: visible;
 }
 
 #navigation_history_inner {
@@ -914,6 +917,8 @@ a#linobject {
     right: 0;
     white-space: nowrap; 
     min-width: 100%;
+    background-color: white;
+    padding-bottom: 0.2em;
 }
 
 #navigation_history li {
@@ -928,6 +933,31 @@ a#linobject {
     content: "»";
     padding: 0.2em;
     font-size: small;
+}
+
+#navigation_history li div.quick_link {
+    display: none;
+    position: absolute;    
+    z-index: 1000;
+    background-color: #343434;
+    width: 15em;
+}
+#navigation_history li:hover div.quick_link,
+#navigation_history div.quick_link:hover
+{
+    display:block;
+}
+#navigation_history div.quick_link a {
+    display: block;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    font-size: normal;
+    color: #eee;
+}
+#navigation_history div.quick_link a:hover {
+    color: #343434;
+    background-color: #eee;
+    
 }
 
 /* deprecated files: small font-size */

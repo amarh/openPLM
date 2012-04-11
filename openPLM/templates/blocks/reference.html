@@ -4,7 +4,7 @@
         <div id="navigation_history">
             <div id="navigation_history_inner">
                 <ul>
-                    {% for url_, type, reference, revision in navigation_history %}
+                    {% for url_, type, reference, revision, menu in navigation_history %}
                         <li>
                         <a href="{{ url_ }}">
                             <span class="type">{{type}}</span> 
@@ -13,6 +13,13 @@
                                 // <span class="rev">{{revision}}</span>
                             {% endif %}
                         </a>
+                        <div class="quick_link">
+                            {% for item in menu %}
+                                <a class="quick_link" href="{{url_}}{{item}}">
+                                    {% filter upper %}{% trans item %}{% endfilter%}
+                                </a>
+                            {% endfor %}
+                        </div>
                         </li>
                     {% endfor%}
                 </ul>
