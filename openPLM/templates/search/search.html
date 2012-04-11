@@ -34,16 +34,7 @@
                 <ul class="Result">
                 {% endif %}
 
-
-                <li class="Result {{result|result_class}}">
-                <div class="reference">
-                    {{result.rendered|hide_emails|safe}}
-                </div>
-                <div class="summary">
-                    {{ result.highlighted.text|hide_emails|safe }}
-                </div>
-                </li>
-
+                {% include "search/result.html" %}
                 {% if forloop.last %}
                 </ul>
             {% endif %}

@@ -1,0 +1,31 @@
+{% load i18n plmapp_tags highlight %}
+
+<li class="Result {{result|result_class}}">
+{% if navigate_bool %}
+    {% if result|is_plmobject %}
+        <div class="toolbar">
+            <button class="attach">{% trans "Attach" %}</button>
+            <button class="add_child">{% trans "Add child" %}</button>
+        </div>
+    {% endif %}
+{% endif %}
+<div class="reference">
+    {% if result|is_plmobject %}
+        <div class="bullet" title="{{result.state}}"></div>
+    {% endif %}
+    {{result.rendered|hide_emails|safe}}
+</div>
+<div class="summary">
+    {{ result.highlighted.text|hide_emails|safe }}
+</div>
+{% if link_creation or navigate_bool %}
+    <form method="post" action="." enctype="multipart/form-data">
+        {{result.rendered_add|safe}}
+        {% if link_creation and result.object|can_add:attach %}
+            <input type="submit" class="{{"Button"|button}}" value="{% trans "ADD" %}"/>
+        {% endif %}
+    </form>
+
+{% endif %}
+</li>
+
