@@ -131,7 +131,7 @@ class DocumentController(PLMObjectController):
         doc_file.locked = False
         doc_file.locker = None
         doc_file.save()
-        self._save_histo("Locked",
+        self._save_histo("Unlocked",
                          "%s unlocked by %s" % (doc_file.filename, self._user))
 
     def add_file(self, f, update_attributes=True, thumbnail=True):
