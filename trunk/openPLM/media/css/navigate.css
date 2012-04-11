@@ -56,6 +56,10 @@ div.node p {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+div.main_node p {
+    color: #343434;
+    text-shadow: 1px 1px #ccc;
+}
 
 #navDocument {
     word-wrap: break-word;
