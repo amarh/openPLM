@@ -7,7 +7,7 @@ function draw_edges(data, width, height){
         var t = r.set()
         var hover_in = function(){
             t.attr("stroke-width", 2);
-            t.attr("stroke", "#d214c5");
+            t.attr("stroke", "#095b7f");
             $("#" + v.id).addClass("hover");
         };
         var hover_out = function (){
