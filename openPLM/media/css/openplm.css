@@ -1060,3 +1060,7 @@ a.decomposable {
     color: #000;
     width: 39em;
 }
+
+div#attributes {
+    margin: 1em;
+ }
