@@ -572,6 +572,7 @@ td.expander span.expander {
 td.expanded span.expander {
     background-image: url("../img/expander_normal_puce.png");
 }
+
 td.expanded span.expander:hover {
     background-image: url("../img/expander_normal_hover_puce.png");
 }
@@ -579,6 +580,7 @@ td.expanded span.expander:hover {
 td.open span.expander {
     background-image: url("../img/expander_open_puce.png");
 }
+
 td.open span.expander:hover {
     background-image: url("../img/expander_open_hover_puce.png");
 }
