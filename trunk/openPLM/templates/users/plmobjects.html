@@ -3,18 +3,21 @@
 
 {% block css %}
     <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
-
 {% endblock %}
 
+{% block scripts %}
+    <script type="text/javascript" src="/media/js/plmobjects.js"></script>
+{% endblock %}
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
 
     <div>
-        <h3>{% trans "Last edited objects" %}</h3>
+        <div class="timeline open" >
+        <h3><span class="expand">{% trans "Last edited objects" %}</span></h3>
 
-        <div class="timeline">
+        <div class="objects">
 
             <dl>
                 {% for histo in last_edited_objects %}
@@ -41,18 +44,19 @@
                 {% endfor %}
             </dl>
         </div>
+	</div>
     </div>
     {% regroup object_user_link by role as links %}
 
     {% for group in links %}
         <div class="timeline">
-            <h3>{{ group.grouper|capfirst}}</h3>
+            <h3><span class="expand">{{ group.grouper|capfirst}}</span></h3>
 
                 {% regroup group.list by plmobject__type as groups %}
 
                 {% for gp in groups %}
 
-                    <div class="objects">
+                    <div class="objects hidden">
 
                         <h4>{{ gp.grouper }} </h4>
                         <div class="objects_inner">
