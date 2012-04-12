@@ -19,7 +19,7 @@ import magickthumbnailer
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from celery.task import task
 
-@task(ignore_result=True)
+@task(ignore_result=True, soft_time_limit=60, time_limit=65)
 def generate_thumbnail(doc_file_id):
     """
     Celery task that tries to generate a thumbnail for a :class:`.DocumentFile`.
