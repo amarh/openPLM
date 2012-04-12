@@ -160,11 +160,12 @@ class DocumentFileIndex(QueuedModelSearchIndex):
         # it's faster than launching a new process 
         path = obj.file.path
         name, ext = os.path.splitext(path)
+        size = 1024*1024 # 1Mo
         if ext.lower() in text_files:
-            content = codecs.open(path, encoding="utf-8", errors="ignore").read()
+            content = codecs.open(path, encoding="utf-8", errors="ignore").read(size)
         else:
             p = Popen([settings.EXTRACTOR, path], stdout=PIPE, close_fds=True)
-            content = p.stdout.read()
+            content = p.stdout.read(size)
         return content
 
     def index_queryset(self):
