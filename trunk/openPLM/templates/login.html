@@ -25,19 +25,26 @@
         <div class="main-box" id="Page">
             <div class="top-box">
                 <div class="top-box-content">
-                    <h1>{% trans "Welcome to openPLM" %}</h1>
+                    <h1>{% trans "Welcome to openPLM" %}   </h1>
                     {% get_current_language as LANGUAGE_CODE %}
                     <form id="SetLangForm" action="/i18n/setlang/" method="post">
-                        <select name="language">
-                            {% for lang in LANGUAGES %}
-                            <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
-                            {{ lang.1 }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+                        <ul>
+                            <li>
+                            <select name="language">
+
+                                {% for lang in LANGUAGES %}
+                                    <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                                    {{ lang.1 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            </li>
+                            <li>
+                            <input type="submit" class="{{"Button"|button}}" value="{% trans "Go" %}" />
+                            </li>
+                        </ul>
                     </form>
-                    <hr />
+
                 </div>
             </div>
             <div id="content-box" class="clearfix">
@@ -54,7 +61,7 @@
                     <h2>{% trans "openPLM connexion :" %}</h2>
                     <div class="error">
                         {% for error in form.errors.values %}
-                        {{ error }}
+                            {{ error }}
                         {% endfor %}
                     </div>
                     <form action="{% url django.contrib.auth.views.login %}" method="post">
@@ -76,21 +83,23 @@
                     </form>
                     <p style="line-height:15px; text-align:left">If you have any trouble logging in to your account, contact your administrator </p>
                 </div>
-                <h4>{% trans "Professionals" %}</h4>
                 <hr />
-                <p>
-                {% trans "You are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
-                <a href="http://www.linobject.com/contact/">
-                    {% trans "contact us" %}.
-                </a>
-                </p>
+                <h4>{% trans "Professionals" %}</h4>
+                <div style="padding:1em;">
+                    <p>
+                    {% trans "You are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
+                    <a href="http://www.linobject.com/contact/">
+                        {% trans "contact us" %}.
+                    </a>
+                    </p>
+                </div>
             </div>
             <div id"bottom-box">
                 <div id="links">
-                <div class="legal">
-                    2010-2012 openPLM &#0153;
-                    - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
-                </div>
+                    <div class="legal">
+                        2010-2012 openPLM &#0153;
+                        - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
+                    </div>
                 </div>
             </div>
         </div>
