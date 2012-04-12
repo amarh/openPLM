@@ -1,16 +1,47 @@
 import subprocess
 
+import sys
+mswindows = (sys.platform == "win32")
+
 from base import ThumbnailersManager
+
+def limit_resources():
+    """
+    Limit the process execution time to 60 seconds.
+    """
+    try:
+        from resource import getrlimit, setrlimit, RLIMIT_CPU
+    except ImportError:
+        return
+    else:
+        def _setrlimit(key, value):
+            try:
+                soft, hard = getrlimit(key)
+                # Change soft limit
+                if hard != -1:
+                    soft = min(value, hard)
+                else:
+                    soft = value
+            except ValueError:
+                hard = -1
+            setrlimit(key, (soft, hard))
+        _setrlimit(RLIMIT_CPU, 60)
+
 
 def magick_thumbnailer(input_path, original_filename, output_path):
     """
     Thumbnailer that calls :command:`convert` (from ImageMagick) to generate
     a thumbnail.
     """
+    if mswindows:
+        preexec_fn = None
+    else:
+        preexec_fn = limit_resources
+
     args = ["convert", "-format", "png",
             "-thumbnail", "%dx%d" % ThumbnailersManager.THUMBNAIL_SIZE,
             u"%s[0]" % input_path, output_path]
-    subprocess.check_call(args)
+    subprocess.check_call(args, preexec_fn=preexec_fn)
     return False
 
 #: Supported formats (if all ImageMagick decoders are installed)
