@@ -1,16 +1,30 @@
 
 function update_part_form() {
     var form = $("#decompose_form");
+
     form.showLoading();
     var prefix = $(this).attr("id").replace("-type_part", "").replace("id_", "");
+
+
+
+    var assembly_reference = $(this).parent().attr("id").replace("_ref", "");  
+    var selected=$(this).val()
+
     var params = form.serialize();
     $.ajax({
-        url: "/ajax/decompose/"+prefix + "/?" + params,
+        url: "/ajax/decompose/"+prefix+"/?" + params,
         success: function( part_form ){
-            $("#extra_part_" + prefix).html(part_form);
-            if ($("#part_show" + prefix.replace("form-", "")+ ">span").text() == "+" ){
-                $("#part_show" + prefix.replace("form-", "")).click();
+            $("#extra_part_form-"+ prefix).html(part_form);
+            if ($("#part_show-" + prefix+ ">span").text() == "+" ){
+                $("#part_show-" + prefix).click();
             }
+            
+       
+            $("#decompose_form a#"+assembly_reference+"_part").html("("+selected+")")
+               
+                
+            
+            
             make_combobox();
             form.hideLoading();
             }
@@ -18,7 +32,19 @@ function update_part_form() {
 }
 
     
+$(document).ready(function() {
+    $("#decompose_form button.toggle_extra_attributes_button").button().click(
+        function () {
+            var id = $(this).attr("id");
+            $("tr." + id).toggle();
+            $(this).children("span").text($(this).children("span").text() == "+" ? "-" : "+");
+            return false;
+        }
+    );
+    $("#decompose_form td.part_type_form > select").change(update_part_form);
+    });
 
+/*
 $(function() {
     $("#decompose_form button.toggle_extra_attributes_button").button().click(
         function () {
@@ -31,4 +57,5 @@ $(function() {
     $("#decompose_form td.part_type_form > select").change(update_part_form);
     }
  );
+ */
 
