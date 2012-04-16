@@ -6,7 +6,7 @@ from OCC.XSControl import XSControl_WorkSession
 from OCC.STEPControl import STEPControl_AsIs
 from OCC.STEPCAFControl import STEPCAFControl_Writer
 from OCC.TopLoc import TopLoc_Location
-
+from OCC.gp import gp_Trsf
 from STP_converter_WebGL import NEW_STEP_Import , SetLabelNom , colour_chercher
 from classes import generateArbre
 
@@ -54,21 +54,27 @@ def add_labels(product,lr,st):
     for link in product.links:
 
     
-        if link.product.doc_id!= product.doc_id:
-            print "adding labels to : " , link.product.name
-            my_step_importer = NEW_STEP_Import(link.product.doc_path)
-            print "A"
-            lr_2= TDF_LabelSequence()
+        if link.product.doc_id!= product.doc_id: # solo los que esten descompuesto, si no esta descompuesto no tiene que anadirlo
 
-            my_step_importer.shape_tool.GetFreeShapes(lr_2)
-            
-            add_labels(link.product,lr_2.Value(1),my_step_importer.shape_tool)
-            print "B"                
+            if not link.product.label_reference:
+
+                my_step_importer = NEW_STEP_Import(link.product.doc_path)
+                lr_2= TDF_LabelSequence()
+                my_step_importer.shape_tool.GetFreeShapes(lr_2)        
+                add_labels(link.product,lr_2.Value(1),my_step_importer.shape_tool)
+                link.product.label_reference=lr_2.Value(1)
+              
+              
             for d in range(link.quantity):
 
-                new_label=st.AddComponent(lr,lr_2.Value(1),TopLoc_Location(link.locations[d].Transformation()))
+                transformation=gp_Trsf()
+                transformation.SetValues(link.locations[d].x1,link.locations[d].x2,link.locations[d].x3,link.locations[d].x4,link.locations[d].y1,link.locations[d].y2,link.locations[d].y3,link.locations[d].y4,link.locations[d].z1,link.locations[d].z2,link.locations[d].z3,link.locations[d].z4,1,1)  
+                new_label=st.AddComponent(lr,link.product.label_reference,TopLoc_Location(transformation))
                 SetLabelNom(new_label,link.names[d])
-            print "C"                                            
+
+            
+        else:
+            pass # no hace falta por que ya esta en la geometria                                            
                 
     
 composer(sys.argv[1])    

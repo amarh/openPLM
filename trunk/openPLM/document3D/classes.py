@@ -1,5 +1,4 @@
-from OCC.gp import gp_Trsf
-from OCC.GarbageCollector import garbage
+
 import hashlib
 import string
 import random
@@ -7,10 +6,8 @@ import os
 import django.utils.simplejson as json
 import sys
 
-def new_collect_object(self, obj_deleted):
-        self._kill_pointed()
 
-garbage.collect_object=new_collect_object
+
 
 
 def get_available_name(location, name):
@@ -107,12 +104,12 @@ class Matrix_rotation(object):
             self.z3=list_coord[10] 
             self.z4=list_coord[11]    
 
-    
+    """    
     def Transformation(self):
         transformation=gp_Trsf()
         transformation.SetValues(self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4,1,1)
         return transformation     
-          
+    """          
     def to_array(self):    
         return [self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4] 
         
@@ -181,11 +178,9 @@ def search_assembly(name,label,id,product_root,geometry=False): # 2 modos , con 
                 if label:
 
                     if link.product.label_reference==label:
-                        print "Encontrado : " , link.product.name 
                         return link.product
                     
                 elif id==link.product.doc_id and geometry==link.product.geometry:
-                    print "Encontrado : " , link.product.name 
                     return link.product                                        
 
                 #else:

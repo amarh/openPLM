@@ -1,5 +1,4 @@
 import os, os.path
-from OCC.gp import *
 from openPLM.plmapp.controllers.part import PartController
 from classes import *
 import classes as classes 
@@ -109,23 +108,10 @@ def generate_object(loc,numeration,reference,part_id):
     locate="var object%s=new THREE.Mesh(_%s_%s,material_for_%s_%s );\n"%(numeration,reference,part_id,reference,part_id)
     locate+="object%s.matrixAutoUpdate = false;\n"%numeration
     if len(loc)>0:
-        transformation=gp_Trsf()
-        gp=gp_XYZ()
         for g in range(len(loc)):
-            if g==0:
-                transformation=loc[g].Transformation()
-            else:
-                transformation.Multiply(loc[g].Transformation())
-                
-        a ,b =transformation.GetRotation(gp)
-        t=transformation.TranslationPart()
+            locate+="object%s.matrix.multiplySelf(new THREE.Matrix4(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0,0,0,1));\n"%(numeration,loc[g].x1,loc[g].x2,loc[g].x3,loc[g].x4,loc[g].y1,
+            loc[g].y2,loc[g].y3,loc[g].y4,loc[g].z1,loc[g].z2,loc[g].z3,loc[g].z4)
 
-
-
-        if a:        
-            locate+="object%s.matrix.setRotationAxis(new THREE.Vector3( %s, %s, %s ), %s);\n"%(numeration,gp.X(),gp.Y(),gp.Z(),b)
-                  
-        locate+="object%s.matrix.setPosition(new THREE.Vector3( %s, %s, %s ));\n"%(numeration,t.X(),t.Y(),t.Z())
         
     locate+="object3D.add(object%s);\n"%numeration    
          
@@ -174,7 +160,7 @@ def add_child_ArbreFile(doc_file,product,product_root,deep):
         #new_product, visited =generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)
         new_product=generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)                                                                                     
         for location in list_loc[i]:
-            product.links[-1].add_occurrence(location.name,Matrix_rotation(location.to_array()))
+            product.links[-1].add_occurrence(location.name,location)
             
         if new_product:
             add_child_ArbreFile(stp,new_product,product_root,deep+1)                       
