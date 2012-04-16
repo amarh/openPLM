@@ -117,6 +117,7 @@ class NEW_STEP_Import(object):
     
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
+        #prohibir step conj 2 ROOTS
         deep=0
         for i in range(roots.Length()):
             
@@ -149,11 +150,11 @@ class simple_shape():
     
     
 def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,deep,doc_id,product_root):
-
+    #un parcour para ver si existen 2 nodos con el mismo nombre o algun nodo sin nombre al principio antes de empezar
 
     #colour_chercher(label,color_tool,shape_tool)
     if shape_tool.IsAssembly(label):
-        
+        # si no tiene nombre lanzar excepcion
         l_c = TDF_LabelSequence()
         shape_tool.GetComponents(label,l_c)
         for i in range(l_c.Length()):
@@ -166,32 +167,33 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
                         reference_found=True
                         break
                 if reference_found:
-                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))
+                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
                 else:
-                    
 
-                    product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root)        
-                    if product_assembly:
+                    product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root)
+                             
+                    if product_assembly:  
                         product.links.append(Link(product_assembly))
          
                     else:      
                         product.links.append(Link(Product(GetLabelNom(label_reference),deep,label_reference,doc_id)))                               
                         parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,shapes_simples,deep+1,doc_id,product_root)
                         
-                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation()))  
+                        
+                    
+                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))  
     else:            
         compShape=shape_tool.GetShape(label)
 
-        #nous cherchons sa correspondance dans la liste de shapes simples / si le shape n avais pas de vertices on ne trouvera aucun shape                         
+        #nous cherchons sa correspondance dans la liste de shapes simples / si le shape n avais pas de vertices on ne trouvera aucun shape 
+                      
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
                 product.set_geometry(index) # to evade product.geometry=0
                    
 
                
-
-
-              
+         
     
 
         

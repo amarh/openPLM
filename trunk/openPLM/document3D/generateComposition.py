@@ -20,7 +20,7 @@ def composer(temp_file_name):
 
     
     output = open(temp_file_name.encode(),"r")
-    product=generateArbre(json.loads(output.read()))
+    product =generateArbre(json.loads(output.read()))
     output.close()
     output = open(temp_file_name.encode(),"w+")# erase old data
     output.close()
@@ -55,20 +55,20 @@ def add_labels(product,lr,st):
 
     
         if link.product.doc_id!= product.doc_id:
-
+            print "adding labels to : " , link.product.name
             my_step_importer = NEW_STEP_Import(link.product.doc_path)
-            
+            print "A"
             lr_2= TDF_LabelSequence()
 
             my_step_importer.shape_tool.GetFreeShapes(lr_2)
             
             add_labels(link.product,lr_2.Value(1),my_step_importer.shape_tool)
-              
+            print "B"                
             for d in range(link.quantity):
 
                 new_label=st.AddComponent(lr,lr_2.Value(1),TopLoc_Location(link.locations[d].Transformation()))
                 SetLabelNom(new_label,link.names[d])
-                                            
+            print "C"                                            
                 
     
 composer(sys.argv[1])    

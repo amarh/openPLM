@@ -26,7 +26,7 @@ class view_3dTest(CommonViewTest):
         data.update({u'last_modif_time': [u'%s-%s-%s %s:%s:%s'%(self.document.mtime.year,self.document.mtime.month,self.document.mtime.day,self.document.mtime.hour,self.document.mtime.minute,self.document.mtime.second)],
            u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
            })
-                   
+    """                   
     def test_view3D_stp_decompose(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -37,7 +37,7 @@ class view_3dTest(CommonViewTest):
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data) 
         response = self.get(self.document.object.plmobject_url+"3D/")        
         self.assertEqual(len(response.context["GeometryFiles"]), 3)
-         
+    """         
     def test_3D_no_stp_associe(self):   
     
         response = self.get(self.document.object.plmobject_url+"3D/")
@@ -143,7 +143,7 @@ class view_decomposeTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)  
         response = self.get(self.base_url+"decompose/"+str(new_doc_file.id)+"/")
         # TODO: check forms
- 
+""" 
     def test_display_decompose_form_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -153,7 +153,8 @@ class view_decomposeTest(CommonViewTest):
         self.update_time(data)
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertRedirects(reponse_post, self.base_url + "BOM-child/")
-        
+"""
+"""        
     def test_display_decompose_time_modification_diferent(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -162,7 +163,8 @@ class view_decomposeTest(CommonViewTest):
         data = data1
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process")
-        
+"""
+"""        
     def test_display_decompose_time_modification_invalid(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -174,8 +176,8 @@ class view_decomposeTest(CommonViewTest):
            })
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse_post.context["extra_errors"],"Mistake reading of the last modification of the document, please restart the task")
-        
-                        
+"""        
+"""                        
     def test_display_decompose_file_locked(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -186,8 +188,8 @@ class view_decomposeTest(CommonViewTest):
         self.update_time(data)
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process")
-        
-        
+"""        
+"""    
     def test_display_decompose_Document_part_doc_links_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -197,7 +199,8 @@ class view_decomposeTest(CommonViewTest):
         self.update_time(data)
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse.context["extra_errors"],u"Columns reference, type, revision are not unique")
-    """        
+"""   
+"""     
     def test_display_decompose_Document3D_decomposer_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -208,8 +211,8 @@ class view_decomposeTest(CommonViewTest):
         GeometryFile.objects.filter(stp=new_doc_file).delete()
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse.context["extra_errors"],u"Error while the file step was decomposed")        
-    """
-            
+"""
+"""         
     def test_display_decompose_bom_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -220,8 +223,8 @@ class view_decomposeTest(CommonViewTest):
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse_post.context["bom_formset"].errors,[{'quantity': [u'This field is required.']}, {}])
 
-    
-    
+"""
+"""
     def test_display_decompose_part_type_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -233,7 +236,8 @@ class view_decomposeTest(CommonViewTest):
         self.assertEqual(reponse_post.context["part_type_formset"].errors,
                 [{'type_part': [u'Select a valid choice. Part54545 is not one of the available choices.']}, {}]
 )
-     
+"""
+"""     
     def test_display_decompose_creation_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -248,7 +252,7 @@ class view_decomposeTest(CommonViewTest):
             if index==1:
                 self.assertEqual(atributes[0].errors,{'group': [u'Bad group, check that the group exists and that you belong to this group.']})
             index+=1
-    
+"""    
                           
 
 

@@ -1,5 +1,3 @@
-from OCC.TopLoc import TopLoc_Location
-from OCC.TDF import *
 import os, os.path
 from OCC.gp import *
 from openPLM.plmapp.controllers.part import PartController
@@ -144,9 +142,10 @@ def read_ArbreFile(doc_file,recursif=None):
     except:
         return False
 
-    product=generateArbre(json.loads(new_ArbreFile.file.read()))
-    if recursif:
-        add_child_ArbreFile(doc_file,product,product,deep=1)        
+    #product , visited =generateArbre(json.loads(new_ArbreFile.file.read()))
+    product =generateArbre(json.loads(new_ArbreFile.file.read()))
+    if recursif and product:
+        add_child_ArbreFile(doc_file,product,product_root=product,deep=1)        
             
     return product
     
@@ -172,13 +171,13 @@ def add_child_ArbreFile(doc_file,product,product_root,deep):
         #try:
         
         new_ArbreFile=ArbreFile.objects.get(stp=stp)
-        new_product=generateArbre(json.loads(new_ArbreFile.file.read()),deep,product_root)                                                      
-        product.links.append(classes.Link(new_product))                             
+        #new_product, visited =generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)
+        new_product=generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)                                                                                     
         for location in list_loc[i]:
-            product.links[-1].add_occurrence(location.name,Matrix_rotation(location.Transforms()))
+            product.links[-1].add_occurrence(location.name,Matrix_rotation(location.to_array()))
             
-    
-        add_child_ArbreFile(stp,new_product,product_root,deep+1)                       
+        if new_product:
+            add_child_ArbreFile(stp,new_product,product_root,deep+1)                       
         #except:
 
             #pass
