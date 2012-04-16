@@ -231,12 +231,12 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
         initialiser_assemblys(assemblys,product,group,request,index)
-        deep_assemblys=sort_assemblys(assemblys)
+        
 
         extra_errors = ""
         
 
-
+    deep_assemblys=sort_assemblys(assemblys)
     ctx.update({'current_page':'decomposer',  # aqui cambiar
                 'deep_assemblys' : deep_assemblys,
                 'extra_errors' :  extra_errors ,
