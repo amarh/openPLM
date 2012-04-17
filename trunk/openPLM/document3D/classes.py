@@ -79,6 +79,11 @@ class Link(object):
             self.names.append(self.product.name)    
         else:
             self.names.append(name)
+            
+            
+        if self.product.name=="":
+            self.product.name=name
+               
         self.locations.append(Matrix_rotation)
         self.quantity=self.quantity+1
 
