@@ -22,20 +22,50 @@ import copy
 
 
 class Document3D(Document):
-    u"""
-    This model of document allows to treat files STEP for his later visualization. It extends Document with the attribute/tab 3D
     """
+    Model which allows to treat files STEP for his later visualization and decomposition. It extends :class:`Document` with the attribute/tab 3D    
+    :model attributes:
+            
+            :class:`Part` from which we generate the decomposition of the file STEP   
+        .. attribute:: PartDecompose
+            
+            original filename
+        .. attribute:: file
+            
+            file stored in :obj:`docfs`
+        .. attribute:: size
+            
+            size of the file in Byte
+        .. attribute:: locked
+
+            True if the file is locked
+        .. attribute:: locker
+            
+            :class:`~django.contrib.auth.models.User` who locked the file,
+            None, if the file is not locked
+        .. attribute:: document
+
+            :class:`Document` bounded to the file (required)
+    """
+
     
     PartDecompose = models.ForeignKey(Part,null=True)
     
     
     @property
     def menu_items(self):
+        """
+        Add Tab 3D 
+        """
         items = list(super(Document3D, self).menu_items)        
         items.extend(["3D"])
         return items
 
-    def get_content_and_size(self, doc_file): 
+    def get_content_and_size(self, doc_file):
+        """
+        Returns one DocumentFile related to this Document3D.
+        If the DocumentFile was decomposed , this function calls a subprocess to reconstruct the file 
+        """ 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
             
@@ -52,7 +82,7 @@ class Document3D(Document):
                     size =os.path.getsize(temp_file.name) 
                     return temp_file, size                   
                 else:
-                    raise Document3D_link_Error 
+                    raise Document3D_composition_Error 
                 
             else:
                 return super(Document3D, self).get_content_and_size(doc_file)
@@ -69,6 +99,14 @@ from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk):
 
+    """
+    Method called when adding a file STEP (method :meth:`add_file`) into Document3D with
+    *updates_attributes* true.
+
+    It calls the subprocess generate3D, that generates and associates an ArbreFile and one o more GeometryFiles with the documentFile
+    
+
+    """
 
 
     import logging
@@ -223,6 +261,10 @@ def delete_files(list_files,ext=""):
 class Document3D_link_Error(Exception):
     def __unicode__(self):
         return u"Did not find a file stp associated with the link"
+        
+class Document3D_composition_Error(Exception):
+    def __unicode__(self):
+        return u"Error during the composition of the file"
         
               
 class Document3D_decomposer_Error(Exception):
