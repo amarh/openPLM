@@ -4,32 +4,30 @@
 {% block scripts %}
     <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
     <script type="text/javascript" src="/media/js/3D/ajax3D.js"></script>
+    <script>
+	$(
+	    function(){
+		$("span.display_name").click(function (){
+		    var cell = $(this).parent();
+		    level = $(this).parent().attr("level");
+		    var find_part = 'tr[name^=part'+level+']';
+		    $(find_part).toggleClass("hidden");
+		    var find_doc = 'tr[name^=doc'+level+']';
+		    $(find_doc).toggleClass("hidden");
+		    cell.toggleClass("open");
+		});
+		$("td.|-> p a").click(function (){
+		   var id_ref = $(this).attr("href"); //id_ref=#name
+		   $(id_ref+" span.display_name").click();
+		});
+	    }
+	);
+    </script>
 {% endblock %}
 
 {% block css %}
     <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
-
-    <style type="text/css">
-        table.Content tr.part td {
-            background-color: #ccc;
-            color: #000;
-        }
-        table.Content tr td.errors {
-            background-color: #F03838;
-            color: #000;
-        }
-        tr.extra_errors td {
-            padding: 0.5em;
-        }
-        .toggle_extra_attributes_button span {
-            width: 1em;
-        }
-        table.Content th.cell_label {
-            width: 15em;
-        }
-
-    </style>
-
+    <link rel="stylesheet" href="/media/css/displayDecompose.css" type="text/css"/>
 {% endblock %}
 
 {% block content %}
@@ -67,26 +65,28 @@
         
 
         <tr class="assembly"> 
-            <td class="assembly_name" id="{{assembly.1}}" colspan="10">
+	    <td class="assembly_level" id="{{forloop.counter0}}" colspan="10">
+	    <!--<td class="assembly_name" id="level{{forloop.counter0}}" colspan="10">-->
 
-                {{forloop.counter0}}
+                {% trans "Level" %} {{forloop.counter0}}
 
             </td>        
-        
+        {% with forloop.counter0 as level %}
                 
         {% for assembly in deep %}       <!-- assembly.0 froms ,  assembly.1 name , assembly.2 interne reference pour href links -->                  
   
             
-            
-            <tr class="assembly"> 
-            <td class="assembly_name" id="{{assembly.1}}" colspan="10">
 
-                {{assembly.1}}
+            <tr class="assembly"> 
+            <td class="assembly_name" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
+
+		<span class="display_name"> {{assembly.1}}
                       
-                <a id="{{assembly.2}}_part">
+                   <a id="{{assembly.2}}_part">
                 
                 (Part) <!-- type de part de la part  -->
-                </a>
+                   </a>
+		</span>
 
             </td>
 
@@ -95,16 +95,19 @@
             
 
 
-            </tr>  
+            </tr>
+		{% with forloop.counter0 as assembly_num %}
            
                 {% for part_type , ord_quantity , part_doc_cforms, name , is_assembly , prefix , ref  in assembly.0 %} 
-                
 
-                    <tr class="part">
+		    {% if level > 0 %}
+		    <tr class="part hidden" name="part{{level}}{{assembly_num}}{{forloop.counter0}}">
+		    {% else %}
+                    <tr class="part" name="part{{level}}{{assembly_num}}{{forloop.counter0}}">
+		    {% endif %}
+
                     
-                    
-                    
-                        <td class="|->">
+                        <td   class="|->">
                         <!--esthetique -->
                         {%if not prefix and forloop.last %}
                         
@@ -123,7 +126,7 @@
                         
                         
                         
-                        <td>
+                        <td  >
                             <p>
                              {% if is_assembly %}
                                 <a href="#{{name}}">{{name}}<a>
@@ -134,9 +137,9 @@
                             </p>
 
                         </td>
-                        <td class="order" >{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
-                        <td class="quantity">{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
-                        <td class="quantity">{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
+                        <td class="order"  >{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
+                        <td class="quantity"  >{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
+                        <td class="quantity"  >{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
 
 
 
@@ -167,7 +170,7 @@
                     <tr class="part part_show-{{prefix}} show_hide" 
                         {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
                         >
-                        <td class="|">
+                       <td class="|">
                         {% if not forloop.last %}| {% endif %}
                         </td>
                         <td class="vide" colspan="4">
@@ -194,7 +197,11 @@
                     
                     
                     {% if prefix %} <!-- else nothing to show , the part was defined in a previous assembly  -->
-                    <tr class="document">
+		    {% if level > 0 %}
+                    <tr class="document hidden"  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
+		    {% else %}
+                    <tr class="document"  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
+		    {% endif %}
                         <td class="|">
                         {% if not forloop.last %}| {% endif %}
                         </td>
@@ -254,9 +261,9 @@
                                         
                     {% endif %}             
                     {% endfor %}
-
-                             
+		    {% endwith %}
         {% endfor %}
+	{% endwith %}
         {% endfor %}
         </table>
         <input type="submit" value="{% trans "Create" %}"/> 

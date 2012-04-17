@@ -1,0 +1,65 @@
+
+/* todo : add color to line which contain file name
+** td.assembly_name {
+    ** background-image : url("../../img/dark/h2_bg_2.png");
+** }
+*/
+
+table.Content tr.assembly td.assembly_level{
+   /*background-image: url("../img/dark/h2_bg_2.png");
+   background-repeat: no-repeat;
+   background-size: 100%;*/
+    background-color: #597f8e;
+}
+
+table.Content tr.part td {
+    background-color: #ccc;
+    color: #000;
+}
+
+table.Content tr td.errors {
+    background-color: #F03838;
+    color: #000;
+}
+
+tr.extra_errors td {
+    padding: 0.5em;
+}
+
+.toggle_extra_attributes_button span {
+    width: 1em;
+}
+ 
+table.Content th.cell_label {
+    width: 15em;
+}
+
+table.Content tr.assembly td.assembly_name{
+    /*background-image: url("../img/dark/h2_bg.png");
+    background-repeat: no-repeat;
+    background-size: 100%;*/
+    background-color: #8f8d8d;
+}
+
+td.assembly_name span.display_name {
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: auto;
+    background-image: url("../img/expander_normal.png");
+    display:block; min-width:36px; 
+    text-indent: 16px;
+    background-repeat: no-repeat;
+    background-position: 0 5px;
+    padding-left:4px;
+    margin-left:6px;
+    color:black;
+    text-align:left;
+}
+
+td.open span.display_name{
+   background-image : url("../img/expander_open.png");
+}
+
+.hidden{
+    display : none;
+}
