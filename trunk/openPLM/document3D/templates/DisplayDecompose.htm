@@ -17,8 +17,19 @@
 		    cell.toggleClass("open");
 		});
 		$("td.|-> p a").click(function (){
-		   var id_ref = $(this).attr("href"); //id_ref=#name
-		   $(id_ref+" span.display_name").click();
+		    var id_ref = $(this).attr("href"); //id_ref=#name
+		    $(id_ref+" span.display_name").click();
+		});
+		$("td a").click(function(){
+		    var id_ref = $(this).attr("name"); //id_ref=#name
+		    var t_body= $(this).parent().parent().parent();
+		    var array_tr = $(t_body).children("tr.part").children("td").children("p[name=ref_"+id_ref.substring(1)+"]");
+		    //alert(array_tr.size());
+		    var array_td=new Array();
+		    $.each(array_tr, function(index, value){
+			var level=$(value).parent().parent().attr("level");
+			$("td[level="+level.substring(0,2)+"]").find("span").click();
+		    });
 		});
 	    }
 	);
@@ -78,7 +89,11 @@
             
 
             <tr class="assembly"> 
+	    {% if level == 0 %}
+            <td class="assembly_name open" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
+	    {% else %}
             <td class="assembly_name" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
+	    {% endif %}
 
 		<span class="display_name"> {{assembly.1}}
                       
@@ -101,9 +116,9 @@
                 {% for part_type , ord_quantity , part_doc_cforms, name , is_assembly , prefix , ref  in assembly.0 %} 
 
 		    {% if level > 0 %}
-		    <tr class="part hidden" name="part{{level}}{{assembly_num}}{{forloop.counter0}}">
+		    <tr class="part hidden" name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
 		    {% else %}
-                    <tr class="part" name="part{{level}}{{assembly_num}}{{forloop.counter0}}">
+                    <tr class="part" name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
 		    {% endif %}
 
                     
@@ -127,10 +142,9 @@
                         
                         
                         <td  >
-                            <p>
+                            <p name="ref_{{name}}">
                              {% if is_assembly %}
-                                <a href="#{{name}}">{{name}}<a>
-
+                                <a href="#{{name}}" >{{name}}<a>
                              {% else %}
                                 {{name}}   
                              {% endif %}
@@ -186,7 +200,7 @@
                         {% else %} <!--  href for the part already defined-->
                         
                          <td colspan="5"> 
-                         <a href="#{{ref}}_ref">ya referenciado<a>
+                         <a href="#{{ref}}_ref" name="#{{name}}">{% trans "already indexed" %}<a>
                          </td>
                         
                         
