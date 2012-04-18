@@ -8,27 +8,24 @@
 	$(
 	    function(){
 		$("span.display_name").click(function (){
-		    var cell = $(this).parent();
 		    level = $(this).parent().attr("level");
-		    var find_part = 'tr[name^=part'+level+']';
-		    $(find_part).toggleClass("hidden");
-		    var find_doc = 'tr[name^=doc'+level+']';
-		    $(find_doc).toggleClass("hidden");
-		    cell.toggleClass("open");
+		    $('tr[name^=part'+level+']').toggleClass("hidden");
+		    $('tr[name^=doc'+level+']').toggleClass("hidden");
+		    $(this).parent().toggleClass("open");
 		});
 		$("td.|-> p a").click(function (){
-		    var id_ref = $(this).attr("href"); //id_ref=#name
-		    $(id_ref+" span.display_name").click();
+		    //$(this).attr("href") return '#name' where name is the name of the assembly
+		    $($(this).attr("href")+" span.display_name").click();
 		});
 		$("td a").click(function(){
-		    var id_ref = $(this).attr("name"); //id_ref=#name
-		    var t_body= $(this).parent().parent().parent();
-		    var array_tr = $(t_body).children("tr.part").children("td").children("p[name=ref_"+id_ref.substring(1)+"]");
-		    //alert(array_tr.size());
-		    var array_td=new Array();
-		    $.each(array_tr, function(index, value){
-			var level=$(value).parent().parent().attr("level");
-			$("td[level="+level.substring(0,2)+"]").find("span").click();
+		    var t_body = $(this).parent().parent().parent();
+		    //$(this).attr("name") return 'name' where name is the name of the assembly
+		    var array = $(t_body).children("tr.part").children("td").children("p[name=ref_"+$(this).attr("name")+"]");
+		    $.each(array, function(index, value){
+			if($(value).children("a").attr("ref")==undefined) {
+				var level=$(value).parent().parent().attr("level");
+				$("td[level="+level.substring(0,2)+"]").find("span").click();
+			}
 		    });
 		});
 	    }
@@ -144,7 +141,12 @@
                         <td  >
                             <p name="ref_{{name}}">
                              {% if is_assembly %}
-                                <a href="#{{name}}" >{{name}}<a>
+				
+				<a href="#{{name}}" 
+				{% if ref %}
+				ref="#{{ref}}_ref"
+				{% endif %}
+                                >{{name}}<a>
                              {% else %}
                                 {{name}}   
                              {% endif %}
@@ -200,7 +202,7 @@
                         {% else %} <!--  href for the part already defined-->
                         
                          <td colspan="5"> 
-                         <a href="#{{ref}}_ref" name="#{{name}}">{% trans "already indexed" %}<a>
+                         <a href="#{{ref}}_ref" name="{{name}}">{% trans "already indexed" %}<a>
                          </td>
                         
                         
