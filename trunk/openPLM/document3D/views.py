@@ -155,8 +155,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
             document_controller=DocumentController(stp_file.document,User.objects.get(username=settings.COMPANY))
             index=[1]
-            if clear_form(request,assemblys,product,index):
-                
+            if clear_form(request,assemblys,product,index,obj_type):
                 # y si tiene un nativo   que hago con el
                 if (same_time(old_modification_data_time, 
                               old_modification_data_microsecond,
@@ -181,9 +180,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
                     try:
                         instances=[]
-                        print "Empieza la decomposicion" 
                         generate_part_doc_links_AUX(request,product, obj,instances)
-                        print "entra"
                         update_indexes.delay(instances) 
                     except Exception as excep:
                         if type(excep) == Document_part_doc_links_Error:
@@ -199,6 +196,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             native_related.deprecated=False
                             native_related.save(False)
                     else:
+                        
                         decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
                         #decomposer_all(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
@@ -230,7 +228,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
-        initialiser_assemblys(assemblys,product,group,request,index)
+        initialiser_assemblys(assemblys,product,group,request,index,obj_type)
         
 
         extra_errors = ""
@@ -260,7 +258,7 @@ def sort_assemblys(assemblys):
 
     
 
-def clear_form(request,assemblys, product,index):
+def clear_form(request,assemblys, product,index,obj_type):
 
 
     creation_formset=[]
@@ -312,18 +310,23 @@ def clear_form(request,assemblys, product,index):
                 index[0]+=1            
 
                                               
-                if not clear_form(request, assemblys, link.product,index):
+                if not clear_form(request, assemblys, link.product,index , part):
                     valid=False
             else:
                 index[0]+=1 
                 part_type.append(False);creation_formset.append(False);prefix.append(False);ref.append(link.product.visited)
+        
+        
+
+        
+        
                                 
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited , product.deep))            
+        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited , product.deep, obj_type))            
     return valid                                    
         
         
    
-def initialiser_assemblys(assemblys,product,group,request,index):
+def initialiser_assemblys(assemblys,product,group,request,index, obj_type):
 
     creation_formset=[]
     initial_bom_values=[]
@@ -360,15 +363,14 @@ def initialiser_assemblys(assemblys,product,group,request,index):
                 ref.append(None)
                 index[0]+=1
                 index[1]+=1                   
-                initialiser_assemblys(assemblys,link.product,group,request,index)                 
+                initialiser_assemblys(assemblys,link.product,group,request,index, "Part")                 
             else:
-                #print "Initializer-el producto fue visitado: " , link.product.name 
                 index[0]+=1 
                 part_type.append(False);creation_formset.append(False);prefix.append(False);ref.append(link.product.visited)
                    
 
-        #assemblys.insert(0,(zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix)  , product.name , product.visited))
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep))
+
+        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep, obj_type))
 
 @transaction.commit_on_success
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances):  # para generar bien el commit on succes
@@ -422,14 +424,14 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
                 part_ctrl.attach_to_document(doc_ctrl.object)
                 
-                
+                                    
                 Doc3D=Document3D.objects.get(id=doc_ctrl.object.id)
                 Doc3D.PartDecompose=part_ctrl.object
+                Doc3D.no_index=True 
                 Doc3D.save()
-                try:
-                    generate_part_doc_links(request,link.product, part_ctrl,instances)
-                except Exception as excep:
-                    raise excep
+
+                generate_part_doc_links(request,link.product, part_ctrl,instances)
+
                     
             else:
             
@@ -439,48 +441,14 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
             
 
         except Exception as excep:
-            raise excep
-            #raise Document_part_doc_links_Error(to_delete,link.product.name)    
+            raise Document_part_doc_links_Error(to_delete,link.product.name)    
     
 
 
             
  
 
-"""      
-@transaction.commit_on_success           
-def generate_part_doc_links(prepare_list, links, parent_ctrl):
 
-    index=0;
-    doc_controllers = []
-    instances = []
-    to_delete=[]
-    user = parent_ctrl._user
-    for  ord_quantity, (part_form, doc_form)  in prepare_list:
-
-        try:
-            part_ctrl = parent_ctrl.create_from_form(part_form, user, True, True)
-            instances.append((part_ctrl.object._meta.app_label,
-                part_ctrl.object._meta.module_name, part_ctrl.object._get_pk_val()))
-
-            link = parent_ctrl.add_child(part_ctrl.object,ord_quantity[1],ord_quantity[0],ord_quantity[2])
-            generate_extra_location_links(links[index], link)
-            doc_ctrl = Document3DController.create_from_form(doc_form,
-                    user, True, True)
-                    
-            to_delete.append(generateGhostDocumentFile(links[index].product,doc_ctrl))
-
-               
-            instances.append((doc_ctrl.object._meta.app_label,
-                doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
-            part_ctrl.attach_to_document(doc_ctrl.object)
-            doc_controllers.append(doc_ctrl)
-            index+=1
-        except :
-            raise Document_part_doc_links_Error(to_delete)
-            
-    update_indexes.delay(instances)
-"""
     
 def generateGhostDocumentFile(product,Doc_controller):
     #importante modifica el arbol
