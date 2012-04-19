@@ -1,14 +1,7 @@
-
-/* todo : add color to line which contain file name
-** td.assembly_name {
-    ** background-image : url("../../img/dark/h2_bg_2.png");
-** }
-*/
-
+table.Content tr td{
+    vertical-align: middle;
+}
 table.Content tr.assembly td.assembly_level{
-   /*background-image: url("../img/dark/h2_bg_2.png");
-   background-repeat: no-repeat;
-   background-size: 100%;*/
     height: 40px;
     background-color: #597f8e;
     vertical-align: middle;
@@ -40,9 +33,6 @@ table.Content th.cell_label {
 }
 
 table.Content tr.assembly td.assembly_name{
-    /*background-image: url("../img/dark/h2_bg.png");
-    background-repeat: no-repeat;
-    background-size: 100%;*/
     height: 30px;
     background-color: #8f8d8d;
     vertical-align: middle;
@@ -78,6 +68,34 @@ td.open span.display_name:hover{
    background-image : url("../img/expander_open_hover.png");
 }
 
+td.assembly_level span.display_level {
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: auto;
+    background-image: url("../img/expander_normal.png");
+    background-size: 0.55%;
+    display:block; min-width:36px; 
+    text-indent: 16px;
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding-left:4px;
+    margin-left:6px;
+    color:black;
+    text-align:left;
+}
+
+td.assembly_level span.display_level:hover{
+    background-image: url("../img/expander_normal_hover.png");
+}
+
+td.open span.display_level{
+    background-image : url("../img/expander_open.png");
+    background-size: 1%;
+}
+
+td.open span.display_level:hover{
+   background-image : url("../img/expander_open_hover.png");
+}
 .hidden{
     display : none;
 }

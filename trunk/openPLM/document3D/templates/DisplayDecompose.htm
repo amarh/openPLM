@@ -7,24 +7,50 @@
     <script>
 	$(
 	    function(){
+		// display or hide all assembly at the level of the span clicked
+		$("span.display_level").click(function(){
+		    var level = $(this).parent().attr("id");
+		    var td_level = $("td[level^="+level+"]");
+		    var open;
+		    $(this).parent().hasClass("open")? open=true : open=false;
+		    $.each(td_level,function(index,value){
+			if($(value).hasClass("open")===open)
+			    $(value).find("span").click();
+		    });
+		    $(this).parent().toggleClass("open");
+		});
+
+		// display or hide one assembly
 		$("span.display_name").click(function (){
 		    level = $(this).parent().attr("level");
 		    $('tr[name^=part'+level+']').toggleClass("hidden");
 		    $('tr[name^=doc'+level+']').toggleClass("hidden");
 		    $(this).parent().toggleClass("open");
 		});
-		$("td.|-> p a").click(function (){
+
+		// display or hide the assembly corresponding to the part
+		$("a.display").click(function (){
 		    //$(this).attr("href") return '#name' where name is the name of the assembly
-		    $($(this).attr("href")+" span.display_name").click();
-		});
-		$("td a").click(function(){
-		    var t_body = $(this).parent().parent().parent();
-		    //$(this).attr("name") return 'name' where name is the name of the assembly
-		    var array = $(t_body).children("tr.part").children("td").children("p[name=ref_"+$(this).attr("name")+"]");
+		    var id_ref=$(this).attr("href").substr(1);
+		    var array=$("td.assembly_name");
 		    $.each(array, function(index, value){
-			if($(value).children("a").attr("ref")==undefined) {
-				var level=$(value).parent().parent().attr("level");
-				$("td[level="+level.substring(0,2)+"]").find("span").click();
+			if(value.id === id_ref)
+			   $(value).find("span").click();
+		    });
+		});
+
+		// display description of a part (type, document, name ....)
+		$("a.indexed").click(function(){
+		    var t_body = $(this).parent().parent().parent();
+		    var name_ref=$(this).attr("name");
+		    //$(this).attr("name") return 'name' where name is the name of the part
+		    var array = $(t_body).children("tr.part").children("td").children('p[name=ref_'+name_ref+']');
+		    $.each(array, function(index, value){
+			if($(value).attr("name").substr(4) === name_ref){
+			    var level=$(value).parent().parent().attr("level");
+			    var td_level = $("td[level="+level.substring(0,2)+"]");
+			    if($(td_level).hasClass("open") == false)
+				$(td_level).find("span").click();
 			}
 		    });
 		});
@@ -73,15 +99,16 @@
         
 
         <tr class="assembly"> 
+	    {% if forloop.counter0 == 0 %}
+	    <td class="assembly_level open" id="{{forloop.counter0}}" colspan="10">
+	    {% else %}
 	    <td class="assembly_level" id="{{forloop.counter0}}" colspan="10">
-	    <!--<td class="assembly_name" id="level{{forloop.counter0}}" colspan="10">-->
-
-                {% trans "Level" %} {{forloop.counter0}}
-
+	    {% endif %}
+                <span class="display_level" title="{%trans "Display or Hide all assemblys at this level"%}">{% trans "Level" %} {{forloop.counter0}}</span>
             </td>        
         {% with forloop.counter0 as level %}
                 
-        {% for assembly in deep %}       <!-- assembly.0 froms ,  assembly.1 name , assembly.2 interne reference pour href links -->                  
+        {% for assembly in deep %}       <!-- assembly.0 froms ,  assembly.1 name , assembly.2 interne reference pour href links , assembly.4 type-->                  
   
             
 
@@ -96,7 +123,8 @@
                       
                    <a id="{{assembly.2}}_part">
                 
-                (Part) <!-- type de part de la part  -->
+                <!--(Part) <!-- type de part de la part  -->
+		   ({{assembly.4}})
                    </a>
 		</span>
 
@@ -123,14 +151,14 @@
                         <!--esthetique -->
                         {%if not prefix and forloop.last %}
                         
-                        -> 
+                        <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%" />
                         {% else %}
                         
                         
                         {% if not forloop.last or forloop.first %} 
-                         |->
+                        <img src="/media/img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
                         {% else %}
-                        ->                        
+                        <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%"/>
                         {% endif %}
                         {% endif %}
                         <!--/esthetique -->
@@ -142,7 +170,7 @@
                             <p name="ref_{{name}}">
                              {% if is_assembly %}
 				
-				<a href="#{{name}}" 
+				<a class="display" href="#{{name}}" 
 				{% if ref %}
 				ref="#{{ref}}_ref"
 				{% endif %}
@@ -153,8 +181,8 @@
                             </p>
 
                         </td>
-                        <td class="order"  >{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
-                        <td class="quantity"  >{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
+                        <td  class="order"  >{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
+                        <td  class="quantity"  >{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
                         <td class="quantity"  >{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
 
 
@@ -187,7 +215,9 @@
                         {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
                         >
                        <td class="|">
-                        {% if not forloop.last %}| {% endif %}
+                        {% if not forloop.last %}
+                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%" />
+			{% endif %}
                         </td>
                         <td class="vide" colspan="4">
                         </td>
@@ -202,7 +232,7 @@
                         {% else %} <!--  href for the part already defined-->
                         
                          <td colspan="5"> 
-                         <a href="#{{ref}}_ref" name="{{name}}">{% trans "already indexed" %}<a>
+                         <a class="indexed" href="#{{ref}}_ref" name="{{name}}">{% trans "already indexed" %}<a>
                          </td>
                         
                         
@@ -219,7 +249,9 @@
                     <tr class="document"  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
 		    {% endif %}
                         <td class="|">
-                        {% if not forloop.last %}| {% endif %}
+                        {% if not forloop.last %}
+                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+			{% endif %}
                         </td>
                         <td class="vide" colspan="4">
                         </td>
@@ -254,9 +286,11 @@
                     >
                     
                     
-                        <td class="|">
+                       <td class="|">
                         <!--esthetique -->
-                        {% if not forloop.last %}| {% endif %}
+                        {% if not forloop.last %}
+                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+			{% endif %}
                         <!--/esthetique -->
                         </td>
                         
