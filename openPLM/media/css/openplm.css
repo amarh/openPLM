@@ -942,9 +942,6 @@ a#linobject {
     border-bottom: 1px solid #ccc;
     padding: 0.2em;
 }
-#navigation_history:hover {
-    overflow-x: visible;
-}
 
 #navigation_history_inner {
     position: absolute;
@@ -971,27 +968,24 @@ a#linobject {
 
 #navigation_history li div.quick_link {
     display: none;
-    position: absolute;    
+    position: fixed;
     z-index: 1000;
     background-color: #343434;
     width: 15em;
+    box-shadow: 3px 3px 5px #888;
 }
-#navigation_history li:hover div.quick_link,
-#navigation_history div.quick_link:hover
-{
-    display:block;
-}
+
 #navigation_history div.quick_link a {
     display: block;
-    padding: 0.5em;
-    margin: 0.5em 0;
+    padding: 0.7em 0.5em;
     font-size: normal;
     color: #eee;
+    border: 1px solid #343434;
 }
 #navigation_history div.quick_link a:hover {
     color: #343434;
     background-color: #eee;
-    
+    margin-left: -3px;
 }
 
 /* deprecated files: small font-size */
