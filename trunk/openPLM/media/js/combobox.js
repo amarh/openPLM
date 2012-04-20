@@ -61,7 +61,26 @@ var make_combobox = function () {
 
 }
 
-$(
-  make_combobox 
 
- );
+$(
+
+    function () {
+        make_combobox(); 
+
+        $("#navigation_history li").hoverIntent({
+            over: function() {
+                $("#navigation_history").find("div.quick_link").hide();
+                var top = $(this).offset().top + $(this).height() + 5;
+                $(this).find("div.quick_link").css({
+                    "top" : top + "px",
+                    "min-width" : $(this).width() + "px"
+                }).show();
+                $(this).addClass("hover");
+            },
+            timeout: 600,
+            out: function() {
+                $(this).find("div.quick_link").hide();
+            }
+        });
+    }
+);
