@@ -75,7 +75,6 @@ $(
                     "top" : top + "px",
                     "min-width" : $(this).width() + "px"
                 }).show();
-                $(this).addClass("hover");
             },
             timeout: 600,
             out: function() {
