@@ -429,7 +429,7 @@ class NavigationGraph(object):
                 # this will be used later to see if it has an attached document
                 self._part_to_node[id_] = data
             else:
-                data["path"] = url
+                data["path"] = iri_to_uri("/".join(ref))
                 data["thumbnails"] = True
                 type_ = "document"
 
