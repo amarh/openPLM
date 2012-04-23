@@ -70,7 +70,7 @@ $(
         $("#navigation_history li").hoverIntent({
             over: function() {
                 $("#navigation_history").find("div.quick_link").hide();
-                var top = $(this).offset().top + $(this).height() + 5;
+                var top = $(this).offset().top - $("html").scrollTop() + $(this).height() + 5;
                 $(this).find("div.quick_link").css({
                     "top" : top + "px",
                     "min-width" : $(this).width() + "px"
