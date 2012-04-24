@@ -1,13 +1,15 @@
 import os, os.path
-from openPLM.plmapp.controllers.part import PartController
-from classes import *
-import classes as classes 
-from openPLM.plmapp.models import *
-from openPLM.plmapp.models import DocumentFile
+
 import django.utils.simplejson as json
     
 def generate_javascript_for_3D(product):
-
+    """
+    
+    :param product: :class:`.Product` that represents the arborescense of the :class:`.DocumentFile` that we want to show
+    
+    From a :class:`.Product`  generates the code javascript necessarily to locate and to show the different geometries that compose the visualization 3D
+    
+    """
     if product:
         numeration=[0]
         javascript=['var object3D = new THREE.Object3D();\n']        
@@ -38,7 +40,7 @@ def generate_javascript(product,numeration,javascript,loc,javascript_menu,old_nu
 
     javascript_menu[0]+="<ul>"
         
-    if product.geometry==None:
+    if product.geometry==False:
         parts_generated=[]
              
         for link in product.links:
@@ -120,124 +122,7 @@ def generate_object(loc,numeration,reference,part_id):
      
     return locate
     
-def read_ArbreFile(doc_file,recursif=None):
-
-    from models import  ArbreFile 
-    try:
-        new_ArbreFile=ArbreFile.objects.get(stp=doc_file)
-    except:
-        return False
-
-    #product , visited =generateArbre(json.loads(new_ArbreFile.file.read()))
-    product =generateArbre(json.loads(new_ArbreFile.file.read()))
-    if recursif and product:
-        add_child_ArbreFile(doc_file,product,product_root=product,deep=1)        
-            
-    return product
-    
-
-    
-    
-def add_child_GeometryFiles(doc_file,files_to_add):
-#ahora puede tener 2 veces el mismo recorrido
-    from models import  GeometryFile
-    stp_related ,list_loc=get_step_related(doc_file)
-    for stp in stp_related: 
-        files_to_add+=list(GeometryFile.objects.filter(stp=stp))
-        add_child_GeometryFiles(stp,files_to_add)
-                        
-                            
-                            
-def add_child_ArbreFile(doc_file,product,product_root,deep):
-
-    from models import  ArbreFile
-    stp_related,list_loc=get_step_related(doc_file)
-
-    for i,stp in enumerate(stp_related):    
-        #try:
-        
-        new_ArbreFile=ArbreFile.objects.get(stp=stp)
-        #new_product, visited =generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)
-        new_product=generateArbre(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,from_child_ArbreFile=product)                                                                                     
-        for location in list_loc[i]:
-            product.links[-1].add_occurrence(location.name,location)
-            
-        if new_product:
-            add_child_ArbreFile(stp,new_product,product_root,deep+1)                       
-        #except:
-
-            #pass
-
-                             
-
-def get_step_related(doc_file,locations=None):
-    from models import Document3D ,Location_link , is_stp
-    stp_related=[]
-    list_loc=[]
-    Doc3D=Document3D.objects.get(id=doc_file.document.id)
-    part=Doc3D.PartDecompose
-    
-    if part:
-        list_link=ParentChildLink.objects.filter(parent=part, end_time=None)
-        for i in range(len(list_link)):
-            locations=list(Location_link.objects.filter(link=list_link[i]))
-            if locations: 
-                part_child=list_link[i].child
-                part_controller=PartController(part_child,None)
-                list_doc=part_controller.get_attached_documents()
-                
-                for Doc_Part_Link in list_doc:
-                    if Doc_Part_Link.document.type=="Document3D":
-                        STP_file=Doc_Part_Link.document.files.filter(is_stp)
-                        if STP_file.exists():
-                            stp_related.append(STP_file[0])
-                            list_loc.append(locations)
-                        else:
-                            pass
-                            #raise Document3D_link_Error
-                            
-                        break
-
-    return stp_related , list_loc
-                            
-                                                       
-
-    
-    
-
-        
-def generate_ArbreFile(product,doc_file):
-
-
-    from models import  ArbreFile
-    #delete_ArbreFile(doc_file)
-    
-    
-    data=data_for_product(product)
-
-    fileName, fileExtension = os.path.splitext(doc_file.filename) 
-    new_ArbreFile= ArbreFile(decomposable=bool(product.links))
-    new_ArbreFile.stp = doc_file
-    name = new_ArbreFile.file.storage.get_available_name(fileName+".arb")
-    path = os.path.join(new_ArbreFile.file.storage.location, name)
-    new_ArbreFile.file = name
-    new_ArbreFile.save()
-    directory = os.path.dirname(path.encode())        
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    output = open(path.encode(),"w")
-    output.write(json.dumps(data))        
-    output.close() 
-    return new_ArbreFile.file.path          
-   
-    
-    
-                
- 
-    
-   
-
-      
+       
 def function_generate_menu(numeration,name):
 
     onclick="change_part"+str(numeration)+"(\\\"click\\\")" 
@@ -269,7 +154,6 @@ function_change_object = """
 
 
 
-#var NewMaterial=new THREE.MeshFaceMaterial({opacity:0.5,shading:THREE.SmoothShading});
   
     
     

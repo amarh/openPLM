@@ -28,7 +28,7 @@ from OCC.Quantity import Quantity_Color
 from mesh import *
 from classes import *
 from OCC.GarbageCollector import garbage
-#from openPLM.document3D.models import media3DGeometryFile
+
 """
 l_SubShapes = TDF_LabelSequence()
 shape_tool.GetSubShapes(label,l_SubShapes)
@@ -47,8 +47,13 @@ garbage.collect_object=new_collect_object
     
 class NEW_STEP_Import(object):
 
-
-   
+    """
+    Class capable of generating from a file .step: 
+    
+    -A set of files **.geo** that represents the geometry of the different simple products that are useful to realize the visualization 3D across the web browser. 
+    
+    -A structure of information that represents the arborescencse of the different assamblajes,represented in a  :class:`.Product` . (Including his spatial location and orientation)
+   """
     
     def __init__(self, file_path,id=None):
 
@@ -65,13 +70,13 @@ class NEW_STEP_Import(object):
         self.STEPReader = STEPCAFControl_Reader()  
 
         if not self.STEPReader.ReadFile(self.file) == 1:
-            print "False"
+            raise OCC_ReadingStep_Error
                
         self.h_doc = TDocStd.Handle_TDocStd_Document()
         self.app = XCAFApp.GetApplication().GetObject()
-        self.app.NewDocument(TCollection_ExtendedString("XmlXCAF"),self.h_doc)
+        self.app.NewDocument(TCollection_ExtendedString("MDTV-XCAF"),self.h_doc)
         """
-          Formats.Append(TCollection_ExtendedString ("MDTV-XCAF"));  
+          Formats.Append(TCollection_ExtendedString (""));  
           Formats.Append(TCollection_ExtendedString ("XmlXCAF"));
           Formats.Append(TCollection_ExtendedString ("XmlOcaf"));
           Formats.Append(TCollection_ExtendedString ("MDTV-Standard"));
@@ -103,12 +108,12 @@ class NEW_STEP_Import(object):
     def procesing_geometrys(self,location):
 
         files_index=""
-
+        
         for index, shape in enumerate(self.shapes_simples):
                 name=get_available_name(location,self.fileName+".geo")
                 path=os.path.join(location, name)
-                mesh_shape(shape,path,"_"+str(index)+"_"+str(self.id))
-                files_index+="GEO:"+name+" , "+str(index)+"\n"
+                mesh_shape(shape,path,"_"+str(index+1)+"_"+str(self.id)) #index+1
+                files_index+="GEO:"+name+" , "+str(index+1)+"\n" #index+1
              
      
         return files_index        
@@ -117,13 +122,13 @@ class NEW_STEP_Import(object):
     
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
-        #prohibir step conj 2 ROOTS
-        deep=0
-        for i in range(roots.Length()):
-            
-            self.product_relationship_arbre=Product(GetLabelNom(roots.Value(i+1)),deep,roots.Value(i+1),self.id,self.file) 
-            parcour_product_relationship_arbre(roots.Value(i+1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
-            (deep+1),self.id,self.product_relationship_arbre)
+        if not roots.Length()==1:
+            raise MultiRoot_Error
+
+        deep=0            
+        self.product_relationship_arbre=Product(GetLabelNom(roots.Value(1)),deep,roots.Value(1),self.id,self.file) 
+        parcour_product_relationship_arbre(roots.Value(1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
+        (deep+1),self.id,self.product_relationship_arbre)
        
         return self.product_relationship_arbre
         
@@ -150,11 +155,8 @@ class simple_shape():
     
     
 def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,deep,doc_id,product_root):
-    #un parcour para ver si existen 2 nodos con el mismo nombre o algun nodo sin nombre al principio antes de empezar
 
-    #colour_chercher(label,color_tool,shape_tool)
     if shape_tool.IsAssembly(label):
-        # si no tiene nombre lanzar excepcion
         l_c = TDF_LabelSequence()
         shape_tool.GetComponents(label,l_c)
         for i in range(l_c.Length()):
@@ -170,7 +172,7 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
                         link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
                 else:
 
-                    product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root)
+                    product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root,shape_tool.IsSimpleShape(label_reference))
                              
                     if product_assembly:  
                         product.links.append(Link(product_assembly))
@@ -185,18 +187,37 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
     else:            
         compShape=shape_tool.GetShape(label)
 
-        #nous cherchons sa correspondance dans la liste de shapes simples / si le shape n avais pas de vertices on ne trouvera aucun shape 
+        
                       
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
-                product.set_geometry(index) # to evade product.geometry=0
+                product.set_geometry(index+1) #to avoid index==0
                    
 
                
          
     
 
-        
+def getMatrixFromLocation(Location):
+
+
+    m=Location.VectorialPart()
+    gp=m.Row(1)
+    x1=gp.X()           
+    x2=gp.Y()
+    x3=gp.Z()
+    x4=Location.Transforms()[0]
+    gp=m.Row(2)
+    y1=gp.X()          
+    y2=gp.Y()
+    y3=gp.Z()
+    y4=Location.Transforms()[1]
+    gp=m.Row(3)
+    z1=gp.X()         
+    z2=gp.Y()
+    z3=gp.Z()
+    z4=Location.Transforms()[2]   
+    return [x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4]          
         
 def GetLabelNom(lab):
 
@@ -216,7 +237,7 @@ def SetLabelNom(lab,nom):
     lab.FindAttribute(TDataStd_Name_GetID(),N)
     n=N.GetObject()
     n.Set(TCollection_ExtendedString(nom.encode("latin-1")))
-    return True
+
  
   
 def colour_chercher(label,color_tool,shape_tool):
@@ -224,16 +245,25 @@ def colour_chercher(label,color_tool,shape_tool):
     if( color_tool.GetInstanceColor(shape_tool.GetShape(label),0,c) or  color_tool.GetInstanceColor(shape_tool.GetShape(label),1,c) or color_tool.GetInstanceColor(shape_tool.GetShape(label),2,c)):
         color_tool.SetColor(label,c,0)
         color_tool.SetColor(label,c,1)
-        color_tool.SetColor(label,c,2) #para no tener problemas a la hora de componer y no perder informacion del color
-        #print "Color encontrado manera 1(",c.Red(),",",c.Green() ,"," ,c.Blue() ,    ") encontrado para : " , GetLabelNom(label) 
+        color_tool.SetColor(label,c,2) 
+
         return c
     
     if( color_tool.GetColor(label,0,c) or  color_tool.GetColor(label,1,c) or color_tool.GetColor(label,2,c) ):
         color_tool.SetInstanceColor(shape_tool.GetShape(label),0,c)
         color_tool.SetInstanceColor(shape_tool.GetShape(label),1,c)
         color_tool.SetInstanceColor(shape_tool.GetShape(label),2,c)
-        #print "Color encontrado manera 2 (",c.Red(),",",c.Green() ,"," ,c.Blue() ,    ") encontrado para : " , GetLabelNom(label) 
+       
         return c
 
     return False
+
+ 
+   
+class MultiRoot_Error(Exception):
+    def __unicode__(self):
+        return u"OpenPLM does not support files step with multiple roots"    
+class OCC_ReadingStep_Error(Exception):
+    def __unicode__(self):
+        return u"PythonOCC could not read the file"
 

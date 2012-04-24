@@ -7,7 +7,7 @@ from OCC.STEPControl import *
 from OCC.Utils.DataExchange.STEP import StepOCAF_Export
 from STP_converter_WebGL import NEW_STEP_Import
 import django.utils.simplejson as json
-from classes import generateArbre
+from classes import Product_from_Arb
 from OCC.GarbageCollector import garbage
 
 def new_collect_object(self, obj_deleted):
@@ -21,7 +21,7 @@ def decomposer(path,temp_file_name):
 
 
     output = open(temp_file_name.encode(),"r")
-    old_product=generateArbre(json.loads(output.read()))
+    old_product=Product_from_Arb(json.loads(output.read()))
     my_step_importer = NEW_STEP_Import(path)
     shape_tool=my_step_importer.shape_tool 
     product=my_step_importer.generate_product_arbre()

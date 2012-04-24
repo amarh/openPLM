@@ -1,8 +1,8 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController , ArbreFile ,GeometryFile , is_decomposable
+from openPLM.document3D.models import  Document3DController , ArbreFile ,GeometryFile , is_decomposable , ArbreFile_to_Product
 from openPLM.plmapp.models import  DocumentFile
 from django.core.files import File
-from openPLM.document3D.arborescense import read_ArbreFile
+
 #from openPLM.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
 from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import ,GetLabelNom
 from OCC.TDF import *
@@ -22,7 +22,7 @@ class decomposer_Test(CommonViewTest):
                 'a', self.user, self.DATA))
         self.list_document_controller.append(Document3DController.create('doc3', 'Document3D',
                 'a', self.user, self.DATA))                                       
-        self.links=read_ArbreFile(self.stp).links
+        self.links=ArbreFile_to_Product(self.stp).links
         self.my_step_importer=NEW_STEP_Import(self.stp.file.path,self.stp.id)
         self.product=self.my_step_importer.generate_product_arbre() 
     """   
@@ -44,7 +44,7 @@ class decomposer_Test(CommonViewTest):
           
         new_stp=self.document.files[0]
         self.assertEqual(len(to_index),3)
-        self.assertEqual(read_ArbreFile(new_stp).links,[])
+        self.assertEqual(ArbreFile_to_Product(new_stp).links,[])
 
         self.assertEqual(len(DocumentFile.objects.all()),4)        
         self.assertEqual(len(DocumentFile.objects.all().exclude(deprecated=True)),3)         
@@ -103,7 +103,7 @@ class decomposer_Test(CommonViewTest):
         self.assertEqual(len(to_index),1)
         
 
-        product=read_ArbreFile(doc_file)       
+        product=ArbreFile_to_Product(doc_file)       
          
         self.assertEqual(self.product.name,product.name)
         self.assertEqual(self.product.links,product.links,[])

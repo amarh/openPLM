@@ -1,7 +1,6 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController 
-from django.core.files import File
-from openPLM.document3D.arborescense import read_ArbreFile
+from openPLM.document3D.models import  Document3DController ,ArbreFile_to_Product
+from django.core.files import File 
 class arborescense_Test(CommonViewTest):
 
     def setUp(self):
@@ -21,14 +20,14 @@ class arborescense_Test(CommonViewTest):
                
                       
 """                       
-    def test_read_ArbreFile(self):
+    def test_ArbreFile_to_Product(self):
         
         #We verify if the structure of the tree is the same for a file without decompose  and the new file generated once decomposed
         
-        product=read_ArbreFile(self.stp)
+        product=ArbreFile_to_Product(self.stp)
         reponse=self.post(self.base_url+"decompose/"+str(self.stp.id)+"/",self.data_to_decompose)
         doc_file=self.document.files[0] 
-        product2=read_ArbreFile(doc_file,self.user)  
+        product2=ArbreFile_to_Product(doc_file,self.user)  
         self.assertTrue(same_estructure(product,product2))
     
 """
