@@ -141,7 +141,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         
     -The :class:`.DocumentFile` (**stp_id**) was locked (afterwards will be promoted)
     
-    -We set the :class:`.Part` (**obj_type**, **obj_ref**, **obj_revi**) like the attribute PartDecompose of the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_id**)
+    
     
     -We call the function :meth:`.generate_part_doc_links_AUX` (with the property transaction.commit_on_success)
            
@@ -163,7 +163,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     
     -We call the processus decomposer_all(with celeryd)         
             
-    
+  
 
     """
 
@@ -214,8 +214,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                     stp_file.locker=User.objects.get(username=settings.COMPANY)
                     stp_file.save(False)
 
-                    doc3D.PartDecompose=obj.object
-                    doc3D.save()
+
                     
                     native_related=stp_file.native_related                       
                     if native_related:
@@ -240,15 +239,13 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         stp_file.locked = False
                         stp_file.locker = None
                         stp_file.save(False)
-                        doc3D.PartDecompose=None
-                        doc3D.save()
                         if native_related:
                             native_related.deprecated=False
                             native_related.save(False)
                     else:
             
                         decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
-
+                        
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
   
 

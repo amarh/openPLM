@@ -59,7 +59,7 @@ class NEW_STEP_Import(object):
       
     -A set of files **.geo** that represents the geometry of the different simple products that are useful to realize the visualization 3D across the web browser. 
     
-    -A structure of information that represents the arborescencse of the different assemblys,represented in a  :class:`.Product` . (Including his spatial location and orientation and his label of reference (**OCC.TDF.TDF_Label**))
+    -A structure of information that represents the arborescencse of the different assemblys,represented in a  :class:`.Product` . (Including his spatial location and orientation and his label of reference (:class:`.OCC.TDF.TDF_Label`))
     
     
     This class is invoked from three different subprocesses related to the functionality of pythonOCC(generate3D.py , generateComposition.py , generateDecomposition.py).
@@ -112,19 +112,29 @@ class NEW_STEP_Import(object):
         ws=self.STEPReader.Reader().WS().GetObject()
         model=ws.Model().GetObject()
         model.Clear()          
-    def procesing_geometrys(self,location):
+    def procesing_geometrys(self,root_path):
         """
-        :param location: Path where to store the files **.geo** generated      
         
-        For every simple shape it generates a file **.geo** representatively of his geometry,the content of the file is identified by an index and **self.id**
+        :param root_path: Path where to store the files **.geo** generated      
+        
+        When we generate a new :class:`.NEW_STEP_Import` we will refill a list(**shapes_simples**) whit the :class:`.simple_shape` contained in the file **.stp**
+        
+        For each :class:`.simple_shape` in the list **shapes_simples**:
+         
+            We call the method :meth:`.mesh_shape` to generate a file **.geo** representatively of his geometry,the content of the file is identified by the index+1 (>0) of the position of the :class:`.simple_shape` in the list of **simple_shapes**  and by the attribue id of :class:`.NEW_STEP_Import`
+        
         Returns the list of the path of the generated **.geo** files
+        
+        
+        
         """
         files_index=""
         
         for index, shape in enumerate(self.shapes_simples):
-                name=get_available_name(location,self.fileName+".geo")
-                path=os.path.join(location, name)
-                mesh_shape(shape,path,"_"+str(index+1)+"_"+str(self.id)) #index+1
+                name=get_available_name(root_path,self.fileName+".geo")
+                path=os.path.join(root_path, name)
+                _index_id="_"+str(index+1)+"_"+str(self.id)
+                mesh_shape(shape,path,_index_id) #index+1
                 files_index+="GEO:"+name+" , "+str(index+1)+"\n" #index+1
              
      
@@ -134,7 +144,7 @@ class NEW_STEP_Import(object):
     
         """    
         
-        Generates a :class:`.Product` relative to the assemblys of the file **.stp**, for every node of the :class:`.Product` it includes a label (**OCC.TDF.TDF_Label**) that represents and identifies the node
+        Generates a :class:`.Product` relative to the assemblys of the file **.stp**, for every node of the :class:`.Product` it includes a label (:class:`.OCC.TDF.TDF_Label`) that represents and identifies the node , openPLM can only work whit a single root **.stp** files 
         
         """    
     
@@ -145,7 +155,7 @@ class NEW_STEP_Import(object):
 
         deep=0            
         self.product_relationship_arbre=Product(GetLabelNom(roots.Value(1)),deep,roots.Value(1),self.id,self.file) 
-        parcour_product_relationship_arbre(roots.Value(1),self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
+        parcour_product_relationship_arbre(self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
         (deep+1),self.id,self.product_relationship_arbre)
        
         return self.product_relationship_arbre
@@ -159,7 +169,7 @@ class NEW_STEP_Import(object):
 class simple_shape():
 
     """
-    Class used to represent a simple geometry ,(not assembly) 
+    Class used to represent a simple shape geometry (not assembly) 
    
     
     
@@ -170,16 +180,19 @@ class simple_shape():
     
         Name of geometry 
 
-    .. attribute:: locations
+    .. attribute:: TopoDS_Shape
     
-        :class:`Matrix_rotation` of each instances of the :class:`Link` 
+        :class:`.OCC.TopoDS.TopoDS_Shape` that contains the geometry
                
-    .. attribute:: product
+    .. attribute:: color
+    
+        :class:`.OCC.Quantity.Quantity_Color` that contains information about color of geometry 
+        
     """    
 
     def __init__(self, name,TopoDS_Shape,color):
         self.name = name
-        self.shape = TopoDS_Shape
+        self.shape = TopoDS_Shape #OCC.TopoDS.TopoDS_Shape
         self.color = color
 
 
@@ -191,23 +204,66 @@ class simple_shape():
     
     
     
-def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,deep,doc_id,product_root):
+def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,doc_id,product_root):
+    """
+    
+    
 
-    if shape_tool.IsAssembly(label):
+    :param shape_tool: :class:`.OCC.XCAFDoc.XCAFDoc_ShapeTool`  
+    :param product: :class:`.Product` that will be expanded 
+    :param shapes_simples: list of :class:`.simple_shape`
+    :param deep: Depth of the node that we explore
+    :param doc_id: id that references a :class:`.DocumentFile` of which we are generating the :class:`.Product`
+    :param product_root: :class:`.Product` root of the arborescense
+    
+    
+    We are going to expand a :class:`.Product` (**product**) from the :class:`.OCC.TDF.TDF_Label` who identifies it (**product**.label_reference)
+    
+    
+    If the **product** is an assembly: 
+    
+        We generate the **list** of the :class:`.OCC.TDF.TDF_Label` that define it
+        
+        for each :class:`.OCC.TDF.TDF_Label` in **list**:
+        
+            We generate a new :class:`.document3D.classes.Link`  or if two or more :class:`.OCC.TDF.TDF_Label` of the list are partner, add an occurrence extra to the :class:`.document3D.classes.Link` that already was generated
+            
+            The :class:`.document3D.classes.Link` is going to point at a new :class:`.Product` or, if the :class:`.Product` is already present in **product_root**, at the already definite product
+            
+            If the :class:`.document3D.classes.Link` pointed at a new :class:`.Product` we need to expand it
+                
+                -The atribute **label_reference** of the new :class:`.Product` should be the :class:`.OCC.TDF.TDF_Label`
+            
+                -We expand the :class:`.Product` in a recursive call of method
+            
+            
+    
+    
+    
+    Else the **product** is a simple shape:
+    
+        We look in the list of **shapes_simples** for his partner
+        
+        We set the attribute **product**.geometry like the index+1 (>0) of the position of his partner in the list of **simple_shape**
+   
+    
+     
+    """
+    if shape_tool.IsAssembly(product.label_reference):
         l_c = TDF_LabelSequence()
-        shape_tool.GetComponents(label,l_c)
+        shape_tool.GetComponents(product.label_reference,l_c)
         for i in range(l_c.Length()):
             if shape_tool.IsReference(l_c.Value(i+1)):
                 label_reference=TDF_Label()            
                 shape_tool.GetReferredShape(l_c.Value(i+1),label_reference)         
                 reference_found=False
                 for link in product.links:
-                    if shape_tool.GetShape(link.product.label_reference).IsPartner(shape_tool.GetShape(label_reference)):                      
+                    if shape_tool.GetShape(link.product.label_reference).IsPartner(shape_tool.GetShape(label_reference)): 
+                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))                     
                         reference_found=True
                         break
-                if reference_found:
-                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
-                else:
+                        
+                if not reference_found:
 
                     product_assembly=search_assembly(GetLabelNom(label_reference),label_reference,doc_id,product_root,shape_tool.IsSimpleShape(label_reference))
                              
@@ -216,13 +272,13 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
          
                     else:      
                         product.links.append(Link(Product(GetLabelNom(label_reference),deep,label_reference,doc_id)))                               
-                        parcour_product_relationship_arbre(label_reference,shape_tool,product.links[-1].product,shapes_simples,deep+1,doc_id,product_root)
+                        parcour_product_relationship_arbre(shape_tool,product.links[-1].product,shapes_simples,deep+1,doc_id,product_root)
                         
                         
                     
                     product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(getMatrixFromLocation(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))  
     else:            
-        compShape=shape_tool.GetShape(label)
+        compShape=shape_tool.GetShape(product.label_reference)
 
         
                       
@@ -236,7 +292,22 @@ def parcour_product_relationship_arbre(label,shape_tool,product,shapes_simples,d
     
 
 def getMatrixFromLocation(Location):
+    """
+    
+    Transform a :class:`.OCC.TopLoc.TopLoc_Location` in an array ([x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4])
+    
+    
+     == == == == == = ==
+     x1 x2 x3 x4  x = x'    
+     y1 y2 y3 y4  y = y'    
+     z1 z2 z3 z4  z = z'    
+     0  0  0  1   1 = 1  
+     == == == == == = ==
+    
+    :param Location: :class:`.OCC.TopLoc.TopLoc_Location` that defined the location of an assembly with regard to his father
 
+    
+    """
 
     m=Location.VectorialPart()
     gp=m.Row(1)
@@ -257,17 +328,30 @@ def getMatrixFromLocation(Location):
     return [x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4]          
         
 def GetLabelNom(lab):
-
-            entry = TCollection_AsciiString()
-            TDF_Tool.Entry(lab,entry)
-            N = Handle_TDataStd_Name()
-            lab.FindAttribute(TDataStd_Name_GetID(),N)
-            n=N.GetObject()
-            return unicode(n.Get().PrintToString(),errors='ignore')#.decode("latin-1")
+    """
+    
+    Return the name of a :class:`.OCC.TDF.TDF_Label` (**lab**)
+    
+    :param lab: :class:`.OCC.TDF.TDF_Label`
+    
+    """
+    entry = TCollection_AsciiString()
+    TDF_Tool.Entry(lab,entry)
+    N = Handle_TDataStd_Name()
+    lab.FindAttribute(TDataStd_Name_GetID(),N)
+    n=N.GetObject()
+    return unicode(n.Get().PrintToString(),errors='ignore')#.decode("latin-1")
             
             
 def SetLabelNom(lab,nom):
-
+    """
+    
+    Set the name of a :class:`.OCC.TDF.TDF_Label` (**lab**)
+    
+    :param lab: :class:`.OCC.TDF.TDF_Label`
+    :param nom: new name for a :class:`.OCC.TDF.TDF_Label`  
+     
+    """
     entry = TCollection_AsciiString()
     TDF_Tool.Entry(lab,entry)
     N = Handle_TDataStd_Name()
@@ -278,6 +362,15 @@ def SetLabelNom(lab,nom):
  
   
 def colour_chercher(label,color_tool,shape_tool):
+    """
+    
+    Get the color of a :class:`.OCC.TDF.TDF_Label` (**label**)
+    
+    :param label: :class:`.OCC.TDF.TDF_Label`
+    :param shape_tool: :class:`.OCC.XCAFDoc.XCAFDoc_ShapeTool`  
+    :param color_tool: :class:`.OCC.XCAFDoc.XCAFDoc_ColorTool`     
+    
+    """
     c=Quantity_Color()
     if( color_tool.GetInstanceColor(shape_tool.GetShape(label),0,c) or  color_tool.GetInstanceColor(shape_tool.GetShape(label),1,c) or color_tool.GetInstanceColor(shape_tool.GetShape(label),2,c)):
         color_tool.SetColor(label,c,0)
