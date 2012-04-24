@@ -19,7 +19,15 @@ garbage.collect_object=new_collect_object
   
 def decomposer(path,temp_file_name):
 
+    """
+    
+    :param path: Path of a file **.stp**
+    :param temp_file_name: path of a  :class:`.tempfile` **.arb** that contains the information to generate a :class:`.Product` relative to the arborescense of a **.stp** file
 
+    
+    For every node of the :class:`.Product`  the attribute **doc_file_path** indicates where it is necessary to store the file generate by the decomposition
+    
+    """
     output = open(temp_file_name.encode(),"r")
     old_product=Product_from_Arb(json.loads(output.read()))
     my_step_importer = NEW_STEP_Import(path)
@@ -64,7 +72,8 @@ def cascade_decompose(product,old_product,shape_tool):
 
 
 
+if __name__ == "__main__":    
+    decomposer(sys.argv[1],sys.argv[2]) 
     
-    
-decomposer(sys.argv[1],sys.argv[2]) 
+
 

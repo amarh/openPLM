@@ -515,7 +515,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
     
         -The bomb-child of Parts (in relation to the :class:`.Product` (generate across the **arbre**)) has been generated
         
-        -For every :class:`.ParentChildLink` generated in the previous condition we attach all the :class:`.location_link` relatives
+        -For every :class:`.ParentChildLink` generated in the previous condition we attach all the :class:`.Location_link` relatives
         
         -To every generated :class:`.Part` a :class:`.Document3D` has been attached and the :class:`.Document3D` as been set like the attribute PartDecompose of the :class:`.Part` 
         
@@ -709,6 +709,8 @@ def update_geometry(product,doc_file,old_doc_id):
     
     Copy the content of :class:`.GeometryFile` determined by his index(**product**.geometry) belonging to the :class:`.DocumentFile` identified by **old_doc_id** 
     generating a new entity :class:`.GeometryFile` connected to the :class:`.DocumentFile` (**doc_file**)
+    
+    To differentiate the content of a file **.geo** we use the combination index more  :class:`.DocumentFile` **.id**
        
     """   
     if not product.geometry==False:
