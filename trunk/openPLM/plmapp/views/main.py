@@ -311,10 +311,16 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays all revisions of the selected object.
-    It computes a context dictionnary based on
+    View that displays the revisions of the given object (a part or
+    a document) and shows a form to make a new revision.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/revisions/`
     
     .. include:: views_params.txt 
+
+    This view returns the result of :func:`revise_document` 
+    if the object is a document and the result of :func:`revise_part`
+    if the object is a part.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx["add_revision_form"] = None
@@ -324,7 +330,51 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
         return revise_part(obj, ctx, request)
 
 def revise_document(obj, ctx, request):
-    """ View to revise a document. """
+    """
+    View to revise a document.
+
+    :param obj: displayed document
+    :type obj: :class:`.DocumentController`
+    :param ctx: initial context
+    :type ctx: dict
+    :param request: riven request
+  
+    This view can create a new revision of the document, it required
+    the following POST parameters:
+
+    :post params:
+        revision
+            new revision of the document
+        a valid :class:`.SelectPartFormset`
+            Only required if *confirmation* is True, see below.
+
+
+    A revised document may be attached to some parts.
+    These parts are given by :meth:`.DocumentController.get_suggested_parts`.
+    If there is at least one suggested part, a confirmation of which
+    parts will be attached to the new document is required.
+
+    **Template:**
+    
+    :file:`documents/revisions.html`
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``confirmation``
+        True if a confirmation is required to revise the document.
+
+    ``revisions``
+        list of revisions of the document
+    
+    ``add_revision_form``
+        form to revise the document. Only set if the document is revisable.
+
+    ``part_formset``
+        a :class:`.SelectPartFormset` of parts that the new revision
+        may be attached to. Only set if *confirmation* is True.
+    """
     confirmation = False
     if obj.is_revisable():
         parts = obj.get_suggested_parts()
@@ -367,7 +417,66 @@ def revise_document(obj, ctx, request):
     return r2r('documents/revisions.html', ctx, request)
 
 def revise_part(obj, ctx, request):
-    """ View to revise a part. """
+    """ View to revise a part.
+    
+    :param obj: displayed part
+    :type obj: :class:`.PartController`
+    :param ctx: initial context
+    :type ctx: dict
+    :param request: riven request
+  
+    This view can create a new revision of the part, it required
+    the following POST parameters:
+
+    :post params:
+        revision
+            new revision of the part
+        a valid :class:`.SelectParentFormset`
+            Only required if *confirmation* is True, see below.
+        a valid :class:`.SelectDocumentFormset`
+            Only required if *confirmation* is True, see below.
+        a valid :class:`.SelectParentFormset`
+            Only required if *confirmation* is True, see below.
+
+    A revised part may be attached to some documents.
+    These documents are given by :meth:`.PartController.get_suggested_documents`.
+    A revised part may also have some children from the original revision.
+    A revised part may also replace some parts inside a parent BOM.
+    These parents are given by :meth:`.PartController.get_suggested_parents`.
+
+    If there is at least one suggested object, a confirmation is required.
+
+    **Template:**
+    
+    :file:`parts/revisions.html`
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``confirmation``
+        True if a confirmation is required to revise the part.
+
+    ``revisions``
+        list of revisions of the part
+    
+    ``add_revision_form``
+        form to revise the part. Only set if the document is revisable.
+
+    ``doc_formset``
+        a :class:`.SelectDocmentFormset` of documents that the new revision
+        may be attached to. Only set if *confirmation* is True.
+
+    ``children_formset``
+        a :class:`.SelectChildFormset` of parts that the new revision
+        will be composed of. Only set if *confirmation* is True.
+    
+    ``parents_formset``
+        a :class:`.SelectParentFormset` of parts that the new revision
+        will be added to, it will replace the previous revisions
+        in the parent's BOM.
+        Only set if *confirmation* is True.
+    """
     confirmation = False
     if obj.is_revisable():
         children = [c.link for c in obj.get_children(1)]
