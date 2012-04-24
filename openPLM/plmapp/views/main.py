@@ -217,24 +217,63 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays lifecycle of the selected object.
-    It computes a context dictionnary based on
+    Lifecycle view of the given object (a part or a document).
+  
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/lifecycle/[apply/]`
     
     .. include:: views_params.txt 
+  
+    POST requests must have a "demote" or "promote" key and must
+    validate the :class:`.ConfirmPasswordForm` form.
+    If the form is valid, the object is promoted or demoted according to
+    the request.
+
+    **Template:**
+    
+    :file:`lifecycle.html`
+
+    **Context:**
+
+    ``RequestContext``
+    
+    ``object_lifecycle``
+        List of tuples (state name, *boolean*, signer role). The boolean is
+        True if the state name equals to the current state. The signer role
+        is a dict {"role" : name of the role, "user__username" : name of the
+        signer}
+
+    ``is_signer``
+        True if the current user has the permission to promote this object
+
+    ``is_signer_dm``
+        True if the current user has the permission to demote this object
+
+    ``password_form``
+        A form to ask the user password
+
+    ``cancelled_revisions``
+        List of plmobjects that will be cancelled if the object is promoted
+    
+    ``deprecated_revisions``
+        List of plmobjects that will be deprecated if the object is promoted
+
+    ``action``
+        Only for unsuccessful POST requests.
+        Name of the action ("demote" or "promote") that the user tries to do.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
-        if "demote" in request.POST:
-            ctx["action"] = "demote"
-        elif "promote" in request.POST:
-            ctx["action"] = "promote"
         if password_form.is_valid():
             if "demote" in request.POST:
                 obj.demote()
             elif "promote" in request.POST:
                 obj.promote()
             return HttpResponseRedirect("..")
+        if "demote" in request.POST:
+            ctx["action"] = "demote"
+        elif "promote" in request.POST:
+            ctx["action"] = "promote"
     else: 
         password_form = forms.ConfirmPasswordForm(request.user)
     state = obj.state.name
