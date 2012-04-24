@@ -55,35 +55,35 @@ from mimetypes import guess_type
 from collections import defaultdict
 
 from django.conf import settings
-from django.shortcuts import render_to_response
+from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User
+from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse,\
                         HttpResponsePermanentRedirect, HttpResponseForbidden
+from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils import simplejson
-from django.forms import HiddenInput
 from django.views.i18n import set_language as dj_set_language
-from django.contrib import messages
-from django.contrib.auth.models import User
 
 from haystack.views import SearchView
 
-from openPLM.plmapp.archive import generate_archive
-from openPLM.plmapp.exceptions import ControllerError, PermissionError
+import openPLM.plmapp.csvimport as csvimport
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import get_controller 
-from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.decomposers.base import DecomposersManager
+from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view
-
-import openPLM.plmapp.csvimport as csvimport
 from openPLM.plmapp.cadformats import is_cad_file
+from openPLM.plmapp.controllers import get_controller 
+from openPLM.plmapp.decomposers.base import DecomposersManager
+from openPLM.plmapp.exceptions import ControllerError, PermissionError
+from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
+
 
 def r2r(template, dictionary, request):
     """
