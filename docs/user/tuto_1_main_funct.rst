@@ -13,99 +13,128 @@ REQUIREMENTS
 OpenPLM is a full web application i.e. you just need a browser.
 We advise you Mozilla Firefox 3.6.
 
+In OpenPLM there are four main types of objects :
 
-OVERVIEW
+* User
+
+* Group
+
+* Part
+
+* Document
+
+The parts and documents are named according to the following convention :
+*type//ref//rev//name*
+
+* *type* refer to the type of the object
+
+* *ref* refer to the reference of the object (usually write as type_number)
+
+* *rev* refer to the number revision of the object
+
+* *name* refer to the name of the object ifs has been given a name
+
+
+HOME PAGE
 ========================================================
-OpenPLM is shared into 5 main areas:
+You have 4 main features:
 
-1- Search area : Displays all criterions you can play with to look for an PLMObject
+1- Search for objects 
 
-2- Results area : Displays the results of your research
+2- Navigate with link between objects
 
-3- Logged-in user area : Displays informations about the user who is logged in (username, current date & time, preferred language, ...)
+3- Creation of objects
 
-4- Create area : Displays all criterions you can play with to create an PLMObject
-
-5- Data display area : Displays all informations about the current PLMObject
-
-.. image:: images/main+red_boxes.png
-   :scale: 75
-
-
-SEARCH AREA
-========================================================
-First, you need to select the type of PLMObject you want to look for.
-
-OpenPLM will display the attributes which correspond to this type.
-
-Then, you can fill the form in order to refine your research.
-
-You can use one or more "*" as wildcard for all attributes with text.
-
-You can use ">" or "<" for all attributes with number.
+4- Study an object (access to the object information)
 
 Example :
 
-.. image:: images/search.png
+.. image:: images/Capture_openPLM_home.png
+   :width: 100%
 
 
-RESULT AREA
+SEARCH
 ========================================================
-Here is where the result of your research is displayed.
+The search block is part in two :
 
-You can click on one reference to access the corresponding objet.
+1- The search part where you will enter your request
 
-If you position your mouse on the "Name" column, the full name of the PLMObject will appear.
+2- The part where the result will be display
 
-Note : When you want to create a new link between PLMObjects, this area switchs to red with some "Add" buttons and you
-can create a link between this PLMObject and the current PLMObject.
+First, you need to select the type of PLMObject you want to look for.
+
+Then, you can fill the form if you want to refine your research.
+
+OpenPLM will display the attributes which correspond to this type.
+
+Example :
+
+.. image:: images/Capture_openPLM_search.png
+   :width: 100%
 
 
-LOGGED-IN USER AREA
+NAVIGATE
 ========================================================
-Contains:
+Objects and their links are represented in a graph.
 
-* Icon to log out OpenPLM : |logout|
-    .. |logout| image:: images/logout.png
+Each box represent an object :
 
-* Username of the logged in User
+* Pink is for users
 
-* Current date and time
+* Blue for parts
 
-* Language preference
+* Purple for documents
 
+Example :
 
-CREATE AREA
+.. image:: images/Capture_openPLM_navigate.png
+   :width: 100%
+
+CREATE
 ========================================================
-First, you need to select the type of PLMObject you want to create.
+You can create an object filling the form displayed.
 
-Then, click on the "Create" button to access the creation page.
+Others ways to create objects are proposed under the form creation.
 
+Example :
 
-DATA DISPLAY AREA - MENU LIKE
+.. image:: images/Capture_openPLM_create.png
+   :width: 100%
+
+STUDY
 ========================================================
-Contains :
+Reaching "Study" from the Home page show the history of the objects you have reached.
 
-* Icon to switch to "navigate" display : |navigate|
-    .. |navigate| image:: images/navigate.png
+On the "Study" page you can :
 
-* Icon to switch to "menu" display : |menu|
-    .. |menu| image:: images/menu.png
+* display informations on an object
 
-* current PLMObject type, reference and revision.
+* reach and modified an object
 
-* Displays a menu to access different data related to the current PLMObject (attributes, history, revisions, ...).
+Example :
 
+.. image:: images/Capture_openPLM_study.png
+   :width: 100%
 
-DATA DISPLAY AREA - NAVIGATE LIKE
-========================================================
-Contains :
+COMMON PARTS
+=======================================================
+No matter the chosen function (search,create,study or navigate),
+two parts are common to all views :
 
-* Icon to switch to "navigate" display : |navigate|
+1- The header which contains :
 
-* Icon to switch to "menu" display : |menu|
+    * User's name, the day, a button to choose the language and a button to log out
 
-* current PLMObject type, reference and revision.
+    * Button to reach different views
 
-* Displays a picture with PLMObjects linked to current PLMObject. You can click on them and navigate from PLMObject to others.
+    * A history of objects reached during your session
+
+.. image:: images/Capture_openPLM_header.png
+   :width: 100%
+
+2- The left panel that can be showed or hidden. This left panel is a search
+area with the same structure as the SEARCH view described higher
+
+.. image:: images/Capture_openPLM_leftpanel.png
+   :width: 100%
 
