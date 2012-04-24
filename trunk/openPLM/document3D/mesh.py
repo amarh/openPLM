@@ -51,9 +51,7 @@ def mesh_shape(shape,filename,name):
     - if quality_factor<1, the mesh will be less precise.
     By default, this argument is set to 1 : the default precision of the mesher is used.
     '''
-    #print "entro" 
-    #garbage.smart_purge()
-    #print "salgo"   
+
     quality_factor=0.3
     a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
 
@@ -85,7 +83,7 @@ class QuickTriangleMesh(object):
 '''
     def __init__(self,shape,quality_factor):
         self._shape = shape
-        #self._shape.was_purged
+
         bbox = Bnd_Box()
         BRepBndLib_Add(self._shape, bbox) 
         x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()

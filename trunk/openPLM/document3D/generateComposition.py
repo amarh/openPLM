@@ -8,8 +8,8 @@ from OCC.STEPCAFControl import STEPCAFControl_Writer
 from OCC.TopLoc import TopLoc_Location
 from OCC.gp import gp_Trsf
 from STP_converter_WebGL import NEW_STEP_Import , SetLabelNom , colour_chercher
-from classes import generateArbre
-
+from classes import Product_from_Arb
+from OCC.Quantity import Quantity_Color
 
 
 
@@ -20,7 +20,7 @@ def composer(temp_file_name):
 
     
     output = open(temp_file_name.encode(),"r")
-    product =generateArbre(json.loads(output.read()))
+    product =Product_from_Arb(json.loads(output.read()))
     output.close()
     output = open(temp_file_name.encode(),"w+")# erase old data
     output.close()
@@ -50,31 +50,35 @@ def composer(temp_file_name):
     
 def add_labels(product,lr,st):
 
-    
-    for link in product.links:
+    if product.links:
+        for link in product.links:
 
-    
-        if link.product.doc_id!= product.doc_id: # solo los que esten descompuesto, si no esta descompuesto no tiene que anadirlo
+        
+            if link.product.doc_id!= product.doc_id: # solo los que esten descompuesto, si no esta descompuesto no tiene que anadirlo
 
-            if not link.product.label_reference:
+                if not link.product.label_reference:
 
-                my_step_importer = NEW_STEP_Import(link.product.doc_path)
-                lr_2= TDF_LabelSequence()
-                my_step_importer.shape_tool.GetFreeShapes(lr_2)        
-                add_labels(link.product,lr_2.Value(1),my_step_importer.shape_tool)
-                link.product.label_reference=lr_2.Value(1)
-              
-              
-            for d in range(link.quantity):
+                    my_step_importer = NEW_STEP_Import(link.product.doc_path)
+                    lr_2= TDF_LabelSequence()
+                    my_step_importer.shape_tool.GetFreeShapes(lr_2)        
+                    add_labels(link.product,lr_2.Value(1),my_step_importer.shape_tool)
+                    link.product.label_reference=lr_2.Value(1)
+                    
+                for d in range(link.quantity):
 
-                transformation=gp_Trsf()
-                transformation.SetValues(link.locations[d].x1,link.locations[d].x2,link.locations[d].x3,link.locations[d].x4,link.locations[d].y1,link.locations[d].y2,link.locations[d].y3,link.locations[d].y4,link.locations[d].z1,link.locations[d].z2,link.locations[d].z3,link.locations[d].z4,1,1)  
-                new_label=st.AddComponent(lr,link.product.label_reference,TopLoc_Location(transformation))
-                SetLabelNom(new_label,link.names[d])
+                    transformation=gp_Trsf()
+                    
+                    transformation.SetValues(link.locations[d].x1,link.locations[d].x2,link.locations[d].x3,link.locations[d].x4,
+                    link.locations[d].y1,link.locations[d].y2,link.locations[d].y3,link.locations[d].y4,link.locations[d].z1,link.locations[d].z2,
+                    link.locations[d].z3,link.locations[d].z4,1,1) 
+                     
+                    new_label=st.AddComponent(lr,link.product.label_reference,TopLoc_Location(transformation))
+                    SetLabelNom(new_label,link.names[d])
 
-            
-        else:
-            pass # no hace falta por que ya esta en la geometria                                            
+                
+            else:
+                pass # no hace falta por que ya esta en la geometria
+                                         
                 
     
 composer(sys.argv[1])    

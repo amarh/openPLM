@@ -19,12 +19,15 @@ import tempfile
 
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
-    """ Manage html page for 3D
+    """
 
-    Manage html page which displays the 3d files STEP of the selected object.
-    It computes a context dictionnary based on
+    Manage html page which displays the 3d view of the :class:`.DocumentFile` STEP attached to a :class:`.Document3D`.
 
-    .. include:: views_params.txt
+    For the correct visualization there is necessary to extract all the geometries contained in the :class:`~django.core.files.File` **.geo** present in the :class:`.GeometryFile` relative to :class:`.DocumentFile` that we want to show and also the **.geo** contained in to the :class:`.DocumentFile` in which the DocumentFile to show has been decomposed.
+    
+    We need to generate also the code javascript to manage these geometries.
+    To generate this code we need the information about the arborescense of the :class:`.DocumentFile` , this arborescense is obtained of the :class:`~django.core.files.File` **.arb** corresponding to the :class:`.ArbreFile` connected to the :class:`.DocumentFile`.The information the file **.arb** turns into a :class:`.Product` that we use to call  the function :meth:`.generate_javascript_for_3D` that return the code required
+
     """
 
     obj_type = "Document3D"
@@ -40,10 +43,13 @@ def display_3d(request, obj_ref, obj_revi):
         GeometryFiles=[]
         javascript_arborescense=False
     else:
-        #puede haberlos repetidos, arreglar
+
+        product=ArbreFile_to_Product(doc_file,recursif=True)
         GeometryFiles=list(GeometryFile.objects.filter(stp=doc_file))
-        add_child_GeometryFiles(doc_file,GeometryFiles)
-        product=read_ArbreFile(doc_file,True)
+        if product:  
+            add_child_GeometryFiles(product,GeometryFiles)
+
+        
         javascript_arborescense=generate_javascript_for_3D(product)
 
     ctx.update({
@@ -115,12 +121,50 @@ Select_Order_Quantity_types = formset_factory(Order_Quantity_Form, extra=0)
 #@handle_errors
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
-    #incluir los script para autocompletar nombres y esos ole1
-    """
-    Manage html page which displays the chidren of the selected object.
-    It computes a context dictionnary based on
 
-    .. include:: views_params.txt
+    """
+    :param obj_type: Type of the :class:`.Part` from which we want to realize the decomposition
+    :param obj_ref: Reference of the :class:`.Part` from which we want to realize the decomposition
+    :param obj_revi: Revision of the :class:`.Part` from which we want to realize the decomposition
+    :param stp_id: Id that identify the :class:`.DocumentFile` contained in a :class:`.Document3D` attached to the :class:`.Part` (identified by **obj_type**, **obj_ref**, **obj_revi**) that we will decompose 
+    
+    
+    When we demand the decomposition across the web form, the following tasks are realized
+    
+    -We check that the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_id**) that will be decomposed has not been modified since the generation of the form
+    
+    -We check the validity of the information got in the form
+    
+    -If exists a :class:`.DocumentFile` native file related to :class:`.DocumentFile` (**stp_id**) that will be decomposed
+    
+        -then this one was depreciated (afterwards will be promoted)
+        
+    -The :class:`.DocumentFile` (**stp_id**) was locked (afterwards will be promoted)
+    
+    -We set the :class:`.Part` (**obj_type**, **obj_ref**, **obj_revi**) like the attribute PartDecompose of the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_id**)
+    
+    -We call the function :meth:`.generate_part_doc_links_AUX` (with the property transaction.commit_on_success)
+           
+        -We generate the arborescense (:class:`.product`) of the :class:`.DocumentFile` (**stp_id**))
+        
+        -The bomb-child of Parts (in relation to the arborescense of the :class:`.DocumentFile` (**stp_id**)) has been generated
+        
+        -For every :class:`.ParentChildLink` generated in the previous condition  we attach all the :class:`.Location_link` relatives
+        
+        -To every generated :class:`.Part` a :class:`.Document3D` has been attached and this document as been set like the attribute PartDecompose of the :class:`.Part`
+         
+        -The attribute doc_id of every node of the arborescense (:class:`.Product`) is now the relative id of :class:`.Document3D` generated in the previous condition
+        
+        -To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP
+        
+        -The attribute doc_path of every node of the arborescense(:class:`.Product`) is now the path of :class:`.DocumentFile` STP generated in the previous condition
+        
+    -We update the indexes for the objects generated
+    
+    -We call the processus decomposer_all(with celeryd)         
+            
+    
+
     """
 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -129,23 +173,24 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     doc_linked_to_part=obj.get_attached_documents().values_list("document_id", flat=True)
     if not stp_file.document_id in doc_linked_to_part:
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
-    if Document3D.objects.filter(PartDecompose=obj.object):
+    if Document3D.objects.filter(PartDecompose=obj.object).exists():
         raise ValueError("Not allowed operation.This Part already forms a part of another decomposition")
     try:
         doc3D=Document3D.objects.get(id=stp_file.document_id)
     except Document3D.DoesNotExist:
         raise ValueError("Not allowed operation.The document is not a subtype of document3D")
 
-    if doc3D.PartDecompose:# y si el documento no es 3D
+    if doc3D.PartDecompose:
         raise ValueError("Not allowed operation.This Document already forms a part of another decomposition")
+        
+
 
     if request.method == 'POST':
+    
+
         extra_errors=""
-        product=read_ArbreFile(stp_file)
-        #part_type_formset = Select_Doc_Part_types(request.POST)
-        #bom_formset = Select_Order_Quantity_types(request.POST)
+        product=ArbreFile_to_Product(stp_file)
         last_time_modification=Form_save_time_last_modification(request.POST)
-        #comprobar que la parte no ha sido descompuesta con anterioridad
         obj.block_mails()
 
         if last_time_modification.is_valid() and product:
@@ -156,20 +201,23 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             document_controller=DocumentController(stp_file.document,User.objects.get(username=settings.COMPANY))
             index=[1]
             if clear_form(request,assemblys,product,index,obj_type):
-                # y si tiene un nativo   que hago con el
+
                 if (same_time(old_modification_data_time, 
                               old_modification_data_microsecond,
                               document_controller.mtime)
-                    and product and stp_file.checkout_valid and not stp_file.locked):
+                    and stp_file.checkout_valid and not stp_file.locked):
                     
 
-                    
+
                    
                     stp_file.locked=True
                     stp_file.locker=User.objects.get(username=settings.COMPANY)
                     stp_file.save(False)
-                    native_related=stp_file.native_related
-                       
+
+                    doc3D.PartDecompose=obj.object
+                    doc3D.save()
+                    
+                    native_related=stp_file.native_related                       
                     if native_related:
                         native_related.deprecated=True
                         native_related.save(False)
@@ -183,22 +231,24 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         generate_part_doc_links_AUX(request,product, obj,instances)
                         update_indexes.delay(instances) 
                     except Exception as excep:
-                        if type(excep) == Document_part_doc_links_Error:
+                        if type(excep) == Document_Generate_Bom_Error:
                             delete_files(excep.to_delete)
 
                         
-                        
+
                         extra_errors = unicode(excep)
                         stp_file.locked = False
                         stp_file.locker = None
                         stp_file.save(False)
+                        doc3D.PartDecompose=None
+                        doc3D.save()
                         if native_related:
                             native_related.deprecated=False
                             native_related.save(False)
                     else:
-                        
+            
                         decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
-                        #decomposer_all(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
+
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
   
 
@@ -206,6 +256,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
 
                 else:
+
                     extra_errors="The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process"
                 
             else:
@@ -213,6 +264,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                 extra_errors="Mistake refilling the form, please check it"
 
         else:
+
             extra_errors="Mistake reading of the last modification of the document, please restart the task"
 
     else:
@@ -222,19 +274,19 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         last_time_modification.fields["last_modif_time"].initial=document_controller.mtime
 
         last_time_modification.fields["last_modif_microseconds"].initial=document_controller.mtime.microsecond
-        product=read_ArbreFile(stp_file)
+        product=ArbreFile_to_Product(stp_file)
         if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
         
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
-        initialiser_assemblys(assemblys,product,group,request,index,obj_type)
+        initialiser_assemblys(assemblys,product,group,request.user,index,obj_type)
         
 
         extra_errors = ""
         
 
-    deep_assemblys=sort_assemblys(assemblys)
+    deep_assemblys=sort_assemblys_by_depth(assemblys)
     ctx.update({'current_page':'decomposer',  # aqui cambiar
                 'deep_assemblys' : deep_assemblys,
                 'extra_errors' :  extra_errors ,
@@ -245,11 +297,10 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     return r2r('DisplayDecompose.htm', ctx, request)
     
     
-def sort_assemblys(assemblys):
+def sort_assemblys_by_depth(assemblys):
 
     new_assembly=[]
     for elem in assemblys:
-        print elem[3]
         for i in range(elem[3]+1-len(new_assembly)):
             new_assembly.append([])        
         new_assembly[elem[3]].append(elem)
@@ -260,11 +311,59 @@ def sort_assemblys(assemblys):
 
 def clear_form(request,assemblys, product,index,obj_type):
 
+    """
+    
+    :param assemblys: will be refill whit the information necessary the generate the forms
+    :param product: :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp contained in a :class:`.DocumentFile`
+    :param index: Use  to mark and to identify the **product** s that already have been visited
+    :param obj_type: Type of the :class:`.Part` from which we want to realize the decomposition 
+    
+    It checks the validity of the forms contained in **request**
+    
+    
+    
+    If the forms are not valide, he returns the information to refill the new forms contained in **assemblys**.
+     
+    Refill **assemblys** with the different assemblys of the file step , we use **index** to mark and to identify the **product** s that already have been visited
+        
+    For every Assembly we have the next information:
+    
+        -Name of assembly
+         
+        -Visited , If assembly is sub-assembly of more than an assembly, this attribute will be **False** for all less one of the occurrences
+        
+            If visited is **False**, we will be able to modify only the attributes **Order** , **Quantity** and **Unit** refered to the :class:`.ParentChildLink` in the form
+            
+            If visited is not **False** , it will be a new id acording to **index** (>=1) generated to identify the assembly
+            
+        -Depth  of assembly
+         
+        -**obj_type** , type of :class:`.Part` of Assembly
+        
+        -A list with the products that compose the assembly
+        
+            for each element in the list:
+            
+                -part_type contains the form to select the type of :class:`.Part`  
+                
+                -ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
+                
+                -creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
+                
+                -name_child_assemblys contains the name of the element
+                
+                -is_assembly determine if the element is a single product or another assembly 
+                
+                -prefix contains the **index** of the assembly  if he is visited for first time , else is False
+                
+                -ref contains the **index** of the assembly if he was visited previously, else False 
+                   
+    """
 
     creation_formset=[]
     initial_bom_values=[]
     initial_deep_values=[]
-    child_assemblys=[]
+    name_child_assemblys=[]
     is_assembly=[]
     part_type=[]
     ord_quantity=[]
@@ -274,9 +373,9 @@ def clear_form(request,assemblys, product,index,obj_type):
     if product.links:
         for link in product.links:
         
-
+            
             ord_qty=Order_Quantity_Form(request.POST,prefix=index[0])
-            link.visited=index[0] # para evitar en caso de nodos repetidos utilizar el link del padre
+            link.visited=index[0]
 
 
             if not ord_qty.is_valid():
@@ -284,9 +383,11 @@ def clear_form(request,assemblys, product,index,obj_type):
      
             ord_quantity.append(ord_qty)
             is_assembly.append(link.product.is_assembly)
-            child_assemblys.append(link.product.name)
+            name_child_assemblys.append(link.product.name)
                         
             if not link.product.visited:
+                link.product.visited=index[0]
+                  
                 part_ctype=Doc_Part_type_Form(request.POST,prefix=index[0])
                 if not part_ctype.is_valid():
                     valid=False        
@@ -300,13 +401,14 @@ def clear_form(request,assemblys, product,index,obj_type):
                 if not part_form.is_valid():
                     valid=False
                 if not doc_form.is_valid():
+                    print "4"
                     valid=False               
 
                 prefix.append(index[0])
                 creation_formset.append([part_form, doc_form])                                
                 ref.append(None)          
                 part_type.append(part_ctype) 
-                link.product.visited=index[0]                 
+                               
                 index[0]+=1            
 
                                               
@@ -321,17 +423,63 @@ def clear_form(request,assemblys, product,index,obj_type):
         
         
                                 
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited , product.deep, obj_type))            
+        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  name_child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited , product.deep, obj_type))            
     return valid                                    
         
         
    
-def initialiser_assemblys(assemblys,product,group,request,index, obj_type):
+def initialiser_assemblys(assemblys,product,group,user,index, obj_type):
+    """
+    
+    :param assemblys: will be refill whit the information necessary the generate the forms
+    :param product: :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp contained in a :class:`.DocumentFile`
+    :param index: Use  to mark and to identify the **product** s that already have been visited
+    :param obj_type: Type of the :class:`.Part` from which we want to realize the decomposition 
+    :param group: group by default from which we want to realize the decomposition 
+    
+            
+    Returns in assemblys a list initialized with the different assemblies of the file step
+        
+        
+        
+    For every Assembly we have the next information:
+    
+        -Name of assembly
+         
+        -Visited , If assembly is sub-assembly of more than an assembly, this attribute will be **False** for all less one of the occurrences
+        
+            If visited is **False**, we will be able to modify only the attributes **Order** , **Quantity** and **Unit** refered to the :class:`.ParentChildLinkin` in the form
+            
+            If visited is not **False** , it will be a new id acording to **index** (>=1) generated to identify the assembly
+            
+        -Depth  of assembly
+         
+        -**obj_type** , type of :class:`.Part` of Assembly
+        
+        -A list with the products that compose the assembly
+        
+            for each element in the list:
+            
+                -part_type contains the form to select the type of :class:`.Part`  
+                
+                -ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
+                
+                -creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
+                
+                -name_child_assemblys contains the name of the element
+                
+                -is_assembly determine if the element is a single product or another assembly 
+                
+                -prefix contains the **index** of the assembly if he is visited for first time , else is False
+                
+                -ref contains the **index** of the assembly if he was visited previously, else False 
 
+                     
+    """ 
     creation_formset=[]
     initial_bom_values=[]
     initial_deep_values=[]
-    child_assemblys=[]
+    name_child_assemblys=[]
     is_assembly=[]
     part_type=[]
     ord_quantity=[]
@@ -346,31 +494,32 @@ def initialiser_assemblys(assemblys,product,group,request,index, obj_type):
             oq.fields["quantity"].initial=link.quantity
             ord_quantity.append(oq)
             is_assembly.append(link.product.is_assembly)
-            child_assemblys.append(link.product.name)
-            if not link.product.visited:            
+            name_child_assemblys.append(link.product.name)
+            if not link.product.visited: 
+                link.product.visited=index[0]           
                 part_type.append(Doc_Part_type_Form(prefix=index[0])) 
-                part_cform = get_creation_form(request.user, Part, None, (index[1])) # index[0].initial=1 -> -1
+                part_cform = get_creation_form(user, Part, None, (index[1])) # index[0].initial=1 -> -1
                 part_cform.prefix = str(index[0])+"-part"
                 part_cform.fields["group"].initial = group
                 part_cform.fields["name"].initial = link.product.name
-                doc_cforms = get_creation_form(request.user, Document3D, None, (index[1]))
+                doc_cforms = get_creation_form(user, Document3D, None, (index[1]))
                 doc_cforms.prefix = str(index[0])+"-document"
                 doc_cforms.fields["name"].initial = link.product.name 
                 doc_cforms.fields["group"].initial = group
                 prefix.append(index[0])
                 creation_formset.append([part_cform, doc_cforms])                                
-                link.product.visited=index[0]
+
                 ref.append(None)
                 index[0]+=1
                 index[1]+=1                   
-                initialiser_assemblys(assemblys,link.product,group,request,index, "Part")                 
+                initialiser_assemblys(assemblys,link.product,group,user,index, "Part")                 
             else:
                 index[0]+=1 
                 part_type.append(False);creation_formset.append(False);prefix.append(False);ref.append(link.product.visited)
                    
 
 
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep, obj_type))
+        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  name_child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep, obj_type))
 
 @transaction.commit_on_success
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances):  # para generar bien el commit on succes
@@ -379,12 +528,33 @@ def generate_part_doc_links_AUX(request,product, parent_ctrl,instances):  # para
          
 def generate_part_doc_links(request,product, parent_ctrl,instances):
 
+    """
+    
 
+    :param product: :class:`.Product` that represents the arborescense
+    :param parent_ctrl: :class:`.Part` from which we want to realize the decomposition
+    :param instances: Use to trace the items to update 
 
+        
+    He reads the forms and generates:
+    
+    
+    -The bomb-child of Parts (in relation to the **product**) 
+    
+    -For every :class:`.ParentChildLink` generated in the condition previous we attach all the :class:`.Location_link` relatives
+    
+    -To every generated :class:`.Part` a :class:`.Document3D` has been attached and Document3D as been set like the attribute PartDecompose of the Part
+     
+    -The attribute doc_id of every node of the arborescense(**product**) is now the relative id of :class:`.Document3D` generated in the previous condition
+    
+    -To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP ( :meth:`.generateGhostDocumentFile` )
+    
+    -The attribute doc_path of every node of the arborescense(**product**) is now the path of :class:`.DocumentFile` STP generated in the previous condition
+    """
+    
     to_delete=[]
     user = parent_ctrl._user
-    
-    #if product.links:    
+     
 
     for link in product.links: 
         try:   
@@ -396,20 +566,20 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
             if not link.product.part_to_decompose: 
             
 
-
                 part_ctype=Doc_Part_type_Form(request.POST,prefix=link.product.visited)
                 part_ctype.is_valid();options=part_ctype.cleaned_data
                 cls = get_all_plmobjects()[options["type_part"]]
                 part_form = get_creation_form(user, cls, request.POST,
                             prefix=str(link.product.visited)+"-part") 
-                              
+                         
                 part_ctrl = parent_ctrl.create_from_form(part_form, user, True, True)
+
                 instances.append((part_ctrl.object._meta.app_label,
                     part_ctrl.object._meta.module_name, part_ctrl.object._get_pk_val()))
 
                 c_link = parent_ctrl.add_child(part_ctrl.object,quantity,order,unit)
+
                 generate_extra_location_links(link, c_link)
-                
 
                 doc_form = get_creation_form(user, Document3D,
                         request.POST, prefix=str(link.product.visited)+"-document")              
@@ -419,7 +589,7 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
                 link.product.part_to_decompose=part_ctrl.object
                 to_delete.append(generateGhostDocumentFile(link.product,doc_ctrl))
 
-                   
+ 
                 instances.append((doc_ctrl.object._meta.app_label,
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
                 part_ctrl.attach_to_document(doc_ctrl.object)
@@ -441,7 +611,8 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
             
 
         except Exception as excep:
-            raise Document_part_doc_links_Error(to_delete,link.product.name)    
+            #raise excep
+            raise Document_Generate_Bom_Error(to_delete,link.product.name)    
     
 
 
@@ -451,8 +622,16 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
 
     
 def generateGhostDocumentFile(product,Doc_controller):
-    #importante modifica el arbol
+    """
+    :param product: :class:`.Product` that represents the arborescense
+    :param Doc_controller: :class:`.Document3DController` from which we want to generate the :class:`.DocumentFile` 
 
+    
+    For one :class:`.Product` (**product**) and one :class:`.Document3DController` (**Doc_controller**)generates a :class:`.DocumentFile` with a file .stp emptily without indexation
+    
+    It updates the attributes **doc_id** and **doc_path** of the :class:`.Product` (**product**) in relation of the generated :class:`.DocumentFile`
+    
+    """
     doc_file=DocumentFile()
     name = doc_file.file.storage.get_available_name(product.name+".stp")
     path = os.path.join(doc_file.file.storage.location, name)
@@ -469,7 +648,7 @@ def generateGhostDocumentFile(product,Doc_controller):
         raise ValueError("Native file has a standard related locked file.") 
            
     doc_file.no_index=True        
-    doc_file.filename="Ghost"
+    doc_file.filename="Ghost.stp"
     doc_file.size=f.size
     doc_file.file=name
     doc_file.document=Doc_controller.object
@@ -478,68 +657,26 @@ def generateGhostDocumentFile(product,Doc_controller):
     doc_file.save()  
     
     
-    ##
+
     product.doc_id=doc_file.id
 
     product.doc_path=doc_file.file.path 
 
-    ##
+
     return doc_file.file.path
 
     
 
 
-"""
-def clear_form(request, part_type_formset, bom_formset):
-    valid=True
-    if bom_formset.is_valid():
-        order_quantity_extra_links=[]
-        for form in bom_formset.forms:
-            if form.is_valid():
-
-                options=form.cleaned_data
-                order_quantity_extra_links.append([options["order"],options["quantity"],options["unit"]])
-            else:
-
-                valid = False
-    else:
-
-        valid=False
-
-    if part_type_formset.is_valid():
-        index=0
-        for form in part_type_formset.forms:
-            options=form.cleaned_data
-            part = options["type_part"]
-            cls = get_all_plmobjects()[part]
-            part_form = get_creation_form(request.user, cls, request.POST,
-                    prefix=str(index*2))
-            if not part_form.is_valid():#son necesarios?
-
-                valid=False
-            doc_form = get_creation_form(request.user, Document3D,
-                    request.POST, prefix=str(index*2+1))
-            creation_formset.append([part_form,doc_form])
-
-            if not doc_form.is_valid(): #son necesarios?
-
-                valid=False
-            index=index+1
-
-    else:
-
-        valid=False
-
-    if valid:
-        return zip(order_quantity_extra_links,creation_formset)
-    else:
-        return valid
-"""
 @secure_required
 @login_required
 def ajax_part_creation_form(request, prefix):
+    """
+    It updates the form of an assembly determined by **prefix** without recharging the whole page and respecting the information introduced up to the moment
+    
+    The attributes can change depending on the type of part selected
 
-
+    """
     tf = Doc_Part_type_Form(request.GET, prefix=prefix)
 
     if tf.is_valid():
