@@ -17,7 +17,14 @@ from OCC.Quantity import Quantity_Color
 
 def composer(temp_file_name):
 
+    """
+    
+    :param temp_file_name: path of a  :class:`.tempfile` **.arb** that contains the information to generate a :class:`.Product` relative to the arborescense of a **.stp** file
 
+    
+    For every node of the :class:`.Product`  the attribute **doc_file_path** indicates where is store the file **.stp** that represents the node
+    
+    """
     
     output = open(temp_file_name.encode(),"r")
     product =Product_from_Arb(json.loads(output.read()))
@@ -80,8 +87,9 @@ def add_labels(product,lr,st):
                 pass # no hace falta por que ya esta en la geometria
                                          
                 
-    
-composer(sys.argv[1])    
+if __name__ == "__main__":    
+    composer(sys.argv[1])  
+  
     
     
     

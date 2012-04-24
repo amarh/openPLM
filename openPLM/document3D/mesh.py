@@ -42,15 +42,18 @@ from kjbuckets import  kjDict
 import time
 from OCC.GarbageCollector import garbage
 def mesh_shape(shape,filename,name):
-    """ Take a topods_shape instance, returns the tesselated object"""
-    ''' Connect a ode.Trimesh to this body. The mesh is generated from the MSH subpackage. vertices lits
-    and faces indices are passed to the trimesh.
+    """ 
+
+
+ 
+    Take a topods_shape instance, returns the tesselated object
     The default mesh precision is divided by the quality factor:
     - if quality_factor>1, the mesh will be more precise, i.e. more triangles (more precision, but also
     more memory consumption and time for the mesher,
     - if quality_factor<1, the mesh will be less precise.
-    By default, this argument is set to 1 : the default precision of the mesher is used.
+
     '''
+    """
 
     quality_factor=0.3
     a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
