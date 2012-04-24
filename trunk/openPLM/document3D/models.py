@@ -299,7 +299,14 @@ class GeometryFile(models.Model):
 #admin.site.register(GeometryFile)
 
 def delete_GeometryFiles(doc_file):
-
+    """
+    
+    Erase physical (file **.geo**) and logically the :class:`.GeometryFiles` associated with a :class:`.DocumentFile` (**doc_file**)
+        
+    :param doc_file: :class:`.DocumentFile`
+        
+        
+    """    
 
     to_delete=GeometryFile.objects.filter(stp=doc_file) 
     list_files=list(to_delete.values_list("file", flat=True))
@@ -337,7 +344,15 @@ class ArbreFile(models.Model):
     decomposable = models.BooleanField()
      
 def delete_ArbreFile(doc_file):
-
+    """
+    
+    Erase physical (file **.arb**) and logically the :class:`.ArbreFile` associated with a :class:`.DocumentFile` (**doc_file**)
+    
+        
+    :param doc_file: :class:`.DocumentFile`
+        
+        
+    """    
 
     to_delete=ArbreFile.objects.filter(stp=doc_file) 
     list_files=list(to_delete.values_list("file", flat=True))
@@ -345,6 +360,8 @@ def delete_ArbreFile(doc_file):
     to_delete.delete()   
     
 def delete_files(list_files,location=""):
+
+
     for name in list_files:
         filename = os.path.join(location, name)
         if os.path.exists(filename) and os.path.isfile(filename):
@@ -549,13 +566,15 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
         -A new root :class:`.DocumentFile` has been generated acording to the situation
         
         -If exists a :class:`.DocumentFile` native (**native_related_pk**) related to the :class:`.DocumentFile` (**stp_file_pk**), then this one was promoted 
-
+        
+        -We set the :class:`.Part` (**part_pk**) like the attribute PartDecompose of the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_file_pk**)  
     """       
     try:
         stp_file = DocumentFile.objects.get(pk=stp_file_pk)
         ctrl=get_controller(stp_file.document.type)
         user=User.objects.get(pk=user_pk)
         ctrl=ctrl(stp_file.document,user)
+        part=Part.objects.get(pk=part_pk)
         
         product=Product_from_Arb(json.loads(arbre))   
 
@@ -573,7 +592,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
         temp_file.seek(0)   
         if subprocess.call(["python", "document3D/generateDecomposition.py",stp_file.file.path,temp_file.name]) == 0:
             update_child_files_BD(product,user,product.doc_id) 
-            update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part_pk)
+            update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part)
                
         else:
 
@@ -594,13 +613,13 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
         
     
     
-def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part_pk):
+def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part):
     """
     
     :param stp_file: :class:`.DocumentFile` that was decompose (will be deprecated)
     :param new_stp_file: :class:`.DocumentFile` that will replace the :class:`.DocumentFile` that was decomposed 
     :param product: :class:`.Product` that represents the arborescense of the :class:`.DocumentFile` that was decompose
-    :param part_pk: primery key of a :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that was decomposed
+    :param part: :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that was decomposed
     :param ctrl: :class:`.Document3DController` that contains the :class:`.DocumentFile` that was decomposed
     :param file: :class:`~django.core.files.File` that contains the new file .stp root
     :param name: name for the :class:`.DocumentFile` (new_stp_file) 
@@ -616,11 +635,14 @@ def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part_pk):
         
         Generate a new :class:`.ArbreFile` for the **new_stp_file** (**product**.doc_id and **product**.doc_path related to the **new_stp_file**)
         
-        Fix the attribute PartDecompose of the :class:`.Document3D` (**ctrl**.object) to the :class:`.Part` (**part_pk**) 
+        Fix the attribute PartDecompose of the :class:`.Document3D` (**ctrl**.object) to the :class:`.Part` (**part**) 
         
         Deprecate the :class:`.DocumentFile` (**stp_file**)
         
-    """    
+    """ 
+    doc3D=Document3D.objects.get(id=stp_file.document_id)
+    doc3D.PartDecompose=part
+    doc3D.save()   
     new_stp_file.filename=product.name+".stp".encode("utf-8")
     new_stp_file.file=name
     new_stp_file.size=file.size
@@ -795,7 +817,7 @@ def child_ArbreFile_to_Product(doc_file,product,product_root,deep):
     """
     
     stp_related,list_loc=get_step_related(doc_file)
-
+    
     for i,stp in enumerate(stp_related):    
 
         
@@ -858,7 +880,7 @@ def Product_to_ArbreFile(product,doc_file):
     """
     
     :param product: :class:`.Product` that contains the information about the arborescense to generate a new :class:`~django.core.files.File` **.arb**
-    :param doc_file: :class:`.DocumentFile` related to **product** for which the new :class:`.ArbreFile` is going to be generated
+    :param doc_file: :class:`.DocumentFile` related to **product** for which the new :class:`.ArbreFile` will be generated
     
     Generates a new :class:`.ArbreFile` associated with a :class:`.DocumentFile` from a :class:`.Product`
     
