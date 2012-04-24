@@ -161,10 +161,23 @@ def display_home_page(request):
 @handle_errors
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays attributes of the selected object.
-    It computes a context dictionnary based on
-    
+    Attributes view of the given object.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/attributes/`
+
     .. include:: views_params.txt 
+
+    **Template:**
+    
+    :file:`attribute.html`
+
+    **Context:**
+
+    ``RequestContext``
+    
+    ``object_attributes``
+        list of tuple (verbose attribute name, value)
+        
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -184,8 +197,12 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays attributes of the selected object.
-    Redirection to :func:display_object_attributes
+    Generic object view.
+
+    Permanently redirects to the attribute page of the given object if it
+    is a part, an user or a group and to the files page if it is a document.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
      
     if obj_type in ('User', 'Group'):
