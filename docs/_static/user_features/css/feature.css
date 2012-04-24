@@ -1,0 +1,98 @@
+.feature_block{
+    position: relative;
+    z-index: 1;
+}
+
+.feature_block img{
+    width:100%;
+}
+
+.feature_block .marker{
+    position: absolute;
+    background: url("../img/focus.png") no-repeat scroll center top transparent;
+    background-position: center bottom;
+    height: 32px;
+    width: 32px;
+    cursor: help;
+    display: block;
+    z-index: 10;
+}
+
+.marker .info{
+    position: absolute;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    border-radius: 4px;
+    /*width: 500%;*/
+    color: white;
+    font-size: small;
+    font-weight: bold;
+    top: 100%;
+    display:none;
+    padding: 20%;
+    background-color:#82979f;
+}
+.marker:hover{
+    z-index: 100;
+    cursor: help;
+}
+.marker:hover .info{
+    display:inline;
+    position:absolute;
+}
+
+#search_type{
+    top: 27%;
+    left: 10%;
+}
+
+#search_request{
+    top: 27%;
+    left: 25%;
+}
+
+#create_type{
+    top: 33%;
+    left: 30%;
+}
+
+#create_ref{
+    top: 37%;
+    left: 33%;
+}
+
+#create_rev{
+    top: 42%;
+    left: 33%;
+}
+
+#create_cycle{
+    top: 46%;
+    left: 45%;
+}
+
+#create_group{
+    top: 56%;
+    left: 27%;
+}
+
+#navigate_current{
+    top: 18%;
+    left: 66%;
+}
+
+#navigate_box{
+    top: 34%;
+    left: 65%;
+}
+
+#navigate_options{
+    top: 25%;
+    left: 94%;
+}
+
+#navigate_left{
+    top: 15%;
+    left: 18%;
+}
