@@ -416,12 +416,6 @@ def _cache_lifecycle_stuff(func):
     :class:`LifecycleStates`. Each key of the cache is
     a tuple (state's name, lifecycle's name).
     """
-    func.__doc__ += """
-    
-        .. note::
-            
-            The result of this function is cached with :func:`._cache_lifecycle_stuff`.
-    """
     @wraps(func)
     def wrapper(plmobject):
         key = (plmobject.state_id, plmobject.lifecycle_id)
@@ -432,6 +426,12 @@ def _cache_lifecycle_stuff(func):
             func.cache[key] = value
             return value
     func.cache = {}
+    wrapper.__doc__ += """
+    
+        .. note::
+            
+            The result of this function is cached with :func:`._cache_lifecycle_stuff`.
+    """
     return wrapper
     
 
