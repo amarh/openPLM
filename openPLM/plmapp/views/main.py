@@ -54,6 +54,7 @@ from operator import attrgetter
 from mimetypes import guess_type
 from collections import defaultdict
 
+from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse,\
                         HttpResponsePermanentRedirect, HttpResponseForbidden
@@ -66,6 +67,7 @@ from django.utils import simplejson
 from django.forms import HiddenInput
 from django.views.i18n import set_language as dj_set_language
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 from haystack.views import SearchView
 
@@ -74,7 +76,6 @@ from openPLM.plmapp.exceptions import ControllerError, PermissionError
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
-from openPLM.plmapp.forms import *
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
@@ -274,7 +275,7 @@ def revise_document(obj, ctx, request):
         confirmation = bool(parts)
        
         if request.method == "POST" and request.POST:
-            add_form = AddRevisionForm(request.POST)
+            add_form = forms.AddRevisionForm(request.POST)
             selected_parts = []
             valid_forms = True
             if confirmation:
@@ -297,7 +298,7 @@ def revise_document(obj, ctx, request):
                 obj.revise(add_form.cleaned_data["revision"], selected_parts)
                 return HttpResponseRedirect(".")
         else:
-            add_form = AddRevisionForm({"revision" : get_next_revision(obj.revision)})
+            add_form = forms.AddRevisionForm({"revision" : get_next_revision(obj.revision)})
             if confirmation:
                 ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
         ctx["add_revision_form"] = add_form
@@ -319,7 +320,7 @@ def revise_part(obj, ctx, request):
         confirmation = bool(children or parents or documents)
 
         if request.method == "POST" and request.POST:
-            add_form = AddRevisionForm(request.POST)
+            add_form = forms.AddRevisionForm(request.POST)
             valid_forms = True
             selected_children = []
             selected_parents = []
@@ -372,7 +373,7 @@ def revise_part(obj, ctx, request):
                         selected_documents, selected_parents)
                 return HttpResponseRedirect(".")
         else:
-            add_form = AddRevisionForm({"revision" : get_next_revision(obj.revision)})
+            add_form = forms.AddRevisionForm({"revision" : get_next_revision(obj.revision)})
             if confirmation:
                 initial = [dict(link=link) for link in children]
                 ctx["children_formset"] = forms.SelectChildFormset(prefix="children",
@@ -437,13 +438,13 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     level = "first"
     state = "all"
     if request.GET:
-        display_form = DisplayChildrenForm(request.GET)
+        display_form = forms.DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
     else:
-        display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
+        display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state":"all"})
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
@@ -498,12 +499,12 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
         # TODO
         raise TypeError()
     if request.method == "POST":
-        formset = get_children_formset(obj, request.POST)
+        formset = forms.get_children_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_children(formset)
             return HttpResponseRedirect("..")
     else:
-        formset = get_children_formset(obj)
+        formset = forms.get_children_formset(obj)
     extra_columns = []
     extra_fields = []
     for PCLE in models.get_PCLEs(obj.object):
@@ -531,7 +532,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_child_form = AddChildForm(obj.object, request.POST)
+        add_child_form = forms.AddChildForm(obj.object, request.POST)
         if add_child_form.is_valid():
             child_obj = get_obj_from_form(add_child_form, request.user)
             obj.add_child(child_obj,
@@ -541,7 +542,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
                           **add_child_form.extensions)
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
     else:
-        add_child_form = AddChildForm(obj.object)
+        add_child_form = forms.AddChildForm(obj.object)
         ctx['current_page'] = 'BOM-child'
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
@@ -566,13 +567,13 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     level = "first"
     state = "all"
     if request.GET:
-        display_form = DisplayChildrenForm(request.GET)
+        display_form = forms.DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
     else:
-        display_form = DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
+        display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state" : "all"})
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
@@ -601,12 +602,12 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
         # TODO
         raise TypeError()
     if request.method == "POST":
-        formset = get_doc_cad_formset(obj, request.POST)
+        formset = forms.get_doc_cad_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_doc_cad(formset)
             return HttpResponseRedirect(".")
     else:
-        formset = get_doc_cad_formset(obj)
+        formset = forms.get_doc_cad_formset(obj)
     dforms = dict((form.instance.id, form) for form in formset.forms)
     archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'doc-cad',
@@ -629,13 +630,13 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_doc_cad_form = AddDocCadForm(request.POST)
+        add_doc_cad_form = forms.AddDocCadForm(request.POST)
         if add_doc_cad_form.is_valid():
             doc_cad_obj = get_obj_from_form(add_doc_cad_form, request.user)
             obj.attach_to_document(doc_cad_obj)
             return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
     else:
-        add_doc_cad_form = AddDocCadForm()
+        add_doc_cad_form = forms.AddDocCadForm()
     ctx.update({'link_creation': True,
                 'add_doc_cad_form': add_doc_cad_form,
                 'attach' : (obj, "attach_doc")})
@@ -658,17 +659,17 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
         # TODO
         raise TypeError()
     if request.method == "POST":
-        formset = get_rel_part_formset(obj, request.POST)
+        formset = forms.get_rel_part_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_rel_part(formset)
             return HttpResponseRedirect(".")
     else:
-        formset = get_rel_part_formset(obj)
-    forms = dict((form.instance.id, form) for form in formset.forms)
+        formset = forms.get_rel_part_formset(obj)
+    rforms = dict((form.instance.id, form) for form in formset.forms)
 
     ctx.update({'current_page':'parts', 
                 'all_parts': obj.get_attached_parts(),
-                'forms' : forms,
+                'forms' : rforms,
                 'parts_formset': formset})
     return r2r('documents/parts.html', ctx, request)
 
@@ -684,14 +685,14 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_rel_part_form = AddRelPartForm(request.POST)
+        add_rel_part_form = forms.AddRelPartForm(request.POST)
         if add_rel_part_form.is_valid():
             part_obj = get_obj_from_form(add_rel_part_form, request.user)
             obj.attach_to_part(part_obj)
             ctx.update({'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
     else:
-        add_rel_part_form = AddRelPartForm()
+        add_rel_part_form = forms.AddRelPartForm()
     ctx.update({'link_creation': True,
                 'add_rel_part_form': add_rel_part_form,
                 'attach' : (obj, "attach_part") })
@@ -711,12 +712,12 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     if not hasattr(obj, "files"):
         raise TypeError()
     if request.method == "POST":
-        formset = get_file_formset(obj, request.POST)
+        formset = forms.get_file_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_file(formset)
             return HttpResponseRedirect(".")
     else:
-        formset = get_file_formset(obj)
+        formset = forms.get_file_formset(obj)
 
     archive_form = forms.ArchiveForm()
     
@@ -739,13 +740,13 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
-        add_file_form = AddFileForm(request.POST, request.FILES)
+        add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
             ctx.update({'add_file_form': add_file_form, })
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
-        add_file_form = AddFileForm()
+        add_file_form = forms.AddFileForm()
     ctx.update({ 'add_file_form': add_file_form, })
     return r2r('documents/files_add.html', ctx, request)
 
@@ -773,7 +774,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
             initial = { "type" : "User",
                         "username" : request.user.username
                       }
-            form = SelectUserForm(initial=initial)
+            form = forms.SelectUserForm(initial=initial)
             for field in ("type", "username"):
                 form.fields[field].widget = HiddenInput() 
             ctx["notify_self_form"] = form
@@ -799,7 +800,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         raise ValueError("Bad link id")
     
     if request.method == "POST":
-        replace_management_form = SelectUserForm(request.POST)
+        replace_management_form = forms.SelectUserForm(request.POST)
         if replace_management_form.is_valid():
             if replace_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(replace_management_form, request.user)
@@ -808,7 +809,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                     obj.remove_notified(link.user)
             return HttpResponseRedirect("../..")
     else:
-        replace_management_form = SelectUserForm()
+        replace_management_form = forms.SelectUserForm()
     
     ctx.update({'current_page':'management', 
                 'replace_management_form': replace_management_form,
@@ -829,14 +830,14 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.method == "POST":
-        add_management_form = SelectUserForm(request.POST)
+        add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, "notified")
             return HttpResponseRedirect("..")
     else:
-        add_management_form = SelectUserForm()
+        add_management_form = forms.SelectUserForm()
     
     ctx.update({'current_page':'management', 
                 'replace_management_form': add_management_form,
@@ -919,13 +920,13 @@ def create_object(request, from_registered_view=False, creation_form=None):
         return r2r('create.html', ctx, request)
 
     if request.method == 'GET' and creation_form is None:
-        creation_form = get_creation_form(request.user, cls)
+        creation_form = forms.get_creation_form(request.user, cls)
         if related is not None:
             creation_form.fields["group"].initial = related.group
             creation_form.fields["lifecycle"].initial = related.lifecycle
     elif request.method == 'POST':
         if creation_form is None:
-            creation_form = get_creation_form(request.user, cls, request.POST)
+            creation_form = forms.get_creation_form(request.user, cls, request.POST)
         if creation_form.is_valid():
             ctrl_cls = get_controller(type_)
             ctrl = ctrl_cls.create_from_form(creation_form, request.user)
@@ -965,12 +966,12 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     cls = models.get_all_plmobjects()[obj_type]
     if request.method == 'POST' and request.POST:
-        modification_form = get_modification_form(cls, request.POST)
+        modification_form = forms.get_modification_form(cls, request.POST)
         if modification_form.is_valid():
             obj.update_from_form(modification_form)
             return HttpResponseRedirect(obj.plmobject_url + "attributes/")
     else:
-        modification_form = get_modification_form(cls, instance=obj.object)
+        modification_form = forms.get_modification_form(cls, instance=obj.object)
     
     ctx['modification_form'] = modification_form
     return r2r('edit.html', ctx, request)
@@ -994,12 +995,12 @@ def modify_user(request, obj_ref):
         raise PermissionError("You are not the user")
     class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
-        modification_form = OpenPLMUserChangeForm(request.POST)
+        modification_form = forms.OpenPLMUserChangeForm(request.POST)
         if modification_form.is_valid():
             obj.update_from_form(modification_form)
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
-        modification_form = OpenPLMUserChangeForm(instance=obj.object)
+        modification_form = forms.OpenPLMUserChangeForm(instance=obj.object)
     
     ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
     return r2r('edit.html', ctx, request)
@@ -1106,7 +1107,7 @@ def delegate(request, obj_ref, role, sign_level):
     obj, ctx = get_generic_data(request, "User", obj_ref)
     
     if request.method == "POST":
-        delegation_form = SelectUserForm(request.POST)
+        delegation_form = forms.SelectUserForm(request.POST)
         if delegation_form.is_valid():
             if delegation_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(delegation_form, request.user)
@@ -1121,7 +1122,7 @@ def delegate(request, obj_ref, role, sign_level):
                         obj.delegate(user_obj.object, level_to_sign_str(int(sign_level)-1))
                         return HttpResponseRedirect("../../..")
     else:
-        delegation_form = SelectUserForm()
+        delegation_form = forms.SelectUserForm()
     if role == 'sign':
         if sign_level.isdigit():
             role = _("signer level") + " " + str(sign_level)
@@ -1154,13 +1155,13 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.POST:
-        checkin_file_form = AddFileForm(request.POST, request.FILES)
+        checkin_file_form = forms.AddFileForm(request.POST, request.FILES)
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
                         request.FILES["filename"])
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
-        checkin_file_form = AddFileForm()
+        checkin_file_form = forms.AddFileForm()
     ctx['add_file_form'] =  checkin_file_form
     return r2r('documents/files_add.html', ctx, request)
 
@@ -1306,7 +1307,7 @@ def group_add_user(request, obj_ref):
 
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
-        form = SelectUserForm(request.POST)
+        form = forms.SelectUserForm(request.POST)
         if form.is_valid():
             obj.add_user(User.objects.get(username=form.cleaned_data["username"]))
             return HttpResponseRedirect("..")
@@ -1357,7 +1358,7 @@ def sponsor(request, obj_ref):
             obj.sponsor(new_user)
             return HttpResponseRedirect("..")
     else:
-        form = SponsorForm(initial={"sponsor":obj.id}, sponsor=obj.id)
+        form = forms.SponsorForm(initial={"sponsor":obj.id}, sponsor=obj.id)
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.html", ctx, request)
@@ -1442,7 +1443,7 @@ def send_invitation(request, obj_ref, token):
 def import_csv_init(request, target="csv"):
     obj, ctx = get_generic_data(request)
     if request.method == "POST":
-        csv_form = CSVForm(request.POST, request.FILES)
+        csv_form = forms.CSVForm(request.POST, request.FILES)
         if csv_form.is_valid():
             f = request.FILES["file"]
             prefix = "openplmcsv" + request.user.username
@@ -1455,7 +1456,7 @@ def import_csv_init(request, target="csv"):
             return HttpResponseRedirect("/import/%s/%s/%s/" % (target, name,
                                         encoding))
     else:
-        csv_form = CSVForm()
+        csv_form = forms.CSVForm()
     ctx["csv_form"] = csv_form
     ctx["step"] = 1
     ctx["target"] = target
@@ -1502,7 +1503,7 @@ def import_csv_apply(request, target, filename, encoding):
         ctx["io_error"] = True
     ctx["has_critical_error"] = ctx["io_error"] or ctx["encoding_error"] \
             or "errors" in ctx
-    ctx["csv_form"] = CSVForm(initial={"encoding" : encoding})
+    ctx["csv_form"] = forms.CSVForm(initial={"encoding" : encoding})
     ctx["step"] = 2
     ctx["target"] = target
     return r2r("import/csv.html", ctx, request)
