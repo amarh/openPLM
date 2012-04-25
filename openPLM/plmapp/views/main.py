@@ -141,6 +141,23 @@ def get_last_edited_objects(user):
 def display_home_page(request):
     """
     Home page view.
+
+    :url: :samp:`/home/`
+    
+    **Template:**
+    
+    :file:`home.html`
+
+    **Context:**
+
+    ``RequestContext``
+ 
+    ``pending_invitations_owner``
+        QuerySet of pending invitations to groups owned by the user
+
+    ``pending_invitations_guest``
+        QuerySet of pending invitations to groups that the user can joined
+
     """
     obj, ctx = get_generic_data(request, "User", request.user.username)
     del ctx["object_menu"]
@@ -176,7 +193,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     ``RequestContext``
     
     ``object_attributes``
-        list of tuple (verbose attribute name, value)
+        list of tuples(verbose attribute name, value)
         
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -563,10 +580,30 @@ def revise_part(obj, ctx, request):
 @handle_errors
 def display_object_history(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the history of the selected object.
-    It computes a context dictionnary based on
+    History view.
+    
+    This view displays an history of the selected object and its revisions.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/`
+    :url: :samp:`/user/{username}/history/`
+    :url: :samp:`/group/{group_name}/history/`
     
     .. include:: views_params.txt 
+
+    **Template:**
+    
+    :file:`attribute.html`
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``object_history``
+        list of :class:`.AbstractHistory`
+
+    ``show_revisions``
+        True if the template should show the revision of each history row
+    
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if hasattr(obj, "get_all_revisions"):
