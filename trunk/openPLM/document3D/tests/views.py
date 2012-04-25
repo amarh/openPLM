@@ -199,7 +199,7 @@ class view_3dTest(CommonViewTest):
         data=self.update_data(new_doc_file)
         self.assertRaises(ValueError, self.post,self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
 
-        
+    """       
     def test_display_decompose_Document_part_doc_links_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -215,7 +215,7 @@ class view_3dTest(CommonViewTest):
         })          
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse.context["extra_errors"],u"Columns reference, type, revision are not unique")
-
+    """
     """
     def test_display_decompose_Document3D_decomposer_Error(self):
         f=open("document3D/data_test/test.stp")
