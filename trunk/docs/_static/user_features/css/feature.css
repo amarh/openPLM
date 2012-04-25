@@ -10,7 +10,8 @@
 .feature_block .marker{
     position: absolute;
     background: url("../img/focus.png") no-repeat scroll center top transparent;
-    background-position: center bottom;
+    background-position: 75% 75%;
+    background-size: 50%;
     height: 32px;
     width: 32px;
     cursor: help;
