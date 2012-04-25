@@ -778,6 +778,8 @@ def ArbreFile_to_Product(doc_file,recursif=None):
 
 
     product =Product_from_Arb(json.loads(new_ArbreFile.file.read()))
+  
+    
     if recursif and product:
         child_ArbreFile_to_Product(doc_file,product,product_root=product,deep=1)        
             
