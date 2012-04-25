@@ -22,3 +22,11 @@ You can :
     * if you have necessary rights, you can check-out them (download and lock file)
     * if you have necessary rights, you can check-in them (upload and unlock them).
 
+
+3D DOCUMENT
+========================================================
+3DDocument is a type of document with all the functions related to the sub-class of PLMObject , Document. It's used to describe the solid geometry of an object. This geometry is usually defined in STEP files, files with extension *.step* *.stp* .
+
+If the document is a 3D document, a 3D view is generated using the files linked.
+
+Example :
