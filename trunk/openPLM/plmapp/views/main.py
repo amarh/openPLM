@@ -626,10 +626,38 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_child(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the chidren of the selected object.
-    It computes a context dictionnary based on
+    BOM view.
     
-    .. include:: views_params.txt 
+    That views displays the children of the selected object that must be a part.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/bom.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``children``
+        a list of :class:`.Child`
+
+    ``display_form``
+        a :class:`.DisplayChildrenForm`
+
+    ``extra_columns``
+        a list of extra columns that are displayed
+    
+    ``extension_data``
+
+    ``decomposition_msg``
+        a html message to decompose the part (may be empty)
+
+    ``decomposable_children``
+        a set of child part ids that are decomposable
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
