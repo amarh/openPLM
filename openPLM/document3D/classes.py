@@ -273,7 +273,7 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
         
     elif to_update_product_root: #Important, in case of generation of a tree contained in several files, it supports updated product_root
         product=generateProduct(arbre,deep)
-        product_assembly=search_assembly(product.name,label_reference,product.doc_id,product_root,product.geometry)
+        product_assembly=search_assembly(product.name,label_reference,product.doc_id,product_root,product.geometry,product)
         if product_assembly: 
             to_update_product_root.links.append(Link(product_assembly))
             return False 
@@ -284,7 +284,7 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
     for i in range(len(arbre)-1):
         
         product_child=generateProduct(arbre[i+1][1],deep+1)
-        product_assembly=search_assembly(product_child.name,label_reference,product_child.doc_id,product_root,product_child.geometry)
+        product_assembly=search_assembly(product_child.name,label_reference,product_child.doc_id,product_root,product_child.geometry,product)
 
            
         if product_assembly:
@@ -326,7 +326,7 @@ def generateProduct(arbre,deep):
 
 
 
-def search_assembly(name,label,doc_id,product_root,geometry): 
+def search_assembly(name,label,doc_id,product_root,geometry,product_father=False): 
     """
     
     :param product_root: :class:`Product` that represents a root arborescense  
@@ -338,11 +338,14 @@ def search_assembly(name,label,doc_id,product_root,geometry):
          
     Function that it checks if a :class:`Product` (determined by **name** , **id** and **geometry** or by **name** and **label**)is already present in a arborescense :class:`Product` (**product_root**)
     There are two manners of comparison, across **name** and **label_reference**, generated for pythonOCC for every product, or across **name**, **doc_id** and **geometry** ,extracted of a file **.geo**
+    
+    Important: puede haber dos ficheros con el mismo nombre en la misma assamblaje
     """
   
-    if product_root: 
+    if product_root and not product_father==product_root: 
         for link in product_root.links:
-
+        
+        
             if (name and link.product.name==name and  
             ((geometry and link.product.geometry) or (not geometry and not link.product.geometry))):# 2 assemblys or 2 geometrys wtih same name       
                                 
@@ -361,7 +364,7 @@ def search_assembly(name,label,doc_id,product_root,geometry):
                     
 
      
-            product=search_assembly(name,label,doc_id,link.product,geometry)
+            product=search_assembly(name,label,doc_id,link.product,geometry,product_father)
             if product:
                 return product
 

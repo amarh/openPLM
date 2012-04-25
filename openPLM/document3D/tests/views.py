@@ -31,7 +31,8 @@ class view_3dTest(CommonViewTest):
            u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
            })
            
-    def update_data(self,data,new_doc_file,update_time=True):
+    def update_data(self,new_doc_file,update_time=True):
+        data={}
         product=ArbreFile_to_Product(new_doc_file)
         index=[1]
         lifecycle='draft_official_deprecated'
@@ -39,27 +40,30 @@ class view_3dTest(CommonViewTest):
         decomposition_fromPOST_data(data,product,index,self.group.id,lifecycle,part_type)
         if update_time:
             self.update_time(data)
-    """                       
+ 
+        return data
+                                 
     def test_view3D_stp_decompose(self):
         f=open("document3D/data_test/test2.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
         self.controller.attach_to_document(self.document.object)        
-        data={}   
-        self.update_data(data,new_doc_file)
+  
+        data=self.update_data(new_doc_file)
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertFalse(is_decomposable(self.document.object))
         reponse = self.get(self.document.object.plmobject_url+"3D/")        
         self.assertEqual(len(reponse.context["GeometryFiles"]), 5)
                        
 
-            
+                 
     def test_3D_no_stp_associe(self):   
     
         response = self.get(self.document.object.plmobject_url+"3D/")
         self.assertEqual(response.context["GeometryFiles"], [])
         self.assertEqual(response.context["javascript_arborescense"], False)
-             
+     
+            
     def test_3D_stp_associe_sans_arborescense(self):   
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -69,13 +73,18 @@ class view_3dTest(CommonViewTest):
         self.assertEqual(3, len(list(response.context["GeometryFiles"])))
         self.assertEqual(response.context["javascript_arborescense"], False)
 
+
+    
     def test_3D_stp_valide_no_info(self):   
         f=open("document3D/data_test/valid_sans_information.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)       
         response = self.get(self.document.object.plmobject_url+"3D/")    
         self.assertEqual(response.context["GeometryFiles"],[])
-        self.assertNotEqual(response.context["javascript_arborescense"], False)    
+        self.assertNotEqual(response.context["javascript_arborescense"], False)
+        
+        
+            
                 
     def test_3D_stp_associe_sans_geometry_with_arborescense(self):   
         f=open("document3D/data_test/test.stp")
@@ -86,20 +95,9 @@ class view_3dTest(CommonViewTest):
         self.assertEqual([], response.context["GeometryFiles"])
         self.assertNotEqual(response.context["javascript_arborescense"], False)  
        
-
-
-    def test_bom_child(self):
-        child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
-        self.controller.add_child(child1, 10 , 20)
-        child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
-        child3 = child2.create("c3", "Part", "a", self.user, self.DATA)
-        self.controller.add_child(child2, 10, 20)
-        response = self.get(self.base_url + "BOM-child/", page="BOM-child")
-        self.assertEqual(2, len(list(response.context["children"])))
-        msg = response.context["decomposition_msg"]
-        self.assertFalse(msg)
+    
         
-        
+           
     def test_decompose_bom_child(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -126,6 +124,7 @@ class view_3dTest(CommonViewTest):
         decomposable_children = response.context["decomposable_children"]
         self.assertTrue(response.context["children"][0].link.child.id
             in decomposable_children)
+    
         
     def test_try_decompose_bom_child_whit_no_links(self):
         f=open("document3D/data_test/valid_sans_information.stp")
@@ -133,7 +132,8 @@ class view_3dTest(CommonViewTest):
         new_doc_file=self.document.add_file(myfile) 
         self.controller.attach_to_document(self.document.object)
         response = self.get(self.base_url+"decompose/"+str(new_doc_file.id)+"/")  
-                        
+        self.assertRedirects(response, self.base_url + "BOM-child/")                        
+    
                   
     #verificar los links creados en las buenas coordenadas      
     def test_display_decompose_form_initial(self):
@@ -144,42 +144,44 @@ class view_3dTest(CommonViewTest):
         response = self.get(self.base_url+"decompose/"+str(new_doc_file.id)+"/")
         # TODO: check forms
 
-
+    
     def test_display_decompose_form_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)    
                                                               
-        data={}
-        self.update_data(data,new_doc_file)
+
+        data=self.update_data(new_doc_file)
 
 
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertRedirects(reponse_post, self.base_url + "BOM-child/")
-
-           
+    
+               
     def test_display_decompose_time_modification_diferent(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
-        data={}
-        self.update_data(data,new_doc_file)
+
+        data=self.update_data(new_doc_file,update_time=False)
         
-        data.update({u'last_modif_time': [u'%s-%s-%s %s:%s:%s'%             (self.document.mtime.year,(self.document.mtime.month),self.document.mtime.day,self.document.mtime.hour-1,self.document.mtime.minute-2,self.document.mtime.second)],
-           u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
+        data.update({u'last_modif_time': [u'%s-%s-%s %s:%s:%s'%             (self.document.mtime.year,(self.document.mtime.month),self.document.mtime.day,self.document.mtime.hour-1,self.document.mtime.minute,self.document.mtime.second)],
+           u'last_modif_microseconds' : [u'%s'%(self.document.mtime.microsecond-1)]
            })
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process")
-
-             
+    
+    
+               
     def test_display_decompose_time_modification_invalid(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
-        data = data1
+
+        data=self.update_data(new_doc_file,update_time=False)
         data.update({u'last_modif_time': [u'not_valid'],
            u'last_modif_microseconds' : [u'not_valid']
            })
@@ -193,21 +195,28 @@ class view_3dTest(CommonViewTest):
         new_doc_file=self.document.add_file(myfile)
         self.document.lock(new_doc_file)     
         self.controller.attach_to_document(self.document.object)                                                          
-        data = data1
-        self.update_time(data)
-        reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process")
 
+        data=self.update_data(new_doc_file)
+        self.assertRaises(ValueError, self.post,self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
+
+        
     def test_display_decompose_Document_part_doc_links_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
-        data = data6
-        self.update_time(data)
+        data=self.update_data(new_doc_file)
+        #u'reference': [u'PART_00001'] 
+        data.update({
+                "%1-part-reference" : [u'2'],
+                "%1-part-revision" : [u'2'],  
+                "%2-part-reference" : [u'2'],
+                "%2-part-revision" : [u'2'],  
+        })          
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse.context["extra_errors"],u"Columns reference, type, revision are not unique")
 
+    """
     def test_display_decompose_Document3D_decomposer_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -303,7 +312,7 @@ data1={u'2-lifecycle': [u'draft_official_deprecated'],
   u'1-reference': [u'DOC_00002']}
 
 
-#u'reference': [u'PART_00001']
+
 data6={u'2-lifecycle': [u'draft_official_deprecated'],
   u'3-lifecycle': [u'draft_official_deprecated'],
   u'0-reference': [u'PART_00001'],

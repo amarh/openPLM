@@ -15,15 +15,13 @@
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC. If not, see <http://www.gnu.org/licenses/>.
 
-''' This module provides an high level API built on top of BRepMesh and SMESH low level
-objects. '''
+
 
 import random
 from math import sqrt as math_sqrt
 from OCC.Utils.Topology import *
 from OCC.TopoDS import *
 from OCC.TopAbs import *
-# to determine default precision
 from OCC.Bnd import *
 from OCC.BRepBndLib import *
 from OCC.gp import *
@@ -46,17 +44,15 @@ def mesh_shape(shape,filename,_index_id):
 
     :param shape: :class:`.simple_shape` of which we are going to generate the file **.geo**  
     :param filename: name of the :class:`.DocumentFile` of which we are going to generate the file **.geo**  
-    :param _index_id: id to to differentiate the content between the diverse files **.geo** generated , was composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile`
+    :param _index_id: id to to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile`
  
  
  
-    Take a topods_shape instance, returns the tesselated object
-    The default mesh precision is divided by the quality factor:
-    - if quality_factor>1, the mesh will be more precise, i.e. more triangles (more precision, but also
-    more memory consumption and time for the mesher,
-    - if quality_factor<1, the mesh will be less precise.
+    The file **.geo** are a series of judgments javascript that turn the geometry of the object into representable triangles by means of Webgl
 
-
+    We can select the **opacity** and the **quality_factor** of the representation
+    
+    
     """
 
     quality_factor=0.3
@@ -89,11 +85,23 @@ def mesh_shape(shape,filename,_index_id):
 class QuickTriangleMesh(object):
 
     """
-     
-    A mesh based on the BRepMesh OCC classes.
+
+
+    :model attributes:
+        
+        
+    .. attribute:: shape
     
+        :class:`.OCC.TopoDS.TopoDS_Shape` that contains the geometry 
+
+    .. attribute:: quality_factor
+    
+        quality of applied to the geometry
+               
+
     """
     def __init__(self,shape,quality_factor):
+
         self._shape = shape
 
         bbox = Bnd_Box()
@@ -104,8 +112,7 @@ class QuickTriangleMesh(object):
 
     
     def triangle_is_valid(self, P1,P2,P3):
-        ''' check wether a triangle is or not valid
-'''
+
         V1 = gp_Vec(P1,P2)
         V2 = gp_Vec(P2,P3)
         V3 = gp_Vec(P3,P1)
@@ -119,6 +126,15 @@ class QuickTriangleMesh(object):
             return False
 
     def compute(self,output,_index_id):
+    
+        """
+        
+        :param _index_id: id to to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile` 
+        :param output: :class:`~django.core.files.File` **.geo**       
+               
+        Divides the geometry in triangles and generates the code javascript of each of these writing in **output** 
+        
+        """
         init_time = time.time()
         if self._shape is None:
             raise "Error: first set a shape"
