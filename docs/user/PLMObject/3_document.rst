@@ -29,4 +29,7 @@ You can :
 
 If the document is a 3D document, a 3D view is generated using the files linked.
 
-Example :
+Here is an example of 3D view :
+
+.. image:: ../images/3Dview.png
+   :width: 100%
