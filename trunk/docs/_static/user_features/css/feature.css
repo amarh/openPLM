@@ -24,7 +24,7 @@
     border-width: 1px;
     border-color: white;
     border-radius: 4px;
-    /*width: 500%;*/
+    width: 500%;
     color: white;
     font-size: small;
     font-weight: bold;
@@ -96,3 +96,84 @@
     top: 15%;
     left: 18%;
 }
+
+#study_doc_add{
+    top: 33%;
+    left: 27%;
+}
+
+#study_doc_create_link{
+    top: 33%;
+    left: 52%;
+}
+
+#study_doc_disconnect{
+    top: 33%;
+    left: 61%;
+}
+
+#study_doc_3D{
+    top: 28%;
+    left: 64%;
+}
+
+#docpart_add_panel{
+    top: 17%;
+    left: 20%;
+}
+
+#docpart_add{
+    top: 36%;
+    left: 39%;
+}
+
+#study_part_add{
+    top: 43%;
+    left: 15%;
+}
+
+#study_part_create_link{
+    top: 43%;
+    left: 41%;
+}
+
+#study_part_disconnect{
+    top: 43%;
+    left: 49%;
+}
+
+#study_part_addchild{
+    top: 32%;
+    left: 26%;
+}
+
+#study_part_editchild{
+    top: 32%;
+    left: 31%;
+}
+
+#study_part_dispchild{
+    top: 35%;
+    left: 28%;
+}
+
+#study_part_genchild{
+    top: 58%;
+    left: 93%;
+}
+
+#study_part_rundisp{
+    top: 54%;
+    left: 27%;
+}
+
+#partpart_add_panel{
+    top: 17%;
+    left: 20%;
+}
+
+#partpart_add{
+    top: 36%;
+    left: 39%;
+}
+
