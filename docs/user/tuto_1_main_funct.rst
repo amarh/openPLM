@@ -52,6 +52,8 @@ Example :
 .. image:: images/Capture_openPLM_home.png
    :width: 100%
 
+As shown on the example, your pending invitations (sent and received) are displayed on the home page.
+
 
 SEARCH
 ========================================================
@@ -90,6 +92,7 @@ Example :
 .. image:: images/Capture_openPLM_navigate.png
    :width: 100%
 
+
 CREATE
 ========================================================
 You can create an object filling the form displayed.
@@ -101,20 +104,22 @@ Example :
 .. image:: images/Capture_openPLM_create.png
    :width: 100%
 
+
 STUDY
 ========================================================
-Reaching "Study" from the Home page show the history of the objects you have reached.
+Reaching "Study" from the Home page show the history of the objects related to the user.
 
 On the "Study" page you can :
 
-* display informations on an object
+* display informations of an object
 
-* reach and modified an object
+* reach and modify an object
 
 Example :
 
 .. image:: images/Capture_openPLM_study.png
    :width: 100%
+
 
 COMMON PARTS
 =======================================================
@@ -129,11 +134,15 @@ two parts are common to all views :
 
     * A history of objects reached during your session
 
+If you place your mouse over an object in the history, the corresponding menu will be shown.
+
 .. image:: images/Capture_openPLM_header.png
    :width: 100%
 
 2- The left panel that can be showed or hidden. This left panel is a search
 area with the same structure as the SEARCH view described higher
+
+Depending on the current object and the current page this panel can have extra functions.
 
 .. image:: images/Capture_openPLM_leftpanel.png
    :width: 100%

@@ -4,9 +4,9 @@ Functions in common related PLMObjects : **PART** / **DOCUMENT**
 
 OVERVIEW
 ========================================================
-The **Parts** are PLMObjects. They represent a product in real life.
+The **Parts** and **Documents** are PLMObjects. They represent a product in real life.
 
-Eg : A bicycle, a pack of cookies, a medicine, a wheel, a cookie, some floor, some sugar, ...
+Eg : A bicycle, a pack of cookies, a medicine, a wheel, a drawing, a 3D document, ...
 
 **Part** and **Document** are subclasses of PLMObject. Depending on the industry you use OpenPLM for, we can define subclasses of **Part** and **Document**.
 Each subclass are designated as *type*.
