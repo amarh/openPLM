@@ -82,6 +82,8 @@ class StepDecomposer(Decomposer):
                         return True
                 except:
                     pass
+        
+        
         self.decompose_valid = decompose_valid
         return len(decompose_valid) > 0
 
@@ -171,6 +173,9 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     stp_file=DocumentFile.objects.get(id=stp_id)
     assemblys=[]
     doc_linked_to_part=obj.get_attached_documents().values_list("document_id", flat=True)
+    
+    if stp_file.locked:
+        raise ValueError("Not allowed operation.This DocumentFile is locked")
     if not stp_file.document_id in doc_linked_to_part:
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
     if Document3D.objects.filter(PartDecompose=obj.object).exists():
@@ -692,10 +697,10 @@ def ajax_part_creation_form(request, prefix):
 def same_time(old_modification_data,old_modification_data_microsecond,mtime):
 
     return (old_modification_data_microsecond == mtime.microsecond
-            and old_modification_data.second == old_modification_data.second
-            and old_modification_data.minute == old_modification_data.minute
-            and old_modification_data.hour == old_modification_data.hour
-            and old_modification_data.date()==old_modification_data.date())
+            and old_modification_data.second == mtime.second
+            and old_modification_data.minute == mtime.minute
+            and old_modification_data.hour == mtime.hour
+            and old_modification_data.date()==mtime.date())
 
 ########################################################################
 

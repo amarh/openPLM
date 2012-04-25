@@ -46,11 +46,10 @@ def composer(temp_file_name):
     for i in range(lr.Length()):
         writer.Transfer(lr.Value(i+1), STEPControl_AsIs)
         
-    #f = NamedTemporaryFile(delete=False)
+
         
     status = writer.Write(temp_file_name) 
-    #f.seek(0)
-    #return f
+
     
     
    
