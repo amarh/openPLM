@@ -27,6 +27,8 @@ def trunc(string, number, dots='...'):
 def can_add(child, arg):
     parent, action = arg
 
+    if isinstance(child, models.DocumentFile):
+        child = child.document
     if action == "attach_doc":
         return parent.can_attach_document(child)
     elif action == "attach_part":
@@ -76,9 +78,16 @@ attr = register.filter('attr', attr)
 @register.filter
 def is_plmobject(result):
     """
-    Returns True if the object behind *result* is an instance of :class:`PLMObject.`
+    Returns True if the object behind *result* is an instance of :class:`.PLMObject`
     """
     return issubclass(result.model, models.PLMObject)
+
+@register.filter
+def is_documentfile(result):
+    """
+    Returns True if the object behind *result* is an instance of :class:`.DocumentFile`
+    """
+    return issubclass(result.model, models.DocumentFile)
 
 @models._cache_lifecycle_stuff
 def get_state_class(plmobject):
@@ -103,10 +112,11 @@ def result_class(result):
     """
     Returns a css class according to result.
     """
-    if issubclass(result.model, models.PLMObject):
+    if issubclass(result.model, (models.PLMObject, models.DocumentFile)):
         result.state_id = result.state
         result.lifecycle_id = result.lifecycle
-        return "state-" + get_state_class(result)
+        if result.state_id and result.lifecycle_id:
+            return "state-" + get_state_class(result)
     return ""
 
 # yes, this is a really bad way to detect an email
