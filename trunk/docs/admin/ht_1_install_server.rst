@@ -156,6 +156,11 @@ All files necessary to run PostgreSQL will be stored in this directory.
     
     * ``exit``
 
+Change the secret key
+=====================
+
+    * ``cd /var/django/openPLM/trunk/openPLM/``
+    * ``python change_secret_key.py``
 
 Create the database
 ===================
