@@ -266,8 +266,10 @@ Configure Apache server
 =======================
 
 Edit you Apache configuration file (:file:`/etc/apache2/httpd.conf`) and
-add the following lines: ::
+add the following lines:
     
+.. code-block:: apache
+
     WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
     Alias /media /var/django/openPLM/trunk/openPLM/media
     <Directory /var/django/openPLM/trunk/openPLM/media>
@@ -308,7 +310,7 @@ Do not forget to edit Home>Plmapp>User profiles in order to give correct rights 
 .. note::
     For more information about the `Django Admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
 
-Then you must create a new *Site* (use the admin interface) and sets the `SITE_ID`
+Then you must create a new *Site* (use the admin interface) and set the `SITE_ID`
 variable in the :file:`settings.py` file.
 
 You are now ready for your first login: ::
@@ -327,7 +329,9 @@ If your (apache) server support HTTPS, you can force HTTPS connections by settin
 Each HTTP connection will be redirected to an HTTPS connection.
 
 A possible apache configuration would be (the rewrite and ssl modules must
-be enabled)::
+be enabled)
+
+.. code-block:: apache
 
     NameVirtualHost *:80
     <VirtualHost *:80>
