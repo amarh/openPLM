@@ -82,7 +82,19 @@ class StepDecomposer(Decomposer):
                         return True
                 except:
                     pass
-        
+
+        else:
+            try:
+
+                doc = Document3D.objects.get(PartDecompose=self.part)
+                file_stp = is_decomposable(doc)
+                if file_stp and msg:
+                    decompose_valid.append((doc, file_stp))
+                elif file_stp:
+                    return True
+            except:
+                pass 
+      
         
         self.decompose_valid = decompose_valid
         return len(decompose_valid) > 0
@@ -178,14 +190,15 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         raise ValueError("Not allowed operation.This DocumentFile is locked")
     if not stp_file.document_id in doc_linked_to_part:
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
-    if Document3D.objects.filter(PartDecompose=obj.object).exists():
-        raise ValueError("Not allowed operation.This Part already forms a part of another decomposition")
+    if Document3D.objects.filter(PartDecompose=obj.object).exists() and not Document3D.objects.get(PartDecompose=obj.object).id==stp_file.document.id: #a same document could be re-decomposed for the same part
+        
+        raise ValueError("Not allowed operation.This Part already forms a part of another decomposition ")
     try:
         doc3D=Document3D.objects.get(id=stp_file.document_id)
     except Document3D.DoesNotExist:
         raise ValueError("Not allowed operation.The document is not a subtype of document3D")
 
-    if doc3D.PartDecompose:
+    if doc3D.PartDecompose and not doc3D.PartDecompose.id==obj.object.id:
         raise ValueError("Not allowed operation.This Document already forms a part of another decomposition")
         
 
@@ -194,7 +207,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     
 
         extra_errors=""
-        product=ArbreFile_to_Product(stp_file)
+        product=ArbreFile_to_Product(stp_file,recursif=None)
         last_time_modification=Form_save_time_last_modification(request.POST)
         obj.block_mails()
 
@@ -276,7 +289,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         last_time_modification.fields["last_modif_time"].initial=document_controller.mtime
 
         last_time_modification.fields["last_modif_microseconds"].initial=document_controller.mtime.microsecond
-        product=ArbreFile_to_Product(stp_file)
+        product=ArbreFile_to_Product(stp_file,recursif=None)
         if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
         
