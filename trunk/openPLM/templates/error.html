@@ -1,24 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-{% load i18n %}
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="content-type" content="text/html"; charset="ISO-8859-1">
-	<link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
-	<title>{% trans "openPLM LOGIN PAGE" %}</title>
-	<meta name="Author" content="philippe.joulaud" />
-	<meta name="Classification" content="" />
-	<meta name="Description" content="" />
-	<meta name="keywords" content="" />
-</head>
+{% block title %}{% trans "openPLM: error" %}{% endblock %}
+{% block leftcolumn %} {% endblock %}
 
-<body>
-    <div id="Page" >
-        <p>{% trans "Error :" %} </p>
-        <p>{{ message }}</p>
-        <p><a href="javascript:back();">{% trans "go back" %}</a> </p>
+
+{% block main %}
+    <div id="ActiveBox">
+
+        <div id="ActiveArea">
+            <h3>{% trans "Error" %}</h3>
+            <p style="padding:2em;">{{ message }}</p>
+            <p style="padding:2em;"><a href="javascript:back();">{% trans "go back" %}</a> </p>
+
+            <div class="clearfix"></div>
+
+        </div>
+
     </div>
-	<br class="clear" />
-</body>
-</html>
+{% endblock %}
+
