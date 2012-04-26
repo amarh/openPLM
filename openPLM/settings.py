@@ -1,13 +1,17 @@
 #-!- coding:utf-8 -!-
 # Django settings for openPLM project.
+# settings that you may have to modify are marked with a #XYZ: comment
+
 
 import sys
 import os.path
 
+#XYZ: once your installation is ok, you should change this to False
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
+    #XYZ: some error are notified to this address
     ('Your Name', 'your_email@domain.com'),
 )
 
@@ -16,11 +20,15 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'openplm'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'django'             # Not used with sqlite3.
+
+#XYZ: should be the password set by the postgresql command 
+# "create role django with password 'MyPassword' login;"
 DATABASE_PASSWORD = 'django#6'         # Not used with sqlite3.
+
 DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-# Local time zone for this installation. Choices can be found here:
+#XYZ: Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
@@ -52,6 +60,7 @@ MEDIA_URL = '/media/'
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 # Make this unique, and don't share it with anybody.
+# XYZ: the script change_secret_key.py can do this for you
 SECRET_KEY = '0ham7d#fh669-xi@wxf1wcpbhn6tbbegtv_cml()_wcboyw&u&'
 
 # List of callables that know how to import templates from various sources.
@@ -100,7 +109,7 @@ INSTALLED_APPS = (
     'south',
     'openPLM.plmapp',
     'openPLM.pdfgen', # enable pdf generations
-    # you can add your application after this line
+    #XYZ: you can add your application after this line
     'openPLM.cad',
     'openPLM.computer',
     'openPLM.cae',
@@ -119,18 +128,16 @@ CELERY_ROUTES = {
     "openPLM.plmapp.tasks.remove_index": {"queue": "index"},
     "openPLM.plmapp.mail.do_send_histories_mail" : {"queue" : "mails"},
     "openPLM.plmapp.mail.do_send_mail" : {"queue" : "mails"},
-    # uncomment this line if you enable document3D
+    #XYZ: uncomment this line if you enable document3D
     # "openPLM.document3d.models.handle_step_file": {"queue": "step"},
     # "openPLM.document3d.decomposer.decomposer_all": {"queue": "step"},
 
 }
 
+#XYZ: EMAIL settings
+# https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
-
-######################
-# openPLM's settings #
-######################
 
 #: directory that stores documents. Make sure to use a trailing slash.
 DOCUMENTS_DIR = "/var/openPLM/docs/"
@@ -152,7 +159,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         )
 
 
-
+#XYZ:
 #: expeditor's mail used when sending notification emails
 EMAIL_OPENPLM = "no-reply@openplm.example.com"
 
@@ -175,9 +182,11 @@ djcelery.setup_loader()
 BROKER_HOST = "localhost"
 BROKER_PORT = 5672
 BROKER_USER = "openplm"
+
+#XYZ: you will have to change this password
+# it must be the same as the one set by the command ``rabbitmqctl add_user openplm 'secret'``
 BROKER_PASSWORD = "secret"
 BROKER_VHOST = "openplm"
-
 
 #Gestion native
 ENABLE_NATIVE_FILE_MANAGEMENT=True
