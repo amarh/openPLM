@@ -1,6 +1,5 @@
 #-!- coding:utf-8 -!-
 # Django settings for openPLM project.
-# sqlite version
 
 import sys
 import os.path
