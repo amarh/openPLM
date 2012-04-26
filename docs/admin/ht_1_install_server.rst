@@ -99,55 +99,23 @@ All files used for a new django site will be stored in this directory.
  The directory ./openPLM is created and all codes are downloaded.
     
     * ``cd /var/django/openPLM``
-    
-    * ``svn info`` ::
-        
-        Path: .
-        URL: svn://openplm.org/openPLM
-        Repository Root: svn://openplm.org/openPLM
-        Repository UUID: 5b46f505-65de-4892-aab2-a53e26d394e5
-        Revision: 195
-        Node Kind: directory
-        Schedule: normal
-        Last Changed Author: pjoulaud
-        Last Changed Rev: 195
-        Last Changed Date: 2010-08-25 11:29:03 +0200 (mer., 25 août 2010)
-        
+
 
 Configure PostgreSQL
 ====================
-
-Check PostgreSQL is running:
     
-    * ``ps aux|grep postgres`` ::
-    
-        postgres 25961  0.0  0.9  50544  4968 ?    S    Aug26   0:14 /usr/lib/postgresql/8.4/bin/postgres -D /var/postgres
-        postgres 25963  0.0  1.0  50664  5600 ?    Ss   Aug26   1:07 postgres: writer process                             
-        postgres 25964  0.0  0.2  50544  1336 ?    Ss   Aug26   1:00 postgres: wal writer process                         
-        postgres 25965  0.0  0.2  50808  1480 ?    Ss   Aug26   0:28 postgres: autovacuum launcher process                
-        postgres 25966  0.0  0.2  14664  1224 ?    Ss   Aug26   0:24 postgres: stats collector process                    
-        root     27338  0.0  0.1   3324   804 pts/3    R+   16:53   0:00 grep --color=auto postgres
-    
-.. note::
-    
-    If PostgreSQL is already installed, you can go to next topic directly.
-    
-Set password for 'postgres' user (in this example we give 'MyPassword' but you can change it)
-    
-    * ``passwd postgres``
     * ``mkdir /var/postgres``
-    
-All files necessary to run PostgreSQL will be stored in this directory.
-    
     * ``chown postgres:postgres /var/postgres/``
     * ``find / -name initdb`` ::
     
         /usr/lib/postgresql/8.4/bin/initdb
         
     * ``locale-gen fr_FR.UTF-8``
+      (replace ``fr_FR.UTF-8`` with your locale) 
     * ``su postgres``
     * ``/usr/lib/postgresql/8.4/bin/initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
     * ``/usr/lib/postgresql/8.4/bin/postgres -D /var/postgres &``
+      (it is not a problem if postgres is already running, you do not have to restart it)
     * ``psql`` ::
     
             postgres=#create database openplm;
