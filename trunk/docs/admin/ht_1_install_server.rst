@@ -220,6 +220,7 @@ choose any broker supported by celery but *rabbitmq* is recommanded.
 
 To configure rabbitmq, you must create an user and a vhost (as root):
 
+    * ``service rabbitmq-server start``
     * ``rabbitmqctl add_user openplm 'secret'``
       (change this password, use single quotes to put special characters or spaces)
     * ``rabbitmqctl add_vhost openplm``
@@ -374,12 +375,19 @@ To fix this link, run the following command:
 /var/django/openPLM/trunk/openPLM/media/admin``
 
 
+Connection refused
+------------------
+
+This error is thrown if Celery is mis-configured and can not connect to
+RabbitMQ. 
+
+See :ref:`celery` for more details, make sure that RabbitMQ is running and do
+not forget to edit the `BROKER_*` variables in the :file:`settings.py` file.
+
 IOError at /object/create -- Socket closed
 ------------------------------------------
 
-This error is thrown if Celery is misconfigured and can not connect to
-RabbitMQ. See :ref:`celery` for more details, do not forget to edit
-the `BROKER_*` variables in the :file:`settings.py` file.
+See `Connection refused`_.
 
 I cannot find any objects
 ----------------------------
