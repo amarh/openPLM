@@ -54,34 +54,6 @@ dependencies:
 
     #. ``apt-get install poppler-utils html2text odt2txt antiword catdoc``
     #. ``pip install openxmllib``
-   
-Check applications are ok
-===============================
-
-For Apache server: ::
-
-    root@openplm-demo:~# service apache2 status
-    
-    Apache is running (pid 5315).
-
-For Python: ::
-
-    root@openplm-demo:~# python
-    
-    Python 2.6.5 (r265:79063, Apr 16 2010, 13:09:56) 
-    [GCC 4.4.3] on linux2
-    Type "help", "copyright", "credits" or "license" for more information.
-    >>> 
-
-
-.. note::
-
-    press :kbd:`Control-D` to exit Python shell
-
-For Django: ::
-
-    root@openplm-demo:~# django-admin --version
-    1.2.5
 
 Get code using Subversion
 ==========================
@@ -96,7 +68,7 @@ All files used for a new django site will be stored in this directory.
     
     * ``svn co svn://openplm.org/openPLM``
     
- The directory ./openPLM is created and all codes are downloaded.
+The directory ./openPLM is created and all codes are downloaded.
     
     * ``cd /var/django/openPLM``
 
