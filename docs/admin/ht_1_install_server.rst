@@ -165,17 +165,24 @@ Change the secret key
 Create the database
 ===================
 
+Edit the file :file:`/var/django/openPLM/trunk/openPLM/settings.py` and set correct password ('MyPassword')
+for DATABASE_PASSWORD.
+It must be the one set with the command ``create role django with password 'MyPassword' login;``
+Here the DATABASE_USER is ``django``, not the Django admin created by
+``./manage.py syncdb --all``.
+
+Then execute the following commands:
+
     * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
     
     .. note::
-        You have to create the superadmin user for Django (in this example, we give 'MyAdmin' but you can change it)
-        and its password.
-    
-    .. warning::
-        Edit the '/var/django/openPLM/trunk/openPLM/settings.py' and set correct password ('MyPassword')
-        for DATABASE_PASSWORD
+        You have to create the superadmin user for Django and a special user named 'company'.
+        The company can access all contents from openPLM and should sponsor other users.
+        The admin is here to administrate openPLM via its admin interface.
+
+
 
 Compile message files
 =====================
