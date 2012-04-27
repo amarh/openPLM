@@ -2572,7 +2572,7 @@ class MechantUserViewTest(TestCase):
         response = self.client.post(self.base_url + "modify/", data, follow=True)
         obj = m.get_all_plmobjects()[self.TYPE].objects.all()[0]
         self.assertEqual(obj.name, '')
-        self.assertEqual(response.template.name, "error.html")
+        self.assertTemplateUsed(response, "error.html")
 
 class SpecialCharactersPartViewTestCase(PartViewTestCase):
     REFERENCE = u"Pa *-\xc5\x93\xc3\xa9'"
