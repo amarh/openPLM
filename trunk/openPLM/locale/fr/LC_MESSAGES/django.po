@@ -732,8 +732,8 @@ msgid "Columns must have distinct headers."
 msgstr "Chaque colonne doit avoir un entête différent."
 
 #: plmapp/forms.py:668
-msgid "Password :"
-msgstr "Mot de passe :"
+msgid "Password"
+msgstr "Mot de passe"
 
 #: plmapp/forms.py:681
 msgid "Your password was entered incorrectly. Please enter it again."
