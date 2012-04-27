@@ -11,11 +11,11 @@ register = template.Library()
 @register.filter
 def trunc(string, number, dots='...'):
     """ 
-    truncate the {string} to {number} characters
-    print {dots} on the end if truncated
+    Truncate the *string* to *number* characters
+    and print *dots* on the end if truncated
 
-    usage: {{ "some text to be truncated"|trunc:6 }}
-    results: some te...
+    :usage: ``"isome text to be truncated"|trunc:6``
+    :results: some te...
     """
     if not isinstance(string, basestring): 
         string = unicode(string)
