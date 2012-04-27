@@ -25,12 +25,18 @@
 """
 This module contains some tests for openPLM.
 """
+
+import os
 import datetime
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
 from django.core.files.base import File
 from django.contrib import messages
+from django.utils.translation import ugettext as _
+from django.utils import translation
 
 from openPLM.plmapp import forms
 from openPLM.plmapp.utils import level_to_sign_str
@@ -46,10 +52,12 @@ class CommonViewTest(BaseTestCase):
     CONTROLLER = PartController
     DATA = {}
     REFERENCE = "Part1"
+    LANGUAGE = "en"
 
     def setUp(self):
         super(CommonViewTest, self).setUp()
         self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
+        self.client.post("/i18n/setlang/", {"language" : self.LANGUAGE})
         self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
                                                  self.user, self.DATA)
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
@@ -1763,7 +1771,14 @@ class UserViewTestCase(CommonViewTest):
         response = self.get(self.user_url + "attributes/", page="attributes")
         attributes = dict((x.capitalize(), y) for (x,y) in 
                           response.context["object_attributes"])
-        self.assertEqual(attributes["E-mail address"], self.user.email)
+
+        old_lang = translation.get_language()
+        translation.activate(self.LANGUAGE)
+        key = _("e-mail address")
+        translation.activate(old_lang)
+        del old_lang
+
+        self.assertEqual(attributes[key.capitalize()], self.user.email)
         self.assertTrue(response.context["is_owner"])
 
     def test_groups(self):
@@ -1849,9 +1864,10 @@ class UserViewTestCase(CommonViewTest):
         for level in ("all", "1", "2"):
             url = self.user_url + "delegation/delegate/sign/%s/" % str(level)
             response = self.get(url, link=True, page="delegation")
-            role = unicode(response.context["role"])
-            self.assertTrue(role.startswith("signer"))
-            self.assertTrue(level in role)
+            if self.LANGUAGE == "en":
+                role = unicode(response.context["role"])
+                self.assertTrue(role.startswith("signer"))
+                self.assertTrue(level in role)
 
     def test_delegate_post(self):
         data = { "type" : "User", "username": self.brian.username }
@@ -2580,4 +2596,20 @@ class SpecialCharactersPartViewTestCase(PartViewTestCase):
 
 class SpecialCharactersDocumentViewTestCase(DocumentViewTestCase):
     REFERENCE = u"Pa *-\xc5\x93\xc3\xa9'"
+
+# also test translations if asked
+if os.environ.get("TEST_TRANS") == "on":
+    test_cases = []
+    def find_test_cases(base, r):
+        r.append(base)
+        for c in base.__subclasses__():
+            find_test_cases(c, r)
+    find_test_cases(CommonViewTest, test_cases)
+    tpl = """class %(base)s__%(language)s(%(base)s):
+        LANGUAGE = "%(language)s"
+    """
+    for language, language_name in settings.LANGUAGES:
+        if language != "en":
+            for base in test_cases:
+                exec (tpl % (dict(base=base.__name__, language=language)))
 
