@@ -80,7 +80,7 @@ runs all tests, including document3D's tests.
 Code coverage
 ================
 
-openPLM ships with a script named :file:`run_coverage.sh`. This script runs all
+openPLM ships with a script named :file:`./bin/run_coverage.sh`. This script runs all
 tests with `coverage`_. By default,
 this script produces an html report into the :file:`coverage_report` directory.
 It is possible to produce an XML output by setting the environment variable
