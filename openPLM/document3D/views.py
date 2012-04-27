@@ -216,6 +216,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
 
             document_controller=DocumentController(stp_file.document,User.objects.get(username=settings.COMPANY))
+
             index=[1]
             if clear_form(request,assemblys,product,index,obj_type):
 
