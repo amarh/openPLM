@@ -1,6 +1,6 @@
 #-!- coding:utf-8 -!-
 # Django settings for openPLM project.
-# sqlite version
+# tests version
 
 import sys
 import os.path
@@ -10,18 +10,17 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
-    ("pcosquer", "pierre.cosquer@insa-rennes.fr"),
-    ("pjoulaud", "ninoo.fr@gmail.com"),
 )
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'database_tests.db'             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
+        'NAME': 'database_tests.db',               # Or path to database file if using sqlite3.
+    }
+}
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -80,6 +79,7 @@ LANGUAGES = (
       ('en', 'English'),
       ('es', u'Español'),
       ('ja', u'日本語'),
+      ('zh_CN', u'中文'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
