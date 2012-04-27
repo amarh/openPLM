@@ -1,6 +1,19 @@
+u"""
+This module defines two constants:
+
+.. data:: DEFAULT_UNIT
+
+    The default unit of a BOM row: ``-`` (each)
+
+.. data:: UNITS
+
+    All valid units of a BOM row.
+"""
+
 from django.utils.translation import ugettext_lazy as _
 
 DEFAULT_UNIT = "-"
+
 UNITS = (
     (_(u'Amounts'), (
         (DEFAULT_UNIT, _(u'Each')),
