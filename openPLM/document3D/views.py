@@ -128,10 +128,9 @@ class StepDecomposer(Decomposer):
         return ""
 
 DecomposersManager.register(StepDecomposer)
-#posibilidades , el objeto a sido modificado despues de acceder al formulario
 
-Select_Doc_Part_types = formset_factory(Doc_Part_type_Form, extra=0)
-Select_Order_Quantity_types = formset_factory(Order_Quantity_Form, extra=0)
+
+
 #@handle_errors
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
@@ -245,6 +244,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
                     try:
                         instances=[]
+                        old_product=json.dumps(data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
                         generate_part_doc_links_AUX(request,product, obj,instances)
                         update_indexes.delay(instances) 
                     except Exception as excep:
@@ -261,10 +261,14 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             native_related.deprecated=False
                             native_related.save(False)
                     else:
-            
-                        decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk)
+                        try:
+                            decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk,old_product)
+                        except Exception as excep:
+                            extra_errors=unicode(excep)
                         
-                        return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
+                        else:
+                        
+                            return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
   
 
 
@@ -560,7 +564,7 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
     
     -To every generated :class:`.Part` a :class:`.Document3D` has been attached and Document3D as been set like the attribute PartDecompose of the Part
      
-    -The attribute doc_id of every node of the arborescense(**product**) is now the relative id of :class:`.Document3D` generated in the previous condition
+    -The attribute doc_id of every node of the arborescense(**product**) is now the relative id of :class:`.DocumentFile` generated in the previous condition
     
     -To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP ( :meth:`.generateGhostDocumentFile` )
     
