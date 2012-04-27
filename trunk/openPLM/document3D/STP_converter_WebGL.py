@@ -158,7 +158,7 @@ class NEW_STEP_Import(object):
         self.product_relationship_arbre=Product(GetLabelNom(roots.Value(1)),deep,roots.Value(1),self.id,product_id[0],self.file)
         product_id[0]+=1 
         parcour_product_relationship_arbre(self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
-        (deep+1),self.id,self.product_relationship_arbre,product_id)
+        (deep+1),self.id,self.product_relationship_arbre,product_id,self.file)
        
         return self.product_relationship_arbre
         
@@ -206,7 +206,7 @@ class simple_shape():
     
     
     
-def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,doc_id,product_root,product_id):
+def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,doc_id,product_root,product_id,file_path):
     """
     
     
@@ -267,7 +267,7 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
                         
                 if not reference_found:
 
-                    new_product=Product(GetLabelNom(label_reference),deep,label_reference,doc_id,product_id[0])
+                    new_product=Product(GetLabelNom(label_reference),deep,label_reference,doc_id,product_id[0],file_path)
                     product_assembly=search_assembly(new_product,product_root)         
                     if product_assembly:
                         product.links.append(Link(product_assembly))
@@ -275,7 +275,7 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
                     else:      
                         product.links.append(Link(new_product))  
                         product_id[0]+=1                             
-                        parcour_product_relationship_arbre(shape_tool,new_product,shapes_simples,deep+1,doc_id,product_root,product_id)
+                        parcour_product_relationship_arbre(shape_tool,new_product,shapes_simples,deep+1,doc_id,product_root,product_id,file_path)
                         
                         
                     

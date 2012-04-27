@@ -42,7 +42,7 @@ class view_3dTest(CommonViewTest):
             self.update_time(data)
  
         return data
-                                 
+                                
     def test_view3D_stp_decompose(self):
         f=open("document3D/data_test/test2.stp")
         myfile = File(f)
@@ -199,7 +199,7 @@ class view_3dTest(CommonViewTest):
         data=self.update_data(new_doc_file)
         self.assertRaises(ValueError, self.post,self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
 
-    """       
+         
     def test_display_decompose_Document_part_doc_links_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -207,38 +207,58 @@ class view_3dTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)                                                          
         data=self.update_data(new_doc_file)
         #u'reference': [u'PART_00001'] 
+
         data.update({
-                "%1-part-reference" : [u'2'],
-                "%1-part-revision" : [u'2'],  
-                "%2-part-reference" : [u'2'],
-                "%2-part-revision" : [u'2'],  
-        })          
+                "1-part-reference" : [u'2'],
+                "1-part-revision" : [u'2'],  
+                "2-part-reference" : [u'2'],
+                "2-part-revision" : [u'2'],  
+        }) 
+     
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse.context["extra_errors"],u"Columns reference, type, revision are not unique")
-    """
-    """
+        self.assertTrue(reponse.context["extra_errors"].startswith(u"Columns reference, type, revision are not unique"))
+    
+    
     def test_display_decompose_Document3D_decomposer_Error(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
-        data = data1
-        self.update_time(data)
+        data=self.update_data(new_doc_file)
         GeometryFile.objects.filter(stp=new_doc_file).delete()
         reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertEqual(reponse.context["extra_errors"],u"Error while the file step was decomposed")        
-        
+      
+    """
     def test_display_decompose_bom_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                          
-        data = data2
-        self.update_time(data)             
+        data=self.update_data(new_doc_file)
+        
+        data.update({
+                "1-quantity" : [u''],
+        })       
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse_post.context["bom_formset"].errors,[{'quantity': [u'This field is required.']}, {}])
 
+        a=reponse_post.context["deep_assemblys"][0]
+        
+        print type(reponse_post.context["deep_assemblys"][0])
+        print "-----------"
+        print "tipo : " , len(a) , a
+        print len(a)
+        print "-----------"
+        print "tipo : " , len(a[0]) , a[0]
+        print "-----------"
+        print "tipo : " , len(a[0][0]) , a[0][0]
+        print "-----------"
+        print "tipo : " , len(a[0][0][0]) , a[0][0][0]
+                
+        #ord_qty=Order_Quantity_Form(reponse_post.request.POST,prefix=1)
+        #self.assertEqual(reponse_post.context["1-quantity"],[{'quantity': [u'This field is required.']}, {}])
 
+    
     def test_display_decompose_part_type_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -269,215 +289,6 @@ class view_3dTest(CommonViewTest):
     """   
                           
 
-
-
-
-data1={u'2-lifecycle': [u'draft_official_deprecated'],
-  u'3-lifecycle': [u'draft_official_deprecated'],
-  u'0-reference': [u'PART_00002'],
-  u'form-0-quantity': [u'1'],
-  u'form-1-order': [u'20'],
-  u'3-revision': [u'a'],
-  u'form-1-type_part': [u'Part'],
-  u'initial-3-lifecycle': [u'draft_official_deprecated'],
-  u'2-group': [u'2'],
-  u'form-0-unit': [u'-'],
-  u'1-lifecycle': [u'draft_official_deprecated'],
-  u'3-group': [u'2'],
-  u'0-group': [u'2'],
-  u'1-revision': [u'a'],
-  u'form-1-quantity': [u'3'],
-  u'2-name': [u'NBA_ASM'],
-  u'form-0-type_part': [u'Part'],
-  u'3-name': [u'NBA_ASM'],
-  u'0-revision': [u'a'],
-  u'initial-2-lifecycle': [u'draft_official_deprecated'],
-  u'initial-1-lifecycle': [u'draft_official_deprecated'],
-  u'form-1-unit': [u'-'],
-  u'1-name': [u'L-BRACKET'],
-  u'form-TOTAL_FORMS': [u'2',
-  u'2'],
-  u'2-reference': [u'PART_00003'],
-  u'2-revision': [u'a'],
-  u'form-INITIAL_FORMS': [u'2', u'2'],
-  u'0-lifecycle': [u'draft_official_deprecated'],
-  u'initial-lifecycle': [u'draft_official_deprecated'],
-  u'3-reference': [u'DOC_00003'],
-  u'0-name': [u'L-BRACKET'],
-  u'form-MAX_NUM_FORMS': [u'2', u'2'],
-  u'1-group': [u'2'],
-  u'form-0-type_document3D': [u'Document3D'],
-  u'form-0-order': [u'10'],
-  u'form-1-type_document3D': [u'Document3D'],
-  u'1-reference': [u'DOC_00002']}
-
-
-
-data6={u'2-lifecycle': [u'draft_official_deprecated'],
-  u'3-lifecycle': [u'draft_official_deprecated'],
-  u'0-reference': [u'PART_00001'],
-  u'form-0-quantity': [u'1'],
-  u'form-1-order': [u'20'],
-  u'3-revision': [u'a'],
-  u'form-1-type_part': [u'Part'],
-  u'initial-3-lifecycle': [u'draft_official_deprecated'],
-  u'2-group': [u'2'],
-  u'form-0-unit': [u'-'],
-  u'1-lifecycle': [u'draft_official_deprecated'],
-  u'3-group': [u'2'],
-  u'0-group': [u'2'],
-  u'1-revision': [u'a'],
-  u'form-1-quantity': [u'3'],
-  u'2-name': [u'NBA_ASM'],
-  u'form-0-type_part': [u'Part'],
-  u'csrfmiddlewaretoken': [u'6a0951fed02461061f796c63d98bb430',
-  u'6a0951fed02461061f796c63d98bb430'],
-  u'3-name': [u'NBA_ASM'],
-  u'0-revision': [u'a'],
-  u'initial-2-lifecycle': [u'draft_official_deprecated'],
-  u'initial-1-lifecycle': [u'draft_official_deprecated'],
-  u'form-1-unit': [u'-'],
-  u'1-name': [u'L-BRACKET'],
-  u'form-TOTAL_FORMS': [u'2',
-  u'2'],
-  u'2-reference': [u'PART_00001'],
-  u'2-revision': [u'a'],
-  u'form-INITIAL_FORMS': [u'2', u'2'],
-  u'0-lifecycle': [u'draft_official_deprecated'],
-  u'initial-lifecycle': [u'draft_official_deprecated'],
-  u'3-reference': [u'DOC_00003'],
-  u'0-name': [u'L-BRACKET'],
-  u'form-MAX_NUM_FORMS': [u'2',
-  u'2'],
-  u'1-group': [u'2'],
-  u'form-0-type_document3D': [u'Document3D'],
-  u'form-0-order': [u'10'],
-  u'form-1-type_document3D': [u'Document3D'],
-  u'1-reference': [u'DOC_00002']}
-
-data2={u'2-lifecycle': [u'draft_official_deprecated'],
-  u'3-lifecycle': [u'draft_official_deprecated'],
-  u'0-reference': [u'PART_00002'],
-  u'form-0-quantity': [u''],
-  u'form-1-order': [u'20'],
-  u'3-revision': [u'a'],
-  u'form-1-type_part': [u'Part'],
-  u'initial-3-lifecycle': [u'draft_official_deprecated'],
-  u'2-group': [u'2'],
-  u'form-0-unit': [u'-'],
-  u'1-lifecycle': [u'draft_official_deprecated'],
-  u'3-group': [u'2'],
-  u'0-group': [u'2'],
-  u'1-revision': [u'a'],
-  u'form-1-quantity': [u'3'],
-  u'2-name': [u'NBA_ASM'],
-  u'form-0-type_part': [u'Part'],
-  u'3-name': [u'NBA_ASM'],
-  u'0-revision': [u'a'],
-  u'initial-2-lifecycle': [u'draft_official_deprecated'],
-  u'initial-1-lifecycle': [u'draft_official_deprecated'],
-  u'form-1-unit': [u'-'],
-  u'1-name': [u'L-BRACKET'],
-  u'form-TOTAL_FORMS': [u'2',
-  u'2'],
-  u'2-reference': [u'PART_00003'],
-  u'2-revision': [u'a'],
-  u'form-INITIAL_FORMS': [u'2',
-  u'2'],
-  u'0-lifecycle': [u'draft_official_deprecated'],
-  u'initial-lifecycle': [u'draft_official_deprecated'],
-  u'3-reference': [u'DOC_00003'],
-  u'0-name': [u'L-BRACKET'],
-  u'form-MAX_NUM_FORMS': [u'2', u'2'],
-  u'1-group': [u'2'],
-  u'form-0-type_document3D': [u'Document3D'],
-  u'form-0-order': [u'10'],
-  u'form-1-type_document3D': [u'Document3D'],
-  u'1-reference': [u'DOC_00002']}
-
-
-
-data3 ={u'2-lifecycle': [u'draft_official_deprecated'],
-  u'3-lifecycle': [u'draft_official_deprecated'],
-  u'0-reference': [u'PART_00002'],
-  u'form-0-quantity': [u'1'],
-  u'form-1-order': [u'20'],
-  u'3-revision': [u'a'],
-  u'form-1-type_part': [u'Part'],
-  u'initial-3-lifecycle': [u'draft_official_deprecated'],
-  u'2-group': [u'2'],
-  u'form-0-unit': [u'-'],
-  u'1-lifecycle': [u'draft_official_deprecated'],
-  u'3-group': [u'2'],
-  u'0-group': [u'2'],
-  u'1-revision': [u'a'],
-  u'form-1-quantity': [u'3'],
-  u'2-name': [u'NBA_ASM'],
-  u'form-0-type_part': [u'Part54545'],
-  u'3-name': [u'NBA_ASM'],
-  u'0-revision': [u'a'],
-  u'initial-2-lifecycle': [u'draft_official_deprecated'],
-  u'initial-1-lifecycle': [u'draft_official_deprecated'],
-  u'form-1-unit': [u'-'],
-  u'1-name': [u'L-BRACKET'],
-  u'form-TOTAL_FORMS': [u'2',
-  u'2'],
-  u'2-reference': [u'PART_00003'],
-  u'2-revision': [u'a'],
-  u'form-INITIAL_FORMS': [u'2',
-  u'2'],
-  u'0-lifecycle': [u'draft_official_deprecated'],
-  u'initial-lifecycle': [u'draft_official_deprecated'],
-  u'3-reference': [u'DOC_00003'],
-  u'0-name': [u'L-BRACKET'],
-  u'form-MAX_NUM_FORMS': [u'2',
-  u'2'],
-  u'1-group': [u'2'],
-  u'form-0-type_document3D': [u'Document3D'],
-  u'form-0-order': [u'10'],
-  u'1-reference': [u'DOC_00002']}
- 
-#u'2-group': [u'1'] 
-data4 ={u'2-lifecycle': [u'draft_official_deprecated'],
-  u'3-lifecycle': [u'draft_official_deprecated'],
-  u'0-reference': [u'PART_00002'],
-  u'form-0-quantity': [u'1'],
-  u'form-1-order': [u'20'],
-  u'3-revision': [u'a'],
-  u'form-1-type_part': [u'Part'],
-  u'initial-3-lifecycle': [u'draft_official_deprecated'],
-  u'2-group': [u'1'],
-  u'form-0-unit': [u'-'],
-  u'1-lifecycle': [u'draft_official_deprecated'],
-  u'3-group': [u'2'],
-  u'0-group': [u'2'],
-  u'1-revision': [u'a'],
-  u'form-1-quantity': [u'3'],
-  u'2-name': [u'NBA_ASM'],
-  u'form-0-type_part': [u'Part'],
-  u'3-name': [u'NBA_ASM'],
-  u'0-revision': [u'a'],
-  u'initial-2-lifecycle': [u'draft_official_deprecated'],
-  u'initial-1-lifecycle': [u'draft_official_deprecated'],
-  u'form-1-unit': [u'-'],
-  u'1-name': [u'L-BRACKET'],
-  u'form-TOTAL_FORMS': [u'2',
-  u'2'],
-  u'2-reference': [u'PART_00003'],
-  u'2-revision': [u'a'],
-  u'form-INITIAL_FORMS': [u'2',
-  u'2'],
-  u'0-lifecycle': [u'draft_official_deprecated'],
-  u'initial-lifecycle': [u'draft_official_deprecated'],
-  u'3-reference': [u'DOC_00003'],
-  u'0-name': [u'L-BRACKET'],
-  u'form-MAX_NUM_FORMS': [u'2',
-  u'2'],
-  u'1-group': [u'2'],
-  u'form-0-type_document3D': [u'Document3D'],
-  u'form-0-order': [u'10'],
-  u'form-1-type_document3D': [u'not_exits_Document4D362182'],
-  u'1-reference': [u'DOC_00002']}
   
   
 def decomposition_fromPOST_data(data,product,index,group,lifecycle,part_type):

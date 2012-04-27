@@ -1,5 +1,5 @@
 import os.path
-
+import shutil
 from django.db import models
 from django.contrib import admin
 from openPLM.plmapp.controllers import DocumentController
@@ -55,31 +55,39 @@ class Document3D(Document):
         Returns the :class:`~django.core.files.File` related to the  :class:`.DocumentFile` (**doc_file**) and his *size*
         
         If the :class:`~django.core.files.File` contains in the :class:`.DocumentFile` (**doc_file**) is a **.stp** and was *decomposed* , this function calls a subprocess( :meth:`.composer` ) to rebuild the .stp :class:`~django.core.files.File` 
-        """ 
+        """
+        
+
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
             
-
-            product=ArbreFile_to_Product(doc_file,recursif=True)# last True to generate arbre whit doc_file_path insteant doc_file_id
-            
-            if product and product.is_decomposed:
-                temp_file = tempfile.NamedTemporaryFile(delete=True)
-                temp_file.write(json.dumps(data_for_product(product)))
-                temp_file.seek(0)
-                dirname = os.path.dirname(__file__)
-                composer = os.path.join(dirname, "generateComposition.py")
-                if subprocess.call(["python", composer, temp_file.name]) == 0:
-                    size =os.path.getsize(temp_file.name) 
-                    return temp_file, size                   
-                else:
-                    raise Document3D_composition_Error 
-                
+            tempfile_size=composer_step(doc_file) 
+            if tempfile_size:
+                return tempfile_size[0] ,tempfile_size[1]  #temp_file , size
+                        
 
         return super(Document3D, self).get_content_and_size(doc_file)
 
 #admin.site.register(Document3D)
+def composer_step(doc_file):
 
+    product=ArbreFile_to_Product(doc_file,recursif=True)# last True to generate arbre whit doc_file_path insteant doc_file_id
 
+    if product and product.is_decomposed:
+        temp_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_file.write(json.dumps(data_for_product(product)))
+        temp_file.seek(0)
+        dirname = os.path.dirname(__file__)
+        composer = os.path.join(dirname, "generateComposition.py")
+        if subprocess.call(["python", composer, temp_file.name]) == 0:
+            size =os.path.getsize(temp_file.name)
+            temp_file.seek(0) 
+            return temp_file, size                   
+        else:
+            raise Document3D_composition_Error 
+    return False
+    
+    
 from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk):
@@ -225,7 +233,61 @@ class Document3DController(DocumentController):
                     raise excep    
                 
 
-             
+    def revise(self, new_revision, selected_parts=()):
+
+        
+        rev = super(Document3DController, self).revise(new_revision,selected_parts) 
+        STP_file=self.object.files.filter(is_stp)
+        if STP_file.exists():
+            new_STP_file=rev.object.files.get(is_stp)
+            if self.object.PartDecompose and self.object.PartDecompose in selected_parts:
+                rev.object.PartDecompose=self.object.PartDecompose
+                rev.object.save()
+                product=ArbreFile_to_Product(STP_file[0],recursif=None)
+                copy_geometry(product,new_STP_file)
+                product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
+                Product_to_ArbreFile(product,new_STP_file)
+                                
+            elif self.object.PartDecompose: #and not self.object.PartDecompose in selected_parts
+            
+                product=ArbreFile_to_Product(STP_file[0],recursif=True)
+                tempfile_size=composer_step(STP_file[0])
+                if tempfile_size:               
+                    filename = new_STP_file.filename
+                    path = docfs.get_available_name(filename)
+                    shutil.copy(tempfile_size[0].name, docfs.path(path))
+                    new_doc = DocumentFile.objects.create(file=path,
+                        filename=filename, size=tempfile_size[1], document=rev.object)
+                    new_doc.thumbnail = new_STP_file.thumbnail
+                    if new_STP_file.thumbnail:
+                        ext = os.path.splitext(new_STP_file.thumbnail.path)[1]
+                        thumb = "%d%s" %(new_doc.id, ext)
+                        dirname = os.path.dirname(new_STP_file.thumbnail.path)
+                        thumb_path = os.path.join(dirname, thumb)
+                        shutil.copy(doc_file.thumbnail.path, thumb_path)
+                        new_doc.thumbnail = os.path.basename(thumb_path)
+                    new_doc.locked = False
+                    new_doc.locker = None
+                    new_doc.save()
+                    new_STP_file.delete()
+                    new_STP_file=new_doc
+
+                copy_geometry(product,new_STP_file)
+                product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=True)
+                Product_to_ArbreFile(product,new_STP_file)                    
+                   
+            else:            
+            
+                product=ArbreFile_to_Product(STP_file[0],recursif=None)
+                copy_geometry(product,new_STP_file)         
+                product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)  
+                Product_to_ArbreFile(product,new_STP_file)
+
+
+                                                
+
+
+        return rev             
               
         
                     
@@ -393,7 +455,7 @@ class Document_Generate_Bom_Error(Exception):
         self.to_delete=to_delete# DocumentFiles generated
         self.assembly=assembly    
     def __unicode__(self):
-        return u"Columns reference, type, revision are not unique between the products of the assembly"+self.assembly #meter referencia         
+        return u"Columns reference, type, revision are not unique between the products of the assembly "+self.assembly #meter referencia         
         
 
 
@@ -512,10 +574,10 @@ def get_all_plmDocument3Dtypes_with_level():
 
 from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
-def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
+def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre):
     """
     
-    :param arbre: Information contained in file **.arb** that allows to generate a :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp to decompose
+    :param arbre: Information contained in file **.arb** that allows to generate a :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp to decompose , his nodes contains doc_id and doc_path of new :class:`.DocumentFile` create in the arborescense 
     :type plmobject: :class:`.Product`
     :param stp_file_pk: primery key of a :class:`.DocumentFile` that contains the :class:`~django.core.files.File` that will be decompose
     :param part_pk: primery key of a :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that will be decompose
@@ -576,24 +638,25 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk):
         ctrl=ctrl(stp_file.document,user)
         part=Part.objects.get(pk=part_pk)
         
-        product=Product_from_Arb(json.loads(arbre))   
-
+        product=Product_from_Arb(json.loads(arbre))   #whit doc_id and doc_path updated for every node
+        old_product=Product_from_Arb(json.loads(old_arbre)) # doc_id and doc_path original
         new_stp_file=DocumentFile()
         name = new_stp_file.file.storage.get_available_name(product.name+".stp".encode("utf-8"))
         new_stp_path = os.path.join(new_stp_file.file.storage.location, name)
         f = File(open(new_stp_path, 'w'))   
         f.close()
         
-        product.doc_path=new_stp_path
-        
+        product.doc_path=new_stp_path # the old documentfile will be deprecated
+        product.doc_id=new_stp_file.id # the old documentfile will be deprecated
         
         temp_file = tempfile.NamedTemporaryFile(delete=True)
         temp_file.write(json.dumps(data_for_product(product)))
         temp_file.seek(0)   
         if subprocess.call(["python", "document3D/generateDecomposition.py",stp_file.file.path,temp_file.name]) == 0:
-            update_child_files_BD(product,user,product.doc_id) 
+
+            update_child_files_BD(product,user,old_product) 
             update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part)
-               
+           
         else:
 
             raise Document3D_decomposer_Error      
@@ -651,17 +714,19 @@ def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part):
     os.chmod(new_stp_file.file.path, 0400)  
     ctrl._save_histo("File generated by decomposition", "file : %s" % new_stp_file.filename)    
     product.links=[]
+    
     product.doc_id=new_stp_file.id
     product.doc_path=new_stp_file.file.path
+    
     Product_to_ArbreFile(product,new_stp_file)     
     ctrl.deprecate_file(stp_file,by_decomposition=True)                          
 
     
-def update_child_files_BD(product,user,old_id):
+def update_child_files_BD(product,user,old_product):
     """
-    :param product: :class:`.Product` that represents a sub-arborescense of the file step that was decompose
-    :param old_id: Identifies the :class:`.DocumentFile` root of the decomposition
-    :type plmobject: :class:`.Product`
+    :param product: :class:`.Product` that represents a sub-arborescense of the file **.stp** that was decompose UPDATE whit the news doc_id and doc_path generating in the bomb-child
+    :param old_product: :class:`.Product` that represents a sub-arborescense ORIGINAL of the file **.stp** that was decompose 
+
     
     
     Updates a :class:`.DocumentFile` STEP that WASNT root in a decomposition, to know which :class:`.DocumentFile` to update we use the attribute **product**.doc_id of the arborescense(**product**)
@@ -670,14 +735,17 @@ def update_child_files_BD(product,user,old_id):
     
         Generate a new :class:`.ArbreFile` for each  :class:`.DocumentFile` STEP present in the arborescense(**product**)
         
-        Generate news :class:`.GeometryFile` for the :class:`.DocumentFile` STEP (Copies of the GeometryFiles of the root :class:`.DocumentFile` (Identified for **old_id**))
+        Generate news :class:`.GeometryFile` for the :class:`.DocumentFile` STEP (Copies of the GeometryFiles of the root :class:`.DocumentFile` (Identified for **old_product**.doc_id))
         
     """  
         
-    for link in product.links:
-        if not link.product.visited: #only one time 
+    for link, old_link in zip(product.links,old_product.links):
+        if not link.product.visited: 
             link.product.visited=True
-            product_copy=copy.copy(link.product)  
+            product_copy=copy.copy(link.product)   
+            old_product_copy=copy.copy(old_link.product) 
+            product_copy.links=[]       #when we decompose we delete the links
+            old_product_copy.links=[] 
             doc_file=DocumentFile.objects.get(id=product_copy.doc_id)
             doc_file.filename=product_copy.name+".stp".encode("utf-8")
             doc_file.no_index=False 
@@ -686,15 +754,15 @@ def update_child_files_BD(product,user,old_id):
             doc_file.locker = None
             doc_file.save()
             os.chmod(doc_file.file.path, 0400)   
-            product_copy.links=[]
-            update_geometry(product_copy,doc_file,old_id)
+
+            copy_geometry(old_product_copy,doc_file) #we utilise old_product
             Product_to_ArbreFile(product_copy,doc_file)
             doc_file.document.no_index=False # to reverse no_index=True make in document3D.views.generate_part_doc_links
             doc_file.document.save()      
             ctrl=get_controller(doc_file.document.type)
             ctrl=ctrl(doc_file.document,user)
             ctrl._save_histo("File generated by decomposition", "file : %s" % doc_file.filename)
-            update_child_files_BD(link.product,user,old_id)
+            update_child_files_BD(link.product,user,old_link.product)
     
 def is_decomposable(doc3d):
     """
@@ -721,23 +789,26 @@ def is_decomposable(doc3d):
     return False
 
 
-def update_geometry(product,doc_file,old_doc_id):
+def copy_geometry(product,doc_file):
     """
-    :param product: :class:`.Product` that represents a sub-arborescense of the file step that was decompose
-    :type plmobject: :class:`.Product`
-    :param doc_file: :class:`.DocumentFile` that will be updated
-    :param doc_file: Identifies the :class:`.DocumentFile` root of the decomposition
+    :param product: :class:`.Product` that represents a sub-arborescense original of the file step that was decompose 
+    :param doc_file: :class:`.DocumentFile` for which the files **.geo** that generated
+
 
     
-    Copy the content of :class:`.GeometryFile` determined by his index(**product**.geometry) belonging to the :class:`.DocumentFile` identified by **old_doc_id** 
-    generating a new entity :class:`.GeometryFile` connected to the :class:`.DocumentFile` (**doc_file**)
+    Copy the content of all :class:`.GeometryFile` (determined by his index(**product**.geometry)) present in the :class:`.Product` (**product**) and his childrens  for a :class:`.DocumentFile` (**doc_file**) generating and connecting news entitys :class:`.GeometryFile`
+
     
-    To differentiate the content of a file **.geo** we use the combination index more  :class:`.DocumentFile` **.id**
+    
+    
+    To differentiate the content of a file **.geo** we use the combination index (determined by **product**.geometry) more id (**product**.doc_id)
        
-    """   
+    """
+ 
+       
     if not product.geometry==False:
-
-        old_GeometryFile=GeometryFile.objects.get(stp__id=old_doc_id,index=product.geometry)
+        product.visited=True
+        old_GeometryFile=GeometryFile.objects.get(stp__id=product.doc_id,index=product.geometry)
         new_GeometryFile= GeometryFile()           
 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
@@ -751,12 +822,13 @@ def update_geometry(product,doc_file,old_doc_id):
                      
         infile = open(old_GeometryFile.file.path,"r")
         outfile = open(new_GeometryFile.file.path,"w")
-
         for line in infile.readlines(): 
-            new_line=line.replace("_%s_%s"%(product.geometry,old_doc_id),"_%s_%s"%(product.geometry,doc_file.id))
+            new_line=line.replace("_%s_%s"%(product.geometry,product.doc_id),"_%s_%s"%(product.geometry,doc_file.id))
             outfile.write(new_line)
 
-        
+    for link in product.links:
+        if not link.product.visited: 
+            copy_geometry(link.product,doc_file)           
 
 
 def ArbreFile_to_Product(doc_file,recursif=None):

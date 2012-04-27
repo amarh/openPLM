@@ -31,7 +31,14 @@ def get_available_name(location, name):
 
 class Product(object):
     """
-    Class used to represent the **arborescense** contained in a :class:`~django.core.files.File` **.stp**.A :class:`.Product` can be simple or an assembly, if it is an assembly in **links** we will guard the information about other :class:`.Product` that compose it
+    Class used to represent the **arborescense** contained in a :class:`~django.core.files.File` **.stp**.A :class:`.Product` can be simple or an assembly, if it is an assembly in **links** we will guard the information about other :class:`.Product` that compose it.
+
+
+    There are two ways of generating a :class:`.Product`, reading the file **stp** across the class :class:`.NEW_STEP_Import` ( will refill the attribute **label_reference**  for every :class:`Product`), or reading a file **.geo** related to a :class:`.ArbreFile`  
+    Therefore there exist two ways of distinguishing the different :class:`.Product`, by means of the attribute **label_reference** if this one is not False , or by means of the combination of attributes  **id** and **doc_id**.
+    
+    
+
     
     :model attributes:
 
@@ -100,7 +107,15 @@ class Product(object):
             self.geometry=geometry
         else:
             raise Document3D_generate_Index_Error
-    
+            
+    def set_new_root(self,new_doc_id,new_doc_path,for_child=False):
+        #0 cant be a valid geometry index , 0==False
+        old_id=self.doc_id
+        self.doc_id=new_doc_id
+        self.doc_path=new_doc_path
+        for link in self.links:
+            if  link.product.doc_id == old_id or for_child:
+                link.product.set_new_root(new_doc_id,new_doc_path,for_child)                  
         
     @property       
     def is_decomposed(self):
