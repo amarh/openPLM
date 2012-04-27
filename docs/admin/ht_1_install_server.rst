@@ -102,7 +102,7 @@ Change the secret key
 =====================
 
     * ``cd /var/django/openPLM/trunk/openPLM/``
-    * ``python change_secret_key.py``
+    * ``python bin/change_secret_key.py``
 
 Create the database
 ===================
@@ -165,7 +165,7 @@ Create directory where the uploaded files will be stored:
 Change rights:
     
     * ``chown www-data:www-data /var/openPLM``
-    
+     
 Change rights for the directory where thumbnails will be stored:
     
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
@@ -231,7 +231,7 @@ To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 Check required modules
 ======================
     
-    * ``./check_modules.py`` ::
+    * ``./bin/check_modules.py`` ::
     
         /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
         from sets import ImmutableSet
