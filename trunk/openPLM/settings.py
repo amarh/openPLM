@@ -17,16 +17,19 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'openplm'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'django'             # Not used with sqlite3.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
+        'NAME': 'openplm',               # Or path to database file if using sqlite3.
+        'USER': 'django',                # Not used with sqlite3.
+        #XYZ: should be the password set by the postgresql command 
+        # "create role django with password 'MyPassword' login;"
+        'PASSWORD': 'MyPassword',        # Not used with sqlite3.
+        'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
-#XYZ: should be the password set by the postgresql command 
-# "create role django with password 'MyPassword' login;"
-DATABASE_PASSWORD = 'django#6'         # Not used with sqlite3.
-
-DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 #XYZ: Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
