@@ -105,11 +105,31 @@ Change the secret key
 Create the database
 ===================
 
-Edit the file :file:`/var/django/openPLM/trunk/openPLM/settings.py` and set correct password ('MyPassword')
-for DATABASE_PASSWORD.
+Edit the file :file:`/var/django/openPLM/trunk/openPLM/settings.py` 
+and set the database password ('MyPassword')
 It must be the one set with the command ``create role django with password 'MyPassword' login;``
 Here the DATABASE_USER is ``django``, not the Django admin created by
 ``./manage.py syncdb --all``.
+
+For example:
+
+.. code-block:: python
+    :emphasize-lines: 7 
+
+    # settings.py
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
+            'NAME': 'openplm',               # Or path to database file if using sqlite3.
+            'USER': 'django',                # Not used with sqlite3.
+            'PASSWORD': 'MyPassword',        # Not used with sqlite3.
+            'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
+
+
+
 
 Then execute the following commands:
 
@@ -180,6 +200,19 @@ To configure rabbitmq, you must create an user and a vhost (as root):
 
 Then you must modify the `BROKER_*` settings in the :file:`settings.py`, if you follow this tutorial, you
 only have to change `BROKER_PASSWORD`.
+
+For example:
+
+.. code-block:: python
+    :emphasize-lines: 5
+
+    # settings.py 
+    BROKER_HOST = "localhost"
+    BROKER_PORT = 5672
+    BROKER_USER = "openplm"
+    BROKER_PASSWORD = "secret"
+    BROKER_VHOST = "openplm"
+
 
 :command:`celeryd`, celery's daemon must be run. openPLM ships with an init script:
 
