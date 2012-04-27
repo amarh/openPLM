@@ -88,7 +88,9 @@ Configure PostgreSQL
     * ``/usr/lib/postgresql/8.4/bin/initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
     * ``/usr/lib/postgresql/8.4/bin/postgres -D /var/postgres &``
       (it is not a problem if postgres is already running, you do not have to restart it)
-    * ``psql`` ::
+    * ``psql``:
+
+        .. code-block:: psql
     
             postgres=#create database openplm;
             postgres=#create role django with password 'MyPassword' login;
