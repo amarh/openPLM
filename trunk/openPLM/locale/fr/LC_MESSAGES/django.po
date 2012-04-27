@@ -29,7 +29,7 @@ msgid ""
 "This document has no 3D data. Maybe it does not have a STEP file or openPLM "
 "has not yet converted its STEP file."
 msgstr ""
-"ce document n'a pas données 3D assoicées. Peut-être qu'il n'a pas de fichier"
+"ce document n'a pas de données 3D associées. Peut-être qu'il n'a pas de fichier"
 "STEP ou openPLM n'a pas encore converti son fichier STEP"
 
 #: document3D/templates/DisplayDecompose.htm:81
@@ -720,7 +720,7 @@ msgstr "L'adresse mail doit être unique."
 
 #: plmapp/forms.py:602
 msgid "Email's domain not valid"
-msgstr "Doé maine du mail non valide"
+msgstr "Domaine du mail non valide"
 
 #: plmapp/forms.py:617
 #, python-format
@@ -732,7 +732,7 @@ msgid "Columns must have distinct headers."
 msgstr "Chaque colonne doit avoir un entête différent."
 
 #: plmapp/forms.py:668
-msgid "Password"
+msgid "Password :"
 msgstr "Mot de passe :"
 
 #: plmapp/forms.py:681
@@ -1415,7 +1415,7 @@ msgstr "NOUVEAU"
 
 #: templates/revisions.html:19
 msgid "You can not revise this object since a revision already exist."
-msgstr "Vous ne pouvez pas reviser car une révision plus récente existe déjà"
+msgstr "Vous ne pouvez pas reviser cet objet car une révision plus récente existe déjà"
 
 #: templates/blocks/search.html:7 templates/search/search.html:18
 msgid "SEARCH !"
@@ -1559,7 +1559,7 @@ msgid ""
 "parts you want to attach and validate to make a new revision."
 msgstr ""
 "Ceci est la liste des parts que vous pourriez attacher à la nouvelle "
-"révision. Selectionnezles parts que vous voulez attacher et validez pour "
+"révision. Selectionnez les parts que vous voulez attacher et validez pour "
 "créer une nouvelle révision."
 
 #: templates/groups/accept_invitation.html:5
@@ -1808,7 +1808,7 @@ msgstr ""
 
 #: templates/mails/new_account.html:16
 msgid "Your credentials:"
-msgstr "Vos informations d'identification"
+msgstr "Vos informations d'identification:"
 
 #: templates/mails/new_account.html:21
 msgid "Username:"
@@ -1888,7 +1888,7 @@ msgid ""
 "the new revision. Select parts you want to update."
 msgstr ""
 "Voici la liste des parents actuels que vous pourriez vouloir mettre à jour "
-"en les liantà la nouvelle révision. Sélectionnez les parts que vous voulez "
+"en les liant à la nouvelle révision. Sélectionnez les parts que vous voulez "
 "mettre à jour."
 
 #: templates/search/result.html:7
@@ -1966,7 +1966,7 @@ msgstr "Cliquez ici pour créer un nouveau group"
 
 #: templates/users/password.html:7
 msgid "PASSWORD MODIFICATION:"
-msgstr "MODIFICATION MOT DE PASSE"
+msgstr "MODIFICATION MOT DE PASSE:"
 
 #: templates/users/password.html:16
 msgid "CHANGE PASSWORD"
