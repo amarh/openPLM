@@ -1,6 +1,6 @@
 import os.path
 
-VERSION = (0, 5, 0, 'dev', 0)
+VERSION = (1, 0, 0, 'final', 0)
 
 # from django.__init__
 def get_version():
