@@ -174,7 +174,7 @@ General queries
     :url: :samp:`{server}/api/login/`
     :type: POST
     :login required: no
-    :implemented by: :func:`plmapp.api.api_login`
+    :implemented by: :func:`plmapp.views.api.api_login`
 
     :param string username: the username of the user
     :param string password: the password of the user
@@ -202,7 +202,7 @@ General queries
     :url: :samp:`{server}/api/testlogin/`
     :type: GET
     :login required: no
-    :implemented by: :func:`plmapp.api.test_login`
+    :implemented by: :func:`plmapp.views.api.test_login`
 
 .. py:function:: types
 
@@ -211,7 +211,7 @@ General queries
     :url: :samp:`{server}/api/types/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_all_types`
+    :implemented by: :func:`plmapp.views.api.get_all_types`
 
     :returned fields:
         types
@@ -227,7 +227,7 @@ General queries
     :url: :samp:`{server}/api/parts/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_all_parts`
+    :implemented by: :func:`plmapp.views.api.get_all_parts`
 
     :returned fields:
         types
@@ -240,7 +240,7 @@ General queries
     :url: :samp:`{server}/api/docs/` or :samp:`{server}/api/documents/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_all_docs`
+    :implemented by: :func:`plmapp.views.api.get_all_docs`
 
     :returned fields:
         types
@@ -263,7 +263,7 @@ General queries
     :url: :samp:`{server}/api/search/[{editable_only}/[{with_file_only}/]]`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.search`
+    :implemented by: :func:`plmapp.views.api.search`
     
 
     :get params:
@@ -283,7 +283,7 @@ General queries
     :url: :samp:`{server}/api/create/`
     :type: POST
     :login required: yes
-    :implemented by: :func:`plmapp.api.create`
+    :implemented by: :func:`plmapp.views.api.create`
     :post params:
         type
             (required) a valid type (see :func:`types` to get a list of types)
@@ -301,7 +301,7 @@ General queries
     :url: :samp:`{server}/api/search_fields/{typename}/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_search_fields`
+    :implemented by: :func:`plmapp.views.api.get_search_fields`
     :returned fields:
         fields
            the list of fields available to perform a search on the objects
@@ -314,7 +314,7 @@ General queries
     :url: :samp:`{server}/api/creation_fields/{typename}/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_creation_fields`
+    :implemented by: :func:`plmapp.views.api.get_creation_fields`
     :returned fields:
         fields
            the list of fields need to create an object of type *typename*, see
@@ -336,7 +336,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/files/[all/]`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.get_files`
+    :implemented by: :func:`plmapp.views.api.get_files`
     :returned fields:
         files
            the list of files of the document, see :ref:`http-api-file`.
@@ -348,7 +348,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/revise/`
     :type: POST
     :login required: yes
-    :implemented by: :func:`plmapp.api.revise`
+    :implemented by: :func:`plmapp.views.api.revise`
     :post params:
         revision
             new revision of the document
@@ -365,7 +365,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/next_revision/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.next_revision`
+    :implemented by: :func:`plmapp.views.api.next_revision`
     :returned fields:
         revision
             the new revision (may be an empty string)
@@ -377,7 +377,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/is_revisable/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.is_revisable`
+    :implemented by: :func:`plmapp.views.api.is_revisable`
     :returned fields:
         revisable
             boolean, True if the document can be revised.
@@ -389,7 +389,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/attach_to_part/{part_id}/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.attach_to_part`
+    :implemented by: :func:`plmapp.views.api.attach_to_part`
     :returned fields: None
 
 .. py:function:: add_file
@@ -403,7 +403,7 @@ In the following queries, *doc_id* is a the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/add_file/[thumbnail/]`
     :type: POST
     :login required: yes
-    :implemented by: :func:`plmapp.api.add_file`
+    :implemented by: :func:`plmapp.views.api.add_file`
     :post param: filename
     :returned fields:
         doc_file
@@ -423,7 +423,7 @@ In the following queries, *df_id* is the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/is_locked/{df_id}/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.is_locked`
+    :implemented by: :func:`plmapp.views.api.is_locked`
     :returned fields:
         locked
             boolean, True if the file is locked.
@@ -436,7 +436,7 @@ In the following queries, *df_id* is the id (an integer) of a
           :samp:`{server}/api/object/{doc_id}/checkout/{df_id}/`
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.check_out`
+    :implemented by: :func:`plmapp.views.api.check_out`
     :returned fields: None
 
 .. py:function:: unlock
@@ -446,7 +446,7 @@ In the following queries, *df_id* is the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/unlock/{df_id}/` 
     :type: GET
     :login required: yes
-    :implemented by: :func:`plmapp.api.unlock`
+    :implemented by: :func:`plmapp.views.api.unlock`
     :returned fields: None
 
 .. py:function:: checkin
@@ -460,7 +460,7 @@ In the following queries, *df_id* is the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/checkin/{df_id}/[thumbnail/]`
     :type: POST
     :login required: yes
-    :implemented by: :func:`plmapp.api.check_in`
+    :implemented by: :func:`plmapp.views.api.check_in`
     :post param: filename
     :returned fields: None
 
@@ -472,6 +472,6 @@ In the following queries, *df_id* is the id (an integer) of a
     :url: :samp:`{server}/api/object/{doc_id}/add_thumbnail/{df_id}/` 
     :type: POST
     :login required: yes
-    :implemented by: :func:`plmapp.api.add_thumbnail`
+    :implemented by: :func:`plmapp.views.api.add_thumbnail`
     :post param: filename
     :returned fields: None
