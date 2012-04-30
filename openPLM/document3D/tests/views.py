@@ -8,6 +8,8 @@ Replace these with more appropriate tests for your application.
 #/var/django/openPLM/trunk/docs$ make html
 #firefox _build/html/index.html
 #/var/django/openPLM/trunk/docs/devel/applications/document3D
+
+#./manage.py compilemessages 
 from django.http import HttpResponse ,HttpResponseRedirect , HttpRequest
 from django.test import TestCase
 from openPLM.document3D.views import *
@@ -42,7 +44,7 @@ class view_3dTest(CommonViewTest):
             self.update_time(data)
  
         return data
-                                
+                                    
     def test_view3D_stp_decompose(self):
         f=open("document3D/data_test/test2.stp")
         myfile = File(f)
@@ -50,6 +52,8 @@ class view_3dTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)        
   
         data=self.update_data(new_doc_file)
+        
+        self.assertTrue(is_decomposable(self.document.object))
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertFalse(is_decomposable(self.document.object))
         reponse = self.get(self.document.object.plmobject_url+"3D/")        
@@ -144,21 +148,9 @@ class view_3dTest(CommonViewTest):
         response = self.get(self.base_url+"decompose/"+str(new_doc_file.id)+"/")
         # TODO: check forms
 
-    
-    def test_display_decompose_form_post(self):
-        f=open("document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)     
-        self.controller.attach_to_document(self.document.object)    
-                                                              
-
-        data=self.update_data(new_doc_file)
-
-
-        reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertRedirects(reponse_post, self.base_url + "BOM-child/")
-    
-               
+       
+ 
+                  
     def test_display_decompose_time_modification_diferent(self):
         f=open("document3D/data_test/test.stp")
         myfile = File(f)
@@ -226,9 +218,8 @@ class view_3dTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)                                                          
         data=self.update_data(new_doc_file)
         GeometryFile.objects.filter(stp=new_doc_file).delete()
-        reponse=self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse.context["extra_errors"],u"Error while the file step was decomposed")        
-      
+        self.assertRaises(Document3D_decomposer_Error,self.post,self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)        
+          
     """
     def test_display_decompose_bom_formset_error_post(self):
         f=open("document3D/data_test/test.stp")
