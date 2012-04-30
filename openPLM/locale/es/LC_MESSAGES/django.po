@@ -1384,7 +1384,7 @@ msgstr "contáctenos"
 
 #: templates/management.html:14
 msgid "Notify"
-msgstr "Notificar"
+msgstr "Avisar"
 
 #: templates/management.html:19
 msgid "Unnotify me"
@@ -1392,7 +1392,7 @@ msgstr "Desnotificarme"
 
 #: templates/management.html:24
 msgid "Notify me"
-msgstr "Notificarme"
+msgstr "Avisarme"
 
 #: templates/management.html:51
 msgid "REPLACE"
@@ -1404,7 +1404,7 @@ msgstr "Borrar"
 
 #: templates/management_replace.html:7
 msgid "Select a user for your delegation as : "
-msgstr "Seleccionar un usuario para delegar vuestro rol de :"
+msgstr "Seleccionar un usuario para delegar como :"
 
 #: templates/navigate.html:37
 msgid "Attach document?"
