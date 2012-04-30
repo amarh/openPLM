@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-30 12:02+0200\n"
+"POT-Creation-Date: 2012-04-30 12:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -176,7 +176,6 @@ msgid "File"
 msgstr "Archivo"
 
 #: pdfgen/templates/summary.xhtml:34
-#, fuzzy
 msgid "State"
 msgstr "Estado"
 
@@ -185,7 +184,6 @@ msgid "User who promoted/demoted the object"
 msgstr "Usuario que promovio/degrado el objeto"
 
 #: pdfgen/templates/summary.xhtml:36
-#, fuzzy
 msgid "Date"
 msgstr "Fecha:"
 
@@ -616,13 +614,12 @@ msgid "An object with the same type, reference and revision already exists"
 msgstr "Ya existe un objeto con el mismo tipo, referencia y revisión "
 
 #: plmapp/forms.py:152
-#, fuzzy
 msgid ""
 "An object with the same type and revision exists, you may consider to revise "
 "it."
 msgstr ""
 "Ya existe un objeto con el mismo tipo y referencia , usted deberia "
-"considerar revisar el mismo "
+"considerar revisar el mismo."
 
 #: plmapp/forms.py:206 plmapp/forms.py:210 plmapp/forms.py:214
 msgid "Select a type"
@@ -642,17 +639,14 @@ msgstr ""
 "Note que todos los campos son sensibles al caso.\n"
 
 #: plmapp/forms.py:312
-#, fuzzy
 msgid "All levels"
-msgstr "Todos los niveles "
+msgstr "Todos los niveles"
 
 #: plmapp/forms.py:313
-#, fuzzy
 msgid "First level"
 msgstr "Primer nivel"
 
 #: plmapp/forms.py:314
-#, fuzzy
 msgid "Last level"
 msgstr "Ultimo nivel"
 
@@ -757,7 +751,6 @@ msgid "Columns must have distinct headers."
 msgstr "Las columnas deben tener cabeceras distintas."
 
 #: plmapp/forms.py:668
-#, fuzzy
 msgid "Password"
 msgstr "Contraseña:"
 
@@ -863,7 +856,6 @@ msgid "Some children are at a lower or draft state."
 msgstr "Algunos hijos están en un estado inferior o preliminar."
 
 #: plmapp/models.py:770
-#, fuzzy
 msgid "There are no official documents attached."
 msgstr "No hay documentos oficiales adjuntos para esta parte"
 
@@ -892,7 +884,6 @@ msgid "True if guest created the invitation"
 msgstr "Verdadero si el visitante creo la invitación"
 
 #: plmapp/models.py:1618
-#, fuzzy
 msgid "date of promotion"
 msgstr "fecha de creacción"
 
@@ -989,7 +980,6 @@ msgid "Enter a valid e-mail address."
 msgstr "Introduzca una dirección de e-mail válida."
 
 #: plmapp/tests/views.py:1777
-#, fuzzy
 msgid "e-mail address"
 msgstr "dirección e-mail"
 
@@ -1042,12 +1032,11 @@ msgid "To export this repository, run the following command:"
 msgstr "Para exportar este repositorio , ejecute el siguiente comando:"
 
 #: templates/404.html:11
-#, fuzzy
 msgid "Error 404"
 msgstr "Error 404"
 
 #: templates/404.html:13
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                Error 404: it seems %(request_path)s is not a valid url.\n"
@@ -1059,12 +1048,10 @@ msgstr ""
 "            "
 
 #: templates/500.html:11
-#, fuzzy
 msgid "Error 500"
 msgstr "Error 500"
 
 #: templates/500.html:12
-#, fuzzy
 msgid ""
 "\n"
 "                Internal server error.\n"
@@ -1084,7 +1071,6 @@ msgid "Edit this information"
 msgstr "Editar esta informacion"
 
 #: templates/attributes.html:31
-#, fuzzy
 msgid "Change my password"
 msgstr "Cambiar mi contraseña"
 
@@ -1097,7 +1083,6 @@ msgid "Comments"
 msgstr "Comentarios"
 
 #: templates/attributes.html:56
-#, fuzzy
 msgid ""
 "\n"
 "                        One comment has been posted.\n"
@@ -1108,7 +1093,7 @@ msgstr ""
 "                         "
 
 #: templates/attributes.html:60
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                        %(comment_count)s comments have been posted.\n"
@@ -1148,7 +1133,6 @@ msgid "HOME"
 msgstr "PRINCIPAL"
 
 #: templates/base.html:78
-#, fuzzy
 msgid "SEARCH"
 msgstr "BUSCAR"
 
@@ -1211,12 +1195,10 @@ msgid "Other creation tools:"
 msgstr "Otras herramientas de creaccion"
 
 #: templates/create.html:66
-#, fuzzy
 msgid "Import several parts or documents from CSV file."
 msgstr "Importar varias partes o documentos desde un fichero CSV."
 
 #: templates/create.html:71
-#, fuzzy
 msgid "Import a BOM from a CSV file."
 msgstr "Importación de un BOM a partir de un fichero CSV"
 
@@ -1225,7 +1207,6 @@ msgid "Sponsor a new user"
 msgstr "Patrocinar un nuevo usuario"
 
 #: templates/create.html:78
-#, fuzzy
 msgid "Sponsor several users from a CSV file."
 msgstr "Patrocinar varios usuarios a partir de un fichero CSV"
 
@@ -1247,7 +1228,6 @@ msgid "Undo"
 msgstr "Deshacer"
 
 #: templates/error.html:4
-#, fuzzy
 msgid "openPLM: error"
 msgstr "openPLM : error"
 
@@ -1265,7 +1245,6 @@ msgid "Welcome %(full_name)s"
 msgstr "Bienvenido %(full_name)s"
 
 #: templates/home.html:29
-#, fuzzy
 msgid "Groups that you own: pending invitations"
 msgstr "Grupos propios:Invitaciones pendientes"
 
@@ -1291,7 +1270,7 @@ msgid "The following revisions will be cancelled:"
 msgstr "Las siguientes revisiones seran canceladas:"
 
 #: templates/lifecycle.html:31 templates/lifecycle.html.py:43
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                                Revision %(revision)s : %(name)s\n"
@@ -1310,7 +1289,6 @@ msgid "DEMOTE"
 msgstr "DEGRADAR"
 
 #: templates/lifecycle.html:62
-#, fuzzy
 msgid ""
 "You can not demote this object since its state is official or more advanced."
 msgstr ""
@@ -1318,7 +1296,6 @@ msgstr ""
 "avanzado."
 
 #: templates/lifecycle.html:65
-#, fuzzy
 msgid "You do not have the permission to demote this object."
 msgstr "usted no tiene permiso para degradar este objeto"
 
@@ -1327,12 +1304,10 @@ msgid "PROMOTE"
 msgstr "PROMOVER"
 
 #: templates/lifecycle.html:72
-#, fuzzy
 msgid "You can not promote this object:"
 msgstr "Usted no puede promover este objeto:"
 
 #: templates/lifecycle.html:76
-#, fuzzy
 msgid "You do not have the permission to promote this object."
 msgstr "Usted no tiene permiso para promover este objeto."
 
@@ -1490,7 +1465,7 @@ msgid "Results"
 msgstr "Resultados"
 
 #: templates/blocks/search.html:23
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                    (1 - %(count)s on %(total)s)\n"
@@ -1501,7 +1476,6 @@ msgstr ""
 "                "
 
 #: templates/blocks/search.html:26
-#, fuzzy
 msgid "All results"
 msgstr "Todos los resultados"
 
@@ -1583,7 +1557,6 @@ msgid "Download merged PDF files"
 msgstr "Descargar combinacion de archivos PDF"
 
 #: templates/documents/files.html:136
-#, fuzzy
 msgid "Confirm CHECK-OUT"
 msgstr "Confirmar CHECK-OUT"
 
@@ -1605,7 +1578,6 @@ msgid "Add new file / Check-in file :"
 msgstr "Añadir archivo/ Check-in de archivo :"
 
 #: templates/documents/parts.html:18
-#, fuzzy
 msgid "Create a part and attach it to the document."
 msgstr "Crear una parte y conectarla al documento"
 
@@ -1743,7 +1715,6 @@ msgid "Pending invitations"
 msgstr "Invitaciones pendientes"
 
 #: templates/groups/users.html:72
-#, fuzzy
 msgid ""
 "The following invitations have been sent but guests have not yet accepted "
 "them."
@@ -1803,7 +1774,6 @@ msgid "Click here to import a new BOM."
 msgstr "Click aqui para importar un nuevo BOM."
 
 #: templates/import/done.html:10
-#, fuzzy
 msgid "Click here to sponsor more users."
 msgstr "Click aqui para ver mas detalles."
 
@@ -1925,7 +1895,6 @@ msgid "Download all CAD files"
 msgstr "Descargar todos los ficheros CAD"
 
 #: templates/parts/doccad.html:53
-#, fuzzy
 msgid "There are no documents attached to this part."
 msgstr "No hay documentos adjuntos para esta parte"
 
@@ -1934,9 +1903,8 @@ msgid "Attach another document"
 msgstr "Adjunte otro documento"
 
 #: templates/parts/doccad.html:69
-#, fuzzy
 msgid "Create a document and attach it to the part."
-msgstr "Crear un documento y conectarlo a esta parte"
+msgstr "Crear un documento y conectarlo a esta parte."
 
 #: templates/parts/doccad_add.html:7
 msgid "Connect new document :"
@@ -1975,7 +1943,7 @@ msgid "Add child"
 msgstr "Añadir hijo"
 
 #: templates/search/search.html:29
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                        (%(start)s - %(end)s on %(total)s)\n"
@@ -2034,12 +2002,10 @@ msgid "Resend mail"
 msgstr "Re-enviar mail"
 
 #: templates/users/groups.html:17
-#, fuzzy
 msgid "You are in the following groups:"
 msgstr "Usted pertenece a los siguientes grupos:"
 
 #: templates/users/groups.html:43
-#, fuzzy
 msgid "Click here to create another group."
 msgstr "Click aqui para crear otro grupo."
 
@@ -2056,7 +2022,6 @@ msgid "Last edited objects"
 msgstr "Ultimos objetos editados"
 
 #: templates/users/sponsor.html:10
-#, fuzzy
 msgid "Click here to sponsor several users from a CSV file."
 msgstr "Click aqui para patrocinar varios usuarios desde un fichero CSV"
 
@@ -2068,7 +2033,6 @@ msgstr ""
 #~ msgid "PASSWORD"
 #~ msgstr "CONTRASEÑA"
 
-#, fuzzy
 #~ msgid "Click here to edit your personal information."
 #~ msgstr "Click aqui para editar su informacion personal"
 
@@ -2081,11 +2045,9 @@ msgstr ""
 #~ msgid "Import a BOM"
 #~ msgstr "Importar un BOM"
 
-#, fuzzy
 #~ msgid "enhancement"
 #~ msgstr "realce"
 
-#, fuzzy
 #~ msgid "blocker"
 #~ msgstr "bloqueador"
 
