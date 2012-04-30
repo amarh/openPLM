@@ -262,14 +262,11 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             native_related.deprecated=False
                             native_related.save(False)
                     else:
-                        try:
-                            decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk,old_product)
-                        except Exception as excep:
-                            extra_errors=unicode(excep)
-                        
-                        else:
-                        
-                            return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
+
+
+                        decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk,old_product)
+
+                        return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
   
 
 
@@ -543,9 +540,10 @@ def initialiser_assemblys(assemblys,product,group,user,index, obj_type):
 
 @transaction.commit_on_success
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances):  # para generar bien el commit on succes
-
-    generate_part_doc_links(request,product, parent_ctrl,instances)
-         
+    try:
+        generate_part_doc_links(request,product, parent_ctrl,instances)
+    except Exception as excep:
+        raise excep          
 def generate_part_doc_links(request,product, parent_ctrl,instances):
 
     """
