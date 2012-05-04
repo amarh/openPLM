@@ -1,8 +1,9 @@
 ===================================================
-How to install openPLM server
+How to install openPLM server 1.0
 ===================================================
 
-This document describes how to install an openPLM server.
+This document describes how to install an openPLM server using the 1.0 version
+tarball.
 
 
 Requirements
@@ -67,7 +68,7 @@ All files used for a new django site will be stored in this directory.
 Configure a valid PATH
 ======================
 
-The files are configured to work after a svn checkout, so you need to change a
+The files are set to work after a svn checkout, so you need to change a
 few PATH (basically, you need to delete the **trunk/openPLM/** part). Grab your favorite editor and change the followings files :
 
     * ``settings.py`` change **MEDIA_ROOT** and **TEMPLATE_DIRS** :
@@ -95,6 +96,7 @@ few PATH (basically, you need to delete the **trunk/openPLM/** part). Grab your 
    * ``etc/default/celeryd`` change **CELERYD_CHDIR**
 
         :: 
+
                 CELERYD_CHDIR="/var/django/openPLM"
 
 
@@ -127,7 +129,7 @@ Change the secret key
 
     * ``python bin/change_secret_key.py``
     .. note:: Most commands supposed that you are in /var/django/openPLM and
-              you should be if you are following this how to. If a command doesn't work,
+              you should be if you are following this How To. If a command doesn't work,
               check your working directory and change back to /var/django/openPLM if
               needed
 
@@ -186,7 +188,6 @@ Configure where the files are saved
 Create directory where the uploaded files will be stored:
     
     * ``mkdir /var/openPLM``
-
     
 Change rights:
     
