@@ -10,15 +10,15 @@ Requirements
 
 This HowTo is based on:
 
-    * Ubuntu 12.04 LTS server edition
-    * Apache Server version: Apache/2.2.22 (Ubuntu)
-    * PostgreSQL 9.1
-    * Python 2.7.3
-    * Django 1.3.1
-    * Celery 2.4.6
-    * Haystack 1.2.7
-    * Xapian 1.2.8
-    * Lepl 5.1.1
+    * Ubuntu 10.04 LTS server edition (also tested on Debian Squeeze)
+    * Apache Server version: Apache/2.2.14 (Ubuntu)
+    * PostgreSQL 8.4.4
+    * Python 2.6.X
+    * Django 1.2.X
+    * Celery 2.3.X
+    * Haystack 1.2.X
+    * Xapian 1.2.X
+    * Lepl 5.0
     * South 0.7.3
  
  
@@ -36,12 +36,18 @@ First, you must install some dependencies:
     #. ``apt-get install swig build-essential pkg-config gettext``
     #. ``apt-get install apache2 libapache2-mod-wsgi``
     #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
-    #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
-    #. ``apt-get install python-xapian rabbitmq-server python-django python-docutils``
-    #. ``apt-get install python-django-celery python-django-south python-pisa``
+    #. ``pip install odfpy``
+    #. ``apt-get install graphviz graphviz-dev``
+    #. ``pip install 'pygraphviz>=1.1'``
+    #. ``apt-get install python-xapian rabbitmq-server``
+    #. ``apt-get install python-django python-docutils``
+    #. ``pip install 'south>=0.7'``
+    #. ``pip install celery``
+    #. ``pip install django-celery``
+    #. ``pip install 'django-haystack<2'``
     #. ``apt-get install postgresql python-psycopg2``
-    #. ``pip install odfpy 'django-haystack<2' lepl``
-    #. ``pip install --upgrade docutils``
+    #. ``pip install lepl``
+    #. ``apt-get install python-pisa``
 
 To enable plain text search on files, you need to install the following
 dependencies:
@@ -49,54 +55,22 @@ dependencies:
     #. ``apt-get install poppler-utils html2text odt2txt antiword catdoc``
     #. ``pip install openxmllib``
 
-Get the tarball containing the code
-===================================
+Get code using Subversion
+==========================
 
-    * ``wget -O openplm-1.0.tar.gz http://wiki.openplm.org/trac/downloads/3``
-
-Extract the code in /var and rename the directory to django
-
-    * ``tar xzf openplm-1.0.tar.gz /var/``
+    * ``apt-get install subversion``
     
-    * ``mv /var/openplm /var/django``
+    * ``mkdir /var/django``
     
 All files used for a new django site will be stored in this directory.
     
+    * ``cd /var/django``
+    
+    * ``svn co svn://openplm.org/openPLM``
+    
+The directory ./openPLM is created and all codes are downloaded.
+    
     * ``cd /var/django/openPLM``
-
-Configure a valid PATH
-======================
-
-The files are configured to work after a svn checkout, so you need to change a
-few PATH (basically, you need to delete the **trunk/openPLM/** part). Grab your favorite editor and change the followings files :
-
-    * ``settings.py`` change **MEDIA_ROOT** and **TEMPLATE_DIRS** :
-
-        .. code-block:: python
-
-            MEDIA_ROOT = '/var/django/openPLM/media/'
-            ...
-            TEMPLATE_DIRS = ( 
-                # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-                # Always use forward slashes, even on Windows.
-                # Don't forget to use absolute paths, not relative paths.
-                "/var/django/openPLM/templates",
-            )
-
-   * ``apache/django.wsgi`` change the three **sys.path.append**
-
-        .. code-block:: python
-
-                sys.path.append('/var/django/')
-                sys.path.append('/var/django/openPLM')
-                ...
-                sys.path.append('/var/django/%s' % app.replace("openplm.", "openPLM/"))
-
-   * ``etc/default/celeryd`` change **CELERYD_CHDIR**
-
-        :: 
-                CELERYD_CHDIR="/var/django/openPLM"
-
 
 
 Configure PostgreSQL
@@ -104,13 +78,15 @@ Configure PostgreSQL
     
     * ``mkdir /var/postgres``
     * ``chown postgres:postgres /var/postgres/``
+    * ``find / -name initdb`` ::
+    
+        /usr/lib/postgresql/8.4/bin/initdb
+        
     * ``locale-gen fr_FR.UTF-8``
       (replace ``fr_FR.UTF-8`` with your locale) 
     * ``su postgres``
-    * ``export PATH=/usr/lib/postgresql/9.1/bin:$PATH``
-    .. note:: You'll have to change the path according to your postgresql version number
-    * ``initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
-    * ``postgres -D /var/postgres &``
+    * ``/usr/lib/postgresql/8.4/bin/initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
+    * ``/usr/lib/postgresql/8.4/bin/postgres -D /var/postgres &``
       (it is not a problem if postgres is already running, you do not have to restart it)
     * ``psql``:
 
@@ -125,16 +101,13 @@ Configure PostgreSQL
 Change the secret key
 =====================
 
+    * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``python bin/change_secret_key.py``
-    .. note:: Most commands supposed that you are in /var/django/openPLM and
-              you should be if you are following this how to. If a command doesn't work,
-              check your working directory and change back to /var/django/openPLM if
-              needed
 
 Create the database
 ===================
 
-Edit the file :file:`/var/django/openPLM/settings.py` 
+Edit the file :file:`/var/django/openPLM/trunk/openPLM/settings.py` 
 and set the database password ('MyPassword')
 It must be the one set with the command ``create role django with password 'MyPassword' login;``
 Here the DATABASE_USER is ``django``, not the Django admin created by
@@ -162,6 +135,7 @@ For example:
 
 Then execute the following commands:
 
+    * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
     
@@ -194,7 +168,7 @@ Change rights:
      
 Change rights for the directory where thumbnails will be stored:
     
-    * ``chown www-data:www-data /var/django/openPLM/media/thumbnails``
+    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
  
 .. _search-engine:
 
@@ -244,11 +218,12 @@ For example:
 
 :command:`celeryd`, celery's daemon must be run. openPLM ships with an init script:
 
-    * ``cp /var/django/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
-    * ``cp /var/django/openPLM/etc/default/celeryd /etc/default/celeryd``
+    * ``cp /var/django/openPLM/trunk/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
+    * ``cp /var/django/openPLM/trunk/openPLM/etc/default/celeryd /etc/default/celeryd``
     * ``chmod +x /etc/init.d/celeryd``
-    * ``mkdir /var/{log,run}/celery``
-    * ``chown www-data:www-data /var/{log,run}/celery``
+    * ``mkdir /var/log/celery``
+    * ``mkdir /var/run/celery``
+    * ``chown www-data:www-data /var/log/celery /var/run/celery``
 
 To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 
@@ -258,6 +233,8 @@ Check required modules
     
     * ``./bin/check_modules.py`` ::
     
+        /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
+        from sets import ImmutableSet
         All is ok
 
 Configure Apache server
@@ -268,9 +245,9 @@ add the following lines:
     
 .. code-block:: apache
 
-    WSGIScriptAlias / /var/django/openPLM/apache/django.wsgi
-    Alias /media /var/django/openPLM/media
-    <Directory /var/django/openPLM/media>
+    WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+    Alias /media /var/django/openPLM/trunk/openPLM/media
+    <Directory /var/django/openPLM/trunk/openPLM/media>
         Order deny,allow
         Allow from all
     </Directory>
@@ -334,7 +311,7 @@ be enabled)
     NameVirtualHost *:80
     <VirtualHost *:80>
 
-        WSGIScriptAlias / /var/django/openPLM/apache/django.wsgi
+        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
         <Location "/admin">
             RewriteEngine On
             RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -354,9 +331,9 @@ be enabled)
         SSLCertificateKeyFile /etc/ssl/mykey.key
         SSLVerifyClient none
 
-        WSGIScriptAlias / /var/django/openPLM/apache/django.wsgi
-        Alias /media /var/django/openPLM/media
-        <Directory /var/django/openPLM/media>
+        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+        Alias /media /var/django/openPLM/trunk/openPLM/media
+        <Directory /var/django/openPLM/trunk/openPLM/media>
             Order deny,allow
             Allow from all
         </Directory>
@@ -386,7 +363,7 @@ be broken on your system.
 
 To fix this link, run the following command:
 ``ln -s `python -c 'import django; print django.__path__[0]'`/contrib/admin/media
-/var/django/openPLM/media/admin``
+/var/django/openPLM/trunk/openPLM/media/admin``
 
 
 Connection refused
