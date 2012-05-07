@@ -1,5 +1,5 @@
 ===================================================
-How to install openPLM server
+How to install openPLM server (development version)
 ===================================================
 
 This document describes how to install an openPLM server.
@@ -170,7 +170,7 @@ Change rights for the directory where thumbnails will be stored:
     
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
  
-.. _search-engine:
+.. _search-engine-svn:
 
 Configure the search engine
 =============================
@@ -184,7 +184,7 @@ Once haystack is configured, you must rebuild the index:
     * ``./manage.py rebuild_index``
     * ``chown www-data:www-data -R /var/openPLM/xapian_index/``
    
-.. _celery:
+.. _celery-svn:
 
 Configure Celery
 ================
@@ -372,7 +372,7 @@ Connection refused
 This error is thrown if Celery is mis-configured and can not connect to
 RabbitMQ. 
 
-See :ref:`celery` for more details, make sure that RabbitMQ is running and do
+See :ref:`celery-svn` for more details, make sure that RabbitMQ is running and do
 not forget to edit the `BROKER_*` variables in the :file:`settings.py` file.
 
 IOError at /object/create -- Socket closed
@@ -383,7 +383,7 @@ See `Connection refused`_.
 I cannot find any objects
 ----------------------------
 
-You can rebuild the search index (:ref:`search-engine`) and see if openPLM
+You can rebuild the search index (:ref:`search-engine-svn`) and see if openPLM
 finds your parts.
 
 It is possible that celery can not update the
