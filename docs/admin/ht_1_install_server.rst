@@ -110,7 +110,10 @@ Configure PostgreSQL
       (replace ``fr_FR.UTF-8`` with your locale) 
     * ``su postgres``
     * ``export PATH=/usr/lib/postgresql/9.1/bin:$PATH``
-    .. note:: You'll have to change the path according to your postgresql version number
+
+        .. note::
+            You'll have to change the path according to your postgresql version number
+
     * ``initdb --encoding=UTF-8 --locale=fr_FR.UTF-8 --pgdata=/var/postgres/``
     * ``postgres -D /var/postgres &``
       (it is not a problem if postgres is already running, you do not have to restart it)
@@ -128,7 +131,8 @@ Change the secret key
 =====================
 
     * ``python bin/change_secret_key.py``
-    .. note:: Most commands supposed that you are in /var/django/openPLM and
+        
+        .. note:: Most commands supposed that you are in /var/django/openPLM and
               you should be if you are following this How To. If a command doesn't work,
               check your working directory and change back to /var/django/openPLM if
               needed
