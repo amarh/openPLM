@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags highlight %}
+
+
+{% block css %}
+{% endblock %}
+
+{% block content  %}
+
+    {% if obj.is_official %}
+        {% if can_publish %}
+            <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}ERP/publish/" method="POST">
+                <div id="form-promote-dialog"
+                    title="{% trans "Are you sure?" %}"
+                    {% if password_form.is_bound and not password_form.is_valid %} 
+                        class="c-error action-publish"
+                    {% endif %}
+                    >
+                    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                    {% trans "Note that this will also export the complete BOM." %}
+                    </p>
+
+                    <div class="password">
+                        {{ password_form.as_p }}
+                    </div>
+                </div>
+
+                <input name="publish" type="submit" class="{{"Button"|button}}" value="{% trans "Publish on OpenERP" %}" />
+            </form>
+        {% else %}
+            <p>
+            {% trans "You can not publish this part on the ERP." %}
+            </p>
+        {% endif %}
+
+    {% else %}
+        <p>{% trans "This part is not official and so, cannot be published on the ERP." %}</p>
+    {% endif %}
+
+
+{% endblock %}
