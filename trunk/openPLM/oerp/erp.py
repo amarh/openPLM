@@ -1,4 +1,7 @@
-import oerplib
+try:
+    import oerplib
+except ImportError:
+    pass
 from django.conf import settings
 
 from openPLM.oerp import models
