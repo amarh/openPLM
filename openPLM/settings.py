@@ -87,6 +87,7 @@ LANGUAGES = (
       ('en', 'English'),
       ('es', u'Español'),
       ('ja', u'日本語'),
+      ('ru', u'Русский'),
       ('zh_CN', u'中文'),
 )
 
