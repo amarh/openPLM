@@ -28,7 +28,7 @@
             </tbody>
         </table>
         <p> {% trans "You should change your password!" %}</p>
-        <a href="http://{{site.domain}}/user/{{new_user.username}}/password/">
+        <a href="http://{{site.domain}}/user/{{new_user.username|urlencode }}/password/">
             {% trans "Click here to change your password" %}
         </a>
     </body>

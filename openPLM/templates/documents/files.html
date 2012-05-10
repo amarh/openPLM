@@ -86,7 +86,7 @@ autoOpen: false
                             {% if is_owner and obj.is_editable %}
 
                                 {% if instance.locked %}
-                                    <a class="{{"Button"|button}}" href="./checkin/{{instance.id}}/">
+                                    <a class="{{"Button"|button}}" href="./checkin/{{instance.id|urlencode }}/">
                                         <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
                                     </a>
                                 {% else %}
@@ -95,7 +95,7 @@ autoOpen: false
 
                                         <a class="{{"Button"|button}}
                                             {% if instance.native_related %}check-out {% endif %}"
-                                            href="./checkout/{{instance.id}}/">
+                                            href="./checkout/{{instance.id|urlencode }}/">
                                             <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
                                         </a>                                    
 
@@ -142,7 +142,7 @@ autoOpen: false
         <div id="deprecated_files">
             <h6>{% trans "Deprecated files:" %}</h6>
             {% for doc_file in deprecated_files %}        
-                <p><a href="/file/{{doc_file.id}}/">{{doc_file.filename}}</a></p>            
+                <p><a href="/file/{{doc_file.id|urlencode }}/">{{doc_file.filename}}</a></p>            
             {% endfor %}    
         </div>
     {% endif %}

@@ -2,7 +2,7 @@
 
 
 {% get_current_language as LANGUAGE_CODE %}
-<a href="/user/{{user}}/">{{user.get_full_name}}</a> | {% now "D j N Y, G:i"%}
+<a href="/user/{{user|urlencode }}/">{{user.get_full_name}}</a> | {% now "D j N Y, G:i"%}
 <form id="SetLangForm" action="/i18n/setlang/" method="post">
     <ul>
         <li>

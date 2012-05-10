@@ -93,7 +93,7 @@
                             {% else %}
                                 <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
                             {% endif %}
-                            <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user}}/navigate/{% endif %}">
+                            <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user|urlencode }}/navigate/{% endif %}">
                                 <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
                             </a>
                             </li>
@@ -102,7 +102,7 @@
                             {% else %}
                                 <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
                             {% endif %}
-                            <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}} {% else %}/user/{{user}}/{% endif %}">
+                            <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}} {% else %}/user/{{user|urlencode }}/{% endif %}">
                                 <span class="ui-button-text">{% trans "STUDY" %}</span>
                             </a>
                             </li>

@@ -71,7 +71,7 @@ This document will be attached to the part {{related_type}} // {{ related_refere
                     {% trans "Import a BOM from a CSV file." %}</a>
                 </li>
                 <li>
-                <a href="/user/{{user.username}}/delegation/sponsor/">
+                <a href="/user/{{user.username|urlencode }}/delegation/sponsor/">
                     {% trans "Sponsor a new user" %}
                 <li>
                 <a href="/import/users/">

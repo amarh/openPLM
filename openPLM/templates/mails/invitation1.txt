@@ -5,8 +5,8 @@
 {% endblocktrans %}
 
 {% trans "Click here to accept the invitation" %}
-http://{{site.domain}}/group/{{group.name}}/invitation/accept/{{invitation.token}}/
+http://{{site.domain}}/group/{{group.name|urlencode }}/invitation/accept/{{invitation.token}}/
 
 {% trans "Click here to refuse the invitation" %}
-http://{{site.domain}}/group/{{group.name}}/invitation/refuse/{{invitation.token}}/
+http://{{site.domain}}/group/{{group.name|urlencode }}/invitation/refuse/{{invitation.token}}/
 {% endautoescape %}

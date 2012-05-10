@@ -36,7 +36,7 @@
         <tr class="Content"> 
             <td class="Content">-{{ level}}</td>
             <td class="Content"> 
-                <a href="/object/{{link.parent.type}}/{{link.parent.reference}}/{{link.parent.revision}}/">
+                <a href="/object/{{link.parent.type|urlencode }}/{{link.parent.reference|urlencode }}/{{link.parent.revision|urlencode }}/">
                     {{ link.parent.reference }}
                 </a>
             </td>
