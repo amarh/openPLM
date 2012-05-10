@@ -1,12 +1,13 @@
 from django.http import HttpResponseRedirect
 
-from openPLM.plmapp.base_views import get_generic_data
+from openPLM.plmapp.base_views import get_generic_data, handle_errors
 from openPLM.plmapp.views.main import r2r
 from openPLM.plmapp.forms import ConfirmPasswordForm
 
 from openPLM.oerp import models
 from openPLM.oerp import erp
 
+@handle_errors
 def erp_summary(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if not obj.is_part:
@@ -23,6 +24,7 @@ def erp_summary(request, obj_type, obj_ref, obj_revi):
         ctx["boms"] = erp.get_bom_data(ctx["product"]["bom_ids"])
         return r2r("erp_published.html", ctx, request)
 
+@handle_errors
 def erp_publish(request, obj, ctx):
     if not obj.group.user_set.filter(id=request.user.id).exists():
         ctx["can_publish"] = False
