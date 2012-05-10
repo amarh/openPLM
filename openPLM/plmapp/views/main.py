@@ -59,7 +59,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.forms import HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse,\
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError, \
                         HttpResponsePermanentRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -68,6 +68,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils import simplejson
 from django.views.i18n import set_language as dj_set_language
+from django.views.decorators.csrf import *
 
 from haystack.views import SearchView
 
@@ -960,6 +961,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################
 @handle_errors(undo="..")
+@csrf_protect
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
@@ -968,17 +970,37 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
             ctx.update({'add_file_form': add_file_form, })
-            return HttpResponseRedirect(obj.plmobject_url + "files/")
+            return HttpResponseRedirect(".")
     else:
         add_file_form = forms.AddFileForm()
     ctx.update({ 'add_file_form': add_file_form, })
     return r2r('documents/files_add.html', ctx, request)
+
+##########################################################################################
+@handle_errors
+@csrf_protect
+def up_progress(request, obj_type, obj_ref, obj_revi):
+    """
+    Show upload progress for a given path
+    """
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    ret = ""
+    #if 'f_path' in request.GET:
+    #f_path=request.GET['f_path']
+    f = glob.glob("/tmp/*upload")
+    ret = str(os.path.getsize(f[0]))
+    if ret==request.GET['f_size']:
+	ret += ":linking"
+    else:
+	ret += ":writing"
+    return HttpResponse(ret)
+
+
 
 #############################################################################################
 ###    All functions which manage the different html pages specific to part and document  ###

@@ -134,6 +134,7 @@ class DocumentController(PLMObjectController):
         self._save_histo("Unlocked",
                          "%s unlocked by %s" % (doc_file.filename, self._user))
 
+       
     def add_file(self, f, update_attributes=True, thumbnail=True):
         """
         Adds file *f* to the document. *f* should be a :class:`~django.core.files.File`
@@ -149,18 +150,21 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`ValueError` if the file size is superior to
                  :attr:`settings.MAX_FILE_SIZE`
         :raises: :exc:`ValueError` if we try to add a native file while a relate standar file locked is present in the Document
-        """
-        self.check_permission("owner")
+        """   
+	self.check_permission("owner")
         self.check_editable()
+
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         
-        f.name = f.name.encode("utf-8")     
+	f.name = f.name.encode("utf-8")
+
         if self.has_standard_related_locked(f.name):
-            raise ValueError("Native file has a standard related locked file.")        
-      
-        doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
-                        file=models.docfs.save(f.name, f), document=self.object)                                     
+            raise ValueError("Native file has a standard related locked file.")
+
+        f.seek(0, os.SEEK_END)
+        doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.tell(),
+                        file=models.docfs.save(f.name,f), document=self.object)                                     
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
