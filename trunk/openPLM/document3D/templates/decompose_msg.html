@@ -2,10 +2,10 @@
     {% for element in decomposable_docs %}
 
         <li>
-        A document (<a href="/object/{{element.0.type}}/{{element.0.reference}}/{{element.0.revision}}/">{{ element.0.reference }}</a> )
-        with a STEP file (<a href="/file/{{element.1.id}}/">{{ element.1.filename }}</a>)
+        A document (<a href="/object/{{element.0.type|urlencode }}/{{element.0.reference|urlencode }}/{{element.0.revision|urlencode }}/">{{ element.0.reference }}</a> )
+        with a STEP file (<a href="/file/{{element.1.id|urlencode }}/">{{ element.1.filename }}</a>)
         is linked to this part. Do you want to analyse it to build the BOM?
-        <a style="color:#FFFF00" href="{{part.plmobject_url}}decompose/{{ element.1.id }}/">Yes</a>             
+        <a style="color:#FFFF00" href="{{part.plmobject_url}}decompose/{{ element.1.id|urlencode }}/">Yes</a>             
     </li>
 
     {% endfor %}

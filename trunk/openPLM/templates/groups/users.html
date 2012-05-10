@@ -35,7 +35,7 @@
                     {% endif %}
 
                     <td class="Content"> 
-                        <a href="/user/{{obj.owner.username}}/">
+                        <a href="/user/{{obj.owner.username|urlencode }}/">
                             {{ obj.owner.username }}
                         </a>
                     </td>
@@ -54,7 +54,7 @@
                         {% endif %}
 
                         <td class="Content"> 
-                            <a href="/user/{{form.user_data.username}}/">
+                            <a href="/user/{{form.user_data.username|urlencode }}/">
                                 {{ form.user_data.username }}
                             </a>
                         </td>

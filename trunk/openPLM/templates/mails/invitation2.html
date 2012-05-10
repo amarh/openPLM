@@ -9,10 +9,10 @@
 
 
         <p> {% trans "Click here to accept the invitation" %}</p>
-        <a href="http://{{site.domain}}/group/{{group.name}}/invitation/accept/{{invitation.token}}/"> {% trans "Accept invitation" %}
+        <a href="http://{{site.domain}}/group/{{group.name|urlencode }}/invitation/accept/{{invitation.token}}/"> {% trans "Accept invitation" %}
         </a>
         <p> {% trans "Click here to refuse the invitation" %}</p>
-        <a href="http://{{site.domain}}/group/{{group.name}}/invitation/refuse/{{invitation.token}}/"> {% trans "Refuse invitation" %}
+        <a href="http://{{site.domain}}/group/{{group.name|urlencode }}/invitation/refuse/{{invitation.token}}/"> {% trans "Refuse invitation" %}
         </a>
     </body>
     </body>

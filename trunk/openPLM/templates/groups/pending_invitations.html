@@ -20,7 +20,7 @@
                     {% endif %}
                     {% with inv.guest as guest %}
                         <td class="Content"> 
-                            <a href="/user/{{guest.username}}/">
+                            <a href="/user/{{guest.username|urlencode }}/">
                                 {{ guest.username }}
                             </a>
                         </td>

@@ -27,12 +27,12 @@
     <div class="center">
         {% if is_owner %}
             {% ifequal object_type 'User' %}
-                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
-                <a class="{{"Button"|button}}" href="/user/{{object_reference}}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
+                <a class="{{"Button"|button}}" href="/user/{{object_reference|urlencode }}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
+                <a class="{{"Button"|button}}" href="/user/{{object_reference|urlencode }}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
             {% else %}
                 {% if obj.is_editable %}
                     <a class="{{"Button"|button}}" 
-                        href="/object/{{object_type}}/{{object_reference}}/{{object_revision}}/modify/">
+                        href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
                         <span class="ui-button-text">{% trans "Edit this information" %}</span>
                     </a>
                 {% endif %}
@@ -68,7 +68,7 @@
                     <div class="comment">
                         <span class="comment posted-by">
                             {% trans "Posted by:" %}
-                            <a href="/user/{{comment.user}}/">{{ comment.user_name }}</a>
+                            <a href="/user/{{comment.user|urlencode }}/">{{ comment.user_name }}</a>
                         </span>
                         <span class="comment date">
                             {% trans "Date:" %}
