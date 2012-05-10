@@ -93,7 +93,10 @@ function get_path_name(){
     xhr1.send(null);
 }
 
-
+function upload_end(){
+    var div_text = $("#progress_div").text();
+    return ((div_text=="")||(div_text.substr(0,3)=="100")||(totalsize==0)||(uploaded==totalsize));
+}
 var t;
 //id generated for the uploaded file not use any more
 var id ;
@@ -111,7 +114,7 @@ $(function(){
     var xhr = getXHR();
     $("input[type='file']").change(function (){
 	//add_file(this);
-	//id=gen_uuid();
+	id=gen_uuid();
     });
     $("input[name='_undo']").click(function(){
 	xhr.abort();
@@ -122,22 +125,19 @@ $(function(){
 	//var xhr=getXHR();
 	var file_form = $('form#fileupload')[0];
 	var new_action = file_form.action;
-	/*new_action = new_action.replace("/files/add","/files/up");
-	new_action +="?X-Progress-ID="+id;*/
+	new_action = new_action.replace("/files/add","/files/up");
+	new_action +="?X-Progress-ID="+id;
 	function update_progress_info() {
-            if(($("#progress_div").text()!=="")&&(totalsize!=0)){
+            if(upload_end()==false){
     	    	var xhr2=getXHR();
     		var action = location.href;
     		action = action.split("?")[0];
     		action=action.replace("/files/add","/files/_up");
 	    	//action+="?f_path="+path;
-		//action+="?X-Progress-ID="+id;
-		action+="?f_size="+totalsize;
+		action+="?X-Progress-ID="+id;
+		action+="&f_size="+totalsize;
 	    	xhr2.open("GET",action,true);
     	    	xhr2.onreadystatechange = function() {
-		    /*if(xhr2.readyState == 2){
-			$("#test_req").append(" demande pour up du progrès reçue<br/"+">");
-		    }*/
      	    	    if((xhr2.readyState == 4)&&(xhr2.status!=500)) {
 	    		var response=xhr2.responseText;
 			uploaded = parseInt(response.split(":")[0]);
@@ -148,7 +148,6 @@ $(function(){
 			    if (aux_per.split(".").length>1)
 			    	aux_per=aux_per.split(".")[0]+"."+aux_per.split(".")[1].substr(0,2);
 		    	    $("#up_progress").text(aux_per+"%");
-			    //$("#up_progress").text(percent+"%");
 			}
 			if(f_status=="linking"){
 			    var text=$("#up_progress").text();
@@ -162,12 +161,12 @@ $(function(){
    	    	}
 	    	xhr2.send(null);
 		//if(uploaded!=totalsize)
-		window.setTimeout(update_progress_info, 1000);
-		if(go_to!="")
-		    location.href=go_to;
 	    }
+	    t=window.setTimeout(update_progress_info, 1000);
+	    if(go_to!="")
+		location.href=go_to;
         };
-	window.setTimeout(update_progress_info, 1000);
+	t=window.setTimeout(update_progress_info, 1000);
 	xhr.onreadystatechange = function() {
      	    if(xhr.readyState == 4) {
 	    	go_to = location.href;
@@ -176,7 +175,7 @@ $(function(){
     	}
 	xhr.open("POST", new_action,true);
 	data = new FormData(file_form);
-	data.append("path",path);
+	data.append("X-Progress-ID",id);
 	xhr.send(data);
 	var file_liste=file_form.elements["filename"].files;
 	var file=file_liste[0];
@@ -207,8 +206,7 @@ $(function(){
 <form id="link" method="post" action=".">{% csrf_token %}
 </form>
 
-<div id="progress_div">
-</div>
+<div id="progress_div"></div>
 <div id="test_req"></div>
 {% endblock %}
 
