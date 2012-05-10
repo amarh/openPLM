@@ -84,6 +84,7 @@ from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
+from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
 
 import glob
 
@@ -983,6 +984,23 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     return r2r('documents/files_add.html', ctx, request)
 
 ##########################################################################################
+
+@csrf_exempt
+def up_file(request, obj_type, obj_ref, obj_revi):
+    request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
+    return _up_file(request, obj_type, obj_ref, obj_revi)
+
+@handle_errors
+@csrf_protect
+def _up_file(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if request.method == "POST":
+        add_file_form = forms.AddFileForm(request.POST, request.FILES)
+        if add_file_form.is_valid():
+	    obj.add_file(request.FILES["filename"])
+            ctx.update({'add_file_form': add_file_form, })
+            return HttpResponse(".")
+
 @handle_errors
 @csrf_protect
 def up_progress(request, obj_type, obj_ref, obj_revi):
@@ -991,10 +1009,10 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ret = ""
-    #if 'f_path' in request.GET:
-    #f_path=request.GET['f_path']
-    f = glob.glob("/tmp/*upload")
-    ret = str(os.path.getsize(f[0]))
+    p_id = request.GET['X-Progress-ID']
+    f = glob.glob("/tmp/*%s_upload" % p_id)
+    if len(f) > 0:
+    	ret = str(os.path.getsize(f[0]))
     if ret==request.GET['f_size']:
 	ret += ":linking"
     else:
