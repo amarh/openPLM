@@ -85,6 +85,7 @@ from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 
+import glob
 
 def r2r(template, dictionary, request):
     """
@@ -961,7 +962,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################
 @handle_errors(undo="..")
-@csrf_protect
+#@csrf_protect
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
