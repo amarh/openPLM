@@ -53,11 +53,11 @@
 		{% else %}
 			{% with forloop.counter as next %}
 			{% with children|indice:next as ci%}
-			{% if ci.level > c.level %}
+				{% if ci.level > c.level %}
                     <span class="expander">{{c.level}}</span>
-			{% else %}
+				{% else %}
 		    <span class="not_expander">{{c.level}}</span>
-			{% endif %}
+				{% endif %}
 			{% endwith %}
 			{% endwith %}
 		{% endif %}

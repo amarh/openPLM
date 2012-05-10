@@ -1,6 +1,7 @@
 {% load i18n plmapp_tags %}
 {% if form.is_multipart %}
-<form enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>
+
+<form id="fileupload" enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>
 {% else %}
     <form method="post" action="{{action|default:"."}}"  {{ form_attributes }}>
 {% endif %}
@@ -10,7 +11,12 @@
             <td>
             </td>
             <td>
+		{% if form.is_multipart %}
+		<input type="button" class="{{"Button"|button}}" value="{% trans "Upload" %}" id="_up"/>
+		<!--<input type="button" class="{{"Button"|button}}" value="{% trans "Delete" %}" id="_delete"/>-->
+		{% else %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
+		{% endif %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "Undo" %}" name="_undo"/>
             </td>
         </tr>
