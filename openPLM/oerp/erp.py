@@ -70,9 +70,9 @@ def export_bom(ctrl):
     bom = bom_srv.create(data)
     models.OERPRootBOM.objects.create(part=ctrl.object, bom=bom)
     boms = [bom]
-    last_level = 1
+    last_level = 0
     for level, link in children:
-        if level < last_level:
+        if level <= last_level:
             del boms[level:]
         try:
             bom = models.OERPBOM.objects.get(link=link).bom
@@ -86,8 +86,7 @@ def export_bom(ctrl):
                 }
             bom = bom_srv.create(data)
             models.OERPBOM.objects.create(bom=bom, link=link)
-        if last_level < level:
-            boms.append(bom)
+        boms.append(bom)
         last_level = level
     # TODO: errors handling
     uri = format_uri(PRODUCT_URI, id=boms[0])
