@@ -1,0 +1,1991 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1042svn\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-25 21:07+0400\n"
+"PO-Revision-Date: 2012-05-05 HO:MI+ZONE\n"
+"Last-Translator: Khoteev Sergey Dmitrievich <13department@gmail.com>\n"
+"Language-Team: src.lgg.ru <13department@gmail.com>\n"
+"Language: Русский\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: computer/models.py:48
+msgid "supplier"
+msgstr "поставщик"
+
+#: computer/models.py:48
+msgid "tech_details"
+msgstr ""
+
+#: gdoc/templates/gdoc_files.html:8
+msgid "You cannot add a file to a GoogleDocument."
+msgstr "Вы не можете добавить файл в GoogleDocument."
+
+#: gdoc/templates/gdoc_files.html:12
+msgid ""
+"\n"
+"            You cannot access to this Google Document. If you did not "
+"created\n"
+"            this document, you can ask its owner to grant you the "
+"permission\n"
+"            to read this file in Google Document.\n"
+"        "
+msgstr ""
+"\n"
+"            Вы не можете получить доступ к этому Google Document. Если вы его не "
+"создавали,\n"
+"             вы можете попросить владельца предоставить вам "
+"права\n"
+"            на чтение этого файла в Google Document.\n"
+"        "
+
+#: gdoc/templates/gdoc_files.html:21
+msgid "Click here to edit the file in Google Document ."
+msgstr "Нажмите здесь чтобы отредактировать файл в Google Document ."
+
+#: gdoc/templates/gdoc_files.html:24
+msgid "Click here to download the file from Google."
+msgstr "Нажмите здесь чтобы скачать файл из Google"
+
+#: pdfgen/templates/select_pdf.html:8
+msgid ""
+"\n"
+"            Select PDF files that will be merged into a unique PDF\n"
+"            and click on the Download button.\n"
+"        "
+msgstr ""
+"\n"
+"            Выберете PDF файлы которые будут слиты в единый PDF\n"
+"            и нажмите кнопку Скачать.\n"
+"        "
+
+#: pdfgen/templates/select_pdf.html:17
+msgid "Download"
+msgstr "Скачать"
+
+#: pdfgen/templates/select_pdf_doc.html:16
+msgid "There are no PDF files."
+msgstr "Существующие файлы не являются PDF файлами"
+
+#: pdfgen/templates/select_pdf_part.html:19
+msgid "Level:"
+msgstr "Уровень"
+
+#: plmapp/base_views.py:127
+msgid "Internal error"
+msgstr "Внутренняя ошибка"
+
+#: plmapp/encoding.py:4
+msgid "Ascii"
+msgstr ""
+
+#: plmapp/encoding.py:5
+msgid "Big5"
+msgstr ""
+
+#: plmapp/encoding.py:6
+msgid "Big5hkscs"
+msgstr ""
+
+#: plmapp/encoding.py:7
+msgid "Charmap"
+msgstr ""
+
+#: plmapp/encoding.py:8
+msgid "CP-037"
+msgstr ""
+
+#: plmapp/encoding.py:9
+msgid "CP-1006"
+msgstr ""
+
+#: plmapp/encoding.py:10
+msgid "CP-1026"
+msgstr ""
+
+#: plmapp/encoding.py:11
+msgid "CP-1140"
+msgstr ""
+
+#: plmapp/encoding.py:12
+msgid "CP-1250"
+msgstr ""
+
+#: plmapp/encoding.py:13
+msgid "CP-1251"
+msgstr ""
+
+#: plmapp/encoding.py:14
+msgid "CP-1252"
+msgstr ""
+
+#: plmapp/encoding.py:15
+msgid "CP-1253"
+msgstr ""
+
+#: plmapp/encoding.py:16
+msgid "CP-1254"
+msgstr ""
+
+#: plmapp/encoding.py:17
+msgid "CP-1255"
+msgstr ""
+
+#: plmapp/encoding.py:18
+msgid "CP-1256"
+msgstr ""
+
+#: plmapp/encoding.py:19
+msgid "CP-1257"
+msgstr ""
+
+#: plmapp/encoding.py:20
+msgid "CP-1258"
+msgstr ""
+
+#: plmapp/encoding.py:21
+msgid "CP-424"
+msgstr ""
+
+#: plmapp/encoding.py:22
+msgid "CP-437"
+msgstr ""
+
+#: plmapp/encoding.py:23
+msgid "CP-500"
+msgstr ""
+
+#: plmapp/encoding.py:24
+msgid "CP-737"
+msgstr ""
+
+#: plmapp/encoding.py:25
+msgid "CP-775"
+msgstr ""
+
+#: plmapp/encoding.py:26
+msgid "CP-850"
+msgstr ""
+
+#: plmapp/encoding.py:27
+msgid "CP-852"
+msgstr ""
+
+#: plmapp/encoding.py:28
+msgid "CP-855"
+msgstr ""
+
+#: plmapp/encoding.py:29
+msgid "CP-856"
+msgstr ""
+
+#: plmapp/encoding.py:30
+msgid "CP-857"
+msgstr ""
+
+#: plmapp/encoding.py:31
+msgid "CP-860"
+msgstr ""
+
+#: plmapp/encoding.py:32
+msgid "CP-861"
+msgstr ""
+
+#: plmapp/encoding.py:33
+msgid "CP-862"
+msgstr ""
+
+#: plmapp/encoding.py:34
+msgid "CP-863"
+msgstr ""
+
+#: plmapp/encoding.py:35
+msgid "CP-864"
+msgstr ""
+
+#: plmapp/encoding.py:36
+msgid "CP-865"
+msgstr ""
+
+#: plmapp/encoding.py:37
+msgid "CP-866"
+msgstr ""
+
+#: plmapp/encoding.py:38
+msgid "CP-869"
+msgstr ""
+
+#: plmapp/encoding.py:39
+msgid "CP-874"
+msgstr ""
+
+#: plmapp/encoding.py:40
+msgid "CP-875"
+msgstr ""
+
+#: plmapp/encoding.py:41
+msgid "CP-932"
+msgstr ""
+
+#: plmapp/encoding.py:42
+msgid "CP-949"
+msgstr ""
+
+#: plmapp/encoding.py:43
+msgid "CP-950"
+msgstr ""
+
+#: plmapp/encoding.py:44
+msgid "Euc-jis-2004"
+msgstr ""
+
+#: plmapp/encoding.py:45
+msgid "Euc-jisx0213"
+msgstr ""
+
+#: plmapp/encoding.py:46
+msgid "Euc-jp"
+msgstr ""
+
+#: plmapp/encoding.py:47
+msgid "Euc-kr"
+msgstr ""
+
+#: plmapp/encoding.py:48
+msgid "Gb18030"
+msgstr ""
+
+#: plmapp/encoding.py:49
+msgid "Gb2312"
+msgstr ""
+
+#: plmapp/encoding.py:50
+msgid "GBK"
+msgstr ""
+
+#: plmapp/encoding.py:51
+msgid "HP-roman8"
+msgstr ""
+
+#: plmapp/encoding.py:52
+msgid "HZ"
+msgstr ""
+
+#: plmapp/encoding.py:53
+msgid "ISO-2022-JP"
+msgstr ""
+
+#: plmapp/encoding.py:54
+msgid "ISO-2022-JP-1"
+msgstr ""
+
+#: plmapp/encoding.py:55
+msgid "ISO-2022-JP-2"
+msgstr ""
+
+#: plmapp/encoding.py:56
+msgid "ISO-2022-JP-2004"
+msgstr ""
+
+#: plmapp/encoding.py:57
+msgid "ISO-2022-JP-3"
+msgstr ""
+
+#: plmapp/encoding.py:58
+msgid "ISO-2022-JP-EXT"
+msgstr ""
+
+#: plmapp/encoding.py:59
+msgid "ISO-2022-KR"
+msgstr ""
+
+#: plmapp/encoding.py:60
+msgid "ISO-8859-1"
+msgstr ""
+
+#: plmapp/encoding.py:61
+msgid "ISO-8859-10"
+msgstr ""
+
+#: plmapp/encoding.py:62
+msgid "ISO-8859-11"
+msgstr ""
+
+#: plmapp/encoding.py:63
+msgid "ISO-8859-13"
+msgstr ""
+
+#: plmapp/encoding.py:64
+msgid "ISO-8859-14"
+msgstr ""
+
+#: plmapp/encoding.py:65
+msgid "ISO-8859-15"
+msgstr ""
+
+#: plmapp/encoding.py:66
+msgid "ISO-8859-16"
+msgstr ""
+
+#: plmapp/encoding.py:67
+msgid "ISO-8859-2"
+msgstr ""
+
+#: plmapp/encoding.py:68
+msgid "ISO-8859-3"
+msgstr ""
+
+#: plmapp/encoding.py:69
+msgid "ISO-8859-4"
+msgstr ""
+
+#: plmapp/encoding.py:70
+msgid "ISO-8859-5"
+msgstr ""
+
+#: plmapp/encoding.py:71
+msgid "ISO-8859-6"
+msgstr ""
+
+#: plmapp/encoding.py:72
+msgid "ISO-8859-7"
+msgstr ""
+
+#: plmapp/encoding.py:73
+msgid "ISO-8859-8"
+msgstr ""
+
+#: plmapp/encoding.py:74
+msgid "ISO-8859-9"
+msgstr ""
+
+#: plmapp/encoding.py:75
+msgid "JOHAB"
+msgstr ""
+
+#: plmapp/encoding.py:76
+msgid "KOI8-R"
+msgstr ""
+
+#: plmapp/encoding.py:77
+msgid "KOI8-U"
+msgstr ""
+
+#: plmapp/encoding.py:78
+msgid "Latin-1"
+msgstr ""
+
+#: plmapp/encoding.py:79
+msgid "MacArabic"
+msgstr ""
+
+#: plmapp/encoding.py:80
+msgid "MacCenteuro"
+msgstr ""
+
+#: plmapp/encoding.py:81
+msgid "MacCroatian"
+msgstr ""
+
+#: plmapp/encoding.py:82
+msgid "MacCyrillic"
+msgstr ""
+
+#: plmapp/encoding.py:83
+msgid "MacFarsi"
+msgstr ""
+
+#: plmapp/encoding.py:84
+msgid "MacGreek"
+msgstr ""
+
+#: plmapp/encoding.py:85
+msgid "MacIceland"
+msgstr ""
+
+#: plmapp/encoding.py:86
+msgid "MacLatin2"
+msgstr ""
+
+#: plmapp/encoding.py:87
+msgid "MacRoman"
+msgstr ""
+
+#: plmapp/encoding.py:88
+msgid "MacRomanian"
+msgstr ""
+
+#: plmapp/encoding.py:89
+msgid "MacTurkish"
+msgstr ""
+
+#: plmapp/encoding.py:90
+msgid "PTCP154"
+msgstr ""
+
+#: plmapp/encoding.py:91
+msgid "Rot-13"
+msgstr ""
+
+#: plmapp/encoding.py:92
+msgid "Shift-JIS"
+msgstr ""
+
+#: plmapp/encoding.py:93
+msgid "Shift-JIS-2004"
+msgstr ""
+
+#: plmapp/encoding.py:94
+msgid "Shift-JISX0213"
+msgstr ""
+
+#: plmapp/encoding.py:95
+msgid "TIS-620"
+msgstr ""
+
+#: plmapp/encoding.py:96
+msgid "UTF-16"
+msgstr ""
+
+#: plmapp/encoding.py:97
+msgid "UTF-16-be"
+msgstr ""
+
+#: plmapp/encoding.py:98
+msgid "UTF-16-le"
+msgstr ""
+
+#: plmapp/encoding.py:99
+msgid "UTF-32"
+msgstr ""
+
+#: plmapp/encoding.py:100
+msgid "UTF-32-be"
+msgstr ""
+
+#: plmapp/encoding.py:101
+msgid "UTF-32-le"
+msgstr ""
+
+#: plmapp/encoding.py:102
+msgid "UTF-7"
+msgstr ""
+
+#: plmapp/encoding.py:103
+msgid "UTF-8"
+msgstr ""
+
+#: plmapp/encoding.py:104
+msgid "UTF-8-sig"
+msgstr ""
+
+#: plmapp/forms.py:52
+msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
+msgstr "Плохое название ссылки: '#', '?', '/' и '..' не допускается"
+
+#: plmapp/forms.py:58
+msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
+msgstr "Плохое название ревизии: '#', '?', '/' и '..' не допускается"
+
+#: plmapp/forms.py:61
+msgid ""
+"Bad group, check that the group exists and that you belong to this group."
+msgstr ""
+"Некорректная группа, убедитесь что эта группа существует, и что вы относитесь к этой группе"
+
+#: plmapp/forms.py:150
+msgid "An object with the same type, reference and revision already exists"
+msgstr "Объект с таким же типом, ссылкой и ревизией уже существует"
+
+#: plmapp/forms.py:152
+msgid ""
+"An object with the same type and revision exists, you may consider to revise "
+"it."
+msgstr ""
+"Объект с таким же типом и ревизией уже существует, вы можете попробовать внести изменения "
+"в него."
+
+#: plmapp/forms.py:206 plmapp/forms.py:210 plmapp/forms.py:214
+msgid "Select a type"
+msgstr "Выберите тип"
+
+#: plmapp/forms.py:222
+msgid "Query"
+msgstr "Запрос"
+
+#: plmapp/forms.py:254
+#, python-format
+msgid ""
+"The object %(type)s // %(reference)s // %(revision)s does not exist.\n"
+"Note that all fields are case-sensitive.\n"
+msgstr ""
+"Объекта с такими %(type)s // %(reference)s // %(revision)s не существует.\n"
+"Внимание, поля чувствительны к регистру.\n"
+
+#: plmapp/forms.py:312
+msgid "All levels"
+msgstr "Все уровни"
+
+#: plmapp/forms.py:313
+msgid "First level"
+msgstr "Начальный уровень"
+
+#: plmapp/forms.py:314
+msgid "Last level"
+msgstr "Последний уровень"
+
+#: plmapp/forms.py:315
+msgid "All status"
+msgstr "Все состояния"
+
+#: plmapp/forms.py:316
+msgid "Official"
+msgstr "Официально"
+
+#: plmapp/forms.py:484
+msgid "only search results"
+msgstr "только результаты поиска"
+
+#: plmapp/forms.py:485
+msgid "Hierarchical"
+msgstr "Иерархическое"
+
+#: plmapp/forms.py:486
+msgid "Radial 1"
+msgstr "Радиальное 1"
+
+#: plmapp/forms.py:487
+msgid "Radial 2"
+msgstr "Радиальное 2"
+
+#: plmapp/forms.py:490
+msgid "layout"
+msgstr "расположение"
+
+#: plmapp/forms.py:497
+msgid "child"
+msgstr "потомок"
+
+#: plmapp/forms.py:498 plmapp/models.py:722
+msgid "parents"
+msgstr "предки"
+
+#: plmapp/forms.py:499 plmapp/forms.py:519
+msgid "doc"
+msgstr ""
+
+#: plmapp/forms.py:500 plmapp/forms.py:506 plmapp/forms.py:516
+#: plmapp/models.py:178 plmapp/models.py:231 plmapp/models.py:499
+#: plmapp/models.py:687 plmapp/controllers/user.py:89
+msgid "owner"
+msgstr "владелец"
+
+#: plmapp/forms.py:501 plmapp/forms.py:507
+msgid "signer"
+msgstr "подписавшийся"
+
+#: plmapp/forms.py:502 plmapp/forms.py:508 plmapp/views/main.py:1362
+msgid "notified"
+msgstr "оповещенный"
+
+#: plmapp/forms.py:505 plmapp/forms.py:518
+msgid "part"
+msgstr "деталь"
+
+#: plmapp/forms.py:511
+msgid "owned"
+msgstr "принадлежит"
+
+#: plmapp/forms.py:512
+msgid "to sign"
+msgstr "подписан"
+
+#: plmapp/forms.py:513
+msgid "request notification from"
+msgstr "запрос уведомление от"
+
+#: plmapp/forms.py:517
+msgid "user"
+msgstr "пользователь"
+
+#: plmapp/forms.py:542 templates/create.html:35 templates/edit.html:11
+#: templates/users/password.html:11
+msgid "Type"
+msgstr "Тип"
+
+#: plmapp/forms.py:543 templates/groups/pending_invitations.html:9
+#: templates/groups/users.html:28 templates/users/delegation.html:32
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: plmapp/forms.py:587
+msgid "The new user will belong to the selected groups"
+msgstr "Новый пользователь будет входить в выбранные группы "
+
+#: plmapp/forms.py:595
+msgid "Email address must be unique."
+msgstr "Адрес электронной почты должен быть уникальным."
+
+#: plmapp/forms.py:602
+msgid "Email's domain not valid"
+msgstr "Домен электронной почты не действителен"
+
+#: plmapp/forms.py:617
+#, python-format
+msgid "Warning! There are homonyms: %s!"
+msgstr "Внимание! Есть омонимы: %s!"
+
+#: plmapp/forms.py:649
+msgid "Columns must have distinct headers."
+msgstr "Столбцы должны обладать различными заголовками"
+
+#: plmapp/forms.py:668
+msgid "Password"
+msgstr "Пароль"
+
+#: plmapp/forms.py:681
+msgid "Your password was entered incorrectly. Please enter it again."
+msgstr "Ваш пароль введен некорректно. Пожалуйста, введите его ещё раз. "
+
+#: plmapp/models.py:136
+msgid "administrator"
+msgstr "администратор"
+
+#: plmapp/models.py:138
+msgid "contributor"
+msgstr "участник"
+
+#: plmapp/models.py:140
+msgid "viewer"
+msgstr "наблюдатель"
+
+#: plmapp/models.py:180 plmapp/models.py:501 plmapp/models.py:1550
+msgid "date of creation"
+msgstr "дата создания"
+
+#: plmapp/models.py:182 plmapp/models.py:503
+msgid "date of last modification"
+msgstr "дата последнего изменения"
+
+#: plmapp/models.py:230 plmapp/models.py:494
+msgid "name"
+msgstr "название"
+
+#: plmapp/models.py:230 plmapp/models.py:497 plmapp/models.py:686
+#: plmapp/controllers/user.py:88
+msgid "creator"
+msgstr "создатель"
+
+#: plmapp/models.py:231 plmapp/models.py:686 plmapp/models.py:687
+msgid "ctime"
+msgstr ""
+
+#: plmapp/models.py:232 plmapp/models.py:688
+msgid "mtime"
+msgstr ""
+
+#: plmapp/models.py:489 plmapp/models.py:684
+msgid "reference"
+msgstr "ссылка"
+
+#: plmapp/models.py:490 plmapp/models.py:684
+msgid "type"
+msgstr "тип"
+
+#: plmapp/models.py:491 plmapp/models.py:685
+msgid "revision"
+msgstr "ревизия"
+
+#: plmapp/models.py:495
+msgid "Name of the product"
+msgstr "Название продукта"
+
+#: plmapp/models.py:507 plmapp/models.py:650
+msgid "lifecycle"
+msgstr "жизненный цикл"
+
+#: plmapp/models.py:510
+msgid "state"
+msgstr "состояние"
+
+#: plmapp/models.py:538
+msgid "The object is at its last state."
+msgstr "Объект находиться в последнем из возможных состояний."
+
+#: plmapp/models.py:650
+msgid "attributes"
+msgstr "атрибуты"
+
+#: plmapp/models.py:651
+msgid "revisions"
+msgstr "ревизии"
+
+#: plmapp/models.py:651
+msgid "history"
+msgstr "история"
+
+#: plmapp/models.py:652
+msgid "management"
+msgstr "управление"
+
+#: plmapp/models.py:688
+msgid "group"
+msgstr "группа"
+
+#: plmapp/models.py:722
+msgid "BOM-child"
+msgstr ""
+
+#: plmapp/models.py:723
+msgid "doc-cad"
+msgstr ""
+
+#: plmapp/models.py:758
+msgid "Some children are at a lower or draft state."
+msgstr "Некоторые потомки находятся в более низком состоянии или в состоянии разработки"
+
+#: plmapp/models.py:770
+msgid "There are no official documents attached."
+msgstr "Не присоединено никаких официальных документов."
+
+#: plmapp/models.py:954
+msgid "This document has no files."
+msgstr "Этот документ не содержит файлов"
+
+#: plmapp/models.py:957
+msgid "Some files are locked."
+msgstr "Некоторые файлы заблокированы."
+
+#: plmapp/models.py:964
+msgid "files"
+msgstr "файлы"
+
+#: plmapp/models.py:965
+msgid "parts"
+msgstr "детали"
+
+#: plmapp/models.py:1552
+msgid "date of validation"
+msgstr "дата проверки"
+
+#: plmapp/models.py:1553
+msgid "True if guest created the invitation"
+msgstr "Правда если гость создан по приглашению"
+
+#: plmapp/models.py:1618
+msgid "date of promotion"
+msgstr "дата продвижения"
+
+#: plmapp/units.py:5
+msgid "Amounts"
+msgstr "Количества"
+
+#: plmapp/units.py:6
+msgid "Each"
+msgstr "Каждый"
+
+#: plmapp/units.py:7
+msgid "mol"
+msgstr "моль"
+
+#: plmapp/units.py:10
+msgid "Lengths"
+msgstr "Длины"
+
+#: plmapp/units.py:11
+msgid "mm"
+msgstr "мм"
+
+#: plmapp/units.py:12
+msgid "cm"
+msgstr "см"
+
+#: plmapp/units.py:13
+msgid "dm"
+msgstr "дм"
+
+#: plmapp/units.py:14
+msgid "m"
+msgstr "м"
+
+#: plmapp/units.py:15
+msgid "km"
+msgstr "км"
+
+#: plmapp/units.py:18
+msgid "Volumes"
+msgstr "Объемы"
+
+#: plmapp/units.py:19
+msgid "m³"
+msgstr "м³"
+
+#: plmapp/units.py:20
+msgid "mL"
+msgstr "мл"
+
+#: plmapp/units.py:21
+msgid "cL"
+msgstr ""
+
+#: plmapp/units.py:22
+msgid "dL"
+msgstr ""
+
+#: plmapp/units.py:23
+msgid "L"
+msgstr "л"
+
+#: plmapp/units.py:26
+msgid "Masses"
+msgstr "Массы"
+
+#: plmapp/units.py:27
+msgid "mg"
+msgstr "мг"
+
+#: plmapp/units.py:28
+msgid "cg"
+msgstr "сг"
+
+#: plmapp/units.py:29
+msgid "dg"
+msgstr "дг"
+
+#: plmapp/units.py:30
+msgid "g"
+msgstr "г"
+
+#: plmapp/units.py:31
+msgid "kg"
+msgstr "кг"
+
+#: plmapp/controllers/user.py:87
+msgid "role in PLM"
+msgstr "роль в ЖЦИ"
+
+#: plmapp/management/commands/createcompany.py:27
+msgid "Enter a valid e-mail address."
+msgstr "Введите действительный адрес электронной почты"
+
+#: plmapp/views/main.py:1171
+#, python-format
+msgid "Error: %(details)s"
+msgstr "Ошибка: %(details)s"
+
+#: plmapp/views/main.py:1358
+msgid "signer level"
+msgstr "уровень подписчика"
+
+#: plmapp/views/main.py:1360
+msgid "signer all levels"
+msgstr "подписан ко всем уровням"
+
+#: subversion/models.py:19
+msgid "Valid value are HEAD, a number or a date between brackets"
+msgstr ""
+
+#: subversion/templates/ajax_logs.html:6
+msgid ""
+"\n"
+"            Sorry, openPLM cannot access to this repository.\n"
+"        "
+msgstr ""
+"\n"
+"            Простите, openPLM не может получить доступ к этому репозиторию.\n"
+"        "
+
+#: subversion/templates/ajax_logs.html:11
+msgid "Last changelogs:"
+msgstr "Список последних изменений"
+
+#: subversion/templates/logs.html:28
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: subversion/templates/subversion_files.html:8
+msgid "You cannot add a file to a SubversionRepository."
+msgstr "Вы не можете добавить файл в Subversion репозиторий"
+
+#: subversion/templates/subversion_files.html:12
+msgid "To check-out this repository, run the following command:"
+msgstr "Выписать этот репозиторий, запустите следующую комманду:"
+
+#: subversion/templates/subversion_files.html:19
+msgid "To export this repository, run the following command:"
+msgstr "Чтобы экспортировать этот репозиторий, введите следующую комманду:"
+
+#: templates/404.html:11
+msgid "Error 404"
+msgstr "Ошибка 404"
+
+#: templates/404.html:13
+#, python-format
+msgid ""
+"\n"
+"                Error 404: it seems %(request_path)s is not a valid url.\n"
+"            "
+msgstr ""
+"\n"
+"                Ошибка 404: это означает что %(request_path)s не является корректным url.\n"
+"            "
+
+#: templates/500.html:11
+msgid "Error 500"
+msgstr "Ошибка 500"
+
+#: templates/500.html:12
+msgid ""
+"\n"
+"                Internal server error.\n"
+"            "
+msgstr ""
+"\n"
+"                Внутренняя ошибка сервера.\n"
+"            "
+
+#: templates/attributes.html:17
+#, python-format
+msgid "%(time_since)s ago"
+msgstr "%(time_since)s тому назад"
+
+#: templates/attributes.html:30 templates/attributes.html.py:36
+msgid "Edit this information"
+msgstr "Редактировать эту информацию"
+
+#: templates/attributes.html:31
+msgid "Change my password"
+msgstr "Изменить мой пароль"
+
+#: templates/attributes.html:43
+msgid "Download as PDF"
+msgstr "Скачать как PDF"
+
+#: templates/attributes.html:50
+msgid "Comments"
+msgstr "Комментарии"
+
+#: templates/attributes.html:56
+msgid ""
+"\n"
+"                        One comment has been posted.\n"
+"                    "
+msgstr ""
+"\n"
+"                        Один комментарий был опубликован.\n"
+"                    "
+
+#: templates/attributes.html:60
+#, python-format
+msgid ""
+"\n"
+"                        %(comment_count)s comments have been posted.\n"
+"                    "
+msgstr ""
+"\n"
+"                        %(comment_count)s комментариев было опубликовано.\n"
+"                    "
+
+#: templates/attributes.html:70
+msgid "Posted by:"
+msgstr "Добавил:"
+
+#: templates/attributes.html:74
+msgid "Date:"
+msgstr "Дата:"
+
+#: templates/attributes.html:84
+msgid "No comments have been posted yet."
+msgstr "Никаких комментариев Не было опубликовано."
+
+#: templates/attributes.html:90
+msgid "Post a comment"
+msgstr "Добавить комментарий"
+
+#: templates/attributes.html:120
+msgid "Post"
+msgstr "Добавить"
+
+#: templates/base.html:45
+msgid "Home page"
+msgstr "Домашняя страница"
+
+#: templates/base.html:72
+msgid "HOME"
+msgstr "ГЛАВНАЯ"
+
+#: templates/base.html:78
+msgid "SEARCH"
+msgstr "ПОИСК"
+
+#: templates/base.html:86 templates/create.html:57
+msgid "CREATE"
+msgstr "СОЗДАТЬ"
+
+#: templates/base.html:97
+msgid "NAVIGATE"
+msgstr "НАВИГАЦИЯ"
+
+#: templates/base.html:106
+msgid "STUDY"
+msgstr "ИЗУЧИТЬ"
+
+#: templates/base.html:117
+msgid "Toggle the left panel"
+msgstr "Свернуть левую панель"
+
+#: templates/base.html:124 templates/blocks/supermenu.html:9
+msgid "Search"
+msgstr "Поиск"
+
+#: templates/base.html:160
+msgid "You are not allowed to see this object"
+msgstr "Вам не разрешено просматривать этот объект"
+
+#: templates/create.html:17
+msgid "OBJECT CREATION:"
+msgstr "СОЗДАНИЕ ОБЪЕКТА:"
+
+#: templates/create.html:46
+#, python-format
+msgid ""
+" \n"
+"This part will be attached to the document %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+msgstr ""
+" \n"
+"Эта деталь была присоединена к документу %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+
+#: templates/create.html:50
+#, python-format
+msgid ""
+" \n"
+"This document will be attached to the part %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+msgstr ""
+" \n"
+"Этот документ был присоединен к детали %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+
+#: templates/create.html:62
+msgid "Other creation tools:"
+msgstr "Другие инструменты создания:"
+
+#: templates/create.html:66
+msgid "Import several parts or documents from CSV file."
+msgstr "Импорт нескольких деталей или документов из CSV файла."
+
+#: templates/create.html:71
+msgid "Import a BOM from a CSV file."
+msgstr "Импорт BOM из CSV файла."
+
+#: templates/create.html:75 templates/users/sponsor.html:9
+msgid "Sponsor a new user"
+msgstr "Внести нового пользователя"
+
+#: templates/create.html:78
+msgid "Sponsor several users from a CSV file."
+msgstr "Внести несколько пользователей из CSV файла"
+
+#: templates/create.html:84
+msgid "You can not create an object since you are not a contributor."
+msgstr "Вы не можете создавать объекты, потому что вы не участник."
+
+#: templates/edit.html:7
+msgid "OBJECT MODIFICATION:"
+msgstr "ИЗМЕНЕНИЕ ОБЪЕКТА:"
+
+#: templates/edit.html:26
+msgid "MODIFY"
+msgstr "ИЗМЕНИТЬ"
+
+#: templates/edit.html:28 templates/import/csv.html:69
+#: templates/parts/bom_edit.html:49 templates/snippets/undo_form.html:14
+msgid "Undo"
+msgstr "Отменить"
+
+#: templates/error.html:9 templates/login.html:17
+msgid "openPLM LOGIN PAGE"
+msgstr "openPLM СТРАНИЦА ВХОДА В СИСТЕМУ"
+
+#: templates/error.html:18
+msgid "Error :"
+msgstr "Ошибка :"
+
+#: templates/error.html:20
+msgid "go back"
+msgstr "вернуться назад"
+
+#: templates/home.html:13
+#, python-format
+msgid "Welcome %(full_name)s"
+msgstr "Добро пожаловать %(full_name)s"
+
+#: templates/home.html:29
+msgid "Groups that you own: pending invitations"
+msgstr "Группа в которой вы состоите: отклонила приглашение"
+
+#: templates/home.html:40
+msgid "Groups that you may join: pending invitations"
+msgstr "Группа в которой вы можете присоедениться:ожидает вашей заявки"
+
+#: templates/lifecycle.html:17 templates/documents/revisions.html:7
+#: templates/parts/revisions.html:7
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+#: templates/lifecycle.html:22
+msgid ""
+"If you promote or demote this object, you may not be allowed to undo this "
+"action."
+msgstr ""
+"Если вы можете повысить,или понизить этот объект, вам может быть не разрешено"
+"отменить это действие."
+
+#: templates/lifecycle.html:27
+msgid "The following revisions will be cancelled:"
+msgstr "Следующие ревизии будут закрыты:"
+
+#: templates/lifecycle.html:31 templates/lifecycle.html.py:43
+#, python-format
+msgid ""
+"\n"
+"                                Revision %(revision)s : %(name)s\n"
+"                            "
+msgstr ""
+"\n"
+"                                Ревезия %(revision)s : %(name)s\n"
+"                            "
+
+#: templates/lifecycle.html:39
+msgid "The following revisions will be deprecated:"
+msgstr "Следующие ревизии были отменены:"
+
+#: templates/lifecycle.html:60
+msgid "DEMOTE"
+msgstr "ПОНИЗИТЬ"
+
+#: templates/lifecycle.html:62
+msgid ""
+"You can not demote this object since its state is official or more advanced."
+msgstr ""
+"Вы не можете понизить этот объект потому что он находиться в официальном или более продвинутом состоянии."
+
+#: templates/lifecycle.html:65
+msgid "You do not have the permission to demote this object."
+msgstr "У Вас нет прав, чтобы понижать этот объект."
+
+#: templates/lifecycle.html:70
+msgid "PROMOTE"
+msgstr "ПОВЫСИТЬ"
+
+#: templates/lifecycle.html:72
+msgid "You can not promote this object:"
+msgstr "Вы не можете повысить этот объект:"
+
+#: templates/lifecycle.html:76
+msgid "You do not have the permission to promote this object."
+msgstr "У Вас нет прав повышать этот объект."
+
+#: templates/login.html:28
+msgid "Welcome to openPLM"
+msgstr "Добро пожаловать в openPLM"
+
+#: templates/login.html:43 templates/blocks/user.html:19
+msgid "Go"
+msgstr "Поехали!"
+
+#: templates/login.html:52
+msgid "is the first genuine open source PLM based on"
+msgstr "это первый основанный на открытом коде PLM проект"
+
+#: templates/login.html:53
+msgid ""
+"intended to provide a starting point for companies CMS/PLM/BIM projects."
+msgstr ""
+"призван обеспечить отправную точку для CMS/PLM/BIM проектов компании."
+
+#: templates/login.html:54
+msgid ""
+"By integrating numerous standard reusable PLM functionalities to take care "
+"of the things that companies have in common, it lets you focus on what makes "
+"your company different."
+msgstr ""
+"Благодаря интеграции с многочисленными часто используемыми PLM функциональностями которые позаботятся "
+"о вещах общих для всех компаний, и позволяет сосредоточиться на том что делает вашу компанию уникальной. "
+
+#: templates/login.html:58
+msgid "For more information about openPLM, see"
+msgstr "Для получения большей информации об openPLM, смотри"
+
+#: templates/login.html:61
+msgid "openPLM connexion :"
+msgstr "Подключение к openPLM:"
+
+#: templates/login.html:70
+msgid "Login :"
+msgstr "Логин :"
+
+#: templates/login.html:74
+msgid "Password :"
+msgstr "Пароль :"
+
+#: templates/login.html:79
+msgid "LOGIN"
+msgstr "ЛОГИН"
+
+#: templates/login.html:87
+msgid "Professionals"
+msgstr "Профессионалам"
+
+#: templates/login.html:90
+msgid ""
+"You are planning to use openPLM in a <b>professional</b> context. If you "
+"want to work with other professionals for your project management, for other "
+"solutions plugins, for openPLM software maintenance, "
+msgstr ""
+"Если вы планируете использовать openPLM в <b>пофессиональной</b> сфере. Если вы "
+"хотите работать с другими специалистами над вашим управлением проектом, над другими "
+"вариантами плагинов, над сопровождением кода openPLM, "
+
+#: templates/login.html:92
+msgid "contact us"
+msgstr "свяжитесь с нами"
+
+#: templates/management.html:14
+msgid "Notify"
+msgstr "Оповестить"
+
+#: templates/management.html:19
+msgid "Unnotify me"
+msgstr "Не сообщать мне"
+
+#: templates/management.html:24
+msgid "Notify me"
+msgstr "Сообщить мне"
+
+#: templates/management.html:51
+msgid "REPLACE"
+msgstr "ЗАМЕНИТЬ"
+
+#: templates/management.html:58
+msgid "Delete"
+msgstr "Удалить"
+
+#: templates/management_replace.html:7
+msgid "Select a user for your delegation as : "
+msgstr "Выберете пользователя которому вы передаете полномочия :"
+
+#: templates/navigate.html:37
+msgid "Attach document?"
+msgstr "Добавить документ?"
+
+#: templates/navigate.html:40
+msgid "Attach the selected document?"
+msgstr "Добавить выбранный документ?"
+
+#: templates/navigate.html:55
+msgid "Close"
+msgstr "Закрыть"
+
+#: templates/navigate.html:71
+msgid "Zoom out"
+msgstr "Уменьшить"
+
+#: templates/navigate.html:75
+msgid "Zoom in"
+msgstr "Увеличить"
+
+#: templates/navigate.html:79
+msgid "Fit all"
+msgstr "Уместить на экране"
+
+#: templates/navigate.html:83
+msgid "Original"
+msgstr "Исходный размер"
+
+#: templates/navigate.html:94 templates/parts/bom.html:23
+#: templates/parts/parents.html:20
+msgid "Display :"
+msgstr "Отобразить :"
+
+#: templates/navigate.html:98
+msgid "FILTER"
+msgstr "ОТФИЛЬТРОВАТЬ"
+
+#: templates/revisions.html:15
+msgid "NEW"
+msgstr "НОВЫЙ"
+
+#: templates/revisions.html:19
+msgid "You can not revise this object since a revision already exist."
+msgstr "Вы не можете создать ревизию объекта, т.к. такая ревизия уже существует."
+
+#: templates/blocks/search.html:7 templates/search/search.html:18
+msgid "SEARCH !"
+msgstr "ПОИСК !"
+
+#: templates/blocks/search.html:14
+msgid "Results for link creation:"
+msgstr "Результаты для создания ссылок:"
+
+#: templates/blocks/search.html:21 templates/search/search.html:27
+msgid "Results"
+msgstr "Результаты"
+
+#: templates/blocks/search.html:23
+#, python-format
+msgid ""
+"\n"
+"                    (1 - %(count)s on %(total)s)\n"
+"                "
+msgstr ""
+"\n"
+"                    (1 - %(count)s из %(total)s)\n"
+"                "
+
+#: templates/blocks/search.html:26
+msgid "All results"
+msgstr "Все результаты"
+
+#: templates/blocks/search.html:39 templates/search/search.html:44
+msgid "No result matching given query"
+msgstr "Нет результатов, по данному запросу"
+
+#: templates/blocks/supermenu.html:11
+msgid "Search for a part, a document, a file and more."
+msgstr "Поиск по деталям, документам, файлам и многому другому."
+
+#: templates/blocks/supermenu.html:20
+msgid "Study"
+msgstr "Изучить"
+
+#: templates/blocks/supermenu.html:22
+msgid "See/edit your personal data and explore your parts and document."
+msgstr "Просмотреть/отредактировать ваши персональные данные а также ваших деталей и документов"
+
+#: templates/blocks/supermenu.html:30
+msgid "Navigate"
+msgstr "Навигация"
+
+#: templates/blocks/supermenu.html:32
+msgid "Graphically explore your parts and documents."
+msgstr "Графическое представление ваших деталей и документов"
+
+#: templates/blocks/supermenu.html:43
+msgid "Create"
+msgstr "Создать"
+
+#: templates/blocks/supermenu.html:45
+msgid "Create a new part, a new document or a new group."
+msgstr "Создать новую деталь, документ или новую группу."
+
+#: templates/blocks/user.html:24
+msgid "EXIT"
+msgstr "ВЫХОД"
+
+#: templates/documents/files.html:45 templates/parts/doccad.html:11
+msgid "Download all files"
+msgstr "Скачать все файлы"
+
+#: templates/documents/files.html:53 templates/documents/parts.html:12
+#: templates/parts/bom.html:19 templates/search/result.html:25
+msgid "ADD"
+msgstr "ДОБАВИТЬ"
+
+#: templates/documents/files.html:56
+msgid "DELETE"
+msgstr "УДАЛИТЬ"
+
+#: templates/documents/files.html:71
+msgid "Locked"
+msgstr "Заблокировано"
+
+#: templates/documents/files.html:73
+msgid "Unlocked"
+msgstr "Разблокировано"
+
+#: templates/documents/files.html:81
+msgid "DOWNLOAD"
+msgstr "СКАЧАТЬ"
+
+#: templates/documents/files.html:90
+msgid "CHECK-IN"
+msgstr "ВПИСАТЬ"
+
+#: templates/documents/files.html:99
+msgid "CHECK-OUT"
+msgstr "ВЫПИСАТЬ"
+
+#: templates/documents/files.html:104
+msgid "Native related file is locked"
+msgstr "Исходный файл заблокирован"
+
+#: templates/documents/files.html:118
+msgid "No thumbnail available"
+msgstr "Нет доступных миниатюр"
+
+#: templates/documents/files.html:130 templates/parts/doccad.html:19
+msgid "Download merged PDF files"
+msgstr "Скачать объедененные PDF файлы"
+
+#: templates/documents/files.html:136
+msgid "Confirm CHECK-OUT"
+msgstr "Подтвердить ВЫПИСКУ"
+
+#: templates/documents/files.html:137
+msgid ""
+"You'are checking out a standardfile while a native file is available. Your "
+"native file will be deprecated and will not be usable anymore."
+msgstr ""
+"Вы выгрузили стандартный файл , тогда когда был доступен исходный файл. Ваш "
+"исходный файл устареет и его нельзя больше будет использовать."
+
+#: templates/documents/files.html:143
+msgid "Deprecated files:"
+msgstr "Устаревшие файлы:"
+
+#: templates/documents/files_add.html:7
+msgid "Add new file / Check-in file :"
+msgstr "Добавить новый файл/ Записать файл"
+
+#: templates/documents/parts.html:18
+msgid "Create a part and attach it to the document."
+msgstr "Создать деталь и присоеденить её к этому документу."
+
+#: templates/documents/parts.html:23 templates/parts/doccad.html:74
+msgid "DISCONNECT"
+msgstr "РАЗЪЕДЕНИТЬ"
+
+#: templates/documents/parts.html:54
+msgid "There are no parts attached to this document"
+msgstr "Нет деталей присоедененных к этому документу"
+
+#: templates/documents/revisions.html:12
+msgid ""
+"Here is the list of parts you may want to attach to the new revision. Select "
+"parts you want to attach and validate to make a new revision."
+msgstr ""
+"Вот список деталей которые вы можете присоединить к новой версии. Выберите"
+"детали, которые вы хотите присоединить и проверти их, чтобы сделать новую ревизию."
+
+#: templates/groups/accept_invitation.html:5
+msgid "Accept invitation ?"
+msgstr "Подтвердить приглашение?"
+
+#: templates/groups/accept_invitation.html:7
+#, python-format
+msgid ""
+"\n"
+"            Accept that %(guest)s join the group %(group)s ?\n"
+"        "
+msgstr ""
+"\n"
+"            Подтвердить что %(guest)s присоединяется к группе %(group)s ?\n"
+"        "
+
+#: templates/groups/accept_invitation.html:11
+#, python-format
+msgid ""
+"\n"
+"            Accept to join the group %(group)s ?\n"
+"        "
+msgstr ""
+"\n"
+"            Подтвердить присоединение к группе %(group)s ?\n"
+"        "
+
+#: templates/groups/add_user.html:6
+msgid "Invite a new user to the group:"
+msgstr "Пригласить нового пользователя в группу:"
+
+#: templates/groups/add_user.html:7
+msgid "The user will receive an e-mail and could accept your invitation."
+msgstr "Пользователь получит сообщение по электронной почте и может принять ваше приглашение."
+
+#: templates/groups/add_user.html:12
+msgid "You can not invite an user to this group."
+msgstr "Вы не можете пригласить пользователя в эту группу. "
+
+#: templates/groups/ask_to_join.html:6
+msgid "You are already in this group."
+msgstr "Вы уже состоите в этой группе."
+
+#: templates/groups/ask_to_join.html:8
+msgid "Join this group ?"
+msgstr "Присоединиться к этой группе ?"
+
+#: templates/groups/pending_invitations.html:7
+msgid "Group"
+msgstr "Группа"
+
+#: templates/groups/pending_invitations.html:10 templates/groups/users.html:29
+msgid "First name"
+msgstr "Имя"
+
+#: templates/groups/pending_invitations.html:11 templates/groups/users.html:30
+msgid "Last name"
+msgstr "Фамилия"
+
+#: templates/groups/pending_invitations.html:12
+msgid "Date of the invitation"
+msgstr "Дата приглашения"
+
+#: templates/groups/pending_invitations.html:37
+msgid "Resend"
+msgstr "Переслать"
+
+#: templates/groups/pending_invitations.html:45
+msgid "Accept"
+msgstr "Подтвердить"
+
+#: templates/groups/pending_invitations.html:50
+msgid "Refuse"
+msgstr "Отклонить"
+
+#: templates/groups/refuse_invitation.html:5
+msgid "Refuse invitation ?"
+msgstr "Отклонить приглашение ?"
+
+#: templates/groups/refuse_invitation.html:7
+#, python-format
+msgid ""
+"\n"
+"            Refuse that %(guest)s join the group %(group)s ?\n"
+"        "
+msgstr ""
+"\n"
+"            Отклонить вступление %(guest)s в группу %(group)s ?\n"
+"        "
+
+#: templates/groups/refuse_invitation.html:11
+#, python-format
+msgid ""
+"\n"
+"            Refuse to join the group %(group)s ?\n"
+"        "
+msgstr ""
+"\n"
+"            Отклонить вступление в группу %(group)s ?\n"
+"        "
+
+#: templates/groups/users.html:8
+msgid "Users"
+msgstr "Пользователи"
+
+#: templates/groups/users.html:13
+msgid "Invite another user"
+msgstr "Пригласить другого пользователя"
+
+#: templates/groups/users.html:15
+msgid "Remove selected users"
+msgstr "Удалить выбранных пользователей"
+
+#: templates/groups/users.html:19
+msgid "Ask to join this group"
+msgstr "Спрашивать перед присоединением к этой группе"
+
+#: templates/groups/users.html:71
+msgid "Pending invitations"
+msgstr "Ожидать приглашения"
+
+#: templates/groups/users.html:72
+msgid ""
+"The following invitations have been sent but guests have not yet accepted "
+"them."
+msgstr ""
+"Следующие приглашениябыли отправлены, но гости ещё не подтвердили "
+"их."
+
+#: templates/import/csv.html:6
+msgid "Import of a csv file"
+msgstr "Импорт CSV файла"
+
+#: templates/import/csv.html:16
+msgid "Error"
+msgstr "Ошибка"
+
+#: templates/import/csv.html:22
+#, python-format
+msgid " Line %(line)s "
+msgstr "Строка %(line)s "
+
+#: templates/import/csv.html:32
+msgid "Error while reading the CSV file. Try upload a new file."
+msgstr "Ошибка при чтении CSV файла. Попробуйте загрузить новый файл."
+
+#: templates/import/csv.html:35
+msgid ""
+"The given encoding seems wrong. Try upload a new file with the right "
+"encoding."
+msgstr ""
+"Неверная кодировка. Попробуйте загрузить новый файл с правильной "
+"кодировкой."
+
+#: templates/import/csv.html:50
+msgid "Field"
+msgstr "Поле"
+
+#: templates/import/csv.html:51
+msgid "Header"
+msgstr "Заголовок"
+
+#: templates/import/csv.html:53
+msgid "Row"
+msgstr "Строка"
+
+#: templates/import/csv.html:68 templates/parts/bom_edit.html:48
+#: templates/snippets/undo_form.html:13
+msgid "Validate"
+msgstr "Подтвердить"
+
+#: templates/import/done.html:6
+msgid "Data have been successfully imported."
+msgstr "Данные успешно импортированы."
+
+#: templates/import/done.html:8
+msgid "Click here to import a new CSV file."
+msgstr "Нажмите здесь чтобы импортировать новый CSV файл."
+
+#: templates/import/done.html:9
+msgid "Click here to import a new BOM."
+msgstr "Нажмите здесь чтобы импортировать новый BOM"
+
+#: templates/import/done.html:10
+msgid "Click here to sponsor more users."
+msgstr "Нажмите здесь чтобы внести больше пользователей."
+
+#: templates/mails/history.html:6 templates/mails/history.txt:3
+msgid "Message from openPLM"
+msgstr "Сообщение от openPLM"
+
+#: templates/mails/history.html:8 templates/mails/history.txt:5
+msgid "Object:"
+msgstr "Объект:"
+
+#: templates/mails/history.html:11 templates/mails/history.txt:7
+msgid "A new action has been done:"
+msgstr "Новое действие, завершено:"
+
+#: templates/mails/history.html:14
+msgid "Details"
+msgstr "Подробности"
+
+#: templates/mails/history.html:32
+msgid "Click here to see more details."
+msgstr "Нажмите здесь чтобы просмотреть более подробную информацию."
+
+#: templates/mails/history.txt:9
+msgid "Details:"
+msgstr "Подробности:"
+
+#: templates/mails/history.txt:14
+msgid "Url of the object:"
+msgstr "Url объекта:"
+
+#: templates/mails/invitation1.html:5 templates/mails/invitation2.html:5
+#, python-format
+msgid ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
+"the group %(group)s.\n"
+"        "
+msgstr ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) предлагает вам присоедениться "
+"к группе %(group)s.\n"
+"        "
+
+#: templates/mails/invitation1.html:11 templates/mails/invitation1.txt:7
+#: templates/mails/invitation2.html:11 templates/mails/invitation2.txt:7
+msgid "Click here to accept the invitation"
+msgstr "Нажмите здесь чтобы подтвердить приглашение"
+
+#: templates/mails/invitation1.html:12 templates/mails/invitation2.html:12
+msgid "Accept invitation"
+msgstr "Подтвердить приглашение"
+
+#: templates/mails/invitation1.html:14 templates/mails/invitation1.txt:10
+#: templates/mails/invitation2.html:14 templates/mails/invitation2.txt:10
+msgid "Click here to refuse the invitation"
+msgstr "Нажмите здесь чтобы отклонить приглашение"
+
+#: templates/mails/invitation1.html:15 templates/mails/invitation2.html:15
+msgid "Refuse invitation"
+msgstr "Отклонить приглашение"
+
+#: templates/mails/invitation1.txt:3 templates/mails/invitation2.txt:3
+#, python-format
+msgid ""
+"\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join the group "
+"%(group)s.\n"
+msgstr ""
+"\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) предлагает вам присоедениться к группе "
+"%(group)s.\n"
+
+#: templates/mails/new_account.html:5
+#, python-format
+msgid ""
+"\n"
+"            Welcome %(first_name)s %(last_name)s!\n"
+"            "
+msgstr ""
+"\n"
+"            Добро пожаловать %(first_name)s %(last_name)s!\n"
+"            "
+
+#: templates/mails/new_account.html:10
+#, python-format
+msgid ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
+"OpenPLM.\n"
+"        "
+msgstr ""
+"\n"
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) добавил вас в "
+"OpenPLM.\n"
+"        "
+
+#: templates/mails/new_account.html:16
+msgid "Your credentials:"
+msgstr "Ваши учетные данные:"
+
+#: templates/mails/new_account.html:21
+msgid "Username:"
+msgstr "Имя пользователя"
+
+#: templates/mails/new_account.html:25
+msgid "Password:"
+msgstr "Пароль"
+
+#: templates/mails/new_account.html:30
+msgid "You should change your password!"
+msgstr "Вы должны сменить ваш пароль!"
+
+#: templates/mails/new_account.html:32
+msgid "Click here to change your password"
+msgstr "Нажмите здесь, чтобы сменить пароль"
+
+#: templates/mails/new_account.txt:3
+#, python-format
+msgid ""
+"\n"
+"Welcome %(first_name)s %(last_name)s!  \n"
+"\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) added you to OpenPLM.\n"
+"\n"
+"Your credentials:\n"
+"\n"
+"    - username: %(username)s\n"
+"    - password: %(password)s\n"
+"\n"
+"You should change your password !\n"
+"See http://%(domain)s/user/%(username)s/password/\n"
+"\n"
+msgstr ""
+"\n"
+"Добро пожаловать %(first_name)s %(last_name)s!  \n"
+"\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) добавил вас в OpenPLM.\n"
+"\n"
+"Ваши учетные данные:\n"
+"\n"
+"    - username: %(username)s\n"
+"    - password: %(password)s\n"
+"\n"
+"Вы должны сменить свой пароль !\n"
+"Смотрите http://%(domain)s/user/%(username)s/password/\n"
+"\n"
+
+#: templates/parts/bom.html:20
+msgid "EDIT"
+msgstr "РЕДАКТИРОВАТЬ"
+
+#: templates/parts/bom.html:27 templates/parts/parents.html:24
+msgid "GO !"
+msgstr "ВПЕРЕД !"
+
+#: templates/parts/bom.html:34
+msgid "Level"
+msgstr "Уровень"
+
+#: templates/parts/bom.html:35
+msgid "Ord."
+msgstr ""
+
+#: templates/parts/bom.html:36
+msgid "Qty"
+msgstr ""
+
+#: templates/parts/bom.html:37 templates/parts/bom_edit.html:13
+msgid "Unit"
+msgstr "Единица"
+
+#: templates/parts/bom_edit.html:11
+msgid "Order"
+msgstr "Порядок"
+
+#: templates/parts/bom_edit.html:12
+msgid "Quantity"
+msgstr "Количество"
+
+#: templates/parts/bom_edit.html:22
+msgid "Delete ?"
+msgstr "Удалить ?"
+
+#: templates/parts/doccad.html:12
+msgid "Download all CAD files"
+msgstr "Скачать все CAD файлы"
+
+#: templates/parts/doccad.html:53
+msgid "There are no documents attached to this part."
+msgstr "Нет документов, связанных с этой деталью."
+
+#: templates/parts/doccad.html:62
+msgid "Attach another document"
+msgstr "Присоеденить другой документ"
+
+#: templates/parts/doccad.html:69
+msgid "Create a document and attach it to the part."
+msgstr "Создать документ и присоеденить его к детали."
+
+#: templates/parts/doccad_add.html:7
+msgid "Connect new document :"
+msgstr "Подключить новый документ:"
+
+#: templates/parts/revisions.html:13
+msgid ""
+"Here is the list of documents you may want to attach to the new revision. "
+"Select documents you want to attach."
+msgstr ""
+"Это список документов , которые вы можете присоеденить к новой ревизии. "
+"Выберете документы которые хотите присоеденить."
+
+#: templates/parts/revisions.html:35
+msgid ""
+"Here is the list of parts you may want to add to the new revision. Select "
+"parts you want to add."
+msgstr ""
+"Это список деталей которые вы можете добавить к новой ревизии. Выберете "
+"детали которые вы хотите добавить."
+
+#: templates/parts/revisions.html:57
+msgid ""
+"Here is the list of the current parents you may want to update to link to "
+"the new revision. Select parts you want to update."
+msgstr ""
+"Здесь представлен список текущих предков вы можете обновить ссылки на "
+"новую ревизию. Выберете детали которые вы бы хотели обновить."
+
+#: templates/search/result.html:7
+msgid "Attach"
+msgstr "Присоеденить"
+
+#: templates/search/result.html:8
+msgid "Add child"
+msgstr "Добавить потомка"
+
+#: templates/search/search.html:29
+#, python-format
+msgid ""
+"\n"
+"                        (%(start)s - %(end)s on %(total)s)\n"
+"                    "
+msgstr ""
+"\n"
+"                        (%(start)s - %(end)s из %(total)s)\n"
+"                    "
+
+#: templates/users/delegation.html:8
+msgid "START DELEGATE :"
+msgstr "НАЧАТЬ ДЕЛЕГИРОВАНИЕ :"
+
+#: templates/users/delegation.html:10
+msgid "OWNERSHIP"
+msgstr "ВЛАДЕЛЕЦ"
+
+#: templates/users/delegation.html:13
+msgid "SIGNATURE 1st LEVEL"
+msgstr "ПОДПИСЬ 1-го УРОВНЯ"
+
+#: templates/users/delegation.html:16
+msgid "SIGNATURE 2nd LEVEL"
+msgstr "ПОДПИСЬ 2-го УРОВНЯ"
+
+#: templates/users/delegation.html:19
+msgid "ALL SIGNATURES"
+msgstr "ВСЕ ПОДПИСИ"
+
+#: templates/users/delegation.html:22
+msgid "NOTIFICATIONS"
+msgstr "УВЕДОМЛЕНИЯ"
+
+#: templates/users/delegation.html:26
+msgid "Sponsor"
+msgstr "Участник"
+
+#: templates/users/delegation.html:33
+msgid "First Name"
+msgstr "Имя"
+
+#: templates/users/delegation.html:34
+msgid "Last Name"
+msgstr "Фамилия"
+
+#: templates/users/delegation.html:35
+msgid "Role"
+msgstr "Роль"
+
+#: templates/users/delegation.html:48
+msgid "STOP DELEGATION"
+msgstr "ПРЕКРАТИТЬ ДЕЛЕГИРОВАНИЕ"
+
+#: templates/users/delegation.html:56
+msgid "Resend mail"
+msgstr "Переслать письмо"
+
+#: templates/users/groups.html:17
+msgid "You are in the following groups:"
+msgstr "Вы состоите в следующих группах:"
+
+#: templates/users/groups.html:43
+msgid "Click here to create another group."
+msgstr "Нажмите здесь чтобы создать новую группу."
+
+#: templates/users/password.html:7
+msgid "PASSWORD MODIFICATION:"
+msgstr "ИЗМЕНЕНИЕ ПАРОЛЯ:"
+
+#: templates/users/password.html:16
+msgid "CHANGE PASSWORD"
+msgstr "СМЕНИТЬ ПАРОЛЬ"
+
+#: templates/users/plmobjects.html:18
+msgid "Last edited objects"
+msgstr "Последний редактированный объект"
+
+#: templates/users/sponsor.html:10
+msgid "Click here to sponsor several users from a CSV file."
+msgstr "Нажмите здесь чтобы внести нескольких пользователей из CSV файла."
+
+#: templates/users/sponsor.html:16
+msgid "You can not sponsor a new user since you are not a contributor."
+msgstr "Вы не можете вносить новых пользователей, т.к. вы не являетесь участником."
