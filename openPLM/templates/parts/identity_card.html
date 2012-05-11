@@ -1,0 +1,22 @@
+{% extends "identity_card.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{% block thumbnail_url%}{{MEDIA_URL}}img/icon_part.png{% endblock %}
+{% block id_details%}
+    <p>
+    <span class="type">{{object.type}}</span>
+    </p>
+    <p>
+    <a href="{{object.plmobject_url}}">
+    <span class="reference">{{object.reference}}</span>
+    <span class="revision">{{object.revision}}</span>
+</a>
+    </p>
+    <p>
+    <span class="name">{{object.name}}</span>
+    </p>
+    <p>
+    <span class="state">{{object.state_id}}</span>
+    </p>
+
+{% endblock %}

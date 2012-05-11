@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{# browse page #}
+
+{% block css %}
+{% endblock %}
+{% block leftcolumn %} {% endblock %}
+
+{% block content %}
+    <div id="browser">
+        <div id="type-panel">
+            <div>
+            <h3 class="alternate">{% trans "Type" %} </h3>
+            </div>
+            <ul>
+                <li {% if type == "object"%}class="selected"{% endif %} >
+                <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
+                </li>
+                <li {% if type == "part"%}class="selected"{% endif %} >
+                <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
+                </li>
+                <li {% if type == "document"%}class="selected"{% endif %} >
+                <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
+                </li>
+                <li {% if type == "group"%}class="selected"{% endif %} >
+                <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
+                <li {% if type == "user"%}class="selected"{% endif %} >
+                <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
+                </li>
+            </ul>
+            <hr/>
+            <ul>
+                <li>
+                <a href="{% add_get sort='recently-used' %}"><span>{% trans "Recently added" %}</span></a>
+                </li>
+                <li>
+                <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
+                </li>
+            </ul>
+            {% if plmobjects %}
+            <hr/>
+            <ul>
+                <li>
+                <a href="{% add_get state='all' %}"><span>{% trans "All states" %}</span></a>
+                </li>
+                <li>
+                <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
+                </li>
+            </ul>
+            {% endif %}
+
+        </div>
+        <div id="browse-results">
+            <h3>{% trans "Results" %}</h3>
+            <div id="object_list">
+                <p id="results">
+                <span id="numresults">
+                    {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
+                        Results: {{start}} - {{end}} on {{total}}
+                    {% endblocktrans %}
+                </span> 
+                </p>
+
+                {% for object in objects.object_list %}
+                    {% if object.is_part %}
+
+                        {% include "parts/identity_card.html" %}
+
+                    {% else %}
+                        {% if object.is_document %}
+                            {% include "documents/identity_card.html" %}
+
+                        {% else %}
+                            {% if object.username %}
+                                {% include "users/identity_card.html" %}
+
+                            {% else %}
+                                {% include "groups/identity_card.html" %}
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+
+            <div class="pagination">
+                <span class="step-links">
+                    {% if objects.has_previous %}
+                        <a href="{% add_get page='1'%}">{% trans "First page" %}</a>
+                        —
+                        <a href="{% add_get page=objects.previous_page_number %}">{% trans "previous" %}</a>
+                    {% endif %}
+
+                    <span class="current">
+                        {% blocktrans with objects.number as page and objects.paginator.num_pages as num_pages %}
+                            Page {{ page }} of {{ num_pages }}.
+                        {% endblocktrans %}
+                    </span>
+
+                    {% if objects.has_next %}
+                        <a href="{% add_get page=objects.next_page_number %}">{% trans "next" %}</a>
+                        —
+                        <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "last page" %}</a>
+
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}

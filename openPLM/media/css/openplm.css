@@ -94,6 +94,9 @@ h3 {
     font-weight: 600;
     background-image: url("../img/dark/h2_bg_2.png");
 }
+h3.alternate {
+    background-image: url("../img/dark/h2_bg_1.png");
+}
 
 
 h3 + p,
@@ -1092,3 +1095,121 @@ a.decomposable {
 div#attributes {
     margin: 1em;
  }
+
+div.identity_card {
+    display: inline-block;
+    background-color: white;
+    border: 1px solid #777;
+    border-radius: 0.4em;
+    box-shadow: 1px 1px 3px #888;
+    width: 20em;
+    height: 130px;
+    padding: 5px;
+    margin: 0.5em;
+    position: relative;
+}
+
+div.identity_card > div.id_thumbnail,
+div.identity_card > div.id_details {
+    display: block;
+}
+div.identity_card > div.id_thumbnail {
+    width: 100px;
+    height: 100px;
+    float: left;
+    background-color: #343434;
+    border: 1px solid #343434;
+    margin-top: 15px;
+    display: table-cell;
+}
+div.identity_card div.id_thumbnail_inner {
+    vertical-align: middle;
+    display: table-cell;
+    height: 100px;
+    width: 100px;
+}
+
+div.identity_card > div.id_thumbnail img {
+    max-width: 100px;
+    max-height: 100px;
+    margin:auto;
+    float: none;
+    display: block;
+}
+div.identity_card > div.id_details {
+    height: 120px;
+    border-left: 1px solid #ccc;
+    padding: 0 1em;
+    position: absolute;
+    left: 120px;
+    width: 150px;
+    font-size: 90%;
+}
+div.id_details span.type {
+    font-weight: bold;
+}
+div.id_details p {
+    margin-top: 0.5em;
+    word-wrap: break-word;
+}
+div.id_details p:not(:last-child) {
+    border-bottom: 1px dotted #ccc;
+}
+
+div#type-panel {
+    float: left;
+    width: 15em;
+    background-color: #fcfcfc;
+    height: 100%;
+    position: absolute;
+}
+div#type-panel h3 {
+    margin: 0;
+}
+div#type-panel li {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 1em;
+}
+div#type-panel li a {
+    line-height: 2em;
+    width: 100%;
+}
+div#type-panel li a span {
+    display: block;
+    width: 100%;
+}
+div#type-panel li a,
+div.id_details a {
+    text-decoration: none;
+}
+div#type-panel li.selected {
+    border-right: 6px solid #343434;
+    border-left: 0.8em solid #343434;
+    margin-right: -3px;
+    margin-left: -0.4em;
+    padding-left: 0.6em;
+}
+div#type-panel li:hover {
+    color: white;
+    background-color: #343434;
+}
+div#type-panel li:hover * {
+    color: white;
+}
+
+.ic-group span.description {
+    overflow: hidden;
+    max-height: 5em;
+    display: block;
+}
+
+div#browse-results {
+    margin-left: 15em;
+    padding-left: 1em;
+}
+
+div#browser {
+    position: relative;
+    min-height: 500px;
+}
