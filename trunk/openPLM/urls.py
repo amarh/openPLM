@@ -87,6 +87,8 @@ urlpatterns += patterns('',
     (import_url + '(?P<filename>[\w]+)/(?P<encoding>[\w]+)/$',
         import_csv_apply),
     ('^import/done/$', import_csv_done),
+    # browse
+    (r'^browse/(?P<type>object|part|document|user|group)?/', 'openPLM.plmapp.views.main.browse'),
     )
 
 urlpatterns += patterns2('', 'ajax/', 

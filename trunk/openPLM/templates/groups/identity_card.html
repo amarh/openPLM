@@ -1,0 +1,18 @@
+{% extends "identity_card.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{% block thumbnail_url%}{{MEDIA_URL}}img/icon_user.png{% endblock %}
+{% block id_details%}
+    <p>
+    <span class="type">{% trans "Group" %}</span>
+    </p>
+    <p>
+    <a href="{{object.plmobject_url}}">
+        <span class="reference">{{object.name}}</span>
+    </a>
+    </p>
+    <p>
+    <span class="description">{{object.description|linebreaksbr}}</span>
+    </p>
+
+{% endblock %}

@@ -58,6 +58,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import F
 from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError, \
                         HttpResponsePermanentRedirect, HttpResponseForbidden
@@ -963,7 +965,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################
 @handle_errors(undo="..")
-#@csrf_protect
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
@@ -976,7 +977,6 @@ def add_file(request, obj_type, obj_ref, obj_revi):
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
-            ctx.update({'add_file_form': add_file_form, })
             return HttpResponseRedirect(".")
     else:
         add_file_form = forms.AddFileForm()
@@ -997,8 +997,7 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-	    obj.add_file(request.FILES["filename"])
-            ctx.update({'add_file_form': add_file_form, })
+            obj.add_file(request.FILES["filename"])
             return HttpResponse(".")
 
 @handle_errors
@@ -1010,13 +1009,14 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ret = ""
     p_id = request.GET['X-Progress-ID']
-    f = glob.glob("/tmp/*%s_upload" % p_id)
+    tempdir = settings.FILE_UPLOAD_TEMP_DIR or tempfile.gettempdir()
+    f = glob.glob(os.path.join(tempdir, "*%s_upload" % p_id))
     if len(f) > 0:
-    	ret = str(os.path.getsize(f[0]))
+        ret = str(os.path.getsize(f[0]))
     if ret==request.GET['f_size']:
-	ret += ":linking"
+        ret += ":linking"
     else:
-	ret += ":writing"
+        ret += ":writing"
     return HttpResponse(ret)
 
 
@@ -1815,4 +1815,66 @@ class OpenPLMSearchView(SearchView):
     @method_decorator(handle_errors)
     def __call__(self, request):
         return super(OpenPLMSearchView, self).__call__(request)
+
+@handle_errors
+def browse(request, type="object"):
+    obj, ctx = get_generic_data(request, search=False)
+    cls = {
+        "object" : models.PLMObject, 
+        "part" : models.Part,
+        "document" : models.Document,
+        "group" : models.GroupInfo,
+        "user" : User,
+    }[type]
+            
+    object_list = cls.objects.all()
+    ctx["state"] = state = request.GET.get("state", "all")
+    if type in ("object", "part", "document"):
+        ctx["plmobjects"] = True
+        if state == "official":
+            object_list = object_list.\
+                    exclude(lifecycle=models.get_cancelled_lifecycle()).\
+                    filter(state=F("lifecycle__official_state"))
+    else:
+        ctx["plmobjects"] = False
+        
+    
+    sort = request.GET.get("sort", "recently-added")
+    if sort == "name":
+        sort_critera = "username" if type == "user" else "name"
+    else:
+        sort_critera = "-date_joined" if type == "user" else "-ctime"
+    object_list = object_list.order_by(sort_critera)
+
+    paginator = Paginator(object_list, 24) # Show 24 objects per page
+
+    page = request.GET.get('page', 1)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        objects = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        objects = paginator.page(paginator.num_pages)
+    ctx["thumbnails"] = {}
+    ctx["num_files"] = {}
+
+    if type in ("object", "document"):
+        ids = objects.object_list.values_list("id", flat=True)
+        thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                document__in=ids, thumbnail__isnull=False)
+        ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
+        num_files = dict.fromkeys(ids, 0)
+        for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+                document__in=ids).values_list("document", flat=True):
+            num_files[doc_id] += 1
+        ctx["num_files"] = num_files
+    ctx.update({
+        "objects" : objects,
+        "object_type" : _("Browse"),
+        "type" : type,
+        "sort" : sort,
+    })
+    return r2r("browse.html", ctx, request)
 

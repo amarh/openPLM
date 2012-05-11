@@ -1,0 +1,40 @@
+{% extends "identity_card.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{% block thumbnail_url%}{% spaceless %}
+    {% with thumbnails|key:object.id as path %}
+        {% if path %}
+            {{MEDIA_URL}}thumbnails/{{path}}
+        {% else %}
+            {{MEDIA_URL}}img/icon_doc.png
+        {% endif %}
+    {% endwith %}
+{% endspaceless %}{% endblock %}
+
+{% block id_details%}
+    <p>
+    <span class="type">{{object.type}}</span>
+    </p>
+    <p>
+    <a href="{{object.plmobject_url}}">
+        <span class="reference">{{object.reference}}</span>
+        <span class="revision">{{object.revision}}</span>
+    </a>
+    </p>
+    <p>
+    <span class="name">{{object.name}}</span>
+    </p>
+    <p>
+    <span class="state">{{object.state_id}}</span>
+    </p>
+    <p>
+    <span class="num_files">
+        {% blocktrans count num_files|key:object.id as file_count %}
+            {{file_count}} file
+            {% plural %}
+            {{file_count}} files
+        {% endblocktrans %}
+    </span>
+    </p>
+
+{% endblock %}
