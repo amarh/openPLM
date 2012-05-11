@@ -52,6 +52,8 @@ def ajax_creation_form(request):
     tf = forms.TypeFormWithoutUser(request.GET)
     if tf.is_valid():
         type_ = tf.cleaned_data["type"]
+        request.session["type"] = type_
+        request.session.save()
         cls = models.get_all_plmobjects()[type_]
         view = get_creation_view(cls)
         if view is not None:
