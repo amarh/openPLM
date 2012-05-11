@@ -33,7 +33,10 @@
                     <tbody>
                         <tr class="Content">
                             <th class="Content">{% trans "Type" %}</th>
-                            <td>{{ creation_type_form.visible_fields.0 }}</td>
+                            <td>{{ creation_type_form.visible_fields.0 }}
+                                {{ creation_type_form.errors.type }}
+                            </td>
+                            
                         </tr>
                         {{ creation_form }}
                     </tbody>

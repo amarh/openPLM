@@ -199,19 +199,23 @@ def group_types(types):
 class TypeForm(forms.Form):
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
+    type.widget.attrs["autocomplete"] = "off"
 
 class TypeFormWithoutUser(forms.Form):
     LIST_WO_USER = group_types(m.get_all_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST_WO_USER,
             label=_("Select a type"))
+    type.widget.attrs["autocomplete"] = "off"
 
 class PartTypeForm(forms.Form):
     LIST = m.get_all_parts_with_level()
     type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
+    type.widget.attrs["autocomplete"] = "off"
 
 class DocumentTypeForm(forms.Form):
     LIST = m.get_all_documents_with_level()
     type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
+    type.widget.attrs["autocomplete"] = "off"
 
 
 from haystack.forms import SearchForm
@@ -219,6 +223,7 @@ class SimpleSearchForm(SearchForm):
    
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
+    type.widget.attrs["autocomplete"] = "off"
     q = forms.CharField(label=_("Query"), required=False,
             initial="*")
 

@@ -6,6 +6,12 @@ $(
                // params is the get parameters
                 var params = form.serialize();
                 form.showLoading();
+                type = $(this).val();
+                try {
+                    history.replaceState(type, document.title, '?type=' + type);
+                } catch (err) {
+                    // old browser...
+                }
                 $.get("/ajax/create/?" + params,  function(data){
                     if (data["reload"]){
                         location = "/object/create/?=" + params;
