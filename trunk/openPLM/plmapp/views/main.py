@@ -977,7 +977,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
             obj.add_file(request.FILES["filename"])
-            return HttpResponseRedirect(".")
+            return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
         add_file_form = forms.AddFileForm()
     ctx.update({ 'add_file_form': add_file_form, })
@@ -997,7 +997,8 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-            obj.add_file(request.FILES["filename"])
+	    for fkey, f in request.FILES.iteritems():
+            	obj.add_file(request.FILES[fkey])
             return HttpResponse(".")
 
 @handle_errors
@@ -1013,10 +1014,13 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     f = glob.glob(os.path.join(tempdir, "*%s_upload" % p_id))
     if len(f) > 0:
         ret = str(os.path.getsize(f[0]))
-    if ret==request.GET['f_size']:
-        ret += ":linking"
+    if ret=="":
+	ret="0 : waiting"
     else:
-        ret += ":writing"
+    	if ret==request.GET['f_size']:
+            ret += ":linking"
+    	else:
+            ret += ":writing"
     return HttpResponse(ret)
 
 

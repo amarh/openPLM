@@ -12,6 +12,9 @@
             </td>
             <td>
 		{% if form.is_multipart %}
+		<noscript>
+		    <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
+		</noscript>
 		<input type="button" class="{{"Button"|button}}" value="{% trans "Upload" %}" id="_up"/>
 		<!--<input type="button" class="{{"Button"|button}}" value="{% trans "Delete" %}" id="_delete"/>-->
 		{% else %}

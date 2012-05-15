@@ -89,7 +89,7 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.files.storage import FileSystemStorage
-from django.utils.encoding import iri_to_uri
+from django.utils.encoding import iri_to_uri, force_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
@@ -840,6 +840,8 @@ class DocumentStorage(FileSystemStorage):
         while os.path.exists(os.path.join(self.location, path)):
             path = os.path.join(ext2, md5_value % rand())
         return path
+
+
 
 #: :class:`DocumentStorage` instance which stores files in :const:`settings.DOCUMENTS_DIR`
 docfs = DocumentStorage(location=settings.DOCUMENTS_DIR)

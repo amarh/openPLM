@@ -2,17 +2,6 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadhandler import FileUploadHandler
 from django.core.files.uploadedfile import *
 
-#import string
-#import random
-
-#def gen_id:
-#    """
-#    Generate random id for temporary file name
-#    """
-#    chars_id = string.ascii_letters + string.digits
-#    return "".join(random.choice(chars_id) for x in xrange(50))
-
-#data={}
 
 class ProgressBarUploadHandler(FileUploadHandler):
     """
@@ -23,23 +12,25 @@ class ProgressBarUploadHandler(FileUploadHandler):
 
     def __init__(self, *args, **kwargs):
         super(ProgressBarUploadHandler, self).__init__(*args, **kwargs)
-        self.progress_id = None
+	self.progress_id = {}
 
     def new_file(self,file_name, *args, **kwargs):
         """
         Create the file object to append to as data is coming in.
         """
-        self.progress_id = self.request.GET['X-Progress-ID']
+	#self.progress_id = self.request.GET['X-Progress-ID']
+	self.progress_id["%s" % args[0]]=self.request.GET["%s" % args[0]]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
-        self.file = ProgressUploadedFile(self.progress_id,self.file_name, self.content_type, 0, self.charset)
+        self.file = ProgressUploadedFile(self.progress_id["%s" % args[0]],self.file_name, self.content_type, 0, self.charset)
+        #self.file = ProgressUploadedFile(self.progress_id,self.file_name, self.content_type, 0, self.charset)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
     
     def file_complete(self, file_size):
-        self.file.seek(0)
-        self.file.size = file_size
-        return self.file
+       	self.file.seek(0)
+       	self.file.size = file_size
+       	return self.file
 
     def upload_complete(self):
         pass
