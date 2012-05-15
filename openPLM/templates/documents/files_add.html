@@ -3,198 +3,8 @@
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
 
-{% block scripts %}
-<script>
-/*var nbr_files=0;
-function new_input_file(){
-    var table = $("#fileupload > table.Content");
-    var num = nbr_files+1;
-    var input = "<tr><th><label for='id_filename"+num+"'>Filename:</label></th><td><input type='file' name='filename"+num+"' id='id_filename"+num+"'/ ></td></tr>";
-    table.prepend(input);
-}
-
-function add_file(input){
-    if (nbr_files==0)
-	$("#div_files").removeChild($("#div_files").firstChild());
-    //create where the progress of the upload will be display for this input
-    var check_id="check";
-    if (nbr_files>0)
-	check_id+=nbr_files;
-    var file_line = $("<p><input type='checkbox' id='"+check_id+"'/"+"></p>");
-    var file_name = this.value;
-    file_line.append(file_name);
-
-    //create link to delete this file from the queue for upload
-    var link = $("<a href='#'></a>");
-    var del_img = "<img src='/media/img
-}
-
-function del_file(input){
-}*/
-
-//generate random id to get the upload progress
-function gen_uuid() {
-    var uuid = "";
-    for (var i=0; i < 32; i++) {
-        uuid += Math.floor(Math.random() * 16).toString(16); 
-    }
-    return uuid;
-}
-
-//return percentage of the progress
-function progress_bar(uploaded, total){
-    var progress_w = uploaded * 100/total;
-    return progress_w;
-}
-
-//return an XMLHttpRequest
-function getXHR(){
-    var xhr=null;
-	
-    if (window.XMLHttpRequest || window.ActiveXObject) {
-	if (window.ActiveXObject) {
-	    try {
-		xhr = new ActiveXObject("Msxml2.XMLHTTP");
-	    } catch(e) {
-		xhr = new ActiveXObject("Microsoft.XMLHTTP");
-	    }
-	} else {
-		xhr = new XMLHttpRequest(); 
-	}
-    } else {
-	alert("Votre navigateur ne supporte pas l'objet XMLHTTPRequest...");
-	return null;
-    }
-
-    return xhr;
-}
-
-//get a unique and available path name for the selected file
-function get_path_name(){
-    var file_form = $('form#fileupload')[0];
-    var file_liste=file_form.elements["filename"].files;
-    var file=file_liste[0];
-    totalsize=file.size;
-    f_name=file.name;
-    var xhr1=getXHR();
-    var action = location.href;
-    action = action.split("?")[0];
-    action +="?f_name="+f_name+"&f_size="+totalsize;
-    xhr1.open("GET",action,false);
-    xhr1.onreadystatechange = function() {
-     	if(xhr1.readyState == 4) {
-	    /*paths[f_name]={
-		'path': xhr1.responseText,
-		'size': totalsize
-	    };*/
-	    path = xhr1.responseText;
-	}
-    }
-    xhr1.send(null);
-}
-
-function upload_end(){
-    var div_text = $("#progress_div").text();
-    return ((div_text=="")||(div_text.substr(0,3)=="100")||(totalsize==0)||(uploaded==totalsize));
-}
-var t;
-//id generated for the uploaded file not use any more
-var id ;
-//size of the selected file
-var totalsize=0;
-//name of the selected file
-var f_name ="";
-var uploaded=0;
-var path="";
-//Array that contains path and size of eache files selected for upload
-//var files_info=new Array();
-var go_to ="";
-
-$(function(){
-    var xhr = getXHR();
-    $("input[type='file']").change(function (){
-	//add_file(this);
-	id=gen_uuid();
-    });
-    $("input[name='_undo']").click(function(){
-	xhr.abort();
-    });
-    $("#_up").click(function(){
-	//get_path_name();
-	var go_to="";
-	//var xhr=getXHR();
-	var file_form = $('form#fileupload')[0];
-	var new_action = file_form.action;
-	new_action = new_action.replace("/files/add","/files/up");
-	new_action +="?X-Progress-ID="+id;
-	function update_progress_info() {
-            if(upload_end()==false){
-    	    	var xhr2=getXHR();
-    		var action = location.href;
-    		action = action.split("?")[0];
-    		action=action.replace("/files/add","/files/_up");
-	    	//action+="?f_path="+path;
-		action+="?X-Progress-ID="+id;
-		action+="&f_size="+totalsize;
-	    	xhr2.open("GET",action,true);
-    	    	xhr2.onreadystatechange = function() {
-     	    	    if((xhr2.readyState == 4)&&(xhr2.status!=500)) {
-	    		var response=xhr2.responseText;
-			uploaded = parseInt(response.split(":")[0]);
-			var f_status = response.split(":")[1];
-			var percent =progress_bar(uploaded,totalsize);
-			if(isNaN(percent)==false){
-			    var aux_per=""+percent;
-			    if (aux_per.split(".").length>1)
-			    	aux_per=aux_per.split(".")[0]+"."+aux_per.split(".")[1].substr(0,2);
-		    	    $("#up_progress").text(aux_per+"%");
-			}
-			if(f_status=="linking"){
-			    var text=$("#up_progress").text();
-			    var evol = text.split("%")[0];
-			    if(isNaN(percent))
-			    	$("#up_progress").text("100%"+"(link in creation)");
-			    else
-				$("#up_progress").text(evol+"%(link in creation)");
-			}
-	    	    }
-   	    	}
-	    	xhr2.send(null);
-		//if(uploaded!=totalsize)
-	    }
-	    t=window.setTimeout(update_progress_info, 1000);
-	    if(go_to!="")
-		location.href=go_to;
-        };
-	t=window.setTimeout(update_progress_info, 1000);
-	xhr.onreadystatechange = function() {
-     	    if(xhr.readyState == 4) {
-	    	go_to = location.href;
-		go_to = go_to.replace("/files/add","/files");
-	    }
-    	}
-	xhr.open("POST", new_action,true);
-	data = new FormData(file_form);
-	data.append("X-Progress-ID",id);
-	xhr.send(data);
-	var file_liste=file_form.elements["filename"].files;
-	var file=file_liste[0];
-	f_name=file.name;
-	var file_name = $("<span id='file_name'></span>");
-	var file_progress=$("<span id='up_progress'>0%</span>");
-	file_name.text(f_name+":");
-	$("#progress_div").append(file_name);
-	$("#progress_div").append(file_progress);
-	$("#progress_div").append("<img src='/media/img/loading.gif' alt='loading' style='float:left;'>");
-	totalsize=file.size;
-    });
-});
-</script>
-{% endblock %}
-
 {% block css %}
-<style type="text/css">
-</style>
+<link type="text/css" href="/media/css/files.css" rel="Stylesheet" /> 
 {% endblock %}
 
 {% block content %}
@@ -203,11 +13,16 @@ $(function(){
         {% include "snippets/undo_form.html" %}
     {% endwith %}
 <!--</form>-->
-<form id="link" method="post" action=".">{% csrf_token %}
-</form>
-
-<div id="progress_div"></div>
-<div id="test_req"></div>
+<noscript>
+    <div style="width:30%;" class="warning">
+	You can only upload one file at a time.<br>
+	Use the "Validate" button to send your file.
+    </div>
+</noscript>
+<form class="form_queue">{% csrf_token %}</form>
+<!--<div id="hidden_forms" style="display:none;"></div>-->
+<div id="div_files"></div>
+<script type="text/javascript" src="/media/js/file.js"></script>
 {% endblock %}
 
 

@@ -1,0 +1,30 @@
+#div_files div{
+    margin-right:10px;
+    padding : 10px; 
+    border-style:groove;
+    border-width: 2px;
+    border-radius: 4px;
+}
+
+.warning{
+    color: black;
+    font-weight: bold;
+    margin:20% 0;
+    padding: 5px; 
+    border-radius: 4px;
+    background-color: #F03838;
+}
+
+.up_fail{
+    display:table;
+    color: black;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 5px; 
+    border-radius: 4px;
+    background-color: #ED7F10;
+}
+
+form.form_queue{
+    display:none;
+}

@@ -156,15 +156,14 @@ class DocumentController(PLMObjectController):
 
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
-        
-	f.name = f.name.encode("utf-8")
 
+	f.name = f.name.encode("utf-8")
         if self.has_standard_related_locked(f.name):
             raise ValueError("Native file has a standard related locked file.")
 
         f.seek(0, os.SEEK_END)
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.tell(),
-                        file=models.docfs.save(f.name,f), document=self.object)                                     
+                        file=models.docfs.save(f.name,f), document=self.object) 
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
