@@ -38,8 +38,13 @@ def can_add(child, arg):
     elif action == "add_child":
         return parent.can_add_child(child)
     elif action == "delegate":
-        return isinstance(child, (User, UserController))
- 
+        if isinstance(child, (User, UserController)):
+            if hasattr(parent, "check_in_group"):
+                from django.conf import settings
+                if child.username == settings.COMPANY:
+                    return False
+                return parent.check_in_group(child)
+        return True
     return False
 
 @register.filter

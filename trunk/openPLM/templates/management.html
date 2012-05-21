@@ -19,10 +19,12 @@
                 <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Unnotify me" %}" />
             </form>
         {% else %}
-            <form  method="POST" action="./add/">
-                {{ notify_self_form.as_p }}
-                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
-            </form>
+            {% if can_notify %}
+                <form  method="POST" action="./add/">
+                    {{ notify_self_form.as_p }}
+                    <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
+                </form>
+            {% endif %}
         {% endif %}
     {% endif %}
 

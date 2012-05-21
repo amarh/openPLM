@@ -1084,15 +1084,19 @@ def display_management(request, obj_type, obj_ref, obj_revi):
         if link:
             ctx["remove_notify_link"] = link[0]
         else:
-            initial = { "type" : "User",
-                        "username" : request.user.username
-                      }
-            form = forms.SelectUserForm(initial=initial)
-            for field in ("type", "username"):
-                form.fields[field].widget = HiddenInput() 
-            ctx["notify_self_form"] = form
+            if obj.check_in_group(request.user, False):
+                initial = { "type" : "User",
+                            "username" : request.user.username
+                          }
+                form = forms.SelectUserForm(initial=initial)
+                for field in ("type", "username"):
+                    form.fields[field].widget = HiddenInput() 
+                ctx["notify_self_form"] = form
+                ctx["can_notify"] = True
+            else:
+                ctx["can_notify"] = False
     ctx.update({'current_page':'management',
-                'object_management': object_management_list})
+            'object_management': object_management_list})
     
     return r2r('management.html', ctx, request)
 

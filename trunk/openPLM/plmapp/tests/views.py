@@ -361,6 +361,7 @@ class ViewTest(CommonViewTest):
        
     def test_management(self):
         response = self.get(self.base_url + "management/", page="management")
+        self.brian.groups.add(self.group)
         self.controller.set_owner(self.brian)
         response = self.get(self.base_url + "management/")
         self.assertFalse(response.context["is_notified"])
@@ -377,12 +378,14 @@ class ViewTest(CommonViewTest):
 
     def test_management_add_post(self):
         data = dict(type="User", username=self.brian.username)
+        self.brian.groups.add(self.group)
         response = self.post(self.base_url + "management/add/", data)
         self.assertTrue(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED))
 
     def test_management_replace_get(self):
         role = level_to_sign_str(0)
+        self.brian.groups.add(self.group)
         self.controller.set_signer(self.brian, role)
         link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
@@ -394,6 +397,7 @@ class ViewTest(CommonViewTest):
     
     def test_management_replace_post(self):
         role = level_to_sign_str(0)
+        self.brian.groups.add(self.group)
         self.controller.set_signer(self.brian, role)
         link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
@@ -406,6 +410,7 @@ class ViewTest(CommonViewTest):
             user=self.user, role=role))
 
     def test_management_delete(self):
+        self.brian.groups.add(self.group)
         self.controller.add_notified(self.brian)
         link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED)

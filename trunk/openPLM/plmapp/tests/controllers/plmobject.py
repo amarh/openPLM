@@ -176,6 +176,7 @@ class ControllerTest(BaseTestCase):
         """
         controller = self.create("Part1")
         user = self.get_contributor()
+        user.groups.remove(self.group)
         ctrl = self.CONTROLLER(controller.object, user)
         self.failIf(ctrl.is_revisable())
         self.assertRaises(exc.PermissionError, ctrl.revise, "b")
@@ -279,6 +280,12 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         self.assertRaises(ValueError, controller.set_owner, self.cie)
 
+    def test_set_owner_error_not_in_group(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        user.groups.remove(self.group)
+        self.assertRaises(exc.PermissionError, controller.set_owner, user)
+
     def test_set_sign1(self):
         controller = self.create("Part1")
         user = self.get_contributor()
@@ -299,6 +306,14 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()
+        user.groups.add(controller.group)
+        self.assertRaises(exc.PermissionError, controller.set_role, user,
+                          level_to_sign_str(0))
+
+    def test_set_signerr_error_not_in_group(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        user.groups.remove(self.group)
         self.assertRaises(exc.PermissionError, controller.set_role, user,
                           level_to_sign_str(0))
 
@@ -306,9 +321,16 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()
+        user.groups.add(controller.group)
         controller.add_notified(user)
         models.PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
                                       role="notified")
+
+    def test_add_notified_error_not_in_group(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        user.groups.remove(self.group)
+        self.assertRaises(exc.PermissionError, controller.add_notified, user)
 
     def test_remove_notified(self):
         controller = self.create("Part1")
