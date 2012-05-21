@@ -930,10 +930,11 @@ def get_step_related(doc_file):
         for i in range(len(list_link)):
             locations=list(Location_link.objects.filter(link=list_link[i]))
             if locations: 
-                
-                Doc3D=Document3D.objects.filter(PartDecompose=list_link[i].child)
+                # FIXME: what to do if there are several document3D attached
+                Doc3D = DocumentPartLink.objects.filter(document__type="Document3D",
+                        part=list_link[i].child).order_by("-ctime")
                 if Doc3D.exists():
-                    STP_file=Doc3D[0].files.filter(is_stp)
+                    STP_file=Doc3D[0].document.files.filter(is_stp)
                     if STP_file.exists():
                         stp_related.append(STP_file[0])
                         list_loc.append(locations)

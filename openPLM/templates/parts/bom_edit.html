@@ -31,8 +31,10 @@
                 <td class="Content" style="width:50px"> {{ form.unit }} </td>
                 <td class="Content"> 
                     <a href="{{form.instance.child.plmobject_url}}">
-                        {{ form.instance.child.reference }}
-                    </a>
+                        {{ form.instance.child.reference }}</a>
+                    —
+                    <a href="../replace/{{form.instance.id}}/">
+                    <span>{% trans "(replace)" %}</span></a>
                 </td>
                 <td class="Content"> {{ form.instance.child.revision }} </td>
                 <td class="Content"> {{ form.instance.child.type }} </td>

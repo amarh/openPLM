@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "parts" menu + "add new"-->
+
+{% block content %} 
+    <p>
+    {% with link.child as c %}
+        {% blocktrans with c.type as type and c.reference as reference and c.revision as revision and c.name as name %} 
+            Select a part to replace the part {{type }} // {{ reference }} // {{revision }} // {{ name }}.
+        {% endblocktrans %}
+    {% endwith %}
+    </p>
+    {% with replace_child_form as form %}
+        {% include "snippets/undo_form.html" %}
+    {% endwith %}
+{% endblock %}
+
+

@@ -217,6 +217,40 @@ class PartController(PLMObjectController):
                 ext.save()
         return link2
 
+    def replace_child(self, link, new_child):
+        """
+        Replaces a child by another one.
+
+        :param link: link being replaced, its data (extensions included)
+                     are copied
+        :type link: :class:`.ParentChildLink`
+        :param new_child: the new child
+        :type new_child: :class:`.Part`
+
+        :raises: :exc:`ValueError` if the link is invalid (already completed
+                 or its parent is not the current object)
+        :raises: all permissions raised by :meth:`check_add_child`
+        """
+        if link.end_time != None or link.parent_id != self.id:
+            raise ValueError("Invalid link")
+        if isinstance(new_child, PLMObjectController):
+            new_child = new_child.object
+        if link.child == new_child:
+            return link
+        self.check_add_child(new_child)
+        link.end_time = datetime.datetime.today()
+        link.save()
+        # make a new link
+        link2, extensions = link.clone(child=new_child, end_time=None)
+        details = u"Child changes from %s to %s" % (link.child, new_child)
+        self._save_histo("Modify - %s" % link.ACTION_NAME, details)
+        link2.save(force_insert=True)
+        # save cloned extensions
+        for ext in extensions:
+            ext.link = link2
+            ext.save(force_insert=True)
+        return link2       
+
     def get_children(self, max_level=1, date=None,
             related=("child", "child__state", "child__lifecycle"),
             only_official=False):
