@@ -763,6 +763,30 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
                 'children_formset': formset, })
     return r2r('parts/bom_edit.html', ctx, request)
 
+
+@handle_errors(undo="../..")
+def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
+    """
+    View to replace a child by another one.
+
+    .. include:: views_params.txt 
+    """
+    link_id = int(link_id)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    link = models.ParentChildLink.objects.get(id=link_id)
+    if request.method == "POST":
+        form = forms.AddRelPartForm(request.POST)
+        if form.is_valid():
+            obj.replace_child(link, get_obj_from_form(form, request.user))
+            return HttpResponseRedirect("../..")
+    else:
+        form = forms.AddRelPartForm()
+    ctx["replace_child_form"] = form
+    ctx["link"] = link
+    ctx["attach"] = (obj, "add_child")
+    ctx["link_creation"] = True
+    return r2r("parts/bom_replace.html", ctx, request)
+
 ##########################################################################################    
 @handle_errors
 def add_children(request, obj_type, obj_ref, obj_revi):
@@ -1011,8 +1035,8 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-	    for fkey, f in request.FILES.iteritems():
-            	obj.add_file(request.FILES[fkey])
+            for fkey, f in request.FILES.iteritems():
+                obj.add_file(request.FILES[fkey])
             return HttpResponse(".")
 
 @handle_errors
@@ -1029,11 +1053,11 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     if len(f) > 0:
         ret = str(os.path.getsize(f[0]))
     if ret=="":
-	ret="0 : waiting"
+        ret="0 : waiting"
     else:
-    	if ret==request.GET['f_size']:
+        if ret==request.GET['f_size']:
             ret += ":linking"
-    	else:
+        else:
             ret += ":writing"
     return HttpResponse(ret)
 
