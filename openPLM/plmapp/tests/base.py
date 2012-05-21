@@ -38,6 +38,7 @@ class BaseTestCase(TestCase):
         user.save()
         user.get_profile().is_contributor = True
         user.get_profile().save()
+        user.groups.add(self.group)
         return user
 
     def create(self, ref="Part1"):

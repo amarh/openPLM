@@ -116,6 +116,8 @@ class PLMObjectController(Controller):
             sponsor = l.delegator
             if sponsor.username == settings.COMPANY:
                 sponsor = user
+            if not obj.check_in_group(sponsor, False):
+                sponsor = user
         except models.DelegationLink.DoesNotExist:
             sponsor = user
         # the user can promote to the next state
@@ -281,6 +283,16 @@ class PLMObjectController(Controller):
         if not self.object.is_editable:
             raise PermissionError("The object is not editable")
 
+    def check_in_group(self, user, raise_=True):
+        if user.username == settings.COMPANY:
+            return True
+        if not self.group.user_set.filter(id=user.id).exists():
+            if raise_:
+                raise PermissionError("The user %s does not belong to the group." % user.username)
+            else:
+                return False
+        return True
+
     def revise(self, new_revision):
         u"""
         Makes a new revision: duplicates :attr:`object`. The duplicated 
@@ -378,6 +390,7 @@ class PLMObjectController(Controller):
         
         if not dirty:
             self.check_contributor(new_owner)
+            self.check_in_group(new_owner)
             if new_owner.username == settings.COMPANY:
                 if self.is_editable:
                     raise ValueError("The company cannot own an editable object.")
@@ -408,6 +421,7 @@ class PLMObjectController(Controller):
         """
         if new_notified != self._user:
             self.check_permission("owner")
+        self.check_in_group(new_notified)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
         details = "user: %s" % new_notified
@@ -429,7 +443,7 @@ class PLMObjectController(Controller):
         link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.delete()
-        details = "user: %s" % notified
+        details = u"user: %s" % notified
         self._save_histo("Notified removed", details) 
 
     def set_signer(self, signer, role):
@@ -446,6 +460,8 @@ class PLMObjectController(Controller):
         """
 
         self.check_contributor(signer)
+        self.check_in_group(signer)
+        
         # remove old signer
         old_signer = None
         try:
@@ -464,9 +480,9 @@ class PLMObjectController(Controller):
         # add new signer
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
                                                 user=signer, role=role)
-        details = "signer: %s, level : %d" % (signer, level)
+        details = u"signer: %s, level : %d" % (signer, level)
         if old_signer:
-            details += ", old signer: %s" % old_signer
+            details += u", old signer: %s" % old_signer
         self._save_histo("New signer", details) 
 
     def set_role(self, user, role):
