@@ -47,8 +47,8 @@
         {% for c in children %}
 
             <tr class="Content"> 
-                <td class="Content expander open level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
-		{% if forloop.last %}
+                <td class="Content {% if level != "last" %} expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
+		{% if forloop.last or level == "last" %}
 		    <span class="not_expander">{{c.level}}</span>
 		{% else %}
 			{% with forloop.counter as next %}

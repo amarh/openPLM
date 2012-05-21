@@ -685,8 +685,14 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     only_official = state == "official"
     children = obj.get_children(max_level, date=date, only_official=only_official)
     if level == "last" and children:
-        maximum = max(children, key=attrgetter("level")).level
-        children = (c for c in children if c.level == maximum)
+        previous_level = 0
+        max_children = []
+        for c in children:
+            if max_children and c.level > previous_level:
+                del max_children[-1]
+            max_children.append(c)
+            previous_level = c.level
+        children = max_children
     children = list(children)
     # pcle
     extra_columns = []
@@ -714,7 +720,9 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
                 'extension_data' : extension_data,
                 'decomposition_msg' : decomposition_msg,
                 'decomposable_children' : decomposable_children,
-                "display_form" : display_form, })
+                "display_form" : display_form,
+                'level' : level,
+                })
     return r2r('parts/bom.html', ctx, request)
 
 ##########################################################################################
@@ -814,8 +822,14 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     only_official = state == "official"
     parents = obj.get_parents(max_level, date=date, only_official=only_official)
     if level == "last" and parents:
-        maximum = max(parents, key=attrgetter("level")).level
-        parents = (c for c in parents if c.level == maximum)
+        previous_level = 0
+        max_parents = []
+        for c in parents:
+            if max_parents and c.level > previous_level:
+                del max_parents[-1]
+            max_parents.append(c)
+            previous_level = c.level
+        parents = max_parents
     ctx.update({'current_page':'parents',
                 'parents' :  parents,
                 'display_form' : display_form, })

@@ -1008,6 +1008,45 @@ class PartViewTestCase(ViewTest):
         self.assertEqual(2, len(list(response.context["children"])))
         form = response.context["display_form"]
 
+    def test_children_last_level(self):
+        """
+        Tests the children view, shows only the last level.
+
+        self
+         -> c1
+             -> c4
+                 -> c6
+             -> c5
+         -> c2
+         -> c3
+             -> c7
+             -> c8
+
+        last level: (c4 -> c6), (c1 -> c5), (self -> c2), (c3 -> c7), (c3 -> c8)
+        """
+        child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
+        ls1 = self.controller.add_child(child1, 10 , 20)
+        child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
+        ls2 = self.controller.add_child(child2, 10, 21)
+        child3 = PartController.create("c3", "Part", "a", self.user, self.DATA)
+        self.controller.add_child(child3, 10, 22)
+        child4 = PartController.create("c4", "Part", "a", self.user, self.DATA)
+        l14 = child1.add_child(child4, 10, 23)
+        child5 = PartController.create("c5", "Part", "a", self.user, self.DATA)
+        l15 = child1.add_child(child5, 10, 24)
+        child6 = PartController.create("c6", "Part", "a", self.user, self.DATA)
+        l46 = child4.add_child(child6, 10, 25)
+        child7 = PartController.create("c7", "Part", "a", self.user, self.DATA)
+        l37 = child3.add_child(child7, 10, 26)
+        child8 = PartController.create("c8", "Part", "a", self.user, self.DATA)
+        l38 = child3.add_child(child8, 10, 27)
+        response = self.get(self.base_url + "BOM-child/",
+                {"level":"last", "state" : "all"},
+                page="BOM-child")
+        children = response.context["children"]
+        self.assertEqual(5, len(children))
+        self.assertEqual([l46, l15, ls2, l37, l38], [c.link for c in children])
+
     def test_add_child(self):
         response = self.get(self.base_url + "BOM-child/add/", link=True)
         child1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
