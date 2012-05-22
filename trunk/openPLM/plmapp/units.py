@@ -46,3 +46,62 @@ UNITS = (
     ),
 )
 
+class UnitConversionError(Exception):
+    """
+    Exception raised if an error occurs while converting 
+    a value from one unit to another one.
+    """
+    pass
+
+FACTORS = {
+
+    'mm' : (0.001, 'm'),
+    'cm' : (0.01, 'm'),
+    'dm' : (0.1, 'm'),
+    'm' : (1., 'm'),
+    'km' : (1000, 'm'),
+
+    'mg' : (0.001, 'g'),
+    'cg' : (0.01, 'g'),
+    'dg' : (0.1, 'g'),
+    'g' : (1., 'g'),
+    'kg' : (1000, 'g'),
+    
+    'mol' : (6.0221404e23, '-'),
+    '-' : (1., '-'),
+
+    'm3' : (1000., 'L'),
+    'mL' : (0.001, 'L'),
+    'cL' : (0.01, 'L'),
+    'dL' : (0.1, 'L'),
+    'L' : (1., 'L'),
+    }
+
+def convert_unit(value, original_unit, new_unit):
+    """
+    Converts a value expressed in *original_unit* to
+    *new_unit*
+
+    :raises: :exc:`UnitConversionError` if the conversion is not
+             possible.
+
+        >>> convert_unit(1, 'm', 'mm')
+        1000.0
+        >>> convert_unit(5, 'dm', 'mm')
+        500.0
+        >>> convert_unit(5, 'dL', 'm3')
+        0.00050000000000000001
+        >>> convert_unit(5, 'dL', 'kg')
+        ------------------------------------------------------------
+        Traceback (most recent call last):
+          File "<ipython console>", line 1, in <module>
+          File "/home/pcosquer/openPLM/trunk/openPLM/../openPLM/plmapp/units.py", line 80, in convert_unit
+            def convert_unit(value, original_unit, new_unit):
+        UnitConversionError: Inconsistent units (dL, kg)
+    """
+    factor1, base1 = FACTORS[original_unit]
+    factor2, base2 = FACTORS[new_unit]
+    if base1 != base2:
+        raise UnitConversionError("Inconsistent units (%s, %s)" % (original_unit, new_unit))
+    return value * factor1 / factor2
+
