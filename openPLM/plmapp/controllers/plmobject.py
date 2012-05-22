@@ -116,7 +116,7 @@ class PLMObjectController(Controller):
             sponsor = l.delegator
             if sponsor.username == settings.COMPANY:
                 sponsor = user
-            if not obj.check_in_group(sponsor, False):
+            if not res.check_in_group(sponsor, False):
                 sponsor = user
         except models.DelegationLink.DoesNotExist:
             sponsor = user
