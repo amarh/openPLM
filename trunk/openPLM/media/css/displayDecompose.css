@@ -56,7 +56,7 @@ td.assembly_name span.display_name {
     text-align:left;
 }
 
-td.assembly_name span.display_name:hover{
+td.assembly_name span.display_name:hover {
     background-image: url("../img/expander_normal_hover.png");
 }
 
@@ -64,7 +64,7 @@ td.open span.display_name{
    background-image : url("../img/expander_open.png");
 }
 
-td.open span.display_name:hover{
+td.open span.display_name:hover {
    background-image : url("../img/expander_open_hover.png");
 }
 
@@ -84,7 +84,7 @@ td.assembly_level span.display_level {
     text-align:left;
 }
 
-td.assembly_level span.display_level:hover{
+td.assembly_level span.display_level:hover {
     background-image: url("../img/expander_normal_hover.png");
 }
 
@@ -93,9 +93,16 @@ td.open span.display_level{
     background-size: 1%;
 }
 
-td.open span.display_level:hover{
+td.open span.display_level:hover {
    background-image : url("../img/expander_open_hover.png");
 }
 .hidden{
     display : none;
+}
+
+table.Content input[type=text] {
+    width: 95%;
+}
+input[id$=-revision] {
+    max-width: 4em;
 }
