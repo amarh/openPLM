@@ -5,57 +5,57 @@
     <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
     <script type="text/javascript" src="/media/js/3D/ajax3D.js"></script>
     <script>
-	$(
-	    function(){
-		// display or hide all assembly at the level of the span clicked
-		$("span.display_level").click(function(){
-		    var level = $(this).parent().attr("id");
-		    var td_level = $("td[level^="+level+"]");
-		    var open;
-		    $(this).parent().hasClass("open")? open=true : open=false;
-		    $.each(td_level,function(index,value){
-			if($(value).hasClass("open")===open)
-			    $(value).find("span").click();
-		    });
-		    $(this).parent().toggleClass("open");
-		});
+        $(
+        function(){
+            // display or hide all assembly at the level of the span clicked
+            $("span.display_level").click(function(){
+                var level = $(this).parent().attr("id");
+                var td_level = $("td[level^="+level+"]");
+                var open;
+                $(this).parent().hasClass("open")? open=true : open=false;
+                $.each(td_level,function(index,value){
+                    if($(value).hasClass("open")===open)
+                    $(value).find("span").click();
+                });
+                $(this).parent().toggleClass("open");
+            });
 
-		// display or hide one assembly
-		$("span.display_name").click(function (){
-		    level = $(this).parent().attr("level");
-		    $('tr[name^=part'+level+']').toggleClass("hidden");
-		    $('tr[name^=doc'+level+']').toggleClass("hidden");
-		    $(this).parent().toggleClass("open");
-		});
+            // display or hide one assembly
+            $("span.display_name").click(function (){
+                level = $(this).parent().attr("level");
+                $('tr[name^=part'+level+']').toggleClass("hidden");
+                $('tr[name^=doc'+level+']').toggleClass("hidden");
+                $(this).parent().toggleClass("open");
+            });
 
-		// display or hide the assembly corresponding to the part
-		$("a.display").click(function (){
-		    //$(this).attr("href") return '#name' where name is the name of the assembly
-		    var id_ref=$(this).attr("href").substr(1);
-		    var array=$("td.assembly_name");
-		    $.each(array, function(index, value){
-			if(value.id === id_ref)
-			   $(value).find("span").click();
-		    });
-		});
+            // display or hide the assembly corresponding to the part
+            $("a.display").click(function (){
+                //$(this).attr("href") return '#name' where name is the name of the assembly
+                var id_ref=$(this).attr("href").substr(1);
+                var array=$("td.assembly_name");
+                $.each(array, function(index, value){
+                    if(value.id === id_ref)
+                    $(value).find("span").click();
+                });
+            });
 
-		// display description of a part (type, document, name ....)
-		$("a.indexed").click(function(){
-		    var t_body = $(this).parent().parent().parent();
-		    var name_ref=$(this).attr("name");
-		    //$(this).attr("name") return 'name' where name is the name of the part
-		    var array = $(t_body).children("tr.part").children("td").children('p[name=ref_'+name_ref+']');
-		    $.each(array, function(index, value){
-			if($(value).attr("name").substr(4) === name_ref){
-			    var level=$(value).parent().parent().attr("level");
-			    var td_level = $("td[level="+level.substring(0,2)+"]");
-			    if($(td_level).hasClass("open") == false)
-				$(td_level).find("span").click();
-			}
-		    });
-		});
-	    }
-	);
+            // display description of a part (type, document, name ....)
+            $("a.indexed").click(function(){
+                var t_body = $(this).parent().parent().parent();
+                var name_ref=$(this).attr("name");
+                //$(this).attr("name") return 'name' where name is the name of the part
+                var array = $(t_body).children("tr.part").children("td").children('p[name=ref_'+name_ref+']');
+                $.each(array, function(index, value){
+                    if($(value).attr("name").substr(4) === name_ref){
+                        var level=$(value).parent().parent().attr("level");
+                        var td_level = $("td[level="+level.substring(0,2)+"]");
+                        if($(td_level).hasClass("open") == false)
+                        $(td_level).find("span").click();
+                    }
+                });
+            });
+        }
+        );
     </script>
 {% endblock %}
 
@@ -73,249 +73,219 @@
         <div style="display:none;">
             {{last_time_modification}}
         </div>
-        
-        <table class="Content">
-        
-        
-        <thead>
-            <th>{% trans "Assembly" %}</th>
-            <th>{% trans "Child" %}</th>
-            <th>{% trans "Order" %}</th>
-            <th>{% trans "Quantity" %}</th>
-            <th>{% trans "Unit" %}</th>
-            <th>{% trans "Type" %}</th>
-            <th>{% trans "Reference" %} </th>
-            <th>{% trans "Revision" %} </th>
-            <th>{% trans "Name" %}  </th>
-            <th>&nbsp;</th>
-        </thead>
-        
-        {% if extra_errors %}
-            <tr class="extra_errors">
-                <td class="errors" colspan="10">{{extra_errors}}</td>
-            </tr>
-        {% endif %}
-        {% for deep in deep_assemblys %} 
-        
 
-        <tr class="assembly"> 
-	    {% if forloop.counter0 == 0 %}
-	    <td class="assembly_level open" id="{{forloop.counter0}}" colspan="10">
-	    {% else %}
-	    <td class="assembly_level" id="{{forloop.counter0}}" colspan="10">
-	    {% endif %}
-                <span class="display_level" title="{%trans "Display or Hide all assemblys at this level"%}">{% trans "Level" %} {{forloop.counter0}}</span>
-            </td>        
-        {% with forloop.counter0 as level %}
-                
-        {% for assembly in deep %}       <!-- assembly.0 froms ,  assembly.1 name , assembly.2 interne reference pour href links , assembly.4 type-->                  
-  
-            
+        <div>
+            <table class="Content">
 
-            <tr class="assembly"> 
-	    {% if level == 0 %}
-            <td class="assembly_name open" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
-	    {% else %}
-            <td class="assembly_name" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
-	    {% endif %}
+                <thead>
+                    <th>{% trans "Assembly" %}</th>
+                    <th>{% trans "Child" %}</th>
+                    <th>{% trans "Order" %}</th>
+                    <th>{% trans "Quantity" %}</th>
+                    <th>{% trans "Unit" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Reference" %} </th>
+                    <th>{% trans "Revision" %} </th>
+                    <th>{% trans "Name" %}  </th>
+                    <th>&nbsp;</th>
+                </thead>
 
-		<span class="display_name"> {{assembly.1}}
-                      
-                   <a id="{{assembly.2}}_part">
-                
-                <!--(Part) <!-- type de part de la part  -->
-		   ({{assembly.4}})
-                   </a>
-		</span>
-
-            </td>
-
-            </tr> 
-            
-            
-
-
-            </tr>
-		{% with forloop.counter0 as assembly_num %}
-           
-                {% for part_type , ord_quantity , part_doc_cforms, name , is_assembly , prefix , ref  in assembly.0 %} 
-
-		    {% if level > 0 %}
-		    <tr class="part hidden" name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
-		    {% else %}
-                    <tr class="part" name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
-		    {% endif %}
-
-                    
-                        <td   class="|->">
-                        <!--esthetique -->
-                        {%if not prefix and forloop.last %}
-                        
-                        <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%" />
-                        {% else %}
-                        
-                        
-                        {% if not forloop.last or forloop.first %} 
-                        <img src="/media/img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
-                        {% else %}
-                        <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%"/>
-                        {% endif %}
-                        {% endif %}
-                        <!--/esthetique -->
-                        </td>
-                        
-                        
-                        
-                        <td  >
-                            <p name="ref_{{name}}">
-                             {% if is_assembly %}
-				
-				<a class="display" href="#{{name}}" 
-				{% if ref %}
-				ref="#{{ref}}_ref"
-				{% endif %}
-                                >{{name}}<a>
-                             {% else %}
-                                {{name}}   
-                             {% endif %}
-                            </p>
-
-                        </td>
-                        <td  class="order"  >{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
-                        <td  class="quantity"  >{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
-                        <td class="quantity"  >{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
-
-
-
-
-
-                        {% if prefix %} <!-- else the part was defined in a previous assembly , make a href -->
-                        <td class="cell_label part_type_form" id="{{prefix}}_ref">
-                            {{ part_type.type_part }}
-                        </td>
-
-                        {% for field in part_doc_cforms.0 %} 
-
-                            {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
-                                <td class="{{field.errors|yesno:"errors,valid"}}">
-                                    {{  field }} {{ field.errors }}
-                                </td> 
-                            {% endif %}
-
-                        {% endfor %}
-
-                        <td>
-                            <button class="toggle_extra_attributes_button"
-                                id="part_show-{{prefix}}"
-                                >{{part_doc_cforms.0.errors|yesno:"-,+"}}</button> 
-                        </td>
+                {% if extra_errors %}
+                    <tr class="extra_errors">
+                        <td class="errors" colspan="10">{{extra_errors}}</td>
                     </tr>
-                    
-                    <tr class="part part_show-{{prefix}} show_hide" 
-                        {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
-                        >
-                       <td class="|">
-                        {% if not forloop.last %}
-                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%" />
-			{% endif %}
-                        </td>
-                        <td class="vide" colspan="4">
-                        </td>
-                        <td colspan="5" id="extra_part_form-{{prefix}}"> 
-                            {% with part_doc_cforms.0 as creation_form %}
-                                {% include "extra_attributes.html" %}
+                {% endif %}
+                {% for deep in deep_assemblys %} 
+
+
+                    <tr class="assembly"> 
+                        <td class="assembly_level{% if forloop.counter0 == 0 %} open {% endif %}" id="{{forloop.counter0}}" colspan="10">
+                            <span class="display_level" title="{%trans "Display or Hide all assemblys at this level"%}">{% trans "Level" %} {{forloop.counter0}}</span>
+                        </td>        
+
+                    </tr>
+                    {% with forloop.counter0 as level %}
+
+                        {% for assembly in deep %}       <!-- assembly.0 froms ,  assembly.1 name , assembly.2 interne reference pour href links , assembly.4 type-->                  
+
+
+                            <tr class="assembly"> 
+                                <td class="assembly_name{% if level == 0 %} open {%endif %}" id="{{assembly.1}}" level="{{level}}{{forloop.counter0}}" colspan="10">
+                                    <span class="display_name"> {{assembly.1}}
+
+                                        <a id="{{assembly.2}}_part">
+                                            <!--(Part) type de part de la part  -->
+                                            ({{assembly.4}})
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr> 
+
+
+                            {% with forloop.counter0 as assembly_num %}
+
+                                {% for part_type, ord_quantity, part_doc_cforms, name , is_assembly, prefix, ref  in assembly.0 %} 
+
+                                    <tr class="part {% if level > 0 %} hidden"{% endif %} name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
+
+
+                                        <td class="|->">
+                                            <!--esthetique -->
+                                            {%if not prefix and forloop.last %}
+
+                                                <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%" />
+                                            {% else %}
+
+
+                                                {% if not forloop.last or forloop.first %} 
+                                                    <img src="/media/img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
+                                                {% else %}
+                                                    <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%"/>
+                                                {% endif %}
+                                            {% endif %}
+                                            <!--/esthetique -->
+                                        </td>
+
+                                        <td>
+                                            <p name="ref_{{name}}">
+                                            {% if is_assembly %}
+
+                                                <a class="display" href="#{{name}}" 
+                                                    {% if ref %}
+                                                        ref="#{{ref}}_ref"
+                                                    {% endif %}
+                                                    >{{name}}</a>
+                                            {% else %}
+                                                {{name}}   
+                                            {% endif %}
+                                            </p>
+
+                                        </td>
+                                        <td class="order">{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
+                                        <td class="quantity">{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
+                                        <td class="quantity">{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
+
+
+
+                                        {% if prefix %} <!-- else the part was defined in a previous assembly , make a href -->
+                                            <td class="cell_label part_type_form" id="{{prefix}}_ref">
+                                                {{ part_type.type_part }}
+                                            </td>
+
+                                            {% for field in part_doc_cforms.0 %} 
+
+                                                {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
+                                                    <td class="{{field.errors|yesno:"errors,valid"}}">
+                                                        <div style="max-width:100%"> {{  field }}</div> {{ field.errors }}
+                                                    </td> 
+                                                {% endif %}
+
+                                            {% endfor %}
+
+                                            <td>
+                                                <button class="toggle_extra_attributes_button"
+                                                    id="part_show-{{prefix}}"
+                                                    >{{part_doc_cforms.0.errors|yesno:"-,+"}}</button> 
+                                            </td>
+                                        </tr>
+
+                                        <tr class="part part_show-{{prefix}} show_hide" 
+                                            {% if not part_doc_cforms.0.errors %} style="display:none;" {% endif %}
+                                            >
+                                            <td class="|">
+                                                {% if not forloop.last %}
+                                                    <img src="/media/img/line.png" alt="|" hight="50%" width="50%" />
+                                                {% endif %}
+                                            </td>
+                                            <td class="vide" colspan="4">
+                                            </td>
+                                            <td colspan="5" id="extra_part_form-{{prefix}}"> 
+                                                {% with part_doc_cforms.0 as creation_form %}
+                                                    {% include "extra_attributes.html" %}
+                                                {% endwith %}
+                                            </td>
+
+
+                                        {% else %} <!--  href for the part already defined-->
+
+                                            <td colspan="5"> 
+                                                <a class="indexed" href="#{{ref}}_ref" name="{{name}}">{% trans "already indexed" %}</a>
+                                            </td>
+                                        </tr>
+
+                                    {% endif %}
+
+
+
+                                    {% if prefix %} <!-- else nothing to show , the part was defined in a previous assembly  -->
+                                        <tr class="document{% if level > 0 %} hidden {% endif %} "  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
+                                            <td class="|">
+                                                {% if not forloop.last %}
+                                                    <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+                                                {% endif %}
+                                            </td>
+                                            <td class="vide" colspan="4">
+                                            </td>
+
+
+                                            <td class="cell_label">
+                                                <p>Document3D</p>
+                                            </td>
+
+                                            {% for field in part_doc_cforms.1 %} 
+
+                                                {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
+                                                    <td class="{{field.errors|yesno:"errors,valid"}}">
+                                                        {{  field }} {{ field.errors }}
+                                                    </td> 
+                                                {% endif %}
+
+                                            {% endfor %}
+
+                                            <td>
+                                                <button class="toggle_extra_attributes_button"
+                                                    id="doc_show-{{prefix}}"
+                                                    >{{part_doc_cforms.1.errors|yesno:"-,+"}}</button> 
+                                            </td>
+
+                                        </tr> 
+
+                                        <tr class="document doc_show-{{prefix}} show_hide" 
+                                            {% if not part_doc_cforms.1.errors %} style="display:none;" {% endif %}
+                                            >
+
+
+                                            <td class="|">
+                                                <!--esthetique -->
+                                                {% if not forloop.last %}
+                                                    <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+                                                {% endif %}
+                                                <!--/esthetique -->
+                                            </td>
+
+
+
+                                            <td class="vide" colspan="4">
+                                            </td>
+                                            <td colspan="5" id="extra_doc_form-{{prefix}}">
+                                                {% with part_doc_cforms.1 as creation_form %}
+                                                    {% include "extra_attributes.html" %}
+                                                {% endwith %}
+                                            </td>
+
+                                        </tr> 
+
+
+
+
+                                    {% endif %}             
+                                {% endfor %}
                             {% endwith %}
-                        </td>
-                        
-                        
-                        
-                        {% else %} <!--  href for the part already defined-->
-                        
-                         <td colspan="5"> 
-                         <a class="indexed" href="#{{ref}}_ref" name="{{name}}">{% trans "already indexed" %}<a>
-                         </td>
-                        
-                        
-                        {% endif %}
-                        
-                        
-                        
-                    
-                    
-                    {% if prefix %} <!-- else nothing to show , the part was defined in a previous assembly  -->
-		    {% if level > 0 %}
-                    <tr class="document hidden"  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
-		    {% else %}
-                    <tr class="document"  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
-		    {% endif %}
-                        <td class="|">
-                        {% if not forloop.last %}
-                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
-			{% endif %}
-                        </td>
-                        <td class="vide" colspan="4">
-                        </td>
-                        
-                        
-                        
-                        
-                        <td class="cell_label">
-                            <p>Document3D</p>
-                        </td>
-                        
-                        {% for field in part_doc_cforms.1 %} 
-
-                            {% if field.name == "reference" or field.name == "name" or field.name == "revision" %}
-                                <td class="{{field.errors|yesno:"errors,valid"}}">
-                                    {{  field }} {{ field.errors }}
-                                </td> 
-                            {% endif %}
-
                         {% endfor %}
-
-                        <td>
-                            <button class="toggle_extra_attributes_button"
-                                id="doc_show-{{prefix}}"
-                                >{{part_doc_cforms.1.errors|yesno:"-,+"}}</button> 
-                        </td>
-
-                    </tr> 
-                     
-                    <tr class="document doc_show-{{prefix}} show_hide" 
-                    {% if not part_doc_cforms.1.errors %} style="display:none;" {% endif %}
-                    >
-                    
-                    
-                       <td class="|">
-                        <!--esthetique -->
-                        {% if not forloop.last %}
-                        <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
-			{% endif %}
-                        <!--/esthetique -->
-                        </td>
-                        
-                        
-                        
-                        <td class="vide" colspan="4">
-                        </td>
-                        <td colspan="5" id="extra_doc_form-{{prefix}}">
-                            {% with part_doc_cforms.1 as creation_form %}
-                                {% include "extra_attributes.html" %}
-                            {% endwith %}
-                        </td>
-
-                    </tr> 
-                
-                
-
-                                        
-                    {% endif %}             
-                    {% endfor %}
-		    {% endwith %}
-        {% endfor %}
-	{% endwith %}
-        {% endfor %}
-        </table>
+                    {% endwith %}
+                {% endfor %}
+            </table>
+        </div>
         <input type="submit" value="{% trans "Create" %}"/> 
 
     </form>       
