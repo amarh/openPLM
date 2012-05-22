@@ -40,7 +40,7 @@ http://wiki.openplm.org/trac/wiki
 Contributing
 =============
 
-Development of celery happens at trac: http://wiki.openplm.org/trac/timeline
+Development of openPLM happens at trac: http://wiki.openplm.org/trac/timeline
 
 You are highly encouraged to participate in the development of openPLM. If you
 don’t like trac (for some reason) you’re welcome to send regular patches.
