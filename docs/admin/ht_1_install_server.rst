@@ -71,7 +71,7 @@ Configure a valid PATH
 The files are set to work after a svn checkout, so you need to change a
 few PATH (basically, you need to delete the **trunk/openPLM/** part). 
 You have two way of doing so, you can either use the following **sed** command (assuming you are in **/var/django/openPLM**) : 
-``sed -in 's#\(/var/django/\)openPLM/trunk/#\1#' settings.py apache/django.wsgi etc/default/celeryd ``
+``sed -in 's#\(/var/django/\)openPLM/trunk/#\1#' settings.py apache/django.wsgi etc/default/celeryd``
 Or you can grab your favorite editor and change the followings files yourself :
 
     * ``settings.py`` change **MEDIA_ROOT** and **TEMPLATE_DIRS** :
