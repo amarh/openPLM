@@ -11,7 +11,7 @@
     <div id="browser">
         <div id="type-panel">
             <div>
-            <h3 class="alternate">{% trans "Type" %} </h3>
+                <h3 class="alternate">{% trans "Type" %} </h3>
             </div>
             <ul>
                 <li {% if type == "object"%}class="selected"{% endif %} >
@@ -39,15 +39,15 @@
                 </li>
             </ul>
             {% if plmobjects %}
-            <hr/>
-            <ul>
-                <li>
-                <a href="{% add_get state='all' %}"><span>{% trans "All states" %}</span></a>
-                </li>
-                <li>
-                <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
-                </li>
-            </ul>
+                <hr/>
+                <ul>
+                    <li>
+                    <a href="{% add_get state='all' %}"><span>{% trans "All states" %}</span></a>
+                    </li>
+                    <li>
+                    <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
+                    </li>
+                </ul>
             {% endif %}
 
         </div>
@@ -55,6 +55,23 @@
             <h3>{% trans "Results" %}</h3>
             <div id="object_list">
                 <p id="results">
+                <span id="sort_method">
+                    {% if sort == "name" %}
+                        {% trans "Sorted by name." %}
+                    {% else %}
+                        {% trans "Recently added." %}
+                    {% endif %}
+                </span>
+                {% if plmobjects %}
+                    <span id="state_filter">
+                        {% if state == "official" %}
+                            {% trans "Only official objects." %}
+                        {% else %}
+                            {% trans "All objects. "%}
+                        {% endif %}
+                    </span>
+                {% endif %}
+
                 <span id="numresults">
                     {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
                         Results: {{start}} - {{end}} on {{total}}
