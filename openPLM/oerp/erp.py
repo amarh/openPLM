@@ -1,9 +1,11 @@
+from itertools import izip
 try:
     import oerplib
 except ImportError:
     pass
 from django.conf import settings
 
+from openPLM.plmapp.units import convert_unit, UnitConversionError
 from openPLM.oerp import models
 
 DEFAULT_PORT = 8070
@@ -14,6 +16,7 @@ PRODUCT_URI = "%(protocol)s://%(host)s:%(port)d/web/webclient/home?#id=%(id)d&vi
 BOM_URI = "%(protocol)s://%(host)s:%(port)d/web/webclient/home?#id=%(id)d&view_type=page&model=mrp.bom"
 
 EXPORT_ACTION = "OpenERP: published"
+COST_ACTION = "Cost: updated"
 
 def format_uri(uri, **kwargs):
     data = {
@@ -29,6 +32,11 @@ def unit_to_uom(unit):
     # FIXME: no mol unit
     from _unit_to_uom import UNIT_TO_UOM
     return UNIT_TO_UOM[unit]
+
+def uom_to_unit(uom):
+    from _unit_to_uom import UNIT_TO_UOM
+    return dict((v, k) for k, v in UNIT_TO_UOM.iteritems())[uom]
+
 
 def get_oerp():
 
@@ -50,7 +58,19 @@ def export_part(obj, prod_srv=None):
             prod_srv = oerp.get("product.product")
         ref = " / ".join((obj.type, obj.reference, obj.revision))
         name = u"%s - %s" % (obj.name, obj.revision) if obj.name else ref
-        product_id = prod_srv.create({"name" : name[:128], "default_code" : ref[:64] })  
+        try:
+            pc = models.PartCost.objects.get(part=obj.id)
+            cost = pc.cost
+            uom = unit_to_uom(pc.unit)
+        except (models.PartCost.DoesNotExist, KeyError):
+            cost = 1
+            uom = unit_to_uom("-")
+        product_id = prod_srv.create({
+            "name" : name[:128],
+            "default_code" : ref[:64],
+            "uom_id" : uom,
+            "standard_price" : cost,
+        })  
         prod = models.OERPProduct.objects.create(part=obj, product=product_id)
     return prod
 
@@ -114,4 +134,55 @@ def get_product_data(product_ids, prod_srv=None):
     for data in products:
         data["uri"] = format_uri(PRODUCT_URI, id=data["id"])
     return products
+
+
+def compute_cost(part_ctrl):
+    cost = 0
+    try:
+        pc = models.PartCost.objects.get(part=part_ctrl.object)
+        cost += pc.cost
+        unit = pc.unit
+    except models.PartCost.DoesNotExist:
+        unit = "-"
+    individual_cost = cost
+
+    ids = []
+    children = part_ctrl.get_children(-1)
+    for level, link in children:
+        ids.append(link.child_id)
+    # total local cost
+    pcs = models.PartCost.objects.filter(part__in=ids).values()
+    pcs = dict((p["part_id"], p) for p in pcs)
+    for level, link in children:
+        try:
+            pc = pcs[link.child_id]
+            cost += link.quantity * convert_unit(pc["cost"], link.unit, pc["unit"]) 
+        except (KeyError, UnitConversionError):
+            pass
+    total_local_cost = cost
+
+    # total erp cost
+    ids.append(part_ctrl.id)
+    products = models.OERPProduct.objects.filter(part__in=ids).values()
+    data = get_product_data([p["product"] for p in products])
+    products = dict((p["part_id"], d) for p, d in izip(products, data))
+    try:
+        total_erp_cost = products[part_ctrl.id]["standard_price"]
+    except KeyError:
+        total_erp_cost = 0
+    for level, link in children:
+        try:
+            pc = products[link.child_id]
+            total_erp_cost += link.quantity * convert_unit(pc["standard_price"],
+                    link.unit, uom_to_unit(pc["uom_id"][0])) 
+        except (KeyError, UnitConversionError):
+            pass
+
+    return models.Cost(individual_cost, unit, total_local_cost, total_erp_cost)
+
+
+def update_cost(ctrl, part_cost):
+    part_cost.save()
+    details = u"Cost: %.2f, unit: %s" % (part_cost.cost, part_cost.get_unit_display()) 
+    ctrl._save_histo(COST_ACTION, details)
 
