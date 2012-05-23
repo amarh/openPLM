@@ -48,6 +48,8 @@ UNITS = (
 
 class UnitConversionError(Exception):
     """
+    .. versionadded:: 1.1
+
     Exception raised if an error occurs while converting 
     a value from one unit to another one.
     """
