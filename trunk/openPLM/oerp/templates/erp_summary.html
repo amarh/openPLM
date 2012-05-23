@@ -1,41 +1,123 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags highlight %}
 
-
-{% block css %}
+{% block scripts %}
+    {# prevents a caching bug on firefox 12 http://stackoverflow.com/a/10379717 https://bugzil.la/751753 #}
+    <script>
+        window.onbeforeunload = function(){} //add onbeforeunload
+    </script>
 {% endblock %}
 
 {% block content  %}
 
-    {% if obj.is_official %}
-        {% if can_publish %}
-            <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}ERP/publish/" method="POST">
-                <div id="form-promote-dialog"
-                    title="{% trans "Are you sure?" %}"
-                    {% if password_form.is_bound and not password_form.is_valid %} 
-                        class="c-error action-publish"
+
+    <div>
+        <h3>{% trans "Cost" %}</h3>
+        <div>
+            <h4>{% trans "Individual cost" %}</h4>
+            <div>
+                {% if can_update %}
+                    <form method="POST" action="{{obj.plmobject_url}}ERP/update_cost/">
+                        <table class="Content">
+                            {{ cost_form.as_table}}
+                        </table>
+                        <div class="center">
+                            <input type="submit" name="update" class="{{"Button"|button}}"
+                            value="{% trans "Update" %}"/>
+                            {% if published %}
+                                <input type="submit" name="update_erp" class="{{"Button"|button}}"
+                                value="{% trans "Update cost from OpenERP" %}"/>
+                            {% endif %}
+                        </div>
+                    </form>
+                {% else %}
+                    <table class="Content">
+                        <colgroup>
+                            <col width="20%"/>
+                            <col width="80%"/>
+                        </colgroup>
+                        <tr>
+                            <th>{% trans "Cost" %}</th>
+                            <td>{{cost.individual_cost}}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Unit" %}</th>
+                            <td>{{cost.unit}}</td>
+                        </tr>
+                    </table>
+
+                {% endif %}
+                <hr/>
+            </div>
+            <h4>{% trans "Total cost" %}</h4>
+            <div>
+                <table class="Content">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="80%"/>
+                    </colgroup>
+                    <tr>
+                        <th>{% trans "Total cost (OpenPLM)" %}</th>
+                        <td>{{cost.total_local_cost}}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Total cost (OpenERP)" %}</th>
+                        <td>{{cost.total_erp_cost}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h3>{% trans "OpenERP" %}</h3>
+        <div>
+            {% if published %}
+                <p>{% trans "This part has been published on OpenERP." %}</p>
+                <p>{% trans "Links:" %}</p>
+
+                <ul>
+                    <li><a href="{{product.uri}}">{% blocktrans with product.name as name %}Product: {{name}}{% endblocktrans %}</a></li>
+                    {% for bom in boms%}
+                        <li><a href="{{bom.uri}}">{% blocktrans with bom.name as name %}BOM: {{name}}{% endblocktrans %}</a></li>
+                    {% endfor %}
+
+                </ul>
+            {% else %}
+                {% if obj.is_official %}
+                    {% if can_publish %}
+                        <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}ERP/publish/" method="POST">
+                            <div id="form-promote-dialog"
+                                title="{% trans "Are you sure?" %}"
+                                {% if password_form.is_bound and not password_form.is_valid %} 
+                                    class="c-error action-publish"
+                                {% endif %}
+                                >
+                                <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                                {% trans "Note that this will also export the complete BOM." %}
+                                </p>
+
+                                <div class="password">
+                                    {{ password_form.as_p }}
+                                </div>
+                            </div>
+
+                            <input name="publish" type="submit" class="{{"Button"|button}}" value="{% trans "Publish on OpenERP" %}" />
+                        </form>
+                    {% else %}
+                        <p>
+                        {% trans "You can not publish this part on the ERP." %}
+                        </p>
                     {% endif %}
-                    >
-                    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                    {% trans "Note that this will also export the complete BOM." %}
-                    </p>
 
-                    <div class="password">
-                        {{ password_form.as_p }}
-                    </div>
-                </div>
-
-                <input name="publish" type="submit" class="{{"Button"|button}}" value="{% trans "Publish on OpenERP" %}" />
-            </form>
-        {% else %}
-            <p>
-            {% trans "You can not publish this part on the ERP." %}
-            </p>
-        {% endif %}
-
-    {% else %}
-        <p>{% trans "This part is not official and so, cannot be published on the ERP." %}</p>
-    {% endif %}
+                {% else %}
+                    <p>{% trans "This part is not official and so, cannot be published on the ERP." %}</p>
+                {% endif %}
 
 
+
+            {% endif %}
+
+        </div>
+    </div>
 {% endblock %}
