@@ -14,8 +14,8 @@
     <div>
         <h3>{% trans "Cost" %}</h3>
         <div>
-            <h4>{% trans "Individual cost" %}</h4>
             <div>
+                <h4>{% trans "Individual cost" %}</h4>
                 {% if can_update %}
                     <form method="POST" action="{{obj.plmobject_url}}ERP/update_cost/">
                         <table class="Content">
@@ -47,24 +47,26 @@
                     </table>
 
                 {% endif %}
-                <hr/>
             </div>
-            <h4>{% trans "Total cost" %}</h4>
+            <hr/>
             <div>
-                <table class="Content">
-                    <colgroup>
-                        <col width="20%"/>
-                        <col width="80%"/>
-                    </colgroup>
-                    <tr>
-                        <th>{% trans "Total cost (OpenPLM)" %}</th>
-                        <td>{{cost.total_local_cost}}</td>
-                    </tr>
-                    <tr>
-                        <th>{% trans "Total cost (OpenERP)" %}</th>
-                        <td>{{cost.total_erp_cost}}</td>
-                    </tr>
-                </table>
+                <h4>{% trans "Total cost" %}</h4>
+                <div>
+                    <table class="Content">
+                        <colgroup>
+                            <col width="20%"/>
+                            <col width="80%"/>
+                        </colgroup>
+                        <tr>
+                            <th>{% trans "Total cost (OpenPLM)" %}</th>
+                            <td>{{cost.total_local_cost}}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Total cost (OpenERP)" %}</th>
+                            <td>{{cost.total_erp_cost}}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
