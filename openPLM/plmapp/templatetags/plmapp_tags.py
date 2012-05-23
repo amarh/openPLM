@@ -129,7 +129,7 @@ def result_class(result):
 # yes, this is a really bad way to detect an email
 # but we may have to hide something like user@<em>domain</em>
 # it is only use to hide an email
-_email_rx = re.compile(r"\b[\w.>_<%+-]+@[\w_<>]+\.[\w_><]+\b")
+_email_rx = re.compile(r"\b[\w.>_<%+-]+@[\w_<>-]+(\.[\w_><-]+)+\b")
 @register.filter
 def hide_emails(text):
     """

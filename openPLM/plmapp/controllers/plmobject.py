@@ -284,6 +284,17 @@ class PLMObjectController(Controller):
             raise PermissionError("The object is not editable")
 
     def check_in_group(self, user, raise_=True):
+        """
+        .. versionadded:: 1.0.1
+
+        Checks that *user* belongs to the object's group.
+        
+        Returns True if the user belongs to the group.
+        Otherwise, returns False if *raise_* is False or raises
+        a :exc:`.PermissionError` if *raise_* is True.
+
+        Note that it always returns True if *user* is the company.
+        """
         if user.username == settings.COMPANY:
             return True
         if not self.group.user_set.filter(id=user.id).exists():
@@ -386,6 +397,11 @@ class PLMObjectController(Controller):
         :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
         :raise: :exc:`ValueError` if *new_owner* is the company and the 
                 object is editable
+
+        .. versionchanged:: 1.0.1
+
+        :raise: :exc:`.PermissionError` if *new_owner* does not belong to
+                the object's group.
         """
         
         if not dirty:
@@ -418,6 +434,11 @@ class PLMObjectController(Controller):
         :type new_notified: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`IntegrityError` if *new_notified* is already notified
             when :attr:`object` changes
+
+        .. versionchanged:: 1.0.1
+
+        :raise: :exc:`.PermissionError` if *new_notified* does not belong to
+                the object's group.
         """
         if new_notified != self._user:
             self.check_permission("owner")
@@ -457,6 +478,11 @@ class PLMObjectController(Controller):
         :param str role: the sign role
         :raise: :exc:`.PermissionError` if *signer* is not a contributor
         :raise: :exc:`.PermissionError` if *role* is invalid (level to high)
+
+        .. versionchanged:: 1.0.1
+
+        :raise: :exc:`.PermissionError` if *signer* does not belong to
+                the object's group.
         """
 
         self.check_contributor(signer)
