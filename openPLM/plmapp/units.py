@@ -79,6 +79,8 @@ FACTORS = {
 
 def convert_unit(value, original_unit, new_unit):
     """
+    .. versionadded:: 1.1
+
     Converts a value expressed in *original_unit* to
     *new_unit*
 
