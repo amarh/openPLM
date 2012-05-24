@@ -1,28 +1,48 @@
-{% extends "base.html" %}
+
 {% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
 
-{% block css %}
-<link type="text/css" href="/media/css/files.css" rel="Stylesheet" /> 
-{% endblock %}
-
-{% block content %}
-    {% trans "Add new file / Check-in file :" %}
+<div id="add_text">{% trans "Add new files / Check-in file :" %}</div>
+<div id="add_form_file">
     {% with add_file_form as form %}
         {% include "snippets/undo_form.html" %}
     {% endwith %}
-<!--</form>-->
-<noscript>
-    <div style="width:30%;" class="warning">
-	You can only upload one file at a time.<br>
-	Use the "Validate" button to send your file.
-    </div>
-</noscript>
-<form class="form_queue">{% csrf_token %}</form>
-<!--<div id="hidden_forms" style="display:none;"></div>-->
-<div id="div_files"></div>
-<script type="text/javascript" src="/media/js/file.js"></script>
-{% endblock %}
-
+    <!--</form>-->
+    <noscript>
+        <div style="display:table;" class="warning">
+	    {% trans "You can only upload one file at a time." %}<br/>
+	    {%trans "Use the Validate button to send your file." %}
+        </div>
+    </noscript>
+    <form class="hidden" action="" target="hidden_frame">{% csrf_token %}</form>
+    <div id="div_files"></div>
+</div>
+<script type="text/javascript" src="/media/js/file.js">
+</script>
+<script type="text/javascript">
+    {% with file_formset.forms as forms %}
+        {% for form in forms %}
+            files_linked.push("{{form.instance.filename}}");
+        {% endfor %}
+    {% endwith %}
+    doc_type="{{document_type}}";
+    trans["Select at least one file"]="{% trans 'Select at least one file' %}";
+    trans["A STEP file is already linked to this document."]="{% trans 'A STEP file is already linked to this document.' %}";
+    trans["A file named "]="{% trans 'A file named ' %}";
+    trans["is already linked to this document."]="{% trans 'is already linked to this document.' %}";
+    trans["You have already selected the file"]="{% trans 'You have already selected the file' %}";
+    trans["for upload"]="{% trans 'for upload' %}";
+    trans["remove the file from the queue"]="{% trans 'remove the file from the queue' %}";
+    trans["Your upload(s) failed"]="{% trans 'Your upload(s) failed' %}";
+    trans["Try again"]="{% trans 'Try again' %}";
+    trans["maybe with less files. "]="{% trans 'maybe with less files. ' %}";
+    trans["You are checking-in for "]="{% trans 'You are checking-in for ' %}";
+    trans["You must add a file with this name."]="{% trans 'You must add a file with this name.' %}";
+    trans["Show/Hide the upload form"]="{% trans 'Show/Hide the upload form' %}";
+    trans["Check-in for file "]="{% trans 'Check-in for file ' %}";
+    trans["You can only upload files, but you wont get progress of this upload"]="{% trans 'You can only upload files, but you wont get progress of this upload' %}";
+    /*trans[""]="{% trans '' %}";
+    trans[""]="{% trans '' %}";*/
+</script>
 

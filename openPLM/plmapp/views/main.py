@@ -991,17 +991,20 @@ def display_files(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(".")
     else:
         formset = forms.get_file_formset(obj)
-
+    add_file_form = forms.AddFileForm()
     archive_form = forms.ArchiveForm()
     
     ctx.update({'current_page':'files', 
                 'file_formset': formset,
                 'archive_form' : archive_form,
                 'deprecated_files' : obj.deprecated_files,
+                'add_file_form': add_file_form,
+                'document_type': obj_type,
                })
     return r2r('documents/files.html', ctx, request)
 
 ##########################################################################################
+@csrf_protect
 @handle_errors(undo="..")
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
@@ -1014,12 +1017,25 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-            obj.add_file(request.FILES["filename"])
+            for fkey, f in request.FILES.iteritems():
+                obj.add_file(request.FILES[fkey])
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
+        if 'file_name' in request.GET:
+            f_name = request.GET['file_name']
+            f_name = f_name.encode("utf-8")
+            ret = obj.has_standard_related_locked(f_name)
+            print "%s : %s" % (f_name,ret)
+            if ret==True:
+    	        return HttpResponse("true:Native file has a standard related locked file.")
+            else:
+                return HttpResponse("false:")
         add_file_form = forms.AddFileForm()
+        files = forms.get_file_formset(obj)
+    	ctx.update({ 'files_list': files, })
     ctx.update({ 'add_file_form': add_file_form, })
-    return r2r('documents/files_add.html', ctx, request)
+    ctx.update({ 'document_type': obj_type, })
+    return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
 
@@ -1028,8 +1044,8 @@ def up_file(request, obj_type, obj_ref, obj_revi):
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
     return _up_file(request, obj_type, obj_ref, obj_revi)
 
-@handle_errors
 @csrf_protect
+@handle_errors
 def _up_file(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == "POST":
@@ -1053,14 +1069,13 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     if len(f) > 0:
         ret = str(os.path.getsize(f[0]))
     if ret=="":
-        ret="0 : waiting"
+        ret="0:waiting"
     else:
         if ret==request.GET['f_size']:
             ret += ":linking"
         else:
             ret += ":writing"
     return HttpResponse(ret)
-
 
 
 #############################################################################################
@@ -1458,8 +1473,15 @@ def delegate(request, obj_ref, role, sign_level):
     
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
-##########################################################################################    
-@handle_errors
+########################################################################################## 
+
+@csrf_exempt
+def get_checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
+    request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
+    return checkin_file(request, obj_type, obj_ref, obj_revi,file_id_value)
+   
+@handle_errors(undo="../..")
+@csrf_protect
 def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
     Manage html page for the files (:class:`DocumentFile`) checkin in the selected object.
@@ -1480,7 +1502,7 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     else:
         checkin_file_form = forms.AddFileForm()
     ctx['add_file_form'] =  checkin_file_form
-    return r2r('documents/files_add.html', ctx, request)
+    return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
 @handle_errors 
