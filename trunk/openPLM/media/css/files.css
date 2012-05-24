@@ -1,11 +1,25 @@
+/*text that indicate which upload form is displayed (add files or check-in)*/
+#add_text{
+    cursor:pointer;
+}
+
+/*style for list of files selected*/
+#div_files{
+    margin : 1%;
+    display:table;
+}
+
 #div_files div{
-    margin-right:10px;
-    padding : 10px; 
     border-style:groove;
     border-width: 2px;
     border-radius: 4px;
 }
 
+.file_p{
+    padding : 10px; 
+}
+
+/****************/
 .warning{
     color: black;
     font-weight: bold;
@@ -20,11 +34,11 @@
     color: black;
     font-weight: bold;
     margin: 20px 0;
-    padding: 5px; 
+    padding: 5px;
     border-radius: 4px;
     background-color: #ED7F10;
 }
 
-form.form_queue{
+.hidden{
     display:none;
 }

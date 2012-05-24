@@ -1524,6 +1524,13 @@ msgstr "AÑADIR"
 msgid "DELETE"
 msgstr "BORRAR"
 
+#: templates/docuemnts/files.html:77
+msgid "CHECK ALL"
+msgstr "SELECCIONNAR TODO"
+
+msgid "UNCHECK ALL"
+msgstr "INSELECCIONNAR TODO"
+
 #: templates/documents/files.html:71
 msgid "Locked"
 msgstr "Cerrado"
@@ -1574,8 +1581,58 @@ msgid "Deprecated files:"
 msgstr "Archivos depreciados:"
 
 #: templates/documents/files_add.html:7
-msgid "Add new file / Check-in file :"
-msgstr "Añadir archivo/ Check-in de archivo :"
+msgid "Add new files / Check-in file :"
+msgstr "Añadir archivos / Check-in de archivo :"
+
+
+#: templates/documents/files_add.htlm:37
+msgid "Select at least one file"
+msgstr "Selecciona al menos un archivo"
+
+msgid "A STEP file is already linked to this document."
+msgstr "Un fichiero STEP es ya relacionado con este documento."
+
+msgid "A file named "
+msgstr "Un archivo nombrado "
+
+msgid "is already linked to this document."
+msgstr "ya es relacionado a este documento"
+
+msgid "You have already selected the file"
+msgstr "Ya ha seleccionado el fichiero"
+
+msgid "for upload"
+msgstr "para cargarlo"
+
+msgid "remove the file from the queue"
+msgstr "quite el archivo de la coleta"
+
+msgid "waiting"
+msgstr "en espera"
+
+msgid "Your upload(s) failed"
+msgstr "Su(s) carga(s) fue suspendido"
+
+msgid "Try again"
+msgstr "Repita"
+
+msgid "maybe with less files. "
+msgstr "quizas con menos fichieros. "
+
+msgid "You are checking-in for "
+msgstr "Està haciendo check-in de "
+
+msgid "You must add a file with this name."
+msgstr "Tiene que anadir un fichiero con este nombre."
+
+msgid "Show/Hide the upload form"
+msgstr "Hacer visible/ esconder the cargado form"
+
+msgid "Check-in for file "
+msgstr "Check-in de fichiero "
+
+msgid "You can only upload files, but you wont get progress of this upload"
+msgstr "Puede solo cargar fichieros, pero no tendrà progresiòn de la carga"
 
 #: templates/documents/parts.html:18
 msgid "Create a part and attach it to the document."

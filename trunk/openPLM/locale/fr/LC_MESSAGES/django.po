@@ -1488,6 +1488,13 @@ msgstr "AJOUTER"
 msgid "DELETE"
 msgstr "DETRUIRE"
 
+#: templates/docuemnts/files.html:77
+msgid "CHECK ALL"
+msgstr "TOUT SÉLECTIONNER"
+
+msgid "UNCHECK ALL"
+msgstr "TOUT DÉ-SELECTIONNER"
+
 #: templates/documents/files.html:71
 msgid "Locked"
 msgstr "Verrouillé"
@@ -1538,8 +1545,57 @@ msgid "Deprecated files:"
 msgstr "Fichiers dépréciés:"
 
 #: templates/documents/files_add.html:7
-msgid "Add new file / Check-in file :"
-msgstr "Ajouter nouveau fichier / Check-in fichier :"
+msgid "Add new files / Check-in file :"
+msgstr "Ajouter de nouveaux fichiers / Check-in fichier :"
+
+#: templates/documents/files_add.htlm:37
+msgid "Select at least one file"
+msgstr "Sélectionnez au moins un fichier"
+
+msgid "A STEP file is already linked to this document."
+msgstr "Un fichier STEP est déjà attaché à ce document."
+
+msgid "A file named "
+msgstr "Un fichier "
+
+msgid "is already linked to this document."
+msgstr "est déjà lié au document"
+
+msgid "You have already selected the file"
+msgstr "Vous avez déjà sélectionnez le fichier"
+
+msgid "for upload"
+msgstr "pour l'envoyer"
+
+msgid "remove the file from the queue"
+msgstr "supprime le fichier de la liste d'attente"
+
+msgid "waiting"
+msgstr "en attente"
+
+msgid "Your upload(s) failed"
+msgstr "Votre(vos) envoi(s) ont échoué"
+
+msgid "Try again"
+msgstr "Recommencez"
+
+msgid "maybe with less files. "
+msgstr "peut-être avec moins de fichiers. "
+
+msgid "You are checking-in for "
+msgstr "Vous êtes en train de télécharger "
+
+msgid "You must add a file with this name."
+msgstr "Vous devez sélectionnez un fichier avec ce nom."
+
+msgid "Show/Hide the upload form"
+msgstr "Affiche/Masque le formulaire d'envoi de fichier"
+
+msgid "Check-in for file "
+msgstr "Check-in pour "
+
+msgid "You can only upload files, but you wont get progress of this upload"
+msgstr "Vous ne pourrez qu'envoyer des fichiers. La progression de l'envoi ne sera pas affichée"
 
 #: templates/documents/parts.html:18
 msgid "Create a part and attach it to the document."
@@ -1720,6 +1776,10 @@ msgstr "Ligne"
 #: templates/snippets/undo_form.html:13
 msgid "Validate"
 msgstr "Valider"
+
+#: templates/snippets/undo_form.html: 18
+msgid "Upload"
+msgstr "Télécharger"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
