@@ -49,12 +49,12 @@ def ajax_creation_form(request):
     The request must contains a get parameter *type* with a valid type,
     otherwise, a :class:`.HttpResponseForbidden` is returned.
     """
-    tf = forms.TypeFormWithoutUser(request.GET)
+    tf = forms.TypeForm(request.GET)
     if tf.is_valid():
         type_ = tf.cleaned_data["type"]
         request.session["type"] = type_
         request.session.save()
-        cls = models.get_all_plmobjects()[type_]
+        cls = models.get_all_users_and_plmobjects()[type_]
         view = get_creation_view(cls)
         if view is not None:
             return {"reload" : True}

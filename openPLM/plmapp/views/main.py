@@ -80,7 +80,7 @@ import openPLM.plmapp.forms as forms
 from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
-    get_creation_view
+    get_creation_view, register_creation_view
 from openPLM.plmapp.cadformats import is_cad_file
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.decomposers.base import DecomposersManager
@@ -1211,7 +1211,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     """
 
     obj, ctx = get_generic_data(request)
-    Form = forms.TypeFormWithoutUser
+    Form = forms.TypeForm
     # it is possible that the created object must be attached to a part
     # or a document
     # related_doc and related_part should be a plmobject id
@@ -1241,7 +1241,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     type_form = Form(request.REQUEST)
     if type_form.is_valid():
         type_ = type_form.cleaned_data["type"]
-        cls = models.get_all_plmobjects()[type_]
+        cls = models.get_all_users_and_plmobjects()[type_]
         if not from_registered_view:
             view = get_creation_view(cls)
             if view is not None:
@@ -1701,6 +1701,12 @@ def sponsor(request, obj_ref):
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.html", ctx, request)
+
+@handle_errors
+def create_user(request):
+    url = request.user.get_profile().plmobject_url + "delegation/sponsor/" 
+    return HttpResponseRedirect(url)
+register_creation_view(User, create_user)
 
 @handle_errors
 def sponsor_resend_mail(request, obj_ref):
