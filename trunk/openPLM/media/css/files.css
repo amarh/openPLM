@@ -19,6 +19,13 @@
     padding : 10px; 
 }
 
+span.del_link{
+    cursor:pointer;
+    float:left;
+    position:relative;
+    bottom:5px;
+}
+
 /****************/
 .warning{
     color: black;

@@ -1025,7 +1025,6 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             f_name = request.GET['file_name']
             f_name = f_name.encode("utf-8")
             ret = obj.has_standard_related_locked(f_name)
-            print "%s : %s" % (f_name,ret)
             if ret==True:
     	        return HttpResponse("true:Native file has a standard related locked file.")
             else:
@@ -1051,9 +1050,12 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-            for fkey, f in request.FILES.iteritems():
-                obj.add_file(request.FILES[fkey])
+            added_file=""
+            for key, f_id in request.GET.iteritems():
+                obj.add_file(request.FILES[key])
             return HttpResponse(".")
+        else:
+            return HttpResponse("failed")
 
 @handle_errors
 @csrf_protect

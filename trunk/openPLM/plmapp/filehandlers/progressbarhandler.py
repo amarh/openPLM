@@ -12,17 +12,16 @@ class ProgressBarUploadHandler(FileUploadHandler):
 
     def __init__(self, *args, **kwargs):
         super(ProgressBarUploadHandler, self).__init__(*args, **kwargs)
-	self.progress_id = {}
+        self.progress_id = {}
 
     def new_file(self,file_name, *args, **kwargs):
         """
         Create the file object to append to as data is coming in.
         """
-	#self.progress_id = self.request.GET['X-Progress-ID']
-	self.progress_id["%s" % args[0]]=self.request.GET["%s" % args[0]]
+        self.progress_id["%s" % file_name]=self.request.GET["%s" % file_name]
+        print "key : %s" % self.request.GET["%s" % file_name]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
-        self.file = ProgressUploadedFile(self.progress_id["%s" % args[0]],self.file_name, self.content_type, 0, self.charset)
-        #self.file = ProgressUploadedFile(self.progress_id,self.file_name, self.content_type, 0, self.charset)
+        self.file = ProgressUploadedFile(self.progress_id["%s" % file_name],self.file_name, self.content_type, 0, self.charset)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
