@@ -15,11 +15,10 @@
 	    {%trans "Use the Validate button to send your file." %}
         </div>
     </noscript>
-    <form class="hidden" action="" target="hidden_frame">{% csrf_token %}</form>
+    <form class="hidden" action="" target="hidden_frame" method="post" enctype="multipart/form-data"></form>
     <div id="div_files"></div>
 </div>
-<script type="text/javascript" src="/media/js/file.js">
-</script>
+<script type="text/javascript" src="/media/js/file.js"></script>
 <script type="text/javascript">
     {% with file_formset.forms as forms %}
         {% for form in forms %}
@@ -45,4 +44,6 @@
     /*trans[""]="{% trans '' %}";
     trans[""]="{% trans '' %}";*/
 </script>
+<script type="text/javascript" src="/media/js/opera_upload.js"></script>
+
 
