@@ -18,7 +18,7 @@ So the idea is to try to find a PNG image in the original
 file and hope it is a valid image (and the thumbnail).
 
 All PNG file starts with a magic number (``89 50 4E 47 0D 0A 1A 0A``).
-This thumbnailer locates this magic number and try to read
+This thumbnailer locates this magic number and tries to read
 the image with PIL. If it succeeds, it assumes it is the thumbnail.
 If it fails, it try to find another magic number and retries.
 """
