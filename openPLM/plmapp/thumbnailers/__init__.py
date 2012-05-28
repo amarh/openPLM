@@ -10,12 +10,13 @@ import os.path
 import Image
 
 from base import ThumbnailersManager
+from openPLM.plmapp.utils import get_ext
 
 # import "official" thumbnailers
 import pilthumbnailer
 import odfthumbnailer
 import magickthumbnailer
-import catthumbnailer
+import jfifthumbnailer
 
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from celery.task import task
@@ -33,10 +34,14 @@ def generate_thumbnail(doc_file_id):
     """
     doc_file = DocumentFile.objects.get(id=doc_file_id)
     ext = os.path.splitext(doc_file.filename)[1].lower()
+    ext2 = get_ext(doc_file.filename)
     name = "%s.png" % (doc_file_id)
     thumbnail_path = thumbnailfs.path(name)
     generated = resize = False
-    for thumbnailer in ThumbnailersManager.get_all_thumbnailers(ext):
+    thumbnailers = ThumbnailersManager.get_all_thumbnailers(ext)[:]
+    if ext2 != ext:
+        thumbnailers.extend(ThumbnailersManager.get_all_thumbnailers(ext2))
+    for thumbnailer in thumbnailers:
         try:
             resize = thumbnailer(doc_file.file.path, doc_file.filename, thumbnail_path)
         except Exception, e:

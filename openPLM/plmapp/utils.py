@@ -29,6 +29,7 @@ This module contains some functions which may be useful.
 import re
 import string
 import random
+import os.path
 from functools import wraps
 
 def next_in_seq(seq, value):
@@ -235,6 +236,31 @@ def can_generate_pdf():
     """
     from django.conf import settings
     return 'openPLM.pdfgen' in settings.INSTALLED_APPS
+
+def get_ext(filename):
+    """
+    .. versionadded:: 1.1
+
+    Returns the extension of *filename* (dot include).
+
+    It stripped all ".{number}" extensions if they are present.
+
+    Example::
+        >>> get_ext("filename.png")
+        '.png'
+        >>> get_ext("filename.prt.2")
+        '.prt'
+        >>> get_ext("filename.prt")
+        '.prt'
+        >>> get_ext("filename.1")
+        '.1'
+    """
+    filename, ext = os.path.splitext(filename)
+    if ext and ext[1:].isdigit():
+        filename, ext2 = os.path.splitext(filename)
+        if ext2:
+            ext = ext2
+    return ext
 
 if __name__ == "__main__":
     import doctest

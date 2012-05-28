@@ -1,12 +1,21 @@
 """
-This module adds an optimist thumbnailer for CATIA files.
+.. versionadded:: 1.1
+
+This module adds an optimist thumbnailer for some files which contain
+a JPEG thumbnails.
+
+This formats are:
+
+    * CATIA file (CATPart, CATProduct, CATDrawing)
+    * Pro Engineer file (prt, asm)
+
 
 How it works
 =============
 
-CATIA files may contain a thumbnail. This thumbnail is
+Some files may contain a thumbnail. This thumbnail is
 stored somewhere in the file as a JPEG image.
-So the idea is to try to find a JPEG image in the CATIA
+So the idea is to try to find a JPEG image in the original
 file and hope it is a valid image (and the thumbnail).
 
 All JPEG file starts with a magic number (``0xFFD8``).
@@ -45,31 +54,31 @@ class SeekedFile(object):
     def seek(self, offset, whence=0):
         return self.file.seek(offset + self.shift, whence)
 
-def cat_thumbnailer(input_path, original_filename, output_path):
+def jfif_thumbnailer(input_path, original_filename, output_path):
     """
-    Thumbnailer for CATIA (CATPart, CATProduct, CATDrawing) files.
+    Thumbnailer for files which contain a JPEG thumbnail.
     """
-    # the catia file must be opened in binary mode
-    with open(input_path, 'rb') as cat:
+    # the file must be opened in binary mode
+    with open(input_path, 'rb') as cad:
         def seek():
             " Seek to the possible start of a JPEG file"
-            c1, c2 = cat.read(1), cat.read(2)
+            c1, c2 = cad.read(1), cad.read(2)
             while c1 + c2 != '\xff\xd8':
                 c1 = c2
-                c2 = cat.read(1)
+                c2 = cad.read(1)
                 if c2 == '':
                     # end of file, raises an exception so that the thumbnailer fails
                     raise Exception()
-            cat.seek(-2, 1)
+            cad.seek(-2, 1)
         done = False
         while not done:
             seek()
             try: 
-                im = Image.open(SeekedFile(cat))
+                im = Image.open(SeekedFile(cad))
             except IOError:
                 # not a JPEG, goes forward and looks up for another
                 # magic number
-                cat.seek(3, 1)
+                cad.seek(3, 1)
             else:
                 # looks good, save the image
                 im.thumbnail(ThumbnailersManager.THUMBNAIL_SIZE, Image.ANTIALIAS)
@@ -77,5 +86,8 @@ def cat_thumbnailer(input_path, original_filename, output_path):
                 done = True
     return False
 
-for ext in ("catpart", "catproduct", "catdrawing"):
-    ThumbnailersManager.register("." + ext, cat_thumbnailer)
+CATIA_FILES = ("catpart", "catproduct", "catdrawing")
+PRO_ENGINEER_FILES = ("asm", "prt")
+FILES = CATIA_FILES + PRO_ENGINEER_FILES
+for ext in FILES:
+    ThumbnailersManager.register("." + ext, jfif_thumbnailer)
