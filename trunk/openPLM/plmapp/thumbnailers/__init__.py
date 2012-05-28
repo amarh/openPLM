@@ -15,6 +15,7 @@ from base import ThumbnailersManager
 import pilthumbnailer
 import odfthumbnailer
 import magickthumbnailer
+import catthumbnailer
 
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from celery.task import task
