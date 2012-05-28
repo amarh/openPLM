@@ -32,6 +32,36 @@ import random
 import os.path
 from functools import wraps
 
+class SeekedFile(object):
+    """
+    .. versionadded:: 1.1
+
+    A file-like object that wraps an already opened
+    and seeked file.
+
+    This file-like can be read by PIL and is used to 
+    open an image contained in another file.
+    """
+    def __init__(self, file):
+        self.shift = file.tell()
+        self.file = file  
+    
+    def read(self, *args):
+        return self.file.read(*args)
+
+    def readline(self, *args):
+        return self.file.readline(*args)
+
+    def readlines(self, *args):
+        return self.file.readlines(*args)
+
+    def tell(self):
+        return self.file.tell() - self.shift
+    
+    def seek(self, offset, whence=0):
+        return self.file.seek(offset + self.shift, whence)
+
+
 def next_in_seq(seq, value):
     """
     Returns item next to *value* in the sequence *seq*

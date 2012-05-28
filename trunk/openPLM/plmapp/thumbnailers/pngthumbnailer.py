@@ -2,24 +2,23 @@
 .. versionadded:: 1.1
 
 This module adds an optimist thumbnailer for some files which contain
-a JPEG thumbnails.
+a PNG thumbnails.
 
 This formats are:
 
-    * CATIA file (CATPart, CATProduct, CATDrawing)
-    * Pro Engineer file (prt, asm)
+    * Google Sketch Up (skp)
 
 
 How it works
 =============
 
 Some files may contain a thumbnail. This thumbnail is
-stored somewhere in the file as a JPEG image.
-So the idea is to try to find a JPEG image in the original
+stored somewhere in the file as a PNG image.
+So the idea is to try to find a PNG image in the original
 file and hope it is a valid image (and the thumbnail).
 
-All JPEG file starts with a magic number (``0xFFD8``).
-This thumbnailer locates this magic number and tries to read
+All PNG file starts with a magic number (``89 50 4E 47 0D 0A 1A 0A``).
+This thumbnailer locates this magic number and try to read
 the image with PIL. If it succeeds, it assumes it is the thumbnail.
 If it fails, it try to find another magic number and retries.
 """
@@ -30,32 +29,35 @@ import Image
 from base import ThumbnailersManager
 from openPLM.plmapp.utils import SeekedFile
 
+PNG_MAGIC_NUMBER = '\x89PNG\r\n\x1a\n'
 
-def jfif_thumbnailer(input_path, original_filename, output_path):
+def png_thumbnailer(input_path, original_filename, output_path):
     """
-    Thumbnailer for files which contain a JPEG thumbnail.
+    Thumbnailer for files which contain a PNG thumbnail.
     """
     # the file must be opened in binary mode
     with open(input_path, 'rb') as cad:
         def seek():
-            " Seek to the possible start of a JPEG file"
-            c1, c2 = cad.read(1), cad.read(2)
-            while c1 + c2 != '\xff\xd8':
-                c1 = c2
-                c2 = cad.read(1)
-                if c2 == '':
-                    # end of file, raises an exception so that the thumbnailer fails
+            t = cad.tell()
+            data = cad.read(1024)
+            pos = data.find(PNG_MAGIC_NUMBER)
+            while pos == -1:
+                data = cad.read(1024)
+                # end of file, raises an exception so that the thumbnailer fails
+                if not data:
                     raise Exception()
-            cad.seek(-2, 1)
+                pos = data.find(PNG_MAGIC_NUMBER)
+            cad.seek(t + pos)
+
         done = False
         while not done:
             seek()
             try: 
                 im = Image.open(SeekedFile(cad))
             except IOError:
-                # not a JPEG, goes forward and looks up for another
+                # not a PNG, goes forward and looks up for another
                 # magic number
-                cad.seek(3, 1)
+                cad.seek(5, 1)
             else:
                 # looks good, save the image
                 im.thumbnail(ThumbnailersManager.THUMBNAIL_SIZE, Image.ANTIALIAS)
@@ -63,8 +65,8 @@ def jfif_thumbnailer(input_path, original_filename, output_path):
                 done = True
     return False
 
-CATIA_FILES = ("catpart", "catproduct", "catdrawing")
-PRO_ENGINEER_FILES = ("asm", "prt")
-FILES = CATIA_FILES + PRO_ENGINEER_FILES
+FILES = ("skp", # google sketch up
+    )
 for ext in FILES:
-    ThumbnailersManager.register("." + ext, jfif_thumbnailer)
+    ThumbnailersManager.register("." + ext, png_thumbnailer)
+
