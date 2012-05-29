@@ -187,6 +187,7 @@ def files_for_decomposition(doc,type_check_out):
     #if not files:
     #    raise ValueError("Document "+ doc.reference+"/"+doc.revision+"/"+doc.name + " (present in the arborescence) does not contain files (" +str(extensions) +") to fulfil the check-out")
     return files ,  check_out_valide
+    
 @login_json    
 def add_zip_file(request, doc_id, unlock , thumbnail_extension ="False" ,thumbnail=False ):
     """
@@ -211,11 +212,11 @@ def add_zip_file(request, doc_id, unlock , thumbnail_extension ="False" ,thumbna
         if not filename.endswith(thumbnail_extension):
             buf = bytearray(zip_file.read(filename))
             tmp_file = io.BytesIO(buf)
-            dummy_file = File(tmp_file)   # this line actually fails
+            dummy_file = File(tmp_file)   
             dummy_file.name = filename
             dummy_file.size = len(buf)
             dummy_file.file = tmp_file
-            df = doc.add_file(dummy_file, thumbnail=thumbnail)
+            df = doc.add_file(dummy_file,thumbnail=True)
             
             if unlock == "False" or unlock == "false":
                 df.locked=True
@@ -223,7 +224,7 @@ def add_zip_file(request, doc_id, unlock , thumbnail_extension ="False" ,thumbna
             if thumbnail:
                 buf = bytearray(zip_file.read(filename+"."+thumbnail_extension))
                 tmp_file = io.BytesIO(buf)
-                dummy_file = File(tmp_file)   # this line actually fails
+                dummy_file = File(tmp_file)   
                 dummy_file.name = filename
                 dummy_file.size = len(buf)
                 dummy_file.file = tmp_file 
