@@ -18,7 +18,7 @@ function opera_prepare_form(inputs_file){
 function opera_up_file(f_form,new_action,go_to){
     $(f_form).attr("action",new_action);
     $(f_form).attr("target","hidden_frame");
-    var hidden_frame=$("<iframe id='hidden_frame' class='hidden'></iframe>");
+    var hidden_frame=$("<iframe id='hidden_frame' class='hidden' ></iframe>");
     $("#add_file_container").append(hidden_frame);
     $(f_form).submit();
     $(f_form).attr("action","");

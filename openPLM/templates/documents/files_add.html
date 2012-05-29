@@ -16,6 +16,13 @@
         </div>
     </noscript>
     <form class="hidden" action="" target="hidden_frame" method="post" enctype="multipart/form-data"></form>
+    <div style="margin:1%;" id="up_message">
+        {% trans "Don't leave the current page until the upload ends" %}
+    </div>
+    <div style="margin:1%;">
+        <input type="button" class="{{"Button"|button}} hidden" value="{% trans "Upload" %}" id="_up"/>
+		<input type="button" class="{{"Button"|button}} hidden" value="{% trans "Delete" %}" id="_delete" title="{%trans "Delete the files selected for upload" %}"/>
+    </div>
     <div id="div_files"></div>
 </div>
 <script type="text/javascript" src="/media/js/file.js"></script>

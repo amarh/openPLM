@@ -16,26 +16,26 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $("#dialog_check-out").dialog({
-                modal: true,
-                autoOpen: false
+            modal: true,
+            autoOpen: false
             });
             $("a.check-out").click(function(e) {
                 e.preventDefault();
                 var url = $(this).attr("href");
                 $("#dialog_check-out").dialog('option', 'buttons', {
-
+                
                     "CANCEL": function() {
                         $(this).dialog("close");
-                    },
-                    "CHECK-OUT": function() {
+                        },
+                        "CHECK-OUT": function() {
                         $(location).attr('href',url); 
                         $(this).dialog("close");
-                    }
-                 });
-                $("#dialog_check-out").dialog();
-                $("#dialog_check-out").dialog("open");
-                return false;
-            });
+                        }
+                    });
+                    $("#dialog_check-out").dialog();
+                    $("#dialog_check-out").dialog("open");
+                    return false;
+                });
 
             $("#s_all").click(function(){
                 $("td.Content > input:checkbox").attr("checked",true);
@@ -54,9 +54,11 @@
 {% endblock scripts %}
 
 {% block content %}
+{% if is_owner and obj.is_editable %}
 <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
 {% include "documents/files_add.html" %}
 </div>
+{% endif %}
     {% if file_formset.total_form_count %}
         <form class="archive_form" method="GET" action="./archive/">
             {{ archive_form.as_p }}

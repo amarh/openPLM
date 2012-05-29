@@ -1,5 +1,5 @@
 /*****************************************************************
-**		Add or delete files in queue			**
+**		Add or delete files in queue			                **
 *****************************************************************/
 
 //count for files to upload
@@ -16,6 +16,10 @@ function new_input_file(){
         if(at_least_one(this)){
             $(".up_fail").remove();
             add_file(this);
+            if($("#_up").hasClass("hidden")){
+                $("#_up").removeClass("hidden");
+                $("#_delete").removeClass("hidden");
+            }
         }else{
              $.each(this.files, function(id,file){
                 var can_add=can_add_file(file.name,true);
@@ -146,12 +150,6 @@ function can_add_file(file_name,display){
         }
     }
     if(display==true){
-        /*if($(".up_fail").length == 0){
-            var div_error=$("<div class='up_fail'></div>");
-            $("#fileupload").after(div_error);
-        }else{
-            msg_error="<p>"+msg_error+"</p>";
-        }*/
         var div_error=$("<div class='up_fail'></div>");
         div_error.text(msg_error);
         $("#fileupload").after(div_error);
@@ -166,6 +164,7 @@ function add_f_file(input,f){
         if((can_add_native(f.name,true))||(doc_type.toLowerCase()!="document3d")){
 
             var key = f.name.replace(".","_");
+            key = key.replace(" ","_");
             var size=f.size;
 
             //create line for file progress
@@ -207,7 +206,7 @@ function add_f_file(input,f){
 //add a file in the queue for uploading
 function add_file(input){
     if (nbr_files==0){
-        $("#div_files > div").remove();
+        $("#div_files > div.file_p").remove();
     }
     $.each(input.files,function(ind,f){
         add_f_file(input,f);
@@ -256,6 +255,7 @@ function check_in_file(input){
     }
                   
     nbr_files+=1;
+    
 }
 
 //hide an input row in table content
@@ -273,6 +273,10 @@ function del_file(item,input){
     $(".up_fail").remove();
     if(($.browser.opera)||($.browser.msie)){
         $(input).remove();
+    }
+    if(nbr_files==0){
+        $("#_up").addClass("hidden");
+        $("#_delete").addClass("hidden");
     }
 }
 
@@ -480,6 +484,7 @@ function init_files_data(f_form){
             $.each(files,function(id, file){
                 var f_key = file.name;
                 f_key = f_key.replace(".","_");
+                f_key = f_key.replace(" ","_");
                 if(files_info[f_key]!=undefined){
                     data.append(files_info[f_key].field_name,file);
                 }
@@ -501,13 +506,17 @@ function upload_failed(){
     }
     fail_div.append(span_text);
     $("#fileupload").after(fail_div);
-    $(".progress .text").text(" ");
+    $(".progress .text").empty();
     $("progress").remove();
     $(".del_link").show();
     $("#global").remove();
     $("#fileupload").find("input[type='file']").removeAttr("disabled");
     $("#_up").show();
     $("#_delete").show();
+    var files_form = $(".archive_form").next();
+    $(files_form[0]).find("a").removeAttr("target");
+    $(files_form[0]).find("input[type='submit']").removeAttr("disabled");
+    $("#up_message").hide();
 }
 //launch and track progress of upload file in the form f_form
 function up_file(f_form){
@@ -551,7 +560,7 @@ function up_file(f_form){
                 y=y.document;
             }
             if($(y).find("body").text()!=""){
-                if($(y).find("body").text()=="."){
+                if($(y).find("body").text()!="failed"){
                     go_to=location.href;
                 }else{
                     upload_failed();
@@ -602,12 +611,13 @@ function reset_upload(){
                  var div_error=$("<div class='up_fail'></div>");
                  $("#fileupload").after(div_error);
              }
-             $("#div_files > div").remove();
-             nbr_files --;
+             $(".del_link").click();
              $(".up_fail").text(trans["You are checking-in for "]+up_f_name+".\n "+trans["You must add a file with this name."]);
          }else{
-             $(".up_fail").remove();
-             check_in_file(this);
+            $(".up_fail").remove();
+            check_in_file(this);
+            $("#_up").removeClass("hidden");
+            $("#_delete").removeClass("hidden");
          }
     });
     var td_input = $("<td></td>");
@@ -645,17 +655,17 @@ if(($.browser.opera!=true)&&($.browser.msie!=true)){
 }
 
 $(function(){
+    $("#up_message").hide();
     if(($.browser.msie!=true)&&($.browser.opera!=true)){
         $("input[type='file']").attr('multiple','multiple');
     }
     $("#add_file_container").toggleClass("hidden");
-    $("#add_form_file").toggleClass("hidden");
+    if(files_linked.length!=0){
+        $("#add_form_file").toggleClass("hidden");
+    }
     var add_text= $("#add_text").text();
     $("#add_text").text(add_text.split(" / ")[0]);
     $("#add_text").attr("title",trans["Show/Hide the upload form"]);
-
-    $("#_up").toggleClass("hidden");
-    $("#_delete").toggleClass("hidden");
 
     $.each($(".check-in"),function(ind,val){
         var ref =$(val).parent().attr("href");
@@ -668,19 +678,23 @@ $(function(){
     });
 
     $(".check-in").click(function(){
-        $("#fileupload").attr("action",$(this).attr("action"));
-        reset_upload();
-        $("#add_form_file").removeClass("hidden");
-        var line= $(this).parent().parent().parent();
-        var f_name = line.find("td a:first").text();
-        $("#add_text").text(trans["Check-in for file "]+f_name+":");
-        $("#add_text").attr("checked-file",f_name);
+        if($("#fileupload").find("input[type='file']").attr("disabled")!="disabled"){
+            $("#fileupload").attr("action",$(this).attr("action"));
+            reset_upload();
+            $("#add_form_file").removeClass("hidden");
+            var line= $(this).parent().parent().parent();
+            var f_name = line.find("td a:first").text();
+            $("#add_text").text(trans["Check-in for file "]+f_name+":");
+            $("#add_text").attr("checked-file",f_name);
+        }
     });
 
     $("input[type='file']").change(function (){
         if(at_least_one(this)){
             $(".up_fail").remove();
             add_file(this);
+            $("#_up").removeClass("hidden");
+            $("#_delete").removeClass("hidden");
         }else{
             $.each(this.files, function(id,file){
                 var can_add=can_add_file(file.name,true);
@@ -693,8 +707,9 @@ $(function(){
     });
 
     $("#_delete").click(function(){
-        $("a.del_link").click();
-        
+        $(".del_link").click();
+        $("#_up").addClass("hidden");
+        $("#_delete").addClass("hidden");
     });
 
     if(xhr!=null){
@@ -715,7 +730,7 @@ $(function(){
             }
             var global_prog = $("<div style='margin-top:1%' id='global'>Total: </div>");
             global_prog.append("<span class='progress'><span class='text'></span></span>");
-            $("#fileupload").after(global_prog);
+            $("#up_message").after(global_prog);
             $(".del_link").hide();
             $(".progress .text").text("0% (waiting)");
             $(".progress").prepend("<progress max=100 value=0></progress>");
@@ -728,6 +743,10 @@ $(function(){
             $("#fileupload").find("input[type='file']").attr("disabled","disabled");
             $("#_delete").hide();
             $("#_up").hide();
+            var files_form = $(".archive_form").next();
+            $(files_form[0]).find("a").attr("target","_blank");
+            $(files_form[0]).find("input[type='submit']").attr("disabled","disabled");
+            $("#up_message").show();
         });
     }else{
         //the browser does not support xmlhttprequest object
