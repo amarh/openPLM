@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from openPLM.plmapp.views.main import r2r
 import tempfile
+import os
 
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
@@ -215,7 +216,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             old_modification_data_microsecond=last_time_modification.cleaned_data['last_modif_microseconds']
 
 
-            document_controller=DocumentController(stp_file.document,User.objects.get(username=settings.COMPANY))
+            document_controller=Document3DController(stp_file.document,User.objects.get(username=settings.COMPANY))
 
             index=[1]
             if clear_form(request,assemblys,product,index,obj_type):
@@ -246,7 +247,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                     try:
                         instances=[]
                         old_product=json.dumps(data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
-                        generate_part_doc_links_AUX(request,product, obj,instances)
+                        generate_part_doc_links_AUX(request,product, obj,instances,doc3D)
                         update_indexes.delay(instances) 
                     except Exception as excep:
                         if type(excep) == Document_Generate_Bom_Error:
@@ -286,7 +287,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
     else:
 
-        document_controller=DocumentController(stp_file.document,request.user)
+        document_controller=Document3DController(stp_file.document,request.user)
         last_time_modification=Form_save_time_last_modification()
         last_time_modification.fields["last_modif_time"].initial=document_controller.mtime
 
@@ -539,12 +540,12 @@ def initialiser_assemblys(assemblys,product,group,user,index, obj_type):
         assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  name_child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep, obj_type))
 
 @transaction.commit_on_success
-def generate_part_doc_links_AUX(request,product, parent_ctrl,instances):  # para generar bien el commit on succes
+def generate_part_doc_links_AUX(request,product, parent_ctrl,instances,doc3D):  # para generar bien el commit on succes
     try:
-        generate_part_doc_links(request,product, parent_ctrl,instances)
+        generate_part_doc_links(request,product, parent_ctrl,instances,doc3D)
     except Exception as excep:
         raise excep          
-def generate_part_doc_links(request,product, parent_ctrl,instances):
+def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
 
     """
     
@@ -612,13 +613,29 @@ def generate_part_doc_links(request,product, parent_ctrl,instances):
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
                 part_ctrl.attach_to_document(doc_ctrl.object)
                 
-                                    
-                Doc3D=Document3D.objects.get(id=doc_ctrl.object.id)
-                Doc3D.PartDecompose=part_ctrl.object
-                Doc3D.no_index=True 
-                Doc3D.save()
+                
+                
+                
+                
 
-                generate_part_doc_links(request,link.product, part_ctrl,instances)
+                         
+                
+                
+                                    
+                new_Doc3D=Document3D.objects.get(id=doc_ctrl.object.id)
+                new_Doc3D.PartDecompose=part_ctrl.object
+                new_Doc3D.no_index=True 
+                new_Doc3D.save()
+
+                #IMPORTANT############################## diferenciar entre node y feuille ###############################"
+                for doc_file in doc3D.files.filter(is_catia): 
+                    fileName,  fileExtension= os.path.splitext(doc_file.filename) 
+                    if fileName==link.product.name:
+                        doc_file.document=new_Doc3D
+                        doc_file.save()
+                        
+                        
+                generate_part_doc_links(request,link.product, part_ctrl,instances,doc3D)
 
                     
             else:
