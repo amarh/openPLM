@@ -13,12 +13,6 @@ function new_input_file(){
     var num = num_file+1;
     var input = $("<input type='file' name='filename"+num+"' id='id_filename"+num+"'/ >");
     input.change(function(){
-        /*var f_name = this.files[0].name;
-        if(can_add_file(f_name)){
-            $(".up_fail").remove();
-            $("span.warning").remove();
-            add_file(this);
-        }*/
         if(at_least_one(this)){
             $(".up_fail").remove();
             add_file(this);
@@ -215,46 +209,53 @@ function add_file(input){
     if (nbr_files==0){
         $("#div_files > div").remove();
     }
-
-   /* //create line where the progress of the upload will be display for this input
-    var f_name = input.value;
-    if(f_name.substr(0, 12) == "C:\\fakepath\\"){
-        f_name=f_name.substr(12);
+    $.each(input.files,function(ind,f){
+        add_f_file(input,f);
+    })
+    if($("#fileupload").attr("action")=="."){
+        add_in_queue_form(input);
+        new_input_file();
     }
-    var key= f_name.replace(".","_");
-    var size = input.files[0].size;
-    var mod_2 = nbr_files%2;
-    var file_line = $("<div id='"+key+"' class='file_p'><span>"+input.files[0].name+"("+render_size(size)+")</span></div>");
+}
+
+function check_in_file(input){
+    var f = input.files[0];
+    var key = f.name.replace(".","_");
+    var size=f.size;
+
+    //create line for file progress
+    var file_line = $("<div id='"+key+"' class='file_p'>"+f.name+"("+render_size(size)+") "+"</div>");
     var progress = $("<span class='progress'><span class='text'></span></span>");
     file_line.append(progress);
 
     //create link to delete this file from the queue for upload
     var link = $("<span class='del_link'> </span>");
     link.click(function(){
-	    del_file(file_line,input);
+        del_file(file_line,input);
     });
     var del_img = "<img src='/media/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
     link.append(del_img);
     file_line.append(link);
+
     //add the file in the list of files to upload
-    $("#div_files").append(file_line);*/
-    $.each(input.files,function(ind,f){
-        add_f_file(input,f);
-    })
-    if($("#fileupload").attr("action")=="."){
-        //add_in_queue_form(input);
-        //$(input).parent().parent().hide();
-        //if($.browser.opera){
-            add_in_queue_form(input);
-        /*}else{
-            hide(input);
-        }*/
-        new_input_file();
-    }
-    /*nbr_files+=1;
+    $("#div_files").append(file_line);
+
     var f_id = gen_uuid();
-    //create an object related to the file in the files_info array-like
-    files_info[key]={"f_name":f_name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};*/
+            
+    if(($.browser.opera!=true)&&($.browser.msie!=true)){
+    /*var data_key = "filename";
+    if(nbr_files!=0){
+        data_key+=nbr_files;
+    }
+    data.append(data_key,f);*/
+     
+        //create an object related to the file in the files_info array-like
+        files_info[key]={"field_name":" ", "f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
+    }else{
+        files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
+    }
+                  
+    nbr_files+=1;
 }
 
 //hide an input row in table content
@@ -263,14 +264,7 @@ function hide(input){
 }
 
 //delete a file from list and form which contains files to upload
-/*function del_file(item,input){
-    var key = item.attr("id");
-    files_info = files_info.remove(key);
-    item.remove();
-    $(input).remove();
-    nbr_files--;
-    $(".up_fail").remove();
-}*/
+
 function del_file(item,input){
     var key = item.attr("id");
     files_info=files_info.remove(key);
@@ -497,6 +491,7 @@ function init_files_data(f_form){
 }
 
 function upload_failed(){
+    clearTimeout(t);
     var fail_div = $("<div class='up_fail'></div>");
     var span_text=trans["Your upload(s) failed"]+"!<br>"+trans["Try again"];
     if(nbr_files>1){
@@ -504,14 +499,15 @@ function upload_failed(){
     }else{
         span_text+=". ";
     }
-    span_text+="<br/>"+xhr.responseText;
     fail_div.append(span_text);
     $("#fileupload").after(fail_div);
     $(".progress .text").text(" ");
     $("progress").remove();
     $(".del_link").show();
     $("#global").remove();
-    clearTimeout(t);
+    $("#fileupload").find("input[type='file']").removeAttr("disabled");
+    $("#_up").show();
+    $("#_delete").show();
 }
 //launch and track progress of upload file in the form f_form
 function up_file(f_form){
@@ -551,9 +547,9 @@ function up_file(f_form){
         if(($.browser.opera)||($.browser.msie)){
             var x=document.getElementById("hidden_frame");
             var y=(x.contentWindow || x.contentDocument);
-            if(y.document)
+            if(y.document){
                 y=y.document;
-            
+            }
             if($(y).find("body").text()!=""){
                 if($(y).find("body").text()=="."){
                     go_to=location.href;
@@ -591,10 +587,10 @@ function up_file(f_form){
 * - delete all files selected and hidden input files
 */
 function reset_upload(){
-    $("a.del_link").click();
+    $(".del_link").click();
     nbr_files=0;
     num_file=0;
-    files_info = files_info.removeAll();
+    //files_info = files_info.removeAll();
     var table = $("#fileupload > table.Content");
     $("#fileupload > table.Content tr:first").remove();
     var input = $("<input type='file' name='filename' id='id_filename'/ >");
@@ -611,14 +607,14 @@ function reset_upload(){
              $(".up_fail").text(trans["You are checking-in for "]+up_f_name+".\n "+trans["You must add a file with this name."]);
          }else{
              $(".up_fail").remove();
-             add_file(this);
+             check_in_file(this);
          }
     });
     var td_input = $("<td></td>");
     td_input.append(input);
     var tr_input = $("<tr><th><label for='id_filename'>Filename:</label></th></tr>");
     tr_input.append(td_input);
-    table.prepend(tr_input); 
+    table.prepend(tr_input);
 }
 
 //get the appropriate XmlHttpRequest object
@@ -720,7 +716,6 @@ $(function(){
             var global_prog = $("<div style='margin-top:1%' id='global'>Total: </div>");
             global_prog.append("<span class='progress'><span class='text'></span></span>");
             $("#fileupload").after(global_prog);
-            $("#_delete").hide();
             $(".del_link").hide();
             $(".progress .text").text("0% (waiting)");
             $(".progress").prepend("<progress max=100 value=0></progress>");
@@ -730,6 +725,9 @@ $(function(){
             }else{
                 up_file($("#fileupload")[0]);
             }
+            $("#fileupload").find("input[type='file']").attr("disabled","disabled");
+            $("#_delete").hide();
+            $("#_up").hide();
         });
     }else{
         //the browser does not support xmlhttprequest object
