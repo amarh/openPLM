@@ -48,6 +48,7 @@ First, you must install some dependencies:
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install lepl``
     #. ``apt-get install python-pisa``
+    #. ``apt-get install libgsf-bin``
 
 To enable plain text search on files, you need to install the following
 dependencies:

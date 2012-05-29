@@ -18,6 +18,7 @@ import odfthumbnailer
 import magickthumbnailer
 import jfifthumbnailer
 import pngthumbnailer
+import swthumbnailer
 
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from celery.task import task
