@@ -19,7 +19,6 @@ class ProgressBarUploadHandler(FileUploadHandler):
         Create the file object to append to as data is coming in.
         """
         self.progress_id["%s" % file_name]=self.request.GET["%s" % file_name]
-        print "key : %s" % self.request.GET["%s" % file_name]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
         self.file = ProgressUploadedFile(self.progress_id["%s" % file_name],self.file_name, self.content_type, 0, self.charset)
 

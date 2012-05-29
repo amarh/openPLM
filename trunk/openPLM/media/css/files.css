@@ -9,14 +9,11 @@
     display:table;
 }
 
-#div_files div{
+#div_files div.file_p{
+    padding : 10px;
     border-style:groove;
     border-width: 2px;
-    border-radius: 4px;
-}
-
-.file_p{
-    padding : 10px; 
+    border-radius: 4px; 
 }
 
 span.del_link{

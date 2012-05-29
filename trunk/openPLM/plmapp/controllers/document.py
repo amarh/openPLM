@@ -151,13 +151,13 @@ class DocumentController(PLMObjectController):
                  :attr:`settings.MAX_FILE_SIZE`
         :raises: :exc:`ValueError` if we try to add a native file while a relate standar file locked is present in the Document
         """   
-	self.check_permission("owner")
+        self.check_permission("owner")
         self.check_editable()
 
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
 
-	f.name = f.name.encode("utf-8")
+        f.name = f.name.encode("utf-8")
         if self.has_standard_related_locked(f.name):
             raise ValueError("Native file has a standard related locked file.")
 
