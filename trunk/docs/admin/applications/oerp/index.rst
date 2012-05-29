@@ -40,19 +40,19 @@ The OpenERP server must have the MRP module installed.
 Synchronizing the database
 ==========================
 
-Run ``./manage.py migate oerp``.
+Run ``./manage.py migrate oerp``.
 
 Creating required units
 =======================
 
 You must import a list of units of measure into OpenERP.
 OpenPLM ships with a CSV file (:file:`oerp/product.uom.csv`) that can be
-imported by OpenERP.
+imported into OpenERP.
 
 Once all units are imported into OpenERP. You must run the following
 command:
 
- * ``./manage.pu createuom``
+ * ``./manage.py createuom``
 
 This should create a file named :file:`oerp/_unit_to_uom.py` that should
 contain something like this::
