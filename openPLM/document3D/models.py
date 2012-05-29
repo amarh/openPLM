@@ -67,6 +67,27 @@ class Document3D(Document):
                         
 
         return super(Document3D, self).get_content_and_size(doc_file)
+    
+    @property    
+    def documents_related(self):
+        """
+
+        If the :class:`.Document3D` has been decomposed, he returns a list with all the :class:`.Document3D` that form a part of the decomposition, 
+        and for every :class:`.Document3D` for ONLY ONE level of depth
+        
+
+        """
+        document_related=[]
+        
+        part=self.PartDecompose
+        
+        if part:
+            list_link=ParentChildLink.objects.filter(parent=part, end_time=None)
+            for i in range(len(list_link)):
+                if Location_link.objects.filter(link=list_link[i]).exists: 
+                    document_related.append(Document3D.objects.get(PartDecompose=list_link[i].child))
+
+        return document_related
 
 #admin.site.register(Document3D)
 def composer_step(doc_file):
@@ -199,8 +220,13 @@ def generateArborescense(path, doc_file, decomposable):
  
 
 is_stp=Q(filename__iendswith=".stp") | Q(filename__iendswith=".step")#.stp , .STP , .step , .STEP 
+is_catia=Q(filename__iendswith=".catpart") | Q(filename__iendswith=".catproduct")
+ 
+        
+        
+        
+        
 
-   
 class Document3DController(DocumentController):
     """
     A :class:`DocumentController` which manages 
@@ -916,7 +942,8 @@ def get_step_related(doc_file):
     For a certain :class:`.DocumentFile` (**doc_file**), if has been decomposed across a :class:`.Part` (attribute PartDecompose of :class:`.Document3D` (**doc_file.document** )
     we recover all the :class:`.ParentChildLink` of the :class:`.Part` and we look for each of them for  possibles  :class:`.Location_link`, these :class:`.Location_link` indicate that the :class:`.ParentChildLink` was the result of a descomposition.If this is the case ,  we are going to look for the  :class:`.DocumentFile` present in :class:`.Document3D` whose attribute PartDecompose is the **child** of the :class:`.ParentChildLink`.
       
-    We return all  :class:`.DocumentFile` that fulfill these condition together with the list of :class:`.Location_link` relatives of each :class:`.DocumentFile`
+    We return all  :class:`.DocumentFile` that fulfill these condition together with the list of :class:`.Location_link` relatives of each :class:`.DocumentFile` 
+    for ONLY ONE level of depth
     
 
     """
@@ -945,7 +972,7 @@ def get_step_related(doc_file):
         pass
     return stp_related , list_loc
                             
-                                                       
+                                             
 
     
     

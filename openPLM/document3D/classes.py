@@ -34,7 +34,7 @@ class Product(object):
     Class used to represent the **arborescense** contained in a :class:`~django.core.files.File` **.stp**.A :class:`.Product` can be simple or an assembly, if it is an assembly in **links** we will guard the information about other :class:`.Product` that compose it.
 
 
-    There are two ways of generating a :class:`.Product`, reading the file **stp** across the class :class:`.NEW_STEP_Import` ( will refill the attribute **label_reference**  for every :class:`Product`), or reading a file **.geo** related to a :class:`.ArbreFile`  
+    There are two ways of generating a :class:`.Product`, reading the file **.stp** across the class :class:`.NEW_STEP_Import` ( will refill the attribute **label_reference**  for every :class:`Product`), or reading a file **.arb** related to a :class:`.ArbreFile`  
     Therefore there exist two ways of distinguishing the different :class:`.Product`, by means of the attribute **label_reference** if this one is not False , or by means of the combination of attributes  **id** and **doc_id**.
     
     
@@ -257,7 +257,7 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
         
     
    
-    The :class:`.Product` generated from a file **.geo ** (The case of this function) have his attribute **label_reference** False
+    The :class:`.Product` generated from a file **.arb ** (The case of this function) have his attribute **label_reference** set to False
     
     When we generate an :class:`.Product` using :class:`.NEW_STEP_Import` , the attribute **label_reference** will represents and identify the :class:`.Product` , 
     
