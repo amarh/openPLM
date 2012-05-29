@@ -98,7 +98,6 @@ from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 
-
 # user stuff
 
 class UserProfile(models.Model):
@@ -983,6 +982,15 @@ def get_all_documents():
     """
     res = {}
     _get_all_subclasses(Document, res)
+    return res
+    
+
+def get_all_subtype_documents(subtype):
+    u"""
+    Returns a dict<doc_name, doc_class> of all available **subtype** classes
+    """
+    res = {}
+    _get_all_subclasses(subtype, res)
     return res
 
 @memoize_noarg
