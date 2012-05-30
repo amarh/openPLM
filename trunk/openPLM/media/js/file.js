@@ -220,6 +220,7 @@ function add_file(input){
 function check_in_file(input){
     var f = input.files[0];
     var key = f.name.replace(".","_");
+    key = key.replace(" ","_");
     var size=f.size;
 
     //create line for file progress
