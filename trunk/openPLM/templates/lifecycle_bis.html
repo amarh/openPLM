@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+
+{% block css %}
+
+    <link rel="stylesheet" href="/media/css/lifecycle.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/media/css/timeline.css" />
+    <link rel="stylesheet" type="text/css" href="/media/css/management.css" />
+{% endblock %}
+
+<!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
+
+{% block content %}
+    <div style="padding:1%">
+        {% if is_owner %}
+            {% trans 'You have the rights of owner on this object' %}
+        {% endif %}
+    </div>
+    <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
+        {% if is_signer or is_signer_dm %}
+            <div id="form-promote-dialog"
+                title="{% trans "Are you sure?" %}"
+                {% if password_form.is_bound and not password_form.is_valid %} 
+                    class="c-error action-{{ action }}"
+                {% endif %}
+                >
+                <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{% trans "If you promote or demote this object, you may not be allowed to undo this action." %}</p>
+
+                {# show the list of previous revisions that will be cancelled/deprecated #}
+
+                {% if cancelled_revisions %}
+                    <p> {% trans "The following revisions will be cancelled:" %} </p>
+                    <ul>
+                        {% for rev in cancelled_revisions %}
+                            <li>
+                            {% blocktrans with rev.revision as revision and rev.name as name %}
+                                Revision {{ revision }} : {{ name }}
+                            {% endblocktrans %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if deprecated_revisions %}
+                    <p> {% trans "The following revisions will be deprecated:" %} </p>
+                    <ul>
+                        {% for rev in deprecated_revisions %}
+                            <li>
+                            {% blocktrans with rev.revision as revision and rev.name as name %}
+                                Revision {{ revision }} : {{ name }}
+                            {% endblocktrans %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="password">
+                    {{ password_form.as_p }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if obj.state != obj.lifecycle.first_state %}
+            {% if is_signer_dm %}
+                {% if obj.is_proposed %}
+                    <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
+                {% else %}
+                    <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
+                {% endif %}
+            {% else %}
+                <p>{% trans "You do not have the permission to demote this object." %}</p>
+            {% endif %}
+        {% endif %}
+        {% if is_signer %}
+            {% if obj.is_promotable %}
+                <input name="promote" type="submit" class="{{"Button"|button}}" value="{% trans "PROMOTE" %}" />
+            {% else %}
+                <p>{% trans "You can not promote this object:" %}</p>
+                {{ obj.promotion_errors.as_ul }}
+            {% endif %}
+        {% else %}
+            <p>{% trans "You do not have the permission to promote this object." %}</p>
+        {% endif %}
+    </form>
+    <div class="lifecycle">
+        {% for status, is_current_state, nb_signer, signer in object_lifecycle %}
+            <div class="state_wrapper">
+                <div class="state
+                    {% if forloop.first %}
+                        draft
+                    {% endif %}
+                    {% if status == obj.lifecycle.official_state.name %}
+                        official 
+                    {% endif %}
+                    {% if forloop.last %}
+                        deprecated
+                    {% endif %}
+                    {% if is_current_state %}
+                        active
+                    {% endif %}
+                    ">
+                    <span class="state">{{status}}</span>
+                </div>
+                {% if not forloop.last %}
+                {% with signers_data|key:forloop.counter0 as signer_data %}
+                    {% if signer_data.nb_signer > 0 %}
+                    <div class="management">
+                        <span class="signer">
+                            <a href="/user/{{signer_data.signer.user.username|urlencode }}/">{{signer_data.signer.user.username}}</a>
+                    {% if is_owner %}
+                            <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                    {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+                {% endwith %}
+                {% endif %}
+            </div>
+            {% if not forloop.last %}
+                <div class="arrow
+                    {% if is_current_state %}
+                        active
+                    {% endif %}
+                    ">&gt;</div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+    <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
+    {% if is_owner %}
+        <a class="{{"Button"|button}}" href="../management/add" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
+    {% else %}
+        {% if is_notified %}
+            <form  method="POST" action="../management/delete/">
+                <input type="hidden" name="link_id" value="{{ remove_notify_link.id }}"/>
+                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Unnotify me" %}" />
+            </form>
+        {% else %}
+            {% if can_notify %}
+                <form  method="POST" action="../management/add/">
+                    {{ notify_self_form.as_p }}
+                    <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
+                </form>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    {% with notified_list as object_management_list %}
+        {% include "snippets/management_block.html" %}
+    {% endwith %}
+    </div>
+     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
+    {% with owner_list as object_management_list %}
+        {% include "snippets/management_block.html" %}
+    {% endwith %}
+    </div>
+{% endblock %}
