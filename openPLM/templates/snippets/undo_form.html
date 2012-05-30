@@ -11,13 +11,7 @@
             <td>
             </td>
             <td>
-		{% if form.is_multipart %}
-		<noscript>
-		    <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
-		</noscript>
-		{% else %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "Validate" %}" name="_validate"/>
-		{% endif %}
                 <input type="submit" class="{{"Button"|button}}" value="{% trans "Undo" %}" name="_undo"/>
             </td>
         </tr>
