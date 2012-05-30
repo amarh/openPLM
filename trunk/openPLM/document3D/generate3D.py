@@ -1,13 +1,14 @@
 import sys
 import os
+import tempfile
 from classes import data_for_product , get_available_name
 from STP_converter_WebGL import NEW_STEP_Import , MultiRoot_Error , OCC_ReadingStep_Error 
 import logging
 import django.utils.simplejson as json
     
+from pov import create_thumbnail
 
-
-def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location):
+def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_path):
     """
     
     
@@ -21,13 +22,14 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location):
     
     """ 
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)    
-    my_step_importer = NEW_STEP_Import(doc_file_path,doc_file_id) 
-    product_arbre=my_step_importer.generate_product_arbre()   
-    geo=my_step_importer.procesing_geometrys(location)
+    step_importer = NEW_STEP_Import(doc_file_path,doc_file_id) 
+    product = step_importer.generate_product_arbre()   
+    pov_dir = tempfile.mkdtemp(suffix="openplm_pov")
+    geo = step_importer.procesing_geometrys(location, pov_dir)
     print geo
-    print write_ArbFile_from_Product(product_arbre,my_step_importer.fileName,location)
-
-
+    print write_ArbFile_from_Product(product, step_importer.fileName,location)
+    if step_importer.thumbnail_valid and product:
+        create_thumbnail(product, step_importer, pov_dir, thumb_path)
 
 def write_ArbFile_from_Product(product,fileName,location):
 
@@ -55,12 +57,12 @@ def write_ArbFile_from_Product(product,fileName,location):
 
 if __name__ == "__main__":    
     try:    
-        generateGeometrys_Arborescense(sys.argv[1],sys.argv[2],sys.argv[3])        
+        generateGeometrys_Arborescense(*sys.argv[1:])   
     except Exception as excep:
+        raise
         if type(excep)==MultiRoot_Error:
             sys.exit(-1)
         elif type(excep)==OCC_ReadingStep_Error:
             sys.exit(-2)
         sys.exit(-3)
 
-    

@@ -39,7 +39,7 @@ import os, os.path
 from kjbuckets import  kjDict
 import time
 from OCC.GarbageCollector import garbage
-def mesh_shape(shape,filename,_index_id):
+def mesh_shape(shape,filename,_index_id, pov_dir):
     """ 
 
     :param shape: :class:`.simple_shape` of which we are going to generate the file **.geo**  
@@ -70,17 +70,53 @@ def mesh_shape(shape,filename,_index_id):
     output.write("//Computation for : %s\n"%shape.name)
     output.write("var %s = new THREE.Geometry();\n"%_index_id) 
     output.write("var material_for%s = new THREE.MeshBasicMaterial({opacity:%s,shading:THREE.SmoothShading});\n"%(_index_id,opacity))
+    pov_file = open(os.path.join(pov_dir, os.path.basename(filename + ".inc")), "w")
+    pov_file.write("""
+#declare m%s = mesh {
+""" % _index_id)
     
     if shape.color:
         output.write("material_for%s.color.setRGB(%f,%f,%f);\n"%(_index_id,shape.color.Red(),shape.color.Green(),shape.color.Blue()))
      
-    a_mesh.compute(output,_index_id)
+    a_mesh.compute(output, pov_file, _index_id)
+    if shape.color:
+        color = shape.color.Red(),shape.color.Green(),shape.color.Blue()
+    else:
+        color = 1, 1, 0
+    pov_file.write("""  
+};
+
+#declare t%s = texture {
+    pigment {
+        color <%f,%f, %f, 0.9>
+    }
+     finish {ambient 0.1
+         diffuse 0.9
+         phong 1}
+  }
+""" % ((_index_id, ) + color))
     
     output.close()
+    pov_file.close()
 
     return a_mesh       
 
+triangle_fmt = """ smooth_triangle {
+        <%f, %f, %f>, <%f, %f, %f>,
+        <%f, %f, %f>, <%f, %f, %f>, 
+        <%f, %f, %f>, <%f, %f, %f>
+      }
+    """
+vertice_fmt = "%s.vertices.push(new THREE.Vertex(new THREE.Vector3(%.4f,%.4f,%.4f)));\n"
+face_fmt = "%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"
 
+def get_mesh_precision(shape, quality_factor):
+    bbox = Bnd_Box()
+    BRepBndLib_Add(shape, bbox) 
+    x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
+    diagonal_length = gp_Vec(gp_Pnt(x_min, y_min, z_min),
+                             gp_Pnt(x_max, y_max, z_max)).Magnitude()
+    return (diagonal_length / 20.) / quality_factor
 
 class QuickTriangleMesh(object):
 
@@ -103,14 +139,9 @@ class QuickTriangleMesh(object):
     def __init__(self,shape,quality_factor):
 
         self._shape = shape
-
-        bbox = Bnd_Box()
-        BRepBndLib_Add(self._shape, bbox) 
-        x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
-        diagonal_length = gp_Vec(gp_Pnt(x_min,y_min,z_min),gp_Pnt(x_max,y_max,z_max)).Magnitude()
-        self._precision = (diagonal_length / 20.)/quality_factor
-
-    
+        self._precision = get_mesh_precision(shape, quality_factor)
+        self.triangle_count = 0
+            
     def triangle_is_valid(self, P1,P2,P3):
 
         V1 = gp_Vec(P1,P2)
@@ -125,7 +156,7 @@ class QuickTriangleMesh(object):
         else:
             return False
 
-    def compute(self,output,_index_id):
+    def compute(self,output, pov_file, _index_id):
     
         """
         
@@ -135,7 +166,6 @@ class QuickTriangleMesh(object):
         Divides the geometry in triangles and generates the code javascript of each of these writing in **output** 
         
         """
-        init_time = time.time()
         if self._shape is None:
             raise "Error: first set a shape"
             return False
@@ -174,19 +204,32 @@ class QuickTriangleMesh(object):
                     p2_coord = P2.XYZ().Coord()
                     p3_coord = P3.XYZ().Coord()
                     if self.triangle_is_valid(P1, P2, P3):                
-                        if not _points.has_key(p1_coord):
-                            _points.add(p1_coord,index)
-                            output.write("%s.vertices.push(new THREE.Vertex(new THREE.Vector3(%.4f,%.4f,%.4f)));\n"%(_index_id,p1_coord[0],p1_coord[1],p1_coord[2]))
-                            index+=1
-                        if not _points.has_key(p2_coord):
-                            _points.add(p2_coord,index)
-                            output.write("%s.vertices.push(new THREE.Vertex(new THREE.Vector3(%.4f,%.4f,%.4f)));\n"%(_index_id,p2_coord[0],p2_coord[1],p2_coord[2]))
-                            index+=1
-                        if not _points.has_key(p3_coord):
-                            _points.add(p3_coord,index)
-                            output.write("%s.vertices.push(new THREE.Vertex(new THREE.Vector3(%.4f,%.4f,%.4f)));\n"%(_index_id,p3_coord[0],p3_coord[1],p3_coord[2]))
-                            index+=1
-                        output.write("%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"%(_index_id,_points.neighbors(p1_coord)[0],_points.neighbors(p2_coord)[0],_points.neighbors(p3_coord)[0],the_normal(index1).X(),the_normal(index1).Y(), the_normal(index1).Z(),the_normal(index2).X(),the_normal(index2).Y(), the_normal(index2).Z(),the_normal(index3).X(),the_normal(index3).Y(), the_normal(index3).Z()))                            
+                        for point in (p1_coord, p2_coord, p3_coord):
+                            if not _points.has_key(point):
+                                _points.add(point, index)
+                                output.write(vertice_fmt % (_index_id, point[0], point[1], point[2]))
+                                index+=1
+
+                        n1 = the_normal(index1)
+                        n2 = the_normal(index2)
+                        n3 = the_normal(index2)
+                        output.write(face_fmt % 
+                                (_index_id, _points.neighbors(p1_coord)[0],
+                                            _points.neighbors(p2_coord)[0],
+                                            _points.neighbors(p3_coord)[0],
+                                            n1.X(), n1.Y(), n1.Z(),
+                                            n2.X(), n2.Y(), n2.Z(),
+                                            n3.X(), n3.Y(), n3.Z(),
+                                    ))                           
+                        pov_file.write(triangle_fmt % (
+                            p1_coord[0], p1_coord[1], p1_coord[2],
+                            n1.X(), n1.Y(), n1.Z(),
+                            p2_coord[0], p2_coord[1], p2_coord[2],
+                            n2.X(), n2.Y(), n2.Z(),
+                            p3_coord[0], p3_coord[1], p3_coord[2],
+                            n3.X(), n3.Y(), n3.Z(),
+                            ))
+                        self.triangle_count += 1
 
          
         return True

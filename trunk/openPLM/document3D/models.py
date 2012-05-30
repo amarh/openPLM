@@ -128,7 +128,12 @@ def handle_step_file(doc_file_pk):
     doc_file = DocumentFile.objects.get(pk=doc_file_pk)
     temp_file = tempfile.TemporaryFile()
     stdout = temp_file.fileno()
-    status=subprocess.call(["python", "document3D/generate3D.py",doc_file.file.path,str(doc_file.id),settings.MEDIA_ROOT+"3D/"],stdout=stdout)
+    name = "%s.png" % (doc_file_pk)
+    thumbnail_path = thumbnailfs.path(name)
+
+    status=subprocess.call(["python", "document3D/generate3D.py", doc_file.file.path,
+        str(doc_file.id), settings.MEDIA_ROOT+"3D/", thumbnail_path],
+        stdout=stdout)
     if status == 0:
         """
         The subprocess is going to return a temporary file with the names of the files *.geo* and *.arb* generated. 
@@ -137,6 +142,9 @@ def handle_step_file(doc_file_pk):
         delete_ArbreFile(doc_file) #In case of an update, to erase the previous elements
         delete_GeometryFiles(doc_file)
         generate_relations_BD(doc_file,temp_file)# We associate the files generated to classes and the classes to the documentFile
+        if os.path.exists(thumbnail_path):
+            doc_file.thumbnail = os.path.basename(thumbnail_path)
+            doc_file.save()
 
     elif status == -1:
         #MultiRoot_Error  SEND MAIL?

@@ -14,6 +14,11 @@ Dependencies
 This application depends on `pythonOCC <http://www.pythonocc.org/>`_. It has been
 tested with the version 0.5.
 
+.. versionchanged:: 1.1
+
+It also depends on `POV-Ray <http://www.povray.org/>`_ to generate thumbnails of
+STEP file. It has been tested with the version 3.6.1.
+
 
 settings.py
 ==============
