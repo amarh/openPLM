@@ -107,7 +107,11 @@ def create_thumbnail(product, step_importer, pov_dir, thumb_path):
         args = ["povray", "-GA", "-I"+path, "-O"+thumb, 
                 "-H400", "-W400",
                 "+A", "+AM2", "+Q9", "-d", "+WL0"]
-        ret = subprocess.call(args, cwd=pov_dir, stdout=null, stderr=null)
+        try:
+            ret = subprocess.call(args, cwd=pov_dir, stdout=null, stderr=null)
+        except OSError:
+            # could not call povray
+            ret = 1
     if ret == 0 and os.path.exists(thumb):
         shutil.copy2(thumb, thumb_path)
     shutil.rmtree(pov_dir, True)
