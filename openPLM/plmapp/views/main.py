@@ -327,7 +327,107 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 'is_signer_dm' : is_signer_dm,
                 'password_form' : password_form,
                 })
+    #get_management_data(obj,ctx)
     return r2r('lifecycle.html', ctx, request)
+
+def display_lifecycle_bis(request, obj_type, obj_ref, obj_revi):
+    """
+    Manage html page which display lifecycle of an object and users who manages its
+    """
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if request.method == 'POST':
+        password_form = forms.ConfirmPasswordForm(request.user, request.POST)
+        if password_form.is_valid():
+            if "demote" in request.POST:
+                obj.demote()
+            elif "promote" in request.POST:
+                obj.promote()
+            return HttpResponseRedirect("..")
+        if "demote" in request.POST:
+            ctx["action"] = "demote"
+        elif "promote" in request.POST:
+            ctx["action"] = "promote"
+    else: 
+        password_form = forms.ConfirmPasswordForm(request.user)
+    ctx.update({'password_form' : password_form,})
+    signer_list = get_management_data(request,obj,ctx)
+    get_lifecycle_data(signer_list,obj,ctx)
+    return r2r('lifecycle_bis.html',ctx,request)
+    
+    
+def get_lifecycle_data(signers,obj,ctx):
+    state = obj.state.name
+    object_lifecycle = []
+    signers_data=[]
+    roles = dict(obj.plmobjectuserlink_plmobject.values_list("role", "user__username"))
+    lcs = obj.lifecycle.to_states_list()
+    for i, st in enumerate(lcs):
+        signer = roles.get(level_to_sign_str(i))
+        signer_data = signers.filter(role=level_to_sign_str(i))
+        if len(signer_data)==0:
+            signer_data=roles.get(level_to_sign_str(i))
+            nb_signer = 0
+        else:
+            nb_signer = len(signer)
+            signer_data = signer_data[0]
+        signers_data.append({"signer":signer_data,"nb_signer":nb_signer})
+        object_lifecycle.append((st, st == state, signer))
+    is_signer = obj.check_permission(obj.get_current_sign_level(), False)
+    is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
+
+    # warning if a previous revision will be cancelled/deprecated
+    cancelled = []
+    deprecated = []
+    if is_signer:
+        if lcs.next_state(state) == obj.lifecycle.official_state.name:
+            for rev in obj.get_previous_revisions():
+                if rev.is_official:
+                    deprecated.append(rev)
+                elif rev.is_draft or rev.is_proposed:
+                    cancelled.append(rev)
+    ctx["cancelled_revisions"] = cancelled
+    ctx["deprecated_revisions"] = deprecated
+
+    ctx.update({'current_page':'lifecycle', 
+                'object_lifecycle': object_lifecycle,
+                'is_signer' : is_signer, 
+                'is_signer_dm' : is_signer_dm,
+                'signers_data':signers_data
+                })
+    
+def get_management_data(request,obj,ctx):
+    """
+    Update ctx with mangemement data related to obj
+    """
+    object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
+    object_management_list = object_management_list.order_by("role")
+    levels =[]
+    lcs = obj.lifecycle.to_states_list()
+    for i, st in enumerate(lcs):
+        levels.append(level_to_sign_str(i))
+    signer_list = object_management_list.filter(role__in=levels)
+    notified_list = object_management_list.filter(role="notified")
+    owner_list = object_management_list.filter(role="owner")
+    if not ctx["is_owner"]:
+        link = object_management_list.filter(role="notified", user=request.user)
+        ctx["is_notified"] = bool(link)
+        if link:
+            ctx["remove_notify_link"] = link[0]
+        else:
+            if obj.check_in_group(request.user, False):
+                initial = { "type" : "User",
+                            "username" : request.user.username
+                          }
+                form = forms.SelectUserForm(initial=initial)
+                for field in ("type", "username"):
+                    form.fields[field].widget = HiddenInput() 
+                ctx["notify_self_form"] = form
+                ctx["can_notify"] = True
+            else:
+                ctx["can_notify"] = False
+    ctx.update({'notified_list': notified_list,
+                'owner_list':owner_list})
+    return signer_list
     
 
 @handle_errors
@@ -1117,7 +1217,7 @@ def display_management(request, obj_type, obj_ref, obj_revi):
     return r2r('management.html', ctx, request)
 
 ##########################################################################################
-@handle_errors(undo="../..")
+@handle_errors(undo="../../../lifecycle")
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
@@ -1496,9 +1596,11 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.POST:
         checkin_file_form = forms.AddFileForm(request.POST, request.FILES)
+        print checkin_file_form.errors
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
                         request.FILES["filename"])
+
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
         checkin_file_form = forms.AddFileForm()

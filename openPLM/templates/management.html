@@ -7,9 +7,18 @@
     <link rel="stylesheet" type="text/css" href="/media/css/management.css" />
 {% endblock %}
 
-
+{% block scripts %}
+<script type="text/javascript">
+$(window).load(function(){
+    var current = location.href;
+    var go_to = current.split("/management")[0];
+    location.href=go_to+"/lifecycle/";
+});
+</script>
+{% endblock %}
 
 {% block content %}
+
     {% if is_owner %}
         <a class="{{"Button"|button}}" href="./add/" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
     {% else %}

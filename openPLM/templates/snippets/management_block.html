@@ -1,0 +1,43 @@
+{% load i18n plmapp_tags %}
+
+    {% regroup object_management_list|dictsort:"role" by role as links %}
+
+    {% for group in links %}
+        <div class="timeline">
+            <h3>{{ group.grouper|capfirst}}</h3>
+
+            <dl>
+                {% for link in group.list|dictsort:"plmobject.type" %}
+                    <dt class="changeset">
+                    <span>{{link.user.first_name}}</span>
+                    <span>{{link.user.last_name}},</span>
+                    <a href="/user/{{link.user.username|urlencode }}/"><span>{{link.user.username}}</span></a>,
+                    {% with link.user.get_profile as profile %}
+                        <span>{{ profile.rank }},</span>
+                    {% endwith %}
+
+                    <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
+                    </dt>
+                    <dd class="management">
+                    {% if is_owner %}
+                        <ul class="management">
+                            <li>
+                            <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                            </li>
+                        {% ifequal link.role 'notified'%}
+                            <li>
+
+                            <form action="../management/delete/" method="POST">
+                                <input name="link_id" type="hidden" value="{{link.id}}"/>
+                                <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Delete" %}" />
+                            </form>
+                            </li>
+                        {% endifequal %}
+                        </ul>
+                    {% endif %}
+                    </dd>
+                {% endfor %}
+            </dl>
+        </div>
+
+    {% endfor %}
