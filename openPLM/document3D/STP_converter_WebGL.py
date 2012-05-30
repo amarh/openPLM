@@ -25,6 +25,7 @@ from OCC.TDF import TDF_LabelSequence , TDF_Tool , TDF_Label
 from OCC.Utils.Topology import Topo
 from OCC.TDataStd import Handle_TDataStd_Name ,TDataStd_Name_GetID
 from OCC.Quantity import Quantity_Color
+import OCC.BRepTools
 from mesh import *
 from classes import *
 from OCC.GarbageCollector import garbage
@@ -108,11 +109,39 @@ class NEW_STEP_Import(object):
                 else:
                     pass
                     #print "Not information found for shape : ", GetLabelNom(shapes.Value(i+1))        
+        
+        roots = TDF_LabelSequence()
+        self.shape_tool.GetFreeShapes(roots)
+        self.thumbnail_valid = False
+        if roots.Length() == 1:
+            shape = self.shape_tool.GetShape(roots.Value(1))
+            t = Topo(shape)
+            if t.number_of_vertices() > 0:
+                bbox = Bnd_Box()
+                gap = 0
+                bbox.SetGap(gap)
+
+                BRepMesh_Mesh(shape, get_mesh_precision(shape, 1))
+                faces_iterator = Topo(shape).faces()  
+                for F in faces_iterator:
+                    face_location = TopLoc_Location()
+                    triangulation = BRep_Tool_Triangulation(F, face_location)
+                BRepBndLib_Add(shape, bbox)
+                x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
+                diagonal = max(x_max-x_min, y_max-y_min, z_max-z_min)
+                if diagonal > 0:
+                    self.scale = 200 / diagonal
+
+                    self.trans = ((x_max-x_min) / 2. -x_max,
+                            (y_max-y_min) / 2. -y_max,
+                            (z_max-z_min) / 2. -z_max)
+                    self.thumbnail_valid = True
 
         ws=self.STEPReader.Reader().WS().GetObject()
         model=ws.Model().GetObject()
         model.Clear()          
-    def procesing_geometrys(self,root_path):
+
+    def procesing_geometrys(self,root_path, pov_dir):
         """
         
         :param root_path: Path where to store the files **.geo** generated      
@@ -129,14 +158,16 @@ class NEW_STEP_Import(object):
         
         """
         files_index=""
+        self.povs = []
         
         for index, shape in enumerate(self.shapes_simples):
-                name=get_available_name(root_path,self.fileName+".geo")
-                path=os.path.join(root_path, name)
-                _index_id="_"+str(index+1)+"_"+str(self.id)
-                mesh_shape(shape,path,_index_id) #index+1
-                files_index+="GEO:"+name+" , "+str(index+1)+"\n" #index+1
-             
+            name=get_available_name(root_path,self.fileName+".geo")
+            path=os.path.join(root_path, name)
+            _index_id="_"+str(index+1)+"_"+str(self.id)
+            qmt = mesh_shape(shape,path,_index_id, pov_dir) #index+1
+            files_index+="GEO:"+name+" , "+str(index+1)+"\n" #index+1
+            if qmt.triangle_count:
+                self.povs.append((os.path.basename(name + ".inc"), _index_id))
      
         return files_index        
 
