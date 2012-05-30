@@ -656,6 +656,7 @@ if(($.browser.opera!=true)&&($.browser.msie!=true)){
 
 $(function(){
     $("#up_message").hide();
+    $("input[type='submit'][name='_validate']").hide();
     if(($.browser.msie!=true)&&($.browser.opera!=true)){
         $("input[type='file']").attr('multiple','multiple');
     }
