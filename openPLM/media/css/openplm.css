@@ -1041,6 +1041,13 @@ div#mi_homepage {
     box-shadow: none;
 }
 
+div.menuitem.disabled {
+    background-image: url("../img/menuitem_home_disable.png");
+}
+div.menuitem.disabled * {
+    color: #888;
+}
+
 .tooltip span.info {
     display: none;
     width: 180px;

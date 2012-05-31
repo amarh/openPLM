@@ -1,51 +1,66 @@
 {% load i18n plmapp_tags %}
 
 <div id="#supermenu">
+    {# Create #}
+    <div class="menurow">
+        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}"> 
+            {% if user.get_profile.is_contributor %}
+                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
+                </a>
+            {% else %}
+                <div class="tooltip">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "You can not create a part or document since you are not a contributor." %}</span>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    {# study, homepage, navigate #}
+    <div class="menurow">
+        <div class="menuitem"> 
+            <a class="tooltip" href="/user/{{user|urlencode }}/parts-doc-cad/">
+                {% trans "Study" %}
+                <span class="triangle">&nbsp;</span>
+                <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
+            </a>
+
+        </div>
+        <div class="menuitem" id="mi_homepage"> 
+        </div>
+        <div class="menuitem"> 
+            <a class="tooltip" href="/user/{{user|urlencode }}/navigate/">
+                {% trans "Navigate" %}
+                <span class="triangle">&nbsp;</span>
+                <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
+            </a>
+        </div>
+
+    </div>
 
     {# Search #}
     <div class="menurow">
-        <div class="menuitem"> 
+        <div class="menuitem" style="margin-right:2em"> 
             <a class="tooltip" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
                 {% trans "Search" %}
                 <span class="triangle">&nbsp;</span>
                 <span class="info">{% trans "Search for a part, a document, a file and more." %}</span>
             </a>
         </div>
-    </div>
-
-    {# study, homepage, navigate #}
-    <div class="menurow">
-        <div class="menuitem"> 
-        <a class="tooltip" href="/user/{{user|urlencode }}/parts-doc-cad/">
-            {% trans "Study" %}
-            <span class="triangle">&nbsp;</span>
-            <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
-        </a>
-
-    </div>
-    <div class="menuitem" id="mi_homepage"> 
-    </div>
-    <div class="menuitem"> 
-    <a class="tooltip" href="/user/{{user|urlencode }}/navigate/">
-        {% trans "Navigate" %}
-        <span class="triangle">&nbsp;</span>
-        <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
-    </a>
-</div>
-
-    </div>
-
-    {# Create #}
-    {% if user.get_profile.is_contributor %}
-        <div class="menurow">
-            <div class="menuitem"> 
-                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
-                    {% trans "Create" %}
-                    <span class="triangle">&nbsp;</span>
-                    <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
-                </a>
-            </div>
+        <div class="menuitem" style="margin-left:2em"> 
+            <a class="tooltip" href="/browse/">
+                {% trans "Browse" %}
+                <span class="triangle">&nbsp;</span>
+                <span class="info">{% trans "Browse all parts, groups, users and documents." %}</span>
+            </a>
         </div>
-    {% endif %}
+    </div>
+
 
 </div>
