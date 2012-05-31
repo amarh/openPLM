@@ -23,7 +23,6 @@
                 e.preventDefault();
                 var url = $(this).attr("href");
                 $("#dialog_check-out").dialog('option', 'buttons', {
-                
                     "CANCEL": function() {
                         $(this).dialog("close");
                         },
@@ -35,7 +34,7 @@
                     $("#dialog_check-out").dialog();
                     $("#dialog_check-out").dialog("open");
                     return false;
-                });
+            });
 
             $("#s_all").click(function(){
                 $("td.Content > input:checkbox").attr("checked",true);
@@ -58,6 +57,12 @@
 <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
 {% include "documents/files_add.html" %}
 </div>
+{% else %}
+    {% if is_owner %}
+        {% trans "The status of this document does not allow adding/deleting files." %}
+    {% else %}
+        {% trans "You don't have the necessary rights to add/delete files."%}
+    {% endif %}
 {% endif %}
     {% if file_formset.total_form_count %}
         <form class="archive_form" method="GET" action="./archive/">

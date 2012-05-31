@@ -360,10 +360,10 @@ class ViewTest(CommonViewTest):
         self.assertTrue(response.context["filter_object_form"])
        
     def test_management(self):
-        response = self.get(self.base_url + "management/", page="management")
+        response = self.get(self.base_url + "lifecycle/", page="lifecycle")
         self.brian.groups.add(self.group)
         self.controller.set_owner(self.brian)
-        response = self.get(self.base_url + "management/")
+        response = self.get(self.base_url + "lifecycle/")
         self.assertFalse(response.context["is_notified"])
         form = response.context["notify_self_form"]
         self.assertEqual("User", form.initial["type"])
@@ -371,7 +371,7 @@ class ViewTest(CommonViewTest):
 
     def test_management_add_get(self):
         response = self.get(self.base_url + "management/add/",
-               link=True, page="management")
+               link=True, page="lifecycle")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("delegate", attach[1])
@@ -390,7 +390,7 @@ class ViewTest(CommonViewTest):
         link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         response = self.get(self.base_url + "management/replace/%d/" % link.id,
-                link=True, page="management")
+                link=True, page="lifecycle")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("delegate", attach[1])
