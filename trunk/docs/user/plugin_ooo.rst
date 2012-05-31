@@ -22,7 +22,8 @@ Build
 -------------
 
 .. note::
-    You can skip this step, download this :download:`file <download/openplm.oxt>`.
+    You can skip this step, download this :download:`file (Windows) <download/openplm-win.oxt>`
+    ot this :download:`file (Other) <download/openplm.oxt>`.
     Note that this file may not be up to date.
 
 You just have to made an archive (a zip file) of 3 files, the archive must have
