@@ -239,7 +239,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     """
-    Lifecycle view of the given object (a part or a document).
+    Lifecycle data of the given object (a part or a document).
   
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/lifecycle/[apply/]`
     
@@ -257,82 +257,10 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     **Context:**
 
     ``RequestContext``
-    
-    ``object_lifecycle``
-        List of tuples (state name, *boolean*, signer role). The boolean is
-        True if the state name equals to the current state. The signer role
-        is a dict {"role" : name of the role, "user__username" : name of the
-        signer}
-
-    ``is_signer``
-        True if the current user has the permission to promote this object
-
-    ``is_signer_dm``
-        True if the current user has the permission to demote this object
-
-    ``password_form``
-        A form to ask the user password
-
-    ``cancelled_revisions``
-        List of plmobjects that will be cancelled if the object is promoted
-    
-    ``deprecated_revisions``
-        List of plmobjects that will be deprecated if the object is promoted
 
     ``action``
         Only for unsuccessful POST requests.
         Name of the action ("demote" or "promote") that the user tries to do.
-    """
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    if request.method == 'POST':
-        password_form = forms.ConfirmPasswordForm(request.user, request.POST)
-        if password_form.is_valid():
-            if "demote" in request.POST:
-                obj.demote()
-            elif "promote" in request.POST:
-                obj.promote()
-            return HttpResponseRedirect("..")
-        if "demote" in request.POST:
-            ctx["action"] = "demote"
-        elif "promote" in request.POST:
-            ctx["action"] = "promote"
-    else: 
-        password_form = forms.ConfirmPasswordForm(request.user)
-    state = obj.state.name
-    object_lifecycle = []
-    roles = dict(obj.plmobjectuserlink_plmobject.values_list("role", "user__username"))
-    lcs = obj.lifecycle.to_states_list()
-    for i, st in enumerate(lcs):
-        signer = roles.get(level_to_sign_str(i))
-        object_lifecycle.append((st, st == state, signer))
-    is_signer = obj.check_permission(obj.get_current_sign_level(), False)
-    is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
-
-    # warning if a previous revision will be cancelled/deprecated
-    cancelled = []
-    deprecated = []
-    if is_signer:
-        if lcs.next_state(state) == obj.lifecycle.official_state.name:
-            for rev in obj.get_previous_revisions():
-                if rev.is_official:
-                    deprecated.append(rev)
-                elif rev.is_draft or rev.is_proposed:
-                    cancelled.append(rev)
-    ctx["cancelled_revisions"] = cancelled
-    ctx["deprecated_revisions"] = deprecated
-
-    ctx.update({'current_page':'lifecycle', 
-                'object_lifecycle': object_lifecycle,
-                'is_signer' : is_signer, 
-                'is_signer_dm' : is_signer_dm,
-                'password_form' : password_form,
-                })
-    #get_management_data(obj,ctx)
-    return r2r('lifecycle.html', ctx, request)
-
-def display_lifecycle_bis(request, obj_type, obj_ref, obj_revi):
-    """
-    Manage html page which display lifecycle of an object and users who manages its
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
@@ -356,6 +284,34 @@ def display_lifecycle_bis(request, obj_type, obj_ref, obj_revi):
     
     
 def get_lifecycle_data(signers,obj,ctx):
+    """
+    Update lifecycle data for a given object 
+    
+    ``object_lifecycle``
+        List of tuples (state name, *boolean*, signer role). The boolean is
+        True if the state name equals to the current state. The signer role
+        is a dict {"role" : name of the role, "user__username" : name of the
+        signer}
+
+    ``is_signer``
+        True if the current user has the permission to promote this object
+
+    ``is_signer_dm``
+        True if the current user has the permission to demote this object
+    
+    ``signers_data``
+        List of tuple (signer, nb_signer). The signer is a dict which contains
+        management data for the signer and indicates wether a signer exists or not.
+        
+    ``password_form``
+        A form to ask the user password
+
+    ``cancelled_revisions``
+        List of plmobjects that will be cancelled if the object is promoted
+    
+    ``deprecated_revisions``
+        List of plmobjects that will be deprecated if the object is promoted
+    """
     state = obj.state.name
     object_lifecycle = []
     signers_data=[]
@@ -398,7 +354,10 @@ def get_lifecycle_data(signers,obj,ctx):
     
 def get_management_data(request,obj,ctx):
     """
-    Update ctx with mangemement data related to obj
+    Update context for html page which displays the Users who manage the selected object (:class:`PLMObjectUserLink`).
+    It computes a context dictionnary based on
+    
+    .. include:: views_params.txt 
     """
     object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
     object_management_list = object_management_list.order_by("role")
@@ -1183,41 +1142,7 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###    All functions which manage the different html pages specific to part and document  ###
 #############################################################################################
-@handle_errors
-def display_management(request, obj_type, obj_ref, obj_revi):
-    """
-    Manage html page which displays the Users who manage the selected object (:class:`PLMObjectUserLink`).
-    It computes a context dictionnary based on
-    
-    .. include:: views_params.txt 
-    """
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
-    object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
-    object_management_list = object_management_list.order_by("role")
-    if not ctx["is_owner"]:
-        link = object_management_list.filter(role="notified", user=request.user)
-        ctx["is_notified"] = bool(link)
-        if link:
-            ctx["remove_notify_link"] = link[0]
-        else:
-            if obj.check_in_group(request.user, False):
-                initial = { "type" : "User",
-                            "username" : request.user.username
-                          }
-                form = forms.SelectUserForm(initial=initial)
-                for field in ("type", "username"):
-                    form.fields[field].widget = HiddenInput() 
-                ctx["notify_self_form"] = form
-                ctx["can_notify"] = True
-            else:
-                ctx["can_notify"] = False
-    ctx.update({'current_page':'management',
-            'object_management': object_management_list})
-    
-    return r2r('management.html', ctx, request)
 
-##########################################################################################
 @handle_errors(undo="../../../lifecycle")
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
@@ -1241,18 +1166,18 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                 obj.set_role(user_obj.object, link.role)
                 if link.role == 'notified':
                     obj.remove_notified(link.user)
-            return HttpResponseRedirect("../..")
+            return HttpResponseRedirect("../../../lifecycle")
     else:
         replace_management_form = forms.SelectUserForm()
     
-    ctx.update({'current_page':'management', 
+    ctx.update({'current_page':'lifecycle', 
                 'replace_management_form': replace_management_form,
                 'link_creation': True,
                 'attach' : (obj, "delegate")})
     return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
-@handle_errors(undo="../..")
+@handle_errors(undo="../../lifecycle")
 def add_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the addition of a "notification" link
@@ -1269,11 +1194,11 @@ def add_management(request, obj_type, obj_ref, obj_revi):
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, "notified")
-            return HttpResponseRedirect("..")
+            return HttpResponseRedirect("../../lifecycle")
     else:
         add_management_form = forms.SelectUserForm()
     
-    ctx.update({'current_page':'management', 
+    ctx.update({'current_page':'lifecycle', 
                 'replace_management_form': add_management_form,
                 'link_creation': True,
                 "attach" : (obj, "delegate")})
@@ -1296,7 +1221,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
             obj.remove_notified(link.user)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
-    return HttpResponseRedirect("../")
+    return HttpResponseRedirect("../../lifecycle")
 
 ##########################################################################################
 ###    Manage html pages for part / document creation and modification                 ###
