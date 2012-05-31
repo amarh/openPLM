@@ -60,26 +60,37 @@
             </div>
         {% endif %}
 
+        <div id="msg">
+        </div>
         {% if obj.state != obj.lifecycle.first_state %}
             {% if is_signer_dm %}
                 {% if obj.is_proposed %}
                     <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
                 {% else %}
-                    <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
+                   <script type="text/javascript">
+                        $("#msg").append("<p>{% trans 'You can not demote this object since its state is official or more advanced.' %}</p>");
+                   </script>
                 {% endif %}
             {% else %}
-                <p>{% trans "You do not have the permission to demote this object." %}</p>
+                <script type="text/javascript">
+                        $("#msg").append("<p>{% trans 'You do not have the permission to demote this object.' %}</p>");
+                </script>
             {% endif %}
         {% endif %}
         {% if is_signer %}
             {% if obj.is_promotable %}
                 <input name="promote" type="submit" class="{{"Button"|button}}" value="{% trans "PROMOTE" %}" />
             {% else %}
-                <p>{% trans "You can not promote this object:" %}</p>
-                {{ obj.promotion_errors.as_ul }}
+                <script type="text/javascript">
+                        $("#msg").append("<p>{% trans 'You can not promote this object:' %}</p>");
+                        $("#msg").append('{{ obj.promotion_errors.as_ul }}');
+                </script>
             {% endif %}
         {% else %}
-            <p>{% trans "You do not have the permission to promote this object." %}</p>
+            <script type="text/javascript">
+                        $("#msg").append("<p>{% trans 'You do not have the permission to promote this object.' %}</p>");
+             </script>
+
         {% endif %}
     </form>
     <div class="lifecycle">
@@ -102,26 +113,29 @@
                     <span class="state">{{status}}</span>
                 </div>
                 {% if not forloop.last %}
-                {% with signers_data|key:forloop.counter0 as signer_data %}
-                    {% if signer_data.nb_signer > 0 %}
-                    <div class="management">
-                        <span class="signer">
-                            <a href="/user/{{signer_data.signer.user.username|urlencode }}/">{{signer_data.signer.user.username}}</a>
-                    {% if is_owner %}
-                            <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
-                    {% endif %}
-                        </span>
-                    </div>
-                {% endif %}
-                {% endwith %}
+                
                 {% endif %}
             </div>
             {% if not forloop.last %}
+            <div class="management">
                 <div class="arrow
                     {% if is_current_state %}
                         active
                     {% endif %}
-                    ">&gt;</div>
+                    " style="">&gt;</div>
+                {% with signers_data|key:forloop.counter0 as signer_data %}
+                    {% if signer_data.nb_signer > 0 %}
+                    <!--<div class="management">-->
+                        <span class="signer">
+                            <a href="/user/{{signer_data.signer.user.username|urlencode }}/">{{signer_data.signer.user.username}}</a><br/>
+                    {% if is_owner %}
+                            <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                    {% endif %}
+                        </span>
+                    <!--</div>-->
+                {% endif %}
+                {% endwith %}
+             </div>
             {% endif %}
         {% endfor %}
 
@@ -147,8 +161,6 @@
     {% with notified_list as object_management_list %}
         {% include "snippets/management_block.html" %}
     {% endwith %}
-    </div>
-     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
     {% with owner_list as object_management_list %}
         {% include "snippets/management_block.html" %}
     {% endwith %}

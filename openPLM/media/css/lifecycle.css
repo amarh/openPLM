@@ -1,5 +1,12 @@
 
 
+#msg{
+    background-color: #E4E3E2;
+    display: table;
+    padding: 1%;
+    border: 4px solid #F95CC8;
+    border-radius: 4px;
+}
 div.lifecycle {
     background-color: #E4E3E2;
     display: block;
@@ -67,14 +74,19 @@ div.lifecycle div.deprecated.active {
     background: url("../img/lifecycle/deprecated_on.png") no-repeat;
 }
 
+div.lifecycle div.management{
+    text-align:center;
+}
 
-div.lifecycle div.arrow {
+div.management div.arrow {
+    margin-left :auto;
+    margin-right : auto;
     line-height: 119px;
     width: 38px;
     background: url("../img/lifecycle/arrow_off.png") no-repeat center center;
     text-indent: -100000px;
 }
 
-div.lifecycle div.arrow.active {
+div.management div.arrow.active {
     background: url("../img/lifecycle/arrow_on.png") no-repeat center center;
 }

@@ -379,12 +379,13 @@ def get_lifecycle_data(signers,obj,ctx):
     cancelled = []
     deprecated = []
     if is_signer:
-        if lcs.next_state(state) == obj.lifecycle.official_state.name:
-            for rev in obj.get_previous_revisions():
-                if rev.is_official:
-                    deprecated.append(rev)
-                elif rev.is_draft or rev.is_proposed:
-                    cancelled.append(rev)
+        if lcs[-1] != state:
+            if lcs.next_state(state) == obj.lifecycle.official_state.name:
+                for rev in obj.get_previous_revisions():
+                    if rev.is_official:
+                        deprecated.append(rev)
+                    elif rev.is_draft or rev.is_proposed:
+                        cancelled.append(rev)
     ctx["cancelled_revisions"] = cancelled
     ctx["deprecated_revisions"] = deprecated
 

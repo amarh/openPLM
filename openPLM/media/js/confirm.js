@@ -33,6 +33,19 @@ function confirm_submit(form, e) {
 				}
 			}
 		});
+	$("#" + form.attr("id") + "-dialog").on('keydown',function(a){
+        if( a.keyCode == $.ui.keyCode.ENTER ) {
+            $( this ).dialog( "close" );
+            form.addClass("confirmed");
+            var button = $("input[type=submit][clicked=true]");
+            $("<input>").attr({
+                'type':'hidden',
+                'name': button.attr('name')
+            }).val(button.val()).appendTo(form);
+            $(this).find("input").hide().appendTo(form);                    
+            form.submit();;
+        }
+    });
     return false;
 
 }
