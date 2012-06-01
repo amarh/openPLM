@@ -41,6 +41,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -247,6 +248,7 @@ def init_ctx(init_type_, init_reference, init_revision):
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
         'can_generate_pdf' : can_generate_pdf(),
         'openPLM_version' : _version,
+        'site' : Site.objects.get_current(),
         }
 
 ##########################################################################################
