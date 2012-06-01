@@ -2,7 +2,7 @@
 Revisions
 =======================
 
-This document show which elements should be suggested when a document or a part
+This document defines which elements should be suggested when a document or a part
 is revised.
 
 Suggested parts when a document is revised
