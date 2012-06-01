@@ -647,6 +647,13 @@ class PLMObject(models.Model):
                 "group", "ctime", "mtime"]
 
     @property
+    def published_attributes(self):
+        u""".. versionadded:: 1.1
+
+        Attributes that are visible to everyone if the object has been published."""
+        return ["type", "reference", "revision", "name",]
+
+    @property
     def menu_items(self):
         "Menu items to choose a view"
         return [ugettext_noop("attributes"), ugettext_noop("lifecycle"),
