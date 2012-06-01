@@ -10,5 +10,7 @@ the consequences of a promote.
     :numbered:   
 
     lifecycle
+    publication
     revisions
+
 
