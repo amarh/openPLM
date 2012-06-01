@@ -42,6 +42,7 @@ user_dict = {'obj_type':'User', 'obj_revi':'-'}
 group_dict = {'obj_type':'Group', 'obj_revi':'-'}
 urlpatterns = patterns('openPLM.pdfgen.views',
     (r'^pdf/object/' + object_pattern +'attributes/$', 'attributes'),
+    (r'^pdf/object/' + object_pattern +'BOM-child/$', 'bom_pdf'),
     (r'^pdf/user/(?P<obj_ref>[^/]+)/attributes/$', 'attributes', user_dict),
     (r'^pdf/group/(?P<obj_ref>[^/]+)/attributes/$', 'attributes', group_dict),
 )

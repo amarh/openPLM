@@ -29,62 +29,71 @@
     <div id="decompose">
         {{ decomposition_msg|safe }}
     </div>
-    <table class="Content">
-        <tr class="Content">
-            <th class="Content" style="width:50px"> {% trans "Level" %} </th>
-            <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
-            <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
-            <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
-            <th class="Content"> {{ obj.reference }} </th>
-            <th class="Content"> {{ obj.revision }} </th>
-            <th class="Content"> {{ obj.type }} </th>
-            <th class="Content"> {{ obj.name }} </th>
-            {% for field, verbose_name in extra_columns %}
-                <th class="Content"> {{ verbose_name|capfirst }} </th>
-            {% endfor %}
-            <th class="Content"> {{ obj.state.name }} </th>
-        </tr>
-        {% for c in children %}
-
-            <tr class="Content"> 
-                <td class="Content {% if level != "last" %} expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
-		{% if forloop.last or level == "last" %}
-		    <span class="not_expander">{{c.level}}</span>
-		{% else %}
-			{% with forloop.counter as next %}
-			{% with children|indice:next as ci%}
-				{% if ci.level > c.level %}
-                    <span class="expander">{{c.level}}</span>
-				{% else %}
-		    <span class="not_expander">{{c.level}}</span>
-				{% endif %}
-			{% endwith %}
-			{% endwith %}
-		{% endif %}
-                </td>
-                {% with c.link as link %}
-                    <td class="Content"> {{ link.order }} </td>
-                    <td class="Content"> {{ link.quantity }} </td>
-                    <td class="Content"> {{ link.get_unit_display }} </td>
-                    {% with link.child as child %}
-                        <td class="Content"> 
-                            <a href="{{child.plmobject_url}}"
-                                {% if child.id in decomposable_children %}class="decomposable"{% endif %}>
-                                {{ child.reference }}
-                            </a>
-                        </td>
-                        <td class="Content"> {{ child.revision }} </td>
-                        <td class="Content"> {{ child.type }} </td>
-                        <td class="Content"> {{ child.name }} </td>
-                        {% for field, verbose_name in extra_columns %}
-                            <td class="Content"> {{ extension_data|key:link.id|key:field }} </td>
-                        {% endfor %}
-                        <td class="Content"> {{ child.state.name }} </td>
-                    {% endwith %}
-                {% endwith %}
+    <div>
+        <table class="Content">
+            <tr class="Content">
+                <th class="Content" style="width:50px"> {% trans "Level" %} </th>
+                <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
+                <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
+                <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
+                <th class="Content"> {{ obj.reference }} </th>
+                <th class="Content"> {{ obj.revision }} </th>
+                <th class="Content"> {{ obj.type }} </th>
+                <th class="Content"> {{ obj.name }} </th>
+                {% for field, verbose_name in extra_columns %}
+                    <th class="Content"> {{ verbose_name|capfirst }} </th>
+                {% endfor %}
+                <th class="Content"> {{ obj.state.name }} </th>
             </tr>
-        {% endfor %}
-    </table>
+            {% for c in children %}
+
+                <tr class="Content"> 
+                    <td class="Content {% if level != "last" %} expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
+                        {% if forloop.last or level == "last" %}
+                            <span class="not_expander">{{c.level}}</span>
+                        {% else %}
+                            {% with forloop.counter as next %}
+                                {% with children|indice:next as ci%}
+                                    {% if ci.level > c.level %}
+                                        <span class="expander">{{c.level}}</span>
+                                    {% else %}
+                                        <span class="not_expander">{{c.level}}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endwith %}
+                        {% endif %}
+                    </td>
+                    {% with c.link as link %}
+                        <td class="Content"> {{ link.order }} </td>
+                        <td class="Content"> {{ link.quantity }} </td>
+                        <td class="Content"> {{ link.get_unit_display }} </td>
+                        {% with link.child as child %}
+                            <td class="Content"> 
+                                <a href="{{child.plmobject_url}}"
+                                    {% if child.id in decomposable_children %}class="decomposable"{% endif %}>
+                                    {{ child.reference }}
+                                </a>
+                            </td>
+                            <td class="Content"> {{ child.revision }} </td>
+                            <td class="Content"> {{ child.type }} </td>
+                            <td class="Content"> {{ child.name }} </td>
+                            {% for field, verbose_name in extra_columns %}
+                                <td class="Content"> {{ extension_data|key:link.id|key:field }} </td>
+                            {% endfor %}
+                            <td class="Content"> {{ child.state.name }} </td>
+                        {% endwith %}
+                    {% endwith %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% if can_generate_pdf %}
+        <div class="center">
+            <a class="{{"Button"|button}}" href="/pdf{{obj.plmobject_url}}BOM-child/{% add_get %}">
+                <span class="ui-button-text">{% trans "Download as PDF" %}</span>
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 

@@ -24,6 +24,7 @@
 #    Pierre Cosquer : pierre.cosquer@insa-rennes.fr
 ################################################################################
 
+import datetime
 import warnings
 from collections import namedtuple
 
@@ -42,10 +43,10 @@ except ImportError:
     import ho.pisa as pisa
 import cStringIO as StringIO
 
-from openPLM.plmapp.models import ParentChildLink
 from openPLM.plmapp.base_views import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
-from openPLM.plmapp.views import r2r 
+from openPLM.plmapp.views import r2r, get_children_data
+from openPLM.plmapp.forms import DisplayChildrenForm
 from openPLM.pdfgen.forms import get_pdf_formset
 
 class StreamedPdfFileWriter(PdfFileWriter):
@@ -337,3 +338,31 @@ def select_pdf(request, obj_type, obj_ref, obj_revi):
     else:
         raise ValueError()
 
+@handle_errors
+def bom_pdf(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj.check_readable(raise_=True)
+    
+    if not hasattr(obj, "get_children"):
+        # TODO
+        raise TypeError()
+    date = None
+    level = "first"
+    state = "all"
+    if request.GET:
+        display_form = DisplayChildrenForm(request.GET)
+        if display_form.is_valid():
+            date = display_form.cleaned_data["date"]
+            level = display_form.cleaned_data["level"]
+            state = display_form.cleaned_data["state"]
+    children, extra_columns, extension_data = get_children_data(obj, date, level, state)
+    ctx.update({
+                'children' : children,
+                'extra_columns' : extra_columns,
+                'extension_data' : extension_data,
+                'level' : level,
+                'date' : date or datetime.datetime.utcnow(),
+                })
+
+    filename = u"%s_%s_%s-bom.pdf" % (obj_type, obj_ref, obj_revi)
+    return render_to_pdf("bom.xhtml", ctx, filename)
