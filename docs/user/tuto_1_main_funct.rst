@@ -65,9 +65,18 @@ The search block is part in two :
 
 First, you need to select the type of PLMObject you want to look for.
 
-Then, you can fill the form if you want to refine your research.
+Then, you can fill the form if you want to refine your research with:
+ * a set of words , OpenPLM will display the attributes which contains all of the given words
+ * advanced queries :
+    * attribute=data 
+        - name=test 
+        - name:test
+    * attribute:data OR query
+        - type=document3D OR type=design
+    * attribute:data AND query
+        - name=test AND (type=document3D OR type=design)
 
-OpenPLM will display the attributes which correspond to this type.
+OpenPLM will display the attributes which correspond to the query set.
 
 Example :
 
