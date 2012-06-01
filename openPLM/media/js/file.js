@@ -1,3 +1,12 @@
+/******************************************************
+Author : Zahariri ALI
+Contact : zahariri.ali@gmail.com
+******************************************************/
+
+
+
+
+
 /*****************************************************************
 **		Add or delete files in queue			                **
 *****************************************************************/
@@ -5,12 +14,12 @@
 //count for files to upload
 var nbr_files=0;
 //count for input added
-var num_file=0;
+var num_input=0;
 
 //create a new input file, called when a new file is added to the queue for upload
 function new_input_file(){
     var table = $("#fileupload > table.Content");
-    var num = num_file+1;
+    var num = num_input+1;
     var input = $("<input type='file' name='filename"+num+"' id='id_filename"+num+"'/ >");
     input.change(function(){
         if(at_least_one(this)){
@@ -30,7 +39,7 @@ function new_input_file(){
         }
         $("span.warning").remove();
     });
-    if(($.browser.msie!=true)&&($.browser.opera!=true)){
+    if(($.browser.msie!=true)&&($.browser.opera!=true)&&(xhr!=null)){
         input.attr("multiple","multiple");
     }
     var td_input = $("<td></td>");
@@ -38,7 +47,7 @@ function new_input_file(){
     var tr_input = $("<tr><th><label for='id_filename"+num+"'>Filename:</label></th></tr>");
     tr_input.append(td_input);
     table.prepend(tr_input);
-    num_file++;
+    num_input++;
 }
 
 //add an input in the form which contains files to upload
@@ -106,7 +115,7 @@ function can_add_native(file_name,display){
     if((doc_type.toLowerCase()=="document3d")&&(xhr!=null)){
         var xhr_nat= getXHR();
         var url=location.href;
-        url=url.replace("/files/","/files/add/?file_name="+file_name);
+        url +="add/?file_name="+file_name;
         xhr_nat.open("GET",url,false);
         xhr_nat.onreadystatechange=function(){
             if(xhr_nat.readyState == 4){
@@ -157,105 +166,68 @@ function can_add_file(file_name,display){
     return false;
 }
 
+//add the file f from the input to the queue
 function add_f_file(input,f){
-    //test if the file f can be added
-    if(can_add_file(f.name,true)){
-        //test if the file can be added even if it is a native file
-        if((can_add_native(f.name,true))||(doc_type.toLowerCase()!="document3d")){
 
-            var key = f.name.replace(".","_");
-            key = key.replace(" ","_");
-            var size=f.size;
+        var key = f.name.replace(".","_");
+        key = key.replace(" ","_");
+        var size=f.size;
 
-            //create line for file progress
-            var file_line = $("<div id='"+key+"' class='file_p'>"+f.name+"("+render_size(size)+") "+"</div>");
-            var progress = $("<span class='progress'><span class='text'></span></span>");
-            file_line.append(progress);
+        //create line for file progress
+        var file_line = $("<div id='"+key+"' class='file_p'>"+f.name+"("+render_size(size)+") "+"</div>");
+        var progress = $("<span class='progress'><span class='text'></span></span>");
+        file_line.append(progress);
 
-            //create link to delete this file from the queue for upload
-            var link = $("<span class='del_link'> </span>");
-            link.click(function(){
-    	        del_file(file_line,input);
-            });
-            var del_img = "<img src='/media/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
-            link.append(del_img);
-            file_line.append(link);
+        //create link to delete this file from the queue for upload
+        var link = $("<span class='del_link'> </span>");
+        link.click(function(){
+    	    del_file(file_line,input);
+        });
+        var del_img = "<img src='/media/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
+        link.append(del_img);
+        file_line.append(link);
 
-            //add the file in the list of files to upload
-            $("#div_files").append(file_line);
+        //add the file in the list of files to upload
+        $("#div_files").append(file_line);
 
-            var f_id = gen_uuid();
-            
-            if(($.browser.opera!=true)&&($.browser.msie!=true)){
-                /*var data_key = "filename";
-                if(nbr_files!=0){
-                    data_key+=nbr_files;
-                }
-                data.append(data_key,f);*/
-                //create an object related to the file in the files_info array-like
-                files_info[key]={"field_name":" ", "f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
-            }else{
-                files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
-            }
-            
-            
-            nbr_files+=1;
+        //create an object related to the file in the files_info array-like
+        var f_id = gen_uuid();
+        if(($.browser.opera!=true)&&($.browser.msie!=true)){
+            files_info[key]={"field_name":" ", "f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
+        }else{
+            files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
         }
-    }
+               
+        nbr_files+=1;
 }
-//add a file in the queue for uploading
+
+//add an input and the files selected in the queue for uploading
 function add_file(input){
     if (nbr_files==0){
         $("#div_files > div.file_p").remove();
     }
+    
     $.each(input.files,function(ind,f){
-        add_f_file(input,f);
-    })
+        //test if the file f can be added
+        if((can_add_file(f.name,true))&&(can_add_native(f.name,true))){
+            add_f_file(input,f);
+        }
+    });
+    
+    //the file is not added in the queue form when
+    // checking in for a given file
     if($("#fileupload").attr("action")=="."){
         add_in_queue_form(input);
         new_input_file();
     }
 }
 
+//add the file selected for check-in to the upload queue
 function check_in_file(input){
+
+    //check-in consider only the first file selected
     var f = input.files[0];
-    var key = f.name.replace(".","_");
-    key = key.replace(" ","_");
-    var size=f.size;
-
-    //create line for file progress
-    var file_line = $("<div id='"+key+"' class='file_p'>"+f.name+"("+render_size(size)+") "+"</div>");
-    var progress = $("<span class='progress'><span class='text'></span></span>");
-    file_line.append(progress);
-
-    //create link to delete this file from the queue for upload
-    var link = $("<span class='del_link'> </span>");
-    link.click(function(){
-        del_file(file_line,input);
-    });
-    var del_img = "<img src='/media/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
-    link.append(del_img);
-    file_line.append(link);
-
-    //add the file in the list of files to upload
-    $("#div_files").append(file_line);
-
-    var f_id = gen_uuid();
-            
-    if(($.browser.opera!=true)&&($.browser.msie!=true)){
-    /*var data_key = "filename";
-    if(nbr_files!=0){
-        data_key+=nbr_files;
-    }
-    data.append(data_key,f);*/
-     
-        //create an object related to the file in the files_info array-like
-        files_info[key]={"field_name":" ", "f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
-    }else{
-        files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
-    }
-                  
-    nbr_files+=1;
+    add_f_file(input,f);
     
 }
 
@@ -265,13 +237,14 @@ function hide(input){
 }
 
 //delete a file from list and form which contains files to upload
-
 function del_file(item,input){
     var key = item.attr("id");
     files_info=files_info.remove(key);
     item.remove();
     nbr_files--;
     $(".up_fail").remove();
+    
+    //input file's multiple selection is not enable for opera and IE
     if(($.browser.opera)||($.browser.msie)){
         $(input).remove();
     }
@@ -290,11 +263,12 @@ function del_file(item,input){
 var doc_type = "";
 
 //Array that contains path and size of eache files selected for upload
-var files_info=new Array();
-files_info.features=['features','size','key','remove','removeAll'];
+var files_info=[];
+files_info.features=['features','size','key','remove'];
 
+//returns all the key except those in files_info.features
 files_info.key=function(){
-    var ret=new Array();
+    var ret=[];
     for(key in files_info){
 	if($.inArray(key,files_info.features)==-1)
 	    ret.push(key);
@@ -302,6 +276,7 @@ files_info.key=function(){
     return ret;
 }
 
+//returns the number of file in files_info
 files_info.size=function(){
     var ret = 0;
     for(key in files_info){
@@ -311,31 +286,29 @@ files_info.size=function(){
     return ret;
 }
 
+//remove an element identified by key from files_info
 files_info.remove=function(key){
-   var keys = files_info.key();
-   if($.inArray(key,keys)==-1){
-	return;
-   }else{
-	var tmp_f_info=new Array();
-	$.each(files_info.features, function (ind,fe){
-	    tmp_f_info[fe]=files_info[fe];
-	});
-	$.each(keys, function(index,val){
-	    if(val!==key)
-		tmp_f_info[val]=files_info[val];
-	});
-	return tmp_f_info;
-   }
+    var keys = files_info.key();
+   
+    if($.inArray(key,keys)==-1){
+        return;
+    }else{
+    
+        var tmp_f_info=[];
+        
+	    $.each(files_info.features, function (ind,fe){
+	        tmp_f_info[fe]=files_info[fe];
+	    });
+	    $.each(keys, function(index,val){
+	        if(val!==key){
+	            tmp_f_info[val]=files_info[val];
+	        }
+	    });
+	    return tmp_f_info;
+    }
 }
 
-files_info.removeAll=function(){
-   var ret = new Array();
-   $.each(files_info.features, function (ind,fe){
-       ret[fe]=files_info[fe];
-   });
-   return ret;
-}
-
+//return the total size of all selected files
 function getSizeSelected(){
     var ret=0;
     var keys = files_info.key();
@@ -345,6 +318,7 @@ function getSizeSelected(){
     return ret;
 }
 
+//return the uploaded size for all selected files
 function getUpSize(){
     var ret = 0;
     var keys = files_info.key();
@@ -358,7 +332,9 @@ function file_selected(file_name){
     var key= file_name.replace(".","_");
     return (files_info[key]!=undefined);
 }
-var files_linked= new Array();
+
+//list of files linked to the document
+var files_linked= [];
 
 function file_linked(file_name){
     return ($.inArray(file_name,files_linked)!=-1);
@@ -369,12 +345,13 @@ function is_stp_file(file_name){
     return ($.inArray(ext, [".stp",".step"])!=-1);
 }
 
+//test if the document has step file linked
 function has_stp_file(){
     var ret = false;
     $.each(files_linked, function(ind,val){
-	if(is_stp_file(val)){
-	    ret = true;
-	}
+        if(is_stp_file(val)){
+	        ret = true;
+	    }
     });
     return ret;
 };
@@ -389,9 +366,12 @@ var t;
 
 var go_to ="";
 
+//size of all files selected for upload
 var totalF_Size =0;
 
+//size of files uploaded
 var totalUpSize =  0;
+
 //xmlhttprequest use to launch the upload
 var xhr = getXHR();
 
@@ -406,7 +386,8 @@ function gen_uuid() {
 
 //return percentage of the progress
 function progress_bar(uploaded, total){
-    var progress_w = uploaded * 100/total;
+    var progress_w = uploaded/total;
+    progress_w=Math.round(progress_w*10000)/100;
     return progress_w;
 }
 
@@ -416,14 +397,14 @@ function ids_to_data(){
     var ret="";
     var keys = files_info.key();
     $.each(keys,function(index,val){
-	ret += files_info[val].field_name+"="+files_info[val].p_id+"&";
+	    ret += files_info[val].field_name+"="+files_info[val].p_id+"&";
     });
     ret = ret.substr(0,ret.length-1);
     return ret;
 }
 
 
-//indicate wether or not the upload is complete for a given file name
+//indicate wether or not the upload is complete for a given file name/key
 function upload_end(key){
     var file_key = files_info[key];
     return (file_key.uploaded==file_key.size);
@@ -432,44 +413,48 @@ function upload_end(key){
 //get the progress for a given file name/key
 function update_progress(key){
     var xhr2=getXHR();
+    
     var action = location.href;
-    action = action.split("/files")[0];
-    //action=action.replace("/files*","/files/_up");
-    action+="/files/_up/";
+    action+="_up/";
     action+="?X-Progress-ID="+files_info[key].p_id;
     action+="&f_size="+files_info[key].size;
+    
     xhr2.open("GET",action,true);
+    
     xhr2.onreadystatechange = function() {
      	if((xhr2.readyState == 4)&&(xhr2.status==200)) {
-	        var response=xhr2.responseText;
+
+	        var response = xhr2.responseText;
 	        var uploaded = parseInt(response.split(":")[0]);
-	        var totalsize = files_info[key].size;
-    	    var f_status = response.split(":")[1];
-    	    files_info[key].status= f_status;
-    	    var percent = progress_bar(uploaded, totalsize);
-    	    if(isNaN(percent)){
-        		$("#"+key+" .progress .text").text("0% ("+files_info[key].status+")");
-    	    }else{
-        		var aux_per=""+percent;
-        		if (aux_per.split(".").length>1){
-        		    aux_per=aux_per.split(".")[0]+"."+aux_per.split(".")[1].substr(0,2);
-        		}
-        		$("#"+key+" .progress .text").text(aux_per+"%");
+	        var f_status = response.split(":")[1];
+	        
+    	    if(files_info[key].status != f_status){
+    	        files_info[key].status = f_status;
     	    }
     	    if(f_status=="linking"){
         		files_info[key].uploaded=files_info[key].size;
     	    }else{
         		if (f_status!="waiting"){
         		    files_info[key].uploaded=parseInt(response.split(":")[0]);
-        		    $("#"+key).find("progress").attr("value",percent);
         		}
     	    }
+    	    
+    	    var percent = progress_bar(uploaded, files_info[key].size);
+    	    if(!isNaN(percent)){
+        		$("#"+key+" .progress .text").text(percent+"%");
+        		$("#"+key).find("progress").attr("value",percent);
+    	    }
+    	    
     	}
     }
+    
     xhr2.send(null);
 }
 
+//intialize data before the upload is sent
+//data : formData object or form element (opera, IE)
 function init_files_data(f_form){
+
     //initialize field_name for each file selected
     var keys = files_info.key();
     $.each(keys,function(id,key){
@@ -478,6 +463,7 @@ function init_files_data(f_form){
             files_info[key].field_name+=id;
         }
     });
+    
     var inputs_file = $(f_form).find("input[type='file']");
     if(($.browser.opera!=true)&&($.browser.msie!=true)){
         $.each(inputs_file, function(id, input){
@@ -496,8 +482,11 @@ function init_files_data(f_form){
     }
 }
 
+//Handle the failure of upload
 function upload_failed(){
     clearTimeout(t);
+    
+    //display a message
     var fail_div = $("<div class='up_fail'></div>");
     var span_text=trans["Your upload(s) failed"]+"!<br>"+trans["Try again"];
     if(nbr_files>1){
@@ -507,22 +496,29 @@ function upload_failed(){
     }
     fail_div.append(span_text);
     $("#fileupload").after(fail_div);
+    
+    //remove all the progress info
     $(".progress .text").empty();
     $("progress").remove();
     $(".del_link").show();
     $("#global").remove();
+    
+    //reset the file upload form
     $("#fileupload").find("input[type='file']").removeAttr("disabled");
     $("#_up").show();
     $("#_delete").show();
     var files_form = $(".archive_form").next();
     $(files_form[0]).find("a").removeAttr("target");
     $(files_form[0]).find("input[type='submit']").removeAttr("disabled");
+    $(files_form[0]).next("div").find("a").removeAttr("target");
     $("#up_message").hide();
 }
+
 //launch and track progress of upload file in the form f_form
 function up_file(f_form){
     totalF_Size=getSizeSelected();
     totalUpSize=getUpSize();
+    
     var new_action = location.href;
     var form_action="";
     if($(f_form).attr("action")!="."){
@@ -530,12 +526,12 @@ function up_file(f_form){
         form_action=form_action.substr(2);
         new_action+="get_"+form_action;
     }else{
-        //new_action = new_action.replace("/files*","/files/up");
-        new_action = new_action.split("/files")[0]+"/files/up/";
+        new_action+="up/";
     }
     init_files_data(f_form);
     var ids_list = ids_to_data();
     new_action +="?"+ids_list;
+    
     function update_progress_info() {
         var keys = files_info.key();
         $.each(keys, function (index,key_val){
@@ -545,15 +541,14 @@ function up_file(f_form){
                 $("#"+key_val).find("progress").attr("value",100);
             }
         });
+        
         totalUpSize=getUpSize();
         var totalPercent = progress_bar(totalUpSize, totalF_Size);
         $("#global").find("progress").attr("value",totalPercent);
-        var textTot = totalPercent.toString().split(".")[0];
-        if(totalPercent.toString().split(".").length > 1){
-            textTot+= "."+totalPercent.toString().split(".")[1].substr(0,2);
-        }
-        $("#global .progress .text").text(textTot+"%");
-        t=window.setTimeout(update_progress_info, 1000)
+        $("#global .progress .text").text(totalPercent+"%");
+        
+        t=window.setTimeout(update_progress_info, 1000);
+        
         if(($.browser.opera)||($.browser.msie)){
             var x=document.getElementById("hidden_frame");
             var y=(x.contentWindow || x.contentDocument);
@@ -568,41 +563,48 @@ function up_file(f_form){
                 }
             }
         }
+        
         if(go_to!=""){
             location.href=go_to;
         }
     }
+    
     t=window.setTimeout(update_progress_info, 1000);
+    
     if(($.browser.opera!=true)&&($.browser.msie!=true)){
         xhr.onreadystatechange = function() {
             if(xhr.readyState == 4){
                 if(xhr.status==200) {
                     go_to = location.href;
-                    //go_to = go_to.replace("/files*","/files");
-                    go_to = go_to.split("/files")[0]+"/files/";
                 }else{
                     upload_failed();
                 }
             }
         }
+        
         xhr.open("POST", new_action,true);
-        //var data = new FormData(f_form);
+        
         xhr.send(data);
     }else{
+        //opera and IE do not support FormData object
         opera_up_file(f_form,new_action,go_to);
     }
 }
 
 /*reset the upload:
 * - delete all files selected and hidden input files
+* - set the upload form to check-in for a given file
 */
 function reset_upload(){
     $(".del_link").click();
     nbr_files=0;
-    num_file=0;
-    //files_info = files_info.removeAll();
+    num_input=0;
+    
+    $(".up_fail").remove();
     var table = $("#fileupload > table.Content");
+    
     $("#fileupload > table.Content tr:first").remove();
+    
     var input = $("<input type='file' name='filename' id='id_filename'/ >");
     input.change(function(){
         var f_name = this.files[0].name;
@@ -649,18 +651,25 @@ function getXHR(){
     return xhr;
 }
 
+//contains translation needed for different message/text
 var trans=[];
+
+//sets data according to the browser used
 var data;
 if(($.browser.opera!=true)&&($.browser.msie!=true)){
     data = new FormData($('form.hidden')[0]);
 }
 
+
 $(function(){
+    //sets the message that will be displayed while uploading files
+    var up_msg = $("<div style='margin:1%;' id='up_message'></div>");
+    up_msg.text(trans["Do not leave the current page until the upload ends"]);
+    $("form.hidden:first").after(up_msg);
     $("#up_message").hide();
+    
     $("input[type='submit'][name='_validate']").hide();
-    if(($.browser.msie!=true)&&($.browser.opera!=true)){
-        $("input[type='file']").attr('multiple','multiple');
-    }
+    
     $("#add_file_container").toggleClass("hidden");
     if(files_linked.length!=0){
         $("#add_form_file").toggleClass("hidden");
@@ -669,19 +678,14 @@ $(function(){
     $("#add_text").text(add_text.split(" / ")[0]);
     $("#add_text").attr("title",trans["Show/Hide the upload form"]);
 
-    $.each($(".check-in"),function(ind,val){
-        var ref =$(val).parent().attr("href");
-        $(val).parent().removeAttr("href");
-        $(val).attr("action",ref);
-    });
-
     $("#add_text").click(function(){
         $("#add_form_file").toggleClass("hidden");
     });
 
-    $(".check-in").click(function(){
+    $(".check-in").click(function(e){
+        e.preventDefault();
         if($("#fileupload").find("input[type='file']").attr("disabled")!="disabled"){
-            $("#fileupload").attr("action",$(this).attr("action"));
+            $("#fileupload").attr("action",$(this).parent().attr("href"));
             reset_upload();
             $("#add_form_file").removeClass("hidden");
             var line= $(this).parent().parent().parent();
@@ -708,14 +712,21 @@ $(function(){
         $("span.warning").remove();
     });
 
+    //remove all the selected files and hidden inputs files
     $("#_delete").click(function(){
         $(".del_link").click();
+        $("form.hidden > input[type='file']").remove();
         $("#_up").addClass("hidden");
         $("#_delete").addClass("hidden");
     });
 
     if(xhr!=null){
     //if the browser supports xmlhttprequest object
+    
+        if(($.browser.msie!=true)&&($.browser.opera!=true)){
+            $("input[type='file']").attr('multiple','multiple');
+        }
+        
         $("input[name='_undo']").click(function(){
             if(xhr.readyState!=0){
                 xhr.onreadystatechange = function() {}
@@ -746,12 +757,18 @@ $(function(){
             $("#_delete").hide();
             $("#_up").hide();
             var files_form = $(".archive_form").next();
+            
+            //disable actions in the file display form
+            $(files_form[0]).find("input[type!='hidden']").attr("disabled","disabled");
+            
+            //set all links so a new tab is opened when they are clicked on
             $(files_form[0]).find("a").attr("target","_blank");
-            $(files_form[0]).find("input[type='submit']").attr("disabled","disabled");
+            $(files_form[0]).next("div").find("a").attr("target","_blank");
+            
             $("#up_message").show();
         });
     }else{
-        //the browser does not support xmlhttprequest object
+        //the browser does not support xmlhttprequest object but has javascript enabled
         //if javascript is disabled, noscript tag will handle that
         $("#fileupload").insertAfter("<span class='warning'>"+trans["You can only upload files, but you wont get progress of this upload"]+"</span>");
         $("#_up").click(function(){
@@ -759,6 +776,8 @@ $(function(){
                 $("#fileupload").find("input[type='file']").parent().append("<span class='warning'>"+trans["Select at least one file"]+"</span>");
                 return;
             }
+            
+            opera_prepare_form($("form.hidden:first > input[type='file']"));
             $('form.hidden')[0].action=location.href+"add/";
             $('form.hidden')[0].method="post";
             $('form.hidden')[0].submit();
