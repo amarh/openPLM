@@ -70,7 +70,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils import simplejson
 from django.views.i18n import set_language as dj_set_language
-from django.views.decorators.csrf import *
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from haystack.views import SearchView
 
@@ -688,6 +688,35 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
 #############################################################################################
+def get_children_data(obj, date, level, state):
+    max_level = 1 if level == "first" else -1
+    only_official = state == "official"
+    children = obj.get_children(max_level, date=date, only_official=only_official)
+    if level == "last" and children:
+        previous_level = 0
+        max_children = []
+        for c in children:
+            if max_children and c.level > previous_level:
+                del max_children[-1]
+            max_children.append(c)
+            previous_level = c.level
+        children = max_children
+    children = list(children)
+    # pcle
+    extra_columns = []
+    extension_data = defaultdict(dict)
+    for PCLE in models.get_PCLEs(obj.object):
+        fields = PCLE.get_visible_fields()
+        if fields:
+            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                    for f in fields)
+            pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
+            pcles = pcles.values("link_id", *fields)
+            for pcle in pcles:
+                extension_data[pcle["link_id"]].update(pcle)
+    return children, extra_columns, extension_data
+
+
 @handle_errors
 def display_object_child(request, obj_type, obj_ref, obj_revi):
     """
@@ -741,31 +770,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     else:
         display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state":"all"})
-    max_level = 1 if level == "first" else -1
-    only_official = state == "official"
-    children = obj.get_children(max_level, date=date, only_official=only_official)
-    if level == "last" and children:
-        previous_level = 0
-        max_children = []
-        for c in children:
-            if max_children and c.level > previous_level:
-                del max_children[-1]
-            max_children.append(c)
-            previous_level = c.level
-        children = max_children
-    children = list(children)
-    # pcle
-    extra_columns = []
-    extension_data = defaultdict(dict)
-    for PCLE in models.get_PCLEs(obj.object):
-        fields = PCLE.get_visible_fields()
-        if fields:
-            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
-                    for f in fields)
-            pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
-            pcles = pcles.values("link_id", *fields)
-            for pcle in pcles:
-                extension_data[pcle["link_id"]].update(pcle)
+    children, extra_columns, extension_data = get_children_data(obj, date, level, state)
     # decomposition
     if DecomposersManager.count() > 0:
         children_ids = (c.link.child_id for c in children)

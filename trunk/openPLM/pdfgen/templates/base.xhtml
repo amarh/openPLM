@@ -18,15 +18,26 @@
                         margin-left: 1cm;
                         margin-right: 1cm;
                         height: 1cm;
-                        width: 100%;
+                        width: 19cm;
                     }
                 }
-                span.date {
-                    margin-left: auto;
-                    margin-right: auto;
+                div.footerContent * {
+                        text-align: center;
+
                 }
-                span.pagenumber {
-                    right: 0cm;
+                span.date {
+                    text-align: left;
+                }
+                a.openplm {
+                    margin-left: 5cm;
+                    margin-right: 5cm;
+                    text-align: center;
+                }
+                div.pagenumber {
+                    display: inline;
+                }
+                div.pagenumber * {
+                    text-align: right;
                 }
                 table.Content tr {
                     border: 1px solid black;
@@ -35,6 +46,11 @@
                 table.Content th {
                     padding: 0.2em;
                 }
+                a, a * {
+                    color: grey;
+                    text-decoration: none;
+                }
+
             {% endblock %}	
         </style>
     </head>
@@ -52,9 +68,11 @@
         <div id="footerContent">
             {%block page_foot%}
                 <span class="date">{% now "D j N Y, G:i" %}</span>
+                <a class="openplm" href="http://www.openplm.org">{% trans "Genererated by openPLM" %}</a>
                 <div class="pagenumber">
                     <pdf:pagenumber>
                 </div>
+                
             {%endblock%}
         </div>
     </body>
