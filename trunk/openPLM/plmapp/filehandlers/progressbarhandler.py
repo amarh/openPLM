@@ -1,3 +1,8 @@
+######################################
+# Author : Zahariri ALI
+# Contact : zahariri.ali@gmail.com
+######################################
+
 from django.core.files import temp as tempfile
 from django.core.files.uploadhandler import FileUploadHandler
 from django.core.files.uploadedfile import *
@@ -5,8 +10,8 @@ from django.core.files.uploadedfile import *
 
 class ProgressBarUploadHandler(FileUploadHandler):
     """
-    Tracks progress for file uploads.
-    The http post request must contain a header or query parameter, 'X_Progress_ID'
+    Handle and tracks progress for multiple file uploads.
+    The http post request must contain a query parameter for each file field, 
     which should contain a unique string to identify the temporary file uploaded to be tracked.
     """
 
@@ -16,7 +21,7 @@ class ProgressBarUploadHandler(FileUploadHandler):
 
     def new_file(self,file_name, *args, **kwargs):
         """
-        Create the file object to append to as data is coming in.
+        Create the file object, identified by the corresponding query parameter, to append to as data is coming in.
         """
         self.progress_id["%s" % file_name]=self.request.GET["%s" % file_name]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
