@@ -15,9 +15,11 @@
                         </a>
                         <div class="quick_link">
                             {% for item in menu %}
+                                {% if item != "management" %}
                                 <a class="quick_link" href="{{url_}}{{item}}">
                                     {% filter upper %}{% trans item %}{% endfilter%}
                                 </a>
+                                {% endif %}
                             {% endfor %}
                         </div>
                         </li>
