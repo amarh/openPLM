@@ -1086,18 +1086,18 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
         if 'file_name' in request.GET:
-            f_name = request.GET['file_name']
-            f_name = f_name.encode("utf-8")
-            ret = obj.has_standard_related_locked(f_name)
-            if ret==True:
-    	        return HttpResponse("true:Native file has a standard related locked file.")
+            f_name = request.GET['file_name'].encode("utf-8")
+            if obj.has_standard_related_locked(f_name):
+                return HttpResponse("true:Native file has a standard related locked file.")
             else:
                 return HttpResponse("false:")
         add_file_form = forms.AddFileForm()
         files = forms.get_file_formset(obj)
-    	ctx.update({ 'files_list': files, })
-    ctx.update({ 'add_file_form': add_file_form, })
-    ctx.update({ 'document_type': obj_type, })
+        ctx['files_list'] =  files
+    ctx.update({
+        'add_file_form': add_file_form, 
+        'document_type': obj_type,
+    })
     return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
@@ -1131,12 +1131,12 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     p_id = request.GET['X-Progress-ID']
     tempdir = settings.FILE_UPLOAD_TEMP_DIR or tempfile.gettempdir()
     f = glob.glob(os.path.join(tempdir, "*%s_upload" % p_id))
-    if len(f) > 0:
+    if f:
         ret = str(os.path.getsize(f[0]))
-    if ret=="":
-        ret="0:waiting"
+    if not ret:
+        ret = "0:waiting"
     else:
-        if ret==request.GET['f_size']:
+        if ret == request.GET['f_size']:
             ret += ":linking"
         else:
             ret += ":writing"
