@@ -280,7 +280,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     ctx.update({'password_form' : password_form,})
     signer_list = get_management_data(request,obj,ctx)
     get_lifecycle_data(signer_list,obj,ctx)
-    return r2r('lifecycle_bis.html',ctx,request)
+    return r2r('lifecycle.html',ctx,request)
     
     
 def get_lifecycle_data(signers,obj,ctx):
