@@ -480,6 +480,8 @@ class PLMObject(models.Model):
 
             :class:`GroupInfo` that owns the object
         .. attribute:: published
+            
+            .. versionadded:: 1.1
 
             True if the object is published (accessible to anonymous user)
 
