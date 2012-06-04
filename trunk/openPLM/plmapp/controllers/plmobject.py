@@ -588,24 +588,54 @@ class PLMObjectController(Controller):
         self._update_state_history()
 
     def check_publish(self, raise_=True):
+        """
+        .. versionadded:: 1.1
+
+        Checks that an object can be published.
+
+        If *raise_* is True:
+
+            :raise: :exc:`.PermissionError` if the object is not official
+            :raise: :exc:`.PermissionError` if the user is not allowed to publish
+                an object (see :attr:`.UserProfile.can_publish`)
+            :raise: :exc:`.PermissionError` if the user does not belong to
+                the object's group
+            :raise: :exc:`.ValueError` if the object is already published
+
+        If *raise_* is False:
+
+            Returns True if all previous tests has been succesfully passed,
+            False otherwise.
+        """
         res = self.is_official
         if (not res) and raise_:
             raise PermissionError("Invalid state: the object is not official")
-        res = res and self.check_in_group(raise_=raise_)
         res = res and self._user.get_profile().can_publish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to publish an object")
+        res = res and self.check_in_group(raise_=raise_)
         res = res and not self.published
         if (not res) and raise_:
             raise ValueError("Object already published")
         return res
 
     def can_publish(self):
+        """
+        .. versionadded:: 1.1
+
+        Returns True if the user can publish this object.
+        """
         return self.check_publish(raise_=False)
 
     def publish(self):
         """
+        .. versionadded:: 1.1
+
         Publish the object.
+        
+        A published object can be accessed by anonymous users.
+
+        :raise: all exceptions raised by :meth:`check_publish`
         """
         self.check_publish()
         self.object.published = True
@@ -614,20 +644,48 @@ class PLMObjectController(Controller):
         self._save_histo("Publish", details)
 
     def check_unpublish(self, raise_=True):
+        """
+        .. versionadded:: 1.1
+
+        Checks that an object can be unpublished.
+
+        If *raise_* is True:
+
+            :raise: :exc:`.PermissionError` if the user is not allowed to publish
+                    an object (see :attr:`.UserProfile.can_publish`)
+            :raise: :exc:`.PermissionError` if the user does not belong to
+                    the object's group
+            :raise: :exc:`.ValueError` if the object is not published
+
+        If *raise_* is False:
+
+            Returns True if all previous tests has been succesfully passed,
+            False otherwise.
+        """
+
         res = self._user.get_profile().can_unpublish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to unpublish an object")
         res = res and self.published
         if (not res) and raise_:
-            raise ValueError("Object not unpublished")
+            raise ValueError("Object not published")
         return res
 
     def can_unpublish(self):
+        """
+        .. versionadded:: 1.1
+
+        Returns True if the user can unpublish this object.
+        """
         return self.check_unpublish(raise_=False)
 
     def unpublish(self):
         """
+        .. versionadded:: 1.1
+
         Unpublish the object.
+        
+        :raise: all exceptions raised by :meth:`check_unpublish`
         """
         self.check_unpublish()
         self.object.published = False
