@@ -587,3 +587,52 @@ class PLMObjectController(Controller):
         self._save_histo("Cancel", "Object cancelled") 
         self._update_state_history()
 
+    def check_publish(self, raise_=True):
+        res = self.is_official
+        if (not res) and raise_:
+            raise PermissionError("Invalid state: the object is not official")
+        res = res and self.check_in_group(raise_=raise_)
+        res = res and self._user.get_profile().can_publish
+        if (not res) and raise_:
+            raise PermissionError("You are not allowed to publish an object")
+        res = res and not self.published
+        if (not res) and raise_:
+            raise ValueError("Object already published")
+        return res
+
+    def can_publish(self):
+        return self.check_publish(raise_=False)
+
+    def publish(self):
+        """
+        Publish the object.
+        """
+        self.check_publish()
+        self.object.published = True
+        self.object.save()
+        details = u"Published by %s (%s)" % (self._user.get_full_name(), self._user.username)
+        self._save_histo("Publish", details)
+
+    def check_unpublish(self, raise_=True):
+        res = self._user.get_profile().can_unpublish
+        if (not res) and raise_:
+            raise PermissionError("You are not allowed to unpublish an object")
+        res = res and self.published
+        if (not res) and raise_:
+            raise ValueError("Object not unpublished")
+        return res
+
+    def can_unpublish(self):
+        return self.check_unpublish(raise_=False)
+
+    def unpublish(self):
+        """
+        Unpublish the object.
+        """
+        self.check_unpublish()
+        self.object.published = False
+        models.Publication.objects.filter(plmobject=self.object).delete()
+        details = u"Unpublished by %s (%s)" % (self._user.get_full_name(), self._user.username)
+        self._save_histo("Unpublish", details)
+
+

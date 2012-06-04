@@ -479,6 +479,9 @@ class PLMObject(models.Model):
         .. attribute:: group
 
             :class:`GroupInfo` that owns the object
+        .. attribute:: published
+
+            True if the object is published (accessible to anonymous user)
 
     .. note::
 
@@ -512,6 +515,8 @@ class PLMObject(models.Model):
     state = models.ForeignKey(State, verbose_name=_("state"),
                               related_name="%(class)s_lifecyle",
                               default=get_default_state)
+
+    published = models.BooleanField(verbose_name=_("published"), default=False)
     
     
     class Meta:
@@ -669,7 +674,7 @@ class PLMObject(models.Model):
     def plmobject_url(self):
         url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
         return iri_to_uri(url)
-    
+
     @classmethod
     def get_creation_fields(cls):
         """
@@ -1063,6 +1068,8 @@ class AbstractHistory(models.Model):
         ("Promote", "Promote"),
         ("Demote", "Demote"),
         ("Cancel", "Cancel"),
+        ("Publish", "Publish"),
+        ("Unpublish", "Unpublish"),
     )
     
     class Meta:
