@@ -613,7 +613,7 @@ class PLMObjectController(Controller):
         res = res and self._user.get_profile().can_publish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to publish an object")
-        res = res and self.check_in_group(raise_=raise_)
+        res = res and self.check_in_group(self._user, raise_=raise_)
         res = res and not self.published
         if (not res) and raise_:
             raise ValueError("Object already published")
@@ -651,11 +651,11 @@ class PLMObjectController(Controller):
 
         If *raise_* is True:
 
-            :raise: :exc:`.PermissionError` if the user is not allowed to publish
+            :raise: :exc:`.PermissionError` if the user is not allowed to unpublish
                     an object (see :attr:`.UserProfile.can_publish`)
             :raise: :exc:`.PermissionError` if the user does not belong to
                     the object's group
-            :raise: :exc:`.ValueError` if the object is not published
+            :raise: :exc:`.ValueError` if the object is unpublished
 
         If *raise_* is False:
 
@@ -663,9 +663,10 @@ class PLMObjectController(Controller):
             False otherwise.
         """
 
-        res = self._user.get_profile().can_unpublish
+        res = self._user.get_profile().can_publish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to unpublish an object")
+        res = res and self.check_in_group(self._user, raise_=raise_)
         res = res and self.published
         if (not res) and raise_:
             raise ValueError("Object not published")
@@ -689,7 +690,7 @@ class PLMObjectController(Controller):
         """
         self.check_unpublish()
         self.object.published = False
-        models.Publication.objects.filter(plmobject=self.object).delete()
+        self.object.save()
         details = u"Unpublished by %s (%s)" % (self._user.get_full_name(), self._user.username)
         self._save_histo("Unpublish", details)
 
