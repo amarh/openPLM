@@ -13,7 +13,7 @@ be accessible to anonymous user.
     This specification is not yet implemented and is still a draft.
 
 
-Condition to publish a part or an object
+Condition to publish a part or a document
 =========================================
 
 
@@ -47,7 +47,7 @@ Visible data
 ==============
 
 
-The public page of a part shows the following data:
+The public page of a **part** shows the following data:
 
     * its type
     * its reference
@@ -60,7 +60,7 @@ The public page of a part shows the following data:
     * all published related revisions
 
 
-The public page of a document shows the following data:
+The public page of a **document** shows the following data:
 
     * its type
     * its reference
