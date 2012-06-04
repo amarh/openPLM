@@ -50,7 +50,6 @@ import csv
 import datetime
 import tempfile
 import itertools
-from operator import attrgetter
 from mimetypes import guess_type
 from collections import defaultdict
 
@@ -61,7 +60,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
 from django.forms import HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError, \
+from django.http import HttpResponseRedirect, HttpResponse, \
                         HttpResponsePermanentRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response
 from django.template import RequestContext
