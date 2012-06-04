@@ -8,9 +8,11 @@
     top: 16%;
     left: 24%;
 }
+
 .marker span{
     display:none;
 }
+
 img{
     width:100%;
 }
