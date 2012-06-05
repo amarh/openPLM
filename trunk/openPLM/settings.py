@@ -207,3 +207,5 @@ HIDE_EMAILS = False
 
 COMPANY = "company"
 
+# change this setting if you use an other user documentation for OpenPLM
+DOCUMENTATION_URL = "http://wiki.openplm.org/docs/user/"

@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
 
+{% block css %}
+<link rel="stylesheet" href="/media/css/import_csv.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+$(function(){
+    var help_block=$("#help_csv");
+    $("input#id_file").after(help_block);
+});
+</script>
+{% endblock %}
 
 {% block content %}
     <h3>{% trans "Import of a csv file" %}</h3>
@@ -71,6 +83,13 @@
             </form>
         {% endif %}
     {% endifequal %}
+    <span id="help_csv">
+        <span>
+            {% trans "Your csv file must have a column for each required field" %}.<br/>
+            {% trans "Examples and more precise descriptions are available in the"%}<a href="{{DOCUMENTATION_URL}}features/create.html#import-from-a-csv-file" target="_blank">{% trans "documentation" %}</a>.
+        </span>     
+    </span>
+
 
 {% endblock %}
 

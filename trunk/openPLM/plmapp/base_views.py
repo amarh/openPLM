@@ -246,6 +246,7 @@ def init_ctx(init_type_, init_reference, init_revision):
         'object_revision': init_revision,
         'object_type': init_type_,
         'THUMBNAILS_URL' : settings.THUMBNAILS_URL,
+        'DOCUMENTATION_URL' : settings.DOCUMENTATION_URL,
         'can_generate_pdf' : can_generate_pdf(),
         'openPLM_version' : _version,
         'site' : Site.objects.get_current(),
