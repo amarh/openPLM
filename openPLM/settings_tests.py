@@ -181,3 +181,4 @@ HIDE_EMAILS = False
 TEST_RUNNER = "openPLM.plmapp.tests.runner.OpenPLMTestSuiteRunner"
 TEST_OUTPUT_DIR = "tests_results"
 
+DOCUMENTATION_URL ="http://wiki.openplm.org/docs/user/"

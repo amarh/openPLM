@@ -1853,6 +1853,7 @@ def import_csv_apply(request, target, filename, encoding):
         with open(path, "rb") as csv_file:
             importer = Importer(csv_file, request.user, encoding)
             preview = importer.get_preview()
+            print preview.rows
         if request.method == "POST":
             headers_formset = Formset(request.POST)
             if headers_formset.is_valid():

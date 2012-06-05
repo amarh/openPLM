@@ -1,0 +1,36 @@
+#help_csv{
+    display: inline-block;
+    position: absolute;
+    background: url("/media/img/focus.png") no-repeat scroll center center transparent;
+    background-position: 75% 50%;
+    background-size: 50%;
+    height: 32px;
+    width: 32px;
+    z-index: 10;
+}
+
+#help_csv span{
+    position: absolute;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    border-radius: 4px;
+    width: 500%;
+    color: white;
+    font-size: small;
+    font-weight: bold;
+    top: 100%;
+    display:none;
+    padding: 20%;
+    background-color:#82979f;
+}
+
+#help_csv:hover{
+    z-index:100;
+    cursor: help;  
+}
+
+#help_csv:hover span{
+    display: inline;
+    position: absolute;
+}
