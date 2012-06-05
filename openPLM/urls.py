@@ -78,7 +78,8 @@ urlpatterns += patterns('',
     (r'^i18n/setlang/', 'openPLM.plmapp.views.main.set_language'),
 
     (r'^(?:home/)?$', display_home_page),
-    (r'^accounts/?$', login, {'template_name': 'login.html', 'redirect_field_name': 'next'}),
+    (r'^accounts/?$', login, {'template_name': 'login.html', 'redirect_field_name': 'next'},
+        "login"),
     (r'^(?:accounts/)?login/', login, {'template_name': 'login.html', 'redirect_field_name': 'next'}),
     (r'^(?:accounts/)?logout/', logout, {'next_page': '/login/', }),
     (r'^object/create/$', create_object),
@@ -131,6 +132,7 @@ urlpatterns += patterns2('', object_url,
     (r'management/delete/$', delete_management),
     (r'navigate/$', navigate),
     (r'(?:files/|doc-cad/)?archive/$', download_archive),
+    (r'public/$', public),
 )
 
 
@@ -170,6 +172,8 @@ urlpatterns += patterns('',
         {'document_root' : 'media/'}),    
     (r'^file/(?P<docfile_id>\d+)/$', download),
     (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
+    (r'^file/public/(?P<docfile_id>\d+)/$', public_download),
+    (r'^file/public/(?P<docfile_id>\d+)/(?P<filename>.*)$', public_download),
 )
 
 # urls related to the api
