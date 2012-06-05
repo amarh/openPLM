@@ -57,10 +57,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
 from django.forms import HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse, \
+from django.http import HttpResponseRedirect, HttpResponse, Http404, \
                         HttpResponsePermanentRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -77,7 +78,7 @@ import openPLM.plmapp.csvimport as csvimport
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.archive import generate_archive
-from openPLM.plmapp.base_views import get_obj, get_obj_from_form, \
+from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view
 from openPLM.plmapp.cadformats import is_cad_file
@@ -1551,6 +1552,25 @@ def download(request, docfile_id, filename=""):
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
     ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
     ctrl.check_readable()
+    return serve(ctrl, doc_file, filename)
+
+def public_download(request, docfile_id, filename=""):
+    """
+    View to download a published document file.
+    
+    :param request: :class:`django.http.QueryDict`
+    :param docfile_id: :attr:`.DocumentFile.id`
+    :type docfile_id: str
+    :return: a :class:`django.http.HttpResponse`
+    """
+    doc_file = models.DocumentFile.objects.get(id=docfile_id)
+    ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
+    if not ctrl.published:
+        return HttpResponseForbidden()
+    return serve(ctrl, doc_file, filename)
+
+
+def serve(ctrl, doc_file, filename):
     name = doc_file.filename.encode("utf-8", "ignore")
     mimetype = guess_type(name, False)[0]
     if not mimetype:
@@ -1985,4 +2005,73 @@ def browse(request, type="object"):
         "sort" : sort,
     })
     return r2r("browse.html", ctx, request)
+
+def public(request, obj_type, obj_ref, obj_revi):
+    """
+    .. versionadded:: 1.1
+
+    Public view of the given object, this view is accessible to anonymous
+    users. The object must be a published part or document.
+
+    Redirects to the login page if the object is not published and the user
+    is not authenticated.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/public/`
+
+    .. include:: views_params.txt 
+
+    **Template:**
+    
+    :file:`public.html`
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``obj``
+        the controller
+    
+    ``object_attributes``
+        list of tuples(verbose attribute name, value)
+
+    ``revisions``
+        list of published related revisions
+
+    ``attached``
+        list of published attached documents and parts
+    """
+    # do not call get_generic_data to avoid the overhead due
+    # to a possible search and the update of the navigation history
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    if not (obj.is_part or obj.is_document):
+        raise Http404
+    if not obj.published and request.user.is_anonymous():
+        return redirect_to_login(request.get_full_path())
+    ctx = init_ctx(obj_type, obj_ref, obj_revi)
+    attrs = obj.published_attributes
+    object_attributes = []
+    for attr in attrs:
+        item = obj.get_verbose_name(attr)
+        object_attributes.append((item, getattr(obj, attr)))
+    object_attributes.insert(4, (obj.get_verbose_name("state"), obj.state.name))
+    revisions = [rev for rev in obj.get_all_revisions() if rev.published]
+    if obj.is_part:
+        attached = [d.document for d in obj.get_attached_documents()
+            if d.document.published]
+    else:
+        attached = [d.part for d in obj.get_attached_parts() if d.part.published]
+
+    ctx.update({
+        # a published object is always readable
+        'is_readable' : True,
+        # disable the menu and the navigation_history
+        'object_menu' : [],
+        'navigation_history' : [],
+        'obj' : obj,
+        'object_attributes': object_attributes,
+        'revisions' : revisions,
+        'attached' : attached,
+    })
+
+    return r2r("public.html", ctx, request)
 

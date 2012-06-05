@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{# template to display a pulished object #}
+
+{# disable search panel and toolbar #}
+
+{% block toolbar %} {% endblock %}
+{% block leftcolumn %} {% endblock %}
+
+{% block content %}
+
+    {% if obj.published %}
+        {% if obj.files %}
+            <div id="files">
+                <h3>{% trans "Files" %}</h3>
+                <div>
+                    <table class="Content">
+                        {% for df in obj.files %}
+                            <tr class="Content">
+
+                                <td class="Content">
+                                    <a href="/file/public/{{df.id}}/{{df.filename|urlencode}}">{{df.filename}}</a></td>
+                                <td class="Content">{{df.size|filesizeformat}}</td>
+                                <td class="Content">
+                                    <a class="{{"Button"|button}}" href="/file/public/{{df.id}}/{{df.filename|urlencode}}">
+                                        <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
+                                    </a>
+                                </td>
+                                <td class="Content">
+                                    {% if df.thumbnail %}
+                                        <img class="thumbnail" src="{{df.thumbnail.url}}"
+                                        alt="Thumbnail"/>
+                                    {% else %}
+                                        {% trans "No thumbnail available" %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}	    
+                    </table>
+
+                </div>
+            </div>
+
+        {% endif %}
+
+        <div id="attributes-outer">
+            <h3>{% trans "Attributes" %}</h3>
+            <div>
+                <table class="Content">
+                    {% for description, attribute in object_attributes %}
+                        <tr class="Content">
+                            <td class="Content description">{{description|capfirst}}</td>
+                            <td class="Content">
+                                {% if attribute.year %}
+                                    {{ attribute|date:"DATETIME_FORMAT" }} — 
+                                    {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                                {% else %}
+                                    {{attribute|linebreaks}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        {% if revisions|length > 1 %}
+            <div id="revisions">
+                <h3>{% trans "Revisions" %}</h3>
+                <div>
+                    <table class="Content">
+                        {% for object in revisions %}
+                            <tr class="Content">
+                                <td class="Content">
+                                    <a href="{{object.plmobject_url}}public/">{{object.reference}}</a>
+                                </td>
+                                <td class="Content">{{object.revision}}</td>
+                                <td class="Content">{{object.type}}</td>
+                                <td class="Content">{{object.state.name}}</td>
+                            </tr>	
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if attached %}
+            <div id="attached">
+                <h3>
+                    {% if obj.is_part %}
+                        {% trans "Attached documents" %}
+                    {% else %}
+                        {% trans "Attached parts" %}
+                    {% endif %}
+                </h3>
+                <div>
+                    <table class="Content">
+                        {% for object in attached %}
+                            <tr class="Content">
+                                <td class="Content">
+                                    <a href="{{object.plmobject_url}}public/">{{object.reference}}</a>
+                                </td>
+                                <td class="Content">{{object.revision}}</td>
+                                <td class="Content">{{object.type}}</td>
+                                <td class="Content">{{object.name}}</td>
+                            </tr>	
+                        {% endfor %}
+                    </table>
+
+                </div>
+            </diV>
+        {% endif %}
+
+    {% else %}
+
+        <p>
+        {% if obj.is_part %}
+            {% trans "This part is unpublished."%}
+        {% else %}
+            {% trans "This document is unpublished."%}
+        {% endif %}
+        </p>
+
+    {% endif %}
+
+{% endblock %}
