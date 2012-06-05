@@ -10,13 +10,11 @@ Contact : zahariri.ali@gmail.com
 /*****************************************************************
 **		Add or delete files in queue			                **
 *****************************************************************/
-
-//count for files to upload
-var nbr_files=0;
 //count for input added
 var num_input=0;
 
-//create a new input file, called when a new file is added to the queue for upload
+//create a new input file
+//function called when a new file is added to the queue for upload
 function new_input_file(){
     var table = $("#fileupload > table.Content");
     var num = num_input+1;
@@ -197,13 +195,11 @@ function add_f_file(input,f){
         }else{
             files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
         }
-               
-        nbr_files+=1;
 }
 
 //add an input and the files selected in the queue for uploading
 function add_file(input){
-    if (nbr_files==0){
+    if (files_info.size()==0){
         $("#div_files > div.file_p").remove();
     }
     
@@ -241,14 +237,13 @@ function del_file(item,input){
     var key = item.attr("id");
     files_info=files_info.remove(key);
     item.remove();
-    nbr_files--;
     $(".up_fail").remove();
     
     //input file's multiple selection is not enable for opera and IE
-    if(($.browser.opera)||($.browser.msie)){
+    if(($.browser.opera)||($.browser.msie)||(input.files.length==1)){
         $(input).remove();
     }
-    if(nbr_files==0){
+    if(files_info.size()==0){
         $("#_up").addClass("hidden");
         $("#_delete").addClass("hidden");
     }
@@ -489,7 +484,7 @@ function upload_failed(){
     //display a message
     var fail_div = $("<div class='up_fail'></div>");
     var span_text=trans["Your upload(s) failed"]+"!<br>"+trans["Try again"];
-    if(nbr_files>1){
+    if(files_info.size() > 1){
         span_text+=" "+trans["maybe with less files. "];
     }else{
         span_text+=". ";
@@ -597,7 +592,6 @@ function up_file(f_form){
 */
 function reset_upload(){
     $(".del_link").click();
-    nbr_files=0;
     num_input=0;
     
     $(".up_fail").remove();
@@ -735,7 +729,7 @@ $(function(){
         });
         $("#_up").click(function(){
             $(".up_fail").remove();
-            if(nbr_files==0){
+            if(files_info.size()==0){
                 if($("#fileupload").find("span.warning").length==0){
                     $("#fileupload").find("input[type='file']").parent().append("<span class='warning'>"+trans["Select at least one file"]+"</span>");
                 }
@@ -772,7 +766,7 @@ $(function(){
         //if javascript is disabled, noscript tag will handle that
         $("#fileupload").insertAfter("<span class='warning'>"+trans["You can only upload files, but you wont get progress of this upload"]+"</span>");
         $("#_up").click(function(){
-            if(nbr_files==0){
+            if(files_info.size()==0){
                 $("#fileupload").find("input[type='file']").parent().append("<span class='warning'>"+trans["Select at least one file"]+"</span>");
                 return;
             }
