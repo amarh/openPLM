@@ -245,12 +245,12 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertEquals("SP1", sp1.name)
 
     def get_users_rows(self):
-        return [['username', 'first_name', 'last_name', 'email', 'groups'],
-                ['user_1', 'fn1', 'ln1', 'user_1@example.net', 'grp'],
-                ['user_2', 'fn2', 'ln2', 'user_2@example.net', 'grp'],
-                ['user_3', 'fn3', 'ln3', 'user_3@example.net', 'grp'],
-                ['user_4', 'fn4', 'ln4', 'user_4@example.net', 'grp'],
-                ['user_5', 'fn5', 'ln5', 'user_5@example.net', 'grp'],
+        return [['username', 'first_name', 'last_name', 'email', 'groups', 'language'],
+                ['user_1', 'fn1', 'ln1', 'user_1@example.net', 'grp', 'en'],
+                ['user_2', 'fn2', 'ln2', 'user_2@example.net', 'grp', 'en'],
+                ['user_3', 'fn3', 'ln3', 'user_3@example.net', 'grp', 'en'],
+                ['user_4', 'fn4', 'ln4', 'user_4@example.net', 'grp', 'en'],
+                ['user_5', 'fn5', 'ln5', 'user_5@example.net', 'grp', 'en'],
                ]
 
     def test_users_valid(self):

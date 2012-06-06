@@ -364,10 +364,11 @@ class UsersImporter(CSVImporter):
         * last_name
         * email
         * groups (multiple groups can be separeted by a "/")
+        * language
 
     """
 
-    REQUIRED_HEADERS = ('username', 'first_name', 'last_name', 'email', 'groups')
+    REQUIRED_HEADERS = ('username', 'first_name', 'last_name', 'email', 'groups','language')
 
     HEADERS_SET = set(REQUIRED_HEADERS)
 
@@ -386,7 +387,7 @@ class UsersImporter(CSVImporter):
     
     def parse_row(self, line, row): 
         from openPLM.plmapp.forms import SponsorForm
-        un, fn, ln, em, grps = self.get_values(row, *self.REQUIRED_HEADERS)
+        un, fn, ln, em, grps,la = self.get_values(row, *self.REQUIRED_HEADERS)
         groups = []
         for grp in grps.split("/"):
             try:
@@ -401,6 +402,7 @@ class UsersImporter(CSVImporter):
                 "first_name": fn,
                 "email" : em,
                 "groups" : groups,
+                "language" : la,
                 "warned" : True,
                 }
         form = SponsorForm(data, sponsor=self.user.id)

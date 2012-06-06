@@ -1848,7 +1848,7 @@ class UserViewTestCase(CommonViewTest):
     def test_sponsor_post(self):
         data = dict(sponsor=self.user.id, 
                     username="loser", first_name="You", last_name="Lost",
-                    email="you.lost@example.com", groups=[self.group.pk])
+                    email="you.lost@example.com", groups=[self.group.pk], language=self.user.get_profile().language)
         response = self.post(self.user_url + "delegation/sponsor/", data)
         user = User.objects.get(username=data["username"])
         for attr in ("first_name", "last_name", "email"):
