@@ -34,9 +34,18 @@ class BaseTestCase(TestCase):
 
     def get_contributor(self, username="user2"):
         """ Returns a new contributor"""
-        user = User(username="user2")
+        user = User(username=username)
         user.save()
         user.get_profile().is_contributor = True
+        user.get_profile().save()
+        user.groups.add(self.group)
+        return user
+    
+    def get_publisher(self, username="publisher"):
+        """ Returns a new contributor"""
+        user = User(username=username)
+        user.save()
+        user.get_profile().can_publish = True
         user.get_profile().save()
         user.groups.add(self.group)
         return user
