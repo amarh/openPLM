@@ -27,14 +27,6 @@ Example of csv file's structure :
     .. csv-table::
         :header-rows: 1
         :file: csv_import/PLMObject.csv
-
-    The available values for language are :
-        * "en" (english)
-        * "fr" (french)
-        * "es" (spanish)
-        * "ja" (japanese)
-        * "ru" (russian)
-        * "zh_CN" (chinese)
                 
     Download the file :download:`here <csv_import/PLMObject.csv>`.
 
@@ -51,5 +43,14 @@ Example of csv file's structure :
     .. csv-table::
         :header-rows: 1
         :file: csv_import/User.csv
+    
+    
+    The available values for language are :
+        * "en" (english)
+        * "fr" (french)
+        * "es" (spanish)
+        * "ja" (japanese)
+        * "ru" (russian)
+        * "zh_CN" (chinese)
         
     Download the file :download:`here <csv_import/User.csv>`.
