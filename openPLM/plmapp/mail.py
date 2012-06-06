@@ -31,8 +31,6 @@ from collections import Iterable, Mapping
 import kjbuckets
 
 from django.conf import settings
-from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Model, Q
 from django.template.loader import render_to_string
@@ -166,12 +164,8 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
 @task(ignore_result=True)
 def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
-        ctx = unserialize(ctx)
-        language=ctx["sponsor"].get_profile().language
         if len(recipients) == 1:
-            r_id = recipients.pop()
-            language = User.objects.get(id=r_id).get_profile().language
-            email = User.objects.get(id=r_id).email
+            email = User.objects.get(id=recipients.pop()).email
             if not email or email in blacklist:
                 return
             emails = (email,)
@@ -181,11 +175,10 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
             emails = set(emails) - set(blacklist)
             if not emails:
                 return
-
+        ctx = unserialize(ctx)
         ctx["site"] = Site.objects.get_current()
-        translation.activate(language)
-        html_content =translation.gettext(render_to_string(template + ".html", ctx))
-        message = translation.gettext(render_to_string(template + ".txt", ctx))
+        html_content =render_to_string(template + ".html", ctx)
+        message = render_to_string(template + ".txt", ctx)
         msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
             emails)
         msg.attach_alternative(html_content, "text/html")
