@@ -576,6 +576,7 @@ class SponsorForm(forms.ModelForm):
             required=True, widget=forms.HiddenInput())
     warned = forms.BooleanField(initial=False, required=False,
                                 widget=forms.HiddenInput())
+    language = forms.TypedChoiceField(choices=settings.LANGUAGES)
 
     class Meta:
         model = User
@@ -583,13 +584,14 @@ class SponsorForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         sponsor = kwargs.pop("sponsor", None)
+        language = kwargs.pop("language", None)
         super(SponsorForm, self).__init__(*args, **kwargs)
         if "sponsor" in self.data:
             sponsor = int(self.data["sponsor"])
         if sponsor is not None:
             qset = m.GroupInfo.objects.filter(owner__id=sponsor)
             self.fields["groups"].queryset = qset
-        self.fields["groups"].help_text = _("The new user will belong to the selected groups") 
+        self.fields["groups"].help_text = _("The new user will belong to the selected groups")
         for key, field in self.fields.iteritems():
             if key != "warned":
                 field.required = True
