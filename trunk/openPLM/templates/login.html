@@ -81,8 +81,12 @@
                         </table>
                         <input type="hidden" name="next" value="{{ next|default:"/home/"|iriencode }}"/>
                     </form>
-                    <p style="line-height:15px; text-align:left">If you have any trouble logging in to your account, contact your administrator </p>
+                    <p style="line-height:15px; text-align:left">{% trans "If you have any trouble logging in to your account, contact your administrator" %} </p>
                 </div>
+                <hr />
+                <p>
+                <a href="/browse/object/">{% trans "Browse public data." %}</a>
+                </p>
                 <hr />
                 <h4>{% trans "Professionals" %}</h4>
                 <div style="padding:1em;">
