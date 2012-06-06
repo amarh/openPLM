@@ -1883,6 +1883,10 @@ msgstr "Click aqui para rechazar la invitación"
 msgid "Refuse invitation"
 msgstr "Rechazar invitacion"
 
+#: plmapp/mail.py:192
+msgid "New account on openPLM"
+msgstr "Nueva cuenta en openPLM"
+
 #: templates/mails/new_account.html:5
 #, python-format
 msgid ""
