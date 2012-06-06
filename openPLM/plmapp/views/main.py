@@ -66,6 +66,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, \
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.encoding import iri_to_uri
+from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils import simplejson
@@ -1743,14 +1744,16 @@ def sponsor(request, obj_ref):
     View of the *sponsor* page.
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
+
     if request.method == "POST":
         form = forms.SponsorForm(request.POST)
         if form.is_valid():
             new_user = form.save()
+            new_user.get_profile().language = form.cleaned_data["language"]
             obj.sponsor(new_user)
             return HttpResponseRedirect("..")
     else:
-        form = forms.SponsorForm(initial={"sponsor":obj.id}, sponsor=obj.id)
+        form = forms.SponsorForm(initial={"sponsor":obj.id, "language":obj.language}, sponsor=obj.id)
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.html", ctx, request)
