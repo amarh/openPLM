@@ -23,11 +23,13 @@
                 <li {% if type == "document"%}class="selected"{% endif %} >
                 <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
                 </li>
-                <li {% if type == "group"%}class="selected"{% endif %} >
-                <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
-                <li {% if type == "user"%}class="selected"{% endif %} >
-                <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
-                </li>
+                {% if request.user.is_authenticated %}
+                    <li {% if type == "group"%}class="selected"{% endif %} >
+                    <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
+                    <li {% if type == "user"%}class="selected"{% endif %} >
+                    <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
+                    </li>
+                {% endif %}
             </ul>
             <hr/>
             <ul>
@@ -38,7 +40,7 @@
                 <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
                 </li>
             </ul>
-            {% if plmobjects %}
+            {% if plmobjects and request.user.is_authenticated %}
                 <hr/>
                 <ul>
                     <li>
@@ -47,6 +49,9 @@
                     <li>
                     <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
                     </li>
+                    <li>
+                    <a href="{% add_get state='published' %}"><span>{% trans "Published" %}</span></a>
+                    <li>
                 </ul>
             {% endif %}
 
@@ -67,7 +72,11 @@
                         {% if state == "official" %}
                             {% trans "Only official objects." %}
                         {% else %}
-                            {% trans "All objects. "%}
+                            {% if state == "published" %}
+                                {% trans "Only published objects." %}
+                            {% else %}
+                                {% trans "All objects. "%}
+                            {% endif %}
                         {% endif %}
                     </span>
                 {% endif %}

@@ -4,7 +4,7 @@
 
     <div class="id_thumbnail">
         <div class="id_thumbnail_inner">
-            <a href="{% block object_url %}{{object.plmobject_url}}{% endblock %}">
+            <a href="{% block object_url %}{{object.plmobject_url}}{% if request.user.is_anonymous %}public/{% endif %}{% endblock %}">
                 <img src="{% block thumbnail_url %}{% endblock %}"/>
             </a>
         </div>

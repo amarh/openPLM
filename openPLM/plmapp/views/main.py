@@ -66,7 +66,6 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, \
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.encoding import iri_to_uri
-from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils import simplejson
@@ -81,7 +80,7 @@ import openPLM.plmapp.forms as forms
 from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
-    get_creation_view, register_creation_view
+    get_creation_view, register_creation_view, secure_required
 from openPLM.plmapp.cadformats import is_cad_file
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.decomposers.base import DecomposersManager
@@ -1964,29 +1963,47 @@ class OpenPLMSearchView(SearchView):
     def __call__(self, request):
         return super(OpenPLMSearchView, self).__call__(request)
 
-@handle_errors
+@secure_required
 def browse(request, type="object"):
-    obj, ctx = get_generic_data(request, search=False)
-    cls = {
-        "object" : models.PLMObject, 
-        "part" : models.Part,
-        "document" : models.Document,
-        "group" : models.GroupInfo,
-        "user" : User,
-    }[type]
-            
-    object_list = cls.objects.all()
-    ctx["state"] = state = request.GET.get("state", "all")
-    if type in ("object", "part", "document"):
-        ctx["plmobjects"] = True
-        if state == "official":
-            object_list = object_list.\
-                    exclude(lifecycle=models.get_cancelled_lifecycle()).\
-                    filter(state=F("lifecycle__official_state"))
+    if request.user.is_authenticated():
+        # only authenticated users can see all groups and users
+        obj, ctx = get_generic_data(request, search=False)
+        cls = {
+            "object" : models.PLMObject, 
+            "part" : models.Part,
+            "document" : models.Document,
+            "group" : models.GroupInfo,
+            "user" : User,
+        }[type]
+        object_list = cls.objects.all()
+        # this only relevant for authenticated users
+        ctx["state"] = state = request.GET.get("state", "all")
+        if type in ("object", "part", "document"):
+            ctx["plmobjects"] = True
+            if state == "official":
+                object_list = object_list.\
+                        exclude(lifecycle=models.get_cancelled_lifecycle()).\
+                        filter(state=F("lifecycle__official_state"))
+            elif state == "published":
+                object_list = object_list.filter(published=True)
+        else:
+            ctx["plmobjects"] = False
     else:
-        ctx["plmobjects"] = False
+        cls = {
+            "object" : models.PLMObject, 
+            "part" : models.Part,
+            "document" : models.Document,
+        }[type]
+        ctx = init_ctx("-", "-", "-")
+        ctx.update({
+            'is_readable' : True,
+            'plmobjects' : True,
+            'object_menu' : [],
+            'navigation_history' : [],
+        })
+        object_list = cls.objects.filter(published=True)
+
         
-    
     sort = request.GET.get("sort", "recently-added")
     if sort == "name":
         sort_critera = "username" if type == "user" else "name"
