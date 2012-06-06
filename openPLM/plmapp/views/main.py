@@ -266,16 +266,18 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
+        actions = (("demote", obj.demote), ("promote", obj.promote),
+                   ("publish", obj.publish), ("unpublish", obj.unpublish,))
         if password_form.is_valid():
-            if "demote" in request.POST:
-                obj.demote()
-            elif "promote" in request.POST:
-                obj.promote()
+            for action_name, method in actions:
+                if action_name in request.POST:
+                    method()
+                    break
             return HttpResponseRedirect("..")
-        if "demote" in request.POST:
-            ctx["action"] = "demote"
-        elif "promote" in request.POST:
-            ctx["action"] = "promote"
+        for action_name, method in actions:
+            if action_name in request.POST:
+                ctx["action"] = action_name
+                break
     else: 
         password_form = forms.ConfirmPasswordForm(request.user)
     ctx.update({'password_form' : password_form,})

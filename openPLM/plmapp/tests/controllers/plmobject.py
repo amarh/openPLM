@@ -466,3 +466,134 @@ class ControllerTest(BaseTestCase):
                 ctrl = self.CONTROLLER(controller.object, user)
                 ctrl.check_readable()        
 
+    # publication tests
+
+    def assertPublish(self, ctrl):
+        self.assertTrue(ctrl.check_publish())
+        self.assertTrue(ctrl.can_publish())
+        ctrl.publish()
+        self.assertTrue(ctrl.published)
+
+    def assertPublishError(self, ctrl):
+        self.assertRaises(exc.PermissionError, ctrl.check_publish)
+        self.assertFalse(ctrl.can_publish())
+        self.assertRaises(exc.PermissionError, ctrl.publish)
+        self.assertFalse(ctrl.published)
+
+    def test_publish_not_official(self):
+        """ Tests that a non official object can *not* be published."""
+        controller = self.create("P1")
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertPublishError(ctrl)
+
+    def test_publish_official(self):
+        """ Tests that an official object can be published."""
+        controller = self.create("P1")
+        self.promote_to_official(controller)
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertPublish(ctrl)
+
+    def test_publish_deprecated(self):
+        """ Tests that a deprecated object can *not* be published."""
+        controller = self.create("P1")
+        self.promote_to_deprecated(controller)
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertPublishError(ctrl)
+
+    def test_publish_published(self):
+        """ Tests that a published object can *not* be published."""
+        controller = self.create("P1")
+        self.promote_to_official(controller)
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertPublish(ctrl)
+        self.assertFalse(ctrl.can_publish())
+        self.assertRaises(ValueError, ctrl.check_publish)
+        self.assertRaises(ValueError, ctrl.publish)
+
+    def test_publish_not_publisher(self):
+        """ Tests that only a publisher can publish."""
+        controller = self.create("P1")
+        self.promote_to_official(controller)
+        self.assertFalse(controller._user.get_profile().can_publish)
+        self.assertPublishError(controller)
+
+    def test_publish_not_in_group(self):
+        """ Tests that only a publisher who does not belongs to the objects
+        group can *not* publish."""
+        controller = self.create("P1")
+        self.promote_to_official(controller)
+        publisher = self.get_publisher()
+        publisher.groups.remove(self.group)
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertPublishError(ctrl)
+
+    # unpublication tests
+
+    def get_published_ctrl(self):
+        controller = self.create("P1")
+        controller.object.published = True
+        controller.object.save()
+        return controller
+
+    def assertUnpublish(self, ctrl):
+        self.assertTrue(ctrl.check_unpublish())
+        self.assertTrue(ctrl.can_unpublish())
+        ctrl.unpublish()
+        self.assertFalse(ctrl.published)
+
+    def assertUnpublishError(self, ctrl):
+        self.assertRaises(exc.PermissionError, ctrl.check_unpublish)
+        self.assertFalse(ctrl.can_unpublish())
+        self.assertRaises(exc.PermissionError, ctrl.unpublish)
+        self.assertTrue(ctrl.published)
+
+    def test_unpublish_not_official(self):
+        """ Tests that a non official published object can be unpublished."""
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(self.get_published_ctrl().object, publisher)
+        self.assertUnpublish(ctrl)
+
+    def test_unpublish_official(self):
+        """ Tests that an official published object can be unpublished."""
+        controller = self.get_published_ctrl()
+        self.promote_to_official(controller)
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertUnpublish(ctrl)
+
+    def test_unpublish_deprecated(self):
+        """ Tests that a deprecated opublished bject can be unpublished."""
+        controller = self.get_published_ctrl()
+        self.promote_to_deprecated(controller)
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertUnpublish(ctrl)
+
+    def test_unpublish_published(self):
+        """ Tests that an unpublished object can *not* be unpublished."""
+        controller = self.create("P1")
+        publisher = self.get_publisher()
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertFalse(ctrl.can_unpublish())
+        self.assertRaises(ValueError, ctrl.check_unpublish)
+        self.assertRaises(ValueError, ctrl.unpublish)
+
+    def test_unpublish_not_publisher(self):
+        """ Tests that only a publisher can unpublish."""
+        controller = self.get_published_ctrl()
+        self.assertFalse(controller._user.get_profile().can_publish)
+        self.assertUnpublishError(controller)
+
+    def test_unpublish_not_in_group(self):
+        """ Tests that only a publisher who does not belongs to the objects
+        group can *not* unpublish."""
+        controller = self.get_published_ctrl()
+        publisher = self.get_publisher()
+        publisher.groups.remove(self.group)
+        ctrl = self.CONTROLLER(controller.object, publisher)
+        self.assertUnpublishError(ctrl)
+

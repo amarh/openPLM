@@ -38,6 +38,8 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.utils import translation
 
+import lxml.html
+
 from openPLM.plmapp import forms
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as m
@@ -60,9 +62,7 @@ class CommonViewTest(BaseTestCase):
         self.client.post("/i18n/setlang/", {"language" : self.LANGUAGE})
         self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
                                                  self.user, self.DATA)
-        self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
-                                              self.controller.reference,
-                                              self.controller.revision)
+        self.base_url = self.controller.plmobject_url 
         brian = User.objects.create_user(username="Brian", password="life",
                 email="brian@example.net")
         brian.get_profile().is_contributor = True
@@ -418,6 +418,111 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "management/delete/", data)
         self.assertFalse(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED))
+
+    def test_publish_post(self):
+        """ Tests a publication. """
+        self.controller.object.state = m.State.objects.get(name="official")
+        self.controller.object.save()
+        self.user.get_profile().can_publish = True
+        self.user.get_profile().save()
+        response = self.post(self.base_url + "lifecycle/apply/", 
+                {"publish" : "on", "password" : "password"})
+        self.assertTrue(response.context["obj"].published)
+        # check that the public link is displayed
+        root = lxml.html.fromstring(response.content.decode("utf-8"))
+        self.assertTrue(root.xpath('//input[@name="unpublish"]'))
+        self.assertFalse(root.xpath('//input[@name="publish"]'))
+        self.assertTrue(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
+    
+    def test_publish_post_error_not_official(self):
+        """ Tests a publication: error: object not official. """
+        self.user.get_profile().can_publish = True
+        self.user.get_profile().save()
+        response = self.client.post(self.base_url + "lifecycle/apply/", 
+                data={"publish" : "on", "password" : "password"})
+        self.assertTemplateUsed(response, "error.html")
+        response2 = self.get(self.base_url + "lifecycle/apply/")
+        self.assertFalse(response2.context["obj"].published)
+        # check that the public link is not displayed
+        root = lxml.html.fromstring(response2.content.decode("utf-8"))
+        self.assertFalse(root.xpath('//input[@name="unpublish"]'))
+        self.assertFalse(root.xpath('//input[@name="publish"]'))
+        self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
+   
+    def test_publish_post_error_published(self):
+        """ Tests a publication: error: object is already published. """
+        self.user.get_profile().can_publish = True
+        self.user.get_profile().save()
+        self.controller.object.state = m.State.objects.get(name="official")
+        self.controller.object.published = True
+        self.controller.object.save()
+        response = self.client.post(self.base_url + "lifecycle/apply/", 
+                data={"publish" : "on", "password" : "password"})
+        self.assertTemplateUsed(response, "error.html")
+        response2 = self.get(self.base_url + "lifecycle/apply/")
+        self.assertTrue(response2.context["obj"].published)
+        # check that the publish button is not displayed
+        root = lxml.html.fromstring(response2.content.decode("utf-8"))
+        self.assertTrue(root.xpath('//input[@name="unpublish"]'))
+        self.assertFalse(root.xpath('//input[@name="publish"]'))
+        self.assertTrue(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
+    
+    def test_unpublish_post(self):
+        """ Tests an unpublication. """
+        self.controller.object.published = True
+        self.controller.object.state = m.State.objects.get(name="official")
+        self.controller.object.save()
+        self.user.get_profile().can_publish = True
+        self.user.get_profile().save()
+        response = self.post(self.base_url + "lifecycle/apply/", 
+                {"unpublish" : "on", "password" : "password"})
+        self.assertFalse(response.context["obj"].published)
+        # check that the public link is not displayed
+        root = lxml.html.fromstring(response.content.decode("utf-8"))
+        self.assertFalse(root.xpath('//input[@name="unpublish"]'))
+        self.assertTrue(root.xpath('//input[@name="publish"]'))
+        self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
+    
+    def test_unpublish_post_error_unpublished(self):
+        """ Tests an unpublication: errror: object is unpublished. """
+        self.controller.object.save()
+        self.user.get_profile().can_publish = True
+        self.user.get_profile().save()
+        response = self.client.post(self.base_url + "lifecycle/apply/", 
+                {"unpublish" : "on", "password" : "password"})
+        self.assertTemplateUsed(response, "error.html")
+        response2 = self.get(self.base_url + "lifecycle/apply/")
+        self.assertFalse(response2.context["obj"].published)
+        # check that the unpublish button is not displayed
+        root = lxml.html.fromstring(response.content.decode("utf-8"))
+        self.assertFalse(root.xpath('//input[@name="unpublish"]'))
+        self.assertFalse(root.xpath('//input[@name="publish"]'))
+        self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
+   
+    def test_public_get(self):
+        """ Tests anonymous access to a published object. """
+        self.controller.object.published = True
+        self.controller.object.save()
+        revb = self.controller.revise("b")
+        self.assertFalse(revb.published)
+        revc = revb.revise("c")
+        revc.object.published = True
+        revc.object.save()
+        self.client.logout()
+        response = self.client.get(self.base_url + "public/")
+        self.assertTrue(response.context["obj"].published)
+        # checks that some private data are not displayed
+        root = lxml.html.fromstring(response.content.decode("utf-8"))
+        self.assertNotContains(response, self.user.username)
+        self.assertEqual(["a", "c"], [o.revision for o in response.context["revisions"]])
+        self.assertFalse(root.xpath('//div[@id="SearchBox"]'))
+        self.assertFalse(root.xpath('//div[@id="DisplayBox"]'))
+
+    def test_public_error(self):
+        """ Tests anonymous access to an unpublished object: error. """
+        self.client.logout()
+        response = self.client.get(self.base_url + "public/", follow=True)
+        self.assertTemplateUsed(response, "login.html")
 
 
 class DocumentViewTestCase(ViewTest):
@@ -1848,7 +1953,8 @@ class UserViewTestCase(CommonViewTest):
     def test_sponsor_post(self):
         data = dict(sponsor=self.user.id, 
                     username="loser", first_name="You", last_name="Lost",
-                    email="you.lost@example.com", groups=[self.group.pk], language=self.user.get_profile().language)
+                    email="you.lost@example.com", groups=[self.group.pk],
+                    language=self.user.get_profile().language)
         response = self.post(self.user_url + "delegation/sponsor/", data)
         user = User.objects.get(username=data["username"])
         for attr in ("first_name", "last_name", "email"):
