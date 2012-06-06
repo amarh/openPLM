@@ -31,6 +31,7 @@ from collections import Iterable, Mapping
 import kjbuckets
 
 from django.conf import settings
+from django.utils import translation
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Model, Q
 from django.template.loader import render_to_string
@@ -164,25 +165,32 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
 @task(ignore_result=True)
 def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
+        from collections import defaultdict
+        lang_to_email = defaultdict(set)
         if len(recipients) == 1:
-            email = User.objects.get(id=recipients.pop()).email
-            if not email or email in blacklist:
+            recipient = User.objects.get(id=recipients.pop())
+            if not recipient.email or recipient.email in blacklist:
                 return
-            emails = (email,)
+            lang_to_email[recipient.get_profile().language].add(recipient.email)
         else:
-            emails = User.objects.filter(id__in=recipients).exclude(email="")\
-                            .values_list("email", flat=True)
-            emails = set(emails) - set(blacklist)
-            if not emails:
-                return
+            users = User.objects.filter(id__in=recipients).exclude(email="")
+            for user in users:
+                if not user.email in blacklist:
+                    lang_to_email[user.get_profile().language].add(user.email)
+            if not lang_to_email:
+                return    
+            
         ctx = unserialize(ctx)
         ctx["site"] = Site.objects.get_current()
-        html_content =render_to_string(template + ".html", ctx)
-        message = render_to_string(template + ".txt", ctx)
-        msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
-            emails)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=True)
+
+        for lang, emails in lang_to_email.items():
+            translation.activate(lang)
+            html_content = translation.gettext(render_to_string(template + ".html", ctx))
+            message = translation.gettext(render_to_string(template + ".txt", ctx))
+            msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
+                emails)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=True)
 
 def send_mail(subject, recipients, ctx, template, blacklist=()):
     ctx = serialize(ctx)
