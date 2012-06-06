@@ -3,12 +3,12 @@
 <!-- Manage html display in the Content div which correspond to the "revisions" menu -->
 
 {% block css %}
-<style type="text/css">
-div.identity_card:last-child{
-    /*border: 2px solid red;*/
-    box-shadow: 3px 3px 9px #C90657;
-}
-</style>
+    <style type="text/css">
+        div.identity_card.ic-current {
+            /*border: 2px solid red;*/
+            box-shadow: 3px 3px 9px #C90657;
+        }
+    </style>
 {% endblock %}
 {% block content %}
     {% if add_revision_form and obj.is_revisable %}
@@ -38,13 +38,17 @@ div.identity_card:last-child{
         {% endif %}
     {% endif %}
     <div id="rev_list" class="Content">
-        {% for object in revisions %}
-            {% if object.is_part %}
-                {% include "parts/identity_card.html" %}
-            {% else %}
-                {% include "documents/identity_card.html" %}
-            {% endif %}
-        {% endfor %}
+        {% with obj.is_part|yesno:"parts,documents"|add:"/identity_card.html" as path %}
+            {% for object in revisions %}
+                {% if obj.revision == object.revision %}
+                    {% with "current" as type %}
+                        {% include path %}
+                    {% endwith %}
+                {% else %}
+                    {% include path %}
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
     </div>
 {% endblock %}
 
