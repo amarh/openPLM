@@ -493,9 +493,25 @@ def revise_document(obj, ctx, request):
             if confirmation:
                 ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
         ctx["add_revision_form"] = add_form
-
     ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()
+        
+    ctx["thumbnails"] = {}
+    ctx["num_files"] = {}
+    
+    ids=[]
+    for revision in revisions :
+        ids.append(revision.id)
+    #ids = revisions.values_list("id", flat=True)
+    thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                document__in=ids, thumbnail__isnull=False)
+    ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
+    num_files = dict.fromkeys(ids, 0)
+    for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+        document__in=ids).values_list("document", flat=True):
+            num_files[doc_id] += 1
+            ctx["num_files"] = num_files
+        
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
                 })

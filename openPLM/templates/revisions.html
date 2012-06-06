@@ -2,6 +2,14 @@
 {% load i18n plmapp_tags %}
 <!-- Manage html display in the Content div which correspond to the "revisions" menu -->
 
+{% block css %}
+<style type="text/css">
+div.identity_card:last-child{
+    /*border: 2px solid red;*/
+    box-shadow: 3px 3px 9px #C90657;
+}
+</style>
+{% endblock %}
 {% block content %}
     {% if add_revision_form and obj.is_revisable %}
         <form id="form-revision" method="POST"
@@ -29,17 +37,14 @@
 
         {% endif %}
     {% endif %}
-    <table class="Content">
+    <div id="rev_list" class="Content">
         {% for object in revisions %}
-            <tr class="Content">
-                <td class="Content">
-                    <a href="{{object.plmobject_url}}">{{object.reference}}</a>
-                </td>
-                <td class="Content">{{object.revision}}</td>
-                <td class="Content">{{object.type}}</td>
-                <td class="Content">{{object.state.name}}</td>
-            </tr>	
+            {% if object.is_part %}
+                {% include "parts/identity_card.html" %}
+            {% else %}
+                {% include "documents/identity_card.html" %}
+            {% endif %}
         {% endfor %}
-    </table>
+    </div>
 {% endblock %}
 
