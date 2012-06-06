@@ -32,6 +32,7 @@ import kjbuckets
 
 from django.conf import settings
 from django.utils import translation
+from django.utils.translation import ugettext as _
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Model, Q
 from django.template.loader import render_to_string
@@ -185,12 +186,16 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
 
         for lang, emails in lang_to_email.items():
             translation.activate(lang)
-            html_content = translation.gettext(render_to_string(template + ".html", ctx))
-            message = translation.gettext(render_to_string(template + ".txt", ctx))
-            msg = EmailMultiAlternatives(subject, message, settings.EMAIL_OPENPLM,
+            html_content = render_to_string(template + ".html", ctx)
+            message = _(render_to_string(template + ".txt", ctx))
+            subj_translation = _(subject)
+            msg = EmailMultiAlternatives(subj_translation, message, settings.EMAIL_OPENPLM,
                 emails)
             msg.attach_alternative(html_content, "text/html")
             msg.send(fail_silently=True)
+        
+        if lang_to_email.items():
+            translation.deactivate()
 
 def send_mail(subject, recipients, ctx, template, blacklist=()):
     ctx = serialize(ctx)
