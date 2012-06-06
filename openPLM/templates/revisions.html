@@ -7,7 +7,7 @@
         <form id="form-revision" method="POST"
             {% if confirmation %} class="confirmation" {% endif %} action="">
             {{ add_revision_form }}
-            
+
             {% if confirmation %}
                 {% block confirmation %} {% endblock %}
             {% endif %}
@@ -16,7 +16,17 @@
         </form>
     {% else %}
         {% if is_readable %}
-            {% trans "You can not revise this object since a revision already exist." %}
+
+            {% if obj.is_cancelled %}
+                {% trans "You can not revise this object since it is cancelled." %}
+            {% else %}
+                {% if obj.is_deprecated %}
+                    {% trans "You can not revise this object since it is deprecated." %}
+                {% else %}
+                    {% trans "You can not revise this object since a revision already exist." %}
+                {% endif %}
+            {% endif %}
+
         {% endif %}
     {% endif %}
     <table class="Content">
