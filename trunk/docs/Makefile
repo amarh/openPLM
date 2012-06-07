@@ -20,6 +20,10 @@ define chdir
    $(info $(MAKE): cd $(_D)) $(eval SHELL = cd $(_D); $(CHDIR_SHELL))
 endef
 
+ifndef $(LANGUAGE)
+    LANGUAGE = en
+endif
+
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html       to make standalone HTML files"
@@ -38,111 +42,64 @@ help:
 	@echo "  changes    to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
+	@echo "To specify a language different than English use somethink like :"
+	@echo "make LANGUAGE=fr html"
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	cd $(LANGUAGE) && make clean
 
 tuto:
-	cd devel/code && tar -pczf bicycle.tar.gz bicycle/*.py && cd ../.. 
+	cd $(LANGUAGE) && make tuto
 
 oxt:
-	-rm -f user/download/openplm*.oxt
-	cd ../plugins/openoffice ; \
-	zip -r ../../docs/user/download/openplm-win.oxt pythonpath Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
-	zip -r ../../docs/user/download/openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
-	cd ../../docs
+	cd $(LANGUAGE) && make oxt
 
 dl: tuto oxt
 
 html: dl
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	cd $(LANGUAGE) && make html
 
 dirhtml: dl
-	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
-	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/dirhtml."
+	cd $(LANGUAGE) && make dirhtml
 
 singlehtml: dl
-	$(SPHINXBUILD) -b singlehtml $(ALLSPHINXOPTS) $(BUILDDIR)/singlehtml
-	@echo
-	@echo "Build finished. The HTML page is in $(BUILDDIR)/singlehtml."
+	cd $(LANGUAGE) && make singlehtml
 
 pickle: dl
-	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) $(BUILDDIR)/pickle
-	@echo
-	@echo "Build finished; now you can process the pickle files."
+	cd $(LANGUAGE) && make pickle
 
 json: dl
-	$(SPHINXBUILD) -b json $(ALLSPHINXOPTS) $(BUILDDIR)/json
-	@echo
-	@echo "Build finished; now you can process the JSON files."
+	cd $(LANGUAGE) && make json
 
 htmlhelp: dl
-	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) $(BUILDDIR)/htmlhelp
-	@echo
-	@echo "Build finished; now you can run HTML Help Workshop with the" \
-	      ".hhp project file in $(BUILDDIR)/htmlhelp."
+	cd $(LANGUAGE) && make htmlhelp
 
 qthelp: dl
-	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) $(BUILDDIR)/qthelp
-	@echo
-	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
-	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/test.qhcp"
-	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/test.qhc"
+	cd $(LANGUAGE) && make qthelp
 
 devhelp: dl
-	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
-	@echo
-	@echo "Build finished."
-	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/test"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/test"
-	@echo "# devhelp"
+	cd $(LANGUAGE) && make devhelp
 
 epub: dl
-	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) $(BUILDDIR)/epub
-	@echo
-	@echo "Build finished. The epub file is in $(BUILDDIR)/epub."
+	cd $(LANGUAGE) && make epub
 
 latex: dl
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
-	@echo
-	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
-	@echo "Run \`make' in that directory to run these through (pdf)latex" \
-	      "(use \`make latexpdf' here to do that automatically)."
+	cd $(LANGUAGE) && make latex
 
 latexpdf:
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
-	@echo "Running LaTeX files through pdflatex..."
-	make -C $(BUILDDIR)/latex all-pdf
-	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
+	cd $(LANGUAGE) && make latexpdf
 
 text: dl
-	$(SPHINXBUILD) -b text $(ALLSPHINXOPTS) $(BUILDDIR)/text
-	@echo
-	@echo "Build finished. The text files are in $(BUILDDIR)/text."
+	cd $(LANGUAGE) && make text
 
 man: dl
-	$(SPHINXBUILD) -b man $(ALLSPHINXOPTS) $(BUILDDIR)/man
-	@echo
-	@echo "Build finished. The manual pages are in $(BUILDDIR)/man."
+	cd $(LANGUAGE) && make man
 
 changes:
-	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/changes
-	@echo
-	@echo "The overview file is in $(BUILDDIR)/changes."
+	cd $(LANGUAGE) && make changes
 
 linkcheck:
-	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) $(BUILDDIR)/linkcheck
-	@echo
-	@echo "Link check complete; look for any errors in the above output " \
-	      "or in $(BUILDDIR)/linkcheck/output.txt."
+	cd $(LANGUAGE) && make linkcheck
 
 doctest:
-	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
-	@echo "Testing of doctests in the sources finished, look at the " \
-	      "results in $(BUILDDIR)/doctest/output.txt."
+	cd $(LANGUAGE) && make doctest
