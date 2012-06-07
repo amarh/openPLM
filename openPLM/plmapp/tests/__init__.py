@@ -41,6 +41,7 @@ from openPLM.plmapp.tests.archive import *
 from openPLM.plmapp.tests.pcle import *
 from openPLM.plmapp.tests.gestion_document_native import *
 from openPLM.plmapp.tests.navigate import *
+from openPLM.plmapp.tests.reference import *
 
 import openPLM.plmapp.models
 from openPLM.plmapp.lifecycle import LifecycleList

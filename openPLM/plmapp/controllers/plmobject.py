@@ -90,8 +90,13 @@ class PLMObjectController(Controller):
         except KeyError:
             raise ValueError("Incorrect type")
         # create an object
+        try:
+            start = "PART_"  if issubclass(models.Part, class_) else "DOC_"
+            reference_number = int(re.search(r"^%s(\d+)$" % start, reference).group(1)) 
+        except:
+            reference_number = 0
         obj = class_(reference=reference, type=type, revision=revision,
-                     owner=user, creator=user)
+                     owner=user, creator=user, reference_number=reference_number)
         if no_index:
             obj.no_index = True
         if data:

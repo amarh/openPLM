@@ -484,12 +484,19 @@ class PLMObject(models.Model):
             .. versionadded:: 1.1
 
             True if the object is published (accessible to anonymous user)
+        .. attribute:: reference_number
+
+            .. versionadded:: 1.1
+
+            number found in the reference if it matches ``PART_|DOC_\d+``            
 
     .. note::
 
         This class is abstract, to create a PLMObject, see :class:`Part` and
         :class:`Document`.
 
+    .. versionchanged:: 1.1
+        :attr:`published` and :attr:`reference_number` added.
     """
 
     # key attributes
@@ -497,6 +504,9 @@ class PLMObject(models.Model):
                                  help_text=_(u"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"))
     type = models.CharField(_("type"), max_length=50)
     revision = models.CharField(_("revision"), max_length=50)
+    
+    # hidden field to get a valid new reference
+    reference_number = models.IntegerField(default=0)
 
     # other attributes
     name = models.CharField(_("name"), max_length=100, blank=True,
