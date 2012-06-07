@@ -26,7 +26,7 @@
 This module contains a function :func:`send_mail` which can be used to notify
 users about a changement in a :class:`.PLMObject`.
 """
-from collections import Iterable, Mapping
+from collections import Iterable, Mapping, defaultdict
 
 import kjbuckets
 
@@ -40,7 +40,7 @@ from django.db.models.loading import get_model
 from django.contrib.sites.models import Site
 from celery.task import task
 
-from openPLM.plmapp.models import User, DelegationLink, ROLE_OWNER, ROLE_SIGN
+from openPLM.plmapp.models import User, UserProfile, DelegationLink, ROLE_OWNER, ROLE_SIGN
 
 
 def get_recipients(obj, roles, users):
@@ -166,7 +166,6 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
 @task(ignore_result=True)
 def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
-        from collections import defaultdict
         lang_to_email = defaultdict(set)
         if len(recipients) == 1:
             recipient = User.objects.get(id=recipients.pop())
@@ -174,17 +173,16 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
                 return
             lang_to_email[recipient.get_profile().language].add(recipient.email)
         else:
-            users = User.objects.filter(id__in=recipients).exclude(email="")
-            for user in users:
-                if not user.email in blacklist:
-                    lang_to_email[user.get_profile().language].add(user.email)
+            qs = UserProfile.objects.filter(user__in=recipients).exclude(user__email="")
+            for lang, email in qs.values_list("language", "user__email"):
+                if email not in blacklist:
+                    lang_to_email[lang].add(email)
             if not lang_to_email:
                 return    
             
         ctx = unserialize(ctx)
         ctx["site"] = Site.objects.get_current()
-
-        for lang, emails in lang_to_email.items():
+        for lang, emails in lang_to_email.iteritems():
             translation.activate(lang)
             html_content = render_to_string(template + ".html", ctx)
             message = _(render_to_string(template + ".txt", ctx))
@@ -194,7 +192,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
             msg.attach_alternative(html_content, "text/html")
             msg.send(fail_silently=True)
         
-        if lang_to_email.items():
+        if lang_to_email:
             translation.deactivate()
 
 def send_mail(subject, recipients, ctx, template, blacklist=()):

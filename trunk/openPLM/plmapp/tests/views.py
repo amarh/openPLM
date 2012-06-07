@@ -2293,10 +2293,16 @@ class GroupViewTestCase(CommonViewTest):
         form = response.context["user_formset"].forms[0]
         self.assertEqual(self.brian, form.initial["user"])
         self.assertTrue(self.brian.groups.filter(id=self.group.id).exists())
-        self.assertEqual(1, len(mail.outbox))
+        if self.LANGUAGE == "en":
+            self.assertEqual(1, len(mail.outbox))
+        else:
+            # two languages -> two messages 
+            self.assertEqual(2, len(mail.outbox))
         # a notification is sent to the owner and to the guest
-        self.assertEqual(set(mail.outbox[0].to), 
-                set([self.user.email, self.brian.email]))
+        recipients = set()
+        for msg in mail.outbox:
+            recipients.update(msg.to)
+        self.assertEqual(recipients, set([self.user.email, self.brian.email]))
         inv = m.Invitation.objects.get(group=self.group,
                 guest=self.brian, owner=self.user)
         self.assertEqual(m.Invitation.ACCEPTED, inv.state)
