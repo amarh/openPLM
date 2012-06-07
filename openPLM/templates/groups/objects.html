@@ -1,23 +1,56 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
 
-
 {% block content %}
-	<table class="Content">
-	    {% for object in objects %}
-            <tr class="Content">
-                <td class="Content">
-                    {{ object.type }}
-                </td>
-                
-                <td class="Content">
-                    <a href="{{ object.plmobject_url }}">{{object.reference}}</a>
-                </td>
-                <td class="Content">
-                    {{ object.revision }}
-                </td>
-		    </tr>
-	    {% endfor %}
-	</table>
+    <div>
+        <span id="numresults">
+        {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
+           Objects : {{start}} - {{end}} on {{total}}
+        {% endblocktrans %}
+        </span> 
+    </div>
+	<div>
+	{% for object in objects.object_list %}
+	    {% if object.is_part %}
+	        {% include "parts/identity_card.html" %}
+	    {% else %}
+	        {% include "documents/identity_card.html" %}
+	    {% endif %}
+	 {% endfor %}
+	<div>
+	<div class="pagination">
+        <span class="step-links">
+        {% if objects.has_previous and 1 not in pages %}
+
+            <a href="{% add_get page='1'%}">
+            {% if objects.number > 4 %}
+                {% trans "First page" %}</a> —
+            {% else %}
+                1</a>
+            {% endif %}
+
+        {% endif %}
+
+        {% for page in pages %}
+            <a 
+            {% if page = objects.number %}
+                style="font-weight:bold">
+            {% else %}
+                href="{% add_get page=page %}">
+            {% endif %}
+            {{page}}</a>
+        {% endfor %}
+
+        {% if objects.has_next  and objects.paginator.num_pages not in pages %}
+            {% if objects.paginator.num_pages|add:'-1' not in pages %}
+            —
+            <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "last page" %}</a>
+            {% else %}
+            <a href="{% add_get page=objects.paginator.num_pages %}">{{objects.paginator.num_pages}}</a>
+            {% endif %}
+
+        {% endif %}
+        </span>
+    </div>
 {% endblock %}
 

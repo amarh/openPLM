@@ -1800,7 +1800,12 @@ def display_plmobjects(request, obj_ref):
     """
     
     obj, ctx = get_generic_data(request, "Group", obj_ref)
-    ctx["objects"] = obj.plmobject_group.order_by("type", "reference", "revision")
+    
+    #ctx["objects"] = obj.plmobject_group.order_by("type", "reference", "revision")
+    objects = obj.plmobject_group.order_by("type", "reference", "revision")
+
+    display_pagination(request.GET,ctx, objects,"object")
+
     ctx['current_page'] = 'objects'
     return r2r("groups/objects.html", ctx, request)
 
@@ -1963,6 +1968,59 @@ class OpenPLMSearchView(SearchView):
     def __call__(self, request):
         return super(OpenPLMSearchView, self).__call__(request)
 
+def get_pages_num(total_pages, current_page,ctx):
+    page = int(current_page)
+    total = int(total_pages)
+    if total < 5:
+        ctx["pages"] = range(1,total)
+    else:
+        if page < total-1:
+            if page > 2:
+                ctx["pages"] = range(page-2, page+3)
+            else:
+                ctx["pages"] = range (1,6)
+        else:
+            ctx["pages"] = range(total-4, total+1)
+
+def display_pagination(r_GET,ctx, object_list, type="object"):
+    sort = r_GET.get("sort", "recently-added")
+    if sort== "name" :
+        sort_critera = "username" if type == "user" else "name"
+    else:
+        sort_critera = "-date_joined" if type == "user" else "-ctime"
+    object_list = object_list.order_by(sort_critera)
+ 
+    paginator = Paginator(object_list, 24) # Show 24 objects per page
+ 
+    page = r_GET.get('page', 1)
+    get_pages_num(paginator.num_pages, page,ctx)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+         objects = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+         objects = paginator.page(paginator.num_pages)
+    ctx["thumbnails"] = {}
+    ctx["num_files"] = {}
+
+    if type in ("object", "document"):
+         ids = objects.object_list.values_list("id", flat=True)
+         thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                 document__in=ids, thumbnail__isnull=False)
+         ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
+         num_files = dict.fromkeys(ids, 0)
+         for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+                 document__in=ids).values_list("document", flat=True):
+             num_files[doc_id] += 1
+         ctx["num_files"] = num_files
+    ctx.update({
+         "objects" : objects,
+         "sort" : sort,
+    })
+
+
 @secure_required
 def browse(request, type="object"):
     if request.user.is_authenticated():
@@ -2003,43 +2061,11 @@ def browse(request, type="object"):
         })
         object_list = cls.objects.filter(published=True)
 
-        
-    sort = request.GET.get("sort", "recently-added")
-    if sort == "name":
-        sort_critera = "username" if type == "user" else "name"
-    else:
-        sort_critera = "-date_joined" if type == "user" else "-ctime"
-    object_list = object_list.order_by(sort_critera)
-
-    paginator = Paginator(object_list, 24) # Show 24 objects per page
-
-    page = request.GET.get('page', 1)
-    try:
-        objects = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        objects = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        objects = paginator.page(paginator.num_pages)
-    ctx["thumbnails"] = {}
-    ctx["num_files"] = {}
-
-    if type in ("object", "document"):
-        ids = objects.object_list.values_list("id", flat=True)
-        thumbnails = models.DocumentFile.objects.filter(deprecated=False,
-                document__in=ids, thumbnail__isnull=False)
-        ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
-        num_files = dict.fromkeys(ids, 0)
-        for doc_id in models.DocumentFile.objects.filter(deprecated=False,
-                document__in=ids).values_list("document", flat=True):
-            num_files[doc_id] += 1
-        ctx["num_files"] = num_files
+    display_pagination(request.GET,ctx, object_list, type=type)
+    
     ctx.update({
-        "objects" : objects,
         "object_type" : _("Browse"),
         "type" : type,
-        "sort" : sort,
     })
     return r2r("browse.html", ctx, request)
 

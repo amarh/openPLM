@@ -2152,7 +2152,7 @@ class GroupViewTestCase(CommonViewTest):
     def test_plmobjects(self):
         response = self.get(self.group_url + "objects/", page="objects")
         objects = response.context["objects"]
-        self.assertEqual([self.part_controller.plmobject_ptr], list(objects))
+        self.assertEqual([self.part_controller.plmobject_ptr], list(objects.object_list))
         # create a new group
         group = m.GroupInfo(name="grp2", owner=self.user, creator=self.user,
                 description="grp")
@@ -2163,7 +2163,7 @@ class GroupViewTestCase(CommonViewTest):
                 dict(group=group))
         response = self.get(self.group_url + "objects/", page="objects")
         objects = response.context["objects"]
-        self.assertEqual([self.part_controller.plmobject_ptr], list(objects))
+        self.assertEqual([self.part_controller.plmobject_ptr], list(objects.object_list))
         
     def test_history(self):
         response = self.get(self.group_url + "history/", page="history")
