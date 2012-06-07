@@ -94,12 +94,13 @@ def get_new_reference(cls, start=0):
         base_cls, name = m.Part, "PART"
     else:
         base_cls, name = m.Document, "DOC"
-    nb = base_cls.objects.count() + start + 1
-    reference = "%s_%05d" % (name, nb)
-    while base_cls.objects.filter(reference=reference).exists():
-        nb += 1
-        reference = "%s_%05d" % (name, nb)
-    return reference
+    try:
+        max_ref = base_cls.objects.order_by("-reference_number")\
+            .values_list("reference_number", flat=True)[0]
+    except IndexError:
+        max_ref = 0
+    nb = max_ref + start + 1
+    return "%s_%05d" % (name, nb)
 
 def get_initial_creation_data(cls, start=0):
     u"""
