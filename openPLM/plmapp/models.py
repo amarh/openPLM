@@ -493,7 +493,8 @@ class PLMObject(models.Model):
     """
 
     # key attributes
-    reference = models.CharField(_("reference"), max_length=50, db_index=True)
+    reference = models.CharField(_("reference"), max_length=50, db_index=True,
+                                 help_text=_(u"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"))
     type = models.CharField(_("type"), max_length=50)
     revision = models.CharField(_("revision"), max_length=50)
 
