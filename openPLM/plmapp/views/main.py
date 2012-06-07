@@ -1572,9 +1572,13 @@ def download(request, docfile_id, filename=""):
     ctrl.check_readable()
     return serve(ctrl, doc_file, filename)
 
+@secure_required
 def public_download(request, docfile_id, filename=""):
     """
     View to download a published document file.
+
+    It returns an :class: `HttpResponseForbidden` if the document is
+    not published.
     
     :param request: :class:`django.http.QueryDict`
     :param docfile_id: :attr:`.DocumentFile.id`

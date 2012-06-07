@@ -132,32 +132,87 @@ Views
 Lifecycle
 ++++++++++
 
+:func:`.display_object_lifecycle` handles the publication
+and unpublication of a PLMObject.
+
 Tests
 ------
+
+    * :meth:`.ViewTest.test_publish_post`
+
+    * :meth:`.ViewTest.test_publish_post_error_not_official`
+   
+    * :meth:`.ViewTest.test_publish_post_error_published`
+    
+    * :meth:`.ViewTest.test_unpublish_post`
+    
+    * :meth:`.ViewTest.test_unpublish_post_error_unpublished`
+   
 
 
 Public
 ++++++
 
+:func:`.public` view renders a published PLMObject. If the given 
+object is not published, it redirects to the login page.
+If the given object is neither a part nor a document, it raises
+an :exc:`.Http404` exception.
+
+
 Tests
 ------
+
+    * :meth:`.ViewTest.test_public_get`
+
+    * :meth:`.ViewTest.test_public_error`
+
 
 Public download
 +++++++++++++++
 
+:func:`.public_download` handles the download of a published file.
+
+
 Browse
 ++++++
 
+:func:`.browse` allows an anonymous user to browse all published
+parts and documents.
 
 Templates
 ===========
+
+lifecycle.html
++++++++++++++++
+
+If an object has been published, this template displays a link to its
+publish page.
+
+If the user can publish the object, it adds a form named ``form-publish`` that
+prompts the user password and warns the user that a published object is
+accessible to anonymous user.
+
+If the user can unpublish the object, it adds a form named ``form-unpublish`` that
+prompts the user password and warns the user that a unpublished object is
+no more accessible to anonymous user.
 
 
 public.html
 +++++++++++
 
+If the object has been published, this template displays:
+
+    * all non deprecated files
+    * all published attributes
+    * the state of the object
+    * all published revisions
+    * all published attached parts and documents
 
 browse.html
 +++++++++++++
+
+If the user is not authenticated, it hides all unaccessible objects
+(users, groups, unpublished object).
+
 
 
