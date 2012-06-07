@@ -245,10 +245,10 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     
     .. include:: views_params.txt 
   
-    POST requests must have a "demote" or "promote" key and must
-    validate the :class:`.ConfirmPasswordForm` form.
-    If the form is valid, the object is promoted or demoted according to
-    the request.
+    POST requests must have a "demote", "promote", "publish" or "unpublish"
+    key and must validate the :class:`.ConfirmPasswordForm` form.
+    If the form is valid, the object is promoted, demoted, published, unpublished
+    according to the request.
 
     **Template:**
     
