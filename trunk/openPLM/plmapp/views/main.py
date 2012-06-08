@@ -1545,7 +1545,6 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.POST:
         checkin_file_form = forms.AddFileForm(request.POST, request.FILES)
-        print checkin_file_form.errors
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
                         request.FILES["filename"])
