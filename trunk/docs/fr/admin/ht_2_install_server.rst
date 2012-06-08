@@ -295,7 +295,7 @@ N'oubliez pas d'éditer Home>Plmapp>User profiles pour lui attribuer les bons dr
 .. image:: images/admin_userprofile.png
 
 .. note::
-    Pour plus d'information sur l'utilisation du `Django admin tool<http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
+    Pour plus d'information sur l'utilisation du `Django admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
 
 Maintenant, il vous faut créer un nouveau *Site* (utilisez l'interface
 d'administration) et renseignez la valeur de la variable `SITE_ID` dans le fichier :file:`settings.py`.
