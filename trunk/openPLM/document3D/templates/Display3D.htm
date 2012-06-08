@@ -3,142 +3,142 @@
 {% load comments %}
 
 {% block css %}
-<style>
+    <style>
 
-.ajustar {
-clear: both;
-}
-.menu {
-	margin: 10px;
-	height: 100px;
-	font-size: 9pt;
-	font-family: roman;
-}
-.menu ul {
+        .ajustar {
+            clear: both;
+        }
+        .menu {
+            margin: 10px;
+            height: 100px;
+            font-size: 9pt;
+            font-family: roman;
+        }
+        .menu ul {
 
-	margin: 0pt;
-	padding: 0pt;
-	position: relative;
-	z-index: 500;
-	list-style-type: none;
-	width: 11em;
+            margin: 0pt;
+            padding: 0pt;
+            position: relative;
+            z-index: 500;
+            list-style-type: none;
+            width: 11em;
 
-}
-.menu li {
+        }
+        .menu li {
 
-	background-color: #cccc99;
-	float: left;
-}
-.menu li.sub {
-	background-color: #cccc99;
-}
+            background-color: #cccc99;
+            float: left;
+        }
+        .menu li.sub {
+            background-color: #cccc99;
+        }
 
-.menu a, .menu a:visited {
-	border: 1px solid #ffffff;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	display: block;
-	text-decoration: none;
-	height: 2em;
-	line-height: 2em;
-	width: 11em;
-	color: #000000;
-	padding-left: 1em;
-	font-weight: normal;
-	font-style: normal;
-	font-variant: normal;
-	text-transform: none;
-}
-.menu b {
-	float: right;
-	margin-right: 5px;
-}
-* html .menu a, * html .menu a:visited {
-	width: 11em;
-}
-* html .menu a:hover {
-	color: #ccff66;
-	background-color: #999966;
-	position: relative;
-	font-weight: normal;
-	font-style: normal;
-	font-variant: normal;
-	text-decoration: none;
-	text-transform: none;
-}
-.menu li:hover {
-	position: relative;
-}
-.menu a:active, .menu a:focus {
-	color: #ccff66;
-	background-color: #999966;
-	font-weight: normal;
-	font-style: normal;
-	font-variant: normal;
-	text-decoration: none;
-	text-transform: none;
-}
-.menu li:hover > a {
-	color: #ccff66;
-	background-color: #999966;
-	font-weight: normal;
-	font-style: normal;
-	font-variant: normal;
-	text-decoration: none;
-	text-transform: none;
-}
-.menu li ul {
-	padding: 2em;
-	visibility: hidden;
-	position: absolute;
-	top: -2em;
-	left: 7em;
-	background-color: transparent;
-}
-.menu li:hover > ul {
-	visibility: visible;
-}
-.menu ul a:hover ul ul {
-	visibility: hidden;
-}
-.menu ul a:hover ul a:hover ul ul {
-	visibility: hidden;
-}
-.menu ul a:hover ul a:hover ul a:hover ul ul {
-	visibility: hidden;
-}
-.menu ul a:hover ul {
-	visibility: visible;
-}
-.menu ul a:hover ul a:hover ul {
-	visibility: visible;
-}
-.menu ul a:hover ul a:hover ul a:hover ul {
-	visibility: visible;
-}
-.menu ul a:hover ul a:hover ul a:hover ul a:hover ul {
-	visibility: visible;
-}
-.trans{    
-position:absolute;
-z-index:10;      
-}  
-#zoom {
-  position:absolute;
-  height:40%;
-  top: 30%;
-  right: 5%;
-  z-index:10;  
-}
-div#main_content {
-    background-color: #848484;
-    box-shadow: 0 0 115px 80px #545454 inset;
-} 
-div#main_content p {
-    color: white;
-}
-</style>
-     
+        .menu a, .menu a:visited {
+            border: 1px solid #ffffff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            text-decoration: none;
+            height: 2em;
+            line-height: 2em;
+            width: 11em;
+            color: #000000;
+            padding-left: 1em;
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            text-transform: none;
+        }
+        .menu b {
+            float: right;
+            margin-right: 5px;
+        }
+        * html .menu a, * html .menu a:visited {
+            width: 11em;
+        }
+        * html .menu a:hover {
+            color: #ccff66;
+            background-color: #999966;
+            position: relative;
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            text-decoration: none;
+            text-transform: none;
+        }
+        .menu li:hover {
+            position: relative;
+        }
+        .menu a:active, .menu a:focus {
+            color: #ccff66;
+            background-color: #999966;
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            text-decoration: none;
+            text-transform: none;
+        }
+        .menu li:hover > a {
+            color: #ccff66;
+            background-color: #999966;
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            text-decoration: none;
+            text-transform: none;
+        }
+        .menu li ul {
+            padding: 2em;
+            visibility: hidden;
+            position: absolute;
+            top: -2em;
+            left: 7em;
+            background-color: transparent;
+        }
+        .menu li:hover > ul {
+            visibility: visible;
+        }
+        .menu ul a:hover ul ul {
+            visibility: hidden;
+        }
+        .menu ul a:hover ul a:hover ul ul {
+            visibility: hidden;
+        }
+        .menu ul a:hover ul a:hover ul a:hover ul ul {
+            visibility: hidden;
+        }
+        .menu ul a:hover ul {
+            visibility: visible;
+        }
+        .menu ul a:hover ul a:hover ul {
+            visibility: visible;
+        }
+        .menu ul a:hover ul a:hover ul a:hover ul {
+            visibility: visible;
+        }
+        .menu ul a:hover ul a:hover ul a:hover ul a:hover ul {
+            visibility: visible;
+        }
+        .trans{    
+            position:absolute;
+            z-index:10;      
+        }  
+        #zoom {
+            position:absolute;
+            height:40%;
+            top: 30%;
+            right: 5%;
+            z-index:10;  
+        }
+        div#main_content {
+            background-color: #848484;
+            box-shadow: 0 0 115px 80px #545454 inset;
+        } 
+        div#main_content p {
+            color: white;
+        }
+    </style>
+
 {% endblock %}
 
 {% block content %}
@@ -150,26 +150,26 @@ div#main_content p {
 
         </p>
     {% else %}
-    <div class="trans" >
-        <div class="menu" id="menu_">   </div>
-    </div> 
+        <div class="trans" >
+            <div class="menu" id="menu_">   </div>
+        </div> 
 
 
-    <div id="webgl_warning" class="main" style="display:none;">
-        <div class="warning_container">
-            <div class="warning">
+        <div id="webgl_warning" class="main" style="display:none;">
+            <div class="warning_container">
+                <div class="warning">
 
-                <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
-                <ul>
-                    <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
-                    <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
+                    <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
+                    <ul>
+                        <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
+                        <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
 
-                    <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
-                </ul>
-                <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
+                        <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
+                    </ul>
+                    <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
+                </div>
             </div>
         </div>
-    </div>
 
     {% endif %}
 {% endblock %}
@@ -178,7 +178,7 @@ div#main_content p {
 
 
 {% block scripts %} 
-  
+
     <script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
     {% for item in GeometryFiles %}
         <script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
@@ -187,188 +187,205 @@ div#main_content p {
 
 
 
-if ( !window.requestAnimationFrame ) {
+        if ( !window.requestAnimationFrame ) {
 
-    window.requestAnimationFrame = ( function() {
+            window.requestAnimationFrame = ( function() {
 
-        return window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+                    return window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.oRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
+                    function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
 
-            window.setTimeout( callback, 1000 / 60 );
+                    window.setTimeout( callback, 1000 / 60 );
 
-        };
+                    };
 
-} )();
+                    } )();
 
-}  		
+        }  		
 
 {% if javascript_arborescense %}
-{{javascript_arborescense|safe}}		
-{% endif %}
+    {{javascript_arborescense|safe}}		
 
-var zoom_var=50	
-var camera, scene, renderer;
-var container;
-var main_content;            
-var width ;
-var height ;
-var deep ;
-var controls;	
-$(document.getElementById( 'main_content' )).ready(init);
-animate();
+    var zoom_var=50	
+    var camera, scene, renderer;
+    var container;
+    var main_content;            
+    var width ;
+    var height ;
+    var deep ;
+    var controls = null;	
+    $(document.getElementById( 'main_content' )).ready(init);
+    animate();
 
-function init() {
+    function init() {
 
+        if (!has_webgl()){
+            document.getElementById("webgl_warning").style.display = 'block'; 
+        }
+        else{
+            container=document.getElementById('main_content');
 
+            scene = new THREE.Scene();
+            // init the lights
 
-if (!has_webgl()){
+            var ambient = new THREE.AmbientLight( 0xffffff );
+            scene.add( ambient );
 
-document.getElementById("webgl_warning").style.display = 'block'; 
+            var light   = new THREE.DirectionalLight( 0xffffff );
+            light.position.set(1, 1, 4 ).normalize();
+            spot1 = light;
+            scene.add( light );
 
-}
-else{
-container=document.getElementById('main_content');
-	
-scene = new THREE.Scene();
-scene.add( new THREE.AmbientLight( 0x0ff20 ) );
-light1 = new THREE.PointLight( 0xff0040 );
-scene.add( light1 );
-centrer_objet(object3D);
+            var light   = new THREE.SpotLight( 0xffffff, 2 );
+            spot2   = light;
+            light.target.position.set( 0, 8, 0 );
+            light.shadowCameraNear      = 0.01;     
+            light.castShadow        = true;
+            light.shadowDarkness        = 0.1;
+            scene.add( light );
 
-scene.add( object3D);
-
-
-
-camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(), 0.1, radius*200 );
-camera.position.z = radius*1.5;
-
-
-renderer = new THREE.WebGLRenderer();
-renderer.setSize( $(container).width(), $(container).height() );
-container.appendChild( renderer.domElement );
-
-zoom = document.createElement("div");
-zoom.id = 'zoom';
-container.appendChild( zoom );
-
-
-	
-controls = new THREE.TrackballControls( camera, renderer.domElement );
-controls.rotateSpeed = 1.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.2;
-controls.noZoom = true;
-controls.noPan = false;
-controls.staticMoving = false;
-controls.dynamicDampingFactor = 0.3;
-controls.minDistance = 0;
-controls.maxDistance = radius * 100;
-controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
-    
-menu();
-container.focus()
-    
-
-renderer.render(scene, camera); 
-
-
-
-$(function() {
-	$( "#zoom" ).slider({
-		orientation: "vertical",
-		min: 0,
-		max: 100,
-		value: 50,
-	    start: function() { /*$('#zoom_bar').data('sliding', true )*/ },
-        stop:  function() {  },
-		slide: function( event, ui ) {
-            total=zoom_var-ui.value;
-            zoom_var=ui.value;
-		    camera.translateZ(1.49999*radius*(total/50));
-		    if($('#zoom_bar .ui-slider-handle:focus').length){
-		    }
-            else{
+            centrer_objet(object3D);
+            for (var i=0; i < object3D.children.length; i++) {
+                var obj = object3D.children[i];
+                obj.receiveShadow=true;
+                obj.castShadow=true;
+                obj.material =  new THREE.MeshPhongMaterial({
+                    ambient		: 0x000000,
+                    shininess	: 1000, 
+                    specular	: 0x000000,
+                    shading		: THREE.SmoothShading,
+                    color: obj.material.color.getHex(),
+                    opacity: 0.8//  obj.material.opacity
+                });
             }
+            object3D.castShadow = true;
+            object3D.receiveShadow = true;
+            scene.add( object3D);
 
-		}
-		
+            camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(), 0.1, radius*200 );
+            camera.position.z = radius*1.5;
 
-		
-		
-	});
-	
-});  
+            renderer = new THREE.WebGLRenderer({
+                antialias		: true,	// to get smoother output
+                preserveDrawingBuffer	: true	// to allow screenshot
+            });
+            renderer.setSize( $(container).width(), $(container).height() );
+            renderer.shadowMapEnabled	= true;
+            renderer.shadowMapSoft		= true;
+            container.appendChild( renderer.domElement );
+
+            controls = new THREE.TrackballControls( camera, renderer.domElement );
+            spot1_controls = new THREE.TrackballControls( spot1, renderer.domElement );
+            spot2_controls = new THREE.TrackballControls( spot2, renderer.domElement );
+            
+            var ctrls = [controls, spot1_controls, spot2_controls ];
+            for (var i = 0; i < ctrls.length; i++) {
+                var ctrl = ctrls[i];
+                ctrl.rotateSpeed = 1.0;
+                ctrl.zoomSpeed = 1.2;
+                ctrl.panSpeed = 0.2;
+                ctrl.noZoom = true;
+                ctrl.noPan = false;
+                ctrl.staticMoving = false;
+                ctrl.dynamicDampingFactor = 0.3;
+                ctrl.minDistance = 0;
+                ctrl.maxDistance = radius * 100;
+                ctrl.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
+            }
+               
+
+            menu();
+            container.focus()
+            renderer.render(scene, camera); 
+
+            zoom = document.createElement("div");
+            zoom.id = 'zoom';
+            container.appendChild( zoom );
+            $( "#zoom" ).slider({
+                orientation: "vertical",
+                min: 0,
+                max: 100,
+                value: 50,
+                start: function() { /*$('#zoom_bar').data('sliding', true )*/ },
+                stop:  function() {  },
+                slide: function( event, ui ) {
+                    total=zoom_var-ui.value;
+                    zoom_var=ui.value;
+                    camera.translateZ(1.49999*radius*(total/50));
+
+                }
 
 
-}
-}			
+            });
+
+        }
+    }			
 
 
-function has_webgl(){
-return !!window.WebGLRenderingContext;
-}
-
-function centrer_objet(object3D){ 	
-	
-boundingBox=computeGroupBoundingBox(object3D);
-		        
-width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
-height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
-deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
-
-radius=Math.max(width,height,deep);
-
-object3D.position.x=-(boundingBox.x[ 0 ]+boundingBox.x[ 1 ])/2;
-object3D.position.y=-(boundingBox.y[ 0 ]+boundingBox.y[ 1 ])/2;  
-object3D.position.z=-(boundingBox.z[ 0 ]+boundingBox.z[ 1 ])/2; 
-
-}
-                        
-function animate() {
-
-requestAnimationFrame(animate);
-
-controls.update();
-renderer.render( scene, camera );
-
-
-};
-
-
-				
-function computeGroupBoundingBox(Object_Group) {   
-    var boundingBox;
-    for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
-    var geo=THREE.GeometryUtils.clone(Object_Group.children[v].geometry);
-    geo.applyMatrix(Object_Group.children[v].matrix);
-    geo.computeBoundingBox();
-    BB=geo.boundingBox;
-    if (BB){    
-    if(!boundingBox){
-    boundingBox= { 
-    'x':[BB.min.x, BB.max.x],
-    'y':[BB.min.y, BB.max.y],
-    'z':[BB.min.z, BB.max.z]
-    }; 
+    function has_webgl(){
+        return !!window.WebGLRenderingContext;
     }
-    else{
-    boundingBox.x[0]=Math.min(BB.min.x, boundingBox.x[0]);
-    boundingBox.y[0]=Math.min(BB.min.y, boundingBox.y[0]);
-    boundingBox.z[0]=Math.min(BB.min.z, boundingBox.z[0]);
-    boundingBox.x[1]=Math.max(BB.max.x, boundingBox.x[1]);
-    boundingBox.y[1]=Math.max(BB.max.y, boundingBox.y[1]);
-    boundingBox.z[1]=Math.max(BB.max.z, boundingBox.z[1]);
-    }
-    }   
-    }
-return boundingBox;
-}
-        
-        
 
-</script>
+    function centrer_objet(object3D){ 	
 
-{% endblock %}
+        boundingBox=computeGroupBoundingBox(object3D);
+
+        width =Math.abs(boundingBox.x[ 1 ]-boundingBox.x[ 0 ]);
+        height =Math.abs(boundingBox.y[ 1 ]-boundingBox.y[ 0 ]);
+        deep =Math.abs(boundingBox.z[ 1 ]-boundingBox.z[ 0 ]);
+
+        radius=Math.max(width,height,deep);
+
+        object3D.position.x=-(boundingBox.x[ 0 ]+boundingBox.x[ 1 ])/2;
+        object3D.position.y=-(boundingBox.y[ 0 ]+boundingBox.y[ 1 ])/2;  
+        object3D.position.z=-(boundingBox.z[ 0 ]+boundingBox.z[ 1 ])/2; 
+
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (controls != null ){
+            controls.update();
+            spot1_controls.update();
+            spot2_controls.update();
+            renderer.render( scene, camera );
+        }
+    };
+
+
+    function computeGroupBoundingBox(Object_Group) {   
+        var boundingBox;
+        for ( var v = 0 ;v  < Object_Group.children.length; v ++ ) {
+            var geo=THREE.GeometryUtils.clone(Object_Group.children[v].geometry);
+            geo.applyMatrix(Object_Group.children[v].matrix);
+            geo.computeBoundingBox();
+            BB=geo.boundingBox;
+            if (BB){    
+                if(!boundingBox){
+                    boundingBox= { 
+                        'x':[BB.min.x, BB.max.x],
+                        'y':[BB.min.y, BB.max.y],
+                        'z':[BB.min.z, BB.max.z]
+                    }; 
+                }
+                else{
+                    boundingBox.x[0]=Math.min(BB.min.x, boundingBox.x[0]);
+                    boundingBox.y[0]=Math.min(BB.min.y, boundingBox.y[0]);
+                    boundingBox.z[0]=Math.min(BB.min.z, boundingBox.z[0]);
+                    boundingBox.x[1]=Math.max(BB.max.x, boundingBox.x[1]);
+                    boundingBox.y[1]=Math.max(BB.max.y, boundingBox.y[1]);
+                    boundingBox.z[1]=Math.max(BB.max.z, boundingBox.z[1]);
+                }
+            }   
+        }
+        return boundingBox;
+    }
+
+
+    {% endif %}
+
+    </script>
+
+    {% endblock %}

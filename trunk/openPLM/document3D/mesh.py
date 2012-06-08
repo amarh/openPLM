@@ -56,7 +56,7 @@ def mesh_shape(shape,filename,_index_id, pov_dir):
     """
 
     quality_factor=0.3
-    opacity=0.5
+    opacity=0.8
     a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
 
     
