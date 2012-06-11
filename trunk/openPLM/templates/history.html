@@ -10,6 +10,11 @@
 {% endblock %}
 
 {% block content %}
+    <div style="width:32px;">
+        <a target="_blank" href="../rss/">
+            <img src="/media/img/feed_icon.png" alt="click here to subscribe to its related feed" title="click here to subscribe to the related feed">
+        </a>
+    </div> <br/>
     {% regroup object_history by get_day as histories %}
 
     {% for group in histories %}
@@ -18,7 +23,7 @@
 
             <dl>
                 {% for histo in group.list %}
-                    <dt class="changeset">
+                    <dt class="changeset" id="{{histo.id}}">
                     <span class="time">
                         {{histo.date|date:"G:i"}}
                     </span>

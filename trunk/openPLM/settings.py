@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'haystack',
     'south',
     'openPLM.plmapp',
+    'openPLM.rss',
     'openPLM.pdfgen', # enable pdf generations
     #XYZ: you can add your application after this line
     'openPLM.cad',
