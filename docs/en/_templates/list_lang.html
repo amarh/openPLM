@@ -1,0 +1,8 @@
+<ul>
+{% for code, name in [("en", "English"), ("fr", "Français") ] %}
+    {% if code != language %}
+        <li><a href="/../{{code}}/{{ pagename }}{{file_suffix}}">{{ name }}</a></li>
+    {% endif %}
+
+{% endfor %}
+</ul>
