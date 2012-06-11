@@ -698,5 +698,43 @@ class PLMObjectController(Controller):
         self.object.save()
         details = u"Unpublished by %s (%s)" % (self._user.get_full_name(), self._user.username)
         self._save_histo("Unpublish", details)
+    
+    def check_cancel(self,raise_=True):
+        """
+        .. versionadded:: 1.1
+
+        Checks that an object can be cancelled.
+
+        If *raise_* is True:
+
+            :raise: :exc:`.PermissionError` if the object is not draft
+            :raise: :exc:`.PermissionError` if the object has related previous
+                    or next revision
+            :raise: :exc:`.PermissionError` if the user has not owner rights on
+                an object
+
+        If *raise_* is False:
+
+            Returns True if all previous tests has been succesfully passed,
+            False otherwise.
+        """
+        res = self.is_draft
+        if (not res) and raise_:
+            raise PermissionError("Invalid state: the object is not draft")
+        res = res and self.check_permission("owner",raise_=False)
+        if (not res) and raise_:
+            raise PermissionError("You are not allowed to cancel this object")
+        res = res and len(self.get_all_revisions())==1
+        if (not res) and raise_:
+            raise PermissionError("This object has more than 1 revision")
+        return res
+        
+    def can_cancel(self):
+        """
+        .. versionadded:: 1.1
+
+        Returns True if the user can cancel this object.
+        """
+        return self.check_cancel(raise_=False)
 
 

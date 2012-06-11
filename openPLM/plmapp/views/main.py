@@ -266,7 +266,8 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
         actions = (("demote", obj.demote), ("promote", obj.promote),
-                   ("publish", obj.publish), ("unpublish", obj.unpublish,))
+                   ("publish", obj.publish), ("unpublish", obj.unpublish),
+                   ("cancel", obj.cancel,))
         if password_form.is_valid():
             for action_name, method in actions:
                 if action_name in request.POST:
@@ -1972,6 +1973,9 @@ class OpenPLMSearchView(SearchView):
         return super(OpenPLMSearchView, self).__call__(request)
 
 def get_pages_num(total_pages, current_page,ctx):
+    """
+        add to ctx the pages to display for the pagination
+    """
     page = int(current_page)
     total = int(total_pages)
     if total < 5:
@@ -1986,6 +1990,12 @@ def get_pages_num(total_pages, current_page,ctx):
             ctx["pages"] = range(total-4, total+1)
 
 def display_pagination(r_GET,ctx, object_list, type="object"):
+    """
+        called in view which return a template where object id card
+        are displayed
+        update ctx with pagination information
+
+    """
     sort = r_GET.get("sort", "recently-added")
     if sort== "name" :
         sort_critera = "username" if type == "user" else "name"
