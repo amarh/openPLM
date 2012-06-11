@@ -241,9 +241,9 @@
             var light   = new THREE.SpotLight( 0xffffff, 2 );
             spot2   = light;
             light.target.position.set( 0, 8, 0 );
-            light.shadowCameraNear      = 0.01;     
-            light.castShadow        = true;
-            light.shadowDarkness        = 0.1;
+            light.shadowCameraNear = 0.01;     
+            light.castShadow = true;
+            light.shadowDarkness = 0.1;
             scene.add( light );
 
             centrer_objet(object3D);
@@ -259,6 +259,7 @@
                     color: obj.material.color.getHex(),
                     opacity: 0.8//  obj.material.opacity
                 });
+                obj.material.original_color = obj.material.color.getHex(); 
             }
             object3D.castShadow = true;
             object3D.receiveShadow = true;
@@ -320,8 +321,47 @@
 
             });
 
+            $('.menu a').hover(
+                function (){
+                    var part = "part" + $(this).attr("id").replace("li-part-", "");
+                    highlight_part(part);
+                },
+                function () {
+                    var part = "part" +  $(this).attr("id").replace("li-part-", "");
+                    unhighlight_part(part);
+                }
+            );
+
         }
-    }			
+        }			
+
+    function highlight_part(part_id) {
+
+        var obj = part_to_object[part_id];
+        if (obj != undefined){
+            m = obj.material;
+            m.color.setHex(0xff0000);
+        }
+        $(part_to_parts[part_id]).each (
+            function (i,p) {
+                highlight_part(p);
+            }
+        );
+    }
+
+    function unhighlight_part(part_id) {
+        var obj = part_to_object[part_id];
+        if (obj != undefined){
+            m =  obj.material;
+            m.color.setHex(m.original_color);
+        }
+        $(part_to_parts[part_id]).each (
+            function (i,p) {
+                unhighlight_part(p);
+            }
+         );
+
+    }
 
 
     function has_webgl(){
@@ -386,6 +426,6 @@
 
     {% endif %}
 
-    </script>
+</script>
 
-    {% endblock %}
+{% endblock %}
