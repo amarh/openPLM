@@ -1205,7 +1205,7 @@ div#type-panel li:hover * {
     color: white;
 }
 
-.ic-group span.description {
+.identity_card span.description {
     overflow: hidden;
     max-height: 5em;
     display: block;
