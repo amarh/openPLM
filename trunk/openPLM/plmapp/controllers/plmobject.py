@@ -736,5 +736,7 @@ class PLMObjectController(Controller):
         Returns True if the user can cancel this object.
         """
         return self.check_cancel(raise_=False)
-
-
+    
+    def safe_cancel(self):
+        self.check_cancel()
+        self.cancel()

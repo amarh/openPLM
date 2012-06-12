@@ -566,7 +566,7 @@ class ControllerTest(BaseTestCase):
         self.assertUnpublish(ctrl)
 
     def test_unpublish_deprecated(self):
-        """ Tests that a deprecated opublished bject can be unpublished."""
+        """ Tests that a deprecated published object can be unpublished."""
         controller = self.get_published_ctrl()
         self.promote_to_deprecated(controller)
         publisher = self.get_publisher()
@@ -596,4 +596,74 @@ class ControllerTest(BaseTestCase):
         publisher.groups.remove(self.group)
         ctrl = self.CONTROLLER(controller.object, publisher)
         self.assertUnpublishError(ctrl)
+    
+    # cancel test
+    
+    def get_created_ctrl(self):
+        controller = self.create("P1")
+        controller.object.save()
+        return controller
+        
+    def assertCancel(self,ctrl):
+        self.assertTrue(ctrl.check_cancel())
+        self.assertTrue(ctrl.can_cancel())
+        ctrl.cancel()
+        self.check_cancelled_object(ctrl)
+        
+    def assertCancelError(self, ctrl):
+        self.assertRaises(exc.PermissionError, ctrl.check_cancel)
+        self.assertRaises(exc.PermissionError, ctrl.check_cancel)
+        self.assertRaises(exc.PermissionError, ctrl.check_cancel)
+        res = not ctrl.is_draft
+        res = res or len(ctrl.get_all_revisions()) > 1
+        res = res or not ctrl.check_permission("owner",raise_=False)
+        self.assertTrue(res)
+    
+    def test_cancel_draft(self):
+        """ Tests that a draft object with only one revision can be cancelled"""
+        controller = self.get_created_ctrl()
+        self.assertCancel(controller)
+        
+    def test_cancel_not_draft(self):
+        """ Tests that a non-draft object can *not* be cancelled"""
+        controller = self.get_created_ctrl()
+        state = controller.object.state
+        lifecycle = controller.object.lifecycle
+        lcl = lifecycle.to_states_list()
+        new_state = lcl.next_state(state.name)
+        controller.object.state = models.State.objects.get_or_create(name=new_state)[0]
+        controller.object.save()
+        self.assertFalse(controller.is_draft)
+        self.assertCancelError(controller)
+        
+    def test_cancel_official(self):
+        """ Tests that an official object can *not* be cancelled (even by its creator/owner)"""
+        controller = self.get_created_ctrl()
+        self.promote_to_official(controller)
+        self.assertCancelError(controller)
 
+    def test_cancel_deprecated(self):
+        """ Tests that a deprecated object can *not* be cancelled"""
+        controller = self.get_created_ctrl()
+        self.promote_to_deprecated(controller)
+        self.assertCancelError(controller)
+        
+    def test_cancel_cancelled(self):
+        """ Tests that a cancelled object can *not* be cancelled"""
+        controller = self.get_created_ctrl()
+        controller.cancel()
+        self.assertCancelError(controller)
+
+    def test_cancel_not_owner(self):
+        """ Tests that only a user who does not have owner rights on the object
+        can not cancel."""
+        controller = self.get_created_ctrl()
+        user = self.get_contributor()
+        ctrl = self.CONTROLLER(controller.object, user)
+        self.assertCancelError(ctrl)
+        
+    def test_cancel_revised(self):
+        """Tests that an object (here a draft) with more than one revision can *not* be cancelled"""
+        controller = self.get_created_ctrl()
+        ctrl = controller.revise("b")
+        self.assertCancelError(ctrl)
