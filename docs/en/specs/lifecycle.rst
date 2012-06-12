@@ -211,6 +211,24 @@ Promote rules to official for Standard lifecycles
        
             What to do if the lifecycles are different?
        
+Cancel rules
+++++++++++++++
+
+    #. An object can only be cancelled by its owner
+    
+       :Tests: - plmapp.ControllerTest.test_cancel_not_owner
+       :Tests: - plmapp.ControllerTest.test_cancel_owner
+
+    #. When an object has more than one revision, none of its revisions can't be
+       cancelled
+       
+       :Tests: - plmapp.ControllerTest.test_cancel_revised
+                    
+    #. Non draft objects can't be cancelled
+    
+       :Tests: - plmapp.ControllerTest.test_cancel_draft
+               - plmapp.ControllerTest.test_cancel_not_draft
+
 Ownership
 ++++++++++
 
