@@ -656,11 +656,20 @@ class ControllerTest(BaseTestCase):
 
     def test_cancel_not_owner(self):
         """ Tests that only a user who does not have owner rights on the object
-        can not cancel."""
+        can not cancel it."""
         controller = self.get_created_ctrl()
         user = self.get_contributor()
         ctrl = self.CONTROLLER(controller.object, user)
         self.assertCancelError(ctrl)
+        
+    def test_cancel_owner(self):
+        """ Tests that any user with owner rights on the object
+        can cancel it."""
+        controller = self.get_created_ctrl()
+        user = self.get_contributor()
+        controller.set_owner(user)
+        ctrl = self.CONTROLLER(controller.object, user)
+        self.assertCancel(ctrl)
         
     def test_cancel_revised(self):
         """Tests that an object (here a draft) with more than one revision can *not* be cancelled"""
