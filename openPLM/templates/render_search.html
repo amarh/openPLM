@@ -1,0 +1,10 @@
+{% load i18n plmapp_tags %}
+<html>
+    <head>
+    </head>
+    <body>
+        <div id="SearchBox" class="Box {{link_creation|yesno:"link_creation,"}}">
+              {% include "blocks/search.html" %}
+        </div>
+    </body>
+</html>
