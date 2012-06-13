@@ -10,7 +10,8 @@ to OpenERP.
 Dependencies
 ==============
 
-The *oerp* application depends on `oerplib <https://launchpad.net/oerplib>`_.
+The *oerp* application depends on `oerplib <https://launchpad.net/oerplib>`_
+(tested version: 0.5.0).
 
 It is installable through *pip* or *easy_install*:
 
