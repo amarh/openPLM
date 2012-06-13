@@ -31,7 +31,13 @@
                     {# allow valid user to resend the invitation #}
                     {% if inv.guest_asked and inv.guest == user or not inv.guest_asked and inv.owner == user%}
                         <td class="Content">
-                            <form method="POST" action="../invitation/send/{{inv.pk}}/">
+                            <form method="POST" action=
+                            {% if prefix %}
+                            "..{{inv.group.plmobject_url}}invitation/send/{{inv.pk}}/"
+                            {% else %}
+                            "../invitation/send/{{inv.pk}}/"
+                            {% endif %}
+                            >
                                 <input type="submit" name="Send"
                                 class="{{"Button"|button}}"
                                 value="{% trans "Resend" %}"/>
@@ -41,12 +47,24 @@
                     {# allow valid user to accept/refuse the invitation #}
                     {% if inv.guest_asked and inv.owner == user or not inv.guest_asked and inv.guest == user %}
                         <td class="Content">
-                            <a href="../invitation/accept/{{inv.pk}}/" class="{{"Button"|button}}" >
+                            <a href=
+                            {% if prefix %}
+                            "..{{inv.group.plmobject_url}}invitation/accept/{{inv.pk}}/" 
+                            {% else %}
+                            "../invitation/accept/{{inv.pk}}/" 
+                            {% endif %}
+                            class="{{"Button"|button}}" >
                                 <span class="ui-button-text">{% trans "Accept" %}</span>
                             </a>
                         </td>
                         <td class="Content">
-                            <a href="../invitation/refuse/{{inv.pk}}/" class="{{"Button"|button}}" >
+                            <a href=
+                            {% if prefix %}
+                            "..{{inv.group.plmobject_url}}invitation/refuse/{{inv.pk}}/" 
+                            {% else %}
+                            "../invitation/refuse/{{inv.pk}}/"
+                            {% endif %}
+                             class="{{"Button"|button}}" >
                                 <span class="ui-button-text">{% trans "Refuse" %}</span>
                             </a>
                         </td>
