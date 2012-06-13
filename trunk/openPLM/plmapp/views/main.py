@@ -2151,6 +2151,8 @@ def public(request, obj_type, obj_ref, obj_revi):
 
     return r2r("public.html", ctx, request)
 
+
+@handle_errors
 def async_search(request, obj_type, obj_ref, obj_revi):
     """Perform search_request asynchronously"""
     obj,ctx = get_generic_data(request)
