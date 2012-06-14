@@ -12,5 +12,9 @@ group_dict = {'obj_type':'Group', 'obj_revi':'-'}
 
 urlpatterns = patterns('',
     (object_url+'rss/$', RssFeed()),
+    (user_url+'rss/$', RssFeed(),user_dict),
+    (group_url+'rss/$', RssFeed(), group_dict),
     (object_url+'atom/$', AtomFeed()),
+    (user_url+'rss/$', AtomFeed(),user_dict),
+    (group_url+'rss/$', AtomFeed(), group_dict),
 )

@@ -47,18 +47,35 @@ class RssFeed(HTTPAuthFeed):
         return obj
     
     def title(self,obj):
-        return obj.object.reference+"//"+obj.object.revision+"//"+obj.object.name
+        if hasattr(obj,'is_part'):
+            return obj.object.reference+"//"+obj.object.revision+"//"+obj.object.name
+        elif hasattr(obj,'username'):
+            return obj.object.username
+        else:
+            return obj.object.name
     
     def link(self, obj):
-        return obj.plmobject_url
+        if hasattr(obj,'plmobject_url'):
+            return obj.plmobject_url
+        else:
+            return obj.get_absolute_url()
         
     def description(self, obj):
-        return _("Updates on changes on ")+obj.object.reference+"//"+obj.object.revision+"//"+obj.object.name
+        ret = _("Updates on changes on ")
+        if hasattr(obj,'is_part'):
+            return ret +obj.object.reference+"//"+obj.object.revision+"//"+obj.object.name
+        elif hasattr(obj,'username'):
+            return ret + obj.object.username
+        else:
+            return ret + obj.object.name
             
     def items(self,obj):
         #return the history items
-        objects = [o.id for o in obj.get_all_revisions()]
-        return obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')[:10]
+        if hasattr(obj,'get_all_revisions'):
+            objects = [o.id for o in obj.get_all_revisions()]
+            return obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')[:10]
+        else:
+            return obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')[:10]
    
     def item_title(self, item):
         i_date = item.date.strftime("%B %d, %Y") 
@@ -72,7 +89,10 @@ class RssFeed(HTTPAuthFeed):
         return make_desc(i_action, i_details, i_user)
     
     def item_link(self, item):
-        return item.plmobject.plmobject_url+"#"+str(item.id)
+        if hasattr(item.plmobject, 'plmobject_url'):
+            return item.plmobject.plmobject_url+"history/#"+str(item.id)
+        else:
+            return item.plmobject.get_absolute_url()+"history/#"+str(item.id)
 
 class AtomFeed(RssFeed):
     feed_type = Atom1Feed

@@ -9,12 +9,10 @@
 
 {% endblock %}
 
+{% block extrahead %}
+    <link rel="alternate" type="application/atom+xml" href="../rss/">
+{% endblock %}
 {% block content %}
-    <div style="width:32px;">
-        <a target="_blank" href="../rss/">
-            <img src="/media/img/feed_icon.png" alt="click here to subscribe to its related feed" title="click here to subscribe to the related feed">
-        </a>
-    </div> <br/>
     {% regroup object_history by get_day as histories %}
 
     {% for group in histories %}
