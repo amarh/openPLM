@@ -1,41 +1,44 @@
 
+//update the results block
 function update_results(msg){
     var response = $(msg);
-    var hr_element = response.find("hr")[0];
+    
+    // get the results block
     var res_div = response.find("div.Result")[0];
     $.each($(res_div).find("div.reference"), function(i,v){
         var link =$(v).find("a")[0];
         var span_link = $(link).next("span");
         $(link).append(span_link);
     });
-    var searchBox=$(res_div).parent()[0];
+    /*var searchBox=$(res_div).parent()[0];
     var searchBox_class = $(searchBox).attr("class");
-    $("#SearchBox").attr("class",searchBox_class);
+    $("#SearchBox").attr("class",searchBox_class);*/
     $("#SearchBox > div.Result").replaceWith(res_div);
-    $("#SearchBox hr").replaceWith(hr_element);
-    init();
-
+    if($(res_div).attr("navigate")=="true"){
+        init();
+    }
 }
 
+//launch the search request asynchronously
 function perform_search(){
-    var url = location.href;
-    url = url.split("navigate")[0];
-    url = url+"navigate/perform_search/";
-    var data = "type=" + $("#search_id_type").val();
+    var data ="navigate=" + $("div.Result").attr("navigate");
+    data = data + "&type=" + $("#search_id_type").val();
     data = data +"&q=" + $("#search_id_q").val();
     $.ajax({
         type : "GET",
-        url : url,
+        url : "/perform_search/",
         data : data,
         success : function(msg){
             update_results(msg);
         } 
-    })
+    });
 }
 
 $(function(){
-    $("#search_button").click(function(e){
-        e.preventDefault();
-        perform_search();
+    $("#SearchBox #search_button").click(function(e){
+        if($("div.Result").attr("link_creation")!="true"){
+            e.preventDefault();
+            perform_search();
+        }
     });
 })

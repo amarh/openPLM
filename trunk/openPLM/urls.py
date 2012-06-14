@@ -90,6 +90,7 @@ urlpatterns += patterns('',
     ('^import/done/$', import_csv_done),
     # browse
     (r'^browse/(?P<type>object|part|document|user|group)?/', 'openPLM.plmapp.views.main.browse'),
+    (r'^perform_search/$',async_search),
     )
 
 urlpatterns += patterns2('', 'ajax/', 
@@ -131,7 +132,6 @@ urlpatterns += patterns2('', object_url,
     (r'management/replace/(?P<link_id>\d+)/$', replace_management),
     (r'management/delete/$', delete_management),
     (r'navigate/$', navigate),
-    (r'navigate/perform_search/$', async_search),
     (r'(?:files/|doc-cad/)?archive/$', download_archive),
     (r'public/$', public),
 )
@@ -151,7 +151,6 @@ urlpatterns += patterns2('', user_url,
     (r'modify/$', modify_user),
     (r'password/$', change_user_password),
     (r'navigate/$', navigate, user_dict),
-    (r'navigate/perform_search/$', async_search, user_dict),
     (r'groups/$', display_groups),
 )
 
@@ -161,7 +160,6 @@ urlpatterns += patterns2('', group_url,
     (r'history/$', display_object_history, group_dict),
     (r'objects/$', display_plmobjects),
     (r'navigate/$', navigate, group_dict),
-    (r'navigate/perform_search/$', async_search,group_dict),
     (r'users/$', display_users),
     (r'users/add/$', group_add_user),
     (r'users/join/$', group_ask_to_join),

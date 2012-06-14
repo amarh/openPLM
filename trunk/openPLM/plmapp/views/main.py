@@ -2153,8 +2153,9 @@ def public(request, obj_type, obj_ref, obj_revi):
 
 
 @handle_errors
-def async_search(request, obj_type, obj_ref, obj_revi):
+def async_search(request):
     """Perform search_request asynchronously"""
     obj,ctx = get_generic_data(request)
-    ctx["navigate_bool"]=True
+    if request.GET["navigate"]=="true" :
+        ctx["navigate_bool"]=True
     return r2r("render_search.html",ctx,request)
