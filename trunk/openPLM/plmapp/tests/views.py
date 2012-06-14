@@ -121,6 +121,7 @@ class ViewTest(CommonViewTest):
         data.update({
                 "type" : self.TYPE,
                 "reference" : "mapart",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "MaPart",
                 "group" : str(self.group.id),
@@ -147,6 +148,7 @@ class ViewTest(CommonViewTest):
                 "__next__" : "/home/",
                 "type" : self.TYPE,
                 "reference" : "mapart",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "MaPart",
                 "group" : str(self.group.id),
@@ -173,7 +175,8 @@ class ViewTest(CommonViewTest):
         rev = "a new revision" 
         data.update({
                 "type" : self.TYPE,
-                "reference" : ref, 
+                "reference" : ref,
+                "auto" : False, 
                 "revision" : rev,
                 "name" : "An invalid object",
                 "group" : str(self.group.id),
@@ -183,9 +186,64 @@ class ViewTest(CommonViewTest):
         model_cls = m.get_all_plmobjects()[self.TYPE]
         response = self.post("/object/create/", data)
         qset = m.PLMObject.objects.filter(type=self.TYPE,
-                reference=ref, revision=ref)
+                reference=ref, revision=rev)
         self.assertFalse(response.context["creation_form"].is_valid())
         self.assertFalse(qset.exists())
+        
+    def test_create_post_error_same_reference_and_revision(self):
+        """
+        Tests that the creation of an object with the same type , 
+        reference and revision is forbidden when auto is not True.
+        """
+        data = self.DATA.copy()
+        ref = self.controller.reference
+        rev = self.controller.revision
+        data.update({
+                "type" : self.TYPE,
+                "reference" : ref,
+                "auto" : False, 
+                "revision" : rev,
+                "name" : "An invalid object",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data)
+        qset = m.PLMObject.objects.filter(type=self.TYPE,
+                reference=ref, revision=rev)
+        self.assertFalse(response.context["creation_form"].is_valid())
+        
+    def test_create_post_same_reference_and_revision(self):
+        """
+        Tests that when auto is True and we intent to create an object with 
+        the same type, reference and revision:
+            * a new and available reference is given to the new object
+            * the object is created.
+        """
+        data = self.DATA.copy()
+        ref = self.controller.reference
+        rev = self.controller.revision
+        data.update({
+                "type" : self.TYPE,
+                "reference" : ref,
+                "auto" : True, 
+                "revision" : rev,
+                "name" : "A valid object",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                })
+        model_cls = m.get_all_plmobjects()[self.TYPE]
+        response = self.post("/object/create/", data)
+        obj = m.PLMObject.objects.get(type=self.TYPE,
+                revision=rev, name="A valid object")
+        self.assertNotEqual(ref, obj.reference)
+        self.assertEqual(self.group.id, obj.group_id)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+
+        
 
     def test_display_attributes(self):
         response = self.get(self.base_url + "attributes/", page="attributes")
@@ -997,6 +1055,7 @@ class DocumentViewTestCase(ViewTest):
                 "related_part" : part.id,
                 "type" : self.TYPE,
                 "reference" : "doc2",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "Docc",
                 "group" : str(self.group.id),
@@ -1023,6 +1082,7 @@ class DocumentViewTestCase(ViewTest):
                 "related_part" : part.id,
                 "type" : self.TYPE,
                 "reference" : "doc2",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "Docc",
                 "group" : str(self.group.id),
@@ -1065,6 +1125,7 @@ class PartViewTestCase(ViewTest):
                 "related_doc" : doc.id,
                 "type" : self.TYPE,
                 "reference" : "mapart",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "MaPart",
                 "group" : str(self.group.id),
@@ -1091,6 +1152,7 @@ class PartViewTestCase(ViewTest):
                 "related_doc" : doc.id,
                 "type" : self.TYPE,
                 "reference" : "mapart",
+                "auto" : False,
                 "revision" : "a",
                 "name" : "MaPart",
                 "group" : str(self.group.id),
