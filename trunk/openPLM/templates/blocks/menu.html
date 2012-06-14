@@ -6,6 +6,11 @@
             <a href="{{obj.plmobject_url}}{{menu_item}}/">
                 {% filter upper %}{% trans menu_item %}{% endfilter%}
             </a>
+            {% ifequal menu_item "history" %}
+            <a target="_blank" href="../rss/">
+                <img src="/media/img/feed_icon.png" alt="click here to subscribe to its related feed" title="click here to subscribe to the related feed">
+            </a>
+            {% endifequal %}
             </li>
         {% endfor %}
     </ul>
