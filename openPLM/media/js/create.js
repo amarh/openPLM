@@ -1,6 +1,9 @@
 $(
     function (){
         var form = $("#creation_form");
+        if($("#id_auto").attr("checked")=="checked"){
+            $("#id_reference").attr("disabled","disabled");
+        }
         $("select#id_type").change(
             function (){
                 // params is the get parameters
@@ -31,7 +34,19 @@ $(
                     $("#reference-title > h2 > span.type").text(data["type"]);
                     form.hideLoading();
                 }
+                if($("#id_auto").attr("checked")=="checked"){
+                    $("#id_reference").attr("disabled","disabled");
+                }
             });
         });
+        $("#id_auto").change(
+            function(){
+                if ($("#id_auto").attr("checked")=="checked"){
+                    $("#id_reference").attr("disabled","disabled");
+                }else{
+                    $("#id_reference").removeAttr("disabled");
+                }
+            }
+        )
     }
 );

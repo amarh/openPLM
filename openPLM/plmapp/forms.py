@@ -30,6 +30,7 @@ from django.conf import settings
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import modelform_factory, modelformset_factory, \
         BaseModelFormSet
+from django.forms.fields import BooleanField
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -141,16 +142,21 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
         # replace textinputs with autocomplete inputs, see ticket #66
         auto_complete_fields(Form, cls)
         if issubclass(cls, m.PLMObject):
+            Form.base_fields.insert(1,'auto',BooleanField(required=False,initial=True, help_text=_("Checking this case, you allow OpenPLM to set the reference of the object.")))
             Form.clean_reference = _clean_reference
             Form.clean_revision = _clean_revision
             def _clean(self):
                 cleaned_data = self.cleaned_data
                 ref = cleaned_data.get("reference", "")
                 rev = cleaned_data.get("revision", "")
+                auto = cleaned_data.get("auto", False)
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
-                    raise ValidationError(_("An object with the same type, reference and revision already exists"))
+                    if not auto:
+                        raise ValidationError(_("An object with the same type, reference and revision already exists"))
+                    else:
+                        cleaned_data["reference"] = get_new_reference(cls)
                 elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
-                    raise ValidationError(_("An object with the same type and revision exists, you may consider to revise it."))
+                    raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
                 return cleaned_data
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
