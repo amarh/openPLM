@@ -22,7 +22,7 @@
                     {% if is_owner %}
                         <ul class="management">
                             <li>
-                            <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                            <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
                             </li>
                         {% ifequal link.role 'notified'%}
                             <li>

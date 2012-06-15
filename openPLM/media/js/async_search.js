@@ -31,6 +31,11 @@ function update_results(msg){
         var create_link = $("#DisplayBox").find("a[href^='/object/create']")[0];
         $(create_link).attr("href","/object/create/?type="+req_type);
     }
+    
+    //update link on ADD button for bom and doccad pages
+    if (typeof(window.update_add_param)=='function'){
+        update_add_param(req_type);
+    }
 }
 
 //launch the search request asynchronously

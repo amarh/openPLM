@@ -3,6 +3,24 @@
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
 
+{% block scripts %}
+<script type="text/javascript">
+    function update_add_param(suggested_type){
+        var add_link = $("#main_content").find("a[href^='./add']");
+        var Doc_group = $("#search_id_type").children("[label='Document']");
+        var doc_types=[];
+        $.each($(Doc_group).children(), function(i,v){
+            doc_types.push($(v).val());
+        });
+        if($.inArray(suggested_type,doc_types)!=-1){
+            $(add_link).attr("href","./add/?q=&type="+suggested_type);               
+        }else{
+            $(add_link).attr("href","./add/?q=&type=Document");
+        }
+    }
+</script>
+{% endblock %}
+
 {% block content %}
     <div>
         {% if all_docs %}
@@ -58,7 +76,12 @@
 
         {% if user.get_profile.is_contributor  %}
             {{ docs_formset.management_form }}
-            <a class="{{"Button"|button}}" href="./add/">
+            <a class="{{"Button"|button}}" 
+            {% if obj.type|can_link:request.session.type %}
+            href="./add/{% add_get type=request.session.type q='' %}"
+            {% else %}
+            href="./add/{% add_get type='Document' q='' %}"
+            {% endif %}>
                 <span class="ui-button-text">{% trans "Attach another document" %}</span>
             </a>
 
