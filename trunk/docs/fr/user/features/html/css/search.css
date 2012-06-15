@@ -1,0 +1,42 @@
+#search_view div.marker{
+    position: absolute;
+    background: url("img/focus.png") repeat scroll center top transparent;
+    /*background-position: right bottom;
+    background-size: 50%;*/
+}
+#search_type{
+    top: 16%;
+    left: 24%;
+}
+
+.marker span{
+    display:none;
+}
+
+img{
+    width:100%;
+}
+/*#search_request{
+    position: absolute;
+    top: 225px;
+    left: 400px;
+}
+#search_view img{
+    width:100%;
+}
+#search_view div.marker{
+    background: url("../../_images/focus.png");
+    background-position: right bottom;
+    background-size: 50%;
+}
+.marker span{
+    display:none;
+}
+.marker:hover{
+    z-index: 500;
+    cursor: help;
+}
+.marker:hover span{
+    display:inline;
+    position:absolute;
+}*/
