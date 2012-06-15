@@ -143,6 +143,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
         auto_complete_fields(Form, cls)
         if issubclass(cls, m.PLMObject):
             Form.base_fields.insert(1,'auto',BooleanField(required=False,initial=True, help_text=_("Checking this case, you allow OpenPLM to set the reference of the object.")))
+            Form.base_fields["reference"].required = False
             Form.clean_reference = _clean_reference
             Form.clean_revision = _clean_revision
             def _clean(self):
@@ -150,6 +151,10 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
                 ref = cleaned_data.get("reference", "")
                 rev = cleaned_data.get("revision", "")
                 auto = cleaned_data.get("auto", False)
+                if auto and not ref:
+                    cleaned_data["reference"] = ref = get_new_reference(cls, start)
+                if not auto and not ref:
+                    self.errors["reference"] = _("The reference is required.")                    
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
