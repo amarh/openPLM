@@ -48,6 +48,26 @@ def can_add(child, arg):
     return False
 
 @register.filter
+def can_add_type(parent_type, child_type):
+    c_type = models.get_all_users_and_plmobjects()[child_type]
+    p_type = models.get_all_users_and_plmobjects()[parent_type]
+    
+    if p_type.__subclasscheck__(c_type):
+        return True
+    return False
+
+@register.filter    
+def can_link(current_type, suggested_type):
+    cur_type = models.get_all_users_and_plmobjects()[current_type]
+    sug_type = models.get_all_users_and_plmobjects()[suggested_type]
+    
+    if issubclass(cur_type,models.Part) and issubclass(sug_type,models.Document):
+        return True
+    elif issubclass(cur_type,models.Document) and issubclass(sug_type,models.Part):
+        return True
+    return False    
+    
+@register.filter
 def button(css_class, options=""):
     classes = set([css_class, " ui-button", 
             "ui-button-text-only", "ui-widget", "ui-state-default",

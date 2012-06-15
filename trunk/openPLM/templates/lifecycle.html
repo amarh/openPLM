@@ -217,7 +217,7 @@
                                 <span class="signer">
                                     <a href="/user/{{signer_data.signer.user.username|urlencode }}/">{{signer_data.signer.user.username}}</a><br/>
                                     {% if is_owner %}
-                                        <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                                        <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
                                     {% endif %}
                                 </span>
                                 <!--</div>-->
@@ -232,7 +232,7 @@
     {# owner and notified users #}
     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
         {% if is_owner %}
-            <a class="{{"Button"|button}}" href="../management/add" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
+            <a class="{{"Button"|button}}" href="../management/add/?q=&type=User" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
         {% else %}
             {% if is_notified %}
                 <form  method="POST" action="../management/delete/">
@@ -241,7 +241,7 @@
                 </form>
             {% else %}
                 {% if can_notify %}
-                    <form  method="POST" action="../management/add/">
+                    <form  method="POST" action="../management/add/?q=&type=User">
                         {{ notify_self_form.as_p }}
                         <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
                     </form>

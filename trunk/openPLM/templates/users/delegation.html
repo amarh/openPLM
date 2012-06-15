@@ -6,19 +6,19 @@
 {% block content %}
     {% if is_owner %}
         {% trans "START DELEGATE :" %}
-        <a class="{{"Button"|button}}" href="./delegate/owner/">
+        <a class="{{"Button"|button}}" href="./delegate/owner/?q=&type=User">
             <span class="ui-button-text">{% trans "OWNERSHIP" %}</span>
         </a>
-        <a class="{{"Button"|button}}" href="./delegate/sign/1/">
+        <a class="{{"Button"|button}}" href="./delegate/sign/1/?q=&type=User">
             <span class="ui-button-text">{% trans "SIGNATURE 1st LEVEL" %}</span>
         </a>
-        <a class="{{"Button"|button}}" href="./delegate/sign/2/">
+        <a class="{{"Button"|button}}" href="./delegate/sign/2/?q=&type=User">
             <span class="ui-button-text">{% trans "SIGNATURE 2nd LEVEL" %}</span>
         </a>
-        <a class="{{"Button"|button}}" href="./delegate/sign/all">
+        <a class="{{"Button"|button}}" href="./delegate/sign/all/?q=&type=User">
             <span class="ui-button-text">{% trans "ALL SIGNATURES" %}</span>
         </a>
-        <a class="{{"Button"|button}}" href="./delegate/notified/">
+        <a class="{{"Button"|button}}" href="./delegate/notified/?q=&type=User">
             <span class="ui-button-text">{% trans "NOTIFICATIONS" %}</span>
         </a>
         {% if obj.is_contributor or obj.is_administrator %}
