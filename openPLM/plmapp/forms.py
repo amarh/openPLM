@@ -154,7 +154,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
                     else:
-                        cleaned_data["reference"] = get_new_reference(cls)
+                        cleaned_data["reference"] = get_new_reference(cls, start)
                 elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
                     raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
                 return cleaned_data

@@ -290,6 +290,7 @@ class PLMObjectsImporter(CSVImporter):
                 "group" : str(group.id),
                 "reference" : reference,
                 "revision" : revision,
+                "auto" : False,
                 }
         for field in form.fields:
             if field not in data and field in self.headers_dict:
