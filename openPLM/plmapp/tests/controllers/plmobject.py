@@ -614,10 +614,12 @@ class ControllerTest(BaseTestCase):
         self.assertRaises(exc.PermissionError, ctrl.check_cancel)
         self.assertRaises(exc.PermissionError, ctrl.check_cancel)
         self.assertRaises(exc.PermissionError, ctrl.check_cancel)
+        self.assertRaises(exc.PermissionError, ctrl.check_cancel)
+        self.assertRaises(exc.PermissionError, ctrl.check_cancel)
         res = not ctrl.is_draft
         res = res or len(ctrl.get_all_revisions()) > 1
         res = res or not ctrl.check_permission("owner",raise_=False)
-        self.assertTrue(res)
+        return res
     
     def test_cancel_draft(self):
         """ Tests that a draft object with only one revision can be cancelled"""

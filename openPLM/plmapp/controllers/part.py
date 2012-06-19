@@ -35,6 +35,8 @@ from openPLM.plmapp.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 
+from openPLM.plmapp.exceptions import PermissionError
+
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
 
@@ -741,4 +743,16 @@ class PartController(PLMObjectController):
         q = Q(parent=self.object) | Q(child=self.object)
         now = datetime.datetime.today()
         models.ParentChildLink.objects.filter(q, end_time=None).update(end_time=now)
+        
+    def check_cancel(self,raise_=True):
+        res = super(PartController, self).check_cancel(raise_=raise_)
+        if res :
+            q = Q(parent=self.object) | Q(child=self.object)
+            res = res and not models.ParentChildLink.objects.filter(q).exists()
+            if (not res) and raise_ :
+                raise PermissionError("This part is related to an other part.")
+            res = res and not self.get_attached_documents()
+            if (not res) and raise_ :
+                raise PermissionError("This part has a document related to it.")
+        return res
 

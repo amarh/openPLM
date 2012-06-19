@@ -32,7 +32,7 @@ import Image
 from django.conf import settings
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError
+from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError, PermissionError
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
@@ -494,3 +494,13 @@ class DocumentController(PLMObjectController):
         super(DocumentController, self).cancel()
         self.get_attached_parts().delete()
 
+    def check_cancel(self, raise_=True):
+        res = super(DocumentController, self).check_cancel(raise_=raise_)
+        if res :
+            res = res and not self.get_attached_parts()
+            if (not res) and raise_ :
+                raise PermissionError("This document has is related to a part.")
+            res = res and not models.DocumentFile.objects.filter(document=self.object).exists()
+            if (not res) and raise_ :
+                raise PermissionError("This document contains one or more files. ")
+        return res

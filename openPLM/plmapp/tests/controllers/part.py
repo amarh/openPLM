@@ -866,4 +866,26 @@ class PartControllerTest(ControllerTest):
         children_o = [c.link for c in other.get_children(1)]
         self.assertEqual(1, len(children))
         self.assertEqual(children_o[0].child_id, self.controller3.id)
+        
 
+    def assertCancelError(self, ctrl):
+        res = super(PartControllerTest, self).assertCancelError(ctrl)
+        from django.db.models.query import Q
+        q = Q(parent=ctrl.object) | Q(child=ctrl.object)
+        res = res or models.ParentChildLink.objects.filter(q).exists()
+        res = res or bool(ctrl.get_attached_documents())
+        self.assertTrue(res)
+        
+    def test_cancel_child(self) :
+        """ Test that a child (part) can *not* be cancelled. """
+        self.add_child()
+        children = self.controller.get_children()
+        self.assertEqual(len(children), 1)
+        self.assertCancelError(self.controller2)
+    
+    def test_cancel_parent(self) :
+        """ Tests that a parent (part) can *not* be cancelled. """
+        self.add_child()
+        children = self.controller.get_children()
+        self.assertEqual(len(children), 1)
+        self.assertCancelError(self.controller)
