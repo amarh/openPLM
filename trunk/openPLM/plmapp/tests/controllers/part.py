@@ -878,14 +878,20 @@ class PartControllerTest(ControllerTest):
         
     def test_cancel_child(self) :
         """ Test that a child (part) can *not* be cancelled. """
-        self.add_child()
+        self.controller.add_child(self.controller3, 10, 15, "m")
         children = self.controller.get_children()
         self.assertEqual(len(children), 1)
-        self.assertCancelError(self.controller2)
+        self.assertCancelError(self.controller3)
     
     def test_cancel_parent(self) :
         """ Tests that a parent (part) can *not* be cancelled. """
-        self.add_child()
-        children = self.controller.get_children()
+        self.controller3.add_child(self.controller2, 10, 15, "m")
+        children = self.controller3.get_children()
         self.assertEqual(len(children), 1)
+        self.assertCancelError(self.controller3)
+        
+    def test_cancel_has_document_related(self):
+        """ Tests that a part with a document related can *not* be cancelled. """
+        self.assertEqual(len(self.controller.get_attached_documents()), 1)
         self.assertCancelError(self.controller)
+        
