@@ -228,6 +228,21 @@ Cancel rules
     
        :Tests: - plmapp.ControllerTest.test_cancel_draft
                - plmapp.ControllerTest.test_cancel_not_draft
+               
+    #. If a part is wether a child or a parent, it can't be cancelled
+    
+       :Tests: - plmapp.PartControllerTest.test_cancel_has_child
+       :Tests: - plmapp.PartControllerTest.test_cancel_has_parent
+       
+    #. If a part is related to a document and inversely, it can't be cancelled.
+    
+       :Tests: - plmapp.PartControllerTest.test_cancel_has_document_related
+       :Tests: - plmapp.DocumentControllerTest.test_cancel_has_part_related
+       
+    #. If a document contains at least one file, it can't be cancelled.
+    
+       :Tests: - plmapp.DocumentControllerTest.test_cancel_has_file_related
+       
 
 Ownership
 ++++++++++
