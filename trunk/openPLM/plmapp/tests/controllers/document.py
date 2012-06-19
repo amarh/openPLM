@@ -343,11 +343,20 @@ class DocumentControllerTest(ControllerTest):
     def assertCancelError(self, ctrl):
         res = super(DocumentControllerTest, self).assertCancelError(ctrl)
         res = res or bool(ctrl.get_attached_parts())
-        res = res or models.DocumentFile.objects.filter(document=self.object).exists()
+        res = res or models.DocumentFile.objects.filter(document=ctrl.object).exists()
         self.assertTrue(res)
         
-    def test_cancel_linked_document(self):
+    def test_cancel_has_part_related(self):
+        """ Tests that a document linked to a part can *not* be cancelled. """
         part = self.get_part()
         self.controller.attach_to_part(part)
         self.assertEqual(1, self.controller.get_attached_parts().count())
+        self.assertCancelError(self.controller)
+        
+    def test_cancel_has_file_related(self):
+        """ Tests that a document with at least one file can *not* be cancelled. """
+        f = self.get_file()
+        self.controller.add_file(f)
+        files = self.controller.files.all()
+        self.assertEqual(len(files), 1)
         self.assertCancelError(self.controller)
