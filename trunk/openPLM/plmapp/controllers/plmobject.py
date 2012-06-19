@@ -740,3 +740,17 @@ class PLMObjectController(Controller):
     def safe_cancel(self):
         self.check_cancel()
         self.cancel()
+        
+    def can_clone(self):
+        """
+        .. versionadded:: 1.1
+        
+        Returns True if the user can clone this object
+        """
+        return True
+        
+    def clone(self):
+        """ 
+        Returns the form to clone this object
+        """
+        pass

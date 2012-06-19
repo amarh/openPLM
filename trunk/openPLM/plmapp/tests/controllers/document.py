@@ -339,4 +339,15 @@ class DocumentControllerTest(ControllerTest):
         self.check_cancelled_object(self.controller)
         # tests the links
         self.assertEqual(0, self.controller.get_attached_parts().count())
-
+        
+    def assertCancelError(self, ctrl):
+        res = super(DocumentControllerTest, self).assertCancelError(ctrl)
+        res = res or bool(ctrl.get_attached_parts())
+        res = res or models.DocumentFile.objects.filter(document=self.object).exists()
+        self.assertTrue(res)
+        
+    def test_cancel_linked_document(self):
+        part = self.get_part()
+        self.controller.attach_to_part(part)
+        self.assertEqual(1, self.controller.get_attached_parts().count())
+        self.assertCancelError(self.controller)
