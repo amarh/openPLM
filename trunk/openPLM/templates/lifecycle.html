@@ -32,6 +32,7 @@
 
                 {# show the list of previous revisions that will be cancelled/deprecated #}
 
+                <div class="msg" style="border-style:hidden; color: #000000;">
                 {% if cancelled_revisions %}
                     <p> {% trans "The following revisions will be cancelled:" %} </p>
                     <ul>
@@ -56,6 +57,7 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+                </div>
 
                 <div class="password">
                     {{ password_form.as_p }}
@@ -66,7 +68,7 @@
 
         {# first put error messages, then put buttons #}
         {% spaceless %}
-        <div id="msg">
+        <div class="msg">
             {# demote #}
 
             {% if obj.state != obj.lifecycle.first_state %}

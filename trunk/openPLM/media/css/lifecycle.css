@@ -1,6 +1,6 @@
 
 
-#msg{
+.msg{
     background-color: #E4E3E2;
     display: table;
     margin-bottom:1%;
@@ -9,7 +9,7 @@
     border-radius: 4px;
 }
 
-#msg:empty{
+.msg:empty{
     display:none;
 }
 
