@@ -76,6 +76,7 @@
 
         {% if user.get_profile.is_contributor  %}
             {{ docs_formset.management_form }}
+            {% if not obj.is_cancelled %}
             <a class="{{"Button"|button}}" 
             {% if obj.type|can_link:request.session.type %}
             href="./add/{% add_get type=request.session.type q='' %}"
@@ -84,6 +85,7 @@
             {% endif %}>
                 <span class="ui-button-text">{% trans "Attach another document" %}</span>
             </a>
+            {% endif %}
 
             {% if obj.is_draft or obj.is_official %}
                 {# action valid if the part is a draft or official, since the user will own the document #}
