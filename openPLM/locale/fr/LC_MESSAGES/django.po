@@ -840,7 +840,7 @@ msgstr "Des parts enfants sont à un statut inférieur ou au statut brouillon."
 
 #: plmapp/models.py:770
 msgid "There are no official documents attached."
-msgstr "Il n'y a pas de document attaché à cette part"
+msgstr "Il n'y a pas de document officiel attaché à cette part"
 
 #: plmapp/models.py:954
 msgid "This document has no files."
