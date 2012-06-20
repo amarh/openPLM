@@ -57,7 +57,7 @@ msgstr "Unité"
 
 #: document3D/templates/DisplayDecompose.htm:86 plmapp/forms.py:542
 #: templates/create.html:35 templates/edit.html:11
-#: templates/users/password.html:11
+#: templates/users/password.html:11 templates/browse.html:14
 msgid "Type"
 msgstr "Type"
 
@@ -89,6 +89,14 @@ msgstr "déjà référencé"
 #: templates/blocks/supermenu.html:43
 msgid "Create"
 msgstr "Créer"
+
+#: templates/blocks/supermenu.html:58
+msgid "Browse"
+msgstr "Parcourir"
+
+#: templates/blocks/supermenu.html:60
+msgid "Browse all parts, groups, users and documents."
+msgstr "Parcourir tous les parts, groupes, utilisateurs et documents."
 
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."
@@ -583,6 +591,11 @@ msgstr "Référence non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
+msgid "Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"
+msgstr "Requis. 50 caractères maximum. Uniquement les lettres, nombres, sauf les caractères #, ?, / et .."
+
+msgid "Checking this case, you allow OpenPLM to set the reference of the object."
+msgstr "En cochant cette case, vous autorisez OpenPLM à choisir la référence de l'objet."
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
@@ -1117,6 +1130,10 @@ msgstr "NAVIGUER"
 msgid "STUDY"
 msgstr "ETUDIER"
 
+#: templates/base.html:86
+msgid "BROWSE"
+msgstr "PARCOURIR"
+
 #: templates/base.html:117
 msgid "Toggle the left panel"
 msgstr "Afficher/cacher le panneau de gauche"
@@ -1433,11 +1450,11 @@ msgstr "Résultats"
 #, python-format
 msgid ""
 "\n"
-"                    (1 - %(count)s on %(total)s)\n"
+"                   (%(start)s - %(count)s on %(total)s)\n"
 "                "
 msgstr ""
 "\n"
-"(1 - %(count)s sur %(total)s)"
+"(%(start)s - %(count)s sur %(total)s)"
 
 #: templates/blocks/search.html:26
 msgid "All results"
@@ -1710,7 +1727,7 @@ msgstr ""
 "\n"
 " Refuser de rejoindre le groupe %(group)s ?"
 
-#: templates/groups/users.html:8
+#: templates/groups/users.html:8 templates/browse.html:30
 msgid "Users"
 msgstr "Utilisateurs"
 
@@ -2051,4 +2068,57 @@ msgstr ""
 "Vous ne pouvez pas parrainer un nouvel utilisateur car vous n'êtes pas un "
 "contributeur"
 
+#: templates/browse.html:18
+msgid "Objects"
+msgstr "Objets"
+
+#: templates/browse.html:37
+msgid "Recently added"
+msgstr "Ajoutés récemment"
+
+#: templates/browse.html:40
+msgid "Sorted by name"
+msgstr "Triés selon le nom"
+
+#: templates/browse.html:47
+msgid "All states"
+msgstr "Tous les états"
+
+#: templates/browse.html:50
+msgid "Official state"
+msgstr "État officiel"
+
+#: templates/browse.html:53
+msgid "Published"
+msgstr "Publiés"
+
+#: templates/browse.html:73
+msgid "Only published objects"
+msgstr "Objets publiés seulement"
+
+#: templates/browse.html:77
+msgid "Only official objects"
+msgstr "Objets officialisés seulement"
+
+#: templates/browse.html:79
+msgid "All objects"
+msgstr "Tous les objets"
+
+#: templates/browse.html:121
+msgid "First page"
+msgstr "Première page"
+
+#: templates/browse.html:141
+msgid "Last page"
+msgstr "Dernière page"
+
+#: templates/documents/identity_card.html:33
+#, python-format
+msgid "%(file_count)s file"
+msgstr "%(file_count)s fichier"
+
+#: templates/documents/identity_card.html:35
+#, python-format
+msgid "%(file_count)s files"
+msgstr "%(file_count)s fichiers"
 
