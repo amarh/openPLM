@@ -37,7 +37,10 @@ def erp_summary(request, obj_type, obj_ref, obj_revi, publish=False, update=Fals
             elif request.POST.get("update_erp"):
                 product = models.OERPProduct.objects.get(part=obj.object).product
                 cost = erp.get_product_data([product])[0]["standard_price"]
-                pc, created = models.PartCost.objects.get_or_create(part=obj.object)
+                try:
+                    pc, created = models.PartCost.objects.get_or_create(part=obj.object)
+                except:
+                    pc = models.PartCost(part=obj.object)
                 pc.cost = cost
                 erp.update_cost(obj, pc)
                 return HttpResponseRedirect("..")
