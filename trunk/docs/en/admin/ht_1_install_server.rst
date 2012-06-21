@@ -288,8 +288,55 @@ Restart Apache server
 
     * ``service apache2 restart``
 
+
 First steps in openPLM
 ======================
+
+Adding users
+------------
+
+To add users in OpenPLM, you have two methods. The first one uses the
+ delegation tab directly in OpenPLM and the second one uses the administration
+ interface.
+
+Recommanded method
+~~~~~~~~~~~~~~~~~~
+
+The first method is the recommanded way to add users to an OpenPLM instance.
+The only constraint is that you need to have a working email configuration.
+
+You need to log into OpenPLM. If you have just completed the installation, you
+can log in using the company user created during installation. 
+
+Open your web browser and go to: ::
+
+    http://your_site_address/
+    
+.. note:: Here your_site_adress is given as example but you have to use your own site adress
+
+.. image:: images/company_login.png
+
+
+Go to Study->Delegation->Sponsor
+You should see a page allowing you to sponsor a new user. Fill the form, add
+the user to a group (a default group exist has already been created), and
+make sure the email address is correct. Then Validate
+
+.. image:: images/sponsor.png
+
+The new user has been created and he should have received an email with his
+connexion informations.
+
+Create other users if needed, then logout and login as your new user account.
+
+
+Second method
+~~~~~~~~~~~~~
+
+The second method to add users is **not** recomanded. Things can go wrong : 
+permissions problems can occurs, and users might not be indexed. 
+The only reason to use it is because you don't need a working email configuration to use it. 
+But even in that case, it is recommanded to take a few minutes to configure emails and use the sponsoring method.
 
 Open your web browser and go to: ::
 

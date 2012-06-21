@@ -269,8 +269,53 @@ Redémarrage du serveur Apache
 
     * ``service apache2 restart``
 
-Premier pas sur openPLM
+Premiers pas sur OpenPLM
 =======================
+
+Ajout d'utilisateurs
+--------------------
+
+Il y a deux façons possible d'ajouter des utilisateurs. La première méthode
+s'effectue directement depuis OpenPLM, dans l'onglet délégation. La deuxième
+méthode utilise l'interface d'administration.
+
+Méthode recommandée
+~~~~~~~~~~~~~~~~~~~
+
+La première méthode est la méthode recommandée pour ajouter des utilisateurs
+dans OpenPLM. Elle nécessite que la configuration email d'OpenPLM soit
+fonctionnelle.
+
+Connecter vous sur OpenPLM. Si vous venez tout juste de terminer
+l'installation, vous pouvez vous connecter avec l'utilisateur company créé
+plus tôt.
+
+Ouvrer votre navigateur et accéder à la page suivante : ::
+
+    http://your_site_address/
+    
+.. note:: your_site_adress est donnée à titre d'exemple, il vous faut utiliser l'adresse de votre instance d'OpenPLM
+
+.. image:: images/company_login.png
+
+
+Cliquer sur Étudier->Delegation->Parrain
+Vous devriez arriver sur une page permettant de parrainer un nouvel
+utilisateur. Remplissez le formulaire en n'oubliant pas d'ajouter un groupe
+(un groupe par défaut a été créé lors de l'installation), et assurez vous de
+renseigner une adresse email valide. Ensuite, valider.
+
+.. image:: images/sponsor.png
+
+Le nouvel utilisateur a été créé et un email contenant ses paramètres de
+connexion à été envoyé.
+
+Créer d'autres utilisateurs si nécessaire, puis déconnectez vous et
+reconnectez vous depuis votre nouveau compte utilisateur.
+
+
+Deuxième méthode
+~~~~~~~~~~~~~~~~
 
 Ouvrer votre navigateur web et aller sur la page : ::
 
