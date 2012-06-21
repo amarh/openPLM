@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    {% if obj.published %}
+    {% if obj.published or is_readable %}
         {% if obj.files %}
             <div id="files">
                 <h3>{% trans "Files" %}</h3>

@@ -584,15 +584,21 @@ def get_user_formset(controller, data=None):
 
 
 class SponsorForm(forms.ModelForm):
+    ROLES = (("contributor",_("Contributor: can create parts, documents, groups and sponsor other users")),
+            ("reader", _("Reader: can not edit or create contents")),
+            ("restricted", _("Restricted account: can only access to specific contents")),
+    )
     sponsor = forms.ModelChoiceField(queryset=User.objects.all(),
             required=True, widget=forms.HiddenInput())
     warned = forms.BooleanField(initial=False, required=False,
                                 widget=forms.HiddenInput())
+    role = forms.TypedChoiceField(choices=ROLES, required=False,
+            initial="contributor", widget=forms.RadioSelect)
     language = forms.TypedChoiceField(choices=settings.LANGUAGES)
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'groups')
+        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'groups')
 
     def __init__(self, *args, **kwargs):
         sponsor = kwargs.pop("sponsor", None)
@@ -605,8 +611,7 @@ class SponsorForm(forms.ModelForm):
             self.fields["groups"].queryset = qset
         self.fields["groups"].help_text = _("The new user will belong to the selected groups")
         for key, field in self.fields.iteritems():
-            if key != "warned":
-                field.required = True
+            field.required = key not in ("warned", "role", "groups")
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -623,19 +628,33 @@ class SponsorForm(forms.ModelForm):
             # restriction disabled if the setting is not set
             pass
         return email
+
+    def clean_role(self):
+        role = self.cleaned_data["role"] or "contributor"
+        return role
   
     def clean(self):
         super(SponsorForm, self).clean()
-        if not self.cleaned_data.get("warned", False):
-            first_name = self.cleaned_data["first_name"]
-            last_name = self.cleaned_data["last_name"]
-            homonyms = User.objects.filter(first_name=first_name, last_name=last_name)
-            if homonyms:
-                self.data = self.data.copy()
-                self.data["warned"] = "on"
-                error = _(u"Warning! There are homonyms: %s!") % \
-                    u", ".join(u.username for u in homonyms)
-                raise forms.ValidationError(error)
+        try:
+            if not self.cleaned_data.get("warned", False):
+                first_name = self.cleaned_data["first_name"]
+                last_name = self.cleaned_data["last_name"]
+                homonyms = User.objects.filter(first_name=first_name, last_name=last_name)
+                if homonyms:
+                    self.data = self.data.copy()
+                    self.data["warned"] = "on"
+                    error = _(u"Warning! There are homonyms: %s!") % \
+                        u", ".join(u.username for u in homonyms)
+                    raise forms.ValidationError(error)
+                role = self.cleaned_data.get("role", "contributor")
+                groups = self.cleaned_data["groups"]
+                if role == "restricted" and groups:
+                    self.cleaned_data["groups"] = ()
+                if role != "restricted" and not groups:
+                    error = _("A contributor or reader must belong to at least one group.")
+                    raise forms.ValidationError(error)
+        except KeyError:
+            pass
         return self.cleaned_data
 
 _inv_qset = m.Invitation.objects.filter(state=m.Invitation.PENDING)

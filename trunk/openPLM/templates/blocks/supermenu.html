@@ -34,24 +34,42 @@
         </div>
         <div class="menuitem" id="mi_homepage"> 
         </div>
-        <div class="menuitem"> 
-            <a class="tooltip" href="/user/{{user|urlencode }}/navigate/">
-                {% trans "Navigate" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
-            </a>
+        <div class="menuitem {% if restricted %} disabled {% endif %}"> 
+            {% if not restricted %}
+                <a class="tooltip" href="/user/{{user|urlencode }}/navigate/">
+                    {% trans "Navigate" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Graphically explore your parts and documents." %}</span>
+                </a>
+            {% else %}
+                <div class="tooltip">
+                    {% trans "Navigate" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Restricted account, navigate not available." %}</span>
+                </div>
+
+            {% endif %}
         </div>
 
     </div>
 
     {# Search #}
     <div class="menurow">
-        <div class="menuitem" style="margin-right:2em"> 
-            <a class="tooltip" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
-                {% trans "Search" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "Search for a part, a document, a file and more." %}</span>
-            </a>
+        <div class="menuitem {% if restricted %} disabled {% endif %}" style="margin-right:2em"> 
+            {% if not restricted %}
+                <a class="tooltip" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
+                    {% trans "Search" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Search for a part, a document, a file and more." %}</span>
+                </a>
+            {% else %}
+                <div class="tooltip">
+                    {% trans "Search" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Restricted account, search not available." %}</span>
+                </div>
+            {% endif %}
+
         </div>
         <div class="menuitem" style="margin-left:2em"> 
             <a class="tooltip" href="/browse/object/">
@@ -61,6 +79,5 @@
             </a>
         </div>
     </div>
-
 
 </div>

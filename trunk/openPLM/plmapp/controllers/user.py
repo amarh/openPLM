@@ -186,6 +186,10 @@ class UserController(Controller):
         """
         if user == self.object:
             raise ValueError("Bad delegatee (self)")
+        if self._user.get_profile().restricted:
+            raise PermissionError("A restricted account can not delegate a right")
+        if user.get_profile().restricted:
+            raise PermissionError("%s can not have role %s" % (user, role))
         if user.get_profile().is_viewer and role != 'notified':
             raise PermissionError("%s can not have role %s" % (user, role))
         if self.object.get_profile().is_viewer and role != 'notified':
@@ -225,8 +229,10 @@ class UserController(Controller):
         return self.delegationlink_delegator.order_by("role", "delegatee__username")
 
     @permission_required(role=models.ROLE_OWNER)
-    def sponsor(self, new_user, is_contributor=True):
+    def sponsor(self, new_user, is_contributor=True, restricted=False):
         self.check_contributor()
+        if is_contributor and restricted:
+            raise ValueError("An restricted account can not be a contributor account")
         email = new_user.email
         try:
             # checks *email*
@@ -242,6 +248,7 @@ class UserController(Controller):
         new_user.set_password(password)
         new_user.save()
         new_user.get_profile().is_contributor = is_contributor
+        new_user.get_profile().restricted = restricted
         new_user.get_profile().save()
         link = models.DelegationLink(delegator=self._user, delegatee=new_user,
                 role=models.ROLE_SPONSOR)
@@ -284,4 +291,12 @@ class UserController(Controller):
                }
         self._send_mail(send_mail, "New account on openPLM", [new_user],
                 ctx, "mails/new_account") 
+
+    def check_readable(self, raise_=True):
+        if self._user.get_profile().restricted:
+            if self._user.id != self.object.id:
+                if raise_:
+                    raise PermissionError("You can not see this user account")
+                return False
+        return True
 

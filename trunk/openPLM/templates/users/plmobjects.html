@@ -13,70 +13,72 @@
 
 {% block content %}
 
-    <div>
-        <div class="timeline open" >
-        <h3><span class="expand">{% trans "Last edited objects" %}</span></h3>
+    {% if not restricted %}
+        <div>
+            <div class="timeline open" >
+                <h3><span class="expand">{% trans "Last edited objects" %}</span></h3>
 
-        <div class="objects">
+                <div class="objects">
 
-            <dl>
-                {% for histo in last_edited_objects %}
-                    <dt class="changeset">
-                    <span class="time">
-                        {{ histo.date|naturalday|capfirst }} - {{histo.date|date:"G:i"}}
-                    </span>
-                    <span class="action"> {{histo.action}} </span>
-                    {% with histo.plmobject as plmobject %}
-                        <span class="type">{{ plmobject.type }}</span>
-                        {% spaceless %}
-                            <a href="{{ plmobject.plmobject_url }}">
-                                <span class="reference">{{ plmobject.reference }}</span>
-                            </a>
-                        {% endspaceless %}
-                        <span class="revision">{{ plmobject.revision }}</span>
-                    {% endwith %}
-                    </dt>
-                    <dd>
-                    <div class="details">
-                        {{ histo.details|linebreaks }}
-                    </div>
-                    </dd>
-                {% endfor %}
-            </dl>
+                    <dl>
+                        {% for histo in last_edited_objects %}
+                            <dt class="changeset">
+                            <span class="time">
+                                {{ histo.date|naturalday|capfirst }} - {{histo.date|date:"G:i"}}
+                            </span>
+                            <span class="action"> {{histo.action}} </span>
+                            {% with histo.plmobject as plmobject %}
+                                <span class="type">{{ plmobject.type }}</span>
+                                {% spaceless %}
+                                    <a href="{{ plmobject.plmobject_url }}">
+                                        <span class="reference">{{ plmobject.reference }}</span>
+                                    </a>
+                                {% endspaceless %}
+                                <span class="revision">{{ plmobject.revision }}</span>
+                            {% endwith %}
+                            </dt>
+                            <dd>
+                            <div class="details">
+                                {{ histo.details|linebreaks }}
+                            </div>
+                            </dd>
+                        {% endfor %}
+                    </dl>
+                </div>
+            </div>
         </div>
-	</div>
-    </div>
+    {% endif %}
     {% regroup object_user_link by role as links %}
 
     {% for group in links %}
         <div class="timeline">
             <h3><span class="expand">{{ group.grouper|capfirst}}</span></h3>
 
-                {% regroup group.list by plmobject__type as groups %}
+            {% regroup group.list by plmobject__type as groups %}
 
-                {% for gp in groups %}
+            {% for gp in groups %}
 
-                    <div class="objects hidden">
+                <div class="objects hidden">
 
-                        <h4>{{ gp.grouper }} </h4>
-                        <div class="objects_inner">
-                            <ul>
-                                {% for link in gp.list %}
-                                    <li>
-                                    {% spaceless %}
-                                    <a href="/object/{{link.plmobject__type|urlencode }}/{{link.plmobject__reference|urlencode }}/{{link.plmobject__revision|urlencode }}/">
+                    <h4>{{ gp.grouper }} </h4>
+                    <div class="objects_inner">
+                        <ul>
+                            {% for link in gp.list %}
+                                <li>
+                                {% spaceless %}
+                                    <a href="/object/{{link.plmobject__type|urlencode }}/{{link.plmobject__reference|urlencode }}/{{link.plmobject__revision|urlencode }}/{% if restricted %}public/{% endif %}">
                                         <span class="reference">{{link.plmobject__reference}}</span>
                                     </a>
-                                    {% endspaceless %}
-                                    <span class="revision">{{link.plmobject__revision}}</span>
-                                    <span class="name">{{link.plmobject__name}}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                {% endspaceless %}
+                                <span class="revision">{{link.plmobject__revision}}</span>
+                                <span class="name">{{link.plmobject__name}}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
                         <br />
                     </div>
-                    </div>
-                {% endfor %}
+                </div>
+            {% endfor %}
         </div>
 
     {% endfor %}

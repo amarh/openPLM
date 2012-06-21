@@ -51,7 +51,7 @@ class ApiTestCase(CommonViewTest):
     def test_search(self):
         for url in ("/api/search/", "/api/search/false/",
                 "/api/search/false/false/"):
-            data = self.get("/api/search/", type="Part", q="reference=Pa*")
+            data = self.get(url, type="Part", q="reference=Pa*")
             self.assertEqual("ok", data["result"])
             self.assertEqual(1, len(data["objects"]))
             part = data["objects"][0]
@@ -249,7 +249,6 @@ class ApiTestCase(CommonViewTest):
         data = self.get("/api/object/%d/lock/%d/" % (doc.id, df.id))
         self.assertEqual("ok", data["result"])
         self.assertTrue(doc.files[0].locked)
-
 
     def test_unlock(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,

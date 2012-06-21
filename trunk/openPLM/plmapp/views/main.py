@@ -58,8 +58,9 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
+from django.contrib.comments.views.comments import post_comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import F
+from django.db.models import F, Q
 from django.forms import HiddenInput
 from django.http import HttpResponseRedirect, HttpResponse, Http404, \
                         HttpResponsePermanentRedirect, HttpResponseForbidden
@@ -116,6 +117,18 @@ def set_language(request):
             request.user.get_profile().save()
     return response
 
+@handle_errors
+def comment_post_wrapper(request):
+    # from http://thejaswi.info/tech/blog/2008/11/20/part-2-django-comments-authenticated-users/
+    # Clean the request to prevent form spoofing
+    user = request.user
+    if user.is_authenticated() and not user.get_profile().restricted:
+        if not (user.get_full_name() == request.POST['name'] or \
+                user.email == request.POST['email']):
+            return HttpResponse("You registered user...trying to spoof a form...eh?")
+        return post_comment(request)
+    return HttpResponse("You anonymous cheater...trying to spoof a form?")
+
 ##########################################################################################
 ###                    Function which manage the html home page                        ###
 ##########################################################################################
@@ -142,7 +155,7 @@ def get_last_edited_objects(user):
         pass # no more histories
     return histories
 
-@handle_errors
+@handle_errors(restricted_access=False)
 def display_home_page(request):
     """
     Home page view.
@@ -166,21 +179,22 @@ def display_home_page(request):
     """
     obj, ctx = get_generic_data(request, "User", request.user.username)
     del ctx["object_menu"]
-
-    pending_invitations_owner = obj.invitation_inv_owner. \
-            filter(state=models.Invitation.PENDING).order_by("group__name")
-    ctx["pending_invitations_owner"] = pending_invitations_owner
-    pending_invitations_guest = obj.invitation_inv_guest. \
-            filter(state=models.Invitation.PENDING).order_by("group__name")
-    ctx["pending_invitations_guest"] = pending_invitations_guest
-    ctx["display_group"] = True
+    if not obj.restricted:
+        # always empty if restricted -> do not hit the database
+        pending_invitations_owner = obj.invitation_inv_owner. \
+                filter(state=models.Invitation.PENDING).order_by("group__name")
+        ctx["pending_invitations_owner"] = pending_invitations_owner
+        pending_invitations_guest = obj.invitation_inv_guest. \
+                filter(state=models.Invitation.PENDING).order_by("group__name")
+        ctx["pending_invitations_guest"] = pending_invitations_guest
+        ctx["display_group"] = True
 
     return r2r("home.html", ctx, request)
 
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###
 #############################################################################################
-@handle_errors
+@handle_errors(restricted_access=False)
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
     Attributes view of the given object.
@@ -216,7 +230,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     return r2r('attributes.html', ctx, request)
 
 ##########################################################################################
-@handle_errors
+@handle_errors(restricted_access=False)
 def display_object(request, obj_type, obj_ref, obj_revi):
     """
     Generic object view.
@@ -280,7 +294,8 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 break
     else: 
         password_form = forms.ConfirmPasswordForm(request.user)
-    ctx.update({'password_form' : password_form,})
+    ctx['password_form'] = password_form
+    ctx['in_group'] = obj.check_in_group(request.user, raise_=False)
     signer_list = get_management_data(request,obj,ctx)
     get_lifecycle_data(signer_list,obj,ctx)
     return r2r('lifecycle.html',ctx,request)
@@ -369,8 +384,9 @@ def get_management_data(request,obj,ctx):
     for i, st in enumerate(lcs):
         levels.append(level_to_sign_str(i))
     signer_list = object_management_list.filter(role__in=levels)
-    notified_list = object_management_list.filter(role="notified")
-    owner_list = object_management_list.filter(role="owner")
+    notified_list = object_management_list.filter(role=models.ROLE_NOTIFIED)
+    owner_list = object_management_list.filter(role=models.ROLE_OWNER)
+    reader_list = object_management_list.filter(role=models.ROLE_READER)
     if not ctx["is_owner"]:
         link = object_management_list.filter(role="notified", user=request.user)
         ctx["is_notified"] = bool(link)
@@ -389,7 +405,9 @@ def get_management_data(request,obj,ctx):
             else:
                 ctx["can_notify"] = False
     ctx.update({'notified_list': notified_list,
-                'owner_list':owner_list})
+                'owner_list':owner_list,
+                'reader_list' : reader_list,
+                })
     return signer_list
     
 
@@ -1167,7 +1185,7 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
 ###    All functions which manage the different html pages specific to part and document  ###
 #############################################################################################
 
-@handle_errors(undo="../../../lifecycle")
+@handle_errors(undo="../../../lifecycle/")
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
@@ -1188,8 +1206,10 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
             if replace_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(replace_management_form, request.user)
                 obj.set_role(user_obj.object, link.role)
-                if link.role == 'notified':
+                if link.role == models.ROLE_NOTIFIED:
                     obj.remove_notified(link.user)
+                elif link.role == models.ROLE_READER:
+                    obj.remove_reader(link.user)
             return HttpResponseRedirect("../../../lifecycle")
     else:
         replace_management_form = forms.SelectUserForm()
@@ -1197,12 +1217,12 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     ctx.update({'current_page':'lifecycle', 
                 'replace_management_form': replace_management_form,
                 'link_creation': True,
-                'attach' : (obj, "delegate")})
+                'attach' : (obj, "delegate-reader" if link.role == models.ROLE_READER else "delegate")})
     return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
-@handle_errors(undo="../../lifecycle")
-def add_management(request, obj_type, obj_ref, obj_revi):
+@handle_errors(undo="../../lifecycle/")
+def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
     """
     Manage html page for the addition of a "notification" link
     (:class:`PLMObjectUserLink`) between some Users and the selected object. 
@@ -1217,7 +1237,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
-                obj.set_role(user_obj.object, "notified")
+                obj.set_role(user_obj.object, models.ROLE_READER if reader else models.ROLE_NOTIFIED)
             return HttpResponseRedirect("../../lifecycle")
     else:
         add_management_form = forms.SelectUserForm()
@@ -1225,7 +1245,7 @@ def add_management(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'lifecycle', 
                 'replace_management_form': add_management_form,
                 'link_creation': True,
-                "attach" : (obj, "delegate")})
+                "attach" : (obj, "delegate-reader" if reader else "delegate")})
     return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
@@ -1242,7 +1262,10 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
         try:
             link_id = request.POST["link_id"]
             link = models.PLMObjectUserLink.objects.get(id=int(link_id))
-            obj.remove_notified(link.user)
+            if link.role == models.ROLE_NOTIFIED:
+                obj.remove_notified(link.user)
+            else:
+                obj.remove_reader(link.user)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
     return HttpResponseRedirect("../../lifecycle")
@@ -1338,7 +1361,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     return r2r('create.html', ctx, request)
 
 ##########################################################################################
-@handle_errors(undo="../attributes/")
+@handle_errors(undo="../attributes/", restricted_access=False)
 def modify_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected object.
@@ -1362,7 +1385,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
 #############################################################################################
-@handle_errors
+@handle_errors(restricted_access=False)
 def modify_user(request, obj_ref):
     """
     Manage html page for the modification of the selected
@@ -1376,7 +1399,6 @@ def modify_user(request, obj_ref):
     obj, ctx = get_generic_data(request, "User", obj_ref)
     if obj.object != request.user:
         raise PermissionError("You are not the user")
-    class_for_div="ActiveBox4User"
     if request.method == 'POST' and request.POST:
         modification_form = forms.OpenPLMUserChangeForm(request.POST)
         if modification_form.is_valid():
@@ -1385,11 +1407,11 @@ def modify_user(request, obj_ref):
     else:
         modification_form = forms.OpenPLMUserChangeForm(instance=obj.object)
     
-    ctx.update({'class4div': class_for_div, 'modification_form': modification_form})
+    ctx["modification_form"] = modification_form
     return r2r('edit.html', ctx, request)
     
 ##########################################################################################
-@handle_errors
+@handle_errors(restricted_access=False)
 def change_user_password(request, obj_ref):
     """
     Manage html page for the modification of the selected
@@ -1415,12 +1437,11 @@ def change_user_password(request, obj_ref):
     else:
         modification_form = PasswordChangeForm(obj)
     
-    ctx.update({'class4div': "ActiveBox4User",
-                'modification_form': modification_form})
+    ctx["modification_form"] = modification_form
     return r2r('users/password.html', ctx, request)
 
 #############################################################################################
-@handle_errors
+@handle_errors(restricted_access=False)
 def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     """
     View listing the related parts and documents of
@@ -1436,10 +1457,12 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     objs = obj.get_object_user_links().select_related("plmobject")
     objs = objs.values("role", "plmobject__type", "plmobject__reference",
             "plmobject__revision", "plmobject__name")
-    ctx.update({'current_page':'parts-doc-cad',
+    ctx.update({
+        'current_page':'parts-doc-cad',
         'object_user_link': objs,
-        'last_edited_objects':  get_last_edited_objects(obj.object),
     })
+    if not obj.restricted:
+        ctx['last_edited_objects'] = get_last_edited_objects(obj.object)
     return r2r('users/plmobjects.html', ctx, request)
 
 #############################################################################################
@@ -1456,7 +1479,8 @@ def display_delegation(request, obj_ref):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
-    
+    if obj.restricted:
+        raise Http404
     if not hasattr(obj, "get_user_delegation_links"):
         # TODO
         raise TypeError()
@@ -1587,7 +1611,10 @@ def public_download(request, docfile_id, filename=""):
     """
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
     ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
-    if not ctrl.published:
+    if request.user.is_authenticated():
+        if not ctrl.published and not ctrl.check_restricted_readable(False):
+            raise Http404
+    elif not ctrl.published:
         return HttpResponseForbidden()
     return serve(ctrl, doc_file, filename)
 
@@ -1742,7 +1769,7 @@ def group_ask_to_join(request, obj_ref):
         form = forms.SelectUserForm()
     ctx["ask_form"] = ""
     ctx['current_page'] = 'users' 
-    ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
+    ctx['in_group'] = request.user.groups.filter(id=obj.id).exists()
     return r2r("groups/ask_to_join.html", ctx, request)
 
 @handle_errors
@@ -1751,7 +1778,6 @@ def display_groups(request, obj_ref):
     View of the *groups* page of an user.
 
     """
-
     obj, ctx = get_generic_data(request, "User", obj_ref)
     ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all())\
             .order_by("name")
@@ -1771,7 +1797,8 @@ def sponsor(request, obj_ref):
         if form.is_valid():
             new_user = form.save()
             new_user.get_profile().language = form.cleaned_data["language"]
-            obj.sponsor(new_user)
+            role = form.cleaned_data["role"]
+            obj.sponsor(new_user, role=="contributor", role=="restricted")
             return HttpResponseRedirect("..")
     else:
         form = forms.SponsorForm(initial={"sponsor":obj.id, "language":obj.language}, sponsor=obj.id)
@@ -1804,12 +1831,8 @@ def display_plmobjects(request, obj_ref):
     """
     
     obj, ctx = get_generic_data(request, "Group", obj_ref)
-    
-    #ctx["objects"] = obj.plmobject_group.order_by("type", "reference", "revision")
     objects = obj.plmobject_group.order_by("type", "reference", "revision")
-
-    display_pagination(request.GET,ctx, objects,"object")
-
+    display_pagination(request.GET, ctx, objects, "object")
     ctx['current_page'] = 'objects'
     return r2r("groups/objects.html", ctx, request)
 
@@ -1868,6 +1891,8 @@ def send_invitation(request, obj_ref, token):
 
 @handle_errors(undo="../..")
 def import_csv_init(request, target="csv"):
+    if not request.user.get_profile().is_contributor:
+        raise PermissionError("You are not a contributor.")
     obj, ctx = get_generic_data(request)
     if request.method == "POST":
         csv_form = forms.CSVForm(request.POST, request.FILES)
@@ -1892,6 +1917,8 @@ def import_csv_init(request, target="csv"):
 @handle_errors(undo="../..")
 def import_csv_apply(request, target, filename, encoding):
     obj, ctx = get_generic_data(request)
+    if not request.user.get_profile().is_contributor:
+        raise PermissionError("You are not a contributor.")
     ctx["encoding_error"] = False
     ctx["io_error"] = False
     Importer = csvimport.IMPORTERS[target]
@@ -2036,16 +2063,20 @@ def display_pagination(r_GET,ctx, object_list, type="object"):
 
 @secure_required
 def browse(request, type="object"):
-    if request.user.is_authenticated():
+    user = request.user
+    if user.is_authenticated() and not user.get_profile().restricted:
         # only authenticated users can see all groups and users
         obj, ctx = get_generic_data(request, search=False)
-        cls = {
-            "object" : models.PLMObject, 
-            "part" : models.Part,
-            "document" : models.Document,
-            "group" : models.GroupInfo,
-            "user" : User,
-        }[type]
+        try:
+            cls = {
+                "object" : models.PLMObject, 
+                "part" : models.Part,
+                "document" : models.Document,
+                "group" : models.GroupInfo,
+                "user" : User,
+            }[type]
+        except KeyError:
+            raise Http404
         object_list = cls.objects.all()
         # this only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
@@ -2059,20 +2090,30 @@ def browse(request, type="object"):
                 object_list = object_list.filter(published=True)
         else:
             ctx["plmobjects"] = False
+        ctx["browse_all"] = True
     else:
-        cls = {
-            "object" : models.PLMObject, 
-            "part" : models.Part,
-            "document" : models.Document,
-        }[type]
+        try:
+            cls = {
+                "object" : models.PLMObject, 
+                "part" : models.Part,
+                "document" : models.Document,
+            }[type]
+        except KeyError:
+            raise Http404
         ctx = init_ctx("-", "-", "-")
         ctx.update({
             'is_readable' : True,
             'plmobjects' : True,
+            'restricted' : True,
+            'browse_all' : False,
             'object_menu' : [],
             'navigation_history' : [],
         })
-        object_list = cls.objects.filter(published=True)
+        query = Q(published=True)
+        if user.is_authenticated():
+            readable = user.plmobjectuserlink_user.filter(role=models.ROLE_READER)
+            query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
+        object_list = cls.objects.filter(query)
 
     display_pagination(request.GET,ctx, object_list, type=type)
     
@@ -2082,6 +2123,7 @@ def browse(request, type="object"):
     })
     return r2r("browse.html", ctx, request)
 
+@secure_required
 def public(request, obj_type, obj_ref, obj_revi):
     """
     .. versionadded:: 1.1
@@ -2123,6 +2165,9 @@ def public(request, obj_type, obj_ref, obj_revi):
         raise Http404
     if not obj.published and request.user.is_anonymous():
         return redirect_to_login(request.get_full_path())
+    elif not obj.published and not obj.check_restricted_readable(False):
+        raise Http404
+
     ctx = init_ctx(obj_type, obj_ref, obj_revi)
     attrs = obj.published_attributes
     object_attributes = []
@@ -2130,15 +2175,19 @@ def public(request, obj_type, obj_ref, obj_revi):
         item = obj.get_verbose_name(attr)
         object_attributes.append((item, getattr(obj, attr)))
     object_attributes.insert(4, (obj.get_verbose_name("state"), obj.state.name))
-    revisions = [rev for rev in obj.get_all_revisions() if rev.published]
-    if obj.is_part:
-        attached = [d.document for d in obj.get_attached_documents()
-            if d.document.published]
+    if request.user.is_anonymous():
+        test = lambda x: x.published
     else:
-        attached = [d.part for d in obj.get_attached_parts() if d.part.published]
+        readable = request.user.plmobjectuserlink_user.filter(role=models.ROLE_READER)\
+                .values_list("plmobject_id", flat=True)
+        test = lambda x: x.published or x.id in readable
 
+    revisions = [rev for rev in obj.get_all_revisions() if test(rev)]
+    if obj.is_part:
+        attached = [d.document for d in obj.get_attached_documents() if test(d.document)]
+    else:
+        attached = [d.part for d in obj.get_attached_parts() if test(d.part)]
     ctx.update({
-        # a published object is always readable
         'is_readable' : True,
         # disable the menu and the navigation_history
         'object_menu' : [],

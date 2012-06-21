@@ -68,6 +68,11 @@ class GroupController(Controller):
    
     @classmethod
     def create(cls, name, description, user, data={}):
+        profile = user.get_profile()
+        if not (profile.is_contributor or profile.is_administrator):
+            raise PermissionError("%s is not a contributor" % user)
+        if profile.restricted:
+            raise PermissionError("Restricted account can not create a group.")
         if not name:
             raise ValueError("name must not be empty")
         if rx_bad_ref.search(name):
@@ -139,6 +144,8 @@ class GroupController(Controller):
                 user = form.cleaned_data["user"]
                 if user == self.owner:
                     raise ValueError("Bad user %s" % user)
+                if user.get_profile().restricted:
+                    raise ValueError("Restricted account can not join a group")
                 if delete:
                     users.append(user)
             for user in users:
@@ -156,6 +163,8 @@ class GroupController(Controller):
         """
         if not user.email:
             raise ValueError("user's email is empty")
+        if user.get_profile().restricted:
+            raise ValueError("Restricted account can not join a group")
         inv = models.Invitation.objects.create(group=self.object, owner=self._user,
                 guest=user, guest_asked=False)
         self.send_invitation_to_guest(inv)
@@ -171,6 +180,8 @@ class GroupController(Controller):
         """
         if not self.owner.email:
             raise ValueError("user's email is empty")
+        if self._user.get_profile().restricted:
+            raise ValueError("Restricted account can not join a group")
         inv = models.Invitation.objects.create(group=self.object, owner=self.owner,
                 guest=self._user, guest_asked=True)
         self.send_invitation_to_owner(inv)
@@ -285,3 +296,9 @@ class GroupController(Controller):
         types = models.get_all_documents().keys()
         return self.plmobject_group.filter(type__in=types)
 
+    def check_readable(self, raise_=True):
+        if self._user.get_profile().restricted:
+            if raise_:
+                raise PermissionError("You can not see this user account")
+            return False
+        return True
