@@ -7,7 +7,7 @@
     <span class="type">{{object.type}}</span>
     </p>
     <p>
-    <a href="{{object.plmobject_url}}{% if request.user.is_anonymous %}public/{% endif %}">
+    <a href="{{object.plmobject_url}}{{ suffix_url }}">
     <span class="reference">{{object.reference}}</span>
     <span class="revision">{{object.revision}}</span>
 </a>

@@ -19,12 +19,12 @@
                     <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
                     </dt>
                     <dd class="management">
-                    {% if is_owner %}
+                    {% if can_delete %}
                         <ul class="management">
                             <li>
                             <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
                             </li>
-                        {% ifequal link.role 'notified'%}
+                        {% if link.role == 'notified' or link.role == 'reader' %}
                             <li>
 
                             <form action="../management/delete/" method="POST">
@@ -32,7 +32,7 @@
                                 <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Delete" %}" />
                             </form>
                             </li>
-                        {% endifequal %}
+                        {% endif %}
                         </ul>
                     {% endif %}
                     </dd>

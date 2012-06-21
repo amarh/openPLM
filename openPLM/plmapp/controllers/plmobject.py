@@ -81,6 +81,8 @@ class PLMObjectController(Controller):
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
+        if profile.restricted:
+            raise PermissionError("Restricted account can not create a part or document.")
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
         if rx_bad_ref.search(reference) or rx_bad_ref.search(revision):
@@ -453,6 +455,18 @@ class PLMObjectController(Controller):
         details = "user: %s" % new_notified
         self._save_histo("New notified", details) 
 
+    def add_reader(self, new_reader):
+        if not self.is_official:
+            raise ValueError("Object is not official")
+        if not new_reader.get_profile().restricted:
+            raise ValueError("Not a restricted account")
+        self.check_in_group(self._user)
+        models.PLMObjectUserLink.objects.create(plmobject=self.object,
+            user=new_reader, role=models.ROLE_READER)
+        details = "user: %s" % new_reader
+        self._save_histo("New reader", details) 
+
+
     def remove_notified(self, notified):
         """
         Removes *notified* to the list of users notified when :attr:`object`
@@ -471,6 +485,25 @@ class PLMObjectController(Controller):
         link.delete()
         details = u"user: %s" % notified
         self._save_histo("Notified removed", details) 
+
+
+    def remove_reader(self, reader):
+        """
+        Removes *reader* to the list of users reader when :attr:`object`
+        changes.
+        
+        :param reader: the user who would be no more reader
+        :type reader: :class:`~django.contrib.auth.models.User`
+        :raise: :exc:`ObjectDoesNotExist` if *reader* is not reader
+            when :attr:`object` changes
+        """
+        
+        self.check_in_group(self._user)
+        link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+                user=reader, role=models.ROLE_READER)
+        link.delete()
+        details = u"user: %s" % reader
+        self._save_histo("Reader removed", details) 
 
     def set_signer(self, signer, role):
         """
@@ -539,6 +572,8 @@ class PLMObjectController(Controller):
         elif role.startswith("sign"):
             self.check_permission("owner")
             self.set_signer(user, role)
+        elif role == models.ROLE_READER:
+            self.add_reader(user)
         else:
             raise ValueError("bad value for role")
 
@@ -560,20 +595,26 @@ class PLMObjectController(Controller):
         Raises a :exc:`.PermissionError` if the user cannot read the object
         and *raise_* is ``True`` (the default).
         """
-        if not self.is_editable:
-            return True
-        if self.is_cancelled:
-            return True
-        if self._user.username == settings.COMPANY:
-            # the company is like a super user
-            return True
-        if self.owner_id == self._user.id:
-            return True
-        if self.group.user_set.filter(id=self._user.id).exists():
-            return True
+        if not self._user.get_profile().restricted:
+            if not self.is_editable:
+                return True
+            if self.is_cancelled:
+                return True
+            if self._user.username == settings.COMPANY:
+                # the company is like a super user
+                return True
+            if self.owner_id == self._user.id:
+                return True
+            if self.group.user_set.filter(id=self._user.id).exists():
+                return True
         if raise_:
             raise PermissionError("You can not see this object.")
         return False
+
+    def check_restricted_readable(self, raise_=True):
+        if not self._user.get_profile().restricted:
+            return self.check_readable(raise_)
+        return super(PLMObjectController, self).check_permission(models.ROLE_READER, raise_)
 
     def cancel(self):
         """

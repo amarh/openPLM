@@ -251,6 +251,9 @@ class Controller(object):
         if not ok and raise_:
             raise PermissionError("action not allowed for %s" % self._user)
         return ok
+    
+    def clear_permissions_cache(self):
+        self.__permissions.clear()
 
     def has_permission(self, role):
         return False
@@ -267,6 +270,9 @@ class Controller(object):
             user = self._user
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
+            raise PermissionError("%s is not a contributor" % user)
+        if profile.restricted:
+            # should not be possible, but an admin mat have done a mistake 
             raise PermissionError("%s is not a contributor" % user)
 
     def check_editable(self):

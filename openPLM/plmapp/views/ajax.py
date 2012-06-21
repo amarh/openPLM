@@ -27,7 +27,7 @@
 import urlparse
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.forms import widgets
 from django.utils.simplejson import JSONEncoder
 from django.views.decorators.cache import cache_page
@@ -39,7 +39,10 @@ import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
         json_view, get_navigate_data, secure_required, get_creation_view 
 
-@login_required
+ajax_login_required = user_passes_test(lambda u: (u.is_authenticated()
+    and not u.get_profile().restricted))
+
+@ajax_login_required
 @json_view
 def ajax_creation_form(request):
     """
@@ -75,7 +78,7 @@ def ajax_creation_form(request):
 
 
 @secure_required
-@login_required
+@ajax_login_required
 @cache_page(60 * 60)
 def ajax_autocomplete(request, obj_type, field):
     """
@@ -110,7 +113,7 @@ def ajax_autocomplete(request, obj_type, field):
     json = JSONEncoder().encode(list(str(r) for r in results[:limit]))  
     return HttpResponse(json, mimetype='application/json')
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     """
@@ -136,7 +139,7 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     return dict(files=files, doc=doc)
 
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_navigate(request, obj_type, obj_ref, obj_revi):
     context = get_navigate_data(request, obj_type, obj_ref, obj_revi)
@@ -149,7 +152,7 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
             }
     return data
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_add_child(request, part_id):
     part = get_obj_by_id(part_id, request.user)
@@ -182,7 +185,7 @@ def ajax_add_child(request, part_id):
            })
     return data
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_can_add_child(request, part_id):
     part = get_obj_by_id(part_id, request.user)
@@ -194,7 +197,7 @@ def ajax_can_add_child(request, part_id):
             data["can_add"] = part.can_add_child(child)
     return data
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_attach(request, plmobject_id):
     plmobject = get_obj_by_id(plmobject_id, request.user)
@@ -226,7 +229,7 @@ def ajax_attach(request, plmobject_id):
            })
     return data
 
-@login_required
+@ajax_login_required
 @json_view
 def ajax_can_attach(request, plmobject_id):
     plmobject = get_obj_by_id(plmobject_id, request.user)

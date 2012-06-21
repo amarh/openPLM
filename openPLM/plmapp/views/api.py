@@ -31,7 +31,6 @@ This modules contains all stuff related to the api
 import functools
 
 import django.forms
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseForbidden
@@ -47,8 +46,8 @@ from openPLM.plmapp.base_views import json_view, get_obj_by_id, object_to_dict,\
 #: Version of the API (value: ``'1.0'``)
 API_VERSION = "1.0"
 #: Decorator whichs requires that the user is login
-api_login_required = user_passes_test(lambda u: u.is_authenticated(), 
-                                      login_url="/api/needlogin/")
+api_login_required = user_passes_test(lambda u: (u.is_authenticated()
+    and u.is_active and not u.get_profile().restricted), login_url="/api/needlogin/")
 
 @json_view
 def need_login(request):
@@ -71,6 +70,8 @@ def login_json(func):
     @api_login_required
     def wrapper(request, *args, **kwargs):
         if request.META["HTTP_USER_AGENT"] != "openplm":
+            return HttpResponseForbidden()
+        if request.user.get_profile().restricted:
             return HttpResponseForbidden()
         return json_func(request, *args, **kwargs)
     return wrapper
@@ -336,7 +337,7 @@ def api_login(request):
     password = request.POST['password']
     user = authenticate(username=username, password=password)
     if user is not None:
-        if user.is_active:
+        if user.is_active and not user.get_profile().restricted:
             login(request, user)
             return {"username" : username, "first_name" : user.first_name,
                     "last_name" : user.last_name}

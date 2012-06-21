@@ -36,10 +36,10 @@ from django.shortcuts import get_object_or_404
 from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponseServerError, Http404
+from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 
@@ -181,7 +181,7 @@ def object_to_dict(plmobject):
     return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
                 revision=plmobject.revision, reference=plmobject.reference)
 
-def handle_errors(func=None, undo=".."):
+def handle_errors(func=None, undo="..", restricted_access=True):
     """
     Decorators which ensures that the user is connected and handles exceptions
     raised by a controller.
@@ -202,6 +202,8 @@ def handle_errors(func=None, undo=".."):
         def wrapper(request, *args, **kwargs):
             if request.method == "POST" and request.POST.get("_undo"):
                 return HttpResponseRedirect(undo)
+            if restricted_access and request.user.get_profile().restricted:
+                return HttpResponseForbidden()
             try:
                 return f(request, *args, **kwargs)
             except (ControllerError, ValueError) as exc:
@@ -270,7 +272,7 @@ def update_navigation_history(request, obj, type_, reference, revision):
         return True
     return False
 
-
+_SEARCH_ID = "search_id_%s"
 def get_generic_data(request, type_='-', reference='-', revision='-', search=True):
     """
     Get a request and return a controller, a context dictionnary with elements common to all pages
@@ -293,57 +295,66 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
     save_session = False
+    restricted = request.user.get_profile().restricted
     if type_ == reference == revision == '-':
         obj = request.user
     else:
         obj = get_obj(type_, reference, revision, request.user)
-        save_session = update_navigation_history(request, obj,
+        if not restricted:
+            save_session = update_navigation_history(request, obj,
                 type_, reference, revision)
         
-    # Builds, update and treat Search form
-    search_needed = "results" not in request.session
-    search_id = "search_id_%s" 
-    if request.method == "GET" and "type" in request.GET:
-        search_form = SimpleSearchForm(request.GET, auto_id=search_id)
-        request.session["type"] = request.GET["type"]
-        request.session["q"] = request.GET.get("q", "")
-        search_needed = True
-        save_session = True
-    elif "type" in request.session:
-        search_form = SimpleSearchForm(request.session, auto_id=search_id)
-    else:
-        request.session['type'] = 'Part'
-        search_form = SimpleSearchForm(auto_id=search_id)
-        save_session = True
+    if not restricted: # a restricted account can not perform a search
+        # Builds, update and treat Search form
+        search_needed = "results" not in request.session
+        if request.method == "GET" and "type" in request.GET:
+            search_form = SimpleSearchForm(request.GET, auto_id=_SEARCH_ID)
+            request.session["type"] = request.GET["type"]
+            request.session["q"] = request.GET.get("q", "")
+            search_needed = True
+            save_session = True
+        elif "type" in request.session:
+            search_form = SimpleSearchForm(request.session, auto_id=_SEARCH_ID)
+        else:
+            request.session['type'] = 'Part'
+            search_form = SimpleSearchForm(auto_id=_SEARCH_ID)
+            save_session = True
 
-    if search and search_needed and search_form.is_valid():
-        search_query = search_form.cleaned_data["q"]
-        qset = search_form.search()
-        request.session["search_query"] = search_query
-        search_count = request.session["search_count"] = qset.count()
-        qset = qset[:30]
-        request.session["results"] = qset
-        save_session = True
-    else:
-        qset = request.session.get("results", [])
-        search_query = request.session.get("search_query", "")
-        search_count = request.session.get("search_count", 0)
+        if search and search_needed and search_form.is_valid():
+            search_query = search_form.cleaned_data["q"]
+            qset = search_form.search()
+            request.session["search_query"] = search_query
+            search_count = request.session["search_count"] = qset.count()
+            qset = qset[:30]
+            request.session["results"] = qset
+            save_session = True
+        else:
+            qset = request.session.get("results", [])
+            search_query = request.session.get("search_query", "")
+            search_count = request.session.get("search_count", 0)
 
-    ctx.update({'results' : qset, 
-                'search_query' : search_query,
-                'search_count' : search_count,
-                'search_form' : search_form,
-                'link_creation' : False,
-                'attach' : (obj, False),
-                'obj' : obj,
-                'navigation_history' : request.session.get("navigation_history", []),
-              })
+        ctx.update({
+           'results' : qset, 
+           'search_query' : search_query,
+           'search_count' : search_count,
+           'search_form' : search_form,
+           'navigation_history' : request.session.get("navigation_history", []),
+        })
+    
+    ctx.update({
+       'link_creation' : False,
+       'attach' : (obj, False),
+       'obj' : obj,
+       'restricted' : restricted,
+    })
     if hasattr(obj, "menu_items"):
         ctx['object_menu'] = obj.menu_items
     if hasattr(obj, "check_permission"):
         ctx["is_owner"] = obj.check_permission("owner", False)
     if hasattr(obj, "check_readable"):
-        ctx["is_readable"] = obj.check_readable(False)
+        ctx["is_readable"] = readable = obj.check_readable(False)
+        if restricted and not readable:
+            raise Http404
     else:
         ctx["is_readable"] = True
     # little hack to avoid a KeyError

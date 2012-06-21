@@ -71,26 +71,26 @@
         <div class="msg">
             {# demote #}
 
-            {% if obj.state != obj.lifecycle.first_state %}
-                {% if is_signer_dm %}
-                    {% if not obj.is_proposed %}
-                        <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
+                {% if obj.state != obj.lifecycle.first_state %}
+                    {% if is_signer_dm %}
+                        {% if not obj.is_proposed %}
+                            <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
+                        {% endif %}
+                    {% else %}
+                        <p>{% trans "You do not have the permission to demote this object." %}</p>
+                    {% endif %}
+                {% endif %}
+
+                {# promote #}
+                {% if is_signer %}
+                    {% if not obj.is_promotable %}
+                        <p>{% trans "You can not promote this object:" %}</p>
+                        {{ obj.promotion_errors.as_ul }}
                     {% endif %}
                 {% else %}
-                    <p>{% trans "You do not have the permission to demote this object." %}</p>
+                    <p>{% trans "You do not have the permission to promote this object." %}</p>
                 {% endif %}
-            {% endif %}
-
-            {# promote #}
-            {% if is_signer %}
-                {% if not obj.is_promotable %}
-                    <p>{% trans "You can not promote this object:" %}</p>
-                    {{ obj.promotion_errors.as_ul }}
-                {% endif %}
-            {% else %}
-                <p>{% trans "You do not have the permission to promote this object." %}</p>
-            {% endif %}
-        </div>
+            </div>
         {% endspaceless %}
 
         {# buttons #}
@@ -250,9 +250,19 @@
                 {% endif %}
             {% endif %}
         {% endif %}
+        {% if obj.is_official and in_group %}
+            <a class="{{"Button"|button}}" href="../management/add-reader/" ><span class="ui-button-text">{% trans "Give access to a restricted account" %}</span></a>
+        {% endif %}
+        {% with reader_list as object_management_list %}
+            {% with in_group as can_delete %}
+                {% include "snippets/management_block.html" %}
+            {% endwith %} 
+        {% endwith %} 
         {% with notified_list as object_management_list %}
-            {% include "snippets/management_block.html" %}
-        {% endwith %}
+            {% with is_owner as can_delete %}
+                {% include "snippets/management_block.html" %}
+            {% endwith %}
+        {% endwith %} 
         {% with owner_list as object_management_list %}
             {% include "snippets/management_block.html" %}
         {% endwith %}

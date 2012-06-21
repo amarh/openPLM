@@ -39,12 +39,17 @@ def can_add(child, arg):
         return parent.can_add_child(child)
     elif action == "delegate":
         if isinstance(child, (User, UserController)):
+            if child.get_profile().restricted:
+                return False
             if hasattr(parent, "check_in_group"):
                 from django.conf import settings
                 if child.username == settings.COMPANY:
                     return False
                 return parent.check_in_group(child)
-        return True
+            return True
+    elif action == "delegate-reader":
+        if isinstance(child, (User, UserController)):
+            return child.get_profile().restricted
     return False
 
 @register.filter

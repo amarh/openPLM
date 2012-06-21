@@ -23,7 +23,7 @@
                 <li {% if type == "document"%}class="selected"{% endif %} >
                 <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
                 </li>
-                {% if request.user.is_authenticated %}
+                {% if browse_all %}
                     <li {% if type == "group"%}class="selected"{% endif %} >
                     <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
                     <li {% if type == "user"%}class="selected"{% endif %} >
@@ -40,7 +40,7 @@
                 <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
                 </li>
             </ul>
-            {% if plmobjects and request.user.is_authenticated %}
+            {% if plmobjects and browse_all %}
                 <hr/>
                 <ul>
                     <li>
@@ -88,6 +88,8 @@
                 </span> 
                 </p>
 
+                {% with restricted|yesno:"public/," as suffix_url %}
+
                 {% for object in objects.object_list %}
                     {% if object.is_part %}
 
@@ -110,6 +112,7 @@
                     {% endif %}
 
                 {% endfor %}
+            {% endwith %}
             </div>
 
             <div class="pagination">
@@ -128,11 +131,11 @@
                     {% for page in pages %}
                         <a 
                         {% if page = objects.number %}
-                            style="font-weight:bold">
+                            style="font-weight:bold"
                         {% else %}
-                            href="{% add_get page=page %}">
+                            href="{% add_get page=page %}"
                         {% endif %}
-                        {{page}}</a>
+                        >{{page}}</a>
                     {% endfor %}
 
                     {% if objects.has_next  and objects.paginator.num_pages not in pages %}

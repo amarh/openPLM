@@ -89,7 +89,7 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.files.storage import FileSystemStorage
-from django.utils.encoding import iri_to_uri, force_unicode
+from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
@@ -111,6 +111,8 @@ class UserProfile(models.Model):
     is_contributor = models.BooleanField(default=False, blank=True)
     #: .. versionadded:: 1.1 True if user can publish a plmobject
     can_publish = models.BooleanField(default=False, blank=True)
+    #: .. versionadded:: 1.1 True if user has a restricted account
+    restricted = models.BooleanField(default=False, blank=True)
 
     #: language
     language = models.CharField(max_length=5, default="en",
@@ -138,6 +140,8 @@ class UserProfile(models.Model):
             return _("administrator")
         elif self.is_contributor:
             return _("contributor")
+        elif self.restricted:
+            return _("restricted account")
         else:
             return _("viewer")
 
@@ -150,6 +154,8 @@ class UserProfile(models.Model):
     @property
     def menu_items(self):
         "menu items to choose a view"
+        if self.restricted:
+            return ["attributes", "parts-doc-cad"]
         return ["attributes", "history", "parts-doc-cad", "delegation",
                 "groups"]
 
@@ -1455,6 +1461,8 @@ ROLES = [ROLE_OWNER, ROLE_NOTIFIED, ROLE_SPONSOR]
 for i in range(10):
     level = level_to_sign_str(i)
     ROLES.append(level)
+ROLE_READER = "reader"
+ROLES.append(ROLE_READER)
 
 class DelegationLink(Link):
     """
