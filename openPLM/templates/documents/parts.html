@@ -26,6 +26,7 @@
 
         {% if user.get_profile.is_contributor %}
             {{ parts_formset.management_form }}
+            {% if not obj.is_cancelled %}
             <a class="{{"Button"|button}}" 
             {% if obj.type|can_link:request.session.type %}
             href="./add/{% add_get type=request.session.type q='' %}"
@@ -40,6 +41,8 @@
                     href="/object/create/?type=Part&amp;related_doc={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"parts/"|urlencode}}">
                     <span class="ui-button-text">{% trans "Create a part and attach it to the document." %}</span>
                 </a>
+            {% endif %}
+            
             {% endif %}
 
             {% if parts_formset.forms %}
