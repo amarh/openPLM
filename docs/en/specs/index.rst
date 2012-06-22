@@ -11,6 +11,7 @@ the consequences of a promote.
 
     lifecycle
     publication
+    restricted_access
     revisions
 
 
