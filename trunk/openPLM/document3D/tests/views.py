@@ -58,15 +58,11 @@ class view_3dTest(CommonViewTest):
         self.assertFalse(is_decomposable(self.document.object))
         reponse = self.get(self.document.object.plmobject_url+"3D/")        
         self.assertEqual(len(reponse.context["GeometryFiles"]), 5)
-                       
-
                  
     def test_3D_no_stp_associe(self):   
-    
         response = self.get(self.document.object.plmobject_url+"3D/")
         self.assertEqual(response.context["GeometryFiles"], [])
-        self.assertEqual(response.context["javascript_arborescense"], False)
-     
+        self.assertFalse(response.context["javascript_arborescense"])
             
     def test_3D_stp_associe_sans_arborescense(self):   
         f=open("document3D/data_test/test.stp")
@@ -75,20 +71,15 @@ class view_3dTest(CommonViewTest):
         ArbreFile.objects.get(stp=new_doc_file).delete()
         response = self.get(self.document.object.plmobject_url+"3D/")    
         self.assertEqual(3, len(list(response.context["GeometryFiles"])))
-        self.assertEqual(response.context["javascript_arborescense"], False)
+        self.assertFalse(response.context["javascript_arborescense"])
 
-
-    
     def test_3D_stp_valide_no_info(self):   
         f=open("document3D/data_test/valid_sans_information.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)       
         response = self.get(self.document.object.plmobject_url+"3D/")    
         self.assertEqual(response.context["GeometryFiles"],[])
-        self.assertNotEqual(response.context["javascript_arborescense"], False)
-        
-        
-            
+        self.assertTrue(response.context["javascript_arborescense"])
                 
     def test_3D_stp_associe_sans_geometry_with_arborescense(self):   
         f=open("document3D/data_test/test.stp")
@@ -97,10 +88,7 @@ class view_3dTest(CommonViewTest):
         GeometryFile.objects.filter(stp=new_doc_file).delete()
         response = self.get(self.document.object.plmobject_url+"3D/")    
         self.assertEqual([], response.context["GeometryFiles"])
-        self.assertNotEqual(response.context["javascript_arborescense"], False)  
-       
-    
-        
+        self.assertTrue(response.context["javascript_arborescense"])
            
     def test_decompose_bom_child(self):
         f=open("document3D/data_test/test.stp")

@@ -137,6 +137,16 @@
         div#main_content p {
             color: white;
         }
+        #toolbar {
+            top: 5px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            width: 25em;
+            display: block;
+            background:none;
+            border: none;
+        }
     </style>
 
 {% endblock %}
@@ -144,9 +154,9 @@
 {% block content %}
 
 
-    {% if not javascript_arborescense %}
+    {% if not javascript_arborescense and not stl %}
         <p>
-        {% trans "This document has no 3D data. Maybe it does not have a STEP file or openPLM has not yet converted its STEP file." %}
+        {% trans "This document has no 3D data. Maybe it does not have a STEP/STL file or openPLM has not yet converted its STEP file." %}
 
         </p>
     {% else %}
@@ -155,11 +165,16 @@
         </div> 
 
 
+        <span id="toolbar" class="ui-widget-header ui-corner-all">
+            <button id="random-color" class="Button small">{% trans "Random colors" %}</button>
+            <button id="initial-color" class="Button small">{% trans "Initial colors" %}</button>
+        </span>
+
         <div id="webgl_warning" class="main" style="display:none;">
             <div class="warning_container">
                 <div class="warning">
 
-                    <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. Thingiview works best with WebGL support, which is available in the following browsers:</p>
+                    <p><strong>WARNING:</strong> Your browser does not support <a target="_top" href="http://www.khronos.org/webgl/wiki/Main_Page">WebGL</a>. The 3D view works best with WebGL support, which is available in the following browsers:</p>
                     <ul>
                         <li><a target="_top" href="http://www.google.com/chrome">Google Chrome 9+</a> (Recommended)</li>
                         <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Firefox 4.0+</a></li>
@@ -180,6 +195,7 @@
 {% block scripts %} 
 
     <script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
+    <script type="text/javascript" src="/media/js/3D/struct.js"></script> 
     {% for item in GeometryFiles %}
         <script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
     {% endfor %}
@@ -205,8 +221,18 @@
 
         }  		
 
-{% if javascript_arborescense %}
-    {{javascript_arborescense|safe}}		
+{% if javascript_arborescense or stl %}
+    // Code from https://developer.mozilla.org/En/Using_XMLHttpRequest#Receiving_binary_data
+      this.load_binary_resource = function(url) {
+       var req = new XMLHttpRequest();
+       req.open('GET', url, false);
+       // The following line says we want to receive data as Binary and not as Unicode
+       req.overrideMimeType('text/plain; charset=x-user-defined');
+       req.send(null);
+       if (req.status != 200) return '';
+
+       return req.responseText;
+      };
 
     var zoom_var=50	
     var camera, scene, renderer;
@@ -216,8 +242,83 @@
     var height ;
     var deep ;
     var controls = null;	
-    $(document.getElementById( 'main_content' )).ready(init);
-    animate();
+
+    {% if stl %}
+        var xhr = new XMLHttpRequest();
+        var geometry = new THREE.Geometry();
+        var object3D = new THREE.Object3D();
+        var part_to_object = {};
+        var part_to_parts = {};
+        var part0=new THREE.Object3D();
+        var material_for_geometry = new THREE.MeshBasicMaterial({opacity:1,shading:THREE.SmoothShading});
+        material_for_geometry.color.setRGB(0.4,0.3,0.3);
+        var object2=new THREE.Mesh(geometry, material_for_geometry );
+        xhr.open('GET', '/file/{{stl_file.id}}/', true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onload = function(e) {
+            var data = new Uint8Array(xhr.response);
+            var t = Struct.Unpack("=80sI", data);
+            var nbf = t[1];
+            var is_text = String.fromCharCode.apply(null,data.subarray(0, 6)) == "solid ";
+            is_text = is_text && (nbf*50+80==data.length);
+            if (is_text) {
+                var text = "";
+                for (var i=0; i<data.length; i+= 1000){
+                    text += String.fromCharCode.apply(null, data.subarray(i, Math.min(i+1000, data.length)));
+                }
+                    // strip out extraneous stuff
+                text = text.replace(/\r/, "\n");
+                text = text.replace(/^solid[^\n]*/, "");
+                text = text.replace(/\n/g, " ");
+                text = text.replace(/facet normal /g,"");
+                text = text.replace(/outer loop/g,"");
+                text = text.replace(/vertex /g,"");
+                text = text.replace(/endloop/g,"");
+                text = text.replace(/endfacet/g,"");
+                text = text.replace(/endsolid[^\n]*/, "");
+                text = text.replace(/\s+/g, " ");
+                text = text.replace(/^\s+/, "");
+                var points = text.split(" ");
+                var i,j,len= parseInt(points.length/ 12) * 12;
+                for (i=0, j=0; i<len; i+=12, j+=3){
+                    for (var k= 0; k<3; k++){
+                        var f1 = parseFloat(points[i + k * 3 + 3]);
+                        var f2 = parseFloat(points[i + k * 3 + 4]);
+                        var f3 = parseFloat(points[i + k * 3 + 5]);
+                        geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(f1, f2, f3)));
+                    }
+                    geometry.faces.push(new THREE.Face3(j, j+1, j+2));
+                }
+            } else {
+                var i,j,len=data.length;
+                for (i=84, j=0; i<len; i+=50, j+=3){
+                    var f = Struct.Unpack("<ffffffffffffxx", data, i);
+                    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(f[3],f[4],f[5])));
+                    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(f[6],f[7],f[8])));
+                    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(f[9],f[10],f[11])));
+                    geometry.faces.push(new THREE.Face3(j, j+1, j+2));
+                }
+            }
+
+            geometry.computeFaceNormals();
+
+            object2.matrixAutoUpdate = false;
+            object3D.add(object2);
+            part_to_object['part2'] = object2;
+            init();
+            animate();
+
+        };
+
+        xhr.send();
+    {% else %}
+        {{javascript_arborescense|safe}}		
+        $(init);
+        animate();
+
+    {% endif %}
+
 
     function init() {
 
@@ -257,15 +358,17 @@
                     specular	: 0x000000,
                     shading		: THREE.SmoothShading,
                     color: obj.material.color.getHex(),
-                    opacity: 0.8//  obj.material.opacity
+                    opacity: 0.8
                 });
+                obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
             }
             object3D.castShadow = true;
             object3D.receiveShadow = true;
             scene.add( object3D);
 
-            camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(), 0.1, radius*200 );
+            camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(),
+                    0.1, radius*200);
             camera.position.z = radius*1.5;
 
             renderer = new THREE.WebGLRenderer({
@@ -292,12 +395,25 @@
                 ctrl.staticMoving = false;
                 ctrl.dynamicDampingFactor = 0.3;
                 ctrl.minDistance = 0;
-                ctrl.maxDistance = radius * 100;
+                ctrl.maxDistance = radius * 1000;
                 ctrl.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
             }
                
+            {% if javascript_arborescense %}
+                menu();
 
-            menu();
+                $('.menu a').hover(
+                    function (){
+                        var part = "part" + $(this).attr("id").replace("li-part-", "");
+                        highlight_part(part);
+                    },
+                    function () {
+                        var part = "part" +  $(this).attr("id").replace("li-part-", "");
+                        unhighlight_part(part);
+                    }
+                );
+
+            {% endif %}
             container.focus()
             renderer.render(scene, camera); 
 
@@ -309,31 +425,19 @@
                 min: 0,
                 max: 100,
                 value: 50,
-                start: function() { /*$('#zoom_bar').data('sliding', true )*/ },
-                stop:  function() {  },
                 slide: function( event, ui ) {
                     total=zoom_var-ui.value;
                     zoom_var=ui.value;
                     camera.translateZ(1.49999*radius*(total/50));
-
                 }
-
 
             });
-
-            $('.menu a').hover(
-                function (){
-                    var part = "part" + $(this).attr("id").replace("li-part-", "");
-                    highlight_part(part);
-                },
-                function () {
-                    var part = "part" +  $(this).attr("id").replace("li-part-", "");
-                    unhighlight_part(part);
-                }
-            );
+            
+            $("#random-color").button().click(random_color);
+            $("#initial-color").button().click(reinit_color);
 
         }
-        }			
+    }			
 
     function highlight_part(part_id) {
 
@@ -423,6 +527,21 @@
         return boundingBox;
     }
 
+    function random_color(){
+        for (var i=0; i < object3D.children.length; i++) {
+            var obj = object3D.children[i];
+            obj.material.color.setRGB(Math.random(), Math.random(), Math.random());
+            obj.material.original_color = obj.material.color.getHex();
+        }
+    }
+    
+    function reinit_color(){
+        for (var i=0; i < object3D.children.length; i++) {
+            var obj = object3D.children[i];
+            obj.material.color.setHex(obj.material.original_step_color);
+            obj.material.original_color = obj.material.original_step_color;
+        }
+    }
 
     {% endif %}
 
