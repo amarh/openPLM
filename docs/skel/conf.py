@@ -204,7 +204,7 @@ html_context = { "language" : language }
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'openPLM.tex', u'openPLM Documentation',
-   u'Pierre Cosquer, Philippe Joulaud', 'manual'),
+   u'LinObject', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
