@@ -1,14 +1,7 @@
-
 import hashlib
 import string
 import random
 import os
-import django.utils.simplejson as json
-import sys
-
-
-
-
 
 def get_available_name(location, name):
 
@@ -37,8 +30,6 @@ class Product(object):
     There are two ways of generating a :class:`.Product`, reading the file **.stp** across the class :class:`.NEW_STEP_Import` ( will refill the attribute **label_reference**  for every :class:`Product`), or reading a file **.arb** related to a :class:`.ArbreFile`  
     Therefore there exist two ways of distinguishing the different :class:`.Product`, by means of the attribute **label_reference** if this one is not False , or by means of the combination of attributes  **id** and **doc_id**.
     
-    
-
     
     :model attributes:
 
@@ -91,8 +82,6 @@ class Product(object):
         #no tiene location
         self.links = []          
         self.label_reference=label_reference
-        #if name="":
-            #raise "Must we forbid it?"  
         self.name=name
         self.doc_id=doc_id
         self.doc_path=doc_path 
@@ -101,12 +90,9 @@ class Product(object):
         self.deep=deep
         self.id=id
         self.visited=False
+
     def set_geometry(self,geometry):
-        #0 cant be a valid geometry index , 0==False
-        if geometry:
-            self.geometry=geometry
-        else:
-            raise Document3D_generate_Index_Error
+        self.geometry=geometry
             
     def set_new_root(self,new_doc_id,new_doc_path,for_child=False):
         #0 cant be a valid geometry index , 0==False
@@ -114,13 +100,14 @@ class Product(object):
         self.doc_id=new_doc_id
         self.doc_path=new_doc_path
         for link in self.links:
-            if  link.product.doc_id == old_id or for_child:
+            if link.product.doc_id == old_id or for_child:
                 link.product.set_new_root(new_doc_id,new_doc_path,for_child)                  
         
     @property       
     def is_decomposed(self):
         """
-        If it is an assembly and the any :class:`.Product` contents in his **links**  are defined (**doc_id**) in another :class:`DocumentFile` (**doc_id**)
+        If it is an assembly and the any :class:`.Product` contents in his **links** 
+        are defined (**doc_id**) in another :class:`DocumentFile` (**doc_id**)
         """
         for link in self.links:
             if not link.product.doc_id == self.doc_id:
@@ -130,18 +117,19 @@ class Product(object):
     @property       
     def is_decomposable(self):
         """
-        If it is an assembly and any :class:`.Product` contents in his **links** are defined (**doc_id**) in the same :class:`DocumentFile` (**doc_id**)
+        If it is an assembly and any :class:`.Product` contents in his **links**
+        are defined (**doc_id**) in the same :class:`DocumentFile` (**doc_id**)
         """
         for link in self.links:
             if link.product.doc_id == self.doc_id:
                 return True 
         return False
+
     @property  
     def is_assembly(self):
         if self.links:
             return self.name 
         return False
-        
  
          
 class Link(object):
@@ -149,9 +137,6 @@ class Link(object):
     
     Class used to represent a :class:`Link` between a :class:`.Product`, a :class:`Link` can have several references, each one with his own name and matrix of transformation. Every :class:`Link` points at a :class:`.Product`
 
-    
-    
-    
     :model attributes:
         
         
@@ -179,7 +164,7 @@ class Link(object):
     __slots__ = ("names","locations","product","quantity","visited")
     
 
-    def __init__(self,product):
+    def __init__(self, product):
   
         self.names=[]           
         self.locations=[]
@@ -187,19 +172,15 @@ class Link(object):
         self.quantity=0
         self.visited=False#used only in multi-level decomposition
 
-
-    def add_occurrence(self,name,Matrix_rotation):
-        if name==u' ' or name==u'':
+    def add_occurrence(self, name, matrix):
+        if not name.strip():
             self.names.append(self.product.name)    
         else:
             self.names.append(name)
-            
-            
-        if self.product.name=="":
+        if not self.product.name:
             self.product.name=name
-               
-        self.locations.append(Matrix_rotation)
-        self.quantity=self.quantity+1
+        self.locations.append(matrix)
+        self.quantity += 1
 
         
 class Matrix_rotation(object):
@@ -219,25 +200,16 @@ class Matrix_rotation(object):
     __slots__ = ("x1","x2","x3","x4","y1","y2","y3","y4","z1","z2","z3","z4")
 
     
-    def __init__(self,list_coord):
+    def __init__(self, coords):
     
-        if list_coord:
-            self.x1=list_coord[0]           
-            self.x2=list_coord[1] 
-            self.x3=list_coord[2] 
-            self.x4=list_coord[3] 
-            self.y1=list_coord[4]         
-            self.y2=list_coord[5] 
-            self.y3=list_coord[6] 
-            self.y4=list_coord[7] 
-            self.z1=list_coord[8]         
-            self.z2=list_coord[9] 
-            self.z3=list_coord[10] 
-            self.z4=list_coord[11]    
-
+        (self.x1, self.x2, self.x3, self.x4,
+            self.y1, self.y2, self.y3, self.y4,
+            self.z1, self.z2, self.z3, self.z4) = coords
    
     def to_array(self):    
-        return [self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4] 
+        return [self.x1, self.x2, self.x3, self.x4,
+                self.y1, self.y2, self.y3, self.y4,
+                self.z1, self.z2, self.z3, self.z4] 
         
 
 
@@ -282,11 +254,8 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
             
                 After generating the **product** and the :class:`Link`, we will have to refill the :class:`Link` calling the function :meth:`.add_occurrence` for the :class:`Link`:
                 
-                
                     for location in locations:
                         product_root_node.links[-1].add_occurrence(location.name,location)
-    
-    
     """
                  
     if not product_root: 
@@ -306,23 +275,13 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
               
                     
     for i in range(len(arbre)-1):
-        
         product_child=generateProduct(arbre[i+1][1],deep+1)
-        
-   
         product_assembly=search_assembly(product_child,product_root)
-          
         if product_assembly:
             product_child=product_assembly 
-            
-           
-                                    
         generateLink(arbre[i+1],product,product_child) 
-               
         if not product_assembly:
             Product_from_Arb(arbre[i+1][1],product_child,product_root,deep+1)  
-            
-           
     return product 
 
 
@@ -349,43 +308,28 @@ def generateProduct(arbre,deep):
     return Product(arbre[0][0],deep,label_reference,arbre[0][1],arbre[0][4],arbre[0][3],arbre[0][2])   
 
 
-
-
 def search_assembly(product,product_root): 
     """
+    Checks if a :class:`Product` is already present in a arborescense :class:`Product` (**product_root**)
+    There are two manners of comparison, across **label_reference**
+    ( generated for :class:`.NEW_STEP_Import` for every :class:`Product`),
+    or across **id** and **doc_id** (extracted of a file **.geo** for every :class:`Product`)
     
     :param product_root: :class:`Product` root of the arborescense   
     :param product: :class:`Product` for that we look in the **product_root**
-
-         
-    Function that it checks if a :class:`Product` is already present in a arborescense :class:`Product` (**product_root**)
-    There are two manners of comparison, across **label_reference** ( generated for :class:`.NEW_STEP_Import` for every :class:`Product`), or across **id** and **doc_id** (extracted of a file **.geo** for every :class:`Product`)
-    
 
     """
 
     if product_root: 
         for link in product_root.links:
-        
-
             if product.label_reference:
-
-                
                 if link.product.label_reference==product.label_reference:
-
                     return link.product
-                
-                 
             elif product.id==link.product.id and product.doc_id==link.product.doc_id:
                 return link.product                                        
-
-
             product_found=search_assembly(product,link.product)
             if product_found:
                 return product_found
-
-    
-   
     
             
 def data_for_product(product):
@@ -395,10 +339,8 @@ def data_for_product(product):
     generate a chain of characters formatted that contains information about a :class:`Product`
     
     """
-    output=[]
     
-    output.append([product.name,product.doc_id,product.geometry,product.doc_path,product.id])  
-    
+    output = [[product.name,product.doc_id,product.geometry,product.doc_path,product.id]]
     for link in product.links:
         output.append(data_for_link(link))    
     return output            
@@ -420,4 +362,4 @@ def data_for_link(link):
     output.append(data_for_product(link.product))
         
     return output
- 
+
