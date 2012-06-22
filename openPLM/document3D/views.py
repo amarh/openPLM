@@ -6,16 +6,12 @@ from openPLM.document3D.classes import *
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.models import get_all_plmobjects
 from django.db import transaction
-from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from openPLM.plmapp.tasks import update_indexes
-from openPLM.plmapp.exceptions import LockError
-from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from openPLM.plmapp.views.main import r2r
-import tempfile
 import os
 
 @handle_errors
@@ -34,23 +30,26 @@ def display_3d(request, obj_ref, obj_revi):
     obj_type = "Document3D"
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = '3D'
+    ctx['stl'] = False
 
     try:
         doc_file = obj.files.filter(is_stp)[0]
     except IndexError:
         doc_file = None
 
-    if doc_file is None:
         GeometryFiles=[]
-        javascript_arborescense=False
+        javascript_arborescense=""
+        try:
+            doc_file = obj.files.filter(is_stl)[0]
+            ctx["stl"] = True
+            ctx["stl_file"] = doc_file
+        except IndexError:
+            pass
     else:
-
         product=ArbreFile_to_Product(doc_file,recursif=True)
         GeometryFiles=list(GeometryFile.objects.filter(stp=doc_file))
         if product:  
             add_child_GeometryFiles(product,GeometryFiles)
-
-        
         javascript_arborescense=generate_javascript_for_3D(product)
 
     ctx.update({

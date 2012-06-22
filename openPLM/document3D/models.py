@@ -228,6 +228,7 @@ def generateArborescense(path, doc_file, decomposable):
  
 
 is_stp=Q(filename__iendswith=".stp") | Q(filename__iendswith=".step")#.stp , .STP , .step , .STEP 
+is_stl=Q(filename__iendswith=".stl") #.stl, .STL 
 is_catia=Q(filename__iendswith=".catpart") | Q(filename__iendswith=".catproduct")
  
         
