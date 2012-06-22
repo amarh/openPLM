@@ -1,39 +1,19 @@
-import functools
-
-import django.forms
-from django.conf import settings
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponseForbidden
-from django.contrib.csrf.middleware import csrf_exempt
-import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import get_controller, DocumentController
-import openPLM.plmapp.forms as forms
-from openPLM.plmapp.utils import get_next_revision
-from openPLM.plmapp.base_views import json_view, get_obj_by_id, object_to_dict,\
-        secure_required
-from openPLM.plmapp.views.api import login_json
-
-
-
-
-
-import openPLM.document3D.models as models3D
-
-
-
+import io, os
 import zipfile
-from django.core.files import File
-import io , os
-import django.utils.simplejson as json
-from django.db import transaction
-import time
 
+from django.core.files import File
+from django.db import transaction
+import django.utils.simplejson as json
+
+import openPLM.plmapp.models as models
+import openPLM.plmapp.forms as forms
+from openPLM.plmapp.base_views import get_obj_by_id, object_to_dict
+from openPLM.plmapp.views.api import login_json
+import openPLM.document3D.models as models3D
 
 
 @login_json
 def get_all_3D_docs(request):
-    #return {"types" : sorted(models.get_all_documents(models3D.Document3D).keys())}
     return {"types" : sorted(models.get_all_subtype_documents(models3D.Document3D).keys())}
     
 @login_json
@@ -46,25 +26,16 @@ def prepare_multi_check_out(request,doc_id):
     type_check_out =dict_args["type_check_out"] #request.POST["type_check_out"]
     documents=dict_args["documents"]#dict(json.loads(request.GET["documents"]))
 
-   
     if type_check_out=="stp":
         lock_of_documents_files_whit_extension(documents,[".stp",".step"],request.user,type_check_out) 
-
-        #to evade concurrence verify all documents were locked by the user
-        #check_locker(request.user,id__check_out,[".stp",".step"])        
-        
+        #to avoid weird concurrency events verify all documents were locked by the user
         STP_file=root_document.files.get(models3D.is_stp)
-
         return {"id" : STP_file.id , "filename" : STP_file.filename , "object" : object_to_dict(controller)}
 
     elif type_check_out=="catia":                 
         objects=lock_of_documents_files_whit_extension(documents,[".catpart",".catproduct"],request.user,type_check_out)
         roots=possibles_root_catia(root_document)                
         return {"objects" : objects, "roots" : roots ,  "object" : object_to_dict(controller)}  
-
-
-
-
 
 
 @transaction.commit_on_success
@@ -114,13 +85,10 @@ def get_decomposition_documents(request, doc_id ,type_check_out):
     ids.add(document.id)   
     
     objects.append(dict(id=document.id, name=document.name, type=document.type,revision=document.revision, reference=document.reference , files=files , check_out_valide=check_out_valide))       
-
-    
  
-    #childs
+    #children
     if files:      
         exploreAroborescense(document,type_check_out,objects,ids)    
-
 
     if type_check_out=="stp":
         return {"objects" : objects  } 
@@ -137,7 +105,6 @@ def exploreAroborescense(document,type_check_out,objects,ids):
             continue
         files , check_out_valide = files_for_decomposition(doc,type_check_out)
         ids.add(doc.id)
-        #if files = [] , this document cant be check-out or download , shall we forbid all the procesus?
         objects.append(dict(id=doc.id, name=doc.name, type=doc.type,revision=doc.revision, reference=doc.reference , files=files , check_out_valide=check_out_valide))
         if files:
             exploreAroborescense(doc,type_check_out,objects,ids)
@@ -161,15 +128,9 @@ def possibles_root_catia(doc):
          
         if possibles_root:
             return possibles_root
-        
-           
-        
-
     for doc_file in catia_files:
         possibles_root.append(dict(filename=doc_file.filename))
     return possibles_root      
-        
-    
 
                   
 def files_for_decomposition(doc,type_check_out):
@@ -184,8 +145,6 @@ def files_for_decomposition(doc,type_check_out):
         files.append(dict(id=doc_file.id , name=doc_file.filename))        
         if not doc_file.checkout_valid or doc_file.locked:
             check_out_valide=False
-    #if not files:
-    #    raise ValueError("Document "+ doc.reference+"/"+doc.revision+"/"+doc.name + " (present in the arborescence) does not contain files (" +str(extensions) +") to fulfil the check-out")
     return files ,  check_out_valide
     
 @login_json    
@@ -204,9 +163,6 @@ def add_zip_file(request, doc_id, unlock , thumbnail_extension ="False" ,thumbna
     form = forms.AddFileForm(request.POST, request.FILES)
     
     zip_file = zipfile.ZipFile(request.FILES["filename"])
-    
-    
-    #file_open=zip_file.open(zip_file.namelist()[0])
     
     for filename in zip_file.namelist(): 
         if not filename.endswith(thumbnail_extension):
@@ -229,25 +185,5 @@ def add_zip_file(request, doc_id, unlock , thumbnail_extension ="False" ,thumbna
                 dummy_file.size = len(buf)
                 dummy_file.file = tmp_file 
                 doc.add_thumbnail(df, dummy_file)               
-            
-            
     return {"OK" : dict(id=unlock, filename=thumbnail, size=df.size)}
-    
-    
-"""         
-def check_locker(user,id__check_out,extensions):
 
-    for elem in id__check_out["documents"]:
-        doc_id=elem["id"] 
-        check_out=bool(elem["check-out"]) 
-        if check_out: 
-            document = models3D.Document3D.objects.get(id=doc_id)                   
-            for doc_file in document.files: 
-                fileName,  fileExtension= os.path.splitext(doc_file.filename)
-                if fileExtension.lower() in extensions:
-                    if not doc_file.locker == user:
-                        #function to undo changes undo changes 
-                        raise Exception("File "+ doc_file.filename   +" of " + document.__unicode__() + " was locked by other user.Please, restart the process")
-                    
-                    break  
-"""           
