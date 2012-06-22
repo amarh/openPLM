@@ -414,7 +414,8 @@
                 );
 
             {% endif %}
-            container.focus()
+            container.focus();
+            $('html, body').animate({scrollTop: $(container).offset().top}, 750);
             renderer.render(scene, camera); 
 
             zoom = document.createElement("div");
