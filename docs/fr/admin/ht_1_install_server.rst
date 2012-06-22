@@ -349,6 +349,14 @@ reconnectez vous depuis votre nouveau compte utilisateur.
 Deuxième méthode
 ~~~~~~~~~~~~~~~~
 
+La deuxième méthode pour ajouter des utilisateurs n'est **pas** recommandée.
+Les choses peuvent mal tourner : problèmes de droits, mauvais référencement,
+etc
+La seule raison d'utiliser cette méthode est qu'elle ne nécessite pas une
+configuration email fonctionnelle. Mais il est quand même conseillé de prendre
+quelques minutes de plus pour configurer les emails et utiliser la première
+méthode.
+
 Ouvrer votre navigateur web et aller sur la page : ::
 
         http://your_site_address/
