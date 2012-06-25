@@ -1,15 +1,4 @@
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
 
-Replace these with more appropriate tests for your application.
-"""
-#openPLM3D="enabled" ./manage.py test document3D --settings=settings_tests
-#/var/django/openPLM/trunk/docs$ make html
-#firefox _build/html/index.html
-#/var/django/openPLM/trunk/docs/devel/applications/document3D
-
-#./manage.py compilemessages 
 from django.http import HttpResponse ,HttpResponseRedirect , HttpRequest
 from django.test import TestCase
 from openPLM.document3D.views import *
@@ -135,8 +124,6 @@ class view_3dTest(CommonViewTest):
         self.controller.attach_to_document(self.document.object)  
         response = self.get(self.base_url+"decompose/"+str(new_doc_file.id)+"/")
         # TODO: check forms
-
-       
  
                   
     def test_display_decompose_time_modification_diferent(self):
@@ -207,68 +194,7 @@ class view_3dTest(CommonViewTest):
         data=self.update_data(new_doc_file)
         GeometryFile.objects.filter(stp=new_doc_file).delete()
         self.assertRaises(Document3D_decomposer_Error,self.post,self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)        
-          
-    """
-    def test_display_decompose_bom_formset_error_post(self):
-        f=open("document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)     
-        self.controller.attach_to_document(self.document.object)                                          
-        data=self.update_data(new_doc_file)
-        
-        data.update({
-                "1-quantity" : [u''],
-        })       
-        reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-
-        a=reponse_post.context["deep_assemblys"][0]
-        
-        print type(reponse_post.context["deep_assemblys"][0])
-        print "-----------"
-        print "tipo : " , len(a) , a
-        print len(a)
-        print "-----------"
-        print "tipo : " , len(a[0]) , a[0]
-        print "-----------"
-        print "tipo : " , len(a[0][0]) , a[0][0]
-        print "-----------"
-        print "tipo : " , len(a[0][0][0]) , a[0][0][0]
-                
-        #ord_qty=Order_Quantity_Form(reponse_post.request.POST,prefix=1)
-        #self.assertEqual(reponse_post.context["1-quantity"],[{'quantity': [u'This field is required.']}, {}])
-
-    
-    def test_display_decompose_part_type_formset_error_post(self):
-        f=open("document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)     
-        self.controller.attach_to_document(self.document.object)                                          
-        data = data3
-        self.update_time(data)       
-        reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse_post.context["part_type_formset"].errors,
-                [{'type_part': [u'Select a valid choice. Part54545 is not one of the available choices.']}, {}]
-)
-   
-    def test_display_decompose_creation_formset_error_post(self):
-        f=open("document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)     
-        self.controller.attach_to_document(self.document.object)                                          
-        data = data4 
-        self.update_time(data)    
-        reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        forms = reponse_post.context["forms"]         
-        index=0
-        for type, atributes, ord_qty in forms:
-            if index==1:
-                self.assertEqual(atributes[0].errors,{'group': [u'Bad group, check that the group exists and that you belong to this group.']})
-            index+=1
-
-    """   
-                          
-
-  
+     
   
 def decomposition_fromPOST_data(data,product,index,group,lifecycle,part_type):
 
