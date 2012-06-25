@@ -1,25 +1,27 @@
 import os.path
+import logging
 import shutil
-from django.db import models
-from django.contrib import admin
-from openPLM.plmapp.controllers import DocumentController
-from openPLM.plmapp.models import *
-from openPLM.plmapp.controllers.part import PartController
-from django.db.models import Q
-from openPLM.document3D.classes import *
 import subprocess
 import tempfile
 import time
+import copy
+
+from django.db import models
+from django.contrib import admin
+from django.db.models import Q
 from django.core.files import File
 import django.utils.simplejson as json
-from openPLM.plmapp.controllers import get_controller
-import copy
+
 from celery.exceptions import TimeoutError
+from celery.task import task
+
+from openPLM.plmapp.controllers import get_controller
+from openPLM.document3D.classes import *
+from openPLM.plmapp.controllers import DocumentController
+from openPLM.plmapp.models import *
+from openPLM.plmapp.controllers.part import PartController
 
 #./manage.py graph_models document3D > models.dot   dot -Tpng models.dot > models.png
-
-
-
 
 
 class Document3D(Document):
@@ -34,9 +36,7 @@ class Document3D(Document):
                     
     """
 
-    
     PartDecompose = models.ForeignKey(Part,null=True)
-    
     
     @property
     def menu_items(self):
@@ -56,7 +56,6 @@ class Document3D(Document):
         
         If the :class:`~django.core.files.File` contains in the :class:`.DocumentFile` (**doc_file**) is a **.stp** and was *decomposed* , this function calls a subprocess( :meth:`.composer` ) to rebuild the .stp :class:`~django.core.files.File` 
         """
-        
 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
@@ -64,7 +63,6 @@ class Document3D(Document):
             tempfile_size=composer_step(doc_file) 
             if tempfile_size:
                 return tempfile_size[0] ,tempfile_size[1]  #temp_file , size
-                        
 
         return super(Document3D, self).get_content_and_size(doc_file)
     
@@ -109,7 +107,6 @@ def composer_step(doc_file):
     return False
     
     
-from celery.task import task
 @task(soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk):
     """
@@ -123,43 +120,47 @@ def handle_step_file(doc_file_pk):
     later this files will be attached to an :class:`.ArbreFile` and one or more :class:`.GeometryFile` and these classes with the :class:`.DocumentFile` determined by **doc_file_pk**     
 
     """
-    import logging
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
+    logger = handle_step_file.get_logger()
     doc_file = DocumentFile.objects.get(pk=doc_file_pk)
     temp_file = tempfile.TemporaryFile()
+    error_file = tempfile.NamedTemporaryFile()
     stdout = temp_file.fileno()
     name = "%s.png" % (doc_file_pk)
     thumbnail_path = thumbnailfs.path(name)
 
-    status=subprocess.call(["python", "document3D/generate3D.py", doc_file.file.path,
-        str(doc_file.id), settings.MEDIA_ROOT+"3D/", thumbnail_path],
-        stdout=stdout)
-    if status == 0:
-        """
-        The subprocess is going to return a temporary file with the names of the files *.geo* and *.arb* generated. 
-        In the moment of his generation these files are not associated the documentFile
-        """
-        delete_ArbreFile(doc_file) #In case of an update, to erase the previous elements
-        delete_GeometryFiles(doc_file)
-        generate_relations_BD(doc_file,temp_file)# We associate the files generated to classes and the classes to the documentFile
-        if os.path.exists(thumbnail_path):
-            doc_file.thumbnail = os.path.basename(thumbnail_path)
-            doc_file.save()
-
-    elif status == -1:
-        #MultiRoot_Error  SEND MAIL?
-        raise ValueError("OpenPLM does not support files STEP with multiple roots")
-    elif status == -2:
-        #OCC_ReadingStep_Error SEND MAIL?
-        raise ValueError("PythonOCC could not read the file")
-    else:
-        #Indeterminate error SEND MAIL?
-        raise ValueError("Error during the treatment of the file STEP")        
-
-
-    
-    
-    
+    try:
+        status=subprocess.call(["python", "document3D/generate3D.py", doc_file.file.path,
+            str(doc_file.id), settings.MEDIA_ROOT+"3D/", thumbnail_path],
+            stdout=stdout, stderr=error_file.fileno())
+        if status == 0:
+            """
+            The subprocess is going to return a temporary file with the names of the files *.geo* and *.arb* generated. 
+            In the moment of his generation these files are not associated the documentFile
+            """
+            delete_ArbreFile(doc_file) #In case of an update, to erase the previous elements
+            delete_GeometryFiles(doc_file)
+            generate_relations_BD(doc_file,temp_file)# We associate the files generated to classes and the classes to the documentFile
+            if os.path.exists(thumbnail_path):
+                doc_file.thumbnail = os.path.basename(thumbnail_path)
+                doc_file.save()
+        else:
+            error_file.seek(0)
+            temp_file.seek(0)
+            logger.info(temp_file.read())
+            logger.info(error_file.read())
+            if status == -1:
+                #MultiRoot_Error  SEND MAIL?
+                raise ValueError("OpenPLM does not support files STEP with multiple roots")
+            elif status == -2:
+                #OCC_ReadingStep_Error SEND MAIL?
+                raise ValueError("PythonOCC could not read the file")
+            else:
+                #Indeterminate error SEND MAIL?
+                raise ValueError("Error during the treatment of the file STEP")        
+    finally:
+        temp_file.close()
+        error_file.close()
 
         
 def generate_relations_BD(doc_file,temp_file):
