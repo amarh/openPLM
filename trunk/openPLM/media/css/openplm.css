@@ -359,6 +359,17 @@ a.Button.small span {
     padding: 3px;
 }
 
+#LoggedPersonBox a.extlink {
+    text-decoration: none;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+#LoggedPersonBox a.extlink span {
+    color: #eee;
+    border-bottom: 1px dotted #eee;
+}
+
 /* AREA WHERE TYPE-REFERENCE-REVISION IS DISPLAYED */
 div#ReferenceArea
 {
