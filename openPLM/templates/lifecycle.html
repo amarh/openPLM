@@ -90,7 +90,16 @@
                 {% else %}
                     <p>{% trans "You do not have the permission to promote this object." %}</p>
                 {% endif %}
-            </div>
+                
+                {# cancel #}
+                {% if obj.is_draft %}
+                    {% if not obj.can_cancel %}
+                     <p>{% trans "You can not cancel this object since it is related to an other object (part , document)." %}</p>
+                     {% endif %}
+                {% else %}
+                    <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}
+                {% endif %}
+        </div>
         {% endspaceless %}
 
         {# buttons #}
@@ -123,7 +132,7 @@
             </div>
 
             {# button #}
-            <input name="cancel" type="submit" class="{{"Button"|button}}" value="{% trans "CANCEL" %}" />
+            <input name="cancel" type="submit" class="{{"Button"|button}}" value="{% trans "CANCEL" %}"/>
         </form>
     {% endif %}
 
