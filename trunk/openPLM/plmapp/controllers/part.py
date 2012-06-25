@@ -748,7 +748,7 @@ class PartController(PLMObjectController):
         res = super(PartController, self).check_cancel(raise_=raise_)
         if res :
             q = Q(parent=self.object) | Q(child=self.object)
-            res = res and not models.ParentChildLink.objects.filter(q).exists()
+            res = res and not models.ParentChildLink.objects.filter(q, end_time=None).exists()
             if (not res) and raise_ :
                 raise PermissionError("This part is related to an other part.")
             res = res and not self.get_attached_documents()
