@@ -239,10 +239,6 @@ Cancel rules
        :Tests: - plmapp.PartControllerTest.test_cancel_has_document_related
        :Tests: - plmapp.DocumentControllerTest.test_cancel_has_part_related
        
-    #. If a document contains at least one file, it can't be cancelled.
-    
-       :Tests: - plmapp.DocumentControllerTest.test_cancel_has_file_related
-       
 
 Ownership
 ++++++++++
