@@ -58,7 +58,7 @@ class CommonViewTest(BaseTestCase):
 
     def setUp(self):
         super(CommonViewTest, self).setUp()
-        self.client.post("/login/", {'username' : 'user', 'password' : 'password'})
+        self.client.post("/login/", {'username' : self.user.username, 'password' : 'password'})
         self.client.post("/i18n/setlang/", {"language" : self.LANGUAGE})
         self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
                                                  self.user, self.DATA)
@@ -283,8 +283,8 @@ class ViewTest(CommonViewTest):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True, u'user'),
-                  ("official", False, u'user'),
+        wanted = (("draft", True, self.user.username),
+                  ("official", False, self.user.username),
                   ("deprecated", False, None))
         self.assertFalse(response.context["cancelled_revisions"])
         self.assertFalse(response.context["deprecated_revisions"])
@@ -294,8 +294,8 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"promote" : "on", "password" : "password"})
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", False, u'user'),
-                  ("official", True, u'user'),
+        wanted = (("draft", False, self.user.username),
+                  ("official", True, self.user.username),
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
         # demote
@@ -310,8 +310,8 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"demote" : "on", "password":"password"})
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True, u'user'),
-                  ("issue1", False, u'user'),
+        wanted = (("draft", True, self.user.username),
+                  ("issue1", False, self.user.username),
                   ("official", False, None),
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
@@ -358,8 +358,8 @@ class ViewTest(CommonViewTest):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = tuple(response.context["object_lifecycle"])
-        wanted = (("draft", True, u'user'),
-                  ("official", False, u'user'),
+        wanted = (("draft", True, self.user.username),
+                  ("official", False, self.user.username),
                   ("deprecated", False, None))
         self.assertEqual(lifecycles, wanted)
         # try to promote
@@ -2590,14 +2590,14 @@ class SearchViewTestCase(CommonViewTest):
         
         query = self.get_query(request)
         t = type or request["type"]
-        response = self.get("/user/user/attributes/",
+        response = self.get("/user/%s/attributes/" % self.user.username,
                 {"type" : t, "q" : query}) 
         results = list(response.context["results"])
         results.sort(key=lambda r:r.object.pk)
         return [r.object for r in results]
 
     def test_forms(self):
-        response = self.get("/user/user/attributes/")
+        response = self.get("/user/%s/attributes/" % self.user.username)
         # check that searchform is present
         af = response.context["search_form"]
     
@@ -2607,7 +2607,7 @@ class SearchViewTestCase(CommonViewTest):
         self.search(data)
         query = self.get_query(data)
         for x in range(4):
-            response = self.get("/user/user/attributes/")
+            response = self.get("/user/%s/attributes/" % self.user.username)
             af = response.context["search_form"]
             self.assertEqual(af.data["q"], query)
 

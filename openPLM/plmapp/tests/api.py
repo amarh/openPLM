@@ -16,12 +16,12 @@ class ApiTestCase(CommonViewTest):
             HTTP_USER_AGENT="openplm").content)
 
     def test_login(self):
-        data = self.post("/api/login/", username="user", password="password")
+        data = self.post("/api/login/", username=self.user.username, password="password")
         self.assertEqual("ok", data["result"])
-        self.assertEqual("user", data["username"])
+        self.assertEqual(self.user.username, data["username"])
 
     def test_login_error(self):
-        data = self.post("/api/login/", username="user", password="fail")
+        data = self.post("/api/login/", username=self.user.username, password="fail")
         self.assertEqual("error", data["result"])
 
     def test_get_all_types(self):

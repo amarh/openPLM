@@ -20,7 +20,7 @@ class BaseTestCase(TestCase):
         self.leading_group = GroupInfo.objects.create(name="leading_group",
                 owner=self.cie, creator=self.cie)
         self.cie.groups.add(self.leading_group)
-        self.user = User(username="user")
+        self.user = User(username="John")
         self.user.set_password("password")
         self.user.email = "test@example.net"
         self.user.save()
