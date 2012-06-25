@@ -499,8 +499,5 @@ class DocumentController(PLMObjectController):
         if res :
             res = res and not self.get_attached_parts()
             if (not res) and raise_ :
-                raise PermissionError("This document has is related to a part.")
-            res = res and not models.DocumentFile.objects.filter(document=self.object).exists()
-            if (not res) and raise_ :
-                raise PermissionError("This document contains one or more files. ")
+                raise PermissionError("This document is related to a part.")
         return res
