@@ -9,6 +9,7 @@ the consequences of a promote.
     :maxdepth: 2
     :numbered:   
 
+    clone
     lifecycle
     publication
     restricted_access
