@@ -93,7 +93,7 @@ class PLMObjectController(Controller):
             raise ValueError("Incorrect type")
         # create an object
         try:
-            start = "PART_"  if issubclass(models.Part, class_) else "DOC_"
+            start = "PART_"  if issubclass(class_, models.Part) else "DOC_"
             reference_number = int(re.search(r"^%s(\d+)$" % start, reference).group(1)) 
         except:
             reference_number = 0
