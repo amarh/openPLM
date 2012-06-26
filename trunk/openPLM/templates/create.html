@@ -26,6 +26,9 @@
                 {% if related_part %}
                     <input type="hidden" name="related_part" value="{{related_part}}"/>
                 {% endif %}
+                {% if related_parent %}
+                    <input type="hidden" name="related_parent" value="{{related_parent}}"/>
+                {% endif %}
 
                 <table class="Content">
                     <col width="20%" />
@@ -50,9 +53,16 @@
 This part will be attached to the document {{related_type}} // {{ related_reference }} // {{ related_revision }} // {{ related_name }}.
     {% endblocktrans %}
                         {% else %}
-                            {% blocktrans with related.type as related_type and related.reference as related_reference and related.revision as related_revision and related.name as related_name %} 
+                            {% if related_part %}
+                                {% blocktrans with related.type as related_type and related.reference as related_reference and related.revision as related_revision and related.name as related_name %} 
 This document will be attached to the part {{related_type}} // {{ related_reference }} // {{ related_revision }} // {{ related_name }}.
-    {% endblocktrans %}
+                                {% endblocktrans %}
+                            {% else %}
+                                {% blocktrans with related.type as related_type and related.reference as related_reference and related.revision as related_revision and related.name as related_name %} 
+This part will be added to the part {{related_type}} // {{ related_reference }} // {{ related_revision }} // {{ related_name }}.
+                                {% endblocktrans %}
+
+                    {% endif %}
 
                         {% endif %}
                         </p>

@@ -37,6 +37,12 @@
             {% else %}
             href="./add/{% add_get type='Part' q='' %}"
             {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>
+
+        <a class="{{"Button"|button}}"
+            href="/object/create/?type=Part&amp;related_parent={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"BOM-child/add/"|urlencode|add:"%3Ftype%3D%23%23type%23%23%26reference%3D%23%23ref%23%23%26revision%3D%23%23rev%23%23"}}">
+            <span class="ui-button-text">{% trans "Create a part and add it" %}</span>
+        </a>
+
         <a class="{{"Button"|button}}" href="./edit/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
     {% endif %}
     <form method="GET" action="">
