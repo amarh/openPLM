@@ -903,7 +903,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
-    if request.POST:
+    if request.method == "POST" and request.POST:
         add_child_form = forms.AddChildForm(obj.object, request.POST)
         if add_child_form.is_valid():
             child_obj = get_obj_from_form(add_child_form, request.user)
@@ -914,7 +914,12 @@ def add_children(request, obj_type, obj_ref, obj_revi):
                           **add_child_form.extensions)
             return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
     else:
-        add_child_form = forms.AddChildForm(obj.object)
+        if "type" in request.GET and request.GET["type"] in models.get_all_parts():
+            # use GET params only if they seems valid
+            initial = request.GET
+        else:
+            initial = None
+        add_child_form = forms.AddChildForm(obj.object, initial=initial)
         ctx['current_page'] = 'BOM-child'
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
@@ -1308,6 +1313,12 @@ def create_object(request, from_registered_view=False, creation_form=None):
         attach = part.attach_to_document
         ctx["related_part"] = request.REQUEST["related_part"]
         related = ctx["related"] = part
+    elif "related_parent" in request.REQUEST:
+        Form = forms.PartTypeForm
+        parent = get_obj_by_id(int(request.REQUEST["related_parent"]), request.user)
+        ctx["related_parent"] = request.REQUEST["related_parent"]
+        related = ctx["related"] = parent
+
     if "__next__" in request.REQUEST:
         redirect_to = request.REQUEST["__next__"]
         ctx["next"] = redirect_to
@@ -1332,7 +1343,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
         creation_form = forms.get_creation_form(request.user, cls)
         if related is not None:
             creation_form.fields["group"].initial = related.group
-            creation_form.fields["lifecycle"].initial = related.lifecycle
+            creation_form.initial["lifecycle"] = related.lifecycle
     elif request.method == 'POST':
         if creation_form is None:
             creation_form = forms.get_creation_form(request.user, cls, request.POST)
@@ -1355,6 +1366,10 @@ def create_object(request, from_registered_view=False, creation_form=None):
                         return HttpResponseRedirect(ctrl.plmobject_url + "parts/")
                     else:
                         return HttpResponseRedirect(ctrl.plmobject_url + "doc-cad/")
+            if redirect_to:
+                redirect_to = redirect_to.replace("##ref##", ctrl.reference)
+                redirect_to = redirect_to.replace("##rev##", ctrl.revision)
+                redirect_to = redirect_to.replace("##type##", ctrl.type)
             return HttpResponseRedirect(redirect_to or ctrl.plmobject_url)
     ctx.update({
         'creation_form' : creation_form,
