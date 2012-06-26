@@ -51,4 +51,8 @@ class HardDiskControllerTest(PartControllerTest):
     CONTROLLER = SinglePartController
     DATA = {"capacity_in_go" : 500}
 
+    def test_create_reference(self):
+        c = self.CONTROLLER.create("PART_00256", self.TYPE, "a", self.user, self.DATA)
+        self.assertEqual(256, c.reference_number)
+
 
