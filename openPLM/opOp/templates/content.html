@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block css %}
+<style type="text/css">
+iframe.uri_content{
+padding-top : 1%;
+min-height: inherit;
+width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not obj.object.location_uri or obj.object.location_uri == " "%}
+    {% trans "This URLDoc has not url related" %}
+{% else %}
+<iframe class="uri_content" src="{{obj.object.location_uri}}" >
+</iframe>
+<noframes>
+    {% trans "Your browser can't include the content. Click " %}
+    <a href="{{obj.object.location_uri}}" target="blank">{% trans "here" %}</a>
+    {% trans "to access the content of your URLDoc" %}
+</noframes>
+{% endif %}
+{% endblock %}
+
+

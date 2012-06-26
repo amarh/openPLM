@@ -7,6 +7,26 @@
     {% with add_child_form as form %}
         {% include "snippets/undo_form.html" %}
     {% endwith %}
+    {% if obj.type = 'Software' %}
+    <script type="text/javascript">
+        function set_required(){
+            if($("#id_type").val()!="Software"){
+                $("#id_dependencylink_required").attr("checked","checked");
+                $("#id_dependencylink_required").parent().parent().hide();
+            }else{
+                $("#id_dependencylink_required").parent().parent().show();
+            }
+        }
+        
+        $(function(){
+            $("#id_type").change(function(){
+                set_required();
+            });
+            set_required();
+        
+        }) 
+    </script>
+    {% endif %}
 {% endblock %}
 
 
