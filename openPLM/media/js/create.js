@@ -47,6 +47,6 @@ $(
                     $("#id_reference").removeAttr("disabled");
                 }
             }
-        )
+        );
     }
 );
