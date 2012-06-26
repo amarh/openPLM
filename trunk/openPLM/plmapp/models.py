@@ -546,7 +546,7 @@ class PLMObject(models.Model):
     def __init__(self, *args, **kwargs):
         # little hack:
         # get_creation_fields is a class method but it needs to create
-        # an instance, this hacks avoids calls to default value functions
+        # an instance, this hack avoids calls to default value functions
         if "__fake__" not in kwargs:
             super(PLMObject, self).__init__(*args, **kwargs)
         self._promotion_errors = None
