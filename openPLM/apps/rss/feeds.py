@@ -1,5 +1,6 @@
+import base64
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from django.contrib.syndication.views import Feed
 from django.utils.encoding import iri_to_uri
@@ -28,9 +29,25 @@ class HTTPAuthFeed(Feed):
     
     def __call__(self, request, *args, **kwargs):
         if request.user.is_authenticated():
+            if request.user.get_profile().restricted:
+                return HttpResponseForbidden()
             # already logged in
             return super(HTTPAuthFeed, self).__call__(request, *args, **kwargs)
-        
+        # check HTTP auth credentials
+        if 'HTTP_AUTHORIZATION' in request.META:
+            auth = request.META['HTTP_AUTHORIZATION'].split()
+            if len(auth) == 2:
+                # only basic auth is supported
+                if auth[0].lower() == "basic":
+                    uname, passwd = base64.b64decode(auth[1]).split(':')
+                    user = authenticate(username=uname, password=passwd)
+                    if user is not None:
+                        if user.is_active:
+                            if user.get_profile().restricted:
+                                return HttpResponseForbidden()
+                            login(request, user)
+                            request.user = user
+                            return super(HTTPAuthFeed, self).__call__(request, *args, **kwargs)
         # failed authentication results in 401
         response = HttpResponse()
         response.status_code = 401
@@ -57,7 +74,7 @@ class RssFeed(HTTPAuthFeed):
         if hasattr(obj,'plmobject_url'):
             return obj.plmobject_url
         else:
-            return obj.get_absolute_url()
+            return iri_to_uri(u"/user/%s/" % obj.username)
         
     def description(self, obj):
         ret = _("Updates on changes on ")
@@ -90,7 +107,7 @@ class RssFeed(HTTPAuthFeed):
     def item_link(self, item):
         if hasattr(item.plmobject, 'plmobject_url'):
             return u"%shistory/#%d" % (item.plmobject.plmobject_url, item.id)
-        elif hasattr(item.plmobject, 'username'):
+        else:
             return iri_to_uri(u"/user/%s/history/#%d" % (item.plmobject.username, item.id))
 
 class AtomFeed(RssFeed):
