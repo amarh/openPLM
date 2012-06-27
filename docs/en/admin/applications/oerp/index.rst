@@ -22,7 +22,7 @@ settings.py
 ==============
 
 To enable the *oerp* application, it must be enabled in the settings file: add
-``'openPLM.oerp'`` to the list of installed applications
+``'openPLM.apps.oerp'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
 At the end of the :file:`settings.py` file, adds the following settings::

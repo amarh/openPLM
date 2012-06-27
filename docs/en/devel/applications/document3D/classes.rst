@@ -7,7 +7,7 @@ Habla sobre los modelos
 
 
 
-.. automodule::  openPLM.document3D.classes
+.. automodule::  openPLM.apps.document3D.classes
     :members:
     :show-inheritance:
     

@@ -23,7 +23,7 @@ settings.py
 
 Pour pouvoir utiliser l'application *Document3D*, il faut qu'elle est été
 activé dans le fichier settings : 
-ajouter ``'openPLM.document3D'`` à la liste des applications installées (:const:`INSTALLED_APPS`).
+ajouter ``'openPLM.apps.document3D'`` à la liste des applications installées (:const:`INSTALLED_APPS`).
 
 La ligne suivante ``"openPLM.document3d.handle_step_file": {"queue": "step"},`` doit être rajouté dans la variable :const:`CELERY_ROUTES`.
 
@@ -51,7 +51,7 @@ Votre fichier STEP devrai apparaitre si le navigateur supporte WebGL.
 En cas de dysfonctionnement, consulter le fichier log de celery (:file:`/var/log/celery/`) pour rechercher une erreur.
 Un échange normal entre les logiciels devrait faire apparaitre une ligne de ce
 genre 
-``[2012-03-12 14:46:48,089: INFO/MainProcess] Task openPLM.document3D.models.handle_step_file[9f732451-1b43-497c-8b89-f726db861941] succeeded in 27.816108942s: True``.
+``[2012-03-12 14:46:48,089: INFO/MainProcess] Task openPLM.apps.document3D.models.handle_step_file[9f732451-1b43-497c-8b89-f726db861941] succeeded in 27.816108942s: True``.
 
 Si la vue 3D fonctionne, vous pouvez essayer de décomposer le fichier STEP : 
 

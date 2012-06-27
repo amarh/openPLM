@@ -6,6 +6,6 @@
 Habla sobre los modelos
 
 
-.. automodule::  openPLM.document3D.generateDecomposition
+.. automodule::  openPLM.apps.document3D.generateDecomposition
     :members:
     :show-inheritance:

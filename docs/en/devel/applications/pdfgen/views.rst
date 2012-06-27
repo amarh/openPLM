@@ -3,7 +3,7 @@
 ==========================================
 
 
-.. automodule::  openPLM.pdfgen.views
+.. automodule::  openPLM.apps.pdfgen.views
     :members:
     :show-inheritance:
     :undoc-members:

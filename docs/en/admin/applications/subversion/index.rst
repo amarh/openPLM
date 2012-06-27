@@ -19,7 +19,7 @@ settings.py
 ==============
 
 To enable the *subversion* application, it must be enabled in the settings file: add
-``'openPLM.subversion'`` to the list of installed applications
+``'openPLM.apps.subversion'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
 Synchronize the database

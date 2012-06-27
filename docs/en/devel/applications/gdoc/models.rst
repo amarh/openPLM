@@ -3,7 +3,7 @@
 ==========================================
 
 
-.. automodule::  openPLM.gdoc.models
+.. automodule::  openPLM.apps.gdoc.models
     :members:
     :show-inheritance:
 

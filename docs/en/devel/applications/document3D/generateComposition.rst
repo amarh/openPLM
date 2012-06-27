@@ -6,6 +6,6 @@
 Habla sobre los modelos
 
 
-.. automodule::  openPLM.document3D.generateComposition
+.. automodule::  openPLM.apps.document3D.generateComposition
     :members:
     :show-inheritance:
