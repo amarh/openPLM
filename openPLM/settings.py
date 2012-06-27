@@ -115,7 +115,7 @@ INSTALLED_APPS = (
     'openPLM.rss',
     'openPLM.pdfgen', # enable pdf generations
     #XYZ: you can add your application after this line
-    'openPLM.cad',
+    'openPLM.apps.cad',
     'openPLM.computer',
     'openPLM.cae',
     'openPLM.office',
