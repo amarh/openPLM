@@ -132,6 +132,22 @@ Administrator changes
 Restricted accounts and publishers
 -----------------------------------
 
+Applications layout
+-------------------
+
+A big change has been made to the application layout. Optionnals applications
+are now located in the apps folder.
+
+Make sure that your settings.py file has been update in consequences : 
+with the exception of plmapp, openPLM applications are now noted openPLM.apps.AppliName
+
+exemple : 
+
+'openPLM.plmapp',
+'openPLM.apps.cad',
+'openPLM.apps.cae',
+'openPLM.apps.office',
+
 document3D
 -----------
 
