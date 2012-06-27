@@ -1,5 +1,5 @@
 from django import forms
-from openPLM.document3D.models import *
+from openPLM.apps.document3D.models import *
 from openPLM.plmapp.models import get_all_parts_with_level
 from openPLM.plmapp.units import UNITS
             

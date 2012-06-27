@@ -16,7 +16,7 @@ from celery.exceptions import TimeoutError
 from celery.task import task
 
 from openPLM.plmapp.controllers import get_controller
-from openPLM.document3D.classes import *
+from openPLM.apps.document3D.classes import *
 from openPLM.plmapp.controllers import DocumentController
 from openPLM.plmapp.models import *
 from openPLM.plmapp.controllers.part import PartController
@@ -130,7 +130,7 @@ def handle_step_file(doc_file_pk):
     thumbnail_path = thumbnailfs.path(name)
 
     try:
-        status=subprocess.call(["python", "document3D/generate3D.py", doc_file.file.path,
+        status=subprocess.call(["python", "apps/document3D/generate3D.py", doc_file.file.path,
             str(doc_file.id), settings.MEDIA_ROOT+"3D/", thumbnail_path],
             stdout=stdout, stderr=error_file.fileno())
         if status == 0:
@@ -567,7 +567,7 @@ def generate_extra_location_links(link,ParentChildLink):
     For a :class:`.ParentChildLink`, it generates the whole necessary :class:`Location_link`
     
     
-    :param link: :class:`.openPLM.document3D.classes.Link` which will be used to generated extra :class:`.Location_link` 
+    :param link: :class:`.openPLM.apps.document3D.classes.Link` which will be used to generated extra :class:`.Location_link` 
     :type plmobject: :class:`.Link`
     :param ParentChildLink: :class:`.ParentChildLink` for that the extra :class:`Location_link` are generated
     :type plmobject: :class:`.ParentChildLink`
@@ -688,7 +688,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         temp_file = tempfile.NamedTemporaryFile(delete=True)
         temp_file.write(json.dumps(data_for_product(product)))
         temp_file.seek(0)   
-        if subprocess.call(["python", "document3D/generateDecomposition.py",stp_file.file.path,temp_file.name]) == 0:
+        if subprocess.call(["python", "apps/document3D/generateDecomposition.py",stp_file.file.path,temp_file.name]) == 0:
 
             update_child_files_BD(product,user,old_product) 
             update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part)

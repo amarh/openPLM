@@ -1,16 +1,16 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController, is_decomposable , ArbreFile_to_Product
+from openPLM.apps.document3D.models import  Document3DController, is_decomposable , ArbreFile_to_Product
 from django.core.files import File
 
-#from openPLM.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
-from openPLM.document3D.STP_converter_WebGL import NEW_STEP_Import
+#from openPLM.apps.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
+from openPLM.apps.document3D.STP_converter_WebGL import NEW_STEP_Import
 class decomposer_Test(CommonViewTest):
 
     def setUp(self):
         super(decomposer_Test, self).setUp()
         self.document = Document3DController.create('doc1', 'Document3D',
                 'a', self.user, self.DATA)
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         myfile.name="test.stp"
         self.stp=self.document.add_file(myfile)

@@ -1,8 +1,8 @@
 from openPLM.plmapp.base_views import handle_errors, secure_required, get_generic_data
-from openPLM.document3D.forms import *
-from openPLM.document3D.models import *
-from openPLM.document3D.arborescense import *
-from openPLM.document3D.classes import *
+from openPLM.apps.document3D.forms import *
+from openPLM.apps.document3D.models import *
+from openPLM.apps.document3D.arborescense import *
+from openPLM.apps.document3D.classes import *
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.models import get_all_plmobjects
 from django.db import transaction
