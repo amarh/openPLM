@@ -112,13 +112,13 @@ INSTALLED_APPS = (
     'haystack',
     'south',
     'openPLM.plmapp',
-    'openPLM.rss',
-    'openPLM.pdfgen', # enable pdf generations
+    'openPLM.apps.rss',
+    'openPLM.apps.pdfgen', # enable pdf generations
     #XYZ: you can add your application after this line
     'openPLM.apps.cad',
-    'openPLM.computer',
-    'openPLM.cae',
-    'openPLM.office',
+    'openPLM.apps.computer',
+    'openPLM.apps.cae',
+    'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
     # also decomment the line CELERY_ROUTES!
     # 'openPLM.document3D',

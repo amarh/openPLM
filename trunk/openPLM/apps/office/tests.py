@@ -30,7 +30,7 @@ unittest). These will both pass when you run "manage.py test".
 
 from django.core.files.base import File
 
-from openPLM.office.models import OfficeDocumentController
+from openPLM.apps.office.models import OfficeDocumentController
 from openPLM.plmapp.tests.controllers.document import DocumentControllerTest
 
 

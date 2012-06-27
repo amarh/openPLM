@@ -6,7 +6,7 @@ except ImportError:
 from django.conf import settings
 
 from openPLM.plmapp.units import convert_unit, UnitConversionError
-from openPLM.oerp import models
+from openPLM.apps.oerp import models
 
 DEFAULT_PORT = 8070
 DEFAULT_HTTP_PORT = 8069

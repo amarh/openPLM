@@ -14,7 +14,7 @@ import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
 
-from openPLM.gdoc.gutils import get_gclient
+from openPLM.apps.gdoc.gutils import get_gclient
 
 
 class FlowModel(models.Model):

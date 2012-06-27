@@ -1,6 +1,6 @@
 from django import forms
 
-from openPLM.oerp.models import PartCost
+from openPLM.apps.oerp.models import PartCost
 
 class CostForm(forms.ModelForm):
 

@@ -265,7 +265,7 @@ def can_generate_pdf():
     is installed.
     """
     from django.conf import settings
-    return 'openPLM.pdfgen' in settings.INSTALLED_APPS
+    return 'openPLM.apps.pdfgen' in settings.INSTALLED_APPS
 
 def get_ext(filename):
     """

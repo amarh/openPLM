@@ -5,9 +5,9 @@ from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.forms import ConfirmPasswordForm
 from openPLM.plmapp.views.main import r2r
 
-from openPLM.oerp import erp
-from openPLM.oerp import forms
-from openPLM.oerp import models
+from openPLM.apps.oerp import erp
+from openPLM.apps.oerp import forms
+from openPLM.apps.oerp import models
 
 
 

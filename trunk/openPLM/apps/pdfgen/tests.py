@@ -6,7 +6,7 @@ from pyPdf import PdfFileReader
 from openPLM.plmapp.controllers import DocumentController, PartController
 from openPLM.plmapp.tests.views import CommonViewTest
 
-from openPLM.pdfgen.views import download_merged_pdf
+from openPLM.apps.pdfgen.views import download_merged_pdf
 
 PDF = """%PDF-1.1
 

@@ -11,10 +11,10 @@ from oauth2client.client import OAuth2WebServerFlow
 import openPLM.plmapp.views.main as pviews
 from openPLM.plmapp.base_views import handle_errors, get_generic_data, register_creation_view
 
-from openPLM.gdoc.models import CredentialsModel, FlowModel
-from openPLM.gdoc.models import GoogleDocument, GoogleDocumentController
-from openPLM.gdoc.forms import get_gdoc_creation_form
-from openPLM.gdoc.gutils import get_gclient, SCOPES, USER_AGENT
+from openPLM.apps.gdoc.models import CredentialsModel, FlowModel
+from openPLM.apps.gdoc.models import GoogleDocument, GoogleDocumentController
+from openPLM.apps.gdoc.forms import get_gdoc_creation_form
+from openPLM.apps.gdoc.gutils import get_gclient, SCOPES, USER_AGENT
 
 STEP2_URI = '%s/oauth2callback'
 

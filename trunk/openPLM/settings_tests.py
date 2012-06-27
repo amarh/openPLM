@@ -104,15 +104,15 @@ INSTALLED_APPS = (
     'djcelery',
     'haystack',
     'openPLM.plmapp',
-    'openPLM.rss',
-    'openPLM.pdfgen',
+    'openPLM.apps.rss',
+    'openPLM.apps.pdfgen',
     # you can add your application after this line
     'openPLM.apps.cad',
-    'openPLM.computer',
-    'openPLM.cae',
-    'openPLM.office',
-    'openPLM.gdoc',
-    'openPLM.subversion',
+    'openPLM.apps.computer',
+    'openPLM.apps.cae',
+    'openPLM.apps.office',
+    'openPLM.apps.gdoc',
+    'openPLM.apps.subversion',
     'openPLM.plmapp.tests',
 )
 
