@@ -27,7 +27,7 @@ This file demonstrates two different styles of tests (one doctest and one
 unittest). These will both pass when you run "manage.py test".
 """
 
-from openPLM.cad.models import DrawingController
+from openPLM.apps.cad.models import DrawingController
 
 from openPLM.plmapp.tests.controllers.document import DocumentControllerTest
 
