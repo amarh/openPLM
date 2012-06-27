@@ -24,7 +24,7 @@ settings.py
 ==============
 
 To enable the *document3D* application, it must be enabled in the settings file: add
-``'openPLM.document3D'`` to the list of installed applications
+``'openPLM.apps.document3D'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
 The following line ``"openPLM.document3d.handle_step_file": {"queue": "step"},`` must
@@ -53,7 +53,7 @@ file should appear if your browser supports WebGL.
 
 If it does not work, you should check celery's log (in :file:`/var/log/celery/`)
 to see if an error happened. A valid conversion should output a line like this one
-``[2012-03-12 14:46:48,089: INFO/MainProcess] Task openPLM.document3D.models.handle_step_file[9f732451-1b43-497c-8b89-f726db861941] succeeded in 27.816108942s: True``.
+``[2012-03-12 14:46:48,089: INFO/MainProcess] Task openPLM.apps.document3D.models.handle_step_file[9f732451-1b43-497c-8b89-f726db861941] succeeded in 27.816108942s: True``.
 
 If the 3D view is ok, you can also try to decompose the STEP file:
 

@@ -7,6 +7,6 @@ Habla sobre los modelos
 
 
 
-.. automodule::  openPLM.document3D.views
+.. automodule::  openPLM.apps.document3D.views
     :members:
     :show-inheritance:

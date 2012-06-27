@@ -7,6 +7,6 @@ Habla sobre los modelos
 
 
 
-.. automodule::  openPLM.document3D.mesh
+.. automodule::  openPLM.apps.document3D.mesh
     :members:
     :show-inheritance:

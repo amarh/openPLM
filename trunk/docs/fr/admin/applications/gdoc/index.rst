@@ -55,7 +55,7 @@ settings.py
 
 Pour utiliser l'application *gdoc*, il faut qu'elle soit activée dans le
 fichier settings : 
-ajouter ``'openPLM.gdoc'`` à la liste des applications installées (:const:`INSTALLED_APPS`).
+ajouter ``'openPLM.apps.gdoc'`` à la liste des applications installées (:const:`INSTALLED_APPS`).
 
 A la fin du fichier :file:`settings.py`, ajouter les deux variables suivantes::
     

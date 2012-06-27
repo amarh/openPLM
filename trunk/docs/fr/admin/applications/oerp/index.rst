@@ -22,7 +22,7 @@ settings.py
 ===========
 
 L'application *oerp* doit être activer dans le fichier settings pour être
-utilisée. Pour cela, rajouter ``'openPLM.oerp'``  à la liste des applications installées (:const:`INSTALLED_APPS`).
+utilisée. Pour cela, rajouter ``'openPLM.apps.oerp'``  à la liste des applications installées (:const:`INSTALLED_APPS`).
 
 A la fin du ficher :file:`settings.py`, ajouter les paramètres suivants::
     

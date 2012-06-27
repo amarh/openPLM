@@ -4,6 +4,6 @@
 
 Habla sobre los modelos
 
-.. automodule::  openPLM.document3D.STP_converter_WebGL
+.. automodule::  openPLM.apps.document3D.STP_converter_WebGL
     :members:
     :show-inheritance:

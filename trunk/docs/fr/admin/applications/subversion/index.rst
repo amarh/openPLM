@@ -19,7 +19,7 @@ settings.py
 ===========
 
 Pour utiliser l'application *subversion*, il faut qu'elle soit activée dans le
-fichier settings : ajouter ``'openPLM.subversion'`` à la liste des applications installées
+fichier settings : ajouter ``'openPLM.apps.subversion'`` à la liste des applications installées
 (:const:`INSTALLED_APPS`).
 
 Synchronisation de la base de données
