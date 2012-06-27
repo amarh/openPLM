@@ -35,7 +35,7 @@ class Product(object):
 
     .. attribute:: links
              
-        If the product is an assembly, links stores one or more :class:`.openPLM.document3D.classes.Link` references to the products that compose it   
+        If the product is an assembly, links stores one or more :class:`.openPLM.apps.document3D.classes.Link` references to the products that compose it   
 
 
     .. attribute:: label_reference

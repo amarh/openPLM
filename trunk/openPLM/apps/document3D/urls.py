@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
-import openPLM.document3D.views as views
-import openPLM.document3D.api as api3D
+import openPLM.apps.document3D.views as views
+import openPLM.apps.document3D.api as api3D
 
 
 def patterns2(view_prefix, url_prefix, *urls):

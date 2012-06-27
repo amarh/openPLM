@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
     # also decomment the line CELERY_ROUTES!
-    # 'openPLM.document3D',
+    # 'openPLM.apps.document3D',
 )
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'

@@ -117,7 +117,7 @@ INSTALLED_APPS = (
 )
 
 if os.environ.get("openPLM3D", "") == "enabled":
-    INSTALLED_APPS += ("openPLM.document3D", )
+    INSTALLED_APPS += ("openPLM.apps.document3D", )
 
 AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
 

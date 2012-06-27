@@ -1,14 +1,14 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController ,ArbreFile_to_Product
+from openPLM.apps.document3D.models import  Document3DController ,ArbreFile_to_Product
 from django.core.files import File 
-from openPLM.document3D.tests.views import decomposition_fromPOST_data
+from openPLM.apps.document3D.tests.views import decomposition_fromPOST_data
 class arborescense_Test(CommonViewTest):
 
     def setUp(self):
         super(arborescense_Test, self).setUp()
         self.document = Document3DController.create('doc1', 'Document3D',
                 'a', self.user, self.DATA)
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         self.stp=self.document.add_file(myfile)
         self.controller.attach_to_document(self.document.object)

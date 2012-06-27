@@ -1,11 +1,11 @@
 
 from django.http import HttpResponse ,HttpResponseRedirect , HttpRequest
 from django.test import TestCase
-from openPLM.document3D.views import *
-from openPLM.document3D.models import *
-from openPLM.document3D.forms import *
+from openPLM.apps.document3D.views import *
+from openPLM.apps.document3D.models import *
+from openPLM.apps.document3D.forms import *
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.document3D.models import  Document3DController , Document_Generate_Bom_Error
+from openPLM.apps.document3D.models import  Document3DController , Document_Generate_Bom_Error
 from django.core.files import File
 
  
@@ -35,7 +35,7 @@ class view_3dTest(CommonViewTest):
         return data
                                     
     def test_view3D_stp_decompose(self):
-        f=open("document3D/data_test/test2.stp")
+        f=open("apps/document3D/data_test/test2.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
         self.controller.attach_to_document(self.document.object)        
@@ -54,7 +54,7 @@ class view_3dTest(CommonViewTest):
         self.assertFalse(response.context["javascript_arborescense"])
             
     def test_3D_stp_associe_sans_arborescense(self):   
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)       
         ArbreFile.objects.get(stp=new_doc_file).delete()
@@ -63,7 +63,7 @@ class view_3dTest(CommonViewTest):
         self.assertFalse(response.context["javascript_arborescense"])
 
     def test_3D_stp_valide_no_info(self):   
-        f=open("document3D/data_test/valid_sans_information.stp")
+        f=open("apps/document3D/data_test/valid_sans_information.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)       
         response = self.get(self.document.object.plmobject_url+"3D/")    
@@ -71,7 +71,7 @@ class view_3dTest(CommonViewTest):
         self.assertTrue(response.context["javascript_arborescense"])
                 
     def test_3D_stp_associe_sans_geometry_with_arborescense(self):   
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)       
         GeometryFile.objects.filter(stp=new_doc_file).delete()
@@ -80,7 +80,7 @@ class view_3dTest(CommonViewTest):
         self.assertTrue(response.context["javascript_arborescense"])
            
     def test_decompose_bom_child(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
         self.controller.attach_to_document(self.document.object)
@@ -93,7 +93,7 @@ class view_3dTest(CommonViewTest):
     def test_decompose_bom_child_whit_child_decomposable(self):
         child2 = PartController.create("c2", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child2, 10, 20)
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
         child2.attach_to_document(self.document.object)
@@ -108,7 +108,7 @@ class view_3dTest(CommonViewTest):
     
         
     def test_try_decompose_bom_child_whit_no_links(self):
-        f=open("document3D/data_test/valid_sans_information.stp")
+        f=open("apps/document3D/data_test/valid_sans_information.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile) 
         self.controller.attach_to_document(self.document.object)
@@ -118,7 +118,7 @@ class view_3dTest(CommonViewTest):
                   
     #verificar los links creados en las buenas coordenadas      
     def test_display_decompose_form_initial(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)  
@@ -127,7 +127,7 @@ class view_3dTest(CommonViewTest):
  
                   
     def test_display_decompose_time_modification_diferent(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
@@ -143,7 +143,7 @@ class view_3dTest(CommonViewTest):
     
                
     def test_display_decompose_time_modification_invalid(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
@@ -157,7 +157,7 @@ class view_3dTest(CommonViewTest):
        
                  
     def test_display_decompose_file_locked(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)
         self.document.lock(new_doc_file)     
@@ -168,7 +168,7 @@ class view_3dTest(CommonViewTest):
 
          
     def test_display_decompose_Document_part_doc_links_Error(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
@@ -187,7 +187,7 @@ class view_3dTest(CommonViewTest):
     
     
     def test_display_decompose_Document3D_decomposer_Error(self):
-        f=open("document3D/data_test/test.stp")
+        f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)     
         self.controller.attach_to_document(self.document.object)                                                          
