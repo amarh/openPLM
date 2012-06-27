@@ -1,9 +1,8 @@
-#import base64
 
 from django.http import HttpResponse
-
 from django.contrib.auth import authenticate, login
 from django.contrib.syndication.views import Feed
+from django.utils.encoding import iri_to_uri
 from django.utils.feedgenerator import Atom1Feed
 
 from django.utils.translation import ugettext_lazy as _
@@ -39,7 +38,7 @@ class HTTPAuthFeed(Feed):
         return response
         
         
-#Un flux par objet
+# one feed per object
 class RssFeed(HTTPAuthFeed):
     
     def get_object(self, request, obj_type, obj_ref, obj_revi):
@@ -90,9 +89,9 @@ class RssFeed(HTTPAuthFeed):
     
     def item_link(self, item):
         if hasattr(item.plmobject, 'plmobject_url'):
-            return item.plmobject.plmobject_url+"history/#"+str(item.id)
-        else:
-            return item.plmobject.get_absolute_url()+"history/#"+str(item.id)
+            return u"%shistory/#%d" % (item.plmobject.plmobject_url, item.id)
+        elif hasattr(item.plmobject, 'username'):
+            return iri_to_uri(u"/user/%s/history/#%d" % (item.plmobject.username, item.id))
 
 class AtomFeed(RssFeed):
     feed_type = Atom1Feed
