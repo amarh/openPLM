@@ -47,7 +47,7 @@ from openPLM.plmapp.base_views import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.views import r2r, get_children_data
 from openPLM.plmapp.forms import DisplayChildrenForm
-from openPLM.pdfgen.forms import get_pdf_formset
+from openPLM.apps.pdfgen.forms import get_pdf_formset
 
 class StreamedPdfFileWriter(PdfFileWriter):
     """

@@ -3,9 +3,9 @@
 from django import forms
 from openPLM.plmapp.forms import get_creation_form
 
-from openPLM.gdoc.models import GoogleDocument
+from openPLM.apps.gdoc.models import GoogleDocument
 
-from openPLM.gdoc.gutils import get_gdocs
+from openPLM.apps.gdoc.gutils import get_gdocs
 
 def clean_gdoc(self):
     cleaned_data = self.cleaned_data

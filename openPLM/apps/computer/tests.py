@@ -29,7 +29,7 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 """
 
-from openPLM.computer.models import SinglePartController
+from openPLM.apps.computer.models import SinglePartController
 from openPLM.plmapp.tests.views import ViewTest
 from openPLM.plmapp.tests.controllers.part import PartControllerTest
 

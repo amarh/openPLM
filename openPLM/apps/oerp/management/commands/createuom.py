@@ -6,14 +6,14 @@ import os.path
 
 from django.core.management.base import BaseCommand
 
-UNIT_TO_UOM_FILE = os.path.join("oerp", "_unit_to_uom.py")
+UNIT_TO_UOM_FILE = os.path.join("apps", "oerp", "_unit_to_uom.py")
 class Command(BaseCommand):
 
     help = 'Used to create all required units in OpenERP'
 
     def handle(self, *args, **options):
 
-        from openPLM.oerp.erp import get_oerp
+        from openPLM.apps.oerp.erp import get_oerp
         from openPLM.plmapp.units import UNITS
 
         uom_srv = get_oerp().get("product.uom")

@@ -5,7 +5,7 @@ import pysvn
 import openPLM.plmapp.views.main as pviews
 from openPLM.plmapp.base_views import handle_errors, get_generic_data
 
-from openPLM.subversion.models import parse_revision
+from openPLM.apps.subversion.models import parse_revision
 
 
 @handle_errors

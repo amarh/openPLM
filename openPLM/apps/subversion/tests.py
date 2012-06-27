@@ -18,7 +18,7 @@ from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.controllers.plmobject import ControllerTest
 from openPLM.plmapp.tests.views import ViewTest
-from openPLM.subversion.models import SubversionRepositoryController
+from openPLM.apps.subversion.models import SubversionRepositoryController
 
 OPENPLM_SVN_REPOSITORY = "http://openplm.org/svn/openPLM/trunk/"
 
