@@ -97,6 +97,8 @@ class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
     def test_cancel_error(self):
         self.assertRaises(exc.PermissionError, self.rctrl.safe_cancel)
 
+    def test_clone_error(self):
+        self.assertRaises(exc.PermissionError, self.rctrl.check_clone)
 
 class RestrictedGroupControllerTestCase(RestrictedTestCase):
 

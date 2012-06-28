@@ -32,7 +32,7 @@ from django.contrib.auth.models import User
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.exceptions as exc
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController
+from openPLM.plmapp.controllers import PLMObjectController, get_controller
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -678,3 +678,64 @@ class ControllerTest(BaseTestCase):
         controller = self.get_created_ctrl()
         ctrl = controller.revise("b")
         self.assertCancelError(ctrl)
+    
+    # clone test
+    def getDataCloning(self,ctrl, ref=None, rev=None):
+        if ref is None:
+            ref = "cloned_01"
+        if rev is None:
+            rev = "a"
+        data={}
+        for attr in ctrl.get_creation_fields():
+            data[attr]=getattr(ctrl,attr)
+        data.update({
+            "reference" : ref,
+            "revision" : rev,
+        })
+        return data
+    
+    def assertCloneError(self, ctrl):
+        self.assertRaises(exc.PermissionError, ctrl.check_clone)
+        self.assertRaises(exc.PermissionError, ctrl.check_clone)
+        self.assertRaises(exc.PermissionError, ctrl.check_clone)
+        self.assertFalse(ctrl.can_clone())
+        res = not ctrl.check_readable(raise_=False)
+        res = res or not ctrl._user.get_profile().is_contributor
+        res = res or not ctrl.is_cloneable
+        self.assertTrue(res)
+        
+    def assertClone(self, ctrl, data):
+        self.assertTrue(ctrl.can_clone())
+        ctrl_cls = get_controller(ctrl.object.type)
+        new_ctrl = ctrl.create(data["reference"], ctrl.object.type , data["revision"], ctrl._user,
+                    data, block_mails=False, no_index=False)
+        res = False
+        for attr in ctrl.get_creation_fields():
+            self.assertTrue(attr in new_ctrl.get_creation_fields())
+            res = res or getattr(ctrl, attr) == getattr(new_ctrl, attr)
+        self.assertTrue(res)
+        return new_ctrl
+        
+
+    #def test_clone_non_cloneable(self):
+    #    """Tests if an object has not the is_cloneable property
+    #    set to True, it can *not* be cloned"""
+    #    ctrl = self.get_created_ctrl()
+    #    ctrl.is_cloneable = False
+    #    self.assertCloneError(ctrl)
+        
+    def test_clone_non_readable(self):
+        """Tests that a user can *not* clone an object
+        that he should not be able to read"""
+        ctrl = self.get_created_ctrl()
+        ctrl._user.get_profile().restricted=True
+        self.assertFalse(ctrl.check_readable(raise_=False))
+        self.assertCloneError(ctrl)
+        
+    def test_clone_by_non_contributor(self):
+        """ Tests that a non contributor can not clone
+        an object."""
+        ctrl= self.get_created_ctrl()
+        ctrl._user.get_profile().is_contributor = False
+        self.assertRaises(exc.PermissionError, ctrl.check_contributor)
+        self.assertCloneError(ctrl)
