@@ -911,8 +911,8 @@ class PartControllerTest(ControllerTest):
         new_children = [c.link for c in new_ctrl.get_children(1)]
         less_or_equal = len(new_children) <= len(children)
         self.assertTrue(less_or_equal)
-        #for child in new_children:
-        #    child_cloned = child_cloned and child in children
+        for link in new_children:
+            child_cloned = child_cloned and ctrl.parentchildlink_parent.filter(child= link.child).exists()
         self.assertTrue(child_cloned)
         
         
