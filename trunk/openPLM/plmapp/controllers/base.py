@@ -272,7 +272,7 @@ class Controller(object):
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
         if profile.restricted:
-            # should not be possible, but an admin mat have done a mistake 
+            # should not be possible, but an admin may have done a mistake 
             raise PermissionError("%s is not a contributor" % user)
 
     def check_editable(self):
