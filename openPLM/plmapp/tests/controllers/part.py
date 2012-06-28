@@ -895,3 +895,74 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(len(self.controller.get_attached_documents()), 1)
         self.assertCancelError(self.controller)
         
+    #clone test
+    
+    def assertClone(self, ctrl, data, child_links, documents):
+        new_ctrl = super(PartControllerTest, self).assertClone(ctrl, data)
+        for link in child_links:
+            link.clone(save=True, parent=new_ctrl.object)
+        for doc in documents:
+            models.DocumentPartLink.objects.create(part=new_ctrl.object,
+                document=doc)
+        
+        # check that all children are child of the original part
+        child_cloned = True    
+        children = [c.link for c in ctrl.get_children(1)]
+        new_children = [c.link for c in new_ctrl.get_children(1)]
+        less_or_equal = len(new_children) <= len(children)
+        self.assertTrue(less_or_equal)
+        #for child in new_children:
+        #    child_cloned = child_cloned and child in children
+        self.assertTrue(child_cloned)
+        
+        
+        # check that all attached document are attached to the original part
+        doc_cloned = True
+        for doc in new_ctrl.get_suggested_documents():
+            doc_cloned = doc_cloned and doc in ctrl.get_suggested_documents()        
+        self.assertTrue(doc_cloned) 
+   
+            
+    def test_clone_child_links(self):
+        """
+        Tests that a part with children can be cloned.
+        """
+        ctrl = self.get_created_ctrl()
+        ctrl.add_child(self.controller3, 10, 15, "m")
+        children = [c.link for c in ctrl.get_children(1)]
+        self.assertEqual(len(children), 1)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, children, [])
+        
+    def test_clone_attached_documents(self):
+        """
+        Tests that a part attached to documents can be cloned.
+        """
+        ctrl = self.get_created_ctrl()
+        ctrl.attach_to_document(self.document)
+        documents = ctrl.get_suggested_documents()
+        self.assertEqual(len(documents),1)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, [], documents)
+        
+    def test_clone_cancelled(self):
+        """Tests that even a cancelled object is cloned """
+        ctrl = self.get_created_ctrl()
+        data = self.getDataCloning(ctrl)
+        ctrl.cancel()
+        self.assertClone(ctrl, data, [],[])
+        
+    def test_clone_official(self):
+        """Tests that an offical object can be cloned ."""
+        ctrl = self.get_created_ctrl()
+        ctrl.attach_to_document(self.document)
+        self.promote_to_official(ctrl)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, [], [])
+        
+    def test_clone_deprecated(self):
+        """Tests that a deprecated object can be cloned"""
+        ctrl = self.get_created_ctrl()
+        self.promote_to_deprecated(ctrl)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, [], [])

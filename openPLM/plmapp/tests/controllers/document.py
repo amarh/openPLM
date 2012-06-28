@@ -352,3 +352,71 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(1, self.controller.get_attached_parts().count())
         self.assertCancelError(self.controller)
         
+    #clone test
+    
+    def assertClone(self, ctrl, data, parts):
+        new_ctrl = super(DocumentControllerTest, self).assertClone(ctrl, data)
+        
+        import shutil
+        for doc_file in ctrl.files.all():
+            filename = doc_file.filename
+            path = models.docfs.get_available_name(filename)
+            shutil.copy(doc_file.file.path, models.docfs.path(path))
+            new_doc = models.DocumentFile.objects.create(file=path,
+                filename=filename, size=doc_file.size, document=new_ctrl.object)
+            new_doc.thumbnail = doc_file.thumbnail
+            if doc_file.thumbnail:
+                ext = os.path.splitext(doc_file.thumbnail.path)[1]
+                thumb = "%d%s" %(new_doc.id, ext)
+                dirname = os.path.dirname(doc_file.thumbnail.path)
+                thumb_path = os.path.join(dirname, thumb)
+                shutil.copy(doc_file.thumbnail.path, thumb_path)
+                new_doc.thumbnail = os.path.basename(thumb_path)
+            new_doc.locked = False
+            new_doc.locker = None
+            new_doc.save()
+            
+        for part in parts:
+            models.DocumentPartLink.objects.create(part=part,
+                document=new_ctrl.object)
+        
+        # check that all files from the original are cloned
+        same_qtity = len(ctrl.files.all()) == len(new_ctrl.files.all())
+        files_cloned = True
+        files_cloned = files_cloned and same_qtity
+        for f in ctrl.files.all():
+            new_f = models.DocumentFile.objects.filter(filename=f.filename,
+                size=f.size, document = new_ctrl.object)[0]
+            files_cloned = files_cloned and bool(new_f)
+            files_cloned = files_cloned and new_f.locker == None and not new_f.locked
+            files_cloned = files_cloned and new_f.file.read() == f.file.read()
+            files_cloned = files_cloned and new_f.file.path != f.file.path
+        self.assertTrue(files_cloned)
+            
+        # check that all attached parts are attached to the original document
+        part_cloned = True
+        for part in new_ctrl.get_suggested_parts():
+            part_cloned = part_cloned and part in ctrl.get_suggested_parts()        
+        self.assertTrue(part_cloned) 
+        
+    def test_clone_files(self):
+        """
+        Tests that a document with files can be cloned, and that
+        all its files are cloned too.
+        """
+        ctrl = self.controller
+        ctrl.add_file(self.get_file())
+        self.assertEqual(len(ctrl.files.all()), 1)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, [])
+        
+    def test_clone_attached_parts(self):
+        """
+        Tests that a document attached to a part can be cloned.
+        """
+        ctrl = self.controller
+        ctrl.attach_to_part(self.get_part())
+        parts = ctrl.get_suggested_parts()
+        self.assertEqual(len(parts),1)
+        data = self.getDataCloning(ctrl)
+        self.assertClone(ctrl, data, parts)
