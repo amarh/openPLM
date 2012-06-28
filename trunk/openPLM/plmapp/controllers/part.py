@@ -756,3 +756,14 @@ class PartController(PLMObjectController):
                 raise PermissionError("This part has a document related to it.")
         return res
 
+    def clone(self,form, user, child_links, documents, block_mails=False, no_index=False):
+        new_ctrl = super(PartController, self).clone(form, user, block_mails, no_index)
+        if child_links :
+            for link in child_links:
+                link.clone(save=True, parent=new_ctrl.object)
+        if documents :
+            for doc in documents:
+                models.DocumentPartLink.objects.create(part=new_ctrl.object,
+                    document=doc)
+        return new_ctrl
+   

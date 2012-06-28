@@ -501,3 +501,31 @@ class DocumentController(PLMObjectController):
             if (not res) and raise_ :
                 raise PermissionError("This document is related to a part.")
         return res
+        
+    def clone(self,form, user, parts, block_mails=False, no_index=False):
+        new_ctrl = super(DocumentController, self).clone(form, user, block_mails, no_index)
+        
+        for doc_file in self.object.files.all():
+            filename = doc_file.filename
+            path = models.docfs.get_available_name(filename)
+            shutil.copy(doc_file.file.path, models.docfs.path(path))
+            new_doc = models.DocumentFile.objects.create(file=path,
+                filename=filename, size=doc_file.size, document=new_ctrl.object)
+            new_doc.thumbnail = doc_file.thumbnail
+            if doc_file.thumbnail:
+                ext = os.path.splitext(doc_file.thumbnail.path)[1]
+                thumb = "%d%s" %(new_doc.id, ext)
+                dirname = os.path.dirname(doc_file.thumbnail.path)
+                thumb_path = os.path.join(dirname, thumb)
+                shutil.copy(doc_file.thumbnail.path, thumb_path)
+                new_doc.thumbnail = os.path.basename(thumb_path)
+            new_doc.locked = False
+            new_doc.locker = None
+            new_doc.save()
+            
+        if parts :
+            # attach the given parts
+            for part in parts:
+                models.DocumentPartLink.objects.create(part=part,
+                    document=new_ctrl.object)
+        return new_ctrl

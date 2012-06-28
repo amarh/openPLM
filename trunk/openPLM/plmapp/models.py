@@ -158,7 +158,7 @@ class UserProfile(models.Model):
             return ["attributes", "parts-doc-cad"]
         return ["attributes", "history", "parts-doc-cad", "delegation",
                 "groups"]
-
+    
     @classmethod
     def excluded_creation_fields(cls):
         "Returns fields which should not be available in a creation form"
@@ -585,6 +585,15 @@ class PLMObject(models.Model):
     promotion_errors = property(_get_promotion_errors)
 
     @property
+    def is_cloneable(self):
+        """
+        Return true by default. This property may be overriden
+        by custom Part or Document
+        """
+        return True
+        
+        
+    @property
     def is_editable(self):
         """
         True if the object is not in a non editable state
@@ -693,6 +702,7 @@ class PLMObject(models.Model):
     def plmobject_url(self):
         url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
         return iri_to_uri(url)
+        
 
     @classmethod
     def get_creation_fields(cls):
@@ -733,12 +743,13 @@ class PLMObject(models.Model):
             if field not in cls.excluded_modification_fields():
                 fields.append(field)
         return fields
-
+        
     def get_attributes_and_values(self):
         return [(attr, getattr(self, attr)) for attr in self.attributes]
 
     def get_leaf_object(self):
         return get_all_plmobjects()[self.type].objects.get(id=self.id)
+
 
 
 
