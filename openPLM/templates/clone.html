@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "attributes" menu -->
+{% block css %}
+    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
+
+    <script type="text/javascript" src="/media/js/create.js"></script>
+{% endblock %}
+
+{% block content %}
+    {% if obj.is_cloneable %}
+        <div>
+        <h3>{% trans "OBJECT CLONING:" %}</h3>
+            <form id="creation_form" method="post" action="." >	
+                <table class="Content">
+                    <col width="20%" />
+                    <col width="80%" />
+                    <tbody>
+                        {{ creation_form }}
+                    </tbody>
+                </table>
+                {% if is_linked %}
+                <div style="padding:0.5em">
+                <h3>{% trans "Links" %}</h3>
+                {% if obj.is_part %}
+                    {% include 'parts/clone.html' %}
+                {% else %}
+                    {% include 'documents/clone.html' %}
+                {% endif %}
+                </div>
+                {% else %}
+                <div style="padding:0.5em; text-align:center;">{% trans "This object is not related to an other object" %}</div>
+                {% endif %}
+                <div style="width:100%; text-align:center; padding:0.5em;">
+                    <input type="submit" class="{{"Button"|button}}" value="{% trans "CLONE" %}" />
+                </div>
+            </form>
+        </div>
+        
+    {% else %}
+        <p>{% trans "You can not create an object since you are not a contributor."%}</p>
+    {% endif %}
+{% endblock %}
+
+

@@ -1,0 +1,48 @@
+{% load i18n plmapp_tags %}
+
+{{ doc_formset.management_form }}
+        {% if doc_formset.total_form_count > 0 %}
+            <p>
+            <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+            {% trans "Here is the list of documents you may want to attach to the new part. Select documents you want to attach." %}</p>
+            <div class="documents">
+
+                <table class="Content" style="width:95%;">
+                    {% for form in doc_formset.forms %}
+                        {{ form.document }}
+                        <tr class="Content">
+                            {% with form.initial.document as document %}
+                                <td class="Content" style="width:50px; text-align:center">{{ form.selected }}</td>
+                                <td class="Content">{{ document.type }}</td>
+                                <td class="Content">{{ document.reference }} </td>
+                                <td class="Content">{{ document.revision }}</td>
+                                <td class="Content">{{ document.name }}</td>
+                            {% endwith %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+
+        {{ children_formset.management_form }}
+        {% if children_formset.total_form_count > 0 %}
+            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{% trans "Here is the list of parts you may want to add to the new part. Select parts you want to add." %}</p>
+            <div class="children">
+
+                <table class="Content" style="width:95%;">
+                    {% for form in children_formset.forms %}
+                        {{ form.link }}
+                        <tr class="Content">
+                            {% with form.initial.link.child as child %}
+                                <td class="Content" style="width:50px; text-align:center">{{ form.selected }}</td>
+                                <td class="Content">{{ child.type }}</td>
+                                <td class="Content">{{ child.reference }} </td>
+                                <td class="Content">{{ child.revision }}</td>
+                                <td class="Content">{{ child.name }}</td>
+                            {% endwith %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+

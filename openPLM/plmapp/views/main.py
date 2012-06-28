@@ -225,6 +225,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     for attr in attrs:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
+    ctx["is_contributor"]= obj._user.get_profile().is_contributor
     ctx.update({'current_page' : 'attributes',
                 'object_attributes': object_attributes_list})
     return r2r('attributes.html', ctx, request)
@@ -244,8 +245,6 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 
     if obj_type in ('User', 'Group'):
         url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
-    elif obj_type == "URLDoc" :
-        url = u"/object/%s/%s/%s/content/" %(obj_type, obj_ref, obj_revi)
     else:
         model_cls = models.get_all_plmobjects()[obj_type]
         page = "files" if issubclass(model_cls, models.Document) else "attributes"
@@ -1400,6 +1399,127 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     ctx['modification_form'] = modification_form
     return r2r('edit.html', ctx, request)
 
+
+@handle_errors
+def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
+    """
+    Manage html page for the cloning of the selected object.
+    
+    """
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    
+    cls = models.get_all_users_and_plmobjects()[obj_type]
+    is_linked = True
+    if not ctx["is_readable"] :
+        raise PermissionError("You can clone only the objects you can see")
+    if not request.user.get_profile().is_contributor :
+        raise PermissionError("You can not clone this object because you are not a contributor.")
+    if issubclass(cls, models.Part):
+        children = [c.link for c in obj.get_children(1)]
+        documents = obj.get_suggested_documents()
+        is_linked = ctx['is_linked'] = bool(children or documents)
+    else :
+        parts = obj.get_suggested_parts()
+        is_linked = ctx['is_linked'] = bool(parts)
+    
+    if request.method == 'GET':
+        # generate and fill the creation form
+        not_auto_cloned_fields =['reference','revision','group','lifecycle','auto']
+        creation_form = forms.get_creation_form(request.user, cls)
+        if bool(request.user.groups.filter(id=obj.group.id)):
+            creation_form.fields["group"].initial = obj.group.id
+        if not obj.is_cancelled:
+            creation_form.initial["lifecycle"] = obj.lifecycle
+        for f in creation_form.fields:
+            if f not in not_auto_cloned_fields:
+                creation_form.fields[f].initial = getattr(obj, f)
+        ctx['creation_form'] = creation_form
+                
+        # generate the links form
+        if issubclass(cls, models.Part) and is_linked :
+            initial = [dict(link=link) for link in children]
+            ctx["children_formset"] = forms.SelectChildFormset(prefix="children",
+                initial=initial)
+            initial = [dict(document=d) for d in documents]
+            ctx["doc_formset"] = forms.SelectDocumentFormset(prefix="documents",
+                initial=initial)
+        elif issubclass(cls, models.Document) and is_linked :
+            ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
+                
+    elif request.method == 'POST':
+        if creation_form is None:
+            creation_form = forms.get_creation_form(request.user, cls, request.POST)
+        if creation_form.is_valid():
+            valid_forms = False
+            if issubclass(cls, models.Part) and is_linked:
+                valid_forms, selected_children, selected_documents = clone_part(creation_form, request.user, request.POST, children, documents)
+                if valid_forms :
+                    new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
+                    return HttpResponseRedirect(new_ctrl.plmobject_url)
+            elif issubclass(cls, models.Document) and is_linked :
+                valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
+                if valid_forms:
+                    new_ctrl = obj.clone(creation_form, request.user, selected_parts)
+                    return HttpResponseRedirect(new_ctrl.plmobject_url) 
+    return r2r('clone.html', ctx, request)
+
+def clone_part(form, user, data, children, documents ):
+    valid_forms = True
+    selected_children = []
+    selected_documents = []
+    if children :
+        # children
+        children_formset = forms.SelectChildFormset(data,
+            prefix="children")
+        if children_formset.is_valid():
+            for form in children_formset.forms:
+                link = form.cleaned_data["link"]
+                if link not in children: 
+                    valid_forms = False
+                    break
+                if form.cleaned_data["selected"]:
+                    selected_children.append(link)
+        else:
+            valid_forms = False
+    if valid_forms and documents :
+        # documents
+        doc_formset = forms.SelectDocumentFormset(data,
+            prefix="documents")
+        if doc_formset.is_valid():
+            for form in doc_formset.forms:
+                doc = form.cleaned_data["document"]
+                if doc not in documents: 
+                    valid_forms = False
+                    break
+                if form.cleaned_data["selected"]:
+                    selected_documents.append(doc)
+        else:
+            valid_forms = False
+    return valid_forms, selected_children, selected_documents
+                        
+def clone_document(p_form, user, data, parts):
+    valid_forms= True
+    selected_parts = []
+    
+    if parts :
+    # parts
+        part_formset = forms.SelectPartFormset(data)
+        if part_formset.is_valid():
+            for form in part_formset.forms:
+                part = form.instance
+                if part not in parts: 
+                    # invalid data
+                    # an user should not be able to go here if he 
+                    # does not write by hand its post request
+                    # so we do not need to generate an error message
+                    valid_forms = False
+                    break
+                if form.cleaned_data["selected"]:
+                    selected_parts.append(part)
+        else:
+            valid_forms = False
+    return valid_forms, selected_parts
+    
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
 #############################################################################################

@@ -35,6 +35,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
     PromotionError
 from openPLM.plmapp.utils import level_to_sign_str
+from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.controllers.base import Controller
 
 rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
@@ -782,16 +783,58 @@ class PLMObjectController(Controller):
         self.check_cancel()
         self.cancel()
         
+    def check_clone(self, raise_=True):
+        """
+        .. versionadded:: 1.1
+
+        Checks that an object can be cloned.
+        
+        If *raise_* is True:
+
+            :raise: :exc:`.PermissionError` if the object can not be read
+            :raise: :exc:`.PermissionError` if the object is not cloneable
+            
+        If *raise_* is False:
+
+            Returns True if all previous tests has been succesfully passed,
+            False otherwise.
+        """
+        res = self.check_readable(raise_=False)
+        if (not res) and raise_:
+            raise PermissionError("You can not clone this object : you shouldn't see it.")
+        res = res and self._user.get_profile().is_contributor
+        if (not res) and raise_:
+            raise PermissionError("You can not clone this object since you are not a contributor.")
+        res = res and self.is_cloneable
+        if (not res) and raise_:
+            raise PermissionError("This object can not be cloned")
+        return res
+        
     def can_clone(self):
         """
         .. versionadded:: 1.1
         
         Returns True if the user can clone this object
         """
-        return True
+        return self.check_clone(raise_=False)
         
-    def clone(self):
+    def clone(self,form, user, block_mails=False, no_index=False):
         """ 
-        Returns the form to clone this object
+        Clones an object
         """
-        pass
+        self.check_clone()
+        type_= self.object.type
+        ctrl_cls = get_controller(type_)
+        if form.is_valid():
+            creation_fields = self.get_creation_fields()
+            data = {}
+            for field in form.cleaned_data :
+                if field in creation_fields:
+                    data[field]=form.cleaned_data[field]
+            ref = form.cleaned_data["reference"]
+            rev = form.cleaned_data["revision"]
+            new_ctrl = ctrl_cls.create(ref, type_ , rev, user, data,
+                    block_mails, no_index)
+            return new_ctrl
+        else:
+            raise ValueError("form is invalid")
