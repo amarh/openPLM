@@ -134,6 +134,7 @@ urlpatterns += patterns2('', object_url,
     (r'navigate/$', navigate),
     (r'(?:files/|doc-cad/)?archive/$', download_archive),
     (r'public/$', public),
+    (r'clone/$', clone),
 )
 
 
