@@ -1400,7 +1400,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     return r2r('edit.html', ctx, request)
 
 
-@handle_errors
+@handle_errors(undo="../attributes")
 def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
     Manage html page for the cloning of the selected object.
@@ -1408,12 +1408,9 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
+    obj.check_clone()
     cls = models.get_all_users_and_plmobjects()[obj_type]
     is_linked = True
-    if not ctx["is_readable"] :
-        raise PermissionError("You can clone only the objects you can see")
-    if not request.user.get_profile().is_contributor :
-        raise PermissionError("You can not clone this object because you are not a contributor.")
     if issubclass(cls, models.Part):
         children = [c.link for c in obj.get_children(1)]
         documents = obj.get_suggested_documents()
