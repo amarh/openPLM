@@ -32,6 +32,7 @@ from django.forms import widgets
 from django.utils.simplejson import JSONEncoder
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponse, HttpResponseForbidden
+from django.template.loader import render_to_string
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController
@@ -149,6 +150,7 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
             "divs" : context["map_areas"],
             "form" : context["filter_object_form"].as_ul(),
             "edges" : context["edges"],
+            "add_buttons" : render_to_string("navigate/add_buttons.html", context)
             }
     return data
 

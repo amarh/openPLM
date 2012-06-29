@@ -77,6 +77,12 @@ div.main_node p {
     overflow: hidden;
 }
 
+#add-buttons {
+    left: 150px;
+    top: 5px;
+    position: absolute;
+}
+
 div#navThumbnails {
     width: 180px;
     display:none;

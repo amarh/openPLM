@@ -139,10 +139,12 @@ function update_nav(focus_node_id, data){
     $("div.node").remove();
     $("div.edge").remove();
     $("#navholder").children().remove();
+    $("#add-buttons").children().remove();
     divNav.append(data.divs);
     var submit = $("#FilterNav").find("li").last().clone();
     $("#FilterNavUl").html(data.form);
     $("#FilterNavUl").append(submit);
+    $("#add-buttons").html(data.add_buttons);
     make_combobox();
     
     var new_offset = $(focus_node_id).offset();
@@ -216,12 +218,20 @@ function can_attach(plmobject, form_child, cache){
     return can;
 }
 
-function show_add_child(part, form_child){
+function reload_page(){
+    if (getQueryVariable("add") === "t"){
+        location.href = location.href.replace("add=t&", "");
+    } else {
+        location.reload();
+    }
+}
+
+function show_add_child(part, form_child_data){
 	var id = part.attr("id").split("_");
     var type = id.slice(-2, -1);
     var id = id.slice(-1);
     $.get("/ajax/add_child/" + id + "/",
-        form_child.serialize(),
+        form_child_data,
         function (data){
             $("#navAddForm").dialog("option", "buttons", {
                 Ok: function() {
@@ -230,7 +240,7 @@ function show_add_child(part, form_child){
                         function (result){
                             if (result.result == "ok"){
                                 $("#navAddForm").dialog("close");
-                                location.reload();
+                                reload_page();
                             }
                             else if (result.error == "invalid form") {
                                 $("#navAddForm>form>table").html(result.form);
@@ -244,6 +254,7 @@ function show_add_child(part, form_child){
                 
             });
             $("#navAddForm>form>table").html(data.form);
+            $("#navAddForm").dialog("option", "width", 500);
             $("#navAddForm").dialog("open");
         }
     );
@@ -264,7 +275,7 @@ function show_attach(plmobject, form_child){
                         function (result){
                             if (result.result == "ok"){
                                 $("#dialog-confirm").dialog("close");
-                                location.reload();
+                                reload_page();
                             }
                         });
                 },
@@ -274,6 +285,7 @@ function show_attach(plmobject, form_child){
                 
             });
             $("#dialog-confirm>form>table").html(data.form);
+            $("#dialog-confirm").dialog("option", "width", 500);
             $("#dialog-confirm").dialog("open");
         }
     );
@@ -339,7 +351,7 @@ function init(){
             }).click(
             function () {
                 var form = $(this).closest("li.Result").children("form");
-                show_add_child($("div.main_node"), form);
+                show_add_child($("div.main_node"), form.serialize());
             }
         );
         
@@ -420,6 +432,17 @@ function center(){
     });
 
 };
+
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) {
+            return unescape(pair[1]);
+        }
+    }
+}
 
 $(document).ready(function(){
 
@@ -517,4 +540,8 @@ cursor: 'crosshair'
 
         init();
         center();
+        if (getQueryVariable("add") === "t") {
+            var q = window.location.search.substring(1).replace("add=t&", "");
+            show_add_child($("div.main_node"), q);
+        }
 });
