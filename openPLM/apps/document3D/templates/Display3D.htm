@@ -142,7 +142,7 @@
             text-align: center;
             margin-left: auto;
             margin-right: auto;
-            width: 25em;
+            width: 100%;
             display: block;
             background:none;
             border: none;
@@ -168,6 +168,7 @@
         <span id="toolbar" class="ui-widget-header ui-corner-all">
             <button id="random-color" class="Button small">{% trans "Random colors" %}</button>
             <button id="initial-color" class="Button small">{% trans "Initial colors" %}</button>
+            <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small">{% trans "Toggle transparency" %}</label></input>
         </span>
 
         <div id="webgl_warning" class="main" style="display:none;">
@@ -181,7 +182,6 @@
 
                         <li><a target="_top" href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Safari Nightly (OS X 10.6+ only)</a></li>
                     </ul>
-                    <p>Or, you can <a href="javascript: show_thingiview();">try Thingiview at your own risk</a>. It may lock up your computer!</p>
                 </div>
             </div>
         </div>
@@ -331,7 +331,7 @@
             scene = new THREE.Scene();
             // init the lights
 
-            var ambient = new THREE.AmbientLight( 0xffffff );
+            var ambient = new THREE.AmbientLight( 0xffffff, 1 );
             scene.add( ambient );
 
             var light   = new THREE.DirectionalLight( 0xffffff );
@@ -339,9 +339,9 @@
             spot1 = light;
             scene.add( light );
 
-            var light   = new THREE.SpotLight( 0xffffff, 2 );
+            var light   = new THREE.SpotLight( 0xffffff, 1 );
             spot2   = light;
-            light.target.position.set( 0, 8, 0 );
+            light.target.position.set( 0, 10, 0 ).normalize();
             light.shadowCameraNear = 0.01;     
             light.castShadow = true;
             light.shadowDarkness = 0.1;
@@ -362,6 +362,7 @@
                 });
                 obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
+                obj.material.original_opacity = obj.material.opacity; 
             }
             object3D.castShadow = true;
             object3D.receiveShadow = true;
@@ -436,6 +437,7 @@
             
             $("#random-color").button().click(random_color);
             $("#initial-color").button().click(reinit_color);
+            $("#transparency").button().click(toggle_transparency);
 
         }
     }			
@@ -541,6 +543,20 @@
             var obj = object3D.children[i];
             obj.material.color.setHex(obj.material.original_step_color);
             obj.material.original_color = obj.material.original_step_color;
+        }
+    }
+
+    function toggle_transparency() {
+        if ($('#transparency').is(':checked')){
+            for (var i=0; i < object3D.children.length; i++) {
+                var obj = object3D.children[i];
+                obj.material.opacity = obj.material.original_opacity;
+            }
+        } else {
+            for (var i=0; i < object3D.children.length; i++) {
+                var obj = object3D.children[i];
+                obj.material.opacity = 1;
+            }
         }
     }
 
