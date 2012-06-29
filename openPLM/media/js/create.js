@@ -37,6 +37,13 @@ $(
                 if($("#id_auto").attr("checked")=="checked"){
                     $("#id_reference").attr("disabled","disabled");
                 }
+                $("#id_auto").change(function(){
+                    if ($("#id_auto").attr("checked")=="checked"){
+                        $("#id_reference").attr("disabled","disabled");
+                    }else{
+                        $("#id_reference").removeAttr("disabled");
+                    }
+                });
             });
         });
         $("#id_auto").change(
