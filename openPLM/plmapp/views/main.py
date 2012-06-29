@@ -1403,7 +1403,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 @handle_errors(undo="../attributes")
 def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
-    Manage html page for the cloning of the selected object.
+    Manage html page to display the cloning form of the selected object
+    or clone it.
     
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -1418,6 +1419,8 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     else :
         parts = obj.get_suggested_parts()
         is_linked = ctx['is_linked'] = bool(parts)
+        
+    formsets ={}
     
     if request.method == 'GET':
         # generate and fill the creation form
@@ -1430,20 +1433,28 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
         for f in creation_form.fields:
             if f not in not_auto_cloned_fields:
                 creation_form.fields[f].initial = getattr(obj, f)
-        ctx['creation_form'] = creation_form
                 
         # generate the links form
         if issubclass(cls, models.Part) and is_linked :
             initial = [dict(link=link) for link in children]
-            ctx["children_formset"] = forms.SelectChildFormset(prefix="children",
+            formsets["children_formset"] = forms.SelectChildFormset(prefix="children",
                 initial=initial)
             initial = [dict(document=d) for d in documents]
-            ctx["doc_formset"] = forms.SelectDocumentFormset(prefix="documents",
+            formsets["doc_formset"] = forms.SelectDocumentFormset(prefix="documents",
                 initial=initial)
         elif issubclass(cls, models.Document) and is_linked :
-            ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
+            formsets["part_formset"] = forms.SelectPartFormset(queryset=parts)
                 
     elif request.method == 'POST':
+        if issubclass(cls, models.Part):
+            formsets.update({
+                "children_formset":forms.SelectChildFormset(request.POST,
+                    prefix="children"),
+                "doc_formset": forms.SelectDocumentFormset(request.POST,
+                    prefix="document"),
+            })
+        else:
+            formsets["part_formset"]=forms.SelectPartFormset(request.POST)
         if creation_form is None:
             creation_form = forms.get_creation_form(request.user, cls, request.POST)
         if creation_form.is_valid():
@@ -1453,11 +1464,24 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                 if valid_forms :
                     new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
                     return HttpResponseRedirect(new_ctrl.plmobject_url)
+                else :
+                    formsets.update({
+                        "children_formset":forms.SelectChildFormset(request.POST,
+                            prefix="children"),
+                        "doc_formset": forms.SelectDocumentFormset(request.POST,
+                            prefix="document"),
+                    })
             elif issubclass(cls, models.Document) and is_linked :
                 valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
                 if valid_forms:
                     new_ctrl = obj.clone(creation_form, request.user, selected_parts)
                     return HttpResponseRedirect(new_ctrl.plmobject_url) 
+                else :
+                    formsets["part_formset"]=forms.SelectPartFormset(request.POST)
+    ctx.update({
+        'creation_form':creation_form,
+    })
+    ctx.update(formsets)
     return r2r('clone.html', ctx, request)
 
 def clone_part(form, user, data, children, documents ):
@@ -1473,6 +1497,7 @@ def clone_part(form, user, data, children, documents ):
                 link = form.cleaned_data["link"]
                 if link not in children: 
                     valid_forms = False
+                    form.errors['link']=[_("It's not a valid child.")]
                     break
                 if form.cleaned_data["selected"]:
                     selected_children.append(link)
@@ -1487,6 +1512,7 @@ def clone_part(form, user, data, children, documents ):
                 doc = form.cleaned_data["document"]
                 if doc not in documents: 
                     valid_forms = False
+                    form.errors['document']=[_("It's not a valid document.")]
                     break
                 if form.cleaned_data["selected"]:
                     selected_documents.append(doc)
@@ -1510,6 +1536,7 @@ def clone_document(p_form, user, data, parts):
                     # does not write by hand its post request
                     # so we do not need to generate an error message
                     valid_forms = False
+                    form.errors.append_("It's not a valid part.")
                     break
                 if form.cleaned_data["selected"]:
                     selected_parts.append(part)

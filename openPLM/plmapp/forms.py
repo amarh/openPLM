@@ -155,7 +155,6 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
                     cleaned_data["reference"] = ref = get_new_reference(cls, start)
                 if not auto and not ref:
                     self.errors['reference']=[_("The reference is required.")]
-                    print self.errors.__class__                  
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
