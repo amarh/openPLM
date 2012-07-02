@@ -94,7 +94,13 @@
                 {# cancel #}
                 {% if obj.is_draft %}
                     {% if not obj.can_cancel %}
-                     <p>{% trans "You can not cancel this object since it is related to an other object (part , document)." %}</p>
+                        {% with obj.get_all_revisions|length as nb_revision %}
+                            {% if nb_revision > 1 %}
+                                <p>{% trans "You can not cancel this object since it has more than one revision." %}</p>
+                            {% else %}
+                                <p>{% trans "You can not cancel this object since it is related to an other object (part , document)." %}</p>
+                            {% endif %}
+                        {% endwith %}
                      {% endif %}
                 {% else %}
                     <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}
