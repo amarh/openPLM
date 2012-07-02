@@ -142,7 +142,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
         # replace textinputs with autocomplete inputs, see ticket #66
         auto_complete_fields(Form, cls)
         if issubclass(cls, m.PLMObject):
-            Form.base_fields.insert(1,'auto',BooleanField(required=False,initial=True, help_text=_("Checking this case, you allow OpenPLM to set the reference of the object.")))
+            Form.base_fields.insert(1,'auto',BooleanField(required=False,initial=True, help_text=_("Checking this box, you allow OpenPLM to set the reference of the object.")))
             Form.base_fields["reference"].required = False
             Form.clean_reference = _clean_reference
             Form.clean_revision = _clean_revision
