@@ -531,3 +531,10 @@ class DocumentController(PLMObjectController):
                 models.DocumentPartLink.objects.create(part=part,
                     document=new_ctrl.object)
         return new_ctrl
+        
+    def has_links(self):
+        """
+        Return true if the document is attached to at least one part.
+        """
+        res = not self.get_attached_parts()
+        return res

@@ -766,4 +766,14 @@ class PartController(PLMObjectController):
                 models.DocumentPartLink.objects.create(part=new_ctrl.object,
                     document=doc)
         return new_ctrl
-   
+
+    def has_links(self):
+        """
+        Return true if the part :
+            * is a parent or a child
+            * is attached to at least one document
+        """
+        q = Q(parent=self.object) | Q(child=self.object)
+        res = not models.ParentChildLink.objects.filter(q, end_time=None).exists()
+        res = res and not self.get_attached_documents()
+        return res
