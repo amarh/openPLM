@@ -33,7 +33,13 @@
                 {% endif %}
                 </div>
                 {% else %}
-                <div style="padding:0.5em; text-align:center;">{% trans "This object is not related to an other object" %}</div>
+                <div style="padding:0.5em; text-align:center;">
+                {% if obj.is_part %}
+                    {% trans "No object ( part and document ) is related to this part." %}
+                {% else %}
+                    {% trans "No part is attached to this document." %}
+                {% endif %}
+                </div>
                 {% endif %}
                 <div style="width:100%; text-align:center; padding:0.5em;">
                     <input type="submit" class="{{"Button"|button}}" value="{% trans "CLONE" %}" />
@@ -42,7 +48,7 @@
         </div>
         
     {% else %}
-        <p>{% trans "You can not create an object since you are not a contributor."%}</p>
+        <p>{% trans "You can not clone an object since you are not a contributor."%}</p>
     {% endif %}
 {% endblock %}
 

@@ -107,6 +107,14 @@ msgstr "ya indexado"
 msgid "Create"
 msgstr "Crear"
 
+#: templates/blocks/supermenu.html:58
+msgid "Browse"
+msgstr "Explorar"
+
+#: templates/blocks/supermenu.html:60
+msgid "Browse all parts, groups, users and documents."
+msgstr "Explorar todos los partes, grupos, usuarios é documentos."
+
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."
 msgstr "Usted no puede añadir un fichero a un GoogleDocument."
@@ -603,6 +611,14 @@ msgstr "Referencia errónea: '#', '?', '/' y '..' no estan permitidos"
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "Revisión errónea: '#', '?', '/' y '..' no estan permitidos"
 
+#: plmapp/models.py:510
+msgid "Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"
+msgstr "Necesario. 50 cáracteres o menos. Cartas, números, excepto #, ?, / y .. carácteres"
+
+#: plmapp/forms.py:145
+msgid "Checking this box, you allow OpenPLM to set the reference of the object."
+msgstr "Marcando este casilla, usted permite OpenPLM establecer la referencia del objeto."
+
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
@@ -1078,6 +1094,10 @@ msgstr "Cambiar mi contraseña"
 msgid "Download as PDF"
 msgstr "Descargar como PDF"
 
+#: templates/attributes.html:48
+msgid "Clone"
+msgstr "Clonar"
+
 #: templates/attributes.html:50
 msgid "Comments"
 msgstr "Comentarios"
@@ -1147,6 +1167,10 @@ msgstr "NAVEGAR"
 #: templates/base.html:106
 msgid "STUDY"
 msgstr "ESTUDIAR"
+
+#: templates/base.html:86
+msgid "BROWSE"
+msgstr "EXPLORAR"
 
 #: templates/base.html:117
 msgid "Toggle the left panel"
@@ -1252,6 +1276,10 @@ msgstr "Grupos propios:Invitaciones pendientes"
 msgid "Groups that you may join: pending invitations"
 msgstr "Grupos a los que usted puede unirse: invitacion pendientes"
 
+#: templates/lifecycle.html:17
+msgid "You have the rights of owner on this object"
+msgstr "Usted tiene derechos de proprietario sobre este objeto"
+
 #: templates/lifecycle.html:17 templates/documents/revisions.html:7
 #: templates/parts/revisions.html:7
 msgid "Are you sure?"
@@ -1310,6 +1338,26 @@ msgstr "Usted no puede promover este objeto:"
 #: templates/lifecycle.html:76
 msgid "You do not have the permission to promote this object."
 msgstr "Usted no tiene permiso para promover este objeto."
+
+#: templates/lifecycle.html:135
+msgid "CANCEL"
+msgstr "CANCELAR"
+
+#: templates/lifecycle.html:99
+msgid "You can not cancel this object since it has more than one revision."
+msgstr "Usted no puede cancelar este objeto por que este tiene más que una revision."
+
+#: templates/lifecycle.html:101
+msgid "You can not cancel this object since it is related to an other object (part , document)."
+msgstr "Usted no puede cancelar este objeto por que está relacionado con un otro objecto  (parte, documento)."
+
+#: templates/lifecycle.html:106
+msgid "You can not cancel this object since its state is more advanced than draft."
+msgstr "Usted no puede cancelar este objeto por que no está a un estado preliminar."
+
+#: templates/lifecycle.html:127
+msgid "Warning, if you cancel this object, it won't be anymore accessible to everyone."
+msgstr "Atención , si usted cancela este objeto, no podra ser accessible por todos en adelante."
 
 #: templates/login.html:17
 msgid "openPLM LOGIN PAGE"
@@ -1464,6 +1512,14 @@ msgstr "Resultados para creación de link:"
 msgid "Results"
 msgstr "Resultados"
 
+#: templates/search/search.html:51
+msgid "Previous"
+msgstr "Anterior"
+
+#: templates/search/search.html:55
+msgid "Next"
+msgstr "Siguiente"
+
 #: templates/blocks/search.html:23
 #, python-format
 msgid ""
@@ -1596,7 +1652,7 @@ msgid "A file named "
 msgstr "Un archivo nombrado "
 
 msgid "is already linked to this document."
-msgstr "ya es relacionado a este documento"
+msgstr "ya es relacionado con este documento"
 
 msgid "You have already selected the file"
 msgstr "Ya ha seleccionado el fichiero"
@@ -2090,6 +2146,88 @@ msgstr "Click aqui para patrocinar varios usuarios desde un fichero CSV"
 msgid "You can not sponsor a new user since you are not a contributor."
 msgstr ""
 "Usted no puede patrocinar a nuevos usuarios por que no es un contribuidor."
+
+#: templates/browse.html:18
+msgid "Objects"
+msgstr "Objetos"
+
+#: templates/browse.html:21
+msgid "Parts"
+msgstr "Partes"
+
+#: templates/browse.html:24
+msgid "Documents"
+msgstr "Documentos"
+
+#: templates/browse.html:37
+msgid "Recently added"
+msgstr "Recientemente añadido"
+
+#: templates/browse.html:40
+msgid "Sorted by name"
+msgstr "Clasificado por nombre"
+
+#: templates/browse.html:47
+msgid "All states"
+msgstr "Todos los estados"
+
+#: templates/browse.html:50
+msgid "Official state"
+msgstr "Oficial estado"
+
+#: templates/browse.html:53
+msgid "Published"
+msgstr "Publicado"
+
+#: templates/browse.html:73
+msgid "Only published objects"
+msgstr "Solo objetos publicados"
+
+#: templates/browse.html:77
+msgid "Only official objects"
+msgstr "Solo objetos oficiales"
+
+#: templates/browse.html:79
+msgid "All objects"
+msgstr "Todos los objetos"
+
+#: templates/browse.html:121
+msgid "First page"
+msgstr "Primera página"
+
+#: templates/browse.html:141
+msgid "Last page"
+msgstr "Última página"
+
+#: templates/documents/identity_card.html:33
+#, python-format
+msgid "%(file_count)s file"
+msgstr "%(file_count)s fichiero"
+
+#: templates/documents/identity_card.html:35
+#, python-format
+msgid "%(file_count)s files"
+msgstr "%(file_count)s fichieros"
+
+#: templates/clone.html:17
+msgid "OBJECT CLONING:"
+msgstr "CLONACIÓN DE OBJETO:"
+
+#: templates/clone.html:28
+msgid "Links"
+msgstr "Relacion"
+
+#: templates/clone.html:36
+msgid "No object ( part and document ) is related to this part."
+msgstr "Ninguno objeto ( parte y documento ) está relacionado con este objeto."
+
+#: templates/clone.html:40
+msgid "No part is attached to this document."
+msgstr "Ninguna parte está relacionado con este documento."
+
+#: templates/clone.html:45
+msgid "CLONE"
+msgstr "CLONAR"
 
 #~ msgid "PASSWORD"
 #~ msgstr "CONTRASEÑA"

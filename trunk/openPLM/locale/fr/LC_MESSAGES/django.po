@@ -591,11 +591,14 @@ msgstr "Référence non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
+#: plmapp/models.py:510
 msgid "Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"
 msgstr "Requis. 50 caractères maximum. Uniquement les lettres, nombres, sauf les caractères #, ?, / et .."
 
-msgid "Checking this case, you allow OpenPLM to set the reference of the object."
+#: plmapp/forms.py:145
+msgid "Checking this box, you allow OpenPLM to set the reference of the object."
 msgstr "En cochant cette case, vous autorisez OpenPLM à choisir la référence de l'objet."
+
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
@@ -1065,6 +1068,10 @@ msgstr "Cliquez ici pour changer votre mot de passe"
 msgid "Download as PDF"
 msgstr "Télécharger au format PDF"
 
+#: templates/attributes.html:48
+msgid "Clone"
+msgstr "Cloner"
+
 #: templates/attributes.html:50
 msgid "Comments"
 msgstr "Commentaires"
@@ -1235,6 +1242,10 @@ msgstr "Les groupes dont vous êtes propriétaire: invitations en attente"
 msgid "Groups that you may join: pending invitations"
 msgstr "Les groupes que vous pouvez rejoindre: invitations en attente"
 
+#: templates/lifecycle.html:17
+msgid "You have the rights of owner on this object"
+msgstr "Vous avez les droits de propriétaire sur cet objet"
+
 #: templates/lifecycle.html:17 templates/documents/revisions.html:7
 #: templates/parts/revisions.html:7
 msgid "Are you sure?"
@@ -1292,6 +1303,26 @@ msgstr "Vous ne pouvez pas valider cet objet:"
 #: templates/lifecycle.html:76
 msgid "You do not have the permission to promote this object."
 msgstr "Vous n'avez pas la permission de valider cet objet."
+
+#: templates/lifecycle.html:135
+msgid "CANCEL"
+msgstr "ANNULER"
+
+#: templates/lifecycle.html:99
+msgid "You can not cancel this object since it has more than one revision."
+msgstr "Vous ne pouvez pas annuler cet objet car il a plus d'une révision."
+
+#: templates/lifecycle.html:101
+msgid "You can not cancel this object since it is related to an other object (part , document)."
+msgstr "Vous ne pouvez pas annuler cet objet car il est lié à un autre objet (part, document)."
+
+#: templates/lifecycle.html:106
+msgid "You can not cancel this object since its state is more advanced than draft."
+msgstr "Vous ne pouvez pas annuler cet objet, il n'est plus à l'état de brouillon."
+
+#: templates/lifecycle.html:127
+msgid "Warning, if you cancel this object, it won't be anymore accessible to everyone."
+msgstr "Attention , si vous annulez cet objet, il ne sera plus accessible à tout le monde."
 
 #: templates/login.html:17
 msgid "openPLM LOGIN PAGE"
@@ -1446,6 +1477,14 @@ msgstr "Résultats pour la création de lien:"
 msgid "Results"
 msgstr "Résultats"
 
+#: templates/search/search.html:51
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/search/search.html:55
+msgid "Next"
+msgstr "Suivant"
+
 #: templates/blocks/search.html:23
 #, python-format
 msgid ""
@@ -1492,6 +1531,9 @@ msgstr "Créer une nouvelle part, un nouveau document ou un nouveau group."
 msgid "EXIT"
 msgstr "SORTIR"
 
+#: templates/documents/files.html:64
+msgid "You don't have the necessary rights to add/delete files."
+msgstr "Vous n'avez pas les droits nécessaires pour ajouter/supprimer des fichiers."
 #: templates/documents/files.html:45 templates/parts/doccad.html:11
 msgid "Download all files"
 msgstr "Télécharger tous les fichiers"
@@ -2122,3 +2164,22 @@ msgstr "%(file_count)s fichier"
 msgid "%(file_count)s files"
 msgstr "%(file_count)s fichiers"
 
+#: templates/clone.html:17
+msgid "OBJECT CLONING:"
+msgstr "CLONAGE D'OBJET:"
+
+#: templates/clone.html:28
+msgid "Links"
+msgstr "Liens"
+
+#: templates/clone.html:36
+msgid "No object ( part and document ) is related to this part."
+msgstr "Aucun objet (ni part ni document) n'est lié à cet objet."
+
+#: templates/clone.html:40
+msgid "No part is attached to this document."
+msgstr "Aucune part n'est lié à ce document."
+
+#: templates/clone.html:45
+msgid "CLONE"
+msgstr "CLONER"

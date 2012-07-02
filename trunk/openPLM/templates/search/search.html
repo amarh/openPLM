@@ -48,11 +48,11 @@
         {% if page.has_previous or page.has_next %}
             <div>
                 {% if page.has_previous %}
-                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>
+                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; {% trans "Previous" %}{% if page.has_previous %}</a>
                 {% endif %}
                 |
                 {% if page.has_next %}
-                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>
+                    <a href="?q={{ query }}&amp;type={{ type }}&amp;page={{ page.next_page_number }}">{% endif %}{% trans "Next" %} &raquo;{% if page.has_next %}</a>
                 {% endif %}
             </div>
         {% endif %}
