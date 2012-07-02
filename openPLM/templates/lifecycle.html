@@ -92,18 +92,23 @@
                 {% endif %}
                 
                 {# cancel #}
-                {% if obj.is_draft %}
+                {% if obj.is_draft and is_owner %}
                     {% if not obj.can_cancel %}
                         {% with obj.get_all_revisions|length as nb_revision %}
                             {% if nb_revision > 1 %}
                                 <p>{% trans "You can not cancel this object since it has more than one revision." %}</p>
-                            {% else %}
-                                <p>{% trans "You can not cancel this object since it is related to an other object (part, document)." %}</p>
                             {% endif %}
                         {% endwith %}
+                        {% if obj.has_links %}
+                             <p>{% trans "You can not cancel this object since it is related to an other object (part , document)." %}</p>
+                        {% endif %}
                      {% endif %}
                 {% else %}
-                    <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}
+                    {% if not is_owner %}
+                    <p>{% trans "You do not have the permission to cancel this object." %}</p>
+                    {% else %}
+                    <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}</p>
+                    {% endif %}
                 {% endif %}
         </div>
         {% endspaceless %}
