@@ -791,6 +791,7 @@ class PLMObjectController(Controller):
         
         If *raise_* is True:
 
+            :raise: :exc:`.PermissionError` if the object is not readable
             :raise: :exc:`.PermissionError` if the object can not be read
             :raise: :exc:`.PermissionError` if the object is not cloneable
             
@@ -814,13 +815,15 @@ class PLMObjectController(Controller):
         """
         .. versionadded:: 1.1
         
-        Returns True if the user can clone this object
+        Returns True if the user can clone this object.
         """
         return self.check_clone(raise_=False)
         
     def clone(self,form, user, block_mails=False, no_index=False):
         """ 
-        Clones an object
+        .. versionadded:: 1.1
+        
+        Clone this object and return the related controller.
         """
         self.check_clone()
         type_= self.object.type
