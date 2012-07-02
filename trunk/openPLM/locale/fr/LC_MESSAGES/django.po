@@ -1312,11 +1312,15 @@ msgstr "ANNULER"
 msgid "You can not cancel this object since it has more than one revision."
 msgstr "Vous ne pouvez pas annuler cet objet car il a plus d'une révision."
 
-#: templates/lifecycle.html:101
+#: templates/lifecycle.html:103
 msgid "You can not cancel this object since it is related to an other object (part , document)."
 msgstr "Vous ne pouvez pas annuler cet objet car il est lié à un autre objet (part, document)."
 
-#: templates/lifecycle.html:106
+#: templates/lifecycle.html:108
+msgid "You do not have the permission to cancel this object."
+msgstr "Vous n'avez pas la permission d'annuler cet objet."
+
+#: templates/lifecycle.html:110
 msgid "You can not cancel this object since its state is more advanced than draft."
 msgstr "Vous ne pouvez pas annuler cet objet, il n'est plus à l'état de brouillon."
 

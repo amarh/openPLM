@@ -1347,13 +1347,17 @@ msgstr "CANCELAR"
 msgid "You can not cancel this object since it has more than one revision."
 msgstr "Usted no puede cancelar este objeto por que este tiene más que una revision."
 
-#: templates/lifecycle.html:101
+#: templates/lifecycle.html:103
 msgid "You can not cancel this object since it is related to an other object (part , document)."
-msgstr "Usted no puede cancelar este objeto por que está relacionado con un otro objecto  (parte, documento)."
+msgstr "Usted no puede cancelar este objeto por que está relacionado con un otro objeto  (parte, documento)."
 
-#: templates/lifecycle.html:106
+#: templates/lifecycle.html:108
+msgid "You do not have the permission to cancel this object."
+msgstr "Usted no tiene permiso para cancelar este objeto"
+
+#: templates/lifecycle.html:110
 msgid "You can not cancel this object since its state is more advanced than draft."
-msgstr "Usted no puede cancelar este objeto por que no está a un estado preliminar."
+msgstr "Usted no puede cancelar este objeto ya que su estado es mas avanzado que preliminar."
 
 #: templates/lifecycle.html:127
 msgid "Warning, if you cancel this object, it won't be anymore accessible to everyone."
