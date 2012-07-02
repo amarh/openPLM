@@ -1442,42 +1442,50 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
             initial = [dict(document=d) for d in documents]
             formsets["doc_formset"] = forms.SelectDocumentFormset(prefix="documents",
                 initial=initial)
-        elif issubclass(cls, models.Document) and is_linked :
-            formsets["part_formset"] = forms.SelectPartFormset(queryset=parts)
+        else:
+            if issubclass(cls, models.Document) and is_linked :
+                formsets["part_formset"] = forms.SelectPartFormset(queryset=parts)
                 
     elif request.method == 'POST':
-        if issubclass(cls, models.Part):
+        if issubclass(cls, models.Part) and is_linked:
             formsets.update({
                 "children_formset":forms.SelectChildFormset(request.POST,
                     prefix="children"),
                 "doc_formset": forms.SelectDocumentFormset(request.POST,
                     prefix="document"),
             })
-        else:
+        elif is_linked:
             formsets["part_formset"]=forms.SelectPartFormset(request.POST)
         if creation_form is None:
             creation_form = forms.get_creation_form(request.user, cls, request.POST)
         if creation_form.is_valid():
-            valid_forms = False
-            if issubclass(cls, models.Part) and is_linked:
-                valid_forms, selected_children, selected_documents = clone_part(creation_form, request.user, request.POST, children, documents)
-                if valid_forms :
-                    new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
-                    return HttpResponseRedirect(new_ctrl.plmobject_url)
-                else :
-                    formsets.update({
-                        "children_formset":forms.SelectChildFormset(request.POST,
-                            prefix="children"),
-                        "doc_formset": forms.SelectDocumentFormset(request.POST,
-                            prefix="document"),
-                    })
-            elif issubclass(cls, models.Document) and is_linked :
-                valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
-                if valid_forms:
-                    new_ctrl = obj.clone(creation_form, request.user, selected_parts)
-                    return HttpResponseRedirect(new_ctrl.plmobject_url) 
-                else :
-                    formsets["part_formset"]=forms.SelectPartFormset(request.POST)
+            if is_linked :
+                valid_forms = False
+                if issubclass(cls, models.Part) :
+                    valid_forms, selected_children, selected_documents = clone_part(creation_form, request.user, request.POST, children, documents)
+                    if valid_forms :
+                        new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
+                        return HttpResponseRedirect(new_ctrl.plmobject_url)
+                    else :
+                        formsets.update({
+                            "children_formset":forms.SelectChildFormset(request.POST,
+                                prefix="children"),
+                            "doc_formset": forms.SelectDocumentFormset(request.POST,
+                                prefix="document"),
+                        })
+                elif issubclass(cls, models.Document) and is_linked :
+                    valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
+                    if valid_forms:
+                        new_ctrl = obj.clone(creation_form, request.user, selected_parts)
+                        return HttpResponseRedirect(new_ctrl.plmobject_url) 
+                    else :
+                        formsets["part_formset"]=forms.SelectPartFormset(request.POST)
+            else:
+                if issubclass(cls, models.Part):
+                    new_ctrl = obj.clone(creation_form, request.user, [], [])
+                else:
+                    new_ctrl = obj.clone(creation_form, request.user, [])
+                return HttpResponseRedirect(new_ctrl.plmobject_url)
     ctx.update({
         'creation_form':creation_form,
     })
@@ -2136,7 +2144,7 @@ class OpenPLMSearchView(SearchView):
         extra = super(OpenPLMSearchView, self).extra_context()
         obj, ctx = get_generic_data(self.request, search=False)
         ctx["type"] = self.request.session["type"]
-        ctx["object_type"] = "Search"
+        ctx["object_type"] = _("Search")
         extra.update(ctx)
         return extra
 
