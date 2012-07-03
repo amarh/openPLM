@@ -1813,6 +1813,10 @@ msgstr ""
 "Les invitations suivantes ont été envoyées mais les destinataires ne les ont "
 "pas encore acceptées."
 
+#: templates/groups/objects.html:7
+msgid "No object belongs to this group."
+msgstr "Aucun objet n'appartient à ce groupe."
+
 #: templates/import/csv.html:6
 msgid "Import of a csv file"
 msgstr "Importer un fichier csv"
