@@ -182,3 +182,27 @@
     left: 39%;
 }
 
+#browse_type_filter{
+    top: 35%;
+    left: 13%;
+}
+
+#browse_sort{
+    top: 60%;
+    left: 13%;
+}
+
+#browse_options{
+    top: 70%;
+    left: 13%;
+}
+
+#browse_results{
+    top: 33%;
+    left: 52%;
+}
+
+#browse_id_card{
+    top: 45%;
+    left: 26%;
+}
