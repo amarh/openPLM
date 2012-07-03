@@ -13,6 +13,8 @@ class Migration(DataMigration):
             try:
                 start = "PART_"  if hasattr(plmobject, "part") else "DOC_"
                 reference_number = int(re.search(r"^%s(\d+)$" % start, plmobject.reference).group(1)) 
+                if reference_number > 2**31 - 1:
+                    reference_number = 0
             except:
                 reference_number = 0
             plmobject.reference_number = reference_number
