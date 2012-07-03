@@ -107,7 +107,7 @@ triangle_fmt = """ smooth_triangle {
         <%f, %f, %f>, <%f, %f, %f>
       }
     """
-vertice_fmt = "%s.vertices.push(new THREE.Vertex(new THREE.Vector3(%.4f,%.4f,%.4f)));\n"
+vertice_fmt = "%s.vertices.push(new THREE.Vector3(%.4f,%.4f,%.4f));\n"
 face_fmt = "%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"
 
 def get_mesh_precision(shape, quality_factor):

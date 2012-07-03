@@ -196,6 +196,15 @@
 
     <script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
     <script type="text/javascript" src="/media/js/3D/struct.js"></script> 
+    <script type="text/javascript">
+        
+THREE.Vertex = function ( position ) {
+
+	return position;//new THREE.Vector3();
+
+};
+
+    </script>
     {% for item in GeometryFiles %}
         <script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
     {% endfor %}
@@ -331,20 +340,20 @@
             scene = new THREE.Scene();
             // init the lights
 
-            var ambient = new THREE.AmbientLight( 0xffffff, 1 );
+            var ambient = new THREE.AmbientLight( 0xffffff, 1.1 );
             scene.add( ambient );
 
-            var light   = new THREE.DirectionalLight( 0xffffff );
+            var light   = new THREE.DirectionalLight( 0xffffff, 1.2 );
             light.position.set(1, 1, 4 ).normalize();
             spot1 = light;
             scene.add( light );
 
-            var light   = new THREE.SpotLight( 0xffffff, 1 );
+            var light   = new THREE.SpotLight( 0xffffff, 1.1 );
             spot2   = light;
             light.target.position.set( 0, 10, 0 ).normalize();
             light.shadowCameraNear = 0.01;     
             light.castShadow = true;
-            light.shadowDarkness = 0.1;
+            light.shadowDarkness = 0.05;
             scene.add( light );
 
             centrer_objet(object3D);
@@ -363,6 +372,7 @@
                 obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
                 obj.material.original_opacity = obj.material.opacity; 
+      
             }
             object3D.castShadow = true;
             object3D.receiveShadow = true;
