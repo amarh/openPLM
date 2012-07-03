@@ -2,6 +2,11 @@
 {% load i18n plmapp_tags %}
 
 {% block content %}
+{% if objects.paginator.count == 0 %}
+    <span>
+        {% trans "No object belongs to this group." %}
+    </span>
+{% else %}
     <div>
         <span id="numresults">
         {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
@@ -52,5 +57,6 @@
         {% endif %}
         </span>
     </div>
+{% endif %}
 {% endblock %}
 
