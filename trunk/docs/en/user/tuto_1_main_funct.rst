@@ -37,7 +37,7 @@ The parts and documents are named according to the following convention :
 
 HOME PAGE
 ========================================================
-You have 4 main features:
+You have 5 main features:
 
 1- Search for objects 
 
@@ -47,7 +47,9 @@ You have 4 main features:
 
 4- Study an object (access to the object information)
 
-Example :
+5- Browse objects
+
+Home page screenshot :
 
 .. image:: images/Capture_openPLM_home.png
    :width: 100%
@@ -130,28 +132,54 @@ Example :
    :width: 100%
 
 
+BROWSE
+======================================================
+The "Browse" page display all objects, groups and users available in your OpenPLM.
+You can filter the results with the Type panel.
+
+Example :
+
+.. image:: images/Capture_openPLM_browse.png
+   :width: 100%
+
+
 COMMON PARTS
 =======================================================
-No matter the chosen function (search,create,study or navigate),
-two parts are common to all views :
 
-1- The header which contains :
+**The header**
 
-    * User's name, the day, a button to choose the language and a button to log out
+It contains :
 
-    * Button to reach different views
+    * User's name
+    
+    * Today's date and hour
+    
+    * Button to choose the language
+    
+    * Link to log out
+    
+    * Link to get help
+
+    * Buttons to reach different views
 
     * A history of objects reached during your session
 
 If you place your mouse over an object in the history, the corresponding menu will be shown.
 
+Once you logged in, this header appears in all views except the home page.
+
 .. image:: images/Capture_openPLM_header.png
    :width: 100%
 
-2- The left panel that can be showed or hidden. This left panel is a search
+
+**The left panel**
+
+It can be showed or hidden. This left panel is a search
 area with the same structure as the SEARCH view described higher
 
 Depending on the current object and the current page this panel can have extra functions.
+
+This panel does not appear in the home page and the "Search" page.
 
 .. image:: images/Capture_openPLM_leftpanel.png
    :width: 100%

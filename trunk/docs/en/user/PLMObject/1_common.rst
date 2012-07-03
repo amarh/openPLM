@@ -41,7 +41,7 @@ Documents contain one or more electronic files.
 
 ATTRIBUTES
 ========================================================
-Displays the ID card of the part.
+Displays the ID card of the object.
 
 You find standard attributes like name, date of creation, owner, ...
 You find customized attributes depending of the company OpenPLM is implemented for (like size or weight or supplier, ...).
@@ -53,32 +53,40 @@ If you have necessary rights, you can **Edit** the attributes and modify them.
 
 LIFECYCLE
 ========================================================
-Displays the lifecycle of the part.
+Displays :
+ * the lifecycle of the object,
+    
+ * related users and their rights.
 
-You find the different states of the part including the current one. These lifecycles can be customized following specifications given by the company OpenPLM is implemented for (with 1, 2, 3 or more states).
+You find the different states of the object including the current one. 
+These lifecycles can be customized following specifications given by 
+the company OpenPLM is implemented for (with 1, 2, 3 or more states).
 
-If you have necessary rights, you can **Promote** or **Demote** the part.
+If you have necessary rights, you can :
+ * **Promote** or **Demote** the object
+    
+ * **Cancel** the object
 
-We can implement different triggers on **Promote**/**Demote** actions following specifications (rights checking, e-mail sending, other PLMObject promotion, ...).
+ * **Replace** some signers or notified users
+    
+ * **Add** or **Remove** Users for e-mail notification, i.e. he/she will receive e-mail 
+   for each new event related to this object (revision, modification, promotion, ...).
+
+We can implement different triggers on **Promote**/**Demote** actions 
+following specifications (rights checking, e-mail sending, other PLMObject promotion, ...).
 
 
 REVISIONS
 ========================================================
-Displays all the revisions of the part.
+Displays all the revisions of the object.
 
-If the current part is the last revision, we can add a new one.
+If the current object is the last revision, we can add a new one.
 
 
 HISTORY
 ========================================================
-Displays the history of the part.
+Displays the history of the object.
 
-It ensures the full tracability of the part.
+It ensures the full tracability of the object.
 
-
-MANAGEMENT
-========================================================
-Displays related Users and their rights on the part.
-
-If you have necessary rights, you can **Replace** some Users. You can also add one or several Users for e-mail notification i.e. he/she will receive e-mail for each new event related to this part (revision, modification, promotion, ...).
 

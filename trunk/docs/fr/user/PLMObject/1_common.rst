@@ -49,7 +49,7 @@ Les Documents peuvent contenir un ou plusieurs fichiers électronique.
 
 ATTRIBUTS
 =========
-Affiche la carte d'identification d'une part.
+Affiche la carte d'identification d'un objet.
 
 On y trouve des attributs standard comme le nom, la date de création, le
 propriétaire...
@@ -64,13 +64,22 @@ et les modifier.
 
 CYCLE DE VIE
 ============
-Affiche le cycle de vie d'une part.
+Affiche :
+ * le cycle de vie d'un objet
+    
+ * les utilisateurs liés et leurs droits sur l'objet.
 
-On y trouve les différents état de la part, incluant l'état courant. Ces
+On y trouve les différents état de l'objet, incluant l'état courant. Ces
 cycles de vie sont personnalisables en fonctions des besoins de l'entreprise.
 
-Si vous avez les autorisations nécessaires, vous pouvez **Valider** ou
-**Annuler** une part.
+Si vous avez les autorisations nécessaires, vous pouvez :
+ * **Valider** ou **Annuler** un objet
+    
+ * **Remplacer** certains signataires ou utilisateurs notifiés
+    
+ * **Inscrire** ou **Supprimer** des utilisateurs aux notifications emails ,
+   il recevra un email pour chaque évènement en rapport avec l'objet (révisions, 
+   modifications, validations, ...)
 
 Il est possible d'ajouter des triggers sur les actions **Valider/Annuler**
 (vérification des autorisations, envoi d'email, validation d'un autre
@@ -79,23 +88,15 @@ PLMObject ...)
 
 RÉVISIONS
 =========
-Affiche toutes les révisions d'une part
+Affiche toutes les révisions d'un objet.
 
-Si la part courante est la dernière révision, on peut en ajouter une nouvelle.
+Si l'objet courant est la dernière révision, on peut en ajouter une nouvelle.
 
 
 HISTORIQUE
 ==========
-Affiche l'historique d'une part.
+Affiche l'historique d'un objet.
 
-Cela permet une traçabilité complète de la part.
+Cela permet une traçabilité complète de l'objet.
 
 
-MANAGEMENT
-==========
-Affiche les utilisateurs liés et leurs autorisations sur la part.
-
-Si vous avez les autorisations nécessaires, vous pouvez **Remplacer** certains
-utilisateurs. Vous pouvez aussi inscrire un ou plusieurs utilisateurs aux
-notifications emails : l'utilisateur recevra un email pour chaque évènement en
-rapport avec la part (révisions, modifications, validations, ...)
