@@ -39,7 +39,7 @@ suivante :
 
 PAGE D'ACCUEIL
 ==============
-Il y a 4 fonctions principales : 
+Il y a 5 fonctions principales : 
 
 1- Rechercher des objets
 
@@ -48,6 +48,8 @@ Il y a 4 fonctions principales :
 3- Création d'objets
 
 4- Étudier un objet (accès aux informations de l'objet)
+
+5- Parcourir les objets
 
 Exemple :
 
@@ -138,15 +140,34 @@ Exemple :
    :width: 100%
 
 
+PARCOURIR
+==========
+Sur la page "Parcourir" tous les objets, groupes et utilisateurs d'OpenPLM sont affichés.
+
+Vous pouvez filtrer les résultats en utilisant le paneau Type.
+
+Exemple :
+
+.. image:: images/Capture_openPLM_browse.png
+   :width: 100%
+   
+
 PARTIES PERSISTANTES
 ====================
-Certaines zone de l'affichage sont communes à toutes les fonctions
-(rechercher, créer, étudier ou naviguer) : 
 
-1- L'en-tête de la page qui contient :
+**L'en-tête de la page**
 
-    * Le nom de l'utilisateur, le jour, un bouton pour changer la langue
-      d'affichage et un bouton de déconnexion.
+On y retrouve :
+
+    * Le nom de l'utilisateur
+    
+    * La date et l'heure
+    
+    * Un bouton pour changer la langue d'affichage
+    
+    * Un lien de déconnexion
+    
+    * Un lien d'aide
 
     * Des boutons pour accéder aux différentes fonctions
 
@@ -155,15 +176,22 @@ Certaines zone de l'affichage sont communes à toutes les fonctions
 Si on place le curseur de la souris sur un objet dans l'historique, le menu
 correspond apparaitra.
 
+Une fois que vous êtes connecté, cette en-tête apparaît sur toutes les pages,
+exceptée la page d'accueil.
+
 .. image:: images/Capture_openPLM_header.png
    :width: 100%
 
-2- Le panneau de gauche, qui peut être masqué ou affiché. Ce panneau offre une
+**Le panneau de gauche**
+
+Il peut être masqué ou affiché. Ce panneau offre une
 zone de recherche présentant la même structure que la page RECHERCHE décrite
 plus haut.
 
 En fonction de l'objet et de la page courante, ce panneau peut offrir des
 fonctionnalités supplémentaires.
+
+Ce panneau n'apparait ni dans la page d'accueil ni dans la page de Recherche.
 
 .. image:: images/Capture_openPLM_leftpanel.png
    :width: 100%
