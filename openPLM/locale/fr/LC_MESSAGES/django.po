@@ -1381,11 +1381,19 @@ msgstr "Mot de passe :"
 msgid "LOGIN"
 msgstr "ENTRER"
 
-#: templates/login.html:87
+#: templates/login.html:85
+msgid "If you have any trouble logging in to your account, contact your administrator"
+msgstr "Si vous rencontrez des difficultés à vous connecter, contactez votre administrateur"
+
+#: templates/login.html:89
+msgid "Browse public data."
+msgstr "Parcourir les données publiques."
+
+#: templates/login.html:92
 msgid "Professionals"
 msgstr "Professionels"
 
-#: templates/login.html:90
+#: templates/login.html:95
 msgid ""
 "You are planning to use openPLM in a <b>professional</b> context. If you "
 "want to work with other professionals for your project management, for other "
@@ -1531,9 +1539,13 @@ msgstr "Explorer graphiquements vos parts et documents."
 msgid "Create a new part, a new document or a new group."
 msgstr "Créer une nouvelle part, un nouveau document ou un nouveau group."
 
-#: templates/blocks/user.html:24
-msgid "EXIT"
-msgstr "SORTIR"
+#: templates/blocks/user.html:37
+msgid "Logout"
+msgstr "Sortir"
+
+#: templates/blocks/user.html:32
+msgid "Help"
+msgstr "Aide"
 
 #: templates/documents/files.html:64
 msgid "You don't have the necessary rights to add/delete files."

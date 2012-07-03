@@ -1416,6 +1416,14 @@ msgstr "Contraseña :"
 msgid "LOGIN"
 msgstr "ENTRAR"
 
+#: templates/login.html:85
+msgid "If you have any trouble logging in to your account, contact your administrator"
+msgstr "Si usted tiene cualquier problema para iniciar sesión, contacta con su administrador"
+
+#: templates/login.html:89
+msgid "Browse public data."
+msgstr "Explorar los datos públicos."
+
 #: templates/login.html:87
 msgid "Professionals"
 msgstr "Profesionales"
@@ -1567,9 +1575,13 @@ msgstr "Explore graficamente sus partes y documentos"
 msgid "Create a new part, a new document or a new group."
 msgstr "Crear una nueva parte , documento o grupo"
 
-#: templates/blocks/user.html:24
-msgid "EXIT"
-msgstr "SALIR"
+#: templates/blocks/user.html:37
+msgid "Logout"
+msgstr "Salir"
+
+#: templates/blocks/user.html:32
+msgid "Help"
+msgstr "Ayuda"
 
 #: templates/documents/files.html:45 templates/parts/doccad.html:11
 msgid "Download all files"
