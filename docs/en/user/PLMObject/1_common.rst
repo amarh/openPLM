@@ -46,7 +46,9 @@ Displays the ID card of the object.
 You find standard attributes like name, date of creation, owner, ...
 You find customized attributes depending of the company OpenPLM is implemented for (like size or weight or supplier, ...).
 
-If you have necessary rights, you can **Edit** the attributes and modify them.
+If you have necessary rights, you can :
+  * **Edit** the attributes and modify them,
+  * **Clone** the current object.
 
 .. note :: You can proceed some research based on each attribute.
 
