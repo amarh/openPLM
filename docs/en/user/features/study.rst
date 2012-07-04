@@ -2,7 +2,7 @@
 Study
 =========
 
-This document give details about few functions you can perform from the Study view. The functions available in the Study view are describe in the paragraph "1.1.2 Functions related to PLMObjects : PART / DOCUMENT" .
+This document give details about few functions you can perform from the Study view. Some of these are describe in the section : :ref:`en-plmObject-func`.
 
 
 DOCUMENT
@@ -26,6 +26,7 @@ The sections detailled in this paragraph are related to the document and part li
 
 
 2. BOM-CHILD
+
 The following pictures show how to add/generate and access to children (great-children,...).
 
 If the current part has already children(parts) they will be displayed in the table which contains the children.

@@ -11,8 +11,8 @@ Par exemple : un vélo, un paquets de gâteaux, un médicament, une roue, un
 dessin, un document 3D, ...
 
 **Part** et **Document** sont des sous classes de PLMObject. Vous pouvez
-définir des sous classes de **Part** et **Document** adaptés au domaine de
-l'industrie pour lequel vous utilisez OpenPLM. Chaque sous-classe est défini
+définir des sous classes de **Part** et **Document** adaptées au domaine de
+l'industrie pour lequel vous utilisez OpenPLM. Chaque sous-classe est définie
 comme un *type*.
 
 ========================    ===============================     ===============================
@@ -30,7 +30,7 @@ PLMObject                   PLMObject                           PLMObject
 Dans une sous classe/type, vous avez plusieurs instances avec une *référence*.
 
 Pour chaque référence, vous pouvez avoir plusieurs *révisions* permettant de
-suivre les modifications majeures. Elles suivent une séquence du type a, b, c ou 1, 2, 3 ou n'importe qu'elle autre séquence personnalisée.
+suivre les modifications majeures. Elles suivent une séquence du type a, b, c ou 1, 2, 3 ou n'importe quelle autre séquence personnalisée.
 
 Chaque **Part** et chaque **Document** possède un unique jeu de *type*,
 *référence*, *révision*.
@@ -73,7 +73,9 @@ On y trouve les différents état de l'objet, incluant l'état courant. Ces
 cycles de vie sont personnalisables en fonctions des besoins de l'entreprise.
 
 Si vous avez les autorisations nécessaires, vous pouvez :
- * **Valider** ou **Annuler** un objet
+ * **Valider** ou **Refuser** l'objet
+ 
+ * **Annuler** l'objet
     
  * **Remplacer** certains signataires ou utilisateurs notifiés
     
@@ -81,7 +83,7 @@ Si vous avez les autorisations nécessaires, vous pouvez :
    il recevra un email pour chaque évènement en rapport avec l'objet (révisions, 
    modifications, validations, ...)
 
-Il est possible d'ajouter des triggers sur les actions **Valider/Annuler**
+Il est possible d'ajouter des triggers sur les actions **Valider/Refuser**
 (vérification des autorisations, envoi d'email, validation d'un autre
 PLMObject ...)
 
@@ -97,6 +99,6 @@ HISTORIQUE
 ==========
 Affiche l'historique d'un objet.
 
-Cela permet une traçabilité complète de l'objet.
+Cela garantit une traçabilité complète de l'objet.
 
 

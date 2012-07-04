@@ -2,13 +2,13 @@
 Fonctions liés aux **UTILISATEURS**
 ===================================
 
-Ce document décrit les fonctions utilisés pour affichés et manipuler les
+Ce document décrit les fonctions utilisées pour afficher et manipuler les
 **Utilisateurs** dans openPLM.
 
 
 APERÇU
 ======
-Les **Utilisateurs** sont des objets Django standard. Depuis OpenPLM, vous
+Les **Utilisateurs** sont des objets standard de Django. Depuis OpenPLM, vous
 pouvez modifier certains attributs, changer votre mot de passe et déléguer vos
 autorisations.
 
@@ -23,7 +23,7 @@ Chaque **Utilisateur** possède un *nom d'utilisateur* unique.
 
 On peut créer des lien entre un **Utilisateur** et une **Part** ou un
 **Document**. Ces liens définissent les différentes autorisations que possèdent les
-**Utilisateur** sur chaque **Part** et chaque **Document**
+**Utilisateurs** sur chaque **Part** et chaque **Document**
 
 On peut créer des lien de délégation entre les **Utilisateurs** pour effectuer
 des transferts d'autorisations.
@@ -61,16 +61,15 @@ Affiche les Parts et Documents de l'utilisateur courant.
 
 DÉLÉGATION
 ========================================================
-Affiche les parrainage effectués par l'utilisateur et les rôles de
-chaque.
+Affiche les parrainages effectués par l'utilisateur et les rôles de
+chaque utilisateurs parrainés.
 
-Si vous avez les autorisations nécessaires, vous pouvez **Ajouter** des
-utilisateurs sponsorisés pour chaque rôle.
+Si vous avez les autorisations nécessaires, vous pouvez 
+  * **Ajouter** des utilisateurs sponsorisés/parrainés pour chaque rôle.
 
-Si vous avez les autorisations nécessaires, vous pouvez **Révoquer** une
-parrainage.
+  * **Révoquer** un parrainage.
 
 
 GROUPES
 ========================================================
-Affiche les Groupes liés à l'utilisateur.
+Affiche les Groupes auxquels appartient l'utilisateur.

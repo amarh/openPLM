@@ -2,7 +2,7 @@
 Étudier
 =======
 
-Ce document détaille les fonctions accessible depuis la vue Étudier.
+Ce document détaille les fonctions accessible depuis la vue Étudier. Certaines sont décrites dans la partie : :ref:`fr-plmObject-func`.
 
 
 DOCUMENT
@@ -27,10 +27,11 @@ relation avec la part courante.
 
 
 2. NOMENCLATURE
-L'image ci dessous comment ajouter/générer et accéder aux fils, petit-fils ...
 
-Si la part courante possède déjà des fils (parts), elles seront affichés dans
-la table.
+L'image ci dessous montre comment ajouter/générer et accéder aux fils, petit-fils ...
+
+Si la part courante possède déjà des fils (parts), ils seront affichés dans
+la table qui contient les descendants.
 
 .. raw:: html
    :file: html/study_part_child.html

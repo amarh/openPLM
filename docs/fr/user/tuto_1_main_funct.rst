@@ -56,8 +56,8 @@ Exemple :
 .. image:: images/Capture_openPLM_home.png
    :width: 100%
 
-Comme on peut le voir sur l'exemple, les invitations en attentes (envoyés et
-reçus) sont affichés sur la page d'accueil.
+Comme on peut le voir sur l'exemple, les invitations en attentes (envoyées et
+reçues) sont affichées sur la page d'accueil.
 
 
 RECHERCHE
@@ -112,9 +112,9 @@ Exemple :
 
 CRÉER
 =====
-On peut créer un objet en renseigner le formulaire présenté.
+On peut créer un objet en renseignant le formulaire présenté.
 
-L'utilisation du formulaire création est un autre moyen de créer des objets.
+D'autres moyens de créer des objets sont proposés sous le formulaire.
 
 Exemple :
 

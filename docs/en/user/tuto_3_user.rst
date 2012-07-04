@@ -53,9 +53,10 @@ DELEGATION
 ========================================================
 Display Users delegated by the current user and their assigned roles.
 
-If you have necessary rights, you can **Add** some delegated Users for each role.
+If you have necessary rights, you can :
+  * **Add** some delegated Users for each role.
 
-If you have necessary rights, you can **Stop** delegation.
+  * **Stop** delegation.
 
 
 GROUPS

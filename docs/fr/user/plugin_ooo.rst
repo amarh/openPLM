@@ -63,14 +63,14 @@ Il vous suffit d'installer le plugin à l'aide de la commande suivante :
 A l'aide du gestionnaire d'extension
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#. Démarrer OpenOffice
-#. Démarrer le gestionnaire d'extension : menu :menuselection:`Tools --> Extension Manager...`.
+#. Démarrez OpenOffice
+#. Démarrez le gestionnaire d'extension : menu :menuselection:`Tools --> Extension Manager...`.
    La fenêtre de dialogue suivante devrait apparaître :
 
    .. image:: images/pl_ooo_em.png
 
-#. Cliquer sur le bouton :guilabel:`Add...` et sélectionner le fichier :file:`openplm.oxt`
-#. L'installation du plugin est terminée. Refermer la fenêtre de dialogue et redémarrer OpenOffice. Si l'installation s'est déroulée correctement, un nouveau menu intitulé :guilabel:`OpenPLM` doit apparaître.
+#. Cliquez sur le bouton :guilabel:`Add...` et sélectionnez le fichier :file:`openplm.oxt`
+#. L'installation du plugin est terminée. Refermez la fenêtre de dialogue et redémarrez OpenOffice. Si l'installation s'est déroulée correctement, un nouveau menu intitulé :guilabel:`OpenPLM` doit apparaître.
 
 Utilisation
 ===========
@@ -78,39 +78,39 @@ Utilisation
 Configuration
 -------------
 
-Avant tout, il faut indiquer l'emplacement du serveur. Pour cela, ouvrer la
+Avant tout, il faut indiquer l'emplacement du serveur. Pour cela, ouvrez la
 fenêtre de configuration (menu :menuselection:`OpenPLM --> Configure`).
 
     .. image:: images/pl_ooo_conf.png
 
-Renseigner l'emplacement du serveur et cliquer sur :guilabel:`Configure`.
+Renseignez l'emplacement du serveur et cliquez sur :guilabel:`Configure`.
 
 Connexion
 ---------
 
-Avant d'effectuer un check-out de fichier, il faut vous connecter. Ouvrer la
+Avant d'effectuer un check-out de fichier, il faut vous connecter. Ouvrez la
 fenêtre de configuration (menu :menuselection:`OpenPLM --> Login`).
 
     .. image:: images/pl_ooo_login.png
 
-Renseigner vos nom d'utilisateur et mot de passe avant de cliquer sur :guilabel:`Login`.
+Renseignez vos nom d'utilisateur et mot de passe avant de cliquer sur :guilabel:`Login`.
 
 Check-out d'un fichier
 ----------------------
 
-Pour effectuer le check-out d'un fichier, cliquer sur :menuselection:`OpenPLM --> Check-out`.
+Pour effectuer le check-out d'un fichier, cliquez sur :menuselection:`OpenPLM --> Check-out`.
 La fenêtre de dialogue suivante devrait apparaître :
 
     .. image:: images/pl_ooo_co1.png
 
-Renseigner votre requête puis cliquer sur le bouton :guilabel:`Recherche`, déroulé l'objet intitulé :guilabel:`Résultats`.
+Renseignez votre requête puis cliquez sur le bouton :guilabel:`Recherche`, déroulez l'objet intitulé :guilabel:`Résultats`.
 Vous devriez pouvoir parcourir les documents pour voir la liste des fichiers
-disponibles : 
+disponibles en déroulant les objets : 
 
     .. image:: images/pl_ooo_co2.png
 
 Il ne vous reste qu'à sélectionner votre fichier et cliquer sur le bouton :guilabel:`Check-out`.
-Votre document devrait s'ouvrir et vous pouvez désormais travailler comme
+Votre fichier devrait s'ouvrir et vous pouvez désormais travailler comme
 habituellement.
 
 Une fois votre travail terminé, il est possible de changer la révision du
@@ -120,52 +120,52 @@ Téléchargement d'un fichier
 ---------------------------
 
 Si vous souhaitez juste consulter un document sans le modifier, il vous suffit
-de cliquer sur :menuselection:`OpenPLM --> Download from OpenPLM`. Effectuer votre requête, sélectionner votre fichier et cliquer sur le bouton :guilabel:`Download`.
+de cliquer sur :menuselection:`OpenPLM --> Download from OpenPLM`. Effectuez votre requête, sélectionnez votre fichier et cliquez sur le bouton :guilabel:`Download`.
 
 Check-in d'un fichier
 ---------------------
 
 
-Pour sauvegarder votre travail sur le serveur, cliquer sur :menuselection:`OpenPLM --> Check-in`.
+Pour sauvegarder votre travail sur le serveur, cliquez sur :menuselection:`OpenPLM --> Check-in`.
 La fenêtre de dialogue suivante devrait apparaître : 
 
     .. image:: images/pl_ooo_ci.png
 
-Cocher la case :guilabel:`Unlock?` si vous souhaitez déverrouiller votre
+Cochez la case :guilabel:`Unlock?` si vous souhaitez déverrouiller votre
 fichier, ce qui le fermera aussi dans OpenOffiche.
 
-Cliquer sur le bouton :guilabel:`Check-in`.
+Cliquez sur le bouton :guilabel:`Check-in`.
 
 Révision d'un document
 ----------------------
 
-Pour créer une nouvelle révision d'un document lié à votre fichier, cliquer
+Pour créer une nouvelle révision du document lié à votre fichier, cliquez
 sur :menuselection:`OpenPLM --> Revise`.
 
     .. image:: images/pl_ooo_rev.png
 
-Si vous souhaitez déverrouiller votre fichier, cocher la case :guilabel:`Unlock?`. Cela fermera aussi votre document dans OpenOffice.
+Si vous souhaitez déverrouiller votre fichier, cochez la case :guilabel:`Unlock?`. Cela fermera aussi votre fichier dans OpenOffice.
 
 .. note::
 
     L'ancienne révision du fichier sera automatiquement déverrouillée.
 
-Cliquer sur le bouton :guilabel:`Revise`.
+Cliquez sur le bouton :guilabel:`Revise`.
 
 
 Création d'un nouveau document
 ------------------------------
 
 Il est possible de créer un nouveau document à partir d'un fichier qui n'a été
-ni check-out, ni téléchargé. Pour cela, cliquer sur :menuselection:`OpenPLM --> Create a document`.
+ni check-out, ni téléchargé. Pour cela, cliquez sur :menuselection:`OpenPLM --> Create a document`.
 La fenêtre de dialogue suivante devrait apparaître :
 
     .. image:: images/pl_ooo_create.png
 
-Remplir le formulaire, sans oublier d'indiquer le nom du fichier et son
-extension, puis cliquer sur :guilabel:`Create` pour valider la création.
+Remplissez le formulaire, sans oublier d'indiquer le nom du fichier et son
+extension, puis cliquez sur :guilabel:`Create` pour valider la création.
 
-Comme pour une révision ou un check-in, cocher la case :guilabel:`Unlock?` si vous souhaitez déverrouiller votre fichier, ce qui le fermera dans OpenOffice.
+Comme pour une révision ou un check-in, cochez la case :guilabel:`Unlock?` si vous souhaitez déverrouiller votre fichier, ce qui le fermera dans OpenOffice.
 
 
 Oublier un fichier
@@ -177,7 +177,7 @@ OpenOffice. Il est possible d'oublier un fichier en cliquant sur :menuselection:
 Attacher un document à une part
 -------------------------------
 
-On peut lier le document courant à une part en cliquant sur :menuselection:`OpenPLM --> Attach to part`.
+Vous pouvez lier le document courant à une part en cliquant sur :menuselection:`OpenPLM --> Attach to part`.
 Ceci ouvrira une fenêtre de dialogue permettant de choisir une part. En
 sélectionner une avant de cliquer sur le bouton :guilabel:`Attach`.
 

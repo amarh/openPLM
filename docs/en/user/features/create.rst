@@ -2,7 +2,8 @@
 Create
 =========
 
-This document describes how to create parts and documents
+This document describes how to create **Parts**, **Documents**.
+It describes how to add new **Users** too.
 
 .. raw:: html
    :file: html/create.html
@@ -17,7 +18,7 @@ The sponsor form is also reachable in the delegation tab
 
 Import from a csv file
 ***********************
-PLMObject and user can be created with a csv file. This file
+PLMObject (parts and document) and user can be created with a csv file. This file
 must contains headers related to the target (object or user).
 Mostly these headers are the required field in the related
 object or user creation form.
@@ -28,7 +29,7 @@ Example of csv file's structure :
         :header-rows: 1
         :file: csv_import/PLMObject.csv
                 
-    Download the file :download:`here <csv_import/PLMObject.csv>`.
+    Download the :download:`file <csv_import/PLMObject.csv>`.
 
   
  2 - BOM      
@@ -36,7 +37,7 @@ Example of csv file's structure :
         :header-rows: 1
         :file: csv_import/BOM.csv
         
-    Download the file :download:`here <csv_import/BOM.csv>`.
+    Download the :download:`file <csv_import/BOM.csv>`.
 
 
  3 - User        
@@ -53,4 +54,4 @@ Example of csv file's structure :
         * "ru" (russian)
         * "zh_CN" (chinese)
         
-    Download the file :download:`here <csv_import/User.csv>`.
+    Download the :download:`file <csv_import/User.csv>`.
