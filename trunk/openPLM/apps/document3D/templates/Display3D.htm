@@ -686,11 +686,10 @@ THREE.Vertex = function ( position ) {
     }
 
     function view_axometric() {
-        view_top();
-        //TODO
-        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), -Math.PI/6);
+        view_front();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), -Math.sqrt(2)/2);
         dummy.updateMatrix();
-        rotateAroundObjectAxis(dummy, new THREE.Vector3(1,0,0), -Math.PI/6);
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(Math.sin(Math.sqrt(2)/2), Math.cos(Math.sqrt(2)/2),0), Math.PI/6);
     }
 
 
