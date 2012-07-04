@@ -56,8 +56,9 @@ propriétaire...
 On y trouve aussi des attributs personnalisés qui dépendent du paramétrage
 effectué par la société utilisant OpenPLM.
 
-Si vous avez les autorisation nécessaires, vous pouvez **Éditer** les attributs
-et les modifier.
+Si vous avez les autorisation nécessaires, vous pouvez :
+  * **Éditer** les attributs et les modifier,
+  * **Cloner** l'objet courant.
 
 .. note :: Il est possible d'effectuer des recherches en fonction des attributs.
 
