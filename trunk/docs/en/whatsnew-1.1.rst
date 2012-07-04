@@ -79,8 +79,15 @@ Shading
 
 .. todo:: screenshots
 
-Random colors
-~~~~~~~~~~~~~~~
+View selection
+~~~~~~~~~~~~~~
+
+A new toolbar is available to switch between views (front, top...).
+
+.. todo:: screenshots
+
+Random colors and transparency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. todo:: screenshots
 
@@ -98,6 +105,10 @@ non decomposed STEP files are handled.
 
 .. todo:: example
 
+WebDAV access
+--------------
+
+OpenPLM can now serves all managed files through a WebDAV access.
 
 Bugs fixed
 ------------
