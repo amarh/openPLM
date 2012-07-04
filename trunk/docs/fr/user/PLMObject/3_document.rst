@@ -5,26 +5,26 @@ Fonctions spécifiques au PLMObject : **DOCUMENT**
 
 PARTS
 =====
-Affiche les Parts liés au Document courant.
+Affiche les Parts liées au Document courant.
 
-Si vous avez les autorisations nécessaires, vous pouvez **Ajouter** une
-nouvelle Part.
+Si vous avez les autorisations nécessaires, vous pouvez : 
+  * **Ajouter** une nouvelle Part,
 
-Si vous avez les autorisations nécessaires, vous pouvez **Supprimer** une Part.
+  * **Supprimer** une Part.
 
 
 FICHIERS
 ========
 Affiche les fichiers uploadés dans le Document courant.
 
-Vous pouvez :
+Si vous avez les autorisations nécessaires, vous pouvez :
     * télécharger des fichiers
-    * Si vous avez les autorisation nécessaires,  ajouter/uploader des
-      fichiers
-    * Si vous avez les autorisation nécessaires, faire des check-out
-      (télécharger et verrouiller un fichier)
-    * Si vous avez les autorisation nécessaires, faire des check-in (uploader
-      et déverrouiller un fichier)
+    
+    * ajouter/uploader des fichiers
+    
+    * faire des check-out (télécharger et verrouiller un fichier)
+    
+    * faire des check-in (uploader et déverrouiller un fichier)
 
 
 3D DOCUMENT
@@ -34,8 +34,8 @@ sous-classe Document de PLMObject. Elle est utilisée pour décrire la géométr
 d'un objet. Cette géométrie est généralement définie dans des fichiers STEPs
 (extensions *.step* ou *.stp*).
 
-Si le document est un Document 3D, une représentation 3D est généré en
-utilisant le fichier lié.
+Si le document est un Document 3D et contient un ou des fichiers STEPs, une représentation 3D est générée en
+utilisant ce(s) fichier(s).
 
 Exemple de représentation 3D : 
 

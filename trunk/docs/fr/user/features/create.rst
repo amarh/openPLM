@@ -2,7 +2,8 @@
 Créer
 =====
 
-Ce document décrit la création de parts et de documents.
+Ce document décrit la création de **Parts**, **Documents**.
+Il décrit aussi l'ajout de nouveaux **Utilisateurs**.
 
 .. raw:: html
    :file: html/create.html
@@ -17,11 +18,11 @@ On peut aussi accéder au formulaire de parrainage depuis l'onglet délégation
 
 Import depuis un fichier csv
 ****************************
-On peut créer des utilisateurs et des objets PLMObject à partir d'un fichier
+On peut créer des utilisateurs et des objets PLMObject (parts et documents) à partir d'un fichier
 csv. Ce fichier doit comporter les en-têtes relatifs à la cible (objet ou
 utilisateur).
 
-En majorité, ces en-têtes correspondent aux champs requis que l'on peut
+Ces en-têtes correspondent, principalement, aux champs requis que l'on peut
 retrouver dans le formulaire de création de l'objet ou de l'utilisateur.
 
 Exemple de la structure d'un fichier csv : 
@@ -30,7 +31,7 @@ Exemple de la structure d'un fichier csv :
         :header-rows: 1
         :file: csv_import/PLMObject.csv
         
-    Télécharger le fichier :download:`here <csv_import/PLMObject.csv>`.
+    Télécharger le  :download:`fichier <csv_import/PLMObject.csv>`.
 
   
  2 - Nomenclature      
@@ -38,12 +39,20 @@ Exemple de la structure d'un fichier csv :
         :header-rows: 1
         :file: csv_import/BOM.csv
         
-    Télécharger le fichier :download:`here <csv_import/BOM.csv>`.
+    Télécharger le  :download:`fichier <csv_import/BOM.csv>`.
 
 
  3 - Utilisateur        
     .. csv-table::
         :header-rows: 1
         :file: csv_import/User.csv
-        
-    Télécharger le fichier :download:`here <csv_import/User.csv>`.
+    
+    Les différentes valeurs que peut prendre l'attribut *language* :
+        * "en" (anglais)
+        * "fr" (français)
+        * "es" (espagnol)
+        * "ja" (japonnais)
+        * "ru" (russe)
+        * "zh_CN" (chinois)
+            
+    Télécharger le  :download:`fichier <csv_import/User.csv>`.
