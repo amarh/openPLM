@@ -746,31 +746,47 @@ msgid "Username"
 msgstr "Nombre de usuario"
 
 #: plmapp/forms.py:587
+msgid "Contributor: can create parts, documents, groups and sponsor other users"
+msgstr "Contribuidor: puede crear partes, documentos, grupos y patrocinar otros usarios"
+
+#: plmapp/forms.py:588
+msgid "Reader: can not edit or create contents"
+msgstr "Espectador: no puede editar ni crear contenidos"
+
+#: plmapp/forms.py:589
+msgid "Restricted account: can only access to specific contents"
+msgstr "Limitado cuenta :solo puede acceder a especificos contenidos"
+
+#: plmapp/forms.py:612
 msgid "The new user will belong to the selected groups"
 msgstr "El nuevo usuario formara parte de los grupos seleccionados"
 
-#: plmapp/forms.py:595
+#: plmapp/forms.py:619
 msgid "Email address must be unique."
 msgstr "La direccion de Email debe ser única."
 
-#: plmapp/forms.py:602
+#: plmapp/forms.py:626
 msgid "Email's domain not valid"
 msgstr "Dominio de Email no valido"
 
-#: plmapp/forms.py:617
+#: plmapp/forms.py:646
 #, python-format
 msgid "Warning! There are homonyms: %s!"
 msgstr "Atención! Hay homóninos: %s!"
 
-#: plmapp/forms.py:649
+#: plmappforms.py:654
+msgid "A contributor or reader must belong to at least one group."
+msgstr "Un contribuidor o espectador debe formar parte por lo menos de un grupo."
+
+#: plmapp/forms.py:687
 msgid "Columns must have distinct headers."
 msgstr "Las columnas deben tener cabeceras distintas."
 
-#: plmapp/forms.py:668
+#: plmapp/forms.py:706
 msgid "Password"
 msgstr "Contraseña:"
 
-#: plmapp/forms.py:681
+#: plmapp/forms.py:719
 msgid "Your password was entered incorrectly. Please enter it again."
 msgstr "El password introducido es incorrecto.Por favor intentelo de nuevo"
 

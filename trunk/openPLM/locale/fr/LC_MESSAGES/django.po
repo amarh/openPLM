@@ -727,31 +727,47 @@ msgid "Username"
 msgstr "Identifiant"
 
 #: plmapp/forms.py:587
+msgid "Contributor: can create parts, documents, groups and sponsor other users"
+msgstr "Contributeur : peut créer des parts, des documents, des groupes et parrainer d'autres utilisateurs"
+
+#: plmapp/forms.py:588
+msgid "Reader: can not edit or create contents"
+msgstr "Lecteur: ne peut ni éditer ni créer du contenu"
+
+#: plmapp/forms.py:589
+msgid "Restricted account: can only access to specific contents"
+msgstr "Compte restreint : peut seulement accéder aux contenus spécifiques"
+
+#: plmapp/forms.py:612
 msgid "The new user will belong to the selected groups"
 msgstr "Le nouvel utilisateur appartiendra aux groupes sélectionnés"
 
-#: plmapp/forms.py:595
+#: plmapp/forms.py:619
 msgid "Email address must be unique."
 msgstr "L'adresse mail doit être unique."
 
-#: plmapp/forms.py:602
+#: plmapp/forms.py:626
 msgid "Email's domain not valid"
 msgstr "Domaine du mail non valide"
 
-#: plmapp/forms.py:617
+#: plmapp/forms.py:646
 #, python-format
 msgid "Warning! There are homonyms: %s!"
 msgstr "Attention ! Il y a des homonymes: %s!"
 
-#: plmapp/forms.py:649
+#: plmappforms.py:654
+msgid "A contributor or reader must belong to at least one group."
+msgstr "Un contributeur ou lecteur doit appartenir à au moins un groupe."
+
+#: plmapp/forms.py:687
 msgid "Columns must have distinct headers."
 msgstr "Chaque colonne doit avoir un entête différent."
 
-#: plmapp/forms.py:668
+#: plmapp/forms.py:706
 msgid "Password"
 msgstr "Mot de passe"
 
-#: plmapp/forms.py:681
+#: plmapp/forms.py:719
 msgid "Your password was entered incorrectly. Please enter it again."
 msgstr ""
 "Votre mot de passe a été saisi de façon incorrect. SVP veuillez le saisir à "
@@ -2104,7 +2120,7 @@ msgstr "Vous êtes dans les groupes suivants :"
 
 #: templates/users/groups.html:43
 msgid "Click here to create another group."
-msgstr "Cliquez ici pour créer un nouveau group"
+msgstr "Cliquez ici pour créer un nouveau groupe."
 
 #: templates/users/password.html:7
 msgid "PASSWORD MODIFICATION:"
