@@ -100,6 +100,7 @@ TEMPLATE_DIRS = (
     "/var/django/openPLM/trunk/openPLM/templates",
 )
 
+#: list of installed apps
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
