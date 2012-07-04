@@ -599,6 +599,10 @@ msgstr "Requis. 50 caractères maximum. Uniquement les lettres, nombres, sauf le
 msgid "Checking this box, you allow OpenPLM to set the reference of the object."
 msgstr "En cochant cette case, vous autorisez OpenPLM à choisir la référence de l'objet."
 
+#: plmapp/forms.py:157
+msgid "You did not check the Auto box: the reference is required."
+msgstr "Vous n'avez pas coché la case Auto: la référence est requise."
+
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
