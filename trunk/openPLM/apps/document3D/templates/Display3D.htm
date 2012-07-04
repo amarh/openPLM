@@ -147,6 +147,41 @@
             background:none;
             border: none;
         }
+        #views-toolbar {
+            display: inline;
+        }
+        .Button.view {
+            margin-right: -0.4em;
+        }
+        button.view span.ui-icon {
+            background: url('{{MEDIA_URL}}/img/views.png') no-repeat;
+            top: 2px;
+            left: 3px;
+            height: 32px;
+            width: 32px;
+            margin: 0;
+            padding: 0;
+        }
+        button.view span.front {
+            background-position: -32px 0;
+        }
+        button.view span.right {
+            background-position: -64px 0;
+        }
+        button.view span.top {
+            background-position: -96px 0;
+        }
+        button.view span.rear {
+            background-position: -128px 0;
+        }
+        button.view span.left {
+            background-position: -160px 0;
+        }
+        button.view span.bottom {
+            background-position: -192px 0;
+        }
+
+
     </style>
 
 {% endblock %}
@@ -166,8 +201,20 @@
 
 
         <span id="toolbar" class="ui-widget-header ui-corner-all">
+            
+            <div id="views-toolbar">
+            <button id="view-axo" class="Button small view">{% trans "Set to axometric view" %}</button>
+            <button id="view-front" class="Button small view">{% trans "Set to front view" %}</button>
+            <button id="view-right" class="Button small view">{% trans "Set to right view" %}</button>
+            <button id="view-top" class="Button small view">{% trans "Set to top view" %}</button>
+            <button id="view-rear" class="Button small view">{% trans "Set to rear view" %}</button>
+            <button id="view-left" class="Button small view">{% trans "Set to left view" %}</button>
+            <button id="view-bottom" class="Button small view">{% trans "Set to bottom view" %}</button>
+        </div>
+
             <button id="random-color" class="Button small">{% trans "Random colors" %}</button>
             <button id="initial-color" class="Button small">{% trans "Initial colors" %}</button>
+            
             <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small">{% trans "Toggle transparency" %}</label></input>
         </span>
 
@@ -251,6 +298,7 @@ THREE.Vertex = function ( position ) {
     var height ;
     var deep ;
     var controls = null;	
+    var dummy;
 
     {% if stl %}
         var xhr = new XMLHttpRequest();
@@ -376,7 +424,9 @@ THREE.Vertex = function ( position ) {
             }
             object3D.castShadow = true;
             object3D.receiveShadow = true;
-            scene.add( object3D);
+            dummy = new THREE.Object3D();
+            dummy.add( object3D);
+            scene.add(dummy);
 
             camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(),
                     0.1, radius*200);
@@ -447,6 +497,16 @@ THREE.Vertex = function ( position ) {
             
             $("#random-color").button().click(random_color);
             $("#initial-color").button().click(reinit_color);
+
+            $("#views-toolbar").buttonset();
+            $("#view-axo").button({text:false, icons:{primary:'axo'}}).click(view_axometric);
+            $("#view-top").button({text:false, icons:{primary:'top'}}).click(view_top);
+            $("#view-bottom").button({text:false, icons:{primary:'bottom'}}).click(view_bottom);
+            $("#view-left").button({text:false, icons:{primary:'left'}}).click(view_left);
+            $("#view-right").button({text:false, icons:{primary:'right'}}).click(view_right);
+            $("#view-front").button({text:false, icons:{primary:'front'}}).click(view_front);
+            $("#view-rear").button({text:false, icons:{primary:'rear'}}).click(view_rear);
+            
             $("#transparency").button().click(toggle_transparency);
 
         }
@@ -569,6 +629,60 @@ THREE.Vertex = function ( position ) {
             }
         }
     }
+
+    function reinit_rotation() {
+        dummy.rotation.set(0,0,0).addSelf(camera.rotation.clone());
+        dummy.updateMatrix();
+    }
+
+    // rotateAroundObjectAxis
+    // from http://stackoverflow.com/questions/11060734/how-to-rotate-a-3d-object-on-axis-three-js?rq=1
+    // by Cory Gross, CC-BY-SA
+    function rotateAroundObjectAxis(object, axis, radians) {
+        var rotObjectMatrix = new THREE.Matrix4();
+        rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+        object.matrix.multiplySelf(rotObjectMatrix);      // post-multiply
+        object.rotation.getRotationFromMatrix(object.matrix, object.scale);
+    }
+
+    function view_rear(){
+        view_front();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), Math.PI);
+    }
+
+    function view_top() {
+        reinit_rotation();
+    }
+    
+    function view_front() {
+        reinit_rotation();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(1,0,0), -Math.PI/2);
+        dummy.updateMatrix();
+    }
+
+    function view_left() {
+        view_front();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), Math.PI/2);
+    }
+
+    function view_right() {
+        view_front();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), -Math.PI/2);
+    }
+
+    function view_bottom() {
+        reinit_rotation();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(1,0,0), Math.PI);
+    }
+
+    function view_axometric() {
+        view_top();
+        //TODO
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(0,0,1), -Math.PI/6);
+        dummy.updateMatrix();
+        rotateAroundObjectAxis(dummy, new THREE.Vector3(1,0,0), -Math.PI/6);
+    }
+
 
     {% endif %}
 
