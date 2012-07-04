@@ -18,7 +18,7 @@
    version="1.1"
    id="svg2"
    height="63.473198"
-   width="440">
+   width="504.00003">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -26,9 +26,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="78.402025"
-     inkscape:cy="29.063049"
+     inkscape:zoom="3.959798"
+     inkscape:cx="409.91506"
+     inkscape:cy="35.193556"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -4381,6 +4381,37 @@
          offset="1"
          id="stop31723" />
     </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3253-334-791-163-170-590-450-653-657-710-395-605-443-603"
+       id="radialGradient32770"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.9724373,-0.105657,0.05052317,0.4650009,-0.3519546,9.5854384)"
+       cx="18.417862"
+       cy="17.013988"
+       fx="18.417862"
+       fy="17.013988"
+       r="27.986706" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3253-334-791-163-170-590-450-653-657-710-395-605-443-603"
+       id="radialGradient32799"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.9724373,-0.105657,0.05052317,0.4650009,-0.3519546,9.5854384)"
+       cx="18.417862"
+       cy="17.013988"
+       fx="18.417862"
+       fy="17.013988"
+       r="27.986706" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath32801">
+      <path
+         style="opacity:0.66000001;fill:#ffffff;fill-opacity:1;stroke:none"
+         d="M 2.37523,61.34098 3.20185,0.77215 48.87593,1.44426 2.37523,61.34098 z"
+         id="path32803"
+         sodipodi:nodetypes="cccc" />
+    </clipPath>
   </defs>
   <metadata
      id="metadata7">
@@ -4728,5 +4759,59 @@ Source: http://sourceforge.net/apps/mediawiki/free-cad/index.php?title=Tango_ico
            style="fill:#ff9b7b;fill-opacity:1;fill-rule:nonzero;stroke:#312783;stroke-width:2.20000005;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.4000001, 2.20000005;stroke-dashoffset:1.54000003;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
       </g>
     </g>
+    <rect
+       style="fill:none;stroke:none"
+       id="rect32762"
+       width="62"
+       height="62"
+       x="574.70056"
+       y="720.02197"
+       inkscape:export-filename="/home/pcosquer/openPLM/trunk/openPLM/media/img/views.png"
+       inkscape:export-xdpi="45.409092"
+       inkscape:export-ydpi="45.409092" />
+    <g
+       inkscape:export-ydpi="45.409092"
+       inkscape:export-xdpi="45.409092"
+       inkscape:export-filename="/home/pcosquer/openPLM/trunk/openPLM/media/img/views.png"
+       transform="translate(574.01242,719.30241)"
+       id="g32774"
+       inkscape:label="Layer 1"
+       style="opacity:0.37636366">
+      <path
+         style="color:#000000;fill:url(#radialGradient32799);fill-opacity:1;fill-rule:nonzero;stroke:#312783;stroke-width:2.16146827;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         d="M 26.909091,2.1818181 4.5454545,19.454545 l 1.2727273,32 L 40.727273,62.181818 57.272727,39.818182 58,6.9090909 26.909091,2.1818181 z"
+         id="path32776" />
+      <path
+         id="path32778"
+         style="color:#000000;fill:none;stroke:#312783;stroke-width:2.16146827;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         d="M 4.7272727,19.272727 40.727273,26.181818 57.636364,7.0909091 M 40.363636,26.181818 41.090909,62.363636" />
+    </g>
+    <g
+       inkscape:label="Layer 1"
+       id="g32764"
+       transform="translate(574.01242,719.30241)"
+       inkscape:export-filename="/home/pcosquer/openPLM/trunk/openPLM/media/img/views.png"
+       inkscape:export-xdpi="45.409092"
+       inkscape:export-ydpi="45.409092"
+       clip-path="url(#clipPath32801)">
+      <path
+         id="path32766"
+         d="M 26.909091,2.1818181 4.5454545,19.454545 l 1.2727273,32 L 40.727273,62.181818 57.272727,39.818182 58,6.9090909 26.909091,2.1818181 z"
+         style="color:#000000;fill:url(#radialGradient32770);fill-opacity:1;fill-rule:nonzero;stroke:#312783;stroke-width:2.16146827;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <path
+         d="M 4.7272727,19.272727 40.727273,26.181818 57.636364,7.0909091 M 40.363636,26.181818 41.090909,62.363636"
+         style="color:#000000;fill:none;stroke:#312783;stroke-width:2.16146827;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         id="path32768" />
+    </g>
+    <rect
+       inkscape:export-ydpi="45.409092"
+       inkscape:export-xdpi="45.409092"
+       inkscape:export-filename="/home/pcosquer/openPLM/trunk/openPLM/media/img/views.png"
+       y="720.02197"
+       x="574.70056"
+       height="62"
+       width="62"
+       id="rect32772"
+       style="fill:none;stroke:none" />
   </g>
 </svg>
