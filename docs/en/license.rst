@@ -53,7 +53,7 @@ any later version.
       For example, if you distribute copies of such a program, whether
     gratis or for a fee, you must pass on to the recipients the same
     freedoms that you received.  You must make sure that they, too, receive
-    or can get the source code.  And you must show them these termss so they
+    or can get the source code.  And you must show them these terms so they
     know their rights.
 
       Developers that use the GNU GPL protect your rights with two steps:
@@ -84,7 +84,7 @@ any later version.
     make it effectively proprietary.  To prevent this, the GPL assures that
     patents cannot be used to render the program non-free.
 
-      The precise termss and conditions for copying, distribution and
+      The precise terms and conditions for copying, distribution and
     modification follow.
 
                            TERMS AND CONDITIONS
@@ -172,7 +172,7 @@ any later version.
 
       2. Basic Permissions.
 
-      All rights granted under this License are granted for the terms of
+      All rights granted under this License are granted for the term of
     copyright on the Program, and are irrevocable provided the stated
     conditions are met.  This License explicitly affirms your unlimited
     permission to run the unmodified Program.  The output from running a
@@ -185,10 +185,10 @@ any later version.
     in force.  You may convey covered works to others for the sole purpose
     of having them make modifications exclusively for you, or provide you
     with facilities for running those works, provided that you comply with
-    the termss of this License in conveying all material for which you do
+    the terms of this License in conveying all material for which you do
     not control copyright.  Those thus making or running the covered works
     for you must do so exclusively on your behalf, under your direction
-    and control, on termss that prohibit them from making any copies of
+    and control, on terms that prohibit them from making any copies of
     your copyrighted material outside their relationship with you.
 
       Conveying under any other circumstances is permitted solely under
@@ -217,7 +217,7 @@ any later version.
     receive it, in any medium, provided that you conspicuously and
     appropriately publish on each copy an appropriate copyright notice;
     keep intact all notices stating that this License and any
-    non-permissive termss added in accord with section 7 apply to the code;
+    non-permissive terms added in accord with section 7 apply to the code;
     keep intact all notices of the absence of any warranty; and give all
     recipients a copy of this License along with the Program.
 
@@ -228,7 +228,7 @@ any later version.
 
       You may convey a work based on the Program, or the modifications to
     produce it from the Program, in the form of source code under the
-    termss of section 4, provided that you also meet all of these conditions:
+    terms of section 4, provided that you also meet all of these conditions:
 
         a) The work must carry prominent notices stating that you modified
         it, and giving a relevant date.
@@ -241,7 +241,7 @@ any later version.
         c) You must license the entire work, as a whole, under this
         License to anyone who comes into possession of a copy.  This
         License will therefore apply, along with any applicable section 7
-        additional termss, to the whole of the work, and all its parts,
+        additional terms, to the whole of the work, and all its parts,
         regardless of how they are packaged.  This License gives no
         permission to license the work in any other way, but it does not
         invalidate such permission if you have separately received it.
@@ -263,9 +263,9 @@ any later version.
 
       6. Conveying Non-Source Forms.
 
-      You may convey a covered work in object code form under the termss
+      You may convey a covered work in object code form under the terms
     of sections 4 and 5, provided that you also convey the
-    machine-readable Corresponding Source under the termss of this License,
+    machine-readable Corresponding Source under the terms of this License,
     in one of these ways:
 
         a) Convey the object code in, or embodied in, a physical product
@@ -316,7 +316,7 @@ any later version.
       A "User Product" is either (1) a "consumer product", which means any
     tangible personal property which is normally used for personal, family,
     or household purposes, or (2) anything designed or sold for incorporation
-    into a dwelling.  In determsining whether a product is a consumer product,
+    into a dwelling.  In determining whether a product is a consumer product,
     doubtful cases shall be resolved in favor of coverage.  For a particular
     product received by a particular user, "normally used" refers to a
     typical or common use of that class of product, regardless of the status
@@ -338,7 +338,7 @@ any later version.
     specifically for use in, a User Product, and the conveying occurs as
     part of a transaction in which the right of possession and use of the
     User Product is transferred to the recipient in perpetuity or for a
-    fixed terms (regardless of how the transaction is characterized), the
+    fixed term (regardless of how the transaction is characterized), the
     Corresponding Source conveyed under this section must be accompanied
     by the Installation Information.  But this requirement does not apply
     if neither you nor any third party retains the ability to install
@@ -361,7 +361,7 @@ any later version.
 
       7. Additional Terms.
 
-      "Additional permissions" are termss that supplement the termss of this
+      "Additional permissions" are terms that supplement the terms of this
     License by making exceptions from one or more of its conditions.
     Additional permissions that are applicable to the entire Program shall
     be treated as though they were included in this License, to the extent
@@ -379,10 +379,10 @@ any later version.
 
       Notwithstanding any other provision of this License, for material you
     add to a covered work, you may (if authorized by the copyright holders of
-    that material) supplement the termss of this License with termss:
+    that material) supplement the terms of this License with terms:
 
         a) Disclaiming warranty or limiting liability differently from the
-        termss of sections 15 and 16 of this License; or
+        terms of sections 15 and 16 of this License; or
 
         b) Requiring preservation of specified reasonable legal notices or
         author attributions in that material or in the Appropriate Legal
@@ -404,22 +404,22 @@ any later version.
         any liability that these contractual assumptions directly impose on
         those licensors and authors.
 
-      All other non-permissive additional termss are considered "further
+      All other non-permissive additional terms are considered "further
     restrictions" within the meaning of section 10.  If the Program as you
     received it, or any part of it, contains a notice stating that it is
-    governed by this License along with a terms that is a further
-    restriction, you may remove that terms.  If a license document contains
+    governed by this License along with a term that is a further
+    restriction, you may remove that term.  If a license document contains
     a further restriction but permits relicensing or conveying under this
-    License, you may add to a covered work material governed by the termss
+    License, you may add to a covered work material governed by the terms
     of that license document, provided that the further restriction does
     not survive such relicensing or conveying.
 
-      If you add termss to a covered work in accord with this section, you
+      If you add terms to a covered work in accord with this section, you
     must place, in the relevant source files, a statement of the
-    additional termss that apply to those files, or a notice indicating
-    where to find the applicable termss.
+    additional terms that apply to those files, or a notice indicating
+    where to find the applicable terms.
 
-      Additional termss, permissive or non-permissive, may be stated in the
+      Additional terms, permissive or non-permissive, may be stated in the
     form of a separately written license, or stated as exceptions;
     the above requirements apply either way.
 
@@ -427,14 +427,14 @@ any later version.
 
       You may not propagate or modify a covered work except as expressly
     provided under this License.  Any attempt otherwise to propagate or
-    modify it is void, and will automatically termsinate your rights under
+    modify it is void, and will automatically terminate your rights under
     this License (including any patent licenses granted under the third
     paragraph of section 11).
 
       However, if you cease all violation of this License, then your
     license from a particular copyright holder is reinstated (a)
     provisionally, unless and until the copyright holder explicitly and
-    finally termsinates your license, and (b) permanently, if the copyright
+    finally terminates your license, and (b) permanently, if the copyright
     holder fails to notify you of the violation by some reasonable means
     prior to 60 days after the cessation.
 
@@ -445,9 +445,9 @@ any later version.
     copyright holder, and you cure the violation prior to 30 days after
     your receipt of the notice.
 
-      Termination of your rights under this section does not termsinate the
+      Termination of your rights under this section does not terminate the
     licenses of parties who have received copies or rights from you under
-    this License.  If your rights have been termsinated and not permanently
+    this License.  If your rights have been terminated and not permanently
     reinstated, you do not qualify to receive new licenses for the same
     material under section 10.
 
@@ -517,7 +517,7 @@ any later version.
 
       If you convey a covered work, knowingly relying on a patent license,
     and the Corresponding Source of the work is not available for anyone
-    to copy, free of charge and under the termss of this License, through a
+    to copy, free of charge and under the terms of this License, through a
     publicly available network server or other readily accessible means,
     then you must either (1) cause the Corresponding Source to be so
     available, or (2) arrange to deprive yourself of the benefit of the
@@ -563,9 +563,9 @@ any later version.
     excuse you from the conditions of this License.  If you cannot convey a
     covered work so as to satisfy simultaneously your obligations under this
     License and any other pertinent obligations, then as a consequence you may
-    not convey it at all.  For example, if you agree to termss that obligate you
+    not convey it at all.  For example, if you agree to terms that obligate you
     to collect a royalty for further conveying from those to whom you convey
-    the Program, the only way you could satisfy both those termss and this
+    the Program, the only way you could satisfy both those terms and this
     License would be to refrain entirely from conveying the Program.
 
       13. Use with the GNU Affero General Public License.
@@ -573,7 +573,7 @@ any later version.
       Notwithstanding any other provision of this License, you have
     permission to link or combine any covered work with a work licensed
     under version 3 of the GNU Affero General Public License into a single
-    combined work, and to convey the resulting work.  The termss of this
+    combined work, and to convey the resulting work.  The terms of this
     License will continue to apply to the part which is the covered work,
     but the special requirements of the GNU Affero General Public License,
     section 13, concerning interaction through a network will apply to the
@@ -589,7 +589,7 @@ any later version.
       Each version is given a distinguishing version number.  If the
     Program specifies that a certain numbered version of the GNU General
     Public License "or any later version" applies to it, you have the
-    option of following the termss and conditions either of that numbered
+    option of following the terms and conditions either of that numbered
     version or of any later version published by the Free Software
     Foundation.  If the Program does not specify a version number of the
     GNU General Public License, you may choose any version ever published
@@ -631,7 +631,7 @@ any later version.
       17. Interpretation of Sections 15 and 16.
 
       If the disclaimer of warranty and limitation of liability provided
-    above cannot be given local legal effect according to their termss,
+    above cannot be given local legal effect according to their terms,
     reviewing courts shall apply local law that most closely approximates
     an absolute waiver of all civil liability in connection with the
     Program, unless a warranty or assumption of liability accompanies a
