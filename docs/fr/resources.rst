@@ -1,35 +1,35 @@
 ==================
-Resources
+Ressources
 ==================
 
 
-Getting help
-===============
+Obtenir de l'aide
+=================
 
-Mailing list
-++++++++++++++
+Liste de diffusion
++++++++++++++++++++
 
-For discussions about the usage, development, and future of openPLM, please
-join the `openPLM-users
-<http://list.openplm.org/mailman/listinfo/openplm_user>`_ mailing list.
+Pour échanger autour de l'utilisation, du développement, et du future d'openPLM, inscrivez-vous
+à  la `liste de diffusion
+<http://list.openplm.org/mailman/listinfo/openplm_user>`_ des utilisateurs.
 
 Forum
 +++++
 
-We also have a forum at http://wiki.openplm.org/trac/discussion
+Nous avons aussi un forum  :  http://wiki.openplm.org/trac/discussion
 
-Commercial support
+Support commercial
 +++++++++++++++++++
 
-`LinObject <http://www.linobject.com/>`_ provides commercial support on
+`LinObject <http://www.linobject.com/>`_ propose un support commercial pour
 openPLM.
 
 
-Bug tracker
-=============
+Suivi des bugs (anomalies)
+==========================
 
-If you have any suggestions, bug reports or annoyances please report them to
-our issue tracker at http://wiki.openplm.org/trac/report
+Si vous avez des suggestions, rencontrez des bugs ou des désagréments veuillez les signaler à
+notre suivi de bugs sur http://wiki.openplm.org/trac/report
 
 
 Wiki
@@ -37,20 +37,20 @@ Wiki
 
 http://wiki.openplm.org/trac/wiki
 
-Contributing
+Participer
 =============
 
-Development of openPLM happens at trac: http://wiki.openplm.org/trac/timeline
+Le développement d'OpenPLM se déroule sur trac: http://wiki.openplm.org/trac/timeline
 
-You are highly encouraged to participate in the development of openPLM. If you
-don’t like trac (for some reason) you’re welcome to send regular patches.
+Nous vous encourageons vivement à participer au développement d'openPLM. Si vous 
+n'appréciez pas trac (pour une raison quelconque) libre à vous de nous envoyer régulièrement des *patchs*.
 
-License
+Licence
 ==========
 
-This software is licensed under the *GNU GENERAL PUBLIC LICENSE Version 3, or
-any later version*. See the :file:`GPLv3-LICENSE.txt` file in the top
-distribution directory for the full license text.
+Ce logiciel est publié sous la *GNU GENERAL PUBLIC LICENSE Version 3, ou toute version ultérieure*. 
+Voir le :file:`GPLv3-LICENSE.txt` fichier à la racine du
+répertoire de distribution pour accéder au texte complet de la licence.
 
 
 
