@@ -17,8 +17,9 @@ Multiple files upload is available :
 you can select more than one file to upload.
 
 Progress-bars appear while uploading files :
-* one per files
-* one for the total progress
+  * one per files
+
+  * one for the total progress
 
 
 Browsing feature
