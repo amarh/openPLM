@@ -153,7 +153,7 @@
         .Button.view {
             margin-right: -0.4em;
         }
-        button.view span.ui-icon {
+        .view span.ui-icon {
             background: url('{{MEDIA_URL}}/img/views.png') no-repeat;
             top: 2px;
             left: 3px;
@@ -180,6 +180,10 @@
         button.view span.bottom {
             background-position: -192px 0;
         }
+        .view span.transparency {
+            background-position: -224px 0;
+        }
+
 
 
     </style>
@@ -203,19 +207,19 @@
         <span id="toolbar" class="ui-widget-header ui-corner-all">
             
             <div id="views-toolbar">
-            <button id="view-axo" class="Button small view">{% trans "Set to axometric view" %}</button>
-            <button id="view-front" class="Button small view">{% trans "Set to front view" %}</button>
-            <button id="view-right" class="Button small view">{% trans "Set to right view" %}</button>
-            <button id="view-top" class="Button small view">{% trans "Set to top view" %}</button>
-            <button id="view-rear" class="Button small view">{% trans "Set to rear view" %}</button>
-            <button id="view-left" class="Button small view">{% trans "Set to left view" %}</button>
-            <button id="view-bottom" class="Button small view">{% trans "Set to bottom view" %}</button>
-        </div>
+                <button id="view-axo" class="Button small view">{% trans "Set to axometric view" %}</button>
+                <button id="view-front" class="Button small view">{% trans "Set to front view" %}</button>
+                <button id="view-right" class="Button small view">{% trans "Set to right view" %}</button>
+                <button id="view-top" class="Button small view">{% trans "Set to top view" %}</button>
+                <button id="view-rear" class="Button small view">{% trans "Set to rear view" %}</button>
+                <button id="view-left" class="Button small view">{% trans "Set to left view" %}</button>
+                <button id="view-bottom" class="Button small view">{% trans "Set to bottom view" %}</button>
+            </div>
 
             <button id="random-color" class="Button small">{% trans "Random colors" %}</button>
             <button id="initial-color" class="Button small">{% trans "Initial colors" %}</button>
             
-            <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small">{% trans "Toggle transparency" %}</label></input>
+            <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small view">{% trans "Toggle transparency" %}</label></input>
         </span>
 
         <div id="webgl_warning" class="main" style="display:none;">
@@ -507,7 +511,7 @@ THREE.Vertex = function ( position ) {
             $("#view-front").button({text:false, icons:{primary:'front'}}).click(view_front);
             $("#view-rear").button({text:false, icons:{primary:'rear'}}).click(view_rear);
             
-            $("#transparency").button().click(toggle_transparency);
+            $("#transparency").button({text:false, icons:{primary:'transparency'}}).click(toggle_transparency);
 
         }
     }			
