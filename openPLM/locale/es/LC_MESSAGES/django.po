@@ -619,6 +619,10 @@ msgstr "Necesario. 50 cáracteres o menos. Cartas, números, excepto #, ?, / y .
 msgid "Checking this box, you allow OpenPLM to set the reference of the object."
 msgstr "Marcando este casilla, usted permite OpenPLM establecer la referencia del objeto."
 
+#: plmapp/forms.py:157
+msgid "You did not check the Auto box: the reference is required."
+msgstr "Usted no ha marcado la casilla Auto: la reference es obligatoria."
+
 #: plmapp/forms.py:61
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
