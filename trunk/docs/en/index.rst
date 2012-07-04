@@ -30,6 +30,7 @@ Table of contents:
     admin/index
     devel/index
     specs/index
+    license
 
 
 Indices and tables
