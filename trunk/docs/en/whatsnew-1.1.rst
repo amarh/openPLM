@@ -12,6 +12,13 @@ User changes
 New files uploading
 -------------------
 
+You can now upload your files and keep an eye on the list of your files.
+Multiple files upload is available :
+you can select more than one file to upload.
+
+Progress-bars appear while uploading files :
+* one per files
+* one for the total progress
 
 
 Browsing feature
