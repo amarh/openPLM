@@ -1586,7 +1586,15 @@ msgstr "Mostrar los documentos relacionados"
 msgid "NEW"
 msgstr "NUEVO"
 
-#: templates/revisions.html:19
+#: templates/revisions.html:28
+msgid "You can not revise this object since it is cancelled."
+msgstr "Usted no pued revisar este objeto por que es cancelado."
+
+#: templates/revisions.html:31
+msgid "You can not revise this object since it is deprecated."
+msgstr "Usted no puede revisar este objeto por que es depreciado."
+
+#: templates/revisions.html:33
 msgid "You can not revise this object since a revision already exist."
 msgstr ""
 "Usted no puede revisar este objeto por que ya existe una revision del mismo."
