@@ -621,7 +621,7 @@ msgstr "Marcando este casilla, usted permite OpenPLM establecer la referencia de
 
 #: plmapp/forms.py:157
 msgid "You did not check the Auto box: the reference is required."
-msgstr "Usted no ha marcado la casilla Auto: la reference es obligatoria."
+msgstr "Usted no ha marcado la casilla Auto: la reference es necesaria."
 
 #: plmapp/forms.py:61
 msgid ""
@@ -1978,6 +1978,10 @@ msgstr ""
 msgid "No object belongs to this group."
 msgstr "Ningun objeto pertenece a este grupo."
 
+#: templates/groups/objects.html:13
+msgid " %(start)s - %(end)s on %(total)s "
+msgstr " %(start)s - %(end)s en %(total)s "
+
 #: templates/import/csv.html:6
 msgid "Import of a csv file"
 msgstr "Importación de un fichero csv"
@@ -2016,6 +2020,18 @@ msgstr "Fila"
 #: templates/snippets/undo_form.html:13
 msgid "Validate"
 msgstr "Validar"
+
+#: templates/import/csv.html:88
+msgid "Your csv file must have a column for each required field"
+msgstr "El fichiero csv debe incluir una columna per campo necesario."
+
+#: templates/import/csv.html:89
+msgid "Examples and more precise descriptions are available in the"
+msgstr "Ejemplos y descripciones mas precisos estan disponibles en la"
+
+#: templates/import/csv.html:89
+msgid "documentation"
+msgstr "documentacion"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
@@ -2344,13 +2360,25 @@ msgstr "Última página"
 
 #: templates/documents/identity_card.html:33
 #, python-format
-msgid "%(file_count)s file"
-msgstr "%(file_count)s fichiero"
+msgid ""
+"\n"
+"                    %(file_count)s file\n"
+"               " 
+msgstr ""
+"\n"
+"                    %(file_count)s fichiero\n"
+"                "
 
 #: templates/documents/identity_card.html:35
 #, python-format
-msgid "%(file_count)s files"
-msgstr "%(file_count)s fichieros"
+msgid ""
+"\n"
+"                    %(file_count)s files\n"
+"               " 
+msgstr ""
+"\n"
+"                    %(file_count)s fichieros\n"
+"                "
 
 #: templates/clone.html:17
 msgid "OBJECT CLONING:"

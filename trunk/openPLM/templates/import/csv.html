@@ -10,6 +10,7 @@
 $(function(){
     var help_block=$("#help_csv");
     $("input#id_file").after(help_block);
+    help_block.removeAttr("style");
 });
 </script>
 {% endblock %}
@@ -83,7 +84,7 @@ $(function(){
             </form>
         {% endif %}
     {% endifequal %}
-    <span id="help_csv">
+    <span id="help_csv" style="display:none">
         <span>
             {% trans "Your csv file must have a column for each required field" %}.<br/>
             {% trans "Examples and more precise descriptions are available in the"%}<a href="{{DOCUMENTATION_URL}}features/create.html#import-from-a-csv-file" target="_blank">{% trans "documentation" %}</a>.

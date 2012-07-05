@@ -1938,6 +1938,10 @@ msgstr ""
 msgid "No object belongs to this group."
 msgstr "Aucun objet n'appartient à ce groupe."
 
+#: templates/groups/objects.html:13
+msgid " %(start)s - %(end)s on %(total)s "
+msgstr " %(start)s - %(end)s sur %(total)s "
+
 #: templates/import/csv.html:6
 msgid "Import of a csv file"
 msgstr "Importer un fichier csv"
@@ -1977,6 +1981,17 @@ msgstr "Ligne"
 msgid "Validate"
 msgstr "Valider"
 
+#: templates/import/csv.html:88
+msgid "Your csv file must have a column for each required field"
+msgstr "Votre fichier csv doit contenir une colonne par champ requis"
+
+#: templates/import/csv.html:89
+msgid "Examples and more precise descriptions are available in the"
+msgstr "Des exemples et des description plus précises sont disponibles dans la"
+
+#: templates/import/csv.html:89
+msgid "documentation"
+msgstr "documentation"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
@@ -2294,13 +2309,25 @@ msgstr "Dernière page"
 
 #: templates/documents/identity_card.html:33
 #, python-format
-msgid "%(file_count)s file"
-msgstr "%(file_count)s fichier"
+msgid ""
+"\n"
+"                    %(file_count)s file\n"
+"               " 
+msgstr ""
+"\n"
+"                    %(file_count)s fichier\n"
+"                "
 
 #: templates/documents/identity_card.html:35
 #, python-format
-msgid "%(file_count)s files"
-msgstr "%(file_count)s fichiers"
+msgid ""
+"\n"
+"                    %(file_count)s files\n"
+"               " 
+msgstr ""
+"\n"
+"                    %(file_count)s fichiers\n"
+"                "
 
 #: templates/clone.html:17
 msgid "OBJECT CLONING:"
