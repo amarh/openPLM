@@ -2130,16 +2130,34 @@ msgid "Delete ?"
 msgstr "Effacer ?"
 
 #: templates/parts/bom_edit.html:37
-msgid "replace"
-msgstr "remplacer"
+msgid "(replace)"
+msgstr "(remplacer)"
 
 #: templates/parts/bom_replace.html:10
 msgid ""
-"       Select a part to replace the part %(type)s // %(reference)s // %(revision)s // %(name)s."
+"\n"
+"       Select a part to replace the part %(type)s // %(reference)s // %(revision)s // %(name)s.\n"
 "       "
 msgstr ""
-"   Selectionnez une part pour remplacer la part %(type)s // %(reference)s // %(revision)s // %(name)s."
+"\n"
+"   Selectionnez une part pour remplacer la part %(type)s // %(reference)s // %(revision)s // %(name)s.\n"
 "       "
+
+#: templates/parts/clone.html:7
+msgid ""
+"Here is the list of documents you may want to attach to the new part. "
+"Select documents you want to attach."
+msgstr ""
+"Voici la liste des documents que vous pourriez attacher à la nouvelle "
+"part.Sélectionnez les documents que vous voulez attacher."
+
+#: templates/parts/clone.html:29
+msgid ""
+"Here is the list of parts you may want to add to the new part. "
+"Select parts you want to add."
+msgstr ""
+"Voici la liste des parts que vous pourriez ajouter à la nouvelle "
+"part.Sélectionnez les parts que vous voulez ajouter."
 
 #: templates/parts/doccad.html:12
 msgid "Download all CAD files"
