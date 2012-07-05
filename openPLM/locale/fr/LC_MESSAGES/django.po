@@ -1564,6 +1564,10 @@ msgstr "Vous ne pouvez pas reviser cet objet car il a été déprécié."
 msgid "You can not revise this object since a revision already exist."
 msgstr "Vous ne pouvez pas reviser cet objet car une révision plus récente existe déjà"
 
+#: templates/blocks/menu.html:11
+msgid "click here to subscribe to the related feed"
+msgstr "cliquez ici pour vous abonner au flux rss correspondant"
+
 #: templates/blocks/search.html:7 templates/search/search.html:18
 msgid "SEARCH !"
 msgstr "RECHERCHER !"

@@ -1619,6 +1619,10 @@ msgstr "Anterior"
 msgid "Next"
 msgstr "Siguiente"
 
+#: templates/blocks/menu.html:11
+msgid "click here to subscribe to the related feed"
+msgstr "click aqui para suscribirte para el relacionado feed"
+
 #: templates/blocks/search.html:23
 #, python-format
 msgid ""
