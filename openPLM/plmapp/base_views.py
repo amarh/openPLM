@@ -207,7 +207,7 @@ def handle_errors(func=None, undo="..", restricted_access=True):
             try:
                 return f(request, *args, **kwargs)
             except (ControllerError, ValueError) as exc:
-                return render_to_response("error.html", {"message" : str(exc)})
+                return render_to_response("error.html", {"message" : _(str(exc))})
             except Http404:
                 raise
             except StandardError:
