@@ -125,11 +125,26 @@
         }  
         #zoom {
             position:absolute;
-            height:40%;
+            height: 60%;
             top: 30%;
-            right: 5%;
+            right: 60px;
             z-index:10;  
         }
+        #main_content {
+            position: relative;
+        }
+            
+        div#zoom-toolbar,
+        div#zoom-toolbar > * {
+            z-index: 800;
+        }
+                
+        div#zoom-toolbar{
+            position: absolute;
+            right: 25px;
+            top: 20%;
+        }
+
         div#main_content {
             background-color: #848484;
             box-shadow: 0 0 115px 80px #545454 inset;
@@ -243,6 +258,21 @@
                     </ul>
                 </div>
             </div>
+        </div>
+        
+        <div id="zoom-toolbar" style="display:none">
+            <img src="/media/img/navigate/zoom-out.png"
+                class="ui-button ui-widget ui-state-default ui-corner-all"
+                id="zoom-out"
+                title="{% trans "Zoom out" %}"/>
+            <img src="/media/img/navigate/zoom-in.png"
+                class="ui-button ui-widget ui-state-default ui-corner-all"
+                id="zoom-in"
+                title="{% trans "Zoom in" %}"/>
+            <img src="/media/img/navigate/zoom-fit-best.png"
+                class="ui-button ui-widget ui-state-default ui-corner-all"
+                id="zoom-fit-all"
+                title="{% trans "Fit all" %}"/>
         </div>
 
     {% endif %}
@@ -515,6 +545,21 @@ THREE.Vertex = function ( position ) {
                 }
 
             });
+
+            $("#zoom-fit-all").button().click(function() {
+                 set_scale(50);
+            });
+            $("#zoom-in").button().click(function () {
+                if (zoom_var < 100){
+                    set_scale(Math.min(zoom_var + 10, 100));
+                }
+            });
+            $("#zoom-out").button().click(function () {
+                if (zoom_var > 0){
+                    set_scale(Math.max(zoom_var - 10, 0));
+                }
+            });
+
             
             $("#colors-toolbar").buttonset();
             $("#random-color").button({text:false, icons:{primary:'random'}}).click(random_color);
@@ -532,10 +577,17 @@ THREE.Vertex = function ( position ) {
             $("#transparency").button({text:false, icons:{primary:'transparency'}}).click(toggle_transparency);
             $("#axis").button({text:false, icons:{primary:'axis'}}).click(toggle_axis);
 
-            $("#toolbar").show();
+            $("#toolbar, #zoom-toolbar").show();
 
         }
     }			
+
+    function set_scale(factor) {
+         total=zoom_var-factor;
+         zoom_var=factor;
+         camera.translateZ(1.49999*radius*(total/50));
+         $("#zoom").slider("value", factor);
+    }
 
     function highlight_part(part_id) {
 
