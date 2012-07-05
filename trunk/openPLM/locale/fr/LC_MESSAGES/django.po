@@ -1357,7 +1357,35 @@ msgstr "Vous ne pouvez pas annuler cet objet, il n'est plus à l'état de brouil
 
 #: templates/lifecycle.html:127
 msgid "Warning, if you cancel this object, it won't be anymore accessible to everyone."
-msgstr "Attention , si vous annulez cet objet, il ne sera plus accessible à tout le monde."
+msgstr "Attention , si vous annulez cet objet, il ne sera plus accessible à tous."
+
+#: templates/lifecycle.html:162
+msgid "Warning, if you publish this object, it will be accessible to everyone, including anonymous users."
+msgstr "Attention, si vous publiez cet objet, il sera accessible à tous, utilisateurs anonymes inclus."
+
+#: templates/lifecycle.html:170
+msgid "PUBLISH"
+msgstr "PUBLIER"
+
+#: templates/lifecycle.html:186
+msgid "Warning, if you unpublish this object, it won't be anymore accessible to everyone."
+msgstr "Attention, si vous annulez la publication de cet objet, il ne sera plus accessible à tous."
+
+#: templates/lifecycle.html:194
+msgid "UNPUBLISH"
+msgstr "ANNULER LA PUBLICATION"
+
+#: templates/lifecycle.html:201
+msgid "This object has been published:"
+msgstr "Cet objet a été publié:"
+
+#: templates/lifecycle.html:202
+msgid "Public link"
+msgstr "Lien public"
+
+#: templates/lifecycle.html:274
+msgid "Give access to a restricted account"
+msgstr "Autorisez l'accès à un compte restreint"
 
 #: templates/login.html:17
 msgid "openPLM LOGIN PAGE"
