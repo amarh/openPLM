@@ -1981,6 +1981,10 @@ msgstr "Ligne"
 msgid "Validate"
 msgstr "Valider"
 
+#: templates/snippets/management_block.html:7
+msgid "Reader"
+msgstr "Lecteur"
+
 #: templates/import/csv.html:88
 msgid "Your csv file must have a column for each required field"
 msgstr "Votre fichier csv doit contenir une colonne par champ requis"

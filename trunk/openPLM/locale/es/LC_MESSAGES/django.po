@@ -2021,6 +2021,10 @@ msgstr "Fila"
 msgid "Validate"
 msgstr "Validar"
 
+#: templates/snippets/management_block.html:7
+msgid "Reader"
+msgstr "Espectador"
+
 #: templates/import/csv.html:88
 msgid "Your csv file must have a column for each required field"
 msgstr "El fichiero csv debe incluir una columna per campo necesario."
