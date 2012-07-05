@@ -4,7 +4,7 @@
 
     {% for group in links %}
         <div class="timeline">
-            <h3>{{ group.grouper|capfirst}}</h3>
+            <h3>{% trans group.grouper|capfirst %}</h3>
 
             <dl>
                 {% for link in group.list|dictsort:"plmobject.type" %}
