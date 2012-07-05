@@ -1394,6 +1394,34 @@ msgstr "Usted no puede cancelar este objeto ya que su estado es mas avanzado que
 msgid "Warning, if you cancel this object, it won't be anymore accessible to everyone."
 msgstr "Atención , si usted cancela este objeto, no podra ser accessible por todos en adelante."
 
+#: templates/lifecycle.html:162
+msgid "Warning, if you publish this object, it will be accessible to everyone, including anonymous users."
+msgstr "Attención, si usted publica este objeto, este objeto sera accessible por todos, hasta los usarios anónimos."
+
+#: templates/lifecycle.html:170
+msgid "PUBLISH"
+msgstr "PUBLICAR"
+
+#: templates/lifecycle.html:186
+msgid "Warning, if you unpublish this object, it won't be anymore accessible to everyone."
+msgstr "Atención , si usted cancela la publicación de este objeto, no podra ser accessible por todos en adelante."
+
+#: templates/lifecycle.html:194
+msgid "UNPUBLISH"
+msgstr "CANCELAR LA PUBLICACIÓN"
+
+#: templates/lifecycle.html:201
+msgid "This object has been published:"
+msgstr "Este objeto ha sido publicado:"
+
+#: templates/lifecycle.html:202
+msgid "Public link"
+msgstr "Publico enlace"
+
+#: templates/lifecycle.html:274
+msgid "Give access to a restricted account"
+msgstr "Dar acceso a un limitado cuenta"
+
 #: templates/login.html:17
 msgid "openPLM LOGIN PAGE"
 msgstr "pagina de ACCESO a openPLM"
