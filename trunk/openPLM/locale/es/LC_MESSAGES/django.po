@@ -2289,9 +2289,17 @@ msgstr "Ninguna parte está relacionado con este documento."
 msgid "CLONE"
 msgstr "CLONAR"
 
-#: templates/clone.html:51
-msgid "You can not clone an object since you are not a contributor."
-msgstr "Usted no puede clonar un objeto si no es contribuidor."
+#: plmapp/controllers/plmobject.py:805
+msgid "You can not clone this object : you shouldn't see it."
+msgstr "Usted no puede clonar este objeto : usted no deberia verlo."
+
+#: templates/clone.html:51 plmapp/controllers/plmobject.py:808
+msgid "You can not clone this object since you are not a contributor."
+msgstr "Usted no puede clonar este objeto si no es contribuidor."
+
+#: plmapp/controllers/plmobject.py:811
+msgid "This object can not be cloned"
+msgstr "Este objeto no puede ser clonado"
 
 #~ msgid "PASSWORD"
 #~ msgstr "CONTRASEÑA"
