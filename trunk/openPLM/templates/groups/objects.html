@@ -9,9 +9,8 @@
 {% else %}
     <div>
         <span id="numresults">
-        {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
-           Objects : {{start}} - {{end}} on {{total}}
-        {% endblocktrans %}
+        {% trans "Objects" %}
+        {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %} {{start}} - {{end}} on {{total}} {% endblocktrans %}
         </span> 
     </div>
 	<div>
@@ -49,7 +48,7 @@
         {% if objects.has_next  and objects.paginator.num_pages not in pages %}
             {% if objects.paginator.num_pages|add:'-1' not in pages %}
             —
-            <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "last page" %}</a>
+            <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "Last page" %}</a>
             {% else %}
             <a href="{% add_get page=objects.paginator.num_pages %}">{{objects.paginator.num_pages}}</a>
             {% endif %}
