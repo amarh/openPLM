@@ -186,7 +186,9 @@
         .view span.random {
             background-position: -256px 0;
         }
-
+        .view span.axis {
+            background-position: -288px 0;
+        }
 
 
     </style>
@@ -225,6 +227,7 @@
             </div>
             
             <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small view">{% trans "Toggle transparency" %}</label></input>
+            <input type="checkbox" id="axis"><label for="axis" class="Button small view">{% trans "Toggle axis visibility" %}</label></input>
         </span>
 
         <div id="webgl_warning" class="main" style="display:none;">
@@ -307,6 +310,7 @@ THREE.Vertex = function ( position ) {
     var height ;
     var deep ;
     var controls = null;	
+    var axis;
     var dummy;
 
     {% if stl %}
@@ -435,6 +439,14 @@ THREE.Vertex = function ( position ) {
             object3D.receiveShadow = true;
             dummy = new THREE.Object3D();
             dummy.add( object3D);
+            axis = new THREE.AxisHelper();
+			axis.position = object3D.position.clone().multiplyScalar(1.3);
+		    axis.scale.x = axis.scale.y = axis.scale.z = radius / 600;
+            for (var i=0; i < axis.children.length; i++) {
+                var obj = axis.children[i];
+                obj.visible = false;
+            }
+            dummy.add(axis);
             scene.add(dummy);
 
             camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(),
@@ -518,6 +530,7 @@ THREE.Vertex = function ( position ) {
             $("#view-rear").button({text:false, icons:{primary:'rear'}}).click(view_rear);
             
             $("#transparency").button({text:false, icons:{primary:'transparency'}}).click(toggle_transparency);
+            $("#axis").button({text:false, icons:{primary:'axis'}}).click(toggle_axis);
 
         }
     }			
@@ -640,6 +653,13 @@ THREE.Vertex = function ( position ) {
         }
     }
 
+    function toggle_axis() {
+        var visible = $('#axis').is(':checked');
+        for (var i=0; i < axis.children.length; i++) {
+            var obj = axis.children[i];
+            obj.visible = visible;
+        }
+    }
     function reinit_rotation() {
         dummy.rotation.set(0,0,0).addSelf(camera.rotation.clone());
         dummy.updateMatrix();
