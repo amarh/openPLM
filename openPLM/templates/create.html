@@ -3,12 +3,12 @@
 
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 {% block css %}
-    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
 {% endblock %}
 {% block scripts %}
-    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.showLoading.min.js"></script>
 
-    <script type="text/javascript" src="/media/js/create.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/create.js"></script>
 {% endblock %}
 
 {% block content %}

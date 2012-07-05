@@ -5,10 +5,10 @@
     <head>
         <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
 
-        <link type="text/css" href="/media/css/openplm/jquery-ui.css" rel="Stylesheet" /> 
-        <link rel="stylesheet" type="text/css" href="/media/css/openplm.css" />
-        <link rel="stylesheet" type="text/css" href="/media/css/help.css" />
-        <link rel="stylesheet" href="/media/css/chosen.css" type="text/css" media="screen" charset="utf-8" />
+        <link type="text/css" href="{{MEDIA_URL}}css/openplm/jquery-ui.css" rel="Stylesheet" /> 
+        <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/openplm.css" />
+        <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/help.css" />
+        <link rel="stylesheet" href="{{MEDIA_URL}}css/chosen.css" type="text/css" media="screen" charset="utf-8" />
 
         {% block css %} {% endblock %}
 
@@ -20,16 +20,16 @@
         <meta name="Classification" content="" />
         <meta name="Description" content="" />
         <meta name="keywords" content="" />
-        <script type="text/javascript" src="/media/js/jquery.min.js"></script>
-        <script type="text/javascript" src="/media/js/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="/media/js/jquery.cookie.js"></script>
-        <script type="text/javascript" src="/media/js/chosen.jquery.min.js"></script>
-        <script type="text/javascript" src="/media/js/jquery.hoverIntent.minified.js"></script>
-        <script type="text/javascript" src="/media/js/combobox.js"></script>
-        <script type="text/javascript" src="/media/js/help.js"></script>
-        <script type="text/javascript" src="/media/js/panels.js"></script>
-        <script type="text/javascript" src="/media/js/confirm.js"></script>
-        <script type="text/javascript" src="/media/js/async_search.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.min.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/chosen.jquery.min.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.hoverIntent.minified.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/combobox.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/help.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/panels.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/confirm.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/async_search.js"></script>
 
 
         {% block scripts %} {% endblock %}
@@ -42,7 +42,7 @@
             <div class="top-box">
                 <div id="home">
                     <a href="/home/">
-                        <img src="/media/img/dark/logo_openplm_linear.png"
+                        <img src="{{MEDIA_URL}}img/dark/logo_openplm_linear.png"
                         alt="logo-openplm" title="{% trans "Home page" %}">
                     </a>
                 </div>
@@ -139,7 +139,7 @@
                                     <ul>
                                         <li>
                                         <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
-                                            href="/media/help/{{LANGUAGE_CODE}}/search.html" target="_blank">
+                                            href="{{MEDIA_URL}}help/{{LANGUAGE_CODE}}/search.html" target="_blank">
                                             <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
                                             <span class="ui-button-text">?</span>
                                         </a>
