@@ -85,9 +85,8 @@ def openplm_webdav(request, local_path):
                 logger.warning("no implementation; %s"%nie)
                 return HttpResponse("501 Not Implemented", None, 501, "text/plain")
 
-        else:
-            # failed authentication results in 401
-            response = HttpResponse()
-            response.status_code = 401
-            response['WWW-Authenticate'] = 'Basic realm="openPLM-dav"'
-            return response
+    # failed authentication results in 401
+    response = HttpResponse()
+    response.status_code = 401
+    response['WWW-Authenticate'] = 'Basic realm="openPLM-dav"'
+    return response
