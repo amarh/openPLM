@@ -59,6 +59,48 @@ of features to custom the rendering.
 for Graphviz. openPLM uses PyGraphviz to generate the graphs of the *Navigate*
 page.
 
+Directories
+==============
+
+.. code-block:: none
+
+   +-openPLM/
+    | apache/                    apache/wsgi files
+    | apps/                      optional applications
+    | bin/                       misc executable scripts 
+    | datatests/                 test data
+    | django_xml_test_runner/    an incorporated dependency required to run test
+    | etc/                       files that should be copied to /etc (celeryes configuration files)
+    | help/                      help messages in reStructuredText format
+    | locale/                    translation data
+    +-media/                     all media files (served by apache)
+    |  css/                     
+    |  img/
+    |  js/
+    +-plmapp/                    core application (most of the code!)
+    |  controllers/
+    |  decomposers/
+    |  customized_models/
+    |  filehandlers/
+    |  fixtures/
+    |  management/
+    |  middleware/
+    |  templatetags/
+    |  thumbnailers/
+    |  tests/
+    |  views/
+    +-templates/                 core templates
+    |  blocks/
+    |  documents/
+    |  groups/
+    |  import/
+    |  mails/
+    |  navigate/
+    |  parts/
+    |  search/
+    |  snippets/
+    |  users/
+
 plmapp
 ======
 
