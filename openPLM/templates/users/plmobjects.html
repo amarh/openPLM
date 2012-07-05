@@ -52,7 +52,7 @@
 
     {% for group in links %}
         <div class="timeline">
-            <h3><span class="expand">{{ group.grouper|capfirst}}</span></h3>
+            <h3><span class="expand">{% trans group.grouper|capfirst %}</span></h3>
 
             {% regroup group.list by plmobject__type as groups %}
 
