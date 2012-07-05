@@ -2047,7 +2047,7 @@ msgstr "Click aqui para importar un nuevo BOM."
 
 #: templates/import/done.html:10
 msgid "Click here to sponsor more users."
-msgstr "Click aqui para ver mas detalles."
+msgstr "Click aqui para patrocinar usarios."
 
 #: templates/mails/history.html:6
 msgid "Message from openPLM"
