@@ -1,3 +1,4 @@
+{% load i18n %}
 {% spaceless %}
 <div id="{{id|safe}}" class="node n_{{type}} {{main|yesno:"main_node, "}}" style="{{style|safe}}"
     title="{{title_}}">
@@ -6,12 +7,12 @@
     </div>
 
     {% if thumbnails %}
-        <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="Display thumbnails"
+        <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="{% trans "Display thumbnails" %}"
         onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{path}}');"/>
     {% endif %}
 
     {% if show_documents %}
-        <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all" title="Show related documents"
+        <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all" title="{% trans "Show related documents" %}"
         onclick="dd('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');"/>
     {% endif %}
 

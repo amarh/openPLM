@@ -1489,6 +1489,26 @@ msgstr "Afficher :"
 msgid "FILTER"
 msgstr "FILTRER"
 
+#: templates/navigate/add_buttons.html:9
+msgid "Attach a new document"
+msgstr "Attacher un nouveau document"
+
+#: templates/navigate/add_buttons.html:16
+msgid "Add a new part"
+msgstr "Attacher une nouvelle part"
+
+#: templates/navigate/add_buttons.html:
+msgid "Attach a new part"
+msgstr "Attacher une nouvelle part"
+
+#: templates/navigate/node.html:9
+msgid "Display thumbnails"
+msgstr "Afficher les aperçus"
+
+#: templates/navigate/node.html:14
+msgid "Show related documents"
+msgstr "Afficher les documents liés"
+
 #: templates/revisions.html:15
 msgid "NEW"
 msgstr "NOUVEAU"
@@ -1694,7 +1714,7 @@ msgstr "Vous ne pourrez qu'envoyer des fichiers. La progression de l'envoi ne se
 
 #: templates/documents/parts.html:18
 msgid "Create a part and attach it to the document."
-msgstr "Il n'y a pas de part attachée à ce document."
+msgstr "Créer une part et l'attacher à ce document."
 
 #: templates/documents/parts.html:23 templates/parts/doccad.html:74
 msgid "DISCONNECT"
