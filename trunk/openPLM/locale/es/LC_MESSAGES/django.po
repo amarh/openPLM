@@ -2150,6 +2150,10 @@ msgstr "Usted debe cambiar su contraseña!"
 msgid "Click here to change your password"
 msgstr "Click aqui para cambiar su contraseña"
 
+#: templates/parts/bom.html:43
+msgid "Create a part and add it"
+msgstr "Crear una parte y añadirla"
+
 #: templates/parts/bom.html:20
 msgid "EDIT"
 msgstr "EDITAR"
@@ -2169,6 +2173,18 @@ msgstr "Cant."
 #: templates/parts/bom_edit.html:22
 msgid "Delete ?"
 msgstr "Borrar ?"
+
+#: templates/parts/bom_edit.html:37
+msgid "replace"
+msgstr "reemplazar"
+
+#: templates/parts/bom_replace.html:10
+msgid ""
+"       Select a part to replace the part %(type)s // %(reference)s // %(revision)s // %(name)s."
+"       "
+msgstr ""
+"   Selecciona una parte para reemplazar la parte %(type)s // %(reference)s // %(revision)s // %(name)s."
+"       "
 
 #: templates/parts/doccad.html:12
 msgid "Download all CAD files"
