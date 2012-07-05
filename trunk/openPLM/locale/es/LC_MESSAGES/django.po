@@ -2069,6 +2069,10 @@ msgstr "Detalles"
 msgid "Click here to see more details."
 msgstr "Click aqui para ver mas detalles."
 
+#: templates/mails/history.txt:14
+msgid "Url of the object:"
+msgstr "Url del objeto:"
+
 #: templates/mails/invitation1.html:5 templates/mails/invitation2.html:5
 #, python-format
 msgid ""
