@@ -2294,3 +2294,31 @@ msgstr "Vous ne pouvez pas cloner cet objet puisque vous n'êtes pas un contribu
 #: plmapp/controllers/plmobject.py:811
 msgid "This object can not be cloned"
 msgstr "Cet objet ne peut pas être cloné"
+
+#: templates/public.html:16
+msgid "Files"
+msgstr "Fichiers"
+
+#: templates/public.html:48
+msgid "Attributes"
+msgstr "Attributs"
+
+#: templates/public.html:70
+msgid "Revisions"
+msgstr "Révisions"
+
+#: templates/public.html:92
+msgid "Attached documents"
+msgstr "Documents liés"
+
+#: templates/public.html:94
+msgid "Attached parts"
+msgstr "Parts liées"
+
+#: templates/public.html:119
+msgid "This part is unpublished."
+msgstr "Cette part n'est plus publique."
+
+#: templates/public.html:121
+msgid "This document is unpublished."
+msgstr "Ce document n'est plus public."

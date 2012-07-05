@@ -2340,6 +2340,34 @@ msgstr "Usted no puede clonar este objeto si no es contribuidor."
 msgid "This object can not be cloned"
 msgstr "Este objeto no puede ser clonado"
 
+#: templates/public.html:16
+msgid "Files"
+msgstr "Fichieros"
+
+#: templates/public.html:48
+msgid "Attributes"
+msgstr "Attributos"
+
+#: templates/public.html:70
+msgid "Revisions"
+msgstr "Revisiones"
+
+#: templates/public.html:92
+msgid "Attached documents"
+msgstr "Adjuntos documentos"
+
+#: templates/public.html:94
+msgid "Attached parts"
+msgstr "Conectadas partes"
+
+#: templates/public.html:119
+msgid "This part is unpublished."
+msgstr "Esta parte no es publica."
+
+#: templates/public.html:121
+msgid "This document is unpublished."
+msgstr "Este documento no es publico."
+
 #~ msgid "PASSWORD"
 #~ msgstr "CONTRASEÑA"
 
