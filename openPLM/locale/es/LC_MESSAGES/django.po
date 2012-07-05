@@ -1755,6 +1755,21 @@ msgstr "Archivos depreciados:"
 msgid "Add new files / Check-in file :"
 msgstr "Añadir archivos / Check-in de archivo :"
 
+#: templates/documents/files_add.html:14
+msgid "You can only upload one file at a time."
+msgstr "Usted puede solo cargar los fichieros uno por uno."
+
+#: templates/documents/files_add.html:15
+msgid "Use the Validate button to send your file."
+msgstr "Usa el boton Validar para enviar sus fichiero."
+
+#: templates/documents/files_add.html:20
+msgid "Upload"
+msgstr "Cargar"
+
+#: templates/documents/files_add.html:21
+msgid "Delete the files selected for upload"
+msgstr "Borra todos los fichieros seleccionados"
 
 #: templates/documents/files_add.htlm:37
 msgid "Select at least one file"
