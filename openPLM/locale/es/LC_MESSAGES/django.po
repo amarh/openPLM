@@ -1674,11 +1674,19 @@ msgstr "Salir"
 msgid "Help"
 msgstr "Ayuda"
 
+#: templates/documents/files.html:62
+msgid "The status of this document does not allow adding/deleting files."
+msgstr "El estado de este documento no permite añadir/borrar fichieros."
+
+#: templates/documents/files.html:64
+msgid "You don't have the necessary rights to add/delete files."
+msgstr "Usted no tiene los derechos necesarios para añadir/borrar fichieros."
+
 #: templates/documents/files.html:45 templates/parts/doccad.html:11
 msgid "Download all files"
 msgstr "Descargar todos los archivos"
 
-#: templates/documents/files.html:53 templates/documents/parts.html:12
+#: templates/documents/parts.html:12
 #: templates/parts/bom.html:19 templates/search/result.html:25
 msgid "ADD"
 msgstr "AÑADIR"
@@ -1687,7 +1695,7 @@ msgstr "AÑADIR"
 msgid "DELETE"
 msgstr "BORRAR"
 
-#: templates/docuemnts/files.html:77
+#: templates/documents/files.html:77
 msgid "CHECK ALL"
 msgstr "SELECCIONNAR TODO"
 
@@ -1817,6 +1825,15 @@ msgstr ""
 "He aqui la lista de partes que usted podria desear conectar a la nueva "
 "revision.Seleccionelas partes deseadas para conectar al documento y valide "
 "para hacer una nueva revision."
+
+#: templates/documents/clone.html:3
+msgid ""
+"Here is the list of parts you may want to attach to the new document. "
+"Select parts you want to attach and validate to make a new document."
+msgstr ""
+"He aqui la lista de partes que usted podria desear conectar a el nuevo "
+"documento. Seleccione las partes deseadas para conectar al documento y valide "
+"para hacer un nuevo documento."
 
 #: templates/groups/accept_invitation.html:5
 msgid "Accept invitation ?"

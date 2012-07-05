@@ -1638,6 +1638,14 @@ msgstr "Sortir"
 msgid "Help"
 msgstr "Aide"
 
+#: templates/documents/files.html:62
+msgid "The status of this document does not allow adding/deleting files."
+msgstr "L'état de ce document ne permet ni l'ajout ni la suppression de fichiers."
+
+#: templates/documents/files.html:64
+msgid "You don't have the necessary rights to add/delete files."
+msgstr "Vous n'avez pas les droits requis pour ajouter/supprimer des fichiers."
+
 #: templates/documents/files.html:64
 msgid "You don't have the necessary rights to add/delete files."
 msgstr "Vous n'avez pas les droits nécessaires pour ajouter/supprimer des fichiers."
@@ -1783,6 +1791,15 @@ msgstr ""
 "Ceci est la liste des parts que vous pourriez attacher à la nouvelle "
 "révision. Selectionnez les parts que vous voulez attacher et validez pour "
 "créer une nouvelle révision."
+
+#: templates/documents/clone.html:3
+msgid ""
+"Here is the list of parts you may want to attach to the new document. "
+"Select parts you want to attach and validate to make a new document."
+msgstr ""
+"Ceci est la liste des parts que vous pourriez attacher au nouveau "
+"document. Selectionnez les parts que vous voulez attacher et validez pour "
+"créer un nouveau document."
 
 #: templates/groups/accept_invitation.html:5
 msgid "Accept invitation ?"
