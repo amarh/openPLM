@@ -3,14 +3,14 @@
 
 {% block css %}
 
-    <link rel="stylesheet" href="/media/css/navigate.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/navigate.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
 {% endblock css %}
 
 {% block scripts %}
-    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
-    <script type="text/javascript" src="/media/js/raphael-min.js"></script>
-    <script type="text/javascript" src="/media/js/navigate.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.showLoading.min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/raphael-min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/navigate.js"></script>
 
     <script>
         $(function () {
@@ -70,19 +70,19 @@
             {% endif %}
         </div>
         <div id="zoom-toolbar">
-            <img src="/media/img/navigate/zoom-out.png"
+            <img src="{{MEDIA_URL}}img/navigate/zoom-out.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-out"
                 title="{% trans "Zoom out" %}"/>
-            <img src="/media/img/navigate/zoom-in.png"
+            <img src="{{MEDIA_URL}}img/navigate/zoom-in.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-in"
                 title="{% trans "Zoom in" %}"/>
-            <img src="/media/img/navigate/zoom-fit-best.png"
+            <img src="{{MEDIA_URL}}img/navigate/zoom-fit-best.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-fit-all"
                 title="{% trans "Fit all" %}"/>
-            <img src="/media/img/navigate/zoom-original.png"
+            <img src="{{MEDIA_URL}}img/navigate/zoom-original.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-original"
                 title="{% trans "Original" %}"/>
