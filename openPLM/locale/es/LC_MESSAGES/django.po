@@ -1523,6 +1523,26 @@ msgstr "Mostrar :"
 msgid "FILTER"
 msgstr "FILTRAR"
 
+#: templates/navigate/add_buttons.html:9
+msgid "Attach a new document"
+msgstr "Conectar un nuevo documento"
+
+#: templates/navigate/add_buttons.html:16
+msgid "Add a new part"
+msgstr "Añadir una nueva parte"
+
+#: templates/navigate/add_buttons.html:
+msgid "Attach a new part"
+msgstr "Conectar una nueva parte"
+
+#: templates/navigate/node.html:9
+msgid "Display thumbnails"
+msgstr "Mostrar las miniaturas"
+
+#: templates/navigate/node.html:14
+msgid "Show related documents"
+msgstr "Mostrar los documentos relacionados"
+
 #: templates/revisions.html:15
 msgid "NEW"
 msgstr "NUEVO"
