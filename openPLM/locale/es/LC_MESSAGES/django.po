@@ -1256,7 +1256,7 @@ msgstr "Patrocinar varios usuarios a partir de un fichero CSV"
 
 #: templates/create.html:84
 msgid "You can not create an object since you are not a contributor."
-msgstr "No puedes crear un objeto si no eres contribuidor."
+msgstr "Usted no puede crear un objeto si no es contribuidor."
 
 #: templates/edit.html:7
 msgid "OBJECT MODIFICATION:"
@@ -2288,6 +2288,10 @@ msgstr "Ninguna parte está relacionado con este documento."
 #: templates/clone.html:45
 msgid "CLONE"
 msgstr "CLONAR"
+
+#: templates/clone.html:51
+msgid "You can not clone an object since you are not a contributor."
+msgstr "Usted no puede clonar un objeto si no es contribuidor."
 
 #~ msgid "PASSWORD"
 #~ msgstr "CONTRASEÑA"

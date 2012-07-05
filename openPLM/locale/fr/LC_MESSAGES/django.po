@@ -2243,3 +2243,7 @@ msgstr "Aucune part n'est lié à ce document."
 #: templates/clone.html:45
 msgid "CLONE"
 msgstr "CLONER"
+
+#: templates/clone.html:51
+msgid "You can not clone an object since you are not a contributor."
+msgstr "Vous ne pouvez cloneer aucun objet puisque vous n'êtes pas un contributeur."
