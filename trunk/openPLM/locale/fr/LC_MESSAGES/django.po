@@ -1646,9 +1646,6 @@ msgstr "L'état de ce document ne permet ni l'ajout ni la suppression de fichier
 msgid "You don't have the necessary rights to add/delete files."
 msgstr "Vous n'avez pas les droits requis pour ajouter/supprimer des fichiers."
 
-#: templates/documents/files.html:64
-msgid "You don't have the necessary rights to add/delete files."
-msgstr "Vous n'avez pas les droits nécessaires pour ajouter/supprimer des fichiers."
 #: templates/documents/files.html:45 templates/parts/doccad.html:11
 msgid "Download all files"
 msgstr "Télécharger tous les fichiers"
@@ -1980,9 +1977,6 @@ msgstr "Ligne"
 msgid "Validate"
 msgstr "Valider"
 
-#: templates/snippets/undo_form.html: 18
-msgid "Upload"
-msgstr "Télécharger"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
