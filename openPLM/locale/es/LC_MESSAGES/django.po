@@ -1235,26 +1235,37 @@ msgstr ""
 "    "
 
 #: templates/create.html:62
+msgid ""
+" \n"
+"This part will be added to the part %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+msgstr ""
+"Esta parte va a ser añadida a la parte %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+
+#: templates/create.html:75
 msgid "Other creation tools:"
 msgstr "Otras herramientas de creaccion"
 
-#: templates/create.html:66
+#: templates/create.html:79
 msgid "Import several parts or documents from CSV file."
 msgstr "Importar varias partes o documentos desde un fichero CSV."
 
-#: templates/create.html:71
+#: templates/create.html:84
 msgid "Import a BOM from a CSV file."
 msgstr "Importación de un BOM a partir de un fichero CSV"
 
-#: templates/create.html:75 templates/users/sponsor.html:9
+#: templates/create.html:88 templates/users/sponsor.html:9
 msgid "Sponsor a new user"
 msgstr "Patrocinar un nuevo usuario"
 
-#: templates/create.html:78
+#: templates/create.html:92
 msgid "Sponsor several users from a CSV file."
 msgstr "Patrocinar varios usuarios a partir de un fichero CSV"
 
-#: templates/create.html:84
+#: templates/create.html:98
 msgid "You can not create an object since you are not a contributor."
 msgstr "Usted no puede crear un objeto si no es contribuidor."
 
