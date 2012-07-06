@@ -18,13 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: computer/models.py:48
-msgid "supplier"
-msgstr "proveedor"
-
-#: computer/models.py:48
-msgid "tech_details"
-msgstr "detalles_tecnicos"
 
 #: document3D/templates/Display3D.htm:149
 msgid ""

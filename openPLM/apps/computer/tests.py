@@ -27,7 +27,9 @@ This file demonstrates two different styles of tests (one doctest and one
 unittest). These will both pass when you run "manage.py test".
 
 Replace these with more appropriate tests for your application.
+
 """
+from django.utils.translation import ugettext_lazy as _
 
 from openPLM.apps.computer.models import SinglePartController
 from openPLM.plmapp.tests.views import ViewTest
@@ -41,7 +43,8 @@ class HardDiskViewTest(ViewTest):
     def test_display_attributes2(self):
         response = self.get(self.base_url + "attributes/")
         self.failUnless(response.context["object_attributes"])
-        attributes = dict(response.context["object_attributes"])
+        attributes = dict((x.lower(), y) for (x,y) in 
+                          response.context["object_attributes"])               
         self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
         self.assertEqual(attributes["supplier"], self.DATA["supplier"])
         self.assertEqual(attributes["tech details"], "")
