@@ -119,9 +119,86 @@ Usage: :samp:`./manage.py migrate [options] [appname] [migrationname|zero] [--al
     More documentation on this command is available
     `here <http://south.readthedocs.org/en/latest/commands.html#migrate>`__.
 
+dbshell
+-------
+
+Runs the command-line client for the database.
+
+Usage: :samp:`./manage.py dbshell`
+
+
 Search index related commands
 ================================
+
+.. note::
+    
+    Do not forget to set change the owner of the index directory
+    to www-data (user who runs celery)
+
+rebuild_index
+---------------
+
+The command :program:`./manage.py rebuild_index` completely rebuilds the search
+index by removing the old data and then updating.
+
+Usage: :samp:`./manage.py rebuild_index [options]`
+
+
+.. program:: ./manage.py rebuild_index
+
+.. option:: -a AGE, --age=AGE 
+
+    Number of hours back to consider objects new.
+
+.. option:: -b BATCHSIZE, --batch-size=BATCHSIZE
+
+    Number of items to index at once.
+    
+.. option:: -r, --remove     
+
+    Remove objects from the index that are no longer present in the database.
+
+.. option:: -k WORKERS, --workers=WORKERS
+
+    Allows for the use multiple workers to parallelize indexing. Requires
+    multiprocessing.
+
+update_index
+----------------
+
+The command :program:`./manage.py update_index` freshens the index for the given app(s).
+
+Usage: :samp:`./manage.py update_index [options] <{appname} {appname} ...>`
+
+.. program:: ./manage.py update_index
+
+.. option:: -a AGE, --age=AGE 
+
+    Number of hours back to consider objects new.
+
+.. option:: -b BATCHSIZE, --batch-size=BATCHSIZE
+
+    Number of items to index at once.
+    
+.. option:: -r, --remove     
+
+    Remove objects from the index that are no longer present in the database.
+
+.. option:: -k WORKERS, --workers=WORKERS
+
+    Allows for the use multiple workers to parallelize indexing. Requires
+    multiprocessing.
+
+.. seealso::
+
+    More documentation on these commands is available
+    `here <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
 
 
 User related commands
 ========================
+
+Translation related commands
+===============================
+
+
