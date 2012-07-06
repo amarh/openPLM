@@ -39,8 +39,8 @@ def register(cls):
 # single part
 class SinglePart(Part):
     
-    supplier = models.CharField(max_length=200)
-    tech_details = models.TextField(blank=True)
+    supplier = models.CharField(verbose_name=_("supplier"),max_length=200)
+    tech_details = models.TextField(verbose_name=_("tech details"),blank=True)
 
     @property
     def attributes(self):
@@ -56,7 +56,7 @@ class SinglePartController(PartController):
 register(SinglePart)
 
 class MotherBoard(SinglePart):
-    motherboard_type = models.CharField(max_length=200)
+    motherboard_type = models.CharField(verbose_name=_("motherboard type"), max_length=200)
 
     @property
     def attributes(self):
@@ -68,7 +68,7 @@ register(MotherBoard)
 
 class ReferenceDesignator(ParentChildLinkExtension):
 
-    reference_designator = models.CharField(max_length=200, blank=True)
+    reference_designator = models.CharField(verbose_name=_("reference designator"),max_length=200, blank=True)
 
     def __unicode__(self):
         return u"ReferenceDesignator<%s>" % self.reference_designator
@@ -93,7 +93,7 @@ register_PCLE(ReferenceDesignator)
 
 
 class RAM(SinglePart):
-    size_in_mo = models.PositiveIntegerField()
+    size_in_mo = models.PositiveIntegerField(verbose_name=_("size in mo"))
     
     @property
     def attributes(self):
@@ -105,7 +105,7 @@ register(RAM)
 
 
 class HardDisk(SinglePart):
-    capacity_in_go = models.PositiveIntegerField()
+    capacity_in_go = models.PositiveIntegerField(verbose_name=_("capacity in go"))
     
     @property
     def attributes(self):
@@ -130,7 +130,7 @@ register(MechanicalPart)
 
 
 class Mouse(SinglePart):
-    number_of_buttons = models.PositiveSmallIntegerField(default=lambda: 3)
+    number_of_buttons = models.PositiveSmallIntegerField(verbose_name=_("number of buttons"), default=lambda: 3)
     
     @property
     def attributes(self):
@@ -145,7 +145,7 @@ class KeyBoard(SinglePart):
     KEYMAPS = (("qw", "Qwerty"),
                ("az", "Azerty"),
               )
-    keymap = models.CharField(max_length=20, choices=KEYMAPS)
+    keymap = models.CharField(verbose_name=_("keymap"), max_length=20, choices=KEYMAPS)
     
     @property
     def attributes(self):
@@ -157,8 +157,8 @@ register(KeyBoard)
 
 
 class Screen(SinglePart):
-    horizontal_resolution = models.IntegerField()
-    vertical_resolution = models.IntegerField()
+    horizontal_resolution = models.IntegerField(verbose_name=_("horizontal resolution"))
+    vertical_resolution = models.IntegerField(verbose_name=_("vertical resolution"))
     
     @property
     def attributes(self):
@@ -172,7 +172,7 @@ register(Screen)
 # assembly
 
 class Assembly(Part):
-    manufacturer = models.CharField(max_length=200)
+    manufacturer = models.CharField(verbose_name=_("manufacturer"), max_length=200)
     
     @property
     def attributes(self):
@@ -184,7 +184,7 @@ register(Assembly)
 
 
 class ComputerSet(Assembly):
-    customer = models.CharField(max_length=200)
+    customer = models.CharField(verbose_name=_("customer"), max_length=200)
     
     @property
     def attributes(self):
@@ -196,7 +196,7 @@ register(ComputerSet)
 
 
 class CentralUnit(Assembly):
-    tech_characteristics = models.TextField(blank=True)
+    tech_characteristics = models.TextField(verbose_name=_("tech characteristics"), blank=True)
     
     @property
     def attributes(self):
@@ -208,7 +208,7 @@ register(CentralUnit)
 
 
 class OtherAssembly(Assembly):
-    tech_details = models.TextField(blank=True)
+    tech_details = models.TextField(verbose_name=_("tech details"), blank=True)
 
     @property
     def attributes(self):
@@ -222,7 +222,7 @@ register(OtherAssembly)
 
 class BiosOs(Part):
 
-    size_in_mo = models.IntegerField()
+    size_in_mo = models.IntegerField(verbose_name=_("size in mo"))
 
     @property
     def attributes(self):

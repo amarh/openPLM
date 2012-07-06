@@ -19,13 +19,6 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: computer/models.py:48
-msgid "supplier"
-msgstr "поставщик"
-
-#: computer/models.py:48
-msgid "tech_details"
-msgstr ""
 
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."

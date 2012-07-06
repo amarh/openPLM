@@ -16,13 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 
-#: computer/models.py:48 phone/models.py:48
-msgid "supplier"
-msgstr "サプライヤー"
-
-#: computer/models.py:48 phone/models.py:48
-msgid "tech_details"
-msgstr "テクニック詳細"
 
 #: gdoc/templates/gdoc_files.html:8
 msgid "You cannot add a file to a GoogleDocument."
