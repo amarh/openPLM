@@ -27,6 +27,8 @@ import os
 from django.db import models
 from django.contrib import admin
 
+from django.utils.translation import ugettext_lazy as _
+
 from openPLM.plmapp.filehandlers import HandlersManager
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
@@ -46,8 +48,8 @@ register(Design)
 
 class Drawing(Design):
     
-    nb_pages = models.PositiveIntegerField("Number of pages", blank=True, null=True)
-    format = models.CharField(max_length=10, choices=CFORMATS, default=lambda: "A4")
+    nb_pages = models.PositiveIntegerField(_("Number of pages"), blank=True, null=True)
+    format = models.CharField(verbose_name=_("format"), max_length=10, choices=CFORMATS, default=lambda: "A4")
 
     @property
     def attributes(self):
@@ -71,7 +73,7 @@ register(Drawing)
 
 class CustomerDrawing(Drawing):
 
-    customer = models.CharField(max_length=50, blank=True)
+    customer = models.CharField(verbose_name=_("customer"), max_length=50, blank=True)
     
     @property
     def attributes(self):
@@ -83,7 +85,7 @@ register(CustomerDrawing)
 
 class SupplierDrawing(Drawing):
 
-    supplier = models.CharField(max_length=50, blank=True)
+    supplier = models.CharField(verbose_name=_("supplier"), max_length=50, blank=True)
     
     @property
     def attributes(self):
@@ -116,8 +118,8 @@ register(FreeCAD)
 
 class Patent(Design):
 
-    expiration_date = models.DateField(null=True, blank=True)
-    inventor = models.CharField(max_length=50, blank=True)
+    expiration_date = models.DateField(verbose_name=_("expiration date"), null=True, blank=True)
+    inventor = models.CharField(verbose_name=_("inventor"), max_length=50, blank=True)
 
 register(Patent)
 
