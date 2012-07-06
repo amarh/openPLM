@@ -198,6 +198,33 @@ Usage: :samp:`./manage.py update_index [options] <{appname} {appname} ...>`
 User related commands
 ========================
 
+changepassword
+---------------
+
+The command :program:`./manage.py changepassword` changes the password of the
+given user.
+
+Usage :samp:`./manage.py changepassword [options] {username}`
+
+createsuperuser
+----------------
+
+The command :program:`./manage.py createsuperuser` creates a new super user
+(administrator who can manage data through the admin interface).
+
+Usage :samp:`./manage.py createsuperuser [options]`
+
+
+createcompany
+----------------
+
+The command :program:`./manage.py createcompany` creates the *company*
+user (special user who owns official and deprecated parts and documents).
+
+Usage :samp:`./manage.py createcompany [options]`
+
+
+
 Translation related commands
 ===============================
 
