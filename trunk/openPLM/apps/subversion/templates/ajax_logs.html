@@ -3,9 +3,7 @@
 
 <div id="logs">
     {% if error %}
-        {% blocktrans %}
-            Sorry, openPLM cannot access to this repository.
-        {% endblocktrans %}
+        {% trans "Sorry, openPLM cannot access to this repository." %}
     {% else %}
         <p>
         {% trans "Last changelogs:" %}

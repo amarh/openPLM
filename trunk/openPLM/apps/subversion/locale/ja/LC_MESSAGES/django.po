@@ -1,0 +1,47 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-30 12:11+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: subversion/models.py:19
+msgid "Valid value are HEAD, a number or a date between brackets"
+msgstr "有効な値はHEADもしくは数値、カッコ内の日付です。"
+
+#: subversion/templates/ajax_logs.html:6
+msgid "Sorry, openPLM cannot access to this repository."
+msgstr "申し訳ありません。openPLMはこの場所にはアクセスできません。"
+
+
+#: subversion/templates/ajax_logs.html:11
+msgid "Last changelogs:"
+msgstr "最終変更履歴"
+
+#: subversion/templates/logs.html:28
+msgid "Loading..."
+msgstr "ロード中..."
+
+#: subversion/templates/subversion_files.html:8
+msgid "You cannot add a file to a SubversionRepository."
+msgstr "Subversionリポジトリにファイルを追加することはできません。"
+
+#: subversion/templates/subversion_files.html:12
+msgid "To check-out this repository, run the following command:"
+msgstr "このディレクトリをダウンロードするには、次のコマンドを実行します。"
+
+#: subversion/templates/subversion_files.html:19
+msgid "To export this repository, run the following command:"
+msgstr "このディレクトリをエクスポートするには、次のコマンドを実行します。"

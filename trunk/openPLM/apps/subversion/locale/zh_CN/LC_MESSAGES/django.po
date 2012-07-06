@@ -1,0 +1,47 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-06 14:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: subversion/models.py:19
+msgid "Valid value are HEAD, a number or a date between brackets"
+msgstr "正确值为HEAD，括号中的一个数字或者一个日期"
+
+#: subversion/templates/ajax_logs.html:6
+#, fuzzy
+msgid "Sorry, openPLM cannot access to this repository."
+msgstr "对不起，openPLM无法进入此仓库"
+
+#: subversion/templates/ajax_logs.html:11
+msgid "Last changelogs:"
+msgstr "最后一个changelogs:"
+
+#: subversion/templates/logs.html:28
+msgid "Loading..."
+msgstr "载入中⋯⋯"
+
+#: subversion/templates/subversion_files.html:8
+msgid "You cannot add a file to a SubversionRepository."
+msgstr "您不能在一个SubversionRepository中加入文件"
+
+#: subversion/templates/subversion_files.html:12
+msgid "To check-out this repository, run the following command:"
+msgstr "请运行以下指令，以便下载仓库:"
+
+#: subversion/templates/subversion_files.html:19
+msgid "To export this repository, run the following command:"
+msgstr "请输入以下指令，以便导出此仓库:"

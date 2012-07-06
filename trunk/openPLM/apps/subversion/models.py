@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_noop
+from django.utils.translation import ugettext_lazy as _
 
 import pysvn
 
@@ -20,10 +21,10 @@ revision_validator = RegexValidator(revision_rx,
 
 class SubversionRepository(Document):
 
-    repository_uri = models.CharField(max_length=250, blank=False, null=False)
-    svn_revision = models.CharField(max_length=50, blank=False, null=False,
+    repository_uri = models.CharField(verbose_name=_("repository uri"),max_length=250, blank=False, null=False)
+    svn_revision = models.CharField(verbose_name=_("svn revision"),max_length=50, blank=False, null=False,
             default="HEAD", validators=[revision_validator])
-    issue_tracking_system = models.CharField(max_length=250, blank=True,
+    issue_tracking_system = models.CharField(verbose_name=_("issue tracking system"),max_length=250, blank=True,
             null=False)
     
     @property
