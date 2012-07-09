@@ -90,7 +90,7 @@ Example:
    :width: 100%
 
 
-NAVIGATE
+Navigate
 ========================================================
 Objects and their links are represented in a graph.
 
@@ -108,7 +108,7 @@ Example:
    :width: 100%
 
 
-CREATE
+Create
 ========================================================
 You can create an object filling the form displayed.
 
@@ -120,7 +120,7 @@ Example:
    :width: 100%
 
 
-STUDY
+Study
 ========================================================
 Reaching "Study" from the Home page show the history of the objects related to the user.
 
@@ -136,7 +136,7 @@ Example:
    :width: 100%
 
 
-BROWSE
+Browse
 ======================================================
 The "Browse" page display all objects, groups and users available in your OpenPLM.
 You can filter the results with the Type panel.
@@ -147,7 +147,7 @@ Example:
    :width: 100%
 
 
-COMMON PARTS
+Common Parts
 =======================================================
 
 **The header**
