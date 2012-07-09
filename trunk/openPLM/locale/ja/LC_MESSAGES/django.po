@@ -16,30 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 
-
-#: pdfgen/templates/select_pdf.html:8
-msgid ""
-"\n"
-"Select PDF files that will be merged into a unique PDF\n"
-"and click on the Download button.\n"
-msgstr ""
-"\n"
-"独自のpdfで結合されるpdfファイルを選択し\n"
-"ダウンロードボタンをクリックしてください。\n"
-
-#: pdfgen/templates/select_pdf.html:17
-msgid "Download"
-msgstr "ダウンロード"
-
-#: pdfgen/templates/select_pdf_doc.html:16
-msgid "There are no PDF files."
-msgstr "pdfファイルはありません。"
-
-
-#: pdfgen/templates/select_pdf_part.html:19
-msgid "Level:"
-msgstr "レベル:"
-
 #: plmapp/base_views.py:128
 msgid "Internal error"
 msgstr "インターナルエラー"
