@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 
 from django.utils.translation import ugettext_noop
+from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.models import Document
 
@@ -16,7 +17,7 @@ class URLDoc(Document):
     u"""
     URLDoc : object which represent an url
     """
-    location_uri= models.CharField(max_length=250, blank=True, default = " ")
+    location_uri= models.CharField(verbose_name=_("location uri"), max_length=250, blank=True, default = " ")
     
     @property
     def attributes(self):
