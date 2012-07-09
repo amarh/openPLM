@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-09 11:46+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templates/gdoc_files.html:8
+msgid "You cannot add a file to a GoogleDocument."
+msgstr "Vous ne pouvez pas télécharger un fichier dans un GoogleDocument"
+
+#: templates/gdoc_files.html:12
+msgid ""
+"\n"
+"            You cannot access to this Google Document. If you did not "
+"created\n"
+"            this document, you can ask its owner to grant you the "
+"permission\n"
+"            to read this file in Google Document.\n"
+"        "
+msgstr ""
+"\n"
+"           Vous ne pouvez pas avoir accès à ce document Google. Si vous n'avez pas "
+"créé\n"
+"           ce document, vous pouvez demander à son propriétaire de vous donner la "
+"permission\n"
+"           de lire ce fichier dans Google Document."
+"       "
+
+#: templates/gdoc_files.html:21
+msgid "Click here to edit the file in Google Document ."
+msgstr "Cliquez ici pour éditer le fichier dans Google Document."
+
+#: templates/gdoc_files.html:24
+msgid "Click here to download the file from Google."
+msgstr "Cliquez ici pour télécharger le fichier depuis Google."

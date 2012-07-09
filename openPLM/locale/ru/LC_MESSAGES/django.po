@@ -20,36 +20,6 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 
-#: gdoc/templates/gdoc_files.html:8
-msgid "You cannot add a file to a GoogleDocument."
-msgstr "Вы не можете добавить файл в GoogleDocument."
-
-#: gdoc/templates/gdoc_files.html:12
-msgid ""
-"\n"
-"            You cannot access to this Google Document. If you did not "
-"created\n"
-"            this document, you can ask its owner to grant you the "
-"permission\n"
-"            to read this file in Google Document.\n"
-"        "
-msgstr ""
-"\n"
-"            Вы не можете получить доступ к этому Google Document. Если вы его не "
-"создавали,\n"
-"             вы можете попросить владельца предоставить вам "
-"права\n"
-"            на чтение этого файла в Google Document.\n"
-"        "
-
-#: gdoc/templates/gdoc_files.html:21
-msgid "Click here to edit the file in Google Document ."
-msgstr "Нажмите здесь чтобы отредактировать файл в Google Document ."
-
-#: gdoc/templates/gdoc_files.html:24
-msgid "Click here to download the file from Google."
-msgstr "Нажмите здесь чтобы скачать файл из Google"
-
 #: pdfgen/templates/select_pdf.html:8
 msgid ""
 "\n"

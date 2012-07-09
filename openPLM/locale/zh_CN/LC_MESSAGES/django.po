@@ -17,33 +17,6 @@ msgstr ""
 "Language: \n"
 
 
-#: gdoc/templates/gdoc_files.html:8
-msgid "You cannot add a file to a GoogleDocument."
-msgstr "您不能在谷歌文件中下载文件"
-
-#: gdoc/templates/gdoc_files.html:12
-#, fuzzy
-msgid ""
-"\n"
-"            You cannot access to this Google Document. If you did not "
-"created\n"
-"            this document, you can ask its owner to grant you the "
-"permission\n"
-"            to read this file in Google Document.\n"
-"        "
-msgstr ""
-"\n"
-" 您没有权力进入此谷歌文件。如果不是您创建的此文件，请您询问文件的创建者以便获"
-"权在谷歌文件中读取此文件 \n"
-
-#: gdoc/templates/gdoc_files.html:21
-msgid "Click here to edit the file in Google Document ."
-msgstr "点击这里可以在谷歌文件里编辑文件"
-
-#: gdoc/templates/gdoc_files.html:24
-msgid "Click here to download the file from Google."
-msgstr "点击这里可以从谷歌里下载文件"
-
 #: pdfgen/templates/select_pdf.html:8
 #, fuzzy
 msgid ""
