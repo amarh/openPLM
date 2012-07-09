@@ -52,53 +52,9 @@ msgstr "Parcourir"
 msgid "Browse all parts, groups, users and documents."
 msgstr "Parcourir tous les parts, groupes, utilisateurs et documents."
 
-#: pdfgen/templates/attributes.xhtml:19
-msgid "User"
-msgstr "Utilisateur"
-
-#: pdfgen/templates/attributes.xhtml:21
 #: templates/groups/pending_invitations.html:7
 msgid "Group"
 msgstr "Groupe"
-
-#: pdfgen/templates/select_pdf.html:8
-msgid ""
-"\n"
-"            Select PDF files that will be merged into a unique PDF\n"
-"            and click on the Download button.\n"
-"        "
-msgstr ""
-"\n"
-"Sélectionnez les fichiers pdf qui seront fusionnés dans un pdf unique\n"
-"et cliquez sur le bouton Télécharger."
-
-#: pdfgen/templates/select_pdf.html:17
-msgid "Download"
-msgstr "Télécharger"
-
-#: pdfgen/templates/select_pdf_doc.html:16
-msgid "There are no PDF files."
-msgstr "Il n'y a pas de fichiers pdf."
-
-#: pdfgen/templates/select_pdf_part.html:19
-msgid "Level:"
-msgstr "Niveau :"
-
-#: pdfgen/templates/summary.xhtml:18
-msgid "File"
-msgstr "Fichier"
-
-#: pdfgen/templates/summary.xhtml:34
-msgid "State"
-msgstr "État"
-
-#: pdfgen/templates/summary.xhtml:35
-msgid "User who promoted/demoted the object"
-msgstr "Utilisateur qui a validé/refusé cet objet"
-
-#: pdfgen/templates/summary.xhtml:36
-msgid "Date"
-msgstr "Date"
 
 #: plmapp/base_views.py:127
 msgid "Internal error"

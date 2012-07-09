@@ -1,0 +1,87 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-09 13:42+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templates/attributes.xhtml:19
+msgid "User"
+msgstr "ユーザー"
+
+#: templates/attributes.xhtml:21
+msgid "Group"
+msgstr "グループ"
+
+#: templates/base.xhtml:71
+msgid "Genererated by openPLM"
+msgstr ""
+
+#: templates/bom.xhtml:27
+msgid "Level"
+msgstr "レベル"
+
+#: templates/bom.xhtml:28
+msgid "Ord."
+msgstr ""
+
+#: templates/bom.xhtml:29
+msgid "Qty"
+msgstr ""
+
+#: templates/bom.xhtml:30
+msgid "Unit"
+msgstr "ユニット"
+
+#: templates/select_pdf.html:8
+msgid ""
+"\n"
+"            Select PDF files that will be merged into a unique PDF\n"
+"            and click on the Download button.\n"
+"        "
+msgstr ""
+"\n"
+"独自のpdfで結合されるpdfファイルを選択し\n"
+"ダウンロードボタンをクリックしてください。\n"
+"       "
+
+#: templates/select_pdf.html:17
+msgid "Download"
+msgstr "ダウンロード"
+
+#: templates/select_pdf_doc.html:16
+msgid "There are no PDF files."
+msgstr "pdfファイルはありません。"
+
+#: templates/select_pdf_part.html:19
+msgid "Level:"
+msgstr "レベル:"
+
+#: templates/summary.xhtml:18
+msgid "File"
+msgstr ""
+
+#: templates/summary.xhtml:34
+msgid "State"
+msgstr "ステート"
+
+#: templates/summary.xhtml:35
+msgid "User who promoted/demoted the object"
+msgstr ""
+
+#: templates/summary.xhtml:36
+msgid "Date"
+msgstr "日付"

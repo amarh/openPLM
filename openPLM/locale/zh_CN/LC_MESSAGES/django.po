@@ -17,30 +17,6 @@ msgstr ""
 "Language: \n"
 
 
-#: pdfgen/templates/select_pdf.html:8
-#, fuzzy
-msgid ""
-"\n"
-"            Select PDF files that will be merged into a unique PDF\n"
-"            and click on the Download button.\n"
-"        "
-msgstr ""
-"\n"
-" 选择多个PDF文件可以集成为一个PDF文件\n"
-"点击下载键 \n"
-
-#: pdfgen/templates/select_pdf.html:17
-msgid "Download"
-msgstr "下载"
-
-#: pdfgen/templates/select_pdf_doc.html:16
-msgid "There are no PDF files."
-msgstr "没有PDF文件"
-
-#: pdfgen/templates/select_pdf_part.html:19
-msgid "Level:"
-msgstr "层次水平"
-
 #: plmapp/base_views.py:127
 msgid "Internal error"
 msgstr "内部错误"
