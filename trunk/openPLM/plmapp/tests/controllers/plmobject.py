@@ -455,16 +455,29 @@ class ControllerTest(BaseTestCase):
         Tests that an official or deprecated object is readable by every body.
         """
         controller = self.create("P1")
+        controller.object.lifecycle = models.Lifecycle.objects.get(name="draft_proposed_official_deprecated")
+        controller.object.save()
+        controller.set_signer(self.user, level_to_sign_str(2))
         controller.object.is_promotable = lambda: True
         robert = models.User.objects.create_user("Robert", "pwd", "robert@p.txt")
         robert.groups.add(self.group)
         ned = models.User.objects.create_user("Ned", "pwd", "ned@p.txt")
+
         for i in range(2):
-            # i = 1 -> official, i = 2 -> deprecated
+            ctrl = self.CONTROLLER(controller.object, ned)
+            self.assertRaises(exc.PermissionError, ctrl.check_readable)
+            for user in (self.user, self.cie, robert):
+                ctrl = self.CONTROLLER(controller.object, user)
+                ctrl.check_readable()
             controller.promote()
+
+        for i in range(2):
+            # i = 0 -> official, i = 1 -> deprecated
             for user in (self.user, self.cie, robert, ned):
                 ctrl = self.CONTROLLER(controller.object, user)
                 ctrl.check_readable()        
+            if i == 0:
+                controller.promote()
 
     # publication tests
 
