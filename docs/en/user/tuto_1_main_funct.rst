@@ -13,7 +13,7 @@ Requirements
 OpenPLM is a full web application i.e. you just need a browser.
 We advise you Mozilla Firefox 3.6.
 
-In OpenPLM there are four main types of objects :
+In OpenPLM there are four main types of objects:
 
 * User
 
@@ -23,7 +23,7 @@ In OpenPLM there are four main types of objects :
 
 * Document
 
-The parts and documents are named according to the following convention :
+The parts and documents are named according to the following convention:
 *type//ref//rev//name*
 
 * *type* refer to the type of the object
@@ -51,7 +51,7 @@ You have 5 main features:
 
 5- Browse objects
 
-Home page screenshot :
+Home page screenshot:
 
 .. image:: images/Capture_openPLM_home.png
    :width: 100%
@@ -67,13 +67,13 @@ The search block is divided in two blocks:
 
 1- The search block where you will enter your request
 
-2- The block where results will be displayed
+2- The part where results will be displayed
 
 First, you need to select the type of PLMObject you want to look for.
 
 Then, you can fill the form if you want to refine your research with:
  * a set of words , OpenPLM will display the attributes which contains all of the given words
- * advanced queries :
+ * advanced queries:
     * attribute=data 
         - name=test 
         - name:test
@@ -84,7 +84,7 @@ Then, you can fill the form if you want to refine your research with:
 
 OpenPLM will display the attributes which correspond to the query set.
 
-Example :
+Example:
 
 .. image:: images/Capture_openPLM_search.png
    :width: 100%
@@ -94,7 +94,7 @@ NAVIGATE
 ========================================================
 Objects and their links are represented in a graph.
 
-Each box represent an object :
+Each box represent an object:
 
 * Pink is for users
 
@@ -102,7 +102,7 @@ Each box represent an object :
 
 * Purple for documents
 
-Example :
+Example:
 
 .. image:: images/Capture_openPLM_navigate.png
    :width: 100%
@@ -114,7 +114,7 @@ You can create an object filling the form displayed.
 
 Others ways to create objects are proposed under the form creation.
 
-Example :
+Example:
 
 .. image:: images/Capture_openPLM_create.png
    :width: 100%
@@ -124,13 +124,13 @@ STUDY
 ========================================================
 Reaching "Study" from the Home page show the history of the objects related to the user.
 
-On the "Study" page you can :
+On the "Study" page you can:
 
 * display informations of an object
 
 * reach and modify an object
 
-Example :
+Example:
 
 .. image:: images/Capture_openPLM_study.png
    :width: 100%
@@ -141,7 +141,7 @@ BROWSE
 The "Browse" page display all objects, groups and users available in your OpenPLM.
 You can filter the results with the Type panel.
 
-Example :
+Example:
 
 .. image:: images/Capture_openPLM_browse.png
    :width: 100%
@@ -152,7 +152,7 @@ COMMON PARTS
 
 **The header**
 
-It contains :
+It contains:
 
     * User's name
     
