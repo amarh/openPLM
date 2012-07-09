@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib import admin
 
+from django.utils.translation import ugettext_lazy as _
+
 from openPLM.plmapp.models import Part, ParentChildLinkExtension, register_PCLE
 
 def register(cls):
@@ -14,7 +16,7 @@ class Package(Part):
     u"""
     Package : represent a package of softwares
     """
-    description = models.TextField(blank=True)
+    description = models.TextField(verbose_name=_("description"), blank=True)
     
     @property
     def attributes(self):
@@ -39,11 +41,11 @@ class Software(Part):
     
         Url for the issue tracker of the software 
     """
-    licence = models.CharField(max_length=50, blank=False, null=False)
-    description = models.TextField(blank=True)
-    linobject_developpement = models.BooleanField(default=False)
-    public = models.BooleanField(default=False)
-    bugtracker_uri = models.CharField(max_length=250, blank=True)
+    licence = models.CharField(verbose_name=_("licence"), max_length=50, blank=False, null=False)
+    description = models.TextField(verbose_name=_("description"), blank=True)
+    linobject_developpement = models.BooleanField(verbose_name=_("developed by LinObject"), default=False)
+    public = models.BooleanField(verbose_name=_("public"), default=False)
+    bugtracker_uri = models.CharField(verbose_name=_("bugtracker uri"), max_length=250, blank=True)
     
     @property
     def attributes(self):
@@ -66,8 +68,8 @@ class DependencyLink(ParentChildLinkExtension):
         
            a boolean that indicate wether the depency is required or not
     """ 
-    required = models.BooleanField(default=False)
-    version_range = models.CharField(max_length=50,blank=True)
+    required = models.BooleanField(verbose_name=_("required"), default=False)
+    version_range = models.CharField(verbose_name=_("version range"), max_length=50,blank=True)
         
     def __unicode__(self):
         return u"DependencyLink<%d,%s>" % (self.required, self.version_range)
