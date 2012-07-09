@@ -23,7 +23,7 @@ msgstr "Les valeurs correctes sont HEAD, un nombre ou une date entre crochets"
 
 #: models.py:23
 msgid "repository uri"
-msgstr "adresse du dépot"
+msgstr "uri du dépot"
 
 #: models.py:24
 msgid "svn revision"

@@ -29,9 +29,9 @@ msgstr "uri del deposito"
 msgid "svn revision"
 msgstr "revision de svn"
 
-##: models.py:26
-#msgid "issue tracking system"
-#msgstr "sistem de suivi des problèmes"
+#: models.py:26
+msgid "issue tracking system"
+msgstr "sistema de seguimiento de errores"
 
 #: subversion/templates/ajax_logs.html:6
 msgid "Sorry, openPLM cannot access to this repository."
