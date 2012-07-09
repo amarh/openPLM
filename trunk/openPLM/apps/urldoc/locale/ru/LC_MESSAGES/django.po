@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 15:07+0200\n"
+"POT-Creation-Date: 2012-07-09 15:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,16 +27,15 @@ msgstr ""
 msgid "content"
 msgstr ""
 
-#: templates/content.html:21
+#: templates/content.html:22
 #, python-format
 msgid ""
 "\n"
 "        You can not display this content on this page. Click\n"
-"        <a href=%(obj.object.location_uri)s target=\"_blank\">here</a>to see "
-"it.\n"
+"        <a href=%(uri)s target=\"_blank\">here</a>to see it.\n"
 "        "
 msgstr ""
 
-#: templates/content.html:28
-msgid "There's not url specified for this URLDoc."
+#: templates/content.html:29
+msgid "There's no url specified for this URLDoc."
 msgstr ""
