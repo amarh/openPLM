@@ -27,13 +27,17 @@ In OpenPLM there are four main types of objects:
 The parts and documents are named according to the following convention:
 *type//ref//rev//name*
 
-* *type* refer to the type of the object
+    type
+        refers to the type of the object (``Part``, ``Document``, ``Document3D``...)
 
-* *ref* refer to the reference of the object (usually write as type_number)
+    ref
+        refers to the reference of the object (usually written as ``PART_1759`` or ``DOC_0051``)
 
-* *rev* refer to the number revision of the object
+    rev
+        refers to the revision number of the object (``a``, ``1.2`` or ``A.a.1``...)
 
-* *name* refer to the name of the object ifs has been given a name
+    name
+        refers to the name of the object (may be empty)
 
 
 .. _func-home:
