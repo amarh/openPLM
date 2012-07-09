@@ -44,6 +44,7 @@ The parts and documents are named according to the following convention:
 
 Home page
 ========================================================
+
 You have 5 main features:
 
 1- Search for objects 
@@ -56,10 +57,14 @@ You have 5 main features:
 
 5- Browse objects
 
-Home page screenshot:
+Screenshot:
 
-.. image:: images/Capture_openPLM_home.png
-   :width: 100%
+.. figure:: images/Capture_openPLM_home.png
+    :width: 100%
+    :align: center
+
+    Home page
+
 
 As shown on the example, your pending invitations (sent and received) are displayed on the home page.
 
@@ -68,31 +73,39 @@ As shown on the example, your pending invitations (sent and received) are displa
 
 Search
 ========================================================
+
 The search block is divided in two blocks:
 
-1- The search block where you will enter your request
+1- The search block where you enter your request
 
-2- The part where results will be displayed
+2- The block where results are displayed
 
-First, you need to select the type of PLMObject you want to look for.
+First, you need to select the type of object you want to look for.
 
 Then, you can fill the form if you want to refine your research with:
- * a set of words , OpenPLM will display the attributes which contains all of the given words
+
+ * a set of words, OpenPLM will search for objects, of which attributes contains all the given words
  * advanced queries:
     * attribute=data 
-        - name=test 
-        - name:test
+        - ``name=test`` 
+        - ``name:test``
     * attribute:data OR query
-        - type=document3D OR type=design
+        - ``type=document3D OR type=design``
     * attribute:data AND query
-        - name=test AND (type=document3D OR type=design)
+        - ``name=test AND (type=document3D OR type=design)``
 
-OpenPLM will display the attributes which correspond to the query set.
+OpenPLM will highlight results according to the query.
 
 Example:
 
-.. image:: images/Capture_openPLM_search.png
-   :width: 100%
+.. figure:: images/Capture_openPLM_search.png
+    :width: 100%
+    :align: center    
+
+    Search example
+
+    As you can see, an empty query matches all objects.
+    Here, all parts are returned, including their sub-types (here SinglePart).
 
 
 Navigate
@@ -115,9 +128,10 @@ Example:
 
 Create
 ========================================================
-You can create an object filling the form displayed.
 
-Others ways to create objects are proposed under the form creation.
+You can create an object by filling the form displayed.
+
+Other ways to create objects are proposed under the form creation.
 
 Example:
 
@@ -127,7 +141,8 @@ Example:
 
 Study
 ========================================================
-Reaching "Study" from the Home page show the history of the objects related to the user.
+
+Reaching "Study" from the Home page shows the history of the objects related to the user.
 
 On the "Study" page you can:
 
@@ -143,8 +158,10 @@ Example:
 
 Browse
 ======================================================
-The "Browse" page display all objects, groups and users available in your OpenPLM.
-You can filter the results with the Type panel.
+
+The "Browse" page displays all objects, groups and users available in your OpenPLM.
+You can filter the results according to their type, status and you can change
+the sorting order.
 
 Example:
 
