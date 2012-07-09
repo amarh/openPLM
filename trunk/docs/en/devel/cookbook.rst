@@ -41,8 +41,8 @@ Condition on promotion
 Controllers
 ===============
 
-Creation of a controller
-------------------------
+Creation of a part using a controller
+--------------------------------------
 
 .. code-block:: python
 

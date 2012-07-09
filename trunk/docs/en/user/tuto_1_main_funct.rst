@@ -7,7 +7,7 @@ This document describes the main concepts and the main functions of openPLM,
 the first genuine open source PLM.
 
 
-REQUIREMENTS
+Requirements
 =============
 
 OpenPLM is a full web application i.e. you just need a browser.
@@ -35,7 +35,9 @@ The parts and documents are named according to the following convention :
 * *name* refer to the name of the object ifs has been given a name
 
 
-HOME PAGE
+.. _func-home:
+
+Home page
 ========================================================
 You have 5 main features:
 
@@ -57,13 +59,15 @@ Home page screenshot :
 As shown on the example, your pending invitations (sent and received) are displayed on the home page.
 
 
-SEARCH
+.. _func-search:
+
+Search
 ========================================================
-The search block is part in two :
+The search block is divided in two blocks:
 
-1- The search part where you will enter your request
+1- The search block where you will enter your request
 
-2- The part where the result will be display
+2- The block where results will be displayed
 
 First, you need to select the type of PLMObject you want to look for.
 
