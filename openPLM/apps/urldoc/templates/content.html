@@ -14,17 +14,19 @@ width: 100%;
 </style>
 {% endblock %}
 {% block content %}
-{% if obj.object.location_uri != " " %}
-<iframe src="{{obj.object.location_uri}}">
-</iframe>
-<noframes>
-    <p>{% blocktrans %}
+{% with obj.object.location_uri as uri %}
+    {% if uri != "" and uri != " " %}
+    <iframe src="{{uri}}" class="content_uri">
+    </iframe>
+    <noframes>
+        <p>{% blocktrans %}
         You can not display this content on this page. Click
-        <a href={{obj.object.location_uri}} target="_blank">here</a>to see it.
+        <a href={{uri}} target="_blank">here</a>to see it.
         {% endblocktrans %}</p>
-</noframes>
-
-{% else %}
-<p>{% trans "There's not url specified for this URLDoc." %}</p>
-{% endif %}
+    </noframes>
+    
+    {% else %}
+    <p>{% trans "There's no url specified for this URLDoc." %}</p>
+    {% endif %}
+{% endwith %}
 {% endblock %}
