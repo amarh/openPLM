@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-09 10:50+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Zahariri ALI <zahariri.ali@gmail.com>\n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templates/Display3D.htm:14
+#, fuzzy
+msgid ""
+"This document has no 3D data. Maybe it does not have a STEP/STL file or "
+"openPLM has not yet converted its STEP file."
+msgstr ""
+"Este documento 3D no contiene informacion para su visualizacion. Quizas no "
+"se agrego ningun fichero STEP/STL o openPLM esta trabajando en su conversion."
+
+#: templates/Display3D.htm:26
+msgid "Set to axometric view"
+msgstr "Poner en vista axometric"
+
+#: templates/Display3D.htm:27
+msgid "Set to front view"
+msgstr "Poner en vista frontal"
+
+#: templates/Display3D.htm:28
+msgid "Set to right view"
+msgstr "Poner en vista de derecha"
+
+#: templates/Display3D.htm:29
+msgid "Set to top view"
+msgstr "Poner en vista de arriba"
+
+#: templates/Display3D.htm:30
+msgid "Set to rear view"
+msgstr "Poner en vista de atras"
+
+#: templates/Display3D.htm:31
+msgid "Set to left view"
+msgstr "Poner en vista de izquierda"
+
+#: templates/Display3D.htm:32
+msgid "Set to bottom view"
+msgstr "Poner en vista de abajo"
+
+#: templates/Display3D.htm:36
+msgid "Random colors"
+msgstr "Colores aleatorias"
+
+#: templates/Display3D.htm:37
+msgid "Initial colors"
+msgstr "Colores iniciales"
+
+#: templates/Display3D.htm:40
+msgid "Toggle transparency"
+msgstr "Activar/desactivar la transparencia"
+
+#: templates/Display3D.htm:41
+msgid "Toggle axis visibility"
+msgstr "Activar/desactivar la visibilidad de los ejes"
+
+#: templates/Display3D.htm:62
+msgid "Zoom out"
+msgstr "Zoom menos"
+
+#: templates/Display3D.htm:66
+msgid "Zoom in"
+msgstr "Zoom mas"
+
+#: templates/Display3D.htm:70
+msgid "Fit all"
+msgstr "Centrar"
+
+#: templates/DisplayDecompose.htm:81
+msgid "Assembly"
+msgstr "Ensamblaje"
+
+#: templates/DisplayDecompose.htm:82
+msgid "Child"
+msgstr "Hijo"
+
+#: templates/DisplayDecompose.htm:83
+msgid "Order"
+msgstr "Orden"
+
+#: templates/DisplayDecompose.htm:84
+msgid "Quantity"
+msgstr "Cantidad"
+
+#: templates/DisplayDecompose.htm:85
+msgid "Unit"
+msgstr "Unidad"
+
+#: templates/DisplayDecompose.htm:86
+msgid "Type"
+msgstr "Tipo"
+
+#: templates/DisplayDecompose.htm:87
+msgid "Reference"
+msgstr "Referencia"
+
+#: templates/DisplayDecompose.htm:88
+msgid "Revision"
+msgstr "Revision"
+
+#: templates/DisplayDecompose.htm:89
+msgid "Name"
+msgstr "Nombre"
+
+#: templates/DisplayDecompose.htm:103
+msgid "Display or Hide all assemblys at this level"
+msgstr "Mostrar o Ocultar todos los ensamblajas para este nivel"
+
+#: templates/DisplayDecompose.htm:103
+msgid "Level"
+msgstr "Nivel"
+
+#: templates/DisplayDecompose.htm:212
+msgid "already indexed"
+msgstr "ya indexado"
+
+#: templates/DisplayDecompose.htm:289
+msgid "Create"
+msgstr "Crear"
