@@ -19,83 +19,28 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 
-#: document3D/templates/Display3D.htm:149
-msgid ""
-"This document has no 3D data. Maybe it does not have a STEP file or openPLM "
-"has not yet converted its STEP file."
-msgstr ""
-"Este documento 3D no contiene informacion para su visualizacion. Quizas no "
-"se agrego ningun fichero STEP o openPLM esta trabajando en su conversion."
-
-#: document3D/templates/DisplayDecompose.htm:81
-#: document3D/templates/DisplayDecompose2222.htm:49
-msgid "Assembly"
-msgstr "Ensamblaje"
-
-#: document3D/templates/DisplayDecompose.htm:82
-#: document3D/templates/DisplayDecompose2222.htm:50
-msgid "Child"
-msgstr "Hijo"
-
-#: document3D/templates/DisplayDecompose.htm:83
-#: document3D/templates/DisplayDecompose2222.htm:51 document3D/templates/copie
-#: de DisplayDecompose.htm:49 templates/parts/bom_edit.html:11
+#: templates/parts/bom_edit.html:11
 msgid "Order"
 msgstr "Orden"
 
-#: document3D/templates/DisplayDecompose.htm:84
-#: document3D/templates/DisplayDecompose2222.htm:52 document3D/templates/copie
-#: de DisplayDecompose.htm:50 templates/parts/bom_edit.html:12
+#: templates/parts/bom_edit.html:12
 msgid "Quantity"
 msgstr "Cantidad"
 
-#: document3D/templates/DisplayDecompose.htm:85
-#: document3D/templates/DisplayDecompose2222.htm:53 document3D/templates/copie
-#: de DisplayDecompose.htm:51 templates/parts/bom.html:37
+#: templates/parts/bom.html:37
 #: templates/parts/bom_edit.html:13
 msgid "Unit"
 msgstr "Unidad"
 
-#: document3D/templates/DisplayDecompose.htm:86
-#: document3D/templates/DisplayDecompose2222.htm:54 document3D/templates/copie
-#: de DisplayDecompose.htm:52 plmapp/forms.py:542 templates/create.html:35
+#: plmapp/forms.py:542 templates/create.html:35
 #: templates/edit.html:11 templates/users/password.html:11
 msgid "Type"
 msgstr "Tipo"
 
-#: document3D/templates/DisplayDecompose.htm:87
-#: document3D/templates/DisplayDecompose2222.htm:55 document3D/templates/copie
-#: de DisplayDecompose.htm:53
-msgid "Reference"
-msgstr "Referencia"
-
-#: document3D/templates/DisplayDecompose.htm:88
-#: document3D/templates/DisplayDecompose2222.htm:56 document3D/templates/copie
-#: de DisplayDecompose.htm:54
-msgid "Revision"
-msgstr "Revision"
-
-#: document3D/templates/DisplayDecompose.htm:89
-#: document3D/templates/DisplayDecompose2222.htm:57 document3D/templates/copie
-#: de DisplayDecompose.htm:55
-msgid "Name"
-msgstr "Nombre"
-
-#: document3D/templates/DisplayDecompose.htm:107
-msgid "Display or Hide all assemblys at this level"
-msgstr "Mostrar o Ocultar todos los ensamblajas para este nivel"
-
-#: document3D/templates/DisplayDecompose.htm:107 templates/parts/bom.html:34
+#: templates/parts/bom.html:34
 msgid "Level"
 msgstr "Nivel"
 
-#: document3D/templates/DisplayDecompose.htm:235
-msgid "already indexed"
-msgstr "ya indexado"
-
-#: document3D/templates/DisplayDecompose.htm:319
-#: document3D/templates/DisplayDecompose2222.htm:266
-#: document3D/templates/copie de DisplayDecompose.htm:153
 #: templates/blocks/supermenu.html:43
 msgid "Create"
 msgstr "Crear"
