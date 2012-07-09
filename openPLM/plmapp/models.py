@@ -525,7 +525,7 @@ class PLMObject(models.Model):
     ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
-    group = models.ForeignKey(GroupInfo, related_name="%(class)s_group")
+    group = models.ForeignKey(GroupInfo, verbose_name=_("group"), related_name="%(class)s_group")
 
     # state and lifecycle
     lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"), 
