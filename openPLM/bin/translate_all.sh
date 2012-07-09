@@ -2,7 +2,7 @@
 
 # run this script to compile translations of all installed apps
 
-MAKEMESSAGES="django-admin makemessages"
+MAKEMESSAGES="django-admin makemessages -e html,htm,xhtml,py,txt"
 COMPILEMESSAGES="django-admin compilemessages"
 current=$(pwd)
 
@@ -37,8 +37,10 @@ if [ -d "apps" ] && [ -d "locale" ];then
     "make")
         if [ $# -eq "2" ]; then
             cd "apps/$2"
+        else
+            MAKEMESSAGES="$MAKEMESSAGES --ignore=apps/* "
         fi
-        $MAKEMESSAGES -l fr
+        $MAKEMESSAGES -l fr 
         $MAKEMESSAGES -l es
         $MAKEMESSAGES -l ja
         $MAKEMESSAGES -l ru
