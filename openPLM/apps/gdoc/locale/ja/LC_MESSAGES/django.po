@@ -36,6 +36,7 @@ msgstr ""
 "このGoogle Documentへのアクセスはできません。もしこのドキュメントを\n"
 "作成できなかった時は,Google Documentでこのファイルを読むために\n"
 "オーナーに許可を求めることができます。\n"
+"       "
 
 #: templates/gdoc_files.html:21
 msgid "Click here to edit the file in Google Document ."
