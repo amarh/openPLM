@@ -597,9 +597,7 @@ class PLMObjectController(Controller):
         and *raise_* is ``True`` (the default).
         """
         if not self._user.get_profile().restricted:
-            if not self.is_editable:
-                return True
-            if self.is_cancelled:
+            if self.is_official or self.is_deprecated or self.is_cancelled:
                 return True
             if self._user.username == settings.COMPANY:
                 # the company is like a super user
