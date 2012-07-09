@@ -1,0 +1,93 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-09 12:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Zahariri ALI <zahariri.ali@gmail.com>\n"
+"Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templates/erp_summary.html:15 templates/erp_summary.html.py:40
+msgid "Cost"
+msgstr "Coût"
+
+#: templates/erp_summary.html:18
+msgid "Individual cost"
+msgstr "Coût individuel"
+
+#: templates/erp_summary.html:26
+msgid "Update"
+msgstr "Actualiser"
+
+#: templates/erp_summary.html:29
+msgid "Update cost from OpenERP"
+msgstr "Actualiser à partir d'OpenERP"
+
+#: templates/erp_summary.html:44
+msgid "Unit"
+msgstr "Unité"
+
+#: templates/erp_summary.html:53
+msgid "Total cost"
+msgstr "Coût total"
+
+#: templates/erp_summary.html:61
+msgid "Total cost (OpenPLM)"
+msgstr "Coût total (OpenPLM)"
+
+#: templates/erp_summary.html:65
+msgid "Total cost (OpenERP)"
+msgstr "Coût total (OpenERP)"
+
+#: templates/erp_summary.html:75
+msgid "OpenERP"
+msgstr "OpenERP"
+
+#: templates/erp_summary.html:78
+msgid "This part has been published on OpenERP."
+msgstr "Cette part a été publiée sur OpenERP."
+
+#: templates/erp_summary.html:79
+msgid "Links:"
+msgstr "Liens:"
+
+#: templates/erp_summary.html:82
+#, python-format
+msgid "Product: %(name)s"
+msgstr "Produit: %(name)s"
+
+#: templates/erp_summary.html:84
+#, python-format
+msgid "BOM: %(name)s"
+msgstr "Nomenclature : %(name)s"
+
+#: templates/erp_summary.html:93
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr?"
+
+#: templates/erp_summary.html:99
+msgid "Note that this will also export the complete BOM."
+msgstr "Notez que cela va aussi exporter toute la nomenclature."
+
+#: templates/erp_summary.html:107
+msgid "Publish on OpenERP"
+msgstr "Publier sur OpenERP"
+
+#: templates/erp_summary.html:111
+msgid "You can not publish this part on the ERP."
+msgstr "Vous ne pouvez pas publier cette part sur l'ERP."
+
+#: templates/erp_summary.html:116
+msgid "This part is not official and so, cannot be published on the ERP."
+msgstr "Cette part n'est pas officielle et ne peut donc pas être publiée sur l'ERP."

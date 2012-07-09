@@ -1,0 +1,93 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-09 12:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: templates/erp_summary.html:15 templates/erp_summary.html.py:40
+msgid "Cost"
+msgstr ""
+
+#: templates/erp_summary.html:18
+msgid "Individual cost"
+msgstr ""
+
+#: templates/erp_summary.html:26
+msgid "Update"
+msgstr ""
+
+#: templates/erp_summary.html:29
+msgid "Update cost from OpenERP"
+msgstr ""
+
+#: templates/erp_summary.html:44
+msgid "Unit"
+msgstr ""
+
+#: templates/erp_summary.html:53
+msgid "Total cost"
+msgstr ""
+
+#: templates/erp_summary.html:61
+msgid "Total cost (OpenPLM)"
+msgstr ""
+
+#: templates/erp_summary.html:65
+msgid "Total cost (OpenERP)"
+msgstr ""
+
+#: templates/erp_summary.html:75
+msgid "OpenERP"
+msgstr ""
+
+#: templates/erp_summary.html:78
+msgid "This part has been published on OpenERP."
+msgstr ""
+
+#: templates/erp_summary.html:79
+msgid "Links:"
+msgstr ""
+
+#: templates/erp_summary.html:82
+#, python-format
+msgid "Product: %(name)s"
+msgstr ""
+
+#: templates/erp_summary.html:84
+#, python-format
+msgid "BOM: %(name)s"
+msgstr ""
+
+#: templates/erp_summary.html:93
+msgid "Are you sure?"
+msgstr ""
+
+#: templates/erp_summary.html:99
+msgid "Note that this will also export the complete BOM."
+msgstr ""
+
+#: templates/erp_summary.html:107
+msgid "Publish on OpenERP"
+msgstr ""
+
+#: templates/erp_summary.html:111
+msgid "You can not publish this part on the ERP."
+msgstr ""
+
+#: templates/erp_summary.html:116
+msgid "This part is not official and so, cannot be published on the ERP."
+msgstr ""
