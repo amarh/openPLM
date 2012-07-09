@@ -18,9 +18,10 @@ width: 100%;
 <iframe src="{{obj.object.location_uri}}">
 </iframe>
 <noframes>
-    <p>{% trans "You can not display this content on this page. Click " %}
-        <a href={{obj.object.location_uri}} targe="blank">{% trans "here" %}</a>
-        {% trans "to see it." %}</p>
+    <p>{% blocktrans %}
+        You can not display this content on this page. Click
+        <a href={{obj.object.location_uri}} target="_blank">here</a>to see it.
+        {% endblocktrans %}</p>
 </noframes>
 
 {% else %}
