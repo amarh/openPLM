@@ -53,36 +53,6 @@ msgstr "Explorar"
 msgid "Browse all parts, groups, users and documents."
 msgstr "Explorar todos los partes, grupos, usuarios é documentos."
 
-#: gdoc/templates/gdoc_files.html:8
-msgid "You cannot add a file to a GoogleDocument."
-msgstr "Usted no puede añadir un fichero a un GoogleDocument."
-
-#: gdoc/templates/gdoc_files.html:12
-msgid ""
-"\n"
-"            You cannot access to this Google Document. If you did not "
-"created\n"
-"            this document, you can ask its owner to grant you the "
-"permission\n"
-"            to read this file in Google Document.\n"
-"        "
-msgstr ""
-"\n"
-"            Usted no puede acceder a este Document Google. Si usted no "
-"creo \n"
-"            este documento, usted puede demandar a su creador permisos de "
-"acceso\n"
-"            para leer este fichero en Google Document.\n"
-"        "
-
-#: gdoc/templates/gdoc_files.html:21
-msgid "Click here to edit the file in Google Document ."
-msgstr "Click aqui para editar el fichero en Google Document."
-
-#: gdoc/templates/gdoc_files.html:24
-msgid "Click here to download the file from Google."
-msgstr "Click aqui para importar un nuevo fichero CSV."
-
 #: pdfgen/templates/attributes.xhtml:19
 msgid "User"
 msgstr "Usuario"
