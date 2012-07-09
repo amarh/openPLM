@@ -1452,7 +1452,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                 "children_formset":forms.SelectChildFormset(request.POST,
                     prefix="children"),
                 "doc_formset": forms.SelectDocumentFormset(request.POST,
-                    prefix="document"),
+                    prefix="documents"),
             })
         elif is_linked:
             formsets["part_formset"]=forms.SelectPartFormset(request.POST)
