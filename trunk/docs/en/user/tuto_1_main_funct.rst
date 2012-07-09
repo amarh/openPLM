@@ -10,8 +10,9 @@ the first genuine open source PLM.
 Requirements
 =============
 
-OpenPLM is a full web application i.e. you just need a browser.
-We advise you Mozilla Firefox 3.6.
+OpenPLM is a full web application i.e. you just need a web browser.
+We advise you to use a decent browser, like Mozilla Firefox, 
+Google Chrome, Opera or any browsers based on Webkit or Gecko.
 
 In OpenPLM there are four main types of objects:
 
