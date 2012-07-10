@@ -90,65 +90,32 @@
 
                 {% with restricted|yesno:"public/," as suffix_url %}
 
-                {% for object in objects.object_list %}
-                    {% if object.is_part %}
+                    {% for object in objects.object_list %}
+                        {% if object.is_part %}
 
-                        {% include "parts/identity_card.html" %}
-
-                    {% else %}
-                        {% if object.is_document %}
-                            {% include "documents/identity_card.html" %}
+                            {% include "parts/identity_card.html" %}
 
                         {% else %}
-                            {% if object.username %}
-                                {% include "users/identity_card.html" %}
+                            {% if object.is_document %}
+                                {% include "documents/identity_card.html" %}
 
                             {% else %}
-                                {% include "groups/identity_card.html" %}
+                                {% if object.username %}
+                                    {% include "users/identity_card.html" %}
+
+                                {% else %}
+                                    {% include "groups/identity_card.html" %}
+                                {% endif %}
+
                             {% endif %}
 
                         {% endif %}
 
-                    {% endif %}
-
-                {% endfor %}
-            {% endwith %}
-            </div>
-
-            <div class="pagination">
-                <span class="step-links">
-                    {% if objects.has_previous and 1 not in pages %}
-
-                        <a href="{% add_get page='1'%}">
-                        {% if objects.number > 4 %}
-                            {% trans "First page" %}</a> —
-                        {% else %}
-                            1</a>
-                        {% endif %}
-
-                    {% endif %}
-
-                    {% for page in pages %}
-                        <a 
-                        {% if page = objects.number %}
-                            style="font-weight:bold"
-                        {% else %}
-                            href="{% add_get page=page %}"
-                        {% endif %}
-                        >{{page}}</a>
                     {% endfor %}
-
-                    {% if objects.has_next  and objects.paginator.num_pages not in pages %}
-                        {% if objects.paginator.num_pages|add:'-1' not in pages %}
-                        —
-                        <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "Last page" %}</a>
-                        {% else %}
-                        <a href="{% add_get page=objects.paginator.num_pages %}">{{objects.paginator.num_pages}}</a>
-                        {% endif %}
-
-                    {% endif %}
-                </span>
+                {% endwith %}
             </div>
+
+            {% include "snippets/pagination.html" %}
         </div>
     </div>
 {% endblock %}

@@ -11,6 +11,8 @@ group_dict = {'obj_type':'Group', 'obj_revi':'-'}
 
 
 urlpatterns = patterns('',
+    ('rss/$', TimelineRssFeed()),
+    ('atom/$', TimelineAtomFeed()),
     (object_url+'rss/$', RssFeed()),
     (user_url+'rss/$', RssFeed(),user_dict),
     (group_url+'rss/$', RssFeed(), group_dict),

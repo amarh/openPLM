@@ -10,10 +10,11 @@
 {% endblock %}
 
 {% block extrahead %}
-    <link rel="alternate" type="application/atom+xml" href="../rss/">
+    <link rel="alternate" type="application/atom+xml" href="../atom/">
+    <link rel="alternate" type="application/rss+xml" href="../rss/">
 {% endblock %}
 {% block content %}
-    {% regroup object_history by get_day as histories %}
+    {% regroup object_history.object_list by get_day as histories %}
 
     {% for group in histories %}
         <div class="timeline">
@@ -25,6 +26,14 @@
                     <span class="time">
                         {{histo.date|date:"G:i"}}
                     </span>
+                    {% if show_identifiers %}
+                        <a href="{{ histo.plmobject.plmobject_url}}">
+                            <span class="type">{{ histo.plmobject.type }}</span>
+                            <span class="reference">{{ histo.plmobject.reference }}</span>
+                            <span class="revision">{{ histo.plmobject.revision }}</span>
+                        </a>
+                        <span>:</span>
+                    {% endif %}
                     {% if show_revisions %}
                         <span class="revision">{{ histo.plmobject.revision }}</span>
                     {% endif %}
@@ -46,5 +55,8 @@
             </dl>
         </div>
     {% endfor %}
+    {% with object_history as objects %}
+        {% include "snippets/pagination.html" %}
+    {% endwith %}
 {% endblock %}
 

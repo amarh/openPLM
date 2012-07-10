@@ -1,5 +1,7 @@
 import base64
 
+from django.conf import settings
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from django.contrib.syndication.views import Feed
@@ -8,7 +10,9 @@ from django.utils.feedgenerator import Atom1Feed
 
 from django.utils.translation import ugettext_lazy as _
 
-from openPLM.plmapp.base_views import get_generic_data
+from openPLM.plmapp.base_views import get_obj
+from openPLM.plmapp import models
+
 
 def make_desc(action, details, username):
     """
@@ -59,7 +63,8 @@ class HTTPAuthFeed(Feed):
 class RssFeed(HTTPAuthFeed):
     
     def get_object(self, request, obj_type, obj_ref, obj_revi):
-        obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+        obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+        obj.check_readable()
         return obj
     
     def title(self,obj):
@@ -105,12 +110,42 @@ class RssFeed(HTTPAuthFeed):
         return make_desc(i_action, i_details, i_user)
     
     def item_link(self, item):
-        if hasattr(item.plmobject, 'plmobject_url'):
-            return u"%shistory/#%d" % (item.plmobject.plmobject_url, item.id)
+        if isinstance(item, models.History):
+            t = "object"
+        elif isinstance(item, models.GroupHistory):
+            t = "group"
         else:
-            return iri_to_uri(u"/user/%s/history/#%d" % (item.plmobject.username, item.id))
+            t = "user"
+        return u"/history_item/%s/%d/" % (t, item.id)
 
 class AtomFeed(RssFeed):
     feed_type = Atom1Feed
     subtitle = RssFeed.description
+
+class TimelineRssFeed(RssFeed):
+
+    def get_object(self, request):
+        return request.user
+
+    def title(self):
+        return _("Timeline")
+
+    def link(self, obj):
+        return "/timeline/"
+
+    def description(self, obj):
+        return _("Timeline")
+
+    def items(self, obj):
+        q = Q(plmobject__owner__username=settings.COMPANY)
+        q |= Q(plmobject__group__in=obj.groups.all())
+        history = models.History.objects.filter(q).order_by('-date')
+        history = history.select_related("user", "plmobject__type", "plmobject__reference",
+            "plmobject__revision")
+        return history[:10]
+
+class TimelineAtomFeed(TimelineRssFeed):
+    feed_type = Atom1Feed
+    subtitle = TimelineRssFeed.description
+
 
