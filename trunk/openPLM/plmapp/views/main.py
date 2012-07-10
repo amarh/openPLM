@@ -886,7 +886,27 @@ def display_children(request, obj_type, obj_ref, obj_revi):
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
     View to edit a BOM.
-  
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/edit/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/bom_edit.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``children_formset``
+        a formset to edit the BOM
+
+    ``extra_columns``
+        a list of extra columns that are displayed
+
+    ``extra_fields``
+        a list of extra fields that are editable
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -921,7 +941,30 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
     """
     View to replace a child by another one.
 
-    .. include:: views_params.txt 
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/replace/{link_id}/`
+    
+    .. include:: views_params.txt
+    :param link_id: id of the :class:`.ParentChildLink` being replaced
+
+    **Template:**
+    
+    :file:`parts/bom_replace.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``replace_child_form``
+        a form to select the replacement part
+
+    ``link``
+        :class:`.ParentChildLink` being replaced
+
+    ``link_creation``
+        Set to True
+
+    ``attach``
+        set to (*obj*, "add_child")
     """
     link_id = int(link_id)
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -943,10 +986,32 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
 @handle_errors
 def add_child(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for chidren creation of the selected object.
-    It computes a context dictionary based on
+    View to add a child to a part.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/add/`
     
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/bom_add.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``add_child_form``
+        a form to add a child (:class:`.AddChildForm`)
+
+    ``link``
+        :class:`.ParentChildLink` being replaced
+
+    ``link_creation``
+        Set to True
+
+    ``attach``
+        set to (*obj*, "add_child")
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
