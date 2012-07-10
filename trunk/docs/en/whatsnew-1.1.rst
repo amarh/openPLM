@@ -62,8 +62,32 @@ select the "restricted account" option:
 As you can see on the screenshot above, it is now possible to sponsor a
 new use who can access mostly all contents but can not modify them.
 
+Timeline
+---------
+
+The timeline is like a global history which contains :
+
+ * all history events related to official objects
+ * all history events related to objects owned by groups you are in
+ 
+
 RSS feeds
 ----------
+
+You can now subscribe to rss feeds for :
+
+ * PLM objects
+ * User
+ * Group
+ * the timeline
+
+You can subscribre to these feeds from :
+
+ * "History" pages
+ * "Timeline" page
+
+This feeds are updated when there is a change on the related object(s), user or group.
+
 
 New application: oerp
 ---------------------
