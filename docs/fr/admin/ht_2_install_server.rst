@@ -178,7 +178,7 @@ On ajuste aussi les droits pour le répertoire où sont stockés les aperçus :
     
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
  
-.. _search-engine:
+.. _search-engine-svn:
 
 Configuration du moteur de recherche
 ====================================
@@ -193,7 +193,7 @@ Une fois haystack configuré, il faut reconstruire l'index :
     * ``./manage.py rebuild_index``
     * ``chown www-data:www-data -R /var/openPLM/xapian_index/``
    
-.. _celery:
+.. _celery-svn:
 
 Configuration de Celery
 =======================
@@ -270,7 +270,7 @@ Redémarrage du serveur Apache
     * ``service apache2 restart``
 
 Premiers pas sur OpenPLM
-=======================
+========================
 
 Ajout d'utilisateurs
 --------------------

@@ -82,6 +82,7 @@ recherchez.
 
 Ensuite, vous renseignez le champ pour affiner la recherche. Pour cela, vous
 pouvez utiliser : 
+
  * un ensemble de mots, OpenPLM cherchera les objets dont les attributs contiennent
    les mots renseignés.
  * une requête avancée : 
