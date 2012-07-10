@@ -11,8 +11,9 @@ Pré requis
 ==========
 
 OpenPLM est une application web, vous n'avez donc besoin que d'un navigateur
-Internet pour l'utiliser. Nous vous recommandons Mozilla Firefox 3.6 et plus
-récent.
+Internet pour l'utiliser. Nous vous recommandons d'utiliser un navigateur
+convenable comme Mozilla Firefox, Google Chrome, Opera 
+ou tout navigateur basé sur Webkit ou Gecko.
 
 Dans OpenPLM, il y a 4 types d'objets principaux : 
 
