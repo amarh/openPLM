@@ -42,6 +42,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.template import RequestContext
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -207,7 +208,9 @@ def handle_errors(func=None, undo="..", restricted_access=True):
             try:
                 return f(request, *args, **kwargs)
             except (ControllerError, ValueError) as exc:
-                return render_to_response("error.html", {"message" : _(str(exc))})
+                ctx = init_ctx("-", "-", "-")
+                ctx["message"] = _(str(exc))
+                return render_to_response("error.html", ctx ,context_instance=RequestContext(request))
             except Http404:
                 raise
             except StandardError:
