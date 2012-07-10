@@ -4,13 +4,14 @@ Fonctions en commun pour les objets PLM **PART** / **DOCUMENT**
 
 APERÇU
 ======
+
 Les **Parts** et les **Documents** sont des objets PLM. Ils représentent un
 produit dans la vraie vie.
 
 Par exemple : un vélo, un paquets de gâteaux, un médicament, une roue, un
 dessin, un document 3D, ...
 
-**Part** et **Document** sont des sous classes de PLMObject. Vous pouvez
+**Part** et **Document** sont des sous classes de **PLMObject**. Vous pouvez
 définir des sous classes de **Part** et **Document** adaptées au domaine de
 l'industrie pour lequel vous utilisez OpenPLM. Chaque sous-classe est définie
 comme un *type*.
@@ -49,6 +50,7 @@ Les Documents peuvent contenir un ou plusieurs fichiers électronique.
 
 ATTRIBUTS
 =========
+
 Affiche la carte d'identification d'un objet.
 
 On y trouve des attributs standard comme le nom, la date de création, le
@@ -65,6 +67,7 @@ Si vous avez les autorisation nécessaires, vous pouvez :
 
 CYCLE DE VIE
 ============
+
 Affiche :
  * le cycle de vie d'un objet
     
@@ -86,11 +89,12 @@ Si vous avez les autorisations nécessaires, vous pouvez :
 
 Il est possible d'ajouter des triggers sur les actions **Valider/Refuser**
 (vérification des autorisations, envoi d'email, validation d'un autre
-PLMObject ...)
+objet PLM ...)
 
 
 RÉVISIONS
 =========
+
 Affiche toutes les révisions d'un objet.
 
 Si l'objet courant est la dernière révision, on peut en ajouter une nouvelle.
@@ -98,6 +102,7 @@ Si l'objet courant est la dernière révision, on peut en ajouter une nouvelle.
 
 HISTORIQUE
 ==========
+
 Affiche l'historique d'un objet.
 
 Cela garantit une traçabilité complète de l'objet.

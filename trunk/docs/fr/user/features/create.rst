@@ -26,7 +26,7 @@ Ces en-têtes correspondent, principalement, aux champs requis que l'on peut
 retrouver dans le formulaire de création de l'objet ou de l'utilisateur.
 
 Exemple de la structure d'un fichier csv : 
- 1 - PLMObject
+ 1 - Objet PLM (Part et Document)
     .. csv-table::
         :header-rows: 1
         :file: csv_import/PLMObject.csv

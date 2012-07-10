@@ -1,14 +1,15 @@
-================================================================
-Functions in common related PLMObjects : **PART** / **DOCUMENT**
-================================================================
+=================================================================
+Functions in common related PLM objects : **PART** / **DOCUMENT**
+=================================================================
 
 OVERVIEW
 ========================================================
-The **Parts** and **Documents** are PLMObjects. They represent a product in real life.
+
+The **Parts** and **Documents** are PLM objects. They represent a product in real life.
 
 Eg : A bicycle, a pack of cookies, a medicine, a wheel, a drawing, a 3D document, ...
 
-**Part** and **Document** are subclasses of PLMObject. Depending on the industry you use OpenPLM for, we can define subclasses of **Part** and **Document**.
+**Part** and **Document** are subclasses of **PLMObject**. Depending on the industry you use OpenPLM for, we can define subclasses of **Part** and **Document**.
 Each subclass are designated as *type*.
 
 ========================    ===============================     ===============================
@@ -41,6 +42,7 @@ Documents contain one or more electronic files.
 
 ATTRIBUTES
 ========================================================
+
 Displays the ID card of the object.
 
 You find standard attributes like name, date of creation, owner, ...
@@ -55,6 +57,7 @@ If you have necessary rights, you can :
 
 LIFECYCLE
 ========================================================
+
 Displays :
  * the lifecycle of the object,
     
@@ -75,11 +78,12 @@ If you have necessary rights, you can :
    for each new event related to this object (revision, modification, promotion, ...).
 
 We can implement different triggers on **Promote**/**Demote** actions 
-following specifications (rights checking, e-mail sending, other PLMObject promotion, ...).
+following specifications (rights checking, e-mail sending, other PLM object promotion, ...).
 
 
 REVISIONS
 ========================================================
+
 Displays all the revisions of the object.
 
 If the current object is the last revision, we can add a new one.
@@ -87,6 +91,7 @@ If the current object is the last revision, we can add a new one.
 
 HISTORY
 ========================================================
+
 Displays the history of the object.
 
 It ensures the full tracability of the object.
