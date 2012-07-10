@@ -2066,7 +2066,7 @@ class UserViewTestCase(CommonViewTest):
         self.controller.delegate(self.brian, m.ROLE_OWNER)
         link = self.controller.get_user_delegation_links()[0]
         data = {"link_id" : link.id }
-        response = self.post(self.user_url + "delegation/", data)
+        response = self.post(self.user_url + "delegation/delete/", data)
         self.assertFalse(self.controller.get_user_delegation_links())
        
     def test_delegate_get(self):
