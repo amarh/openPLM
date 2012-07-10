@@ -43,7 +43,6 @@ from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.template import RequestContext
-from django.views.decorators.cache import never_cache
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -207,19 +206,21 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
             if restricted_access and request.user.get_profile().restricted:
                 return HttpResponseForbidden()
             try:
-                return f(request, *args, **kwargs)
+                response = f(request, *args, **kwargs)
+                if no_cache:
+                    response['Pragma'] = 'no-cache'
+                    response['Cache-Control'] = 'no-cache must-revalidate proxy-revalidate'
+                return response
             except (ControllerError, ValueError) as exc:
                 ctx = init_ctx("-", "-", "-")
                 ctx["message"] = _(str(exc))
-                return render_to_response("error.html", ctx ,context_instance=RequestContext(request))
+                return render_to_response("error.html", ctx, context_instance=RequestContext(request))
             except Http404:
                 raise
             except StandardError:
                 if settings.DEBUG:
                     raise
             return HttpResponseServerError()
-        if no_cache:
-            wrapper = never_cache(wrapper)
         return wrapper
     if func:
         return decorator(func)

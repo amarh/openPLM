@@ -63,8 +63,9 @@ from django.contrib.comments.views.comments import post_comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F, Q
 from django.forms import HiddenInput
-from django.http import HttpResponseRedirect, HttpResponse, Http404, \
-                        HttpResponsePermanentRedirect, HttpResponseForbidden
+from django.http import (HttpResponseRedirect, HttpResponse, Http404,
+                        HttpResponsePermanentRedirect, HttpResponseForbidden,
+                        HttpResponseBadRequest)
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.encoding import iri_to_uri
@@ -816,8 +817,7 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a part")
     date = None
     level = "first"
     state = "all"
@@ -864,8 +864,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a part")
     if request.method == "POST":
         formset = forms.get_children_formset(obj, request.POST)
         if formset.is_valid():
@@ -958,8 +957,7 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_parents"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a part")
     date = None
     level = "first"
     state = "all"
@@ -970,8 +968,8 @@ def display_object_parents(request, obj_type, obj_ref, obj_revi):
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
     else:
-        display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
-            "level" : "first", "state" : "all"})
+        display_form = forms.DisplayChildrenForm(initial=dict(date=datetime.datetime.now(),
+            level="first", state="all"))
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
     parents = obj.get_parents(max_level, date=date, only_official=only_official)
@@ -1002,8 +1000,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_documents"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a part")
     if request.method == "POST":
         formset = forms.get_doc_cad_formset(obj, request.POST)
         if formset.is_valid():
@@ -1059,8 +1056,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_attached_parts"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a document")
     if request.method == "POST":
         formset = forms.get_rel_part_formset(obj, request.POST)
         if formset.is_valid():
@@ -1112,7 +1108,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
 
     if not hasattr(obj, "files"):
-        raise TypeError()
+        return HttpResponseBadRequest("object must be a document")
     if request.method == "POST":
         formset = forms.get_file_formset(obj, request.POST)
         if formset.is_valid():
@@ -1420,7 +1416,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     return r2r('edit.html', ctx, request)
 
 
-@handle_errors(undo="../attributes")
+@handle_errors(undo="../attributes/")
 def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
     Manage html page to display the cloning form of the selected object
@@ -1436,7 +1432,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
         children = [c.link for c in obj.get_children(1)]
         documents = obj.get_suggested_documents()
         is_linked = ctx['is_linked'] = bool(children or documents)
-    else :
+    else:
         parts = obj.get_suggested_parts()
         is_linked = ctx['is_linked'] = bool(parts)
         
@@ -1455,7 +1451,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                 creation_form.fields[f].initial = getattr(obj, f)
                 
         # generate the links form
-        if issubclass(cls, models.Part) and is_linked :
+        if issubclass(cls, models.Part) and is_linked:
             initial = [dict(link=link) for link in children]
             formsets["children_formset"] = forms.SelectChildFormset(prefix="children",
                 initial=initial)
@@ -1481,7 +1477,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
         if creation_form.is_valid():
             if is_linked :
                 valid_forms = False
-                if issubclass(cls, models.Part) :
+                if issubclass(cls, models.Part):
                     valid_forms, selected_children, selected_documents = clone_part(creation_form, request.user, request.POST, children, documents)
                     if valid_forms :
                         new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
@@ -1493,7 +1489,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                             "doc_formset": forms.SelectDocumentFormset(request.POST,
                                 prefix="document"),
                         })
-                elif issubclass(cls, models.Document) and is_linked :
+                elif issubclass(cls, models.Document) and is_linked:
                     valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
                     if valid_forms:
                         new_ctrl = obj.clone(creation_form, request.user, selected_parts)
@@ -1510,7 +1506,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     ctx.update(formsets)
     return r2r('clone.html', ctx, request)
 
-def clone_part(form, user, data, children, documents ):
+def clone_part(form, user, data, children, documents):
     valid_forms = True
     selected_children = []
     selected_documents = []
@@ -1550,7 +1546,7 @@ def clone_document(p_form, user, data, parts):
     valid_forms= True
     selected_parts = []
     
-    if parts :
+    if parts:
         part_formset = forms.SelectPartFormset(data)
         if part_formset.is_valid():
             for form in part_formset.forms:
@@ -1639,8 +1635,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_object_user_links"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be an user")
     objs = obj.get_object_user_links().select_related("plmobject")
     objs = objs.values("role", "plmobject__type", "plmobject__reference",
             "plmobject__revision", "plmobject__name")
@@ -1669,12 +1664,11 @@ def display_delegation(request, obj_ref):
     if obj.restricted:
         raise Http404
     if not hasattr(obj, "get_user_delegation_links"):
-        # TODO
-        raise TypeError()
+        return HttpResponseBadRequest("object must be an user")
     if request.method == "POST":
         selected_link_id = request.POST.get('link_id')
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
-        return HttpResponseRedirect(".")
+        return HttpResponseRedirect("..")
     links = obj.get_user_delegation_links().select_related("delegatee")
     ctx.update({'current_page':'delegation', 
                 'user_delegation_link': links})
@@ -1760,7 +1754,6 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
         if checkin_file_form.is_valid():
             obj.checkin(models.DocumentFile.objects.get(id=file_id_value),
                         request.FILES["filename"])
-
             return HttpResponseRedirect(obj.plmobject_url + "files/")
     else:
         checkin_file_form = forms.AddFileForm()
@@ -1968,7 +1961,6 @@ def display_groups(request, obj_ref):
     obj, ctx = get_generic_data(request, "User", obj_ref)
     ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all())\
             .order_by("name")
-
     ctx['current_page'] = 'groups' 
     return r2r("users/groups.html", ctx, request)
 
@@ -1988,7 +1980,8 @@ def sponsor(request, obj_ref):
             obj.sponsor(new_user, role=="contributor", role=="restricted")
             return HttpResponseRedirect("..")
     else:
-        form = forms.SponsorForm(initial={"sponsor":obj.id, "language":obj.language}, sponsor=obj.id)
+        form = forms.SponsorForm(initial=dict(sponsor=obj.id, language=obj.language),
+                sponsor=obj.id)
     ctx["sponsor_form"] = form
     ctx['current_page'] = 'delegation' 
     return r2r("users/sponsor.html", ctx, request)
