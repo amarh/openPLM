@@ -18,13 +18,13 @@ The sponsor form is also reachable in the delegation tab
 
 Import from a csv file
 ***********************
-PLMObject (parts and document) and user can be created with a csv file. This file
+PLM object (parts and document) and user can be created with a csv file. This file
 must contains headers related to the target (object or user).
 Mostly these headers are the required field in the related
 object or user creation form.
 
 Example of csv file's structure :
- 1 - PLMObject
+ 1 - PLM object
     .. csv-table::
         :header-rows: 1
         :file: csv_import/PLMObject.csv

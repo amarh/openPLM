@@ -1,10 +1,11 @@
 =============================================
-Fonctions spécifiques au PLMObject : **PART**
+Fonctions spécifiques à l'objet PLM : **PART**
 =============================================
 
 
 NOMENCLATURE
 ============
+
 Affiche la NOMENCLATURE de la part courante, c'est à dire l'ensemble des Parts
 qui en découlent.
 

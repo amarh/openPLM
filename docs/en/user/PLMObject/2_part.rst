@@ -1,5 +1,5 @@
 ========================================================
-Functions specific to PLMObject : **PART**
+Functions specific to PLM object : **PART**
 ========================================================
 
 

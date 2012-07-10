@@ -1,6 +1,6 @@
-=================================================
-Fonctions spécifiques au PLMObject : **DOCUMENT**
-=================================================
+==================================================
+Fonctions spécifiques à l'objet PLM : **DOCUMENT**
+==================================================
 
 
 PARTS
@@ -30,7 +30,7 @@ Si vous avez les autorisations nécessaires, vous pouvez :
 3D DOCUMENT
 ===========
 3DDocument est un type de document possédant toutes les fonctionnalités de la
-sous-classe Document de PLMObject. Elle est utilisée pour décrire la géométrie
+sous-classe Document de **PLMObject**. Elle est utilisée pour décrire la géométrie
 d'un objet. Cette géométrie est généralement définie dans des fichiers STEPs
 (extensions *.step* ou *.stp*).
 

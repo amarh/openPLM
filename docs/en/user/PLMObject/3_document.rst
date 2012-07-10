@@ -1,5 +1,5 @@
 ========================================================
-Functions specific to PLMObject : **DOCUMENT**
+Functions specific to PLM object : **DOCUMENT**
 ========================================================
 
 
@@ -26,7 +26,7 @@ If you have necessary rights, you can :
 
 3D DOCUMENT
 ========================================================
-3DDocument is a type of document with all the functions related to the sub-class of PLMObject , Document. It's used to describe the solid geometry of an object. This geometry is usually defined in STEP files ( extension *.step* or *.stp*)  .
+3DDocument is a type of document with all the functions related to the sub-class of **PLMObject** , Document. It's used to describe the solid geometry of an object. This geometry is usually defined in STEP files ( extension *.step* or *.stp*)  .
 
 If the document is a 3D document and contains STEP files,  a 3D view is generated using these files.
 
