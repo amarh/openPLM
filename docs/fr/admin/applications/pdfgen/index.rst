@@ -21,7 +21,7 @@ settings.py
 L'application *pdfgen* doit être activée dans le fichier settings pour être
 utilisée. Pour cela, rajouter ``'openPLM.apps.pdfgen'``  à la liste des applications installées (:const:`INSTALLED_APPS`).
 
-Testing
+Test
 =========
 
 Pour tester cette application, créez une part. Ensuite rendez vous 
