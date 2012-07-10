@@ -43,6 +43,7 @@ from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.template import RequestContext
+from django.views.decorators.cache import never_cache
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -182,7 +183,7 @@ def object_to_dict(plmobject):
     return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
                 revision=plmobject.revision, reference=plmobject.reference)
 
-def handle_errors(func=None, undo="..", restricted_access=True):
+def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
     """
     Decorators which ensures that the user is connected and handles exceptions
     raised by a controller.
@@ -217,6 +218,8 @@ def handle_errors(func=None, undo="..", restricted_access=True):
                 if settings.DEBUG:
                     raise
             return HttpResponseServerError()
+        if no_cache:
+            wrapper = never_cache(wrapper)
         return wrapper
     if func:
         return decorator(func)
