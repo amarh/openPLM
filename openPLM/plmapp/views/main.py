@@ -33,7 +33,7 @@ This module contains all views to display html pages.
 All URLs are linked with django's standard views or with plmapp view functions hereafter.
 Each of them receives an httprequest object.
 Then treat data with the help of different controllers and different models.
-Then adress a html template with a context dictionnary via an httpresponse.
+Then adress a html template with a context dictionary via an httpresponse.
 
 We have a view for each :class:`PLMObject` or :class:`UserProfile` :func:`menu_items`.
 We have some views which allow link creation between 2 instances of :class:`PLMObject` or between
@@ -47,6 +47,7 @@ Finaly we have :func:`navigate` which draw a picture with a central object and i
 
 import os
 import csv
+import glob
 import datetime
 import tempfile
 import itertools
@@ -89,7 +90,6 @@ from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
 
-import glob
 
 def r2r(template, dictionary, request):
     """
@@ -241,7 +241,6 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
-    
 
     if obj_type in ('User', 'Group'):
         url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
@@ -298,14 +297,14 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
         password_form = forms.ConfirmPasswordForm(request.user)
     ctx['password_form'] = password_form
     ctx['in_group'] = obj.check_in_group(request.user, raise_=False)
-    signer_list = get_management_data(request,obj,ctx)
-    get_lifecycle_data(signer_list,obj,ctx)
+    ctx.update(get_management_data(obj, request.user, ctx["is_owner"]))
+    ctx.update(get_lifecycle_data(obj))
     return r2r('lifecycle.html',ctx,request)
     
     
-def get_lifecycle_data(signers,obj,ctx):
+def get_lifecycle_data(obj):
     """
-    Update lifecycle data for a given object 
+    Returns a dictionary containing lifecycle data of *ob* 
     
     ``object_lifecycle``
         List of tuples (state name, *boolean*, signer role). The boolean is
@@ -332,22 +331,15 @@ def get_lifecycle_data(signers,obj,ctx):
     ``deprecated_revisions``
         List of plmobjects that will be deprecated if the object is promoted
     """
+    ctx = {}
     state = obj.state.name
     object_lifecycle = []
-    signers_data=[]
-    roles = dict(obj.plmobjectuserlink_plmobject.values_list("role", "user__username"))
+    roles = dict((r, (id, u)) for r, id, u in
+            obj.plmobjectuserlink_plmobject.values_list("role", "id", "user__username"))
     lcs = obj.lifecycle.to_states_list()
     for i, st in enumerate(lcs):
-        signer = roles.get(level_to_sign_str(i))
-        signer_data = signers.filter(role=level_to_sign_str(i))
-        if len(signer_data)==0:
-            signer_data=roles.get(level_to_sign_str(i))
-            nb_signer = 0
-        else:
-            nb_signer = len(signer)
-            signer_data = signer_data[0]
-        signers_data.append({"signer":signer_data,"nb_signer":nb_signer})
-        object_lifecycle.append((st, st == state, signer))
+        link_id, signer = roles.get(level_to_sign_str(i), (None, None))
+        object_lifecycle.append((st, st == state, signer, link_id))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
 
@@ -365,39 +357,32 @@ def get_lifecycle_data(signers,obj,ctx):
     ctx["cancelled_revisions"] = cancelled
     ctx["deprecated_revisions"] = deprecated
 
-    ctx.update({'current_page':'lifecycle', 
-                'object_lifecycle': object_lifecycle,
-                'is_signer' : is_signer, 
-                'is_signer_dm' : is_signer_dm,
-                'signers_data':signers_data
-                })
+    ctx.update({
+        'current_page':'lifecycle', 
+        'object_lifecycle': object_lifecycle,
+        'is_signer' : is_signer, 
+        'is_signer_dm' : is_signer_dm,
+    })
+    return ctx
     
-def get_management_data(request,obj,ctx):
+def get_management_data(obj, user, is_owner):
     """
-    Update context for html page which displays the Users who manage the selected object (:class:`PLMObjectUserLink`).
-    It computes a context dictionnary based on
-    
-    .. include:: views_params.txt 
+    Returns a dictionary containing management data for *obj*.
     """
-    object_management_list = models.PLMObjectUserLink.objects.filter(plmobject=obj)
-    object_management_list = object_management_list.order_by("role")
-    levels =[]
-    lcs = obj.lifecycle.to_states_list()
-    for i, st in enumerate(lcs):
-        levels.append(level_to_sign_str(i))
-    signer_list = object_management_list.filter(role__in=levels)
-    notified_list = object_management_list.filter(role=models.ROLE_NOTIFIED)
-    owner_list = object_management_list.filter(role=models.ROLE_OWNER)
-    reader_list = object_management_list.filter(role=models.ROLE_READER)
-    if not ctx["is_owner"]:
-        link = object_management_list.filter(role="notified", user=request.user)
+    ctx = {}
+    links = models.PLMObjectUserLink.objects.filter(plmobject=obj).order_by("role")
+    notified_list = links.filter(role=models.ROLE_NOTIFIED)
+    owner_list = links.filter(role=models.ROLE_OWNER)
+    reader_list = links.filter(role=models.ROLE_READER)
+    if not is_owner:
+        link = links.filter(role="notified", user=user)
         ctx["is_notified"] = bool(link)
         if link:
             ctx["remove_notify_link"] = link[0]
         else:
-            if obj.check_in_group(request.user, False):
+            if obj.check_in_group(user, False):
                 initial = { "type" : "User",
-                            "username" : request.user.username
+                            "username" : user.username
                           }
                 form = forms.SelectUserForm(initial=initial)
                 for field in ("type", "username"):
@@ -410,7 +395,7 @@ def get_management_data(request,obj,ctx):
                 'owner_list':owner_list,
                 'reader_list' : reader_list,
                 })
-    return signer_list
+    return ctx
     
 
 @handle_errors
@@ -880,7 +865,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     Manage html page which edits the chidren of the selected object.
     Possibility to modify the `.ParentChildLink.order`, the `.ParentChildLink.quantity` and to
     desactivate the `.ParentChildLink`
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -940,7 +925,7 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
 def add_children(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for chidren creation of the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -974,7 +959,7 @@ def add_children(request, obj_type, obj_ref, obj_revi):
 def display_object_parents(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the parent of the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1018,7 +1003,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the related documents and CAD of 
     the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1049,7 +1034,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
 def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some documents or CAD.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1075,7 +1060,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
 def display_related_part(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the related part of (:class:`DocumentPartLink` with) the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1104,7 +1089,7 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
 def add_rel_part(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some parts.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1129,7 +1114,7 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
 def display_files(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page which displays the files (:class:`DocumentFile`) uploaded in the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1162,7 +1147,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1240,7 +1225,7 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     :param link_id: :attr:`.PLMObjectUserLink.id`
@@ -1261,7 +1246,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                     obj.remove_notified(link.user)
                 elif link.role == models.ROLE_READER:
                     obj.remove_reader(link.user)
-            return HttpResponseRedirect("../../../lifecycle")
+            return HttpResponseRedirect("../../../lifecycle/")
     else:
         replace_management_form = forms.SelectUserForm()
     
@@ -1277,7 +1262,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
     """
     Manage html page for the addition of a "notification" link
     (:class:`PLMObjectUserLink`) between some Users and the selected object. 
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1289,7 +1274,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, models.ROLE_READER if reader else models.ROLE_NOTIFIED)
-            return HttpResponseRedirect("../../lifecycle")
+            return HttpResponseRedirect("../../lifecycle/")
     else:
         add_management_form = forms.SelectUserForm()
     
@@ -1304,7 +1289,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
 def delete_management(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the deletion of a "notification" link (:class:`PLMObjectUserLink`) between some Users and the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1319,7 +1304,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
                 obj.remove_reader(link.user)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
-    return HttpResponseRedirect("../../lifecycle")
+    return HttpResponseRedirect("../../lifecycle/")
 
 ##########################################################################################
 ###    Manage html pages for part / document creation and modification                 ###
@@ -1329,7 +1314,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 def create_object(request, from_registered_view=False, creation_form=None):
     """
     Manage html page for the creation of an instance of `models.PLMObject` subclass.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :return: a :class:`django.http.HttpResponse`
@@ -1426,7 +1411,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
 def modify_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     """
@@ -1604,7 +1589,7 @@ def modify_user(request, obj_ref):
     """
     Manage html page for the modification of the selected
     :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
@@ -1630,7 +1615,7 @@ def change_user_password(request, obj_ref):
     """
     Manage html page for the modification of the selected
     :class:`~django.contrib.auth.models.User` password.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
@@ -1685,7 +1670,7 @@ def display_delegation(request, obj_ref):
     """
     Manage html page which displays the delegations of the selected 
     :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
@@ -1714,7 +1699,7 @@ def delegate(request, obj_ref, role, sign_level):
     """
     Manage html page for delegations modification of the selected
     :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
@@ -1774,7 +1759,7 @@ def get_checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
 def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
     Manage html page for the files (:class:`DocumentFile`) checkin in the selected object.
-    It computes a context dictionnary based on
+    It computes a context dictionary based on
     
     .. include:: views_params.txt 
     :param file_id_value: :attr:`.DocumentFile.id`

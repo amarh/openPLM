@@ -279,10 +279,13 @@ class ViewTest(CommonViewTest):
         form = response.context["modification_form"]
         self.assertFalse(form.is_valid())
 
+    def _remove_link_id(self, lifecycle):
+        return tuple(x[:-1] for x in lifecycle)
+
     def test_lifecycle(self):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
-        lifecycles = tuple(response.context["object_lifecycle"])
+        lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", True, self.user.username),
                   ("official", False, self.user.username),
                   ("deprecated", False, None))
@@ -293,7 +296,7 @@ class ViewTest(CommonViewTest):
         self.assertTrue(self.controller.is_promotable())
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"promote" : "on", "password" : "password"})
-        lifecycles = tuple(response.context["object_lifecycle"])
+        lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", False, self.user.username),
                   ("official", True, self.user.username),
                   ("deprecated", False, None))
@@ -309,7 +312,7 @@ class ViewTest(CommonViewTest):
         self.assertEqual(self.controller.state.name, "issue1")
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"demote" : "on", "password":"password"})
-        lifecycles = tuple(response.context["object_lifecycle"])
+        lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", True, self.user.username),
                   ("issue1", False, self.user.username),
                   ("official", False, None),
@@ -357,7 +360,7 @@ class ViewTest(CommonViewTest):
     def test_lifecycle_bad_password(self):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
-        lifecycles = tuple(response.context["object_lifecycle"])
+        lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", True, self.user.username),
                   ("official", False, self.user.username),
                   ("deprecated", False, None))
@@ -365,7 +368,7 @@ class ViewTest(CommonViewTest):
         # try to promote
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"promote" : "on", "password":"wrong_password"})
-        lifecycles = tuple(response.context["object_lifecycle"])
+        lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         self.assertEqual(lifecycles, wanted)
         self.assertFalse(response.context["password_form"].is_valid())
 

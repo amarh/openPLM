@@ -1,29 +1,29 @@
 {% load i18n plmapp_tags %}
 
-    {% regroup object_management_list|dictsort:"role" by role as links %}
+{% regroup object_management_list|dictsort:"role" by role as links %}
 
-    {% for group in links %}
-        <div class="timeline">
-            <h3>{% trans group.grouper|capfirst %}</h3>
+{% for group in links %}
+    <div class="timeline">
+        <h3>{% trans group.grouper|capfirst %}</h3>
 
-            <dl>
-                {% for link in group.list|dictsort:"plmobject.type" %}
-                    <dt class="changeset">
-                    <span>{{link.user.first_name}}</span>
-                    <span>{{link.user.last_name}},</span>
-                    <a href="/user/{{link.user.username|urlencode }}/"><span>{{link.user.username}}</span></a>,
-                    {% with link.user.get_profile as profile %}
-                        <span>{{ profile.rank }},</span>
-                    {% endwith %}
+        <dl>
+            {% for link in group.list|dictsort:"plmobject.type" %}
+                <dt class="changeset">
+                <span>{{link.user.first_name}}</span>
+                <span>{{link.user.last_name}},</span>
+                <a href="/user/{{link.user.username|urlencode }}/"><span>{{link.user.username}}</span></a>,
+                {% with link.user.get_profile as profile %}
+                    <span>{{ profile.rank }},</span>
+                {% endwith %}
 
-                    <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
-                    </dt>
-                    <dd class="management">
-                    {% if can_delete %}
-                        <ul class="management">
-                            <li>
-                            <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
-                            </li>
+                <span>{{link.user.is_active|yesno:"active,inactive"}}</span>
+                </dt>
+                <dd class="management">
+                {% if can_delete %}
+                    <ul class="management">
+                        <li>
+                        <a class="{{"Button"|button}}" href="../management/replace/{{link.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                        </li>
                         {% if link.role == 'notified' or link.role == 'reader' %}
                             <li>
 
@@ -33,11 +33,11 @@
                             </form>
                             </li>
                         {% endif %}
-                        </ul>
-                    {% endif %}
-                    </dd>
-                {% endfor %}
-            </dl>
-        </div>
+                    </ul>
+                {% endif %}
+                </dd>
+            {% endfor %}
+        </dl>
+    </div>
 
-    {% endfor %}
+{% endfor %}
