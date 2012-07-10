@@ -27,7 +27,7 @@ ne sont pas implémentées.
 settings.py
 ==============
 
-L'application *webdav* doit être activer dans le fichier settings pour être
+L'application *webdav* doit être activée dans le fichier settings pour être
 utilisée. Pour cela, rajouter ``'openPLM.apps.webdav'``  à la liste des applications installées (:const:`INSTALLED_APPS`).
 
 Testing
