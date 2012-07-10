@@ -43,7 +43,7 @@
                 {% if is_owner %}
                     {% if link.role != "sponsor" %}
                         <td class="Content">
-                            <form method="post" action="">
+                            <form method="post" action="./delete/">
                                 <input type="hidden" name="link_id" value="{{link.id}}" />
                                 <input type="submit" class="{{"Button"|button}}" value="{% trans "STOP DELEGATION" %}"/>
                             </form>
