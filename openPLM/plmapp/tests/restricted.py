@@ -587,7 +587,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         p2 = self.create("Part2")
         p3 = self.create("Part3")
         response = self.client.get("/browse/object/")
-        self.assertFalse(response.context["browse_all"])
+        self.assertTrue(response.context["restricted"])
         objects = response.context["objects"]
         self.assertEquals(1, objects.paginator.count)
         self.assertEquals(self.ctrl.object, objects.object_list[0].part)
@@ -596,7 +596,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         p3.object.save()
         response = self.client.get("/browse/object/")
         objects = response.context["objects"]
-        self.assertFalse(response.context["browse_all"])
+        self.assertTrue(response.context["restricted"])
         self.assertEquals(2, objects.paginator.count)
         self.assertEquals([p3.object, self.ctrl.object], 
                 [p.part for p in objects.object_list])
