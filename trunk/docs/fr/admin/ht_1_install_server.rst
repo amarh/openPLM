@@ -5,7 +5,7 @@ Installation de OpenPLM serveur version 1.0
 Ce document décrit l'installation d'un serveur OpenPLM en version stable 1.0
 
 
-Pré requis
+Prérequis
 ==========
 
 Ce tutoriel a été réalisé à l'aide des logiciels suivant :
