@@ -302,7 +302,7 @@ Redémarrage du serveur Apache
     * ``service apache2 restart``
 
 Premiers pas sur OpenPLM
-=======================
+========================
 
 Ajout d'utilisateurs
 --------------------
