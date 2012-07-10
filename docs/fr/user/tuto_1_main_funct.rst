@@ -42,7 +42,7 @@ suivante :
         renvoie au nom de l'objet (il peut être vide)
 
 
-PAGE D'ACCUEIL
+Page d'accueil
 ==============
 
 Il y a 5 fonctions principales : 
@@ -69,7 +69,7 @@ Comme on peut le voir sur l'exemple, les invitations en attentes (envoyées et
 reçues) sont affichées sur la page d'accueil.
 
 
-RECHERCHE
+Recherche
 =========
 La page de recherche se décompose en deux parties : 
 
@@ -107,7 +107,7 @@ Exemple :
    Ici, toutes les parts sont affichées, leurs sous-types inclus (ici SinglePart).
 
 
-NAVIGUER
+Naviguer
 ========
 
 Les objets et leurs relations sont représentés dans un schéma.
@@ -126,7 +126,7 @@ Exemple :
    :width: 100%
 
 
-CRÉER
+Créer
 =====
 On peut créer un objet en renseignant le formulaire présenté.
 
@@ -139,8 +139,8 @@ Exemple :
 
 
 
-ÉTUDE
-=====
+Étudier
+=======
 Accéder à la page "Étudier" depuis la page d'accueil affiche l'historique des
 objets liés à l'utilisateur.
 
@@ -156,7 +156,7 @@ Exemple :
    :width: 100%
 
 
-PARCOURIR
+Parcourir
 ==========
 Sur la page "Parcourir" tous les objets, groupes et utilisateurs d'OpenPLM sont affichés.
 
@@ -169,7 +169,7 @@ Exemple :
    :width: 100%
    
 
-PARTIES PERSISTANTES
+Parties persistantes
 ====================
 
 **L'en-tête de la page**
