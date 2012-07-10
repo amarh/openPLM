@@ -13,6 +13,7 @@ New files uploading
 -------------------
 
 You can now upload your files and keep an eye on the list of your files.
+
 Multiple files upload is available :
 you can select more than one file to upload.
 
@@ -20,6 +21,27 @@ Progress-bars appear while uploading files :
   * one per files
 
   * one for the total progress
+
+Screenshots :
+
+.. list-table::
+
+    * - .. figure:: images/Capture_openPLM_file_add.png
+           :width: 100%
+           :align: center    
+
+           New "Files" page
+    
+           As you can see, the upload form and the list of files are both displayed on the "Files" page.
+
+    * - .. figure:: images/Capture_openPLM_file_progress.png
+           :width: 100%
+           :align: center
+    
+           Progress-bars
+           
+           Now OpenPLM display a progress informations for each uploaded file. A global progress information is also given.
+    
 
 
 Browsing feature
@@ -92,6 +114,7 @@ This feeds are updated when there is a change on the related object(s), user or 
 New application: oerp
 ---------------------
 
+
 document3D
 -----------
 
@@ -142,8 +165,16 @@ WebDAV access
 
 OpenPLM can now serves all managed files through a WebDAV access.
 
+
 Bugs fixed
 ------------
+
+** Suggested reference for PLM objects **
+
+Now you can let OpenPLM automatically generate the reference or 
+set it by yourself in the creation form.
+
+
 
 Other enhancements
 --------------------
