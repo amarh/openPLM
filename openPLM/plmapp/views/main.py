@@ -681,8 +681,25 @@ def revise_part(obj, ctx, request):
     return r2r('parts/revisions.html', ctx, request)
 
 ##########################################################################################
+ITEMS_PER_HISTORY = 50
+
+def redirect_history(request, type, hid):
+    """
+    Redirects to the history page that contains the history item
+    numbered *hid*.
+    """
+    H = {"group" : models.GroupHistory,
+         "user" : models.UserHistory,
+         "object" : models.History,}[type]
+    h = H.objects.get(id=int(hid))
+    items = H.objects.filter(plmobject=h.plmobject, date__gte=h.date).count() - 1
+    page = items // ITEMS_PER_HISTORY + 1
+    url = u"%shistory/?page=%d#%s" % (h.plmobject.plmobject_url, page, hid)
+    return HttpResponseRedirect(url)
+
+
 @handle_errors
-def display_object_history(request, obj_type, obj_ref, obj_revi):
+def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", timeline=False):
     """
     History view.
     
@@ -691,6 +708,7 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/`
     :url: :samp:`/user/{username}/history/`
     :url: :samp:`/group/{group_name}/history/`
+    :url: :samp:`/timeline/`
     
     .. include:: views_params.txt 
 
@@ -708,21 +726,47 @@ def display_object_history(request, obj_type, obj_ref, obj_revi):
     ``show_revisions``
         True if the template should show the revision of each history row
     
+    ``show_identifiers``
+        True if the template should show the type, reference and revision
+        of each history row
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    if hasattr(obj, "get_all_revisions"):
+    if timeline:
+        # global timeline: shows objects owned by the company and readable objects
+        q = Q(plmobject__owner__username=settings.COMPANY)
+        q |= Q(plmobject__group__in=request.user.groups.all())
+        history = models.History.objects.filter(q).order_by('-date')
+        history = history.select_related("user", "plmobject__type", "plmobject__reference",
+            "plmobject__revision")
+        ctx['show_identifiers'] = True
+        ctx['object_type'] = _("Timeline")
+    elif hasattr(obj, "get_all_revisions"):
         # display history of all revisions
         objects = [o.id for o in obj.get_all_revisions()]
         history = obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')
         history = history.select_related("user", "plmobject__revision")
         ctx["show_revisions"] = True
+        ctx['show_identifiers'] = False
     else:
         history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
-        ctx["show_revisions"] = False
+        ctx["show_revisions"] = ctx['show_identifiers'] = False
         history = history.select_related("user")
-    ctx.update({'current_page' : 'history', 
-                'object_history' : list(history)})
+    paginator = Paginator(history, ITEMS_PER_HISTORY)
+    page = request.GET.get('page', 1)
+    try:
+        history = paginator.page(page)
+    except PageNotAnInteger:
+        history = paginator.page(1)
+        page = 1
+    except EmptyPage:
+        history = paginator.page(paginator.num_pages)
+    ctx.update({
+        'pages' : get_pages_num(paginator.num_pages, page),
+        'current_page' : 'history', 
+        'object_history' : history,
+        })
     return r2r('history.html', ctx, request)
+
 
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
@@ -2002,7 +2046,7 @@ def display_plmobjects(request, obj_ref):
     
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     objects = obj.plmobject_group.order_by("type", "reference", "revision")
-    display_pagination(request.GET, ctx, objects, "object")
+    ctx.update(get_pagination(request.GET, objects, "object"))
     ctx['current_page'] = 'objects'
     return r2r("groups/objects.html", ctx, request)
 
@@ -2169,30 +2213,31 @@ class OpenPLMSearchView(SearchView):
     def __call__(self, request):
         return super(OpenPLMSearchView, self).__call__(request)
 
-def get_pages_num(total_pages, current_page,ctx):
+def get_pages_num(total_pages, current_page):
     """
-        add to ctx the pages to display for the pagination
+    Returns the pages to display for the pagination
     """
     page = int(current_page)
     total = int(total_pages)
     if total < 5:
-        ctx["pages"] = range(1,total)
+        pages = range(1,total)
     else:
         if page < total-1:
             if page > 2:
-                ctx["pages"] = range(page-2, page+3)
+                pages = range(page-2, page+3)
             else:
-                ctx["pages"] = range (1,6)
+                pages = range (1,6)
         else:
-            ctx["pages"] = range(total-4, total+1)
+            pages = range(total-4, total+1)
+    return pages
 
-def display_pagination(r_GET,ctx, object_list, type="object"):
+def get_pagination(r_GET, object_list, type="object"):
     """
-        called in view which return a template where object id card
-        are displayed
-        update ctx with pagination information
+    Returns a dictionary with pagination data.
 
+    Called in view which returns a template where object id cards are displayed.
     """
+    ctx = {}
     sort = r_GET.get("sort", "recently-added")
     if sort== "name" :
         sort_critera = "username" if type == "user" else "name"
@@ -2203,15 +2248,16 @@ def display_pagination(r_GET,ctx, object_list, type="object"):
     paginator = Paginator(object_list, 24) # Show 24 objects per page
  
     page = r_GET.get('page', 1)
-    get_pages_num(paginator.num_pages, page,ctx)
     try:
         objects = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-         objects = paginator.page(1)
+        objects = paginator.page(1)
+        page = 1
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-         objects = paginator.page(paginator.num_pages)
+        history = paginator.page(paginator.num_pages)
+    ctx["pages"] = get_pages_num(paginator.num_pages, page)
     ctx["thumbnails"] = {}
     ctx["num_files"] = {}
 
@@ -2229,6 +2275,7 @@ def display_pagination(r_GET,ctx, object_list, type="object"):
          "objects" : objects,
          "sort" : sort,
     })
+    return ctx
 
 
 @secure_required
@@ -2285,7 +2332,7 @@ def browse(request, type="object"):
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
         object_list = cls.objects.filter(query)
 
-    display_pagination(request.GET,ctx, object_list, type=type)
+    ctx.update(get_pagination(request.GET, object_list, type=type))
     
     ctx.update({
         "object_type" : _("Browse"),
@@ -2378,3 +2425,4 @@ def async_search(request):
     if request.GET["navigate"]=="true" :
         ctx["navigate_bool"]=True
     return r2r("render_search.html",ctx,request)
+

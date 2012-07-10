@@ -91,6 +91,8 @@ urlpatterns += patterns('',
     ('^import/done/$', import_csv_done),
     (r'^browse/(?P<type>object|part|document|user|group)?/', 'openPLM.plmapp.views.main.browse'),
     (r'^perform_search/$',async_search),
+    ('^timeline/', display_object_history, {"timeline" : True}),
+    ('^history_item/(?P<type>object|group|user)/(?P<hid>\d+)/', redirect_history),
     )
 
 urlpatterns += patterns2('', 'ajax/', 
