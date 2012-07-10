@@ -225,9 +225,9 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     for attr in attrs:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
-    ctx["is_contributor"]= obj._user.get_profile().is_contributor
+    ctx["is_contributor"] = obj._user.get_profile().is_contributor
     ctx.update({'current_page' : 'attributes',
-                'object_attributes': object_attributes_list})
+                'object_attributes' : object_attributes_list})
     return r2r('attributes.html', ctx, request)
 
 ##########################################################################################
@@ -358,8 +358,8 @@ def get_lifecycle_data(obj):
     ctx["deprecated_revisions"] = deprecated
 
     ctx.update({
-        'current_page':'lifecycle', 
-        'object_lifecycle': object_lifecycle,
+        'current_page' : 'lifecycle', 
+        'object_lifecycle' : object_lifecycle,
         'is_signer' : is_signer, 
         'is_signer_dm' : is_signer_dm,
     })
@@ -371,9 +371,6 @@ def get_management_data(obj, user, is_owner):
     """
     ctx = {}
     links = models.PLMObjectUserLink.objects.filter(plmobject=obj).order_by("role")
-    notified_list = links.filter(role=models.ROLE_NOTIFIED)
-    owner_list = links.filter(role=models.ROLE_OWNER)
-    reader_list = links.filter(role=models.ROLE_READER)
     if not is_owner:
         link = links.filter(role="notified", user=user)
         ctx["is_notified"] = bool(link)
@@ -381,9 +378,7 @@ def get_management_data(obj, user, is_owner):
             ctx["remove_notify_link"] = link[0]
         else:
             if obj.check_in_group(user, False):
-                initial = { "type" : "User",
-                            "username" : user.username
-                          }
+                initial = dict(type="User", username=user.username)
                 form = forms.SelectUserForm(initial=initial)
                 for field in ("type", "username"):
                     form.fields[field].widget = HiddenInput() 
@@ -391,10 +386,11 @@ def get_management_data(obj, user, is_owner):
                 ctx["can_notify"] = True
             else:
                 ctx["can_notify"] = False
-    ctx.update({'notified_list': notified_list,
-                'owner_list':owner_list,
-                'reader_list' : reader_list,
-                })
+    ctx.update({
+        'notified_list' : links.filter(role=models.ROLE_NOTIFIED),
+        'owner_list' : links.filter(role=models.ROLE_OWNER),
+        'reader_list' : links.filter(role=models.ROLE_READER),
+    })
     return ctx
     
 
@@ -418,6 +414,18 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
         return revise_document(obj, ctx, request)
     else:
         return revise_part(obj, ctx, request)
+
+def get_id_card_data(doc_ids):
+    ctx = { "thumbnails" : {}, "num_files" : {} }
+    thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                document__in=doc_ids, thumbnail__isnull=False)
+    ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
+    num_files = dict.fromkeys(doc_ids, 0)
+    for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+        document__in=doc_ids).values_list("document", flat=True):
+            num_files[doc_id] += 1
+            ctx["num_files"] = num_files
+    return ctx
 
 def revise_document(obj, ctx, request):
     """
@@ -500,23 +508,8 @@ def revise_document(obj, ctx, request):
         ctx["add_revision_form"] = add_form
     ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()
-        
-    ctx["thumbnails"] = {}
-    ctx["num_files"] = {}
     
-    ids=[]
-    for revision in revisions :
-        ids.append(revision.id)
-    #ids = revisions.values_list("id", flat=True)
-    thumbnails = models.DocumentFile.objects.filter(deprecated=False,
-                document__in=ids, thumbnail__isnull=False)
-    ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
-    num_files = dict.fromkeys(ids, 0)
-    for doc_id in models.DocumentFile.objects.filter(deprecated=False,
-        document__in=ids).values_list("document", flat=True):
-            num_files[doc_id] += 1
-            ctx["num_files"] = num_files
-        
+    ctx.update(get_id_card_data([r.id for r in revisions]))
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
                 })
@@ -723,7 +716,6 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         history = models.History.objects.filter(q).order_by('-date')
         history = history.select_related("user", "plmobject__type", "plmobject__reference",
             "plmobject__revision")
-        ctx['show_identifiers'] = True
         ctx['object_type'] = _("Timeline")
     elif hasattr(obj, "get_all_revisions"):
         # display history of all revisions
@@ -731,10 +723,9 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         history = obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')
         history = history.select_related("user", "plmobject__revision")
         ctx["show_revisions"] = True
-        ctx['show_identifiers'] = False
     else:
         history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
-        ctx["show_revisions"] = ctx['show_identifiers'] = False
+        ctx["show_revisions"] = False
         history = history.select_related("user")
     paginator = Paginator(history, ITEMS_PER_HISTORY)
     page = request.GET.get('page', 1)
@@ -749,6 +740,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         'pages' : get_pages_num(paginator.num_pages, page),
         'current_page' : 'history', 
         'object_history' : history,
+        'show_identifiers' : timeline,
         })
     return r2r('history.html', ctx, request)
 
@@ -1100,7 +1092,6 @@ def add_rel_part(request, obj_type, obj_ref, obj_revi):
         if add_rel_part_form.is_valid():
             part_obj = get_obj_from_form(add_rel_part_form, request.user)
             obj.attach_to_part(part_obj)
-            ctx.update({'add_rel_part_form': add_rel_part_form, })
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
     else:
         add_rel_part_form = forms.AddRelPartForm()
@@ -1296,8 +1287,8 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
         try:
-            link_id = request.POST["link_id"]
-            link = models.PLMObjectUserLink.objects.get(id=int(link_id))
+            link_id = int(request.POST["link_id"])
+            link = models.PLMObjectUserLink.objects.get(id=link_id)
             if link.role == models.ROLE_NOTIFIED:
                 obj.remove_notified(link.user)
             else:
@@ -1515,9 +1506,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                 else:
                     new_ctrl = obj.clone(creation_form, request.user, [])
                 return HttpResponseRedirect(new_ctrl.plmobject_url)
-    ctx.update({
-        'creation_form':creation_form,
-    })
+    ctx['creation_form'] = creation_form
     ctx.update(formsets)
     return r2r('clone.html', ctx, request)
 
@@ -1562,7 +1551,6 @@ def clone_document(p_form, user, data, parts):
     selected_parts = []
     
     if parts :
-    # parts
         part_formset = forms.SelectPartFormset(data)
         if part_formset.is_valid():
             for form in part_formset.forms:
@@ -1686,10 +1674,10 @@ def display_delegation(request, obj_ref):
     if request.method == "POST":
         selected_link_id = request.POST.get('link_id')
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
+        return HttpResponseRedirect(".")
     links = obj.get_user_delegation_links().select_related("delegatee")
     ctx.update({'current_page':'delegation', 
                 'user_delegation_link': links})
-    
     return r2r('users/delegation.html', ctx, request)
 
 
@@ -2216,7 +2204,7 @@ def get_pages_num(total_pages, current_page):
             pages = range(total-4, total+1)
     return pages
 
-def get_pagination(r_GET, object_list, type="object"):
+def get_pagination(r_GET, object_list, type):
     """
     Returns a dictionary with pagination data.
 
@@ -2248,14 +2236,7 @@ def get_pagination(r_GET, object_list, type="object"):
 
     if type in ("object", "document"):
          ids = objects.object_list.values_list("id", flat=True)
-         thumbnails = models.DocumentFile.objects.filter(deprecated=False,
-                 document__in=ids, thumbnail__isnull=False)
-         ctx["thumbnails"].update(dict(thumbnails.values_list("document", "thumbnail")))
-         num_files = dict.fromkeys(ids, 0)
-         for doc_id in models.DocumentFile.objects.filter(deprecated=False,
-                 document__in=ids).values_list("document", flat=True):
-             num_files[doc_id] += 1
-         ctx["num_files"] = num_files
+         ctx.update(get_id_card_data(ids))
     ctx.update({
          "objects" : objects,
          "sort" : sort,
@@ -2292,7 +2273,6 @@ def browse(request, type="object"):
                 object_list = object_list.filter(published=True)
         else:
             ctx["plmobjects"] = False
-        ctx["browse_all"] = True
     else:
         try:
             cls = {
@@ -2307,7 +2287,6 @@ def browse(request, type="object"):
             'is_readable' : True,
             'plmobjects' : True,
             'restricted' : True,
-            'browse_all' : False,
             'object_menu' : [],
             'navigation_history' : [],
         })
@@ -2317,8 +2296,7 @@ def browse(request, type="object"):
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
         object_list = cls.objects.filter(query)
 
-    ctx.update(get_pagination(request.GET, object_list, type=type))
-    
+    ctx.update(get_pagination(request.GET, object_list, type))
     ctx.update({
         "object_type" : _("Browse"),
         "type" : type,

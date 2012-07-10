@@ -23,7 +23,7 @@
                 <li {% if type == "document"%}class="selected"{% endif %} >
                 <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
                 </li>
-                {% if browse_all %}
+                {% if not restricted %}
                     <li {% if type == "group"%}class="selected"{% endif %} >
                     <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
                     <li {% if type == "user"%}class="selected"{% endif %} >
@@ -40,7 +40,7 @@
                 <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
                 </li>
             </ul>
-            {% if plmobjects and browse_all %}
+            {% if plmobjects and not restricted %}
                 <hr/>
                 <ul>
                     <li>
