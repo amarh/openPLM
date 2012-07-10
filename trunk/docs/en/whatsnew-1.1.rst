@@ -49,6 +49,11 @@ Browsing feature
 
 A new feature is available to browse all parts, documents, groups and users.
 
+.. figure:: user/images/thumbnails/browse.png
+    :target: user/features/browse.html#browse
+    
+    Click on the thumbnail for detailled documentation on browsing feature.
+
 
 Lifecycle and management
 -------------------------
@@ -56,6 +61,7 @@ Lifecycle and management
 The lifecycle and management pages have been merged into the lifecycle page.
 
 Replacing a signer is now much more intuitive.
+
 
 
 Public pages
