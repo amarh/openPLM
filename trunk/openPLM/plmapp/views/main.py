@@ -1040,12 +1040,30 @@ def add_child(request, obj_type, obj_ref, obj_revi):
     
 ##########################################################################################    
 @handle_errors
-def display_object_parents(request, obj_type, obj_ref, obj_revi):
+def display_parents(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the parent of the selected object.
-    It computes a context dictionary based on
+    Parents view.
     
-    .. include:: views_params.txt 
+    That views displays the parents of the selected object that must be a part.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parents/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/parents.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``parents``
+        a list of :class:`.Parents`
+
+    ``display_form``
+        a :class:`.DisplayChildrenForm`
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
