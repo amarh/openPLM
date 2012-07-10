@@ -941,7 +941,7 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
 
 ##########################################################################################    
 @handle_errors
-def add_children(request, obj_type, obj_ref, obj_revi):
+def add_child(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for chidren creation of the selected object.
     It computes a context dictionary based on
