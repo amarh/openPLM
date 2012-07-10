@@ -810,7 +810,7 @@ def get_children_data(obj, date, level, state):
 
 
 @handle_errors
-def display_object_child(request, obj_type, obj_ref, obj_revi):
+def display_children(request, obj_type, obj_ref, obj_revi):
     """
     BOM view.
     
@@ -885,12 +885,9 @@ def display_object_child(request, obj_type, obj_ref, obj_revi):
 @handle_errors(undo="..")
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which edits the chidren of the selected object.
-    Possibility to modify the `.ParentChildLink.order`, the `.ParentChildLink.quantity` and to
-    desactivate the `.ParentChildLink`
-    It computes a context dictionary based on
-    
-    .. include:: views_params.txt 
+    View to edit a BOM.
+  
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
