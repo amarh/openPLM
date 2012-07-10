@@ -64,8 +64,35 @@ l'option "compte restreint" :
 Comme vous pouvez le voir sur l'image ci-dessus, vous pouvez aussi parrainer un nouvel utilisateur
 qui peut accéder à pratiquement tous les objets mais ne peut pas les modifier.
 
+
+Timeline
+---------
+
+La timeline est un historique global qui contients :
+
+ * l'historique des objets officiels
+ * l'historique des objets appartenant aux groupes
+ dont vous faites partie
+ 
+ 
 Flux RSS
 ----------
+
+Vous pouvez souscrire aux flux RSS de :
+
+ * objets PLM
+ * Utilisateur
+ * Groupe
+ * la timeline
+
+Les liens pour souscrire à ces flux sont accessibles depuis les pages :
+
+ * "Historique"
+ * "Timeline"
+
+Chaque flux se met à jour lorsqu'une modification intervient sur  l' (les) objet(s), l'utilisateur 
+ou le groupe associé(s) au flux.
+
 
 Nouvelle application: oerp
 ---------------------------
