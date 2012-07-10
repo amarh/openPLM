@@ -298,14 +298,16 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
         password_form = forms.ConfirmPasswordForm(request.user)
     ctx['password_form'] = password_form
     ctx['in_group'] = obj.check_in_group(request.user, raise_=False)
-    ctx.update(get_management_data(obj, request.user, ctx["is_owner"]))
+    ctx.update(get_management_data(obj, request.user))
     ctx.update(get_lifecycle_data(obj))
     return r2r('lifecycle.html',ctx,request)
     
     
 def get_lifecycle_data(obj):
     """
-    Returns a dictionary containing lifecycle data of *ob* 
+    Returns a dictionary containing lifecycle data of *obj*.
+
+    **Dictionary content**
     
     ``object_lifecycle``
         List of tuples (state name, *boolean*, signer role). The boolean is
@@ -366,13 +368,42 @@ def get_lifecycle_data(obj):
     })
     return ctx
     
-def get_management_data(obj, user, is_owner):
+def get_management_data(obj, user):
     """
     Returns a dictionary containing management data for *obj*.
+
+    :param user: User who runs the request
+    
+    **Dictionary content**
+
+    ``notified_list``
+        List of notification :class:`.PLMObjectUserLink` related to *obj*
+
+    ``owner_list``
+        List of owner :class:`.PLMObjectUserLink` related to *obj*
+
+    ``reader_list``
+        List of restricted reader :class:`.PLMObjectUserLink` related to *obj*
+
+    If *user* does not own *obj*:
+
+        ``is_notified``
+            True if *user* receives notifications when *obj* changes
+        
+        ``remove_notify_link``
+            (set if *is_notified* is True)
+            Notification :class:`.PLMObjectUserLink` between *obj* and *user*
+
+        ``can_notify``
+            True if *user* can ask to receive notifications when *obj* changes
+
+        ``notify_self_form``
+            (set if *can_notify* is True)
+            form to notify *user*
     """
     ctx = {}
     links = models.PLMObjectUserLink.objects.filter(plmobject=obj).order_by("role")
-    if not is_owner:
+    if not obj.check_permission("owner", False):
         link = links.filter(role="notified", user=user)
         ctx["is_notified"] = bool(link)
         if link:
