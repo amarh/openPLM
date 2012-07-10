@@ -25,6 +25,7 @@ Table des matières :
     :numbered:   
 
     resources
+    whatsnew-1.1
     user/index
     admin/index
     devel/index

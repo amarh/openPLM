@@ -28,17 +28,22 @@ Les articles et les documents sont nommés suivant en accord avec la convention
 suivante : 
 *type//ref//rev//name*
 
-* *type* renvoi au type de l'objet
+    type
+        renvoie au type de l'objet (``Part``, ``Document``, ``Document3D``...)
 
-* *ref* renvoi à la référence de l'objet (habituellement noté type_number)
+    ref
+        renvoie à la référence de l'objet (habituellement notée : ``PART_1759`` ou ``DOC_0051``)
 
-* *rev* renvoi au numéro de révision de l'objet
+    rev
+        renvoie au numéro de révision de l'objet (``a``, ``1.2`` ou ``A.a.1``...)
 
-* *name* renvoi au nom de l'objet s'il en a reçu un
+    name
+        renvoie au nom de l'objet (il peut être vide)
 
 
 PAGE D'ACCUEIL
 ==============
+
 Il y a 5 fonctions principales : 
 
 1- Rechercher des objets
@@ -51,10 +56,13 @@ Il y a 5 fonctions principales :
 
 5- Parcourir les objets
 
-Exemple :
+Capture d'écran :
 
-.. image:: images/Capture_openPLM_home.png
+.. figure:: images/Capture_openPLM_home.png
    :width: 100%
+   :align: center
+   
+   Page d'accueil
 
 Comme on peut le voir sur l'exemple, les invitations en attentes (envoyées et
 reçues) sont affichées sur la page d'accueil.
@@ -68,32 +76,39 @@ La page de recherche se décompose en deux parties :
 
 2- La zone où sont affichés les résultats de la recherche
 
-En premier lieu, il faut sélectionner le type d'objet PLM que vous
+En premier lieu, vous devez sélectionner le type d'objet PLM que vous
 recherchez.
 
 Ensuite, vous renseignez le champ pour affiner la recherche. Pour cela, vous
 pouvez utiliser : 
- * un ensemble de mots, OpenPLM affichera tout les éléments qui contiennent
+ * un ensemble de mots, OpenPLM cherchera les objets dont les attributs contiennent
    les mots renseignés.
- * une requête avancé : 
+ * une requête avancée : 
     * attribute=data 
-        - name=test 
-        - name:test
+        - ``name=test`` 
+        - ``name:test``
     * attribute:data OR query
-        - type=document3D OR type=design
+        - ``type=document3D OR type=design``
     * attribute:data AND query
-        - name=test AND (type=document3D OR type=design)
+        - ``name=test AND (type=document3D OR type=design)``
 
 OpenPLM affichera les éléments qui répondent aux critères renseignés.
 
 Exemple :
 
-.. image:: images/Capture_openPLM_search.png
+.. figure:: images/Capture_openPLM_search.png
    :width: 100%
+   :align: center
+   
+   Exemple de recherche
+
+   Comme vous pouvez le voir une requête vide, correspond à tous les objets.
+   Ici, toutes les parts sont affichées, leurs sous-types inclus (ici SinglePart).
 
 
 NAVIGUER
 ========
+
 Les objets et leurs relations sont représentés dans un schéma.
 
 Chaque boîte représente un objet : 
@@ -125,10 +140,10 @@ Exemple :
 
 ÉTUDE
 =====
-Accéder à la partie Étude depuis la page d'accueil affiche l'historique des
+Accéder à la page "Étudier" depuis la page d'accueil affiche l'historique des
 objets liés à l'utilisateur.
 
-Sur la page Étude, il est possible : 
+Sur la page "Étudier", il est possible : 
 
 * d'afficher les informations d'un objet 
 
@@ -144,7 +159,8 @@ PARCOURIR
 ==========
 Sur la page "Parcourir" tous les objets, groupes et utilisateurs d'OpenPLM sont affichés.
 
-Vous pouvez filtrer les résultats en utilisant le paneau Type.
+Vous pouvez filtrer les résultats en fonction du type, de l'état et vous pouvez changer 
+l'ordre d'affichage.
 
 Exemple :
 
