@@ -206,7 +206,7 @@
 
     {# lifecycle : display all states #}
     <div class="lifecycle">
-        {% for status, is_current_state, nb_signer, signer in object_lifecycle %}
+        {% for status, is_current_state, signer, link_id in object_lifecycle %}
             <div class="state_wrapper">
                 <div class="state
                     {% if forloop.first %}
@@ -228,23 +228,16 @@
             </div>
             {% if not forloop.last %}
                 <div class="management">
-                    <div class="arrow
-                        {% if is_current_state %}
-                            active
-                        {% endif %}
-                        " style="">&gt;</div>
-                    {% with signers_data|key:forloop.counter0 as signer_data %}
-                        {% if signer_data.nb_signer > 0 %}
-                            <!--<div class="management">-->
-                                <span class="signer">
-                                    <a href="/user/{{signer_data.signer.user.username|urlencode }}/">{{signer_data.signer.user.username}}</a><br/>
-                                    {% if is_owner %}
-                                        <a class="{{"Button"|button}}" href="../management/replace/{{signer_data.signer.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
-                                    {% endif %}
-                                </span>
-                                <!--</div>-->
-                        {% endif %}
-                    {% endwith %}
+                    <div class="arrow {% if is_current_state %} active {% endif %}" style="">&gt;</div>
+                    {% if signer %}
+                        <span class="signer">
+                            <a href="/user/{{signer|urlencode }}/">{{signer}}</a>
+                            <br/>
+                            {% if is_owner %}
+                                <a class="{{"Button"|button}}" href="../management/replace/{{link_id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                            {% endif %}
+                        </span>
+                    {% endif %}
                 </div>
             {% endif %}
         {% endfor %}
@@ -284,7 +277,9 @@
             {% endwith %}
         {% endwith %} 
         {% with owner_list as object_management_list %}
-            {% include "snippets/management_block.html" %}
+            {% with is_owner as can_delete %}
+                {% include "snippets/management_block.html" %}
+            {% endwith %}
         {% endwith %}
     </div>
 {% endblock %}
