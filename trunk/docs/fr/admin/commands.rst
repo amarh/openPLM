@@ -116,8 +116,8 @@ Utilisation : :samp:`./manage.py migrate [options] [appname] [migrationname|zero
 
 .. seealso::
 
-    More documentation on this command is available
-    `here <http://south.readthedocs.org/en/latest/commands.html#migrate>`__.
+    Plus de documentation sur cette commande 
+    `ici <http://south.readthedocs.org/en/latest/commands.html#migrate>`__.
 
 dbshell
 -------
@@ -191,8 +191,8 @@ Utilisation : :samp:`./manage.py update_index [options] <{appname} {appname} ...
 
 .. seealso::
 
-    More documentation on these commands is available
-    `here <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
+    Plus de documentation sur ces commandes 
+    `ici <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
 
 
 Commandes relatives à l'utilisateur
