@@ -22,22 +22,20 @@ Progress-bars appear while uploading files :
 
   * one for the total progress
 
-Screenshots :
 
-.. list-table::
+.. list-table:: Screenshots
 
     * - .. figure:: images/Capture_openPLM_file_add.png
            :width: 100%
-           :align: center    
 
            New "Files" page
     
            As you can see, the upload form and the list of files are both displayed on the "Files" page.
 
+
     * - .. figure:: images/Capture_openPLM_file_progress.png
            :width: 100%
-           :align: center
-    
+               
            Progress-bars
            
            Now OpenPLM display a progress informations for each uploaded file. A global progress information is also given.
@@ -49,10 +47,7 @@ Browsing feature
 
 A new feature is available to browse all parts, documents, groups and users.
 
-.. figure:: user/images/thumbnails/browse.png
-    :target: user/features/browse.html#browse
-    
-    Click on the thumbnail for detailled documentation on browsing feature.
+For more details see :ref:`feat-browse` feature documentation
 
 
 Lifecycle and management
@@ -60,7 +55,9 @@ Lifecycle and management
 
 The lifecycle and management pages have been merged into the lifecycle page.
 
-Replacing a signer is now much more intuitive.
+Replacing a signer is now much more intuitive, see the screenshot :
+
+.. image:: images/Capture_openPLM_lifecycle_management.png
 
 
 
@@ -83,12 +80,19 @@ This new account make it possible to share some contents to someone and be sure 
 would not be able to modify it or see other confidential data.
 
 To create a restricted account, you only have to sponsor a new user and
-select the "restricted account" option:
+select the "restricted account" option.
 
-.. todo:: image
+Screenshot :
+
+.. image:: images/Capture_openPLM_sponsor.png
+
 
 As you can see on the screenshot above, it is now possible to sponsor a
-new use who can access mostly all contents but can not modify them.
+new user who can access mostly all contents but can not modify them.
+
+You can also select a language , the "new account" mail sent should be translated 
+according to the chosen language.
+
 
 Timeline
 ---------
@@ -121,7 +125,7 @@ New application: oerp
 ---------------------
 
 
-document3D
+Document3D
 -----------
 
 The document3D application has been improved.
@@ -175,21 +179,52 @@ OpenPLM can now serves all managed files through a WebDAV access.
 Bugs fixed
 ------------
 
-** Suggested reference for PLM objects **
+**Suggested reference for PLM objects**
 
-Now you can let OpenPLM automatically generate the reference or 
-set it by yourself in the creation form.
+`108 <http://wiki.openplm.org/trac/ticket/108>`_ step management - Suggested part references are all the same
 
+`113 <http://wiki.openplm.org/trac/ticket/113>`_  Part - Suggested reference may cause some problem
+
+`117 <http://wiki.openplm.org/trac/ticket/117>`_ Object creation - If you update the page suggested reference and reference change
+
+
+**BOM**
+
+`121 <http://wiki.openplm.org/trac/ticket/121>`_ BOM - Display last level is not correct
+
+
+**Document3D**
+
+`104 <http://wiki.openplm.org/trac/ticket/104>`_ 3D data not copied when a Document3D is revised
+
+`106 <http://wiki.openplm.org/trac/ticket/106>`_ document3D: can not decompose a step file defining two products with the same name
+
+
+**File management**
+
+`124 <http://wiki.openplm.org/trac/ticket/124>`_ File check-in broken
+
+
+**Sponsorship**
+
+`109 <http://wiki.openplm.org/trac/ticket/109>`_ Sponsorship - Character ' is authorised for username and leads to a bug
+
+
+**Delegation**
+
+`119 <http://wiki.openplm.org/trac/ticket/119>`_ Delegation - We can delegate someone who is not in the same groupe as the object
 
 
 Other enhancements
 --------------------
 
-BOM: download as PDF
+BOM: 
 
-BOM: replace child
+ * download as PDF
+ * replace child
 
-Part and document cancellation
+
+Part and document cancellation and cloning
 
 Display enhancements:
 Groups, revisions...
