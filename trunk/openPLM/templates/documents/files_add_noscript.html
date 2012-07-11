@@ -6,5 +6,7 @@
 {% endblock %}
 
 {% block content %}
-{% include "documents/files_add.html" %}
+    {% with add_file_form as form %}
+        {% include "snippets/undo_form.html" %}
+    {% endwith %}
 {% endblock %}

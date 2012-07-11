@@ -1292,16 +1292,39 @@ def add_part(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_files(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the files (:class:`DocumentFile`) uploaded in the selected object.
-    It computes a context dictionary based on
+    Files view.
     
-    .. include:: views_params.txt 
+    That view displays files of the given document. 
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`documents/files.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``file_formset``
+        a formset to remove files
+
+    ``archive_form``
+        form to download all files in a single archive (tar, zip)
+    
+    ``add_file_form``
+        form to add a file
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
 
     if not hasattr(obj, "files"):
         return HttpResponseBadRequest("object must be a document")
     if request.method == "POST":
+        if request.FILES:
+            # from a browser where js is disabled
+            return add_file(request, obj_type, obj_ref, obj_revi)
         formset = forms.get_file_formset(obj, request.POST)
         if formset.is_valid():
             obj.update_file(formset)
@@ -1316,7 +1339,6 @@ def display_files(request, obj_type, obj_ref, obj_revi):
                 'archive_form' : archive_form,
                 'deprecated_files' : obj.deprecated_files,
                 'add_file_form': add_file_form,
-                'document_type': obj_type,
                })
     return r2r('documents/files.html', ctx, request)
 
@@ -1325,10 +1347,26 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 @handle_errors(undo="..")
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for the files (:class:`DocumentFile`) addition in the selected object.
-    It computes a context dictionary based on
+    That view displays the form to upload a file. 
+
+    .. note::
+
+        This view show a simple form (no javascript) and is here
     
-    .. include:: views_params.txt 
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/add/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`documents/files_add_noscript.html`
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``add_file_form``
+        form to add a file
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == "POST":
@@ -1345,12 +1383,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             else:
                 return HttpResponse("false:")
         add_file_form = forms.AddFileForm()
-        files = forms.get_file_formset(obj)
-        ctx['files_list'] =  files
-    ctx.update({
-        'add_file_form': add_file_form, 
-        'document_type': obj_type,
-    })
+    ctx['add_file_form'] = add_file_form 
     return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
@@ -1403,12 +1436,33 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
 @handle_errors(undo="../../../lifecycle/")
 def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
-    Manage html page for the modification of the Users who manage the selected object (:class:`PLMObjectUserLink`).
-    It computes a context dictionary based on
+    View to replace a manager (owner, signer, reader...) by another one.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/replace/{link_id}/`
     
-    .. include:: views_params.txt 
-    :param link_id: :attr:`.PLMObjectUserLink.id`
-    :type link_id: str
+    .. include:: views_params.txt
+    :param link_id: id of the :class:`.PLMObjectUserLink` being replaced
+
+    **Template:**
+    
+    :file:`management_replace.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``replace_manager_form``
+        a form to select the new manager (an user)
+
+    ``link_creation``
+        Set to True
+
+    ``role``
+        role of the link being replace
+
+    ``attach``
+        set to (*obj*, "delegate") or (*obj*, "delegate-reader*) according to
+        the role of the link
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.objects.get(id=int(link_id))
@@ -1416,10 +1470,10 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         raise ValueError("Bad link id")
     
     if request.method == "POST":
-        replace_management_form = forms.SelectUserForm(request.POST)
-        if replace_management_form.is_valid():
-            if replace_management_form.cleaned_data["type"] == "User":
-                user_obj = get_obj_from_form(replace_management_form, request.user)
+        replace_manager_form = forms.SelectUserForm(request.POST)
+        if replace_manager_form.is_valid():
+            if replace_manager_form.cleaned_data["type"] == "User":
+                user_obj = get_obj_from_form(replace_manager_form, request.user)
                 obj.set_role(user_obj.object, link.role)
                 if link.role == models.ROLE_NOTIFIED:
                     obj.remove_notified(link.user)
@@ -1427,11 +1481,12 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                     obj.remove_reader(link.user)
             return HttpResponseRedirect("../../../lifecycle/")
     else:
-        replace_management_form = forms.SelectUserForm()
+        replace_manager_form = forms.SelectUserForm()
     
     ctx.update({'current_page':'lifecycle', 
-                'replace_management_form': replace_management_form,
+                'replace_manager_form': replace_manager_form,
                 'link_creation': True,
+                'role' : link.role,
                 'attach' : (obj, "delegate-reader" if link.role == models.ROLE_READER else "delegate")})
     return r2r('management_replace.html', ctx, request)
 
@@ -1439,27 +1494,53 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
 @handle_errors(undo="../../lifecycle/")
 def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
     """
-    Manage html page for the addition of a "notification" link
-    (:class:`PLMObjectUserLink`) between some Users and the selected object. 
-    It computes a context dictionary based on
+    View to add a manager (notified user or restricted reader).
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add/`
+    or 
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add-reader/`
+
+    .. include:: views_params.txt
+    :param reader: True to add a restricted reader instead of a notified user
+
+    **Template:**
     
-    .. include:: views_params.txt 
+    :file:`management_replace.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``replace_manager_form``
+        a form to select the new manager (an user)
+
+    ``link_creation``
+        Set to True
+
+    ``role``
+        role of the new user (:const:`.ROLE_NOTIFIED` or :const:`.ROLE_READER`)
+
+    ``attach``
+        set to (*obj*, "delegate") or (*obj*, "delegate-reader*) according to
+        *reader*
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+    role =  models.ROLE_READER if reader else models.ROLE_NOTIFIED
     if request.method == "POST":
         add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
-                obj.set_role(user_obj.object, models.ROLE_READER if reader else models.ROLE_NOTIFIED)
+                obj.set_role(user_obj.object, role)
             return HttpResponseRedirect("../../lifecycle/")
     else:
         add_management_form = forms.SelectUserForm()
     
     ctx.update({'current_page':'lifecycle', 
-                'replace_management_form': add_management_form,
+                'replace_manager_form': add_management_form,
                 'link_creation': True,
+                'role' : role,
                 "attach" : (obj, "delegate-reader" if reader else "delegate")})
     return r2r('management_replace.html', ctx, request)
 
@@ -1467,10 +1548,17 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
 @handle_errors
 def delete_management(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for the deletion of a "notification" link (:class:`PLMObjectUserLink`) between some Users and the selected object.
-    It computes a context dictionary based on
-    
-    .. include:: views_params.txt 
+    View to remove a notified user or a restricted user.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/delete/`
+
+    The request must be a POST request containing the key ``link_id``.
+    It should be the id of one of the :class:`.PLMObjectUserLink` related to
+    the object.
+    The role of this link must be :const:`.ROLE_NOTIFIED` or :class:`.ROLE_READER`.
+
+    Redirects to :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/lifecycle/`
+    in case of a success.
     """
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
@@ -1912,7 +2000,7 @@ def delegate(request, obj_ref, role, sign_level):
         role = _("notified")
     
     ctx.update({'current_page':'delegation',
-                'replace_management_form': delegation_form,
+                'replace_manager_form': delegation_form,
                 'link_creation': True,
                 'attach' : (obj, "delegate"),
                 'role': role})
