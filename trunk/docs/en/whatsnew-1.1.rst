@@ -218,26 +218,48 @@ Bugs fixed
 Other enhancements
 --------------------
 
-BOM: 
+**BOM** 
 
- * download as PDF
- * replace child
+ * download as PDF,
+ * replace child.
+
+**Navigate view**
+
+If the current object is a part you can :
+
+ * attach a new document,
+ * add a new part (child).
+ 
+If the current object is a document you can :
+
+ * attach a new part.
 
 
-Part and document cancellation and cloning
+**Part and document**
 
-Display enhancements:
-Groups, revisions...
+You can cancel and clone PLM objects.
 
-Search panel: asynchronous
 
-Documentation: 
+**Search panel**
+
+The research is performed asynchronously
+
+
+**Display enhancements**
+
+ * groups tab
+ * revisions tab
+ * ...
+ 
+ 
+**Documentation** 
 
     * More documented features
     * disponible dans la langue de Molière
 
 
-Thumbnails: new supported formats
+**Thumbnails: new supported formats**
+
 SolidWorks, Catia, Sketch Up, Pro Engineer 
 
 
