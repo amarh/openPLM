@@ -193,7 +193,7 @@ def ajax_can_add_child(request, part_id):
     part = get_obj_by_id(part_id, request.user)
     data = {"can_add" : False}
     if part.is_part and request.GET:
-        form = forms.AddRelPartForm(request.GET)
+        form = forms.AddPartForm(request.GET)
         if form.is_valid():
             child = get_obj_from_form(form, request.user)
             data["can_add"] = part.can_add_child(child)

@@ -970,12 +970,12 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.ParentChildLink.objects.get(id=link_id)
     if request.method == "POST":
-        form = forms.AddRelPartForm(request.POST)
+        form = forms.AddPartForm(request.POST)
         if form.is_valid():
             obj.replace_child(link, get_obj_from_form(form, request.user))
             return HttpResponseRedirect("../..")
     else:
-        form = forms.AddRelPartForm()
+        form = forms.AddPartForm()
     ctx["replace_child_form"] = form
     ctx["link"] = link
     ctx["attach"] = (obj, "add_child")
@@ -1265,7 +1265,7 @@ def add_part(request, obj_type, obj_ref, obj_revi):
     ``RequestContext``
    
     ``add_part_form``
-        a form to attach a part (:class:`.AddRelPartForm`)
+        a form to attach a part (:class:`.AddPartForm`)
 
     ``link_creation``
         Set to True
@@ -1276,13 +1276,13 @@ def add_part(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_part_form = forms.AddRelPartForm(request.POST)
+        add_part_form = forms.AddPartForm(request.POST)
         if add_part_form.is_valid():
             part_obj = get_obj_from_form(add_part_form, request.user)
             obj.attach_to_part(part_obj)
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
     else:
-        add_part_form = forms.AddRelPartForm()
+        add_part_form = forms.AddPartForm()
     ctx.update({'link_creation': True,
                 'add_part_form': add_part_form,
                 'attach' : (obj, "attach_part") })
