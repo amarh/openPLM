@@ -597,7 +597,7 @@ class DocumentViewTestCase(ViewTest):
         
         response = self.get(self.base_url + "parts/", page="parts")
         self.assertEqual([part.id],
-                         [p.part.id for p in response.context["all_parts"]])
+                         [p.part.id for p in response.context["parts"]])
         self.assertEqual([part.id],
             [f.instance.part.id for f in response.context["parts_formset"].forms])
 
@@ -622,9 +622,9 @@ class DocumentViewTestCase(ViewTest):
                 'form-1-delete' : '',
             }
         response = self.post(self.base_url + "parts/", data, page="parts")
-        self.assertEqual(1, response.context["all_parts"].count())
+        self.assertEqual(1, response.context["parts"].count())
         self.assertEqual(list(part2.get_attached_documents()), 
-                         list(response.context["all_parts"]))
+                         list(response.context["parts"]))
         forms_ = response.context["forms"]
         self.assertEqual([part2.id],
                 [f.instance.part.id for f in forms_.values()]) 
@@ -650,7 +650,7 @@ class DocumentViewTestCase(ViewTest):
                 'form-1-delete' : '',
             }
         response = self.post(self.base_url + "parts/", data, page="parts")
-        self.assertEqual(2, response.context["all_parts"].count())
+        self.assertEqual(2, response.context["parts"].count())
         forms_ = response.context["forms"]
         self.assertEqual(set((part1.id, part2.id)), 
                 set(f.instance.part.id for f in forms_.values())) 
@@ -676,12 +676,12 @@ class DocumentViewTestCase(ViewTest):
                 'form-1-delete' : 'on',
             }
         response = self.post(self.base_url + "parts/", data, page="parts")
-        self.assertEqual(0, response.context["all_parts"].count())
+        self.assertEqual(0, response.context["parts"].count())
         self.assertFalse(response.context["forms"])
         
     def test_add_related_part_get(self):
         response = self.get(self.base_url + "parts/add/", link=True)
-        self.assertTrue(isinstance(response.context["add_rel_part_form"],
+        self.assertTrue(isinstance(response.context["add_part_form"],
                                    forms.AddRelPartForm))
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
