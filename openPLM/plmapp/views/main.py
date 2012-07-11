@@ -1497,7 +1497,9 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
     View to add a manager (notified user or restricted reader).
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add/`
+
     or 
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add-reader/`
 
     .. include:: views_params.txt
@@ -1580,11 +1582,73 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def create_object(request, from_registered_view=False, creation_form=None):
     """
-    Manage html page for the creation of an instance of `models.PLMObject` subclass.
-    It computes a context dictionary based on
+    View to create a :class:`.PLMObject` or a :class:`.GroupInfo`.
+
+    :url: ``/object/create/`` 
+
+    Requests (POST and GET) must contain a ``type`` variable that validates a
+    :class:`.TypeForm`.
+
+    POST requests must validate the creation form, fields depend on the
+    given type. If the creation form is valid, an object is created and
+    in case of success, this view redirects to the created object.
     
-    :param request: :class:`django.http.QueryDict`
-    :return: a :class:`django.http.HttpResponse`
+    Requests may contain a ``__next__`` variable. A successful creation will
+    redirect to this URL. Some special strings are replaced:
+
+        * ``##type##`` with the created object's type
+        * ``##ref##`` with the created object's reference
+        * ``##rev##`` with the created object's reference
+
+    Requests may also contain other special variables (at most one of
+    them):
+
+        ``related_doc``
+            Id of a document. The created part will be attached to this
+            document. Object's type is restricted to part types.
+            Two context variables (``related_doc`` and ``related``)
+            are set to the document controller.
+
+        ``related_part``
+            Id of a part. The created document will be attached to this
+            part. Object's type is restricted to document types.
+            Two context variables (``related_part`` and ``related``)
+            are set to the part controller.
+
+        ``related_parent``
+            Id of a part. Object's type is restricted to part types.
+            Two context variables (``related_parent`` and ``related``)
+            are set to the part controller.
+
+    .. note::
+        If *from_registered_view* is False, this view delegates its
+        treatment to a registered view that handles creation of
+        objects of the given type.
+        (see :func:`.get_creation_view` and :func:`.register_creation_view`)
+
+    :param from_registered_view: True if this function is called by another
+         creation view
+    :param creation_form: a creation form that will be used instead of the
+         default one
+    
+    **Template:**
+    
+    :file:`create.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``creation_form``
+    
+    ``creation_type_form``
+        :class:`.TypeForm` to select the type of the created object
+
+    ``object_type``
+        type of the created object
+
+    ``next``
+        value of the ``__next__`` request variable if given
     """
 
     obj, ctx = get_generic_data(request)
@@ -1931,14 +1995,9 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def display_delegation(request, obj_ref):
     """
-    Manage html page which displays the delegations of the selected 
-    :class:`~django.contrib.auth.models.User`.
-    It computes a context dictionary based on
-    
-    :param request: :class:`django.http.QueryDict`
-    :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
-    :type obj_ref: str
-    :return: a :class:`django.http.HttpResponse`
+    Delegation view.
+
+    This view displays all delegations of the given user.
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
     if obj.restricted:
