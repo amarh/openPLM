@@ -88,7 +88,8 @@ from openPLM.plmapp.cadformats import is_cad_file
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
-from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
+from openPLM.plmapp.utils import (level_to_sign_str, get_next_revision,
+        get_pages_num)
 from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
 
 
@@ -2458,24 +2459,6 @@ class OpenPLMSearchView(SearchView):
     @method_decorator(handle_errors)
     def __call__(self, request):
         return super(OpenPLMSearchView, self).__call__(request)
-
-def get_pages_num(total_pages, current_page):
-    """
-    Returns the pages to display for the pagination
-    """
-    page = int(current_page)
-    total = int(total_pages)
-    if total < 5:
-        pages = range(1,total)
-    else:
-        if page < total-1:
-            if page > 2:
-                pages = range(page-2, page+3)
-            else:
-                pages = range (1,6)
-        else:
-            pages = range(total-4, total+1)
-    return pages
 
 def get_pagination(r_GET, object_list, type):
     """

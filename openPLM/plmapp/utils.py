@@ -292,6 +292,28 @@ def get_ext(filename):
             ext = ext2
     return ext
 
+
+def get_pages_num(total_pages, current_page):
+    """
+    .. versionadded:: 1.1
+
+    Returns the pages to display for the pagination
+    """
+    page = int(current_page)
+    total = int(total_pages)
+    if total < 5:
+        pages = range(1,total)
+    else:
+        if page < total-1:
+            if page > 2:
+                pages = range(page-2, page+3)
+            else:
+                pages = range (1,6)
+        else:
+            pages = range(total-4, total+1)
+    return pages
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
