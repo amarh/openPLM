@@ -1266,7 +1266,7 @@ class PartViewTestCase(ViewTest):
 
     def test_doc_cad_empty(self):
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
-        self.assertEqual(0, len(list(response.context["all_docs"])))
+        self.assertEqual(0, len(list(response.context["documents"])))
     
     def test_doc_cad(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -1278,7 +1278,7 @@ class PartViewTestCase(ViewTest):
         doc2.object.state = doc2.object.lifecycle.last_state
         doc2.object.save()
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
-        self.assertEqual(2, response.context["all_docs"].count())
+        self.assertEqual(2, response.context["documents"].count())
         forms_ = response.context["forms"]
         self.assertEqual([doc1.id], [f.instance.document.id for f in forms_.values()]) 
 
@@ -1318,9 +1318,9 @@ class PartViewTestCase(ViewTest):
                 'form-1-delete' : '',
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
-        self.assertEqual(1, response.context["all_docs"].count())
+        self.assertEqual(1, response.context["documents"].count())
         self.assertEqual(list(doc2.get_attached_parts()), 
-                         list(response.context["all_docs"]))
+                         list(response.context["documents"]))
         forms_ = response.context["forms"]
         self.assertEqual([doc2.id], [f.instance.document.id for f in forms_.values()]) 
         
@@ -1347,7 +1347,7 @@ class PartViewTestCase(ViewTest):
                 'form-1-delete' : '',
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
-        self.assertEqual(2, response.context["all_docs"].count())
+        self.assertEqual(2, response.context["documents"].count())
         forms_ = response.context["forms"]
         self.assertEqual(set((doc1.id, doc2.id)), 
                 set(f.instance.document.id for f in forms_.values())) 
@@ -1375,7 +1375,7 @@ class PartViewTestCase(ViewTest):
                 'form-1-delete' : 'on',
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
-        self.assertEqual(0, response.context["all_docs"].count())
+        self.assertEqual(0, response.context["documents"].count())
         self.assertFalse(response.context["forms"])
 
     def test_revise_no_attached_document_get(self):

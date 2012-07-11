@@ -814,7 +814,7 @@ def display_children(request, obj_type, obj_ref, obj_revi):
     """
     BOM view.
     
-    That views displays the children of the selected object that must be a part.
+    That view displays the children of the selected object that must be a part.
     
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/`
     
@@ -1044,7 +1044,7 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
     """
     Parents view.
     
-    That views displays the parents of the selected object that must be a part.
+    That view displays the parents of the selected object that must be a part.
     
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parents/`
     
@@ -1100,13 +1100,37 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
 
 ##########################################################################################
 @handle_errors
-def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
+def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the related documents and CAD of 
-    the selected object.
-    It computes a context dictionary based on
+    Attached documents view.
     
-    .. include:: views_params.txt 
+    That view displays the documents attached to the selected object that must be a part.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/doc-cad/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/doccad.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``documents``
+        a queryset of :class:`.DocumentPartLink` bound to the part
+
+    ``archive_form``
+        a form to download an archive containing all attached files
+
+    ``docs_formset``
+        a formset to detach documents
+
+    ``forms``
+        a dictionary (link_id -> form) to get the form related to a link
+        (a document may not be "detachable")
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -1122,7 +1146,7 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
     dforms = dict((form.instance.id, form) for form in formset.forms)
     archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'doc-cad',
-                'all_docs': obj.get_attached_documents(),
+                'documents': obj.get_attached_documents(),
                 'forms' : dforms,
                 'archive_form' : archive_form,
                 'docs_formset': formset})
@@ -1133,10 +1157,28 @@ def display_object_doc_cad(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some documents or CAD.
-    It computes a context dictionary based on
+    View to attach a document to a part.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/doc-cad/add/`
     
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`parts/doccad_add.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``add_doc_cad_form``
+        a form to attach a document (:class:`.AddDocCadForm`)
+
+    ``link_creation``
+        Set to True
+
+    ``attach``
+        set to (*obj*, "attach_doc")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     

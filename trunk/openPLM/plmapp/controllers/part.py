@@ -775,5 +775,5 @@ class PartController(PLMObjectController):
         """
         q = Q(parent=self.object) | Q(child=self.object)
         res = not models.ParentChildLink.objects.filter(q, end_time=None).exists()
-        res = res and not self.get_attached_documents()
+        res = res and not self.get_attached_documents().exists()
         return res
