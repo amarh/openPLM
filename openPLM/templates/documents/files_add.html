@@ -29,7 +29,7 @@
             files_linked.push("{{form.instance.filename}}");
         {% endfor %}
     {% endwith %}
-    doc_type="{{document_type}}";
+    doc_type="{{object_type}}";
     trans["Select at least one file"]="{% trans 'Select at least one file' %}";
     trans["A STEP file is already linked to this document."]="{% trans 'A STEP file is already linked to this document.' %}";
     trans["A file named "]="{% trans 'A file named ' %}";

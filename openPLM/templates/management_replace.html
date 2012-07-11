@@ -5,7 +5,7 @@
 
 {% block content %}
     {% trans "Select a user for your delegation as : " %}{{role}}
-    {% with replace_management_form as form %}
+    {% with replace_manager_form as form %}
         {% include "snippets/undo_form.html" %}
     {% endwith %}
 {% endblock %}
