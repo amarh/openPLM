@@ -105,7 +105,7 @@ Example:
     Search example
 
     As you can see, an empty query matches all objects.
-    Here, all parts are returned, including their sub-types (here SinglePart).
+    Here, all parts are returned, including their sub-types (here Assembly, SinglePart, RAM, ... ).
 
 
 Navigate

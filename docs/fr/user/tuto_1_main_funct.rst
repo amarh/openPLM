@@ -69,8 +69,9 @@ Comme on peut le voir sur l'exemple, les invitations en attentes (envoyées et
 reçues) sont affichées sur la page d'accueil.
 
 
-Recherche
-=========
+Rechercher
+==========
+
 La page de recherche se décompose en deux parties : 
 
 1- La zone permettant de renseigner la requête 
@@ -105,7 +106,7 @@ Exemple :
    Exemple de recherche
 
    Comme vous pouvez le voir une requête vide, correspond à tous les objets.
-   Ici, toutes les parts sont affichées, leurs sous-types inclus (ici SinglePart).
+   Ici, toutes les parts sont affichées, leurs sous-types inclus (ici Assembly, SinglePart, RAM, ...).
 
 
 Naviguer
