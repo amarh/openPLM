@@ -83,23 +83,28 @@
     left: 45%;
 }
 #navigate_current{
-    top: 18%;
+    top: 5%;
     left: 66%;
 }
 
 #navigate_box{
-    top: 34%;
+    top: 29%;
     left: 65%;
 }
 
 #navigate_options{
-    top: 25%;
+    top: 15%;
     left: 94%;
 }
 
 #navigate_left{
     top: 15%;
     left: 18%;
+}
+
+#navigate_add{
+    top: 15%;
+    left: 46%;
 }
 
 #study_doc_add{
