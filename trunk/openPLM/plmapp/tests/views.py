@@ -682,7 +682,7 @@ class DocumentViewTestCase(ViewTest):
     def test_add_related_part_get(self):
         response = self.get(self.base_url + "parts/add/", link=True)
         self.assertTrue(isinstance(response.context["add_part_form"],
-                                   forms.AddRelPartForm))
+                                   forms.AddPartForm))
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("attach_part", attach[1])

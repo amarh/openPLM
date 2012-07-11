@@ -441,7 +441,7 @@ SelectParentFormset = formset_factory(form=SelectParentForm, extra=0)
 
 
 
-class AddRelPartForm(PLMObjectForm, PartTypeForm):
+class AddPartForm(PLMObjectForm, PartTypeForm):
     pass
     
 class ModifyRelPartForm(RelPartForm):
