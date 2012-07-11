@@ -84,7 +84,6 @@ from openPLM.plmapp.archive import generate_archive
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view, secure_required
-from openPLM.plmapp.cadformats import is_cad_file
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
@@ -2092,26 +2091,6 @@ def serve(ctrl, doc_file, filename):
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
 
-def get_cad_files(part):
-    """
-    Returns an iterable of all :class:`.DocumentFile` related
-    to *part* that contains a CAD file. It retrieves all non deprecated
-    files of all documents parts to *part* and its children and
-    filters these files according to their extension (see :meth:`.is_cad_file`).
-    """
-    children = part.get_children(-1, related=("child",))
-    children_ids = set(c.link.child_id for c in children)
-    children_ids.add(part.id)
-    links = models.DocumentPartLink.objects.filter(part__in=children_ids)
-    docs = links.values_list("document", flat=True)
-    d_o_u = "document__owner__username"
-    files = models.DocumentFile.objects.filter(deprecated=False,
-                document__in=set(docs))
-    # XXX : maybe its faster to build a complex query than retrieving
-    # each file and testing their extension
-    return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
-
-
 @handle_errors 
 def download_archive(request, obj_type, obj_ref, obj_revi):
     """
@@ -2127,7 +2106,7 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
     if obj.is_document:
         files = obj.files.select_related(d_o_u)
     elif obj.is_part and "cad" in request.GET:
-        files = get_cad_files(obj)
+        files = obj.get_cad_files()
     elif obj.is_part:
         links = obj.get_attached_documents()
         docs = (link.document for link in links)
