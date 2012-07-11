@@ -23,7 +23,7 @@
 
 {% block content %}
     <div>
-        {% if all_docs %}
+        {% if documents %}
             <form class="archive_form" method="GET" action="./archive/">
                 {{ archive_form.as_p }}
                 <input type="submit" name="files" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
@@ -42,7 +42,7 @@
     <form method="post" action="">	
 
         <table class="Content">
-            {% for link in all_docs %}
+            {% for link in documents %}
 
                 <tr class="Content">
                     {% with link.document as document %}
