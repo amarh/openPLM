@@ -34,6 +34,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
+from openPLM.plmapp.cadformats import is_cad_file
 
 from openPLM.plmapp.exceptions import PermissionError
 
@@ -777,3 +778,24 @@ class PartController(PLMObjectController):
         res = not models.ParentChildLink.objects.filter(q, end_time=None).exists()
         res = res and not self.get_attached_documents().exists()
         return res
+
+   
+    def get_cad_files(self):
+        """
+        Returns an iterable of all :class:`.DocumentFile` related
+        to *part* that contain a CAD file. It retrieves all non deprecated
+        files of all documents parts to *part* and its children and
+        filters these files according to their extension (see :meth:`.is_cad_file`).
+        """
+        children = self.get_children(-1, related=("child",))
+        children_ids = set(c.link.child_id for c in children)
+        children_ids.add(self.id)
+        links = models.DocumentPartLink.objects.filter(part__in=children_ids)
+        docs = links.values_list("document", flat=True)
+        d_o_u = "document__owner__username"
+        files = models.DocumentFile.objects.filter(deprecated=False,
+                    document__in=set(docs))
+        # XXX : maybe its faster to build a complex query than retrieving
+        # each file and testing their extension
+        return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
+
