@@ -54,33 +54,33 @@
 }
 
 #create_type{
-    top: 33%;
-    left: 30%;
+    top: 23%;
+    left: 40%;
 }
 
 #create_ref{
-    top: 37%;
-    left: 33%;
+    top: 29%;
+    left: 55%;
 }
 
 #create_rev{
     top: 42%;
-    left: 33%;
+    left: 54%;
 }
 
 #create_cycle{
     top: 46%;
-    left: 45%;
+    left: 65%;
 }
 
 #create_group{
-    top: 56%;
-    left: 27%;
+    top: 59%;
+    left: 39%;
 }
 
 #create_import{
-    top: 75%;
-    left: 40%;
+    top: 78%;
+    left: 45%;
 }
 #navigate_current{
     top: 18%;
