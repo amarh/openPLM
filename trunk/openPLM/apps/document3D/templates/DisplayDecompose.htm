@@ -15,7 +15,7 @@
                 $(this).parent().hasClass("open")? open=true : open=false;
                 $.each(td_level,function(index,value){
                     if($(value).hasClass("open")===open)
-                    $(value).find("span").click();
+                        $(value).find("span").click();
                 });
                 $(this).parent().toggleClass("open");
             });
@@ -126,7 +126,7 @@
 
                                 {% for part_type, ord_quantity, part_doc_cforms, name , is_assembly, prefix, ref  in assembly.0 %} 
 
-                                    <tr class="part {% if level > 0 %} hidden"{% endif %} name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
+                                    <tr class="part {% if level > 0 %} hidden{% endif %}" name="part{{level}}{{assembly_num}}{{forloop.counter0}}" level="{{level}}{{assembly_num}}{{forloop.counter0}}">
 
 
                                         <td class="|->">
