@@ -1199,12 +1199,33 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
 ###      All functions which manage the different html pages specific to documents        ###
 #############################################################################################
 @handle_errors
-def display_related_part(request, obj_type, obj_ref, obj_revi):
+def display_parts(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page which displays the related part of (:class:`DocumentPartLink` with) the selected object.
-    It computes a context dictionary based on
+    Attached parts view.
     
-    .. include:: views_params.txt 
+    That view displays the parts attached to the selected object that must be a document.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parts/`
+    
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`documents/parts.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``parts``
+        a queryset of :class:`.DocumentPartLink` bound to the document
+
+    ``parts_formset``
+        a formset to detach parts
+
+    ``forms``
+        a dictionary (link_id -> form) to get the form related to a link
+        (a part may not be "detachable")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
@@ -1220,32 +1241,50 @@ def display_related_part(request, obj_type, obj_ref, obj_revi):
     rforms = dict((form.instance.id, form) for form in formset.forms)
 
     ctx.update({'current_page':'parts', 
-                'all_parts': obj.get_attached_parts(),
+                'parts': obj.get_attached_parts(),
                 'forms' : rforms,
                 'parts_formset': formset})
     return r2r('documents/parts.html', ctx, request)
 
 ##########################################################################################    
 @handle_errors
-def add_rel_part(request, obj_type, obj_ref, obj_revi):
+def add_part(request, obj_type, obj_ref, obj_revi):
     """
-    Manage html page for link creation (:class:`DocumentPartLink` link) between the selected object and some parts.
-    It computes a context dictionary based on
+    View to attach a part to a document.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parts/add/`
     
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
+
+    **Template:**
+    
+    :file:`documents/parts_add.html`
+
+    **Context:**
+
+    ``RequestContext``
+   
+    ``add_part_form``
+        a form to attach a part (:class:`.AddRelPartForm`)
+
+    ``link_creation``
+        Set to True
+
+    ``attach``
+        set to (*obj*, "attach_part")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if request.POST:
-        add_rel_part_form = forms.AddRelPartForm(request.POST)
-        if add_rel_part_form.is_valid():
-            part_obj = get_obj_from_form(add_rel_part_form, request.user)
+        add_part_form = forms.AddRelPartForm(request.POST)
+        if add_part_form.is_valid():
+            part_obj = get_obj_from_form(add_part_form, request.user)
             obj.attach_to_part(part_obj)
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
     else:
-        add_rel_part_form = forms.AddRelPartForm()
+        add_part_form = forms.AddRelPartForm()
     ctx.update({'link_creation': True,
-                'add_rel_part_form': add_rel_part_form,
+                'add_part_form': add_part_form,
                 'attach' : (obj, "attach_part") })
     return r2r('documents/parts_add.html', ctx, request)
 
