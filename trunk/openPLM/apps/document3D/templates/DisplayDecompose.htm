@@ -71,7 +71,7 @@
         {% csrf_token %} 
 
         <div style="display:none;">
-            {{last_time_modification}}
+            {{last_mtime}}
         </div>
 
         <div>
@@ -132,10 +132,8 @@
                                         <td class="|->">
                                             <!--esthetique -->
                                             {%if not prefix and forloop.last %}
-
                                                 <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%" />
                                             {% else %}
-
 
                                                 {% if not forloop.last or forloop.first %} 
                                                     <img src="/media/img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
@@ -164,7 +162,6 @@
                                         <td class="order">{{ord_quantity.order}}{{ord_quantity.order.errors }}</td>
                                         <td class="quantity">{{ord_quantity.quantity}}{{ord_quantity.quantity.errors}}</td>
                                         <td class="quantity">{{ord_quantity.unit}}{{ord_quantity.unit.errors}}</td>
-
 
 
                                         {% if prefix %} <!-- else the part was defined in a previous assembly , make a href -->
@@ -205,7 +202,6 @@
                                                 {% endwith %}
                                             </td>
 
-
                                         {% else %} <!--  href for the part already defined-->
 
                                             <td colspan="5"> 
@@ -214,7 +210,6 @@
                                         </tr>
 
                                     {% endif %}
-
 
 
                                     {% if prefix %} <!-- else nothing to show , the part was defined in a previous assembly  -->
@@ -254,7 +249,6 @@
                                             {% if not part_doc_cforms.1.errors %} style="display:none;" {% endif %}
                                             >
 
-
                                             <td class="|">
                                                 <!--esthetique -->
                                                 {% if not forloop.last %}
@@ -262,8 +256,6 @@
                                                 {% endif %}
                                                 <!--/esthetique -->
                                             </td>
-
-
 
                                             <td class="vide" colspan="4">
                                             </td>
@@ -274,9 +266,6 @@
                                             </td>
 
                                         </tr> 
-
-
-
 
                                     {% endif %}             
                                 {% endfor %}

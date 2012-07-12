@@ -261,7 +261,6 @@ class Document3DController(DocumentController):
         fileName, fileExtension = os.path.splitext(doc_file.filename)
 
         if fileExtension.upper() in ('.STP', '.STEP'):
-            Document3D=self.object
             delete_GeometryFiles(doc_file)
             delete_ArbreFile(doc_file)
 
@@ -477,7 +476,7 @@ class Location_link(ParentChildLinkExtension):
 register_PCLE(Location_link)
 
 
-def generate_extra_location_links(link,ParentChildLink):
+def generate_extra_location_links(link, pcl):
     """
     For a :class:`.ParentChildLink`, it generates the whole necessary :class:`Location_link`
 
@@ -490,7 +489,7 @@ def generate_extra_location_links(link,ParentChildLink):
     """
     for i in range(link.quantity):
         loc=Location_link()
-        loc.link=ParentChildLink
+        loc.link = pcl
 
         array=link.locations[i].to_array()
 
@@ -611,13 +610,13 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         raise Document3D_decomposer_Error
 
     finally:
-        if not native_related_pk==None:
+        if native_related_pk is not None:
             native_related = DocumentFile.objects.get(pk=native_related_pk)
             native_related.deprecated=False
-            native_related.save(False)
+            native_related.save()
         stp_file.locked = False
         stp_file.locker = None
-        stp_file.save(False)
+        stp_file.save()
 
 
 

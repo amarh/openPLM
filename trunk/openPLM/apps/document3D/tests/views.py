@@ -153,7 +153,7 @@ class view_3dTest(CommonViewTest):
            u'last_modif_microseconds' : [u'not_valid']
            })
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse_post.context["extra_errors"],"Mistake reading of the last modification of the document, please restart the task")
+        self.assertEqual(reponse_post.context["extra_errors"], INVALID_TIME_ERROR)
 
 
     def test_display_decompose_file_locked(self):

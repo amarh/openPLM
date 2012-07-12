@@ -25,24 +25,18 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_pat
     step_importer = NEW_STEP_Import(doc_file_path,doc_file_id) 
     product = step_importer.generate_product_arbre()   
     pov_dir = tempfile.mkdtemp(suffix="openplm_pov")
-    geo = step_importer.procesing_geometrys(location, pov_dir)
+    geo = step_importer.compute_geometries(location, pov_dir)
     print geo
     print write_ArbFile_from_Product(product, step_importer.fileName,location)
     if step_importer.thumbnail_valid and product:
         create_thumbnail(product, step_importer, pov_dir, thumb_path)
 
 def write_ArbFile_from_Product(product,fileName,location):
-
     """
-    
-    
     :param product: :class:`.Product` relative to the structure of assamblys of a file **.stp**
     :param fileName: Name of the file **.stp** for which we are going to generate the file **.arb**
     :param location: Path where to store the file **.arb** generated  
     """ 
-    
-    
-       
     data=data_for_product(product)
     name=get_available_name(location,fileName+".arb")
     path=os.path.join(location, name)
