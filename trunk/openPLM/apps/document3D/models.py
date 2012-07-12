@@ -298,7 +298,6 @@ class Document3DController(DocumentController):
             gfs = GeometryFile.objects.filter(q)
         else:
             gfs = GeometryFile.objects.filter(stp=doc_file)
-
         return gfs.values_list("file", flat=True)
 
 
@@ -342,11 +341,10 @@ def delete_GeometryFiles(doc_file):
 
     :param doc_file: :class:`.DocumentFile`
     """
-    to_delete=GeometryFile.objects.filter(stp=doc_file)
-    list_files=list(to_delete.values_list("file", flat=True))
-    delete_files(list_files,media3DGeometryFile.location)
+    to_delete = GeometryFile.objects.filter(stp=doc_file)
+    files = to_delete.values_list("file", flat=True)
+    delete_files(files, media3DGeometryFile.location)
     to_delete.delete()
-
 
 
 media3DArbreFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
@@ -385,13 +383,13 @@ def delete_ArbreFile(doc_file):
 
     """
 
-    to_delete=ArbreFile.objects.filter(stp=doc_file)
-    list_files=list(to_delete.values_list("file", flat=True))
-    delete_files(list_files,media3DArbreFile.location)
+    to_delete = ArbreFile.objects.filter(stp=doc_file)
+    files = to_delete.values_list("file", flat=True)
+    delete_files(files, media3DArbreFile.location)
     to_delete.delete()
 
-def delete_files(list_files,location=""):
-    for name in list_files:
+def delete_files(files, location=""):
+    for name in files:
         filename = os.path.join(location, name)
         if os.path.exists(filename) and os.path.isfile(filename):
             os.remove(filename)
