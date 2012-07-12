@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import logging
 import base64
-from functools import wraps
 
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
