@@ -67,23 +67,23 @@ def openplm_webdav(request, local_path):
         user = basic_auth(request)
     else:
         user = request.user
-        if user:
-            if user.get_profile().restricted:
-                return HttpResponseForbidden("403 Forbidden", None, 403, "text/plain")
-            backend = OpenPLMBackend(user)
-            handler = WebDavHandler(local_path, backend)
-            try:
-                return handler.handle_method(request)
-            except WebDavHandlerException, wdhe:
-                logger.error("handlers failed to handle request; %s"%wdhe)
-                return HttpResponse("400 Bad Request", None, 400, "text/plain")
-            except (WebDavPrivilegeException, ControllerError), wpe:
-                logger.info("user '%s' failed privileges; %s"
-                        %(request.user.username, wpe))
-                return HttpResponse("403 Forbidden", None, 403, "text/plain")
-            except NotImplementedError, nie:
-                logger.warning("no implementation; %s"%nie)
-                return HttpResponse("501 Not Implemented", None, 501, "text/plain")
+    if user:
+        if user.get_profile().restricted:
+            return HttpResponseForbidden("403 Forbidden", None, 403, "text/plain")
+        backend = OpenPLMBackend(user)
+        handler = WebDavHandler(local_path, backend)
+        try:
+            return handler.handle_method(request)
+        except WebDavHandlerException, wdhe:
+            logger.error("handlers failed to handle request; %s"%wdhe)
+            return HttpResponse("400 Bad Request", None, 400, "text/plain")
+        except (WebDavPrivilegeException, ControllerError), wpe:
+            logger.info("user '%s' failed privileges; %s"
+                    %(request.user.username, wpe))
+            return HttpResponse("403 Forbidden", None, 403, "text/plain")
+        except NotImplementedError, nie:
+            logger.warning("no implementation; %s"%nie)
+            return HttpResponse("501 Not Implemented", None, 501, "text/plain")
 
     # failed authentication results in 401
     response = HttpResponse()
