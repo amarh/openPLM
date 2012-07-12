@@ -173,58 +173,18 @@ def generate_relations_BD(doc_file,temp_file):
     for line in temp_file.readlines():
         line=line.rstrip("\n")
         if line.startswith("GEO:"):
-            generateGeometry(line.lstrip("GEO:").split(" , "),doc_file)
+            path, index = line.lstrip("GEO:").split(" , ")
+            GeometryFile.objects.create(stp=doc_file, file=path, index=index)
         if line.startswith("ARB:"):
             arb = line.lstrip("ARB:")
         if line.startswith("Decomposable:"):
             decomposable = line.lstrip("Decomposable:").startswith("true")
     if arb:
-        generateArborescense(arb, doc_file, decomposable)
-
-
-
-
-def generateGeometry(name_path,doc_file):
-    """
-    The function receives a path of file(**name_path[0]**) **.geo** and an index(**name_path[1]**), generates a new entity
-    :class:`.GeometryFile` and associates this class to the :class:`.DocumentFile` (**doc_file**) spent as parameter
-
-    :param doc_file: :class:`.DocumentFile` which will be attached to the :class:`.GeometryFile`
-    :type plmobject: :class:`.DocumentFile`
-    :param name_index: index(name_path[1]) and path(name_path[0]) to identify the geometry of the file **.geo** (**>=1**)
-    """
-    new_GeometryFile= GeometryFile()
-    new_GeometryFile.stp = doc_file
-    new_GeometryFile.file = name_path[0]
-    new_GeometryFile.index = name_path[1]
-    new_GeometryFile.save()
-
-def generateArborescense(path, doc_file, decomposable):
-    """
-    The function receives a path of file(**path**) of a file **.arb**, generates a new entity of the class
-    :class:`.ArbreFile` and associates this class to the :class:`.DocumentFile` (**doc_file**) spent as parameter,
-    it initializes the attribute decomposable of generated entity (whit the value **decomposable**),
-    this attribute indicates if the :class:`.DocumentFile` can be decompose
-
-    :param doc_file: object which will be attached to the :class:`.ArbreFile`
-    :type plmobject: :class:`.DocumentFile`
-    :param path: path of the file **.arb**
-    :param decomposable: boolean that determines if the file can be decomposed
-    """
-    new_ArbreFile= ArbreFile()
-    new_ArbreFile.stp = doc_file
-    new_ArbreFile.file = path
-    new_ArbreFile.decomposable = decomposable
-    new_ArbreFile.save()
-
+        ArbreFile.objects.create(file=arb, stp=doc_file, decomposable=decomposable)
 
 is_stp=Q(filename__iendswith=".stp") | Q(filename__iendswith=".step")#.stp , .STP , .step , .STEP
 is_stl=Q(filename__iendswith=".stl") #.stl, .STL
 is_catia=Q(filename__iendswith=".catpart") | Q(filename__iendswith=".catproduct")
-
-
-
-
 
 
 class Document3DController(DocumentController):
