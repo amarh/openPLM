@@ -7,12 +7,8 @@ from OCC.STEPControl import STEPControl_AsIs
 from OCC.STEPCAFControl import STEPCAFControl_Writer
 from OCC.TopLoc import TopLoc_Location
 from OCC.gp import gp_Trsf
-from STP_converter_WebGL import NEW_STEP_Import , SetLabelNom , colour_chercher
+from STP_converter_WebGL import NEW_STEP_Import, SetLabelNom 
 from classes import Product_from_Arb
-from OCC.Quantity import Quantity_Color
-
-
-
 
 
 def composer(temp_file_name):
@@ -33,32 +29,24 @@ def composer(temp_file_name):
     output.close()
     my_step_importer = NEW_STEP_Import(product.doc_path)
 
-  
     st=my_step_importer.shape_tool
     lr= TDF_LabelSequence()
     st.GetFreeShapes(lr)
     
     add_labels(product,lr.Value(1),st)
-
     
     WS = XSControl_WorkSession()
     writer = STEPCAFControl_Writer( WS.GetHandle(), False )
     for i in range(lr.Length()):
         writer.Transfer(lr.Value(i+1), STEPControl_AsIs)
         
-
-        
     status = writer.Write(temp_file_name) 
 
-    
-    
-   
     
 def add_labels(product,lr,st):
 
     if product.links:
         for link in product.links:
-
         
             if link.product.doc_id!= product.doc_id: # solo los que esten descompuesto, si no esta descompuesto no tiene que anadirlo
 
@@ -80,18 +68,7 @@ def add_labels(product,lr,st):
                      
                     new_label=st.AddComponent(lr,link.product.label_reference,TopLoc_Location(transformation))
                     SetLabelNom(new_label,link.names[d])
-
-                
-            else:
-                pass # no hace falta por que ya esta en la geometria
-                                         
                 
 if __name__ == "__main__":    
     composer(sys.argv[1])  
-  
-    
-    
-    
-    
-     
-    
+

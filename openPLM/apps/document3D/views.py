@@ -1,3 +1,6 @@
+from collections import namedtuple
+
+
 from openPLM.plmapp.base_views import handle_errors, secure_required, get_generic_data
 from openPLM.apps.document3D.forms import *
 from openPLM.apps.document3D.models import *
@@ -17,18 +20,16 @@ import os
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
     """
+    3D view.
 
-    Manage html page which displays the 3d view of the :class:`.DocumentFile` STEP attached to a :class:`.Document3D`.
+    This view is able to show a 3D file (STEP or STL) using WebGL.
 
-    For the correct visualization there is necessary to extract all the geometries contained in the :class:`~django.core.files.File` **.geo** present in the :class:`.GeometryFile` relative to :class:`.DocumentFile` that we want to show and also the **.geo** contained in to the :class:`.DocumentFile` in which the DocumentFile to show has been decomposed.
+    **Template:**
 
-    We need to generate also the code javascript to manage these geometries.
-    To generate this code we need the information about the arborescense of the :class:`.DocumentFile` , this arborescense is obtained of the :class:`~django.core.files.File` **.arb** corresponding to the :class:`.ArbreFile` connected to the :class:`.DocumentFile`.The information the file **.arb** turns into a :class:`.Product` that we use to call  the function :meth:`.generate_javascript_for_3D` that return the code required
-
+    :file:`Display3D.html`
     """
 
-    obj_type = "Document3D"
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, "Document3D", obj_ref, obj_revi)
     ctx['current_page'] = '3D'
     ctx['stl'] = False
 
@@ -58,6 +59,9 @@ def display_3d(request, obj_ref, obj_revi):
 
 
 class StepDecomposer(Decomposer):
+    """
+    :class:`.Decomposer` of Document3D.
+    """
 
     __slots__ = ("part", "decompose_valid")
 
@@ -124,6 +128,11 @@ class StepDecomposer(Decomposer):
 
 DecomposersManager.register(StepDecomposer)
 
+PartDoc = namedtuple("PartDoc", "part_type qty_form cforms name is_assembly prefix ref")
+Assembly = namedtuple("Assembly", ("part_docs", "name", "visited", "depth", "type"))
+
+INVALID_TIME_ERROR = "Error: document has been modified since the beginning of this task."
+
 @handle_errors
 def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
@@ -174,11 +183,10 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     stp_file=DocumentFile.objects.get(id=stp_id)
     assemblys=[]
-    doc_linked_to_part=obj.get_attached_documents().values_list("document_id", flat=True)
 
     if stp_file.locked:
         raise ValueError("Not allowed operation.This DocumentFile is locked")
-    if not stp_file.document_id in doc_linked_to_part:
+    if not obj.get_attached_documents().filter(document=stp_file.document).exists():
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
     if Document3D.objects.filter(PartDecompose=obj.object).exists() and not Document3D.objects.get(PartDecompose=obj.object).id==stp_file.document.id: #a same document could be re-decomposed for the same part
 
@@ -192,41 +200,38 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         raise ValueError("Not allowed operation.This Document already forms a part of another decomposition")
 
     if request.method == 'POST':
-        extra_errors=""
-        product=ArbreFile_to_Product(stp_file,recursif=None)
-        last_time_modification=Form_save_time_last_modification(request.POST)
+        extra_errors = ""
+        product = ArbreFile_to_Product(stp_file,recursif=None)
+        last_mtime = Form_save_time_last_modification(request.POST)
         obj.block_mails()
 
-        if last_time_modification.is_valid() and product:
-            old_modification_data_time=last_time_modification.cleaned_data['last_modif_time']
-            old_modification_data_microsecond=last_time_modification.cleaned_data['last_modif_microseconds']
+        if last_mtime.is_valid() and product:
+            old_time = last_mtime.cleaned_data['last_modif_time']
+            old_microseconds = last_mtime.cleaned_data['last_modif_microseconds']
 
-            document_controller=Document3DController(stp_file.document,User.objects.get(username=settings.COMPANY))
-
+            document_controller=Document3DController(doc3D, User.objects.get(username=settings.COMPANY))
             index=[1]
             if clear_form(request,assemblys,product,index,obj_type):
 
-                if (same_time(old_modification_data_time,
-                              old_modification_data_microsecond,
-                              document_controller.mtime)
+                if (same_time(old_time, old_microseconds, document_controller.mtime)
                     and stp_file.checkout_valid and not stp_file.locked):
 
                     stp_file.locked=True
                     stp_file.locker=User.objects.get(username=settings.COMPANY)
-                    stp_file.save(False)
+                    stp_file.save()
 
                     native_related=stp_file.native_related
                     if native_related:
                         native_related.deprecated=True
-                        native_related.save(False)
+                        native_related.save()
                         native_related_pk=native_related.pk
                     else:
                         native_related_pk=None
 
                     try:
-                        instances=[]
-                        old_product=json.dumps(data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
-                        generate_part_doc_links_AUX(request,product, obj,instances,doc3D)
+                        instances = []
+                        old_product = json.dumps(data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
+                        generate_part_doc_links_AUX(request, product, obj,instances,doc3D)
                         update_indexes.delay(instances)
                     except Exception as excep:
                         if isinstance(excep, Document_Generate_Bom_Error):
@@ -235,43 +240,43 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                         extra_errors = unicode(excep)
                         stp_file.locked = False
                         stp_file.locker = None
-                        stp_file.save(False)
+                        stp_file.save()
                         if native_related:
                             native_related.deprecated=False
-                            native_related.save(False)
+                            native_related.save()
                     else:
 
-                        decomposer_all.delay(stp_file.pk,json.dumps(data_for_product(product)),obj.object.pk,native_related_pk,obj._user.pk,old_product)
+                        decomposer_all.delay(stp_file.pk,
+                                json.dumps(data_for_product(product)),
+                                obj.object.pk, native_related_pk, obj._user.pk, old_product)
 
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
                 else:
                     extra_errors="The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process"
 
             else:
-                extra_errors="Mistake refilling the form, please check it"
+                extra_errors="Error refilling the form, please check it"
         else:
-            extra_errors="Mistake reading of the last modification of the document, please restart the task"
+            extra_errors = INVALID_TIME_ERROR
     else:
 
-        document_controller=Document3DController(stp_file.document,request.user)
-        last_time_modification=Form_save_time_last_modification()
-        last_time_modification.fields["last_modif_time"].initial=document_controller.mtime
-
-        last_time_modification.fields["last_modif_microseconds"].initial=document_controller.mtime.microsecond
+        last_mtime=Form_save_time_last_modification()
+        last_mtime.fields["last_modif_time"].initial = stp_file.document.mtime
+        last_mtime.fields["last_modif_microseconds"].initial= stp_file.document.mtime.microsecond
         product=ArbreFile_to_Product(stp_file,recursif=None)
         if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
 
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
-        initialiser_assemblys(assemblys,product,group,request.user,index,obj_type)
+        initialize_assemblies(assemblys,product,group,request.user,index,obj_type)
         extra_errors = ""
 
     deep_assemblys=sort_assemblys_by_depth(assemblys)
-    ctx.update({'current_page':'decomposer',  # aqui cambiar
+    ctx.update({'current_page':'decomposer',
                 'deep_assemblys' : deep_assemblys,
-                'extra_errors' :  extra_errors ,
-                'last_time_modification' : last_time_modification
+                'extra_errors' :  extra_errors,
+                'last_mtime' : last_mtime
     })
     return r2r('DisplayDecompose.htm', ctx, request)
 
@@ -287,7 +292,7 @@ def sort_assemblys_by_depth(assemblys):
     return new_assembly
 
 
-def clear_form(request,assemblys, product,index,obj_type):
+def clear_form(request, assemblys, product, index, obj_type):
 
     """
 
@@ -338,65 +343,48 @@ def clear_form(request,assemblys, product,index,obj_type):
 
     """
 
-    creation_formset=[]
-    initial_bom_values=[]
-    initial_deep_values=[]
-    name_child_assemblys=[]
-    is_assembly=[]
-    part_type=[]
-    ord_quantity=[]
-    prefix=[]
-    ref=[]
     valid=True
     if product.links:
+        part_docs = []
         for link in product.links:
-            ord_qty=Order_Quantity_Form(request.POST,prefix=index[0])
             link.visited=index[0]
-
-            if not ord_qty.is_valid():
+            oq = Order_Quantity_Form(request.POST,prefix=index[0])
+            if not oq.is_valid():
                 valid=False
 
-            ord_quantity.append(ord_qty)
-            is_assembly.append(link.product.is_assembly)
-            name_child_assemblys.append(link.product.name)
-
+            is_assembly = link.product.is_assembly
+            name = link.product.name
             if not link.product.visited:
-                link.product.visited=index[0]
+                link.product.visited = index[0]
 
-                part_ctype=Doc_Part_type_Form(request.POST,prefix=index[0])
-                if not part_ctype.is_valid():
-                    valid=False
-                options=part_ctype.cleaned_data
-                part = options["type_part"]
+                part_type = Doc_Part_type_Form(request.POST, prefix=index[0])
+                if not part_type.is_valid():
+                    valid = False
+                part = part_type.cleaned_data["type_part"]
                 cls = get_all_plmobjects()[part]
-                part_form = get_creation_form(request.user, cls, request.POST,
+                part_cform = get_creation_form(request.user, cls, request.POST,
                         prefix=str(index[0])+"-part")
-                doc_form = get_creation_form(request.user, Document3D,
+                doc_cform = get_creation_form(request.user, Document3D,
                         request.POST, prefix=str(index[0])+"-document")
-                if not part_form.is_valid():
-                    valid=False
-                if not doc_form.is_valid():
-                    valid=False
-
-                prefix.append(index[0])
-                creation_formset.append([part_form, doc_form])
-                ref.append(None)
-                part_type.append(part_ctype)
-
+                if not part_cform.is_valid():
+                    valid = False
+                if not doc_cform.is_valid():
+                    valid = False
+                prefix = index[0]
+                part_docs.append(PartDoc(part_type, oq, (part_cform, doc_cform), name, is_assembly,
+                    prefix, None))
                 index[0]+=1
-
-                if not clear_form(request, assemblys, link.product,index , part):
-                    valid=False
+                if not clear_form(request, assemblys, link.product,index, part):
+                    valid = False
             else:
                 index[0]+=1
-                part_type.append(False);creation_formset.append(False);prefix.append(False);ref.append(link.product.visited)
+                part_docs.append(PartDoc(False, oq, False, name, is_assembly, None, link.product.visited))
 
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  name_child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited , product.deep, obj_type))
+        assemblys.append(Assembly(part_docs, product.name , product.visited , product.deep, obj_type))
     return valid
 
 
-
-def initialiser_assemblys(assemblys,product,group,user,index, obj_type):
+def initialize_assemblies(assemblys,product,group,user,index, obj_type):
     """
 
     :param assemblys: will be refill whit the information necessary the generate the forms
@@ -441,50 +429,40 @@ def initialiser_assemblys(assemblys,product,group,user,index, obj_type):
 
                 -ref contains the **index** of the assembly if he was visited previously, else False
 
-
     """
-    creation_formset=[]
-    initial_bom_values=[]
-    initial_deep_values=[]
-    name_child_assemblys=[]
-    is_assembly=[]
-    part_type=[]
-    ord_quantity=[]
-    prefix=[]
-    ref=[]
+
     if product.links:
-        for order , link in enumerate(product.links):
-
+        part_docs = []
+        for order, link in enumerate(product.links):
+            prefix = index[0]
             oq=Order_Quantity_Form(prefix=index[0])
-
-            oq.fields["order"].initial=(order+1)*10
-            oq.fields["quantity"].initial=link.quantity
-            ord_quantity.append(oq)
-            is_assembly.append(link.product.is_assembly)
-            name_child_assemblys.append(link.product.name)
+            oq.fields["order"].initial = (order + 1)*10
+            oq.fields["quantity"].initial = link.quantity
+            is_assembly = link.product.is_assembly
+            name = link.product.name
             if not link.product.visited:
-                link.product.visited=index[0]
-                part_type.append(Doc_Part_type_Form(prefix=index[0]))
+                link.product.visited = index[0]
+                part_type = Doc_Part_type_Form(prefix=index[0])
                 part_cform = get_creation_form(user, Part, None, (index[1])) # index[0].initial=1 -> -1
                 part_cform.prefix = str(index[0])+"-part"
                 part_cform.fields["group"].initial = group
                 part_cform.fields["name"].initial = link.product.name
-                doc_cforms = get_creation_form(user, Document3D, None, (index[1]))
-                doc_cforms.prefix = str(index[0])+"-document"
-                doc_cforms.fields["name"].initial = link.product.name
-                doc_cforms.fields["group"].initial = group
-                prefix.append(index[0])
-                creation_formset.append([part_cform, doc_cforms])
+                doc_cform = get_creation_form(user, Document3D, None, (index[1]))
+                doc_cform.prefix = str(index[0])+"-document"
+                doc_cform.fields["name"].initial = link.product.name
+                doc_cform.fields["group"].initial = group
+                prefix = index[0]
 
-                ref.append(None)
+                part_docs.append(PartDoc(part_type, oq, (part_cform, doc_cform), name, is_assembly,
+                    prefix, None))
                 index[0]+=1
                 index[1]+=1
-                initialiser_assemblys(assemblys,link.product,group,user,index, "Part")
+                initialize_assemblies(assemblys,link.product,group,user,index, "Part")
             else:
                 index[0]+=1
-                part_type.append(False);creation_formset.append(False);prefix.append(False);ref.append(link.product.visited)
+                part_docs.append(PartDoc(False, oq, False, name, is_assembly, None, link.product.visited))
 
-        assemblys.append((zip(part_type ,ord_quantity,  creation_formset,  name_child_assemblys , is_assembly , prefix , ref )  , product.name , product.visited ,product.deep, obj_type))
+        assemblys.append(Assembly(part_docs, product.name, product.visited, product.deep, obj_type))
 
 @transaction.commit_on_success
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances,doc3D):
@@ -517,7 +495,6 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
     to_delete=[]
     user = parent_ctrl._user
 
-
     for link in product.links:
         try:
 
@@ -529,7 +506,6 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
             unit=options["unit"]
 
             if not link.product.part_to_decompose:
-
 
                 part_ctype=Doc_Part_type_Form(request.POST,prefix=link.product.visited)
                 part_ctype.is_valid();options=part_ctype.cleaned_data
@@ -553,7 +529,6 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
 
                 link.product.part_to_decompose=part_ctrl.object
                 to_delete.append(generateGhostDocumentFile(link.product,doc_ctrl))
-
 
                 instances.append((doc_ctrl.object._meta.app_label,
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
@@ -596,15 +571,6 @@ def generateGhostDocumentFile(product,Doc_controller):
     path = os.path.join(doc_file.file.storage.location, name)
     f = File(open(path.encode(), 'w'))
     f.close()
-
-    Doc_controller.check_permission("owner")
-    Doc_controller.check_editable()
-
-    if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
-        raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
-
-    if Doc_controller.has_standard_related_locked(f.name):
-        raise ValueError("Native file has a standard related locked file.")
 
     doc_file.no_index=True
     doc_file.filename="Ghost.stp"
