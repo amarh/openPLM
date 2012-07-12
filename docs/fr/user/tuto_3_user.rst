@@ -58,6 +58,7 @@ Affiche l'historique de l'utilisateur.
 
 Ceci offre une traçabilité complète des actions des utilisateurs.
 
+Une icone RSS sur cette page vous permet de vous abonner au flux d'actualités de l'utilisateurs.
 
 PARTS-DOC-CAD
 ========================================================

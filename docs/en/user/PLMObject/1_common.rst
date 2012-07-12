@@ -96,4 +96,5 @@ Displays the history of the object.
 
 It ensures the full tracability of the object.
 
-
+A RSS feed icon is shown when you are on this tab. By clicking it you can
+subscribe to the feed of the object.

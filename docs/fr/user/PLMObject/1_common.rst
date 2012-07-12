@@ -107,4 +107,4 @@ Affiche l'historique d'un objet.
 
 Cela garantit une traçabilité complète de l'objet.
 
-
+Une icone RSS sur cette page vous permet de vous abonner aux actualités de l'objet.
