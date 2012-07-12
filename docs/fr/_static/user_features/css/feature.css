@@ -168,27 +168,32 @@
 }
 
 #study_part_addchild{
-    top: 32%;
-    left: 26%;
+    top: 22%;
+    left: 29%;
+}
+
+#study_part_createchild{
+    top: 22%;
+    left: 45%;
 }
 
 #study_part_editchild{
-    top: 32%;
-    left: 31%;
+    top: 22%;
+    left: 51%;
 }
 
 #study_part_dispchild{
-    top: 35%;
-    left: 28%;
+    top: 27%;
+    left: 30%;
 }
 
 #study_part_genchild{
-    top: 58%;
-    left: 93%;
+    top: 55%;
+    left: 94%;
 }
 
 #study_part_rundisp{
-    top: 54%;
+    top: 50%;
     left: 27%;
 }
 
