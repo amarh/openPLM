@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 17:24+0200\n"
+"POT-Creation-Date: 2012-07-12 17:18+0200\n"
 "PO-Revision-Date: 2011-11-21 11:12+0100\n"
 "Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: plmapp/base_views.py:128
+#: plmapp/base_views.py:129
 msgid "Internal error"
 msgstr "Erreur interne"
 
@@ -457,13 +457,12 @@ msgstr ""
 "Un objet avec le même type, la même référence et la même révision existe déjà"
 
 #: plmapp/forms.py:164
-#, fuzzy
 msgid ""
 "An object with the same type and reference exists, you may consider to "
 "revise it."
 msgstr ""
-"Un objet avec le même type, la même référence existe, "
-"vous devriez réfléchir à le réviser."
+"Un objet avec le même type et la même référence existe, vous devriez réfléchir "
+"à le réviser."
 
 #: plmapp/forms.py:219 plmapp/forms.py:224 plmapp/forms.py:229
 msgid "Select a type"
@@ -544,7 +543,7 @@ msgstr "propriétaire"
 msgid "signer"
 msgstr "signataire"
 
-#: plmapp/forms.py:519 plmapp/forms.py:525 plmapp/views/main.py:1709
+#: plmapp/forms.py:519 plmapp/forms.py:525 plmapp/views/main.py:2059
 msgid "notified"
 msgstr "notifié"
 
@@ -861,37 +860,42 @@ msgstr "rôle dans le PLM"
 msgid "Enter a valid e-mail address."
 msgstr "Veuillez saisir une adresse mail valide."
 
-#: plmapp/tests/views.py:1988
+#: plmapp/tests/views.py:1991
 msgid "e-mail address"
 msgstr "Adresse E-mail"
 
-#: plmapp/views/main.py:1360
+#: plmapp/views/main.py:751 templates/home.html:28
+#: templates/blocks/user.html:41
+msgid "Timeline"
+msgstr "Timeline"
+
+#: plmapp/views/main.py:1720
 #, python-format
 msgid "Error: %(details)s"
 msgstr "Erreur : %(details)s"
 
-#: plmapp/views/main.py:1508
+#: plmapp/views/main.py:1866
 msgid "It's not a valid child."
 msgstr "Ce n'est pas un enfant (part) valide."
 
-#: plmapp/views/main.py:1523
+#: plmapp/views/main.py:1881
 msgid "It's not a valid document."
 msgstr "Ce n'est pas un document valide."
 
-#: plmapp/views/main.py:1705
+#: plmapp/views/main.py:2055
 msgid "signer level"
 msgstr "signataire niveau"
 
-#: plmapp/views/main.py:1707
+#: plmapp/views/main.py:2057
 msgid "signer all levels"
 msgstr "signataire tous niveaux"
 
-#: plmapp/views/main.py:2147 templates/base.html:137
+#: plmapp/views/main.py:2476 templates/base.html:137
 #: templates/blocks/supermenu.html:9 templates/blocks/supermenu.html.py:15
 msgid "Search"
 msgstr "Rechercher"
 
-#: plmapp/views/main.py:2291 templates/blocks/supermenu.html:48
+#: plmapp/views/main.py:2595 templates/blocks/supermenu.html:48
 msgid "Browse"
 msgstr "Parcourir"
 
@@ -1095,14 +1099,6 @@ msgstr ""
 "(%(start)s - %(end)s sur %(total)s)\n"
 "   "
 
-#: templates/browse.html:124 templates/groups/objects.html:31
-msgid "First page"
-msgstr "Première page"
-
-#: templates/browse.html:144 templates/groups/objects.html:51
-msgid "Last page"
-msgstr "Dernière page"
-
 #: templates/clone.html:17
 msgid "OBJECT CLONING:"
 msgstr "CLONAGE D'OBJET:"
@@ -1223,11 +1219,11 @@ msgstr "revenir en arrière"
 msgid "Welcome %(full_name)s"
 msgstr "Bienvenue %(full_name)s!"
 
-#: templates/home.html:29
+#: templates/home.html:36
 msgid "Groups that you own: pending invitations"
 msgstr "Les groupes dont vous êtes propriétaire: invitations en attente"
 
-#: templates/home.html:40
+#: templates/home.html:47
 msgid "Groups that you may join: pending invitations"
 msgstr "Les groupes que vous pouvez rejoindre: invitations en attente"
 
@@ -1360,23 +1356,23 @@ msgstr "Cet objet a été publié:"
 msgid "Public link"
 msgstr "Lien public"
 
-#: templates/lifecycle.html:242 templates/snippets/management_block.html:25
+#: templates/lifecycle.html:237 templates/snippets/management_block.html:25
 msgid "REPLACE"
 msgstr "REMPLACER"
 
-#: templates/lifecycle.html:257
+#: templates/lifecycle.html:250
 msgid "Notify"
 msgstr "Notifier"
 
-#: templates/lifecycle.html:262
+#: templates/lifecycle.html:255
 msgid "Unnotify me"
 msgstr "Ne plus me notifier"
 
-#: templates/lifecycle.html:268
+#: templates/lifecycle.html:261
 msgid "Notify me"
 msgstr "Me notifier"
 
-#: templates/lifecycle.html:274
+#: templates/lifecycle.html:267
 msgid "Give access to a restricted account"
 msgstr "Autoriser l'accès à un compte restreint"
 
@@ -1572,14 +1568,14 @@ msgid "Results for link creation:"
 msgstr "Résultats pour la création de lien:"
 
 #: templates/blocks/search.html:34
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "                    (1 - %(count)s on %(total)s)\n"
 "                "
 msgstr ""
 "\n"
-"(1 - %(count)s sur %(total)s)\n"
+"                    (1 - %(count)s sur %(total)s)\n"
 "   "
 
 #: templates/blocks/search.html:37
@@ -1624,7 +1620,9 @@ msgstr "Créer une nouvelle part, un nouveau document ou un nouveau group."
 
 #: templates/blocks/supermenu.html:68
 msgid "You can not create a part or document since you are not a contributor."
-msgstr "Vous ne pouvez créer ni une part ni un document car vous n'êtes pas contributeur."
+msgstr ""
+"Vous ne pouvez créer ni une part ni un document car vous n'êtes pas "
+"contributeur."
 
 #: templates/blocks/supermenu.html:76
 msgid "Study"
@@ -1817,7 +1815,16 @@ msgstr ""
 
 #: templates/documents/files_add.html:48
 msgid "Do not leave the current page before the upload ends"
-msgstr "Ne quittez pas cette page tant que le téléchargement n'est pas terminé."
+msgstr ""
+"Ne quittez pas cette page tant que le téléchargement n'est pas terminé."
+
+#: templates/documents/files_add.html:49
+msgid "waiting"
+msgstr "en attente"
+
+#: templates/documents/files_add.html:50
+msgid "Total"
+msgstr "Total"
 
 #: templates/documents/identity_card.html:32
 #, python-format
@@ -2200,8 +2207,8 @@ msgstr ""
 "   - identifiant: %(username)s\n"
 "   - mot de passe: %(password)s\n"
 "\n"
-"Vous devriez changer votre mot de passe!"
-"Voir http://%(domain)s/user/%(username_url)s/password/\n"
+"Vous devriez changer votre mot de passe!Voir http://%(domain)s/user/"
+"%(username_url)s/password/\n"
 "\n"
 
 #: templates/navigate/add_buttons.html:9
@@ -2357,6 +2364,14 @@ msgstr "Précédent"
 #: templates/search/search.html:55
 msgid "Next"
 msgstr "Suivant"
+
+#: templates/snippets/pagination.html:8
+msgid "First page"
+msgstr "Première page"
+
+#: templates/snippets/pagination.html:26
+msgid "Last page"
+msgstr "Dernière page"
 
 #: templates/users/delegation.html:8
 msgid "START DELEGATE :"
