@@ -188,6 +188,9 @@ On y retrouve :
     
     * Un lien d'aide
 
+
+**La barre d'outils**
+
     * Des boutons pour accéder aux différentes fonctions
 
     * Un historique des objets accédés pendant la session
@@ -195,11 +198,14 @@ On y retrouve :
 Si on place le curseur de la souris sur un objet dans l'historique, le menu
 correspond apparaitra.
 
-Une fois que vous êtes connecté, cette en-tête apparaît sur toutes les pages,
-exceptée la page d'accueil.
+Une fois que vous êtes connecté, l'en-tête et la barre d'outils apparaissent sur toutes les pages,
+exceptée la page d'accueil. Sur la page d'accueil seule l'en-tête est affichée .
 
-.. image:: images/Capture_openPLM_header.png
+.. figure:: images/Capture_openPLM_header.png
    :width: 100%
+   
+   En-tête et barre d'outils
+   
 
 **Le panneau de gauche**
 
