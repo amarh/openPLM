@@ -1,3 +1,5 @@
+.. _fr-feat-browse:
+
 ==========
 Parcourir
 ==========
