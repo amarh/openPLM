@@ -146,16 +146,25 @@ Exemple :
 Accéder à la page "Étudier" depuis la page d'accueil affiche l'historique des
 objets liés à l'utilisateur.
 
-Sur la page "Étudier", il est possible : 
+La page "Etudier" dispose de plusieurs onglets à partir desquels on peut :
 
-* d'afficher les informations d'un objet 
+* accéder à diverses informations sur l'objet , le groupe ou l'utilisateur affiché
 
-* d'accéder à un objet pour le modifier 
+* manipuler cet objet
+
 
 Exemple :
 
-.. image:: images/Capture_openPLM_study.png
+.. figure:: images/Capture_openPLM_study.png
    :width: 100%
+   
+   Etudier
+   
+   Les manipulations possibles et informations accessibles depuis cette vue sont décrites ici :
+   
+   * :ref:`fr-plmObject-func`
+   * :ref:`fr-user-func`
+   * :ref:`fr-group-func`
 
 
 Parcourir
