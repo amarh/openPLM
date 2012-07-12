@@ -1,8 +1,8 @@
 .. _fr-user-func:
 
-===================================
+====================================
 Fonctions liées aux **UTILISATEURS**
-===================================
+====================================
 
 Ce document décrit les fonctions utilisées pour afficher et manipuler les
 **Utilisateurs** dans openPLM.
