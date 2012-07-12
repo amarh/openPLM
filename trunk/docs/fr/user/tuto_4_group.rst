@@ -43,6 +43,7 @@ Affiche l'historique du groupe.
 
 Ceci offre une traçabilité complète des actions effectuées sur le groupe.
 
+Une icone RSS sur cette page vous permet de vous abonner au flux d'actualités du groupe.
 
 UTILISATEURS
 =============

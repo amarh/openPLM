@@ -39,6 +39,9 @@ Displays the history of the group.
 
 It ensures the full tracability of the group.
 
+A RSS feed icon is shown when you are on this tab. By clicking it you can
+subscribe to the feed related to the group.
+
 
 USERS
 =============
