@@ -1,5 +1,7 @@
+.. _fr-user-func:
+
 ===================================
-Fonctions liés aux **UTILISATEURS**
+Fonctions liées aux **UTILISATEURS**
 ===================================
 
 Ce document décrit les fonctions utilisées pour afficher et manipuler les
@@ -8,6 +10,7 @@ Ce document décrit les fonctions utilisées pour afficher et manipuler les
 
 APERÇU
 ======
+
 Les **Utilisateurs** sont des objets standard de Django. Depuis OpenPLM, vous
 pouvez modifier certains attributs, changer votre mot de passe et déléguer vos
 autorisations.
@@ -31,6 +34,7 @@ des transferts d'autorisations.
 
 ATTRIBUTS
 =========
+
 Affiche la carte d'identification de l'utilisateur.
 
 On trouve des attributs standards comme le nom de famille et le prénom,
@@ -49,6 +53,7 @@ de passe**
 
 HISTORIQUE
 ==========
+
 Affiche l'historique de l'utilisateur.
 
 Ceci offre une traçabilité complète des actions des utilisateurs.
@@ -56,11 +61,13 @@ Ceci offre une traçabilité complète des actions des utilisateurs.
 
 PARTS-DOC-CAD
 ========================================================
+
 Affiche les Parts et Documents de l'utilisateur courant.
 
 
 DÉLÉGATION
 ========================================================
+
 Affiche les parrainages effectués par l'utilisateur et les rôles de
 chaque utilisateurs parrainés.
 

@@ -144,16 +144,24 @@ Study
 
 Reaching "Study" from the Home page shows the history of the objects related to the user.
 
-On the "Study" page you can:
+The "Study" page contains tabs from where you can :
 
-* display informations of an object
+* access to informations of an object, user or group
 
-* reach and modify an object
+* modify an object
 
 Example:
 
-.. image:: images/Capture_openPLM_study.png
+.. figure:: images/Capture_openPLM_study.png
    :width: 100%
+   
+   Study
+   
+   The possible actions and displayed informations in "Study" view are describes here :
+   
+   * :ref:`en-plmObject-func`
+   * :ref:`en-user-func`
+   * :ref:`en-group-func`
 
 
 Browse
