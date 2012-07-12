@@ -1,7 +1,7 @@
 from openPLM.plmapp.base_views import handle_errors, secure_required, get_generic_data
 from openPLM.apps.document3D.forms import *
 from openPLM.apps.document3D.models import *
-from openPLM.apps.document3D.arborescense import *
+from openPLM.apps.document3D.arborescense import JSGenerator
 from openPLM.apps.document3D.classes import *
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.models import get_all_plmobjects
@@ -48,7 +48,7 @@ def display_3d(request, obj_ref, obj_revi):
     else:
         product=ArbreFile_to_Product(doc_file,recursif=True)
         GeometryFiles= obj.get_all_geometry_files(doc_file)
-        javascript_arborescense=generate_javascript_for_3D(product)
+        javascript_arborescense = JSGenerator(product).get_js()
 
     ctx.update({
         'GeometryFiles' : GeometryFiles ,
