@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 10:13+0200\n"
+"POT-Creation-Date: 2012-07-12 12:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Zahariri ALI <zahariri.ali@gmail.com>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -19,9 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
 #: templates/Display3D.htm:14
-#, fuzzy
-msgid "This document has no 3D data. Maybe it does not have a STEP/STL file or openPLM has not yet converted its STEP file."
-msgstr "Ce document n'a pas de données 3D associées. Peut-être qu'il n'a pas de fichier STEP/STL ou openPLM n'a pas encore converti son fichier STEP."
+msgid ""
+"This document has no 3D data. Maybe it does not have a STEP/STL file or "
+"openPLM has not yet converted its STEP file."
+msgstr ""
+"Ce document n'a pas de données 3D associées. Peut-être qu'il n'a pas de "
+"fichier STEP/STL ou openPLM n'a pas encore converti son fichier STEP."
 
 #: templates/Display3D.htm:26
 msgid "Set to axometric view"
@@ -130,3 +132,24 @@ msgstr "déjà référencé"
 #: templates/DisplayDecompose.htm:289
 msgid "Create"
 msgstr "Créer"
+
+#: templates/decompose_msg.html:5
+#, python-format
+msgid ""
+"\n"
+"        A document (<a href=\"/object/%(type)s/%(ref)s/%(rev)s/\">%(ref)s</"
+"a> )\n"
+"        with a STEP file (<a href=\"/file/%(f_id)s/\">%(f_name)s</a>)\n"
+"        is linked to this part. Do you want to analyse it to build the BOM?\n"
+"        <a style=\"color:#FFFF00\" href=\"%(plmobject_url)sdecompose/"
+"%(f_id)s/\">Yes</a>\n"
+"        "
+msgstr ""
+"\n"
+"       Un document (<a href=\"/object/%(type)s/%(ref)s/%(rev)s/\">%(ref)s</"
+"a> )\n"
+"        contenant un fichier STEP (<a href=\"/file/%(f_id)s/\">%(f_name)s</a>)\n"
+"        est attaché à cette part. Souhaitez vous l'analyser pour générer la nomenclature?\n"
+"        <a style=\"color:#FFFF00\" href=\"%(plmobject_url)sdecompose/"
+"%(f_id)s/\">Oui</a>\n"
+"        "
