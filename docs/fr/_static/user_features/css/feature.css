@@ -107,34 +107,44 @@
     left: 50%;
 }
 
+#study_doc_files{
+    top: 15%;
+    left: 26%;
+}
+
 #study_doc_add{
-    top: 33%;
-    left: 27%;
+    top: 22%;
+    left: 28%;
 }
 
 #study_doc_create_link{
-    top: 33%;
-    left: 52%;
+    top: 22%;
+    left: 54%;
 }
 
 #study_doc_disconnect{
-    top: 33%;
-    left: 61%;
+    top: 22%;
+    left: 63%;
 }
 
 #study_doc_3D{
-    top: 28%;
-    left: 64%;
+    top: 15%;
+    left: 62%;
+}
+
+#study_doc_list{
+    top:28%;
+    left:64%;
 }
 
 #docpart_add_panel{
-    top: 17%;
-    left: 20%;
+    top: 18%;
+    left: 23%;
 }
 
 #docpart_add{
-    top: 36%;
-    left: 39%;
+    top: 34%;
+    left: 43%;
 }
 
 #study_part_add{
