@@ -47,9 +47,7 @@ def display_3d(request, obj_ref, obj_revi):
             pass
     else:
         product=ArbreFile_to_Product(doc_file,recursif=True)
-        GeometryFiles=list(GeometryFile.objects.filter(stp=doc_file))
-        if product:
-            add_child_GeometryFiles(product,GeometryFiles)
+        GeometryFiles= obj.get_all_geometry_files(doc_file)
         javascript_arborescense=generate_javascript_for_3D(product)
 
     ctx.update({
@@ -378,7 +376,6 @@ def clear_form(request,assemblys, product,index,obj_type):
                 if not part_form.is_valid():
                     valid=False
                 if not doc_form.is_valid():
-                    print "4"
                     valid=False
 
                 prefix.append(index[0])

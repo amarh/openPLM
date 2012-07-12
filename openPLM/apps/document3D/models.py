@@ -326,6 +326,21 @@ class Document3DController(DocumentController):
         else:
             self._save_histo("File deprecated", "file : %s" % doc_file.filename)
 
+    def get_all_geometry_files(self, doc_file):
+        if self.PartDecompose is not None:
+            pctrl = PartController(self.PartDecompose, self._user)
+            children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
+                only=("child__id", "parent__id",))]
+            docs = DocumentPartLink.objects.filter(document__type="Document3D",
+                    part__in=children_ids).values_list("document", flat=True)
+            dfs = DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("id", flat=True)
+            q = Q(stp=doc_file) | Q(stp__in=dfs)
+            gfs = GeometryFile.objects.filter(q)
+        else:
+            gfs = GeometryFile.objects.filter(stp=doc_file)
+
+        return gfs.values_list("file", flat=True)
+
 
 media3DGeometryFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
 class GeometryFile(models.Model):
@@ -817,20 +832,6 @@ def ArbreFile_to_Product(doc_file,recursif=None):
         child_ArbreFile_to_Product(doc_file,product,product_root=product,deep=1)
     return product
 
-
-def add_child_GeometryFiles(product, files_to_add):
-    """
-    :param product: :class:`.Product` that represents a arborescense
-    :param files_to_add: list where add the :class:`.GeometryFiles` childs founded
-
-    We explore the :class:`.Product` (**product**) looking for :class:`.GeometryFiles` of his childs
-
-    """
-    for link in product.links:
-        if not link.product.doc_id == product.doc_id and not link.product.visited:
-            link.product.visited = True
-            files_to_add+=list(GeometryFile.objects.filter(stp__id=link.product.doc_id))
-            add_child_GeometryFiles(link.product,files_to_add)
 
 def child_ArbreFile_to_Product(doc_file,product,product_root,deep):
     """
