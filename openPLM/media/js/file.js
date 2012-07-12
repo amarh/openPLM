@@ -735,11 +735,11 @@ $(function(){
                 }
                 return;
             }
-            var global_prog = $("<div style='margin-top:1%' id='global'>Total: </div>");
+            var global_prog = $("<div style='margin-top:1%' id='global'>"+trans["Total"]+": </div>");
             global_prog.append("<span class='progress'><span class='text'></span></span>");
             $("#up_message").after(global_prog);
             $(".del_link").hide();
-            $(".progress .text").text("0% (waiting)");
+            $(".progress .text").text("0% ("+trans["waiting"]+")");
             $(".progress").prepend("<progress max=100 value=0></progress>");
             if($("#fileupload").attr("action")=="."){
                 $('form.hidden')[0].action=".";
