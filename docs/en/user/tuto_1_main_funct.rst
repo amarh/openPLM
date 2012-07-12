@@ -176,15 +176,18 @@ Common Parts
 
 It contains:
 
-    * User's name
+    * User's name (if the user is logged)
     
     * Today's date and hour
     
     * Button to choose the language
     
-    * Link to log out
+    * Link to log out (or login)
     
     * Link to get help
+
+
+**The toolbar**
 
     * Buttons to reach different views
 
@@ -192,10 +195,13 @@ It contains:
 
 If you place your mouse over an object in the history, the corresponding menu will be shown.
 
-Once you logged in, this header appears in all views except the home page.
+Once you are logged in, the header and the toolbar appears in all views. 
+Except in "Home" page, where only the header appears.
 
-.. image:: images/Capture_openPLM_header.png
+.. figure:: images/Capture_openPLM_header.png
    :width: 100%
+   
+   Header and toolbar
 
 
 **The left panel**
