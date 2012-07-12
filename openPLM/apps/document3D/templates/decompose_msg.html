@@ -1,11 +1,13 @@
+ {% load i18n %}
 <ul> 
     {% for element in decomposable_docs %}
-
         <li>
-        A document (<a href="/object/{{element.0.type|urlencode }}/{{element.0.reference|urlencode }}/{{element.0.revision|urlencode }}/">{{ element.0.reference }}</a> )
-        with a STEP file (<a href="/file/{{element.1.id|urlencode }}/">{{ element.1.filename }}</a>)
+        {% blocktrans with element.0.type|urlencode as type and element.0.reference|urlencode as ref_enc and element.0.reference as ref and element.0.revision|urlencode as rev and element.1.id|urlencode as f_id and element.1.filename as f_name and part.plmobject_url as plmobject_url %}
+        A document (<a href="/object/{{ type }}/{{ ref }}/{{ rev }}/">{{ ref }}</a> )
+        with a STEP file (<a href="/file/{{ f_id }}/">{{ f_name }}</a>)
         is linked to this part. Do you want to analyse it to build the BOM?
-        <a style="color:#FFFF00" href="{{part.plmobject_url}}decompose/{{ element.1.id|urlencode }}/">Yes</a>             
+        <a style="color:#FFFF00" href="{{plmobject_url}}decompose/{{ f_id }}/">Yes</a>
+        {% endblocktrans %}             
     </li>
 
     {% endfor %}
