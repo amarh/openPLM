@@ -148,18 +148,23 @@
 }
 
 #study_part_add{
-    top: 43%;
-    left: 15%;
+    top: 33%;
+    left: 39%;
 }
 
 #study_part_create_link{
-    top: 43%;
-    left: 41%;
+    top: 33%;
+    left: 65%;
 }
 
 #study_part_disconnect{
-    top: 43%;
-    left: 49%;
+    top: 33%;
+    left: 75%;
+}
+
+#study_part_left{
+    top: 15%;
+    left: 15%;
 }
 
 #study_part_addchild{
