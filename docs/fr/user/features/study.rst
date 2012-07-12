@@ -20,7 +20,7 @@ relation avec la part courante.
 
 1. DOC-CAO
 
-* Le bouton de téléchargement permet de récupérer les fichiers liés au format PDF ou au sein d'une archive.
+* Les différents boutons de téléchargement permettent de récupérer les fichiers liés au format PDF ou au sein d'une archive.
 
 .. raw:: html
    :file: html/study_part.html
