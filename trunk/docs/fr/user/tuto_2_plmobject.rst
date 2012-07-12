@@ -1,8 +1,8 @@
 .. _fr-plmObject-func:
 
-=======================================================
-Fonctions liés aux objets PLM : **PART** / **DOCUMENT**
-=======================================================
+========================================================
+Fonctions liées aux objets PLM : **PART** / **DOCUMENT**
+========================================================
 
 
 Ce document décrit les fonctions utilisés pour afficher et manipuler les
