@@ -82,8 +82,8 @@
         <script type="text/javascript">
             THREE.Vertex = function ( position ) { return position; };
         </script>
-        {% for item in GeometryFiles %}
-            <script type="text/javascript" src="/media/3D/{{ item.file.name}}"></script>
+        {% for path in GeometryFiles %}
+            <script type="text/javascript" src="/media/3D/{{ path }}"></script>
         {% endfor %}
         {%  if javascript_arborescense %}
             <script type="text/javascript"> {{javascript_arborescense|safe}}</script>

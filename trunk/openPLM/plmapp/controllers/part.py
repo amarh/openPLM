@@ -256,7 +256,7 @@ class PartController(PLMObjectController):
 
     def get_children(self, max_level=1, date=None,
             related=("child", "child__state", "child__lifecycle"),
-            only_official=False):
+            only_official=False, only=None):
         """
         Returns a list of all children at time *date*.
         
@@ -269,6 +269,8 @@ class PartController(PLMObjectController):
             links = objects.filter(end_time__exact=None)
         else:
             links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
+        if only is not None:
+            links = links.only(*only)
         res = []
         parents = [self.object.id]
         level = 1
