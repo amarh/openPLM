@@ -283,7 +283,7 @@ def get_matrix(location):
      == == == == == = ==
     
     :param location: location
-    :type location: :class:`.OCC.TopLoc.TopLoc_Location
+    :type location: :class:`.OCC.TopLoc.TopLoc_Location`
 
     """
 
