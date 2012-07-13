@@ -65,6 +65,24 @@ class StepDecomposer(Decomposer):
 
     __slots__ = ("part", "decompose_valid")
 
+    def _get_decomposable_stpfile(self, doc):
+        if not ArbreFile.objects.filter(stp__document=doc,
+            stp__deprecated=False, stp__locked=False,
+            decomposable=True).exists():
+            return None
+        try:
+            stp_file = DocumentFile.objects.only("document",
+                    "filename").get(is_stp, locked=False,
+                            deprecated=False, document=doc)
+        except:
+            return None
+        else:
+            if not ArbreFile.objects.filter(stp=stp_file, decomposable=True).exists():
+                return None
+            if stp_file.checkout_valid:
+                return stp_file
+            return None
+
     def is_decomposable(self, msg=True):
         decompose_valid = []
         if not Document3D.objects.filter(PartDecompose=self.part).exists():
@@ -77,7 +95,7 @@ class StepDecomposer(Decomposer):
                         doc = Document3D.objects.get(id=doc_id)
                     else:
                         doc = doc_id
-                    file_stp = is_decomposable(doc)
+                    file_stp = self._get_decomposable_stpfile(doc)
                     if file_stp and msg:
                         decompose_valid.append((doc, file_stp))
                     elif file_stp:
@@ -87,7 +105,7 @@ class StepDecomposer(Decomposer):
         else:
             try:
                 doc = Document3D.objects.get(PartDecompose=self.part)
-                file_stp = is_decomposable(doc)
+                file_stp = self._get_decomposable_stpfile(doc)
                 if file_stp and msg:
                     decompose_valid.append((doc, file_stp))
                 elif file_stp:
@@ -108,7 +126,7 @@ class StepDecomposer(Decomposer):
                 document__document3d__PartDecompose=None). \
                 exclude(part__in=invalid_parts).values_list("document", "part"))
         docs = [l[0] for l in links]
-        # valid documents are document with a step file that is decomposable
+        # valid documents are documents with a step file that is decomposable
         valid_docs = dict(ArbreFile.objects.filter(stp__document__in=docs,
             stp__deprecated=False, stp__locked=False,
             decomposable=True).values_list("stp__document", "stp"))
