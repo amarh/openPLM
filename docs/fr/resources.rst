@@ -49,7 +49,7 @@ Licence
 ==========
 
 Ce logiciel est publié sous la *GNU GENERAL PUBLIC LICENSE Version 3, ou toute version ultérieure*. 
-Voir le :file:`GPLv3-LICENSE.txt` fichier à la racine du
+Voir le fichier :file:`GPLv3-LICENSE.txt` à la racine du
 répertoire de distribution pour accéder au texte complet de la licence.
 
 
