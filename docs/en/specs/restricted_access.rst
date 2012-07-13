@@ -1,3 +1,5 @@
+.. _rest-account-specs:
+
 =========================
  Restricted access
 =========================
