@@ -139,25 +139,55 @@ The document3D application has been improved.
 Highlighting
 ~~~~~~~~~~~~~~~
 
-.. todo:: screenshots, gifs
+You can highlight a sub-assembly by moving your mouse over the sub-assembly name as show on 
+the screenshot below :
+
+.. figure:: /whatsnew/1.1/3D3.png
+    
+    Highlithing
+    
+    The highlighted part , L-Bracket, is the red one.
+
 
 Shading
 ~~~~~~~~~~
 
-.. todo:: screenshots
+Now there are shades displayed for 3D view.
+
+Screenshots before and now :
+
+.. list-table::
+
+   * - .. figure:: /whatsnew/1.1/3D_old.png
+            :width: 100%
+            
+            Before   
+            
+            
+     - .. figure:: /whatsnew/1.1/3D1.png
+            :width: 115%
+            
+            Now
+        
 
 View selection
 ~~~~~~~~~~~~~~
 
-A new toolbar is available to switch between views (front, top...).
+A new toolbar is available to switch between views (axometric, front, right, top, rear, left, bottom).
 
-.. todo:: screenshots
 
 Random colors and transparency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. todo:: screenshots
+You can select switch between random colors or initial colors.
+You can also toggle (enable/disable) the transparency and chose to display or hide axis.
 
+
+.. figure:: /whatsnew/1.1/3D2.png
+    
+    3D view new toolbars
+    
+    
 STL 
 ++++++++++++++
 
