@@ -266,6 +266,19 @@ Changements administrateur
 Comptes restreints et publieur
 -----------------------------------
 
+Les comptes restreints représentent les utilisateurs dont le champ ``restricted`` vaut true (vrai).
+Un utilisateur ayant un compte restreint :
+
+ * ne peut ni être un contributeur ( il ne peut pas créer d'objet ou de groupe ou encore parrainer un autre utilisateur) ni être un administrateur
+ * ne peut pas appartenir à un groupe
+ 
+Un "publicateur" est un utilisateur dont le champ ``can_publish`` vaut true. Il peut publier
+tous les objets PLM officiels auxquels il a accés. Un objet publié est visible par tous,
+même les utilisateurs anonymes (non connecté).
+
+Pour plus d'informations voir :ref:`rest-account-specs` et :ref:`publication-specs` (en anglais).
+
+
 Agencement des applications
 -----------------------------
 
@@ -290,7 +303,14 @@ Nouvelle dépendance optionnelle: povray
 Nouvelle application : oerp
 -----------------------------
 
+Cette application depend de oerplib et son utilisation nécessite une mise à jour de votre fichier setting.py , see :ref:`oerp-admin`
+
+
 Changement pour les développeurs
 ================================
 
+Nouvelles applications
+--------------------------
+
+Quelques nouvelles applications ont été implémentées, voir :ref:`applications` pour plus d'informations.
 
