@@ -1020,7 +1020,7 @@ msgstr "NAVIGUER"
 
 #: templates/base.html:116
 msgid "STUDY"
-msgstr "ETUDIER"
+msgstr "ÉTUDIER"
 
 #: templates/base.html:130
 msgid "Toggle the left panel"
