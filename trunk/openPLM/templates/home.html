@@ -21,14 +21,6 @@
     <div id="supermenuholder">
         {% include "blocks/supermenu.html" %}
     </div>
-
-    {% if not restricted %}
-        <div class="center">
-            <p>
-                <a href="/timeline/">{% trans "Timeline" %}</a>
-            </p>
-        </div>
-    {% endif %}
     
     {% with pending_invitations_owner as pending_invitations %}
         {% if pending_invitations %}
