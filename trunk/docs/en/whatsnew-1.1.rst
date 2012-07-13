@@ -38,7 +38,7 @@ Progress-bars appear while uploading files :
                
            Progress-bars
            
-           Now OpenPLM display a progress informations for each uploaded file. A global progress information is also given.
+           Now OpenPLM display progress informations for each uploaded file. A global progress information is also given.
     
 
 
@@ -124,6 +124,8 @@ This feeds are updated when there is a change on the related object(s), user or 
 New application: oerp
 ---------------------
 
+If you use OpenERP , OpenPLM provides a new application to "push" your official
+parts (and their BOM) into OpenERP.
 
 Document3D
 -----------
@@ -269,6 +271,20 @@ Administrator changes
 Restricted accounts and publishers
 -----------------------------------
 
+Restricted accounts represent a user with the ``restricted`` field set to true.
+A user with restricted access can :
+
+ * neither be a contributor ( imply he(she) can't create object or group, sponsor user) neither an administrator
+ * not be member of a group
+ 
+A publisher is a user with the ``can_publish`` field set to true. He(she) can publish
+all official PLM objects he(she) can read. A published object is accessible to everyone,
+even anonymous users.
+
+For more informations see :ref:`rest-account-specs` and :ref:`publication-specs` .
+
+
+
 Applications layout
 -------------------
 
@@ -293,7 +309,15 @@ New optional dependency: povray
 New application: oerp
 ----------------------
 
+This application depends on oerplib and require an update of your setting.py file, see :ref:`oerp-admin`
+
+
 Developer changes
 ==================
+
+New applications
+-----------------
+
+Some new applications were implemented , more details in :ref:`applications`
 
 
