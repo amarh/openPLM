@@ -2,8 +2,6 @@ Document3D
 ==========
 
 
-Hello
-
 .. toctree::
 
 
@@ -26,4 +24,3 @@ Hello
     
     mesh
     
-La caca
