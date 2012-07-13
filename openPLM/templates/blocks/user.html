@@ -27,6 +27,12 @@
     </ul>
 </form>
 
+{% if request.user.is_authenticated and not restricted %}
+    |
+    <a class="extlink" href="/timeline/">
+        <span>{% trans "Timeline" %}</span>
+    </a>
+{% endif %}
     |
     <a class="extlink" rel="help" href="{{DOCUMENTATION_URL}}../resources.html#getting-help" target="_blank">
         <span>{% trans "Help" %}</span>
