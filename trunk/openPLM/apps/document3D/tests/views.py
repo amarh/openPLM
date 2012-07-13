@@ -1,11 +1,9 @@
-
-from django.http import HttpResponse ,HttpResponseRedirect , HttpRequest
-from django.test import TestCase
 from openPLM.apps.document3D.views import *
 from openPLM.apps.document3D.models import *
 from openPLM.apps.document3D.forms import *
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.apps.document3D.models import  Document3DController , Document_Generate_Bom_Error
+from openPLM.apps.document3D.models import Document3DController
+from openPLM.plmapp.decomposers import DecomposersManager
 from django.core.files import File
 
 
@@ -42,9 +40,9 @@ class view_3dTest(CommonViewTest):
 
         data=self.update_data(new_doc_file)
 
-        self.assertTrue(is_decomposable(self.document.object))
+        self.assertTrue(DecomposersManager.is_decomposable(self.controller.object))
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertFalse(is_decomposable(self.document.object))
+        self.assertFalse(DecomposersManager.is_decomposable(self.controller.object))
         reponse = self.get(self.document.object.plmobject_url+"3D/")
         self.assertEqual(len(reponse.context["GeometryFiles"]), 5)
 

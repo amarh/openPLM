@@ -1,15 +1,18 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.apps.document3D.models import  Document3DController, is_decomposable , ArbreFile_to_Product
+from openPLM.apps.document3D.models import  Document3DController
+import openPLM.apps.document3D.views
+
+from openPLM.plmapp.decomposers import DecomposersManager
 from django.core.files import File
 
-#from openPLM.apps.document3D.decomposer import decomposer_all  , is_decomposable  #decomposer_product #diviser
-from openPLM.apps.document3D.STP_converter_WebGL import NEW_STEP_Import
-class decomposer_Test(CommonViewTest):
+class DecomposerTestCase(CommonViewTest):
 
     def setUp(self):
-        super(decomposer_Test, self).setUp()
+        super(DecomposerTestCase, self).setUp()
         self.document = Document3DController.create('doc1', 'Document3D',
                 'a', self.user, self.DATA)
+        self.controller.attach_to_document(self.document)
+
         f=open("apps/document3D/data_test/test.stp")
         myfile = File(f)
         myfile.name="test.stp"
@@ -17,20 +20,19 @@ class decomposer_Test(CommonViewTest):
 
         self.ctrl2 = Document3DController.create('doc2', 'Document3D',
                 'a', self.user, self.DATA)
-        self.links=ArbreFile_to_Product(self.stp).links
-        self.my_step_importer=NEW_STEP_Import(self.stp.file.path,self.stp.id)
-        self.product=self.my_step_importer.generate_product_arbre() 
             
     def test_is_decomposable(self):
 
-        self.assertTrue(is_decomposable(self.document))
-        self.assertFalse(is_decomposable(self.ctrl2))
+        self.assertTrue(DecomposersManager.is_decomposable(self.controller.object))
         
-        native=self.document.add_file(self.get_file("test.fcstd"))
+        native = self.document.add_file(self.get_file("test.fcstd"))
         self.document.lock(native)
-        self.assertFalse(is_decomposable(self.document))
+        self.assertFalse(DecomposersManager.is_decomposable(self.controller.object))
         
         self.document.unlock(native)
         self.document.lock(self.stp)
-        self.assertFalse(is_decomposable(self.document))
+        self.assertFalse(DecomposersManager.is_decomposable(self.controller.object))
 
+        self.controller.detach_document(self.document)
+        self.controller.attach_to_document(self.ctrl2)
+        self.assertFalse(DecomposersManager.is_decomposable(self.controller.object))
