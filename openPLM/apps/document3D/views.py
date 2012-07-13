@@ -47,7 +47,7 @@ def display_3d(request, obj_ref, obj_revi):
         except IndexError:
             pass
     else:
-        product=ArbreFile_to_Product(doc_file,recursif=True)
+        product = obj.get_product(doc_file, True)
         GeometryFiles= obj.get_all_geometry_files(doc_file)
         javascript_arborescense = JSGenerator(product).get_js()
 
@@ -217,9 +217,10 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     if doc3D.PartDecompose and not doc3D.PartDecompose.id==obj.object.id:
         raise ValueError("Not allowed operation.This Document already forms a part of another decomposition")
 
+    document_controller=Document3DController(doc3D, User.objects.get(username=settings.COMPANY))
     if request.method == 'POST':
         extra_errors = ""
-        product = ArbreFile_to_Product(stp_file,recursif=None)
+        product = document_controller.get_product(stp_file, False)
         last_mtime = Form_save_time_last_modification(request.POST)
         obj.block_mails()
 
@@ -227,7 +228,6 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             old_time = last_mtime.cleaned_data['last_modif_time']
             old_microseconds = last_mtime.cleaned_data['last_modif_microseconds']
 
-            document_controller=Document3DController(doc3D, User.objects.get(username=settings.COMPANY))
             index=[1]
             if clear_form(request,assemblys,product,index,obj_type):
 
@@ -281,7 +281,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         last_mtime=Form_save_time_last_modification()
         last_mtime.fields["last_modif_time"].initial = stp_file.document.mtime
         last_mtime.fields["last_modif_microseconds"].initial= stp_file.document.mtime.microsecond
-        product=ArbreFile_to_Product(stp_file,recursif=None)
+        product= document_controller.get_product(stp_file, False)
         if not product or not product.links:
             return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
 

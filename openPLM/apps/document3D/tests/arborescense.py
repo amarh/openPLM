@@ -1,5 +1,5 @@
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.apps.document3D.models import  Document3DController ,ArbreFile_to_Product
+from openPLM.apps.document3D.models import  Document3DController, Document3D
 from django.core.files import File 
 from openPLM.apps.document3D.tests.views import decomposition_fromPOST_data
 class arborescense_Test(CommonViewTest):
@@ -14,17 +14,14 @@ class arborescense_Test(CommonViewTest):
         self.controller.attach_to_document(self.document.object)
         self.data_to_decompose = self.update_data(self.stp)
         
-        
-        
     def update_time(self,data):
         data.update({u'last_modif_time': [u'%s-%s-%s %s:%s:%s'%(self.document.mtime.year,self.document.mtime.month,self.document.mtime.day,self.document.mtime.hour,self.document.mtime.minute,self.document.mtime.second)],
            u'last_modif_microseconds' : [u'%s'%self.document.mtime.microsecond]
            })
            
-           
     def update_data(self,new_doc_file,update_time=True):
         data={}
-        product=ArbreFile_to_Product(new_doc_file)
+        product = self.document.get_product(self.stp)
         index=[1]
         lifecycle='draft_official_deprecated'
         part_type='Part'
@@ -34,32 +31,33 @@ class arborescense_Test(CommonViewTest):
  
         return data
                
-                      
-                       
-    def test_ArbreFile_to_Product(self):
-        
+    def test_get_product(self):
         #We verify if the structure of the tree is the same for a file without decompose  and the new file generated once decomposed
         
-        product=ArbreFile_to_Product(self.stp)
-        reponse=self.post(self.base_url+"decompose/"+str(self.stp.id)+"/",self.data_to_decompose)
-        product2=ArbreFile_to_Product(self.document.files[0],recursif=True)  
-
-        self.assertTrue(same_estructure(product,product2))
+        product = self.document.get_product(self.stp)
+        self.post(self.base_url+"decompose/"+str(self.stp.id)+"/",self.data_to_decompose)
+        ctrl = Document3DController(Document3D.objects.get(id=self.document.id), self.user)
+        product2 = ctrl.get_product(ctrl.files[0], True)  
+        self.assertTrue(same_structure(product,product2))
     
 
     
-def same_estructure(product,product2):
+def same_structure(product,product2):
     if product.name==product2.name:
-        for i,link in enumerate(product.links):
-            if link.names==product2.links[i].names:
-                for t,loc in enumerate(link.locations):
-                    if not loc.to_array()==product2.links[i].locations[t].to_array():
-                        return False
-                if not same_estructure(link.product,product2.links[i].product):
-                    return False
-            else:
-                print product2.links[i].names ,link.names
-                return False         
+        for link in product.links:
+            print link.names
+            try:
+                print product2.links
+                print[l.names for l in product2.links]
+                link2 = [l for l in product2.links if l.names == link.names][0]
+            except IndexError:
+                return False
+            loc1 = set(tuple(loc.to_array()) for loc in link.locations)
+            loc2 = set(tuple(loc.to_array()) for loc in link2.locations)
+            if loc1 != loc2:
+                return False
+            if not same_structure(link.product, link2.product):
+                return False
     else:
         return False
     

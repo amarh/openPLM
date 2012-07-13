@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import tempfile
 import copy
+from collections import defaultdict
 
 from django.db import models
 from django.contrib import admin
@@ -80,7 +81,7 @@ class Document3D(Document):
 admin.site.register(Document3D)
 
 def composer_step(doc_file):
-    product=ArbreFile_to_Product(doc_file,recursif=True)# last True to generate arbre whit doc_file_path insteant doc_file_id
+    product = Document3DController(doc_file.document.document3d, None).get_product(doc_file, True)
 
     if product and product.is_decomposed:
         temp_file = tempfile.NamedTemporaryFile(delete=True)
@@ -195,6 +196,12 @@ class Document3DController(DocumentController):
     It provides methods to deprecate and to manage (**visualization3D** and **decomposition**)files STEP.
     """
 
+    __slots__ = DocumentController.__slots__ + ("_stps",)
+
+    def __init__(self, *args, **kwargs):
+        super(Document3DController, self).__init__(*args, **kwargs)
+        self._stps = None
+
     def handle_added_file(self, doc_file):
         """
         If a :class:`~django.core.files.File` .stp is set like the file of a :class:`.DocumentFile` (**doc_file**) added to a :class:`.Document3D` , a special treatment (:meth:`.handle_step_file`) is begun (Only one file STEP allowed for each :class:`.Document3D` )
@@ -216,13 +223,13 @@ class Document3DController(DocumentController):
             if self.object.PartDecompose and self.object.PartDecompose in selected_parts:
                 rev.object.PartDecompose=self.object.PartDecompose
                 rev.object.save()
-                product=ArbreFile_to_Product(STP_file[0],recursif=None)
+                product=self.get_product(STP_file[0], True)
                 copy_geometry(product,new_STP_file)
                 product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
                 Product_to_ArbreFile(product,new_STP_file)
 
             elif self.object.PartDecompose: #and not self.object.PartDecompose in selected_parts
-                product=ArbreFile_to_Product(STP_file[0],recursif=True)
+                product=self.get_product(STP_file[0], True)
                 tempfile_size=composer_step(STP_file[0])
                 if tempfile_size:
                     filename = new_STP_file.filename
@@ -248,7 +255,7 @@ class Document3DController(DocumentController):
                 product.set_new_root(new_STP_file.id, new_STP_file.file.path, for_child=True)
                 Product_to_ArbreFile(product, new_STP_file)
             else:
-                product=ArbreFile_to_Product(STP_file[0],recursif=None)
+                product=self.get_product(STP_file[0], False)
                 copy_geometry(product,new_STP_file)
                 product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
                 Product_to_ArbreFile(product,new_STP_file)
@@ -288,16 +295,84 @@ class Document3DController(DocumentController):
     def get_all_geometry_files(self, doc_file):
         if self.PartDecompose is not None:
             pctrl = PartController(self.PartDecompose, self._user)
-            children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
-                only=("child__id", "parent__id",))]
-            docs = DocumentPartLink.objects.filter(document__type="Document3D",
-                    part__in=children_ids).values_list("document", flat=True)
-            dfs = DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("id", flat=True)
-            q = Q(stp=doc_file) | Q(stp__in=dfs)
+            if self._stps is None:
+                children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
+                    only=("child__id", "parent__id",))]
+                docs = DocumentPartLink.objects.filter(document__type="Document3D",
+                        part__in=children_ids).values_list("document", flat=True)
+                dfs = DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("id", flat=True)
+                self._stps = dfs
+            q = Q(stp=doc_file) | Q(stp__in=self._stps)
             gfs = GeometryFile.objects.filter(q)
         else:
             gfs = GeometryFile.objects.filter(stp=doc_file)
         return gfs.values_list("file", flat=True)
+
+    def get_product(self, doc_file, recursive=False):
+        """
+        Returns the :class:`.Product` associated to *doc_file*.
+        If *recursive* is True, it returns a complet product, built by browsing
+        the BOM of the attached part, if it has been decomposed.
+        """
+        try:
+            af = ArbreFile.objects.get(stp=doc_file)
+        except:
+            return None
+        product = Product_from_Arb(json.loads(af.file.read()))
+        if recursive and product:
+            if self.PartDecompose is not None:
+                # Here be dragons
+                # this code try to reduce the number of database queries:
+                # h queries (h: height of the BOM) to get children
+                # + 1 query to doc-part links
+                # + 1 query to get STP files
+                # + 1 query to get location links
+                # + 1 query to get ArbreFile
+                pctrl = PartController(self.PartDecompose, self._user)
+                children = pctrl.get_children(-1, related=("child__id"), only=("child__id", "parent__id",))
+                if not children:
+                    return product
+                links, children_ids = zip(*[(c.link.id, c.link.child_id) for c in children])
+                docs = []
+                part_to_docs = defaultdict(list)
+                for doc, part in DocumentPartLink.objects.filter(document__type="Document3D",
+                        part__in=children_ids).values_list("document", "part").order_by("-ctime"):
+                    # order by -ctime to test the most recently attached document first
+                    part_to_docs[part].append(doc)
+                    docs.append(doc)
+                
+                dfs = dict(DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("document", "id"))
+                # cache this values as it may be useful for get_all_geometry_files
+                self._stps = dfs.values()
+                locs = defaultdict(list)
+                for l in Location_link.objects.filter(link__in=links):
+                    locs[l.link_id].append(l)
+                # read all jsons files
+                jsons = {}
+                for af in ArbreFile.objects.filter(stp__in=dfs.values()):
+                    jsons[af.stp_id] = json.loads(af.file.read())
+                # browse the BOM and build product
+                previous_level = 0
+                products = [product]
+                for level, link in children:
+                    if level <= previous_level:
+                        del products[level:]
+                    stp = None
+                    for doc in part_to_docs[link.child_id]:
+                        if doc in dfs:
+                            stp = dfs[doc]
+                            break
+                    if stp is not None and stp in jsons:
+                        pr = products[-1]
+                        prod = Product_from_Arb(jsons[stp], product=False,
+                                product_root=product, deep=level, to_update_product_root=pr)
+                        for location in locs[link.id]:
+                            pr.links[-1].add_occurrence(location.name, location)
+                        products.append(prod)
+                    previous_level = level
+
+        return product
+
 
 
 media3DGeometryFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
@@ -742,88 +817,6 @@ def copy_geometry(product,doc_file):
     for link in product.links:
         if not link.product.visited:
             copy_geometry(link.product,doc_file)
-
-
-def ArbreFile_to_Product(doc_file,recursif=None):
-
-    """
-    :param product: If recursif is True we explore the bom-child of the decomposition to compose the :class:`.Product` (**product**)
-    :param doc_file: :class:`.DocumentFile` for which the Product will be generated
-
-    For a :class:`.DocumentFile` and the :class:`.ArbreFile` related to him, it recovers the :class:`~django.core.files.File` .arb, and  constructs the :class:`.Product` that represent the arborescense.
-
-    If the file was decomposed and **recursif** is true, completes the :class:`.Product` with relation to the bom-child of the decomposition
-
-    """
-    try:
-        new_ArbreFile=ArbreFile.objects.get(stp=doc_file)
-    except:
-        return False
-    product =Product_from_Arb(json.loads(new_ArbreFile.file.read()))
-    if recursif and product:
-        child_ArbreFile_to_Product(doc_file,product,product_root=product,deep=1)
-    return product
-
-
-def child_ArbreFile_to_Product(doc_file,product,product_root,deep):
-    """
-    :param product: :class:`.Product` to expanding
-    :param doc_file: :class:`.DocumentFile` related to **product**
-    :param product_root: :class:`.Product` root , **product** is a sub-branch of **product_root**
-    :deep: Depth of **product** in the arborescense
-
-
-    For a :class:`.DocumentFile` (**doc_file**) and his :class:`.Product` (**product**) related , it explore the Bom-Child looking for :class:`.Product` of his childrens and adds it to the **product**
-
-    """
-
-    stp_related,list_loc=get_step_related(doc_file)
-
-    for i,stp in enumerate(stp_related):
-
-        new_ArbreFile=ArbreFile.objects.get(stp=stp)
-        new_product=Product_from_Arb(json.loads(new_ArbreFile.file.read()),product=False,product_root=product_root,deep=deep,to_update_product_root=product)
-
-
-        for location in list_loc[i]:
-            product.links[-1].add_occurrence(location.name,location)
-
-        if new_product:
-            child_ArbreFile_to_Product(stp,new_product,product_root,deep+1)
-
-
-def get_step_related(doc_file):
-    """
-
-    :param doc_file: :class:`.DocumentFile` of which we want to know the :class:`.DocumentFile` in which it was decomposed and his relatives :class:`.Location_link`
-
-    For a certain :class:`.DocumentFile` (**doc_file**), if has been decomposed across a :class:`.Part` (attribute PartDecompose of :class:`.Document3D` (**doc_file.document** )
-    we recover all the :class:`.ParentChildLink` of the :class:`.Part` and we look for each of them for  possibles  :class:`.Location_link`, these :class:`.Location_link` indicate that the :class:`.ParentChildLink` was the result of a descomposition.If this is the case ,  we are going to look for the  :class:`.DocumentFile` present in :class:`.Document3D` whose attribute PartDecompose is the **child** of the :class:`.ParentChildLink`.
-
-    We return all  :class:`.DocumentFile` that fulfill these condition together with the list of :class:`.Location_link` relatives of each :class:`.DocumentFile`
-    for ONLY ONE level of depth
-
-
-    """
-    stp_related=[]
-    list_loc=[]
-    Doc3D=Document3D.objects.get(id=doc_file.document.id)
-    part=Doc3D.PartDecompose
-
-    if part:
-        links = ParentChildLink.objects.filter(parent=part, end_time=None)
-        for link in links:
-            locations = list(Location_link.objects.filter(link=link))
-            if locations:
-                # FIXME: what to do if there are several document3D attached
-                Doc3D = DocumentPartLink.objects.filter(document__type="Document3D",
-                        part=link.child).order_by("-ctime")
-                if Doc3D.exists():
-                    STP_file=Doc3D[0].document.files.filter(is_stp)
-                    if STP_file.exists():
-                        stp_related.append(STP_file[0])
-                        list_loc.append(locations)
-    return stp_related, list_loc
 
 def Product_to_ArbreFile(product,doc_file):
     """

@@ -22,7 +22,9 @@ class view_3dTest(CommonViewTest):
 
     def update_data(self,new_doc_file,update_time=True):
         data={}
-        product=ArbreFile_to_Product(new_doc_file)
+        new_ArbreFile=ArbreFile.objects.get(stp=new_doc_file)
+        product =Product_from_Arb(json.loads(new_ArbreFile.file.read()))
+
         index=[1]
         lifecycle='draft_official_deprecated'
         part_type='Part'
