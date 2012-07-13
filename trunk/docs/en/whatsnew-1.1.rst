@@ -281,6 +281,7 @@ A publisher is a user with the ``can_publish`` field set to true. He(she) can pu
 all official PLM objects he(she) can read. A published object is accessible to everyone,
 even anonymous users.
 
+The ``restricted`` and ``can_publish`` fields can be set via the admin interface .
 For more informations see :ref:`rest-account-specs` and :ref:`publication-specs` .
 
 

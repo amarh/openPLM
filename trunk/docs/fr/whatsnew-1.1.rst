@@ -29,7 +29,7 @@ Des barres de progressions apparaissent lors de l'upload des fichiers :
 
            Nouvelle page "Fichiers"
     
-           comme vous pouvez le voir , le formulaire d'*upload* et la liste des fichiers sont tous deux disponibles sur cette page.
+           Comme vous pouvez le voir , le formulaire d'*upload* et la liste des fichiers sont tous deux disponibles sur cette page.
 
 
     * - .. figure:: images/Capture_openPLM_file_progress.png
@@ -46,7 +46,7 @@ Fonctionnalité **Parcourir**
 Une nouvelle fonctionnalité est disponible, elle permet de parcourir tous les objets (parts, documents),
 groupes et utilisateurs de votre OpenPLM.
 
-Pour plus d'information voir la documentation sur la fonctionnalité :ref:`fr-feat-browse` 
+Pour plus d'informations voir la documentation sur la fonctionnalité :ref:`fr-feat-browse` 
 
 
 Cycle de vie et gestion
@@ -208,7 +208,7 @@ Bugs réparés
 `109 <http://wiki.openplm.org/trac/ticket/109>`_ Sponsorship - Character ' is authorised for username and leads to a bug
 
 
-**Delegation de droits**
+**Délégation de droits**
 
 `119 <http://wiki.openplm.org/trac/ticket/119>`_ Delegation - We can delegate someone who is not in the same groupe as the object
 
@@ -241,7 +241,8 @@ Si l'objet courrant est un document vous pouvez :
 
 **Panneau de recherche**
 
-La recherche est exécutée de manière asynchrone.
+La recherche s'exécute de manière asynchrone exceptée sur les pages de création
+de liens (ajout de document ou part).
 
 
 **Amélioration d'affichage**
@@ -252,11 +253,12 @@ La recherche est exécutée de manière asynchrone.
 
 **Documentation** 
 
-    * Plus de fonctionnaliés documentées
+    * Plus de fonctionnalités documentées
     * disponible en anglais
 
 
 **Aperçu : nouveaux formats supportés**
+
 SolidWorks, Catia, Sketch Up, Pro Engineer 
 
 
@@ -272,10 +274,11 @@ Un utilisateur ayant un compte restreint :
  * ne peut ni être un contributeur ( il ne peut pas créer d'objet ou de groupe ou encore parrainer un autre utilisateur) ni être un administrateur
  * ne peut pas appartenir à un groupe
  
-Un "publicateur" est un utilisateur dont le champ ``can_publish`` vaut true. Il peut publier
+Un "publieur" est un utilisateur dont le champ ``can_publish`` vaut true. Il peut publier
 tous les objets PLM officiels auxquels il a accés. Un objet publié est visible par tous,
 même les utilisateurs anonymes (non connecté).
 
+Les champs ``restricted``et ``can_publish`` peuvent être modifiés via l'interface administrateur.
 Pour plus d'informations voir :ref:`rest-account-specs` et :ref:`publication-specs` (en anglais).
 
 
@@ -298,12 +301,12 @@ exemple :
 document3D
 -----------
 
-Nouvelle dépendance optionnelle: povray
+Nouvelle dépendance optionnelle : povray
 
 Nouvelle application : oerp
 -----------------------------
 
-Cette application depend de oerplib et son utilisation nécessite une mise à jour de votre fichier setting.py , see :ref:`oerp-admin`
+Cette application depend de oerplib et son utilisation nécessite une mise à jour de votre fichier settings.py , see :ref:`oerp-admin`
 
 
 Changement pour les développeurs
