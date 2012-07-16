@@ -29,6 +29,7 @@ Table of contents:
     user/index
     admin/index
     devel/index
+    glossary
     specs/index
     license
 
