@@ -108,9 +108,6 @@ class WebDavHandler(object):
         return ""
 
     def handle_method(self, request):
-        for key, value in request.META.items():
-            if key.startswith("HTTP"):
-                print key, "'%s'"%value
         try:
             if request.method == "OPTIONS":
                 return self.handle_options(request)
@@ -262,9 +259,6 @@ class WebDavHandler(object):
         return response
 
     def handle_unlock(self, request):
-        for key, value in request.META.items():
-            if key.startswith("HTTP"):
-                print key, "'%s'"%value
         path = self.get_final_path_part(request.path)
         token = request.META.get("HTTP_LOCK_TOKEN")
         if token.startswith("<"):
