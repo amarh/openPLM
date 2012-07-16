@@ -30,6 +30,17 @@ To enable the *webdav* application, it must be enabled in the settings file: add
 ``'openPLM.apps.webdav'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
+Apache
+=========
+
+Make sure that
+
+.. code-block:: apache
+
+    WSGIPassAuthorization On 
+
+is set on your apache configuration file.
+
 Testing
 =========
 
