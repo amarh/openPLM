@@ -25,7 +25,7 @@ Progress-bars appear while uploading files :
 
 .. list-table:: Screenshots
 
-    * - .. figure:: images/Capture_openPLM_file_add.png
+    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_add.png
            :width: 100%
 
            New "Files" page
@@ -33,7 +33,7 @@ Progress-bars appear while uploading files :
            As you can see, the upload form and the list of files are both displayed on the "Files" page.
 
 
-    * - .. figure:: images/Capture_openPLM_file_progress.png
+    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_progress.png
            :width: 100%
                
            Progress-bars
