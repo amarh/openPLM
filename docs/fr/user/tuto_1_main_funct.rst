@@ -25,7 +25,7 @@ Dans OpenPLM, il y a 4 types d'objets principaux :
 
 * Document
 
-Les articles et les documents sont nommés suivant en accord avec la convention
+Les articles et les documents sont nommés en accord avec la convention
 suivante : 
 *type//ref//rev//name*
 
@@ -49,7 +49,7 @@ Il y a 5 fonctions principales :
 
 1- Rechercher des objets
 
-2- Parcourir les objets en fonction de leur relations
+2- Parcourir les objets en fonction de leur relations (Naviguer)
 
 3- Création d'objets
 
@@ -106,7 +106,7 @@ Exemple :
    Exemple de recherche
 
    Comme vous pouvez le voir une requête vide, correspond à tous les objets.
-   Ici, toutes les parts sont affichées, leurs sous-types inclus (ici Assembly, SinglePart, RAM, ...).
+   Ici, toutes les parts sont affichées, les sous-types de parts inclus (ici Assembly, SinglePart, RAM, ...).
 
 
 Naviguer
@@ -116,11 +116,11 @@ Les objets et leurs relations sont représentés dans un schéma.
 
 Chaque boîte représente un objet : 
 
-* en rose pour les utilisateurs 
+* rose pour les utilisateurs 
 
-* en bleu pour les articles
+* bleu pour les articles
 
-* en violet pour les documents 
+* violet pour les documents 
 
 Exemple :
 
@@ -143,7 +143,7 @@ Exemple :
 
 Étudier
 =======
-Accéder à la page "Étudier" depuis la page d'accueil affiche l'historique des
+Accéder à la page "Etudier" depuis la page d'accueil affiche l'historique des
 objets liés à l'utilisateur.
 
 La page "Etudier" dispose de plusieurs onglets à partir desquels on peut :
