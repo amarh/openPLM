@@ -23,7 +23,9 @@ Progress-bars appear while uploading files :
   * one for the total progress
 
 
-.. list-table:: Screenshots
+Screenshots:
+
+.. list-table::
 
     * - .. figure:: whatsnew/1.1/Capture_openPLM_file_add.png
            :width: 100%
@@ -146,7 +148,7 @@ the screenshot below :
     
     Highlithing
     
-    The highlighted part , L-Bracket, is the red one.
+    The highlighted part , L-Bracket, is displayed in red instead of green.
 
 
 Shading
@@ -179,13 +181,16 @@ A new toolbar is available to switch between views (axometric, front, right, top
 Random colors and transparency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can select switch between random colors or initial colors.
+You can switch between random colors or initial colors.
 You can also toggle (enable/disable) the transparency and chose to display or hide axis.
 
 
 .. figure:: whatsnew/1.1/3D2.png
+    :target: http://www.openplm.org/example3D/mendelmax2.html
     
     3D view new toolbars
+    
+    Click on it to test the new toolbars (view selection, random colors and transparency).
     
     
 STL 

@@ -22,9 +22,11 @@ Des barres de progressions apparaissent lors de l'upload des fichiers :
  * une pour chaque fichier envoyé
  * une barre de progression globale
 
-.. list-table:: Capture d'écrant
+Captures d'écran :
 
-    * - .. figure:: images/Capture_openPLM_file_add.png
+.. list-table::
+
+    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_add.png
            :width: 100%
 
            Nouvelle page "Fichiers"
@@ -32,7 +34,7 @@ Des barres de progressions apparaissent lors de l'upload des fichiers :
            Comme vous pouvez le voir , le formulaire d'*upload* et la liste des fichiers sont tous deux disponibles sur cette page.
 
 
-    * - .. figure:: images/Capture_openPLM_file_progress.png
+    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_progress.png
            :width: 100%
                
            Barre de progression
@@ -56,7 +58,7 @@ Les pages cycle de vie et gestion ont été fusionnées dans la page cycle de vi
 
 Remplacer un signataire est maintenant beaucoup plus intuitif, voir la capture d'écran ci-dessous :
 
-.. image:: images/Capture_openPLM_lifecycle_management.png
+.. image:: whatsnew/1.1/Capture_openPLM_lifecycle_management.png
 
 
 Pages publiques
@@ -83,8 +85,9 @@ l'option "compte restreint".
 
 Capture d'écran :
 
-.. image:: images/Capture_openPLM_sponsor.png
+.. image:: whatsnew/1.1/Capture_openPLM_sponsor.png
     :width: 100%
+
 
 Comme vous pouvez le voir sur l'image ci-dessus, vous pouvez aussi parrainer un nouvel utilisateur
 qui peut accéder à pratiquement tous les objets mais ne peut pas les modifier.
@@ -124,6 +127,10 @@ ou le groupe associé(s) au flux.
 Nouvelle application: oerp
 ---------------------------
 
+Si vous utilisez OpenERP , OpenPLM dispose d'une nouvelle application qui permet de "publier"
+vos parts officielles (et leur nomenclature) vers OpenERP.
+
+
 document3D
 -----------
 
@@ -133,27 +140,63 @@ Amélioration de la vue 3D
 ++++++++++++++++++++++++++
 
 
-Surbrillance
-~~~~~~~~~~~~~~~
+Mettre en évidence
+~~~~~~~~~~~~~~~~~~~
 
-.. todo:: screenshots, gifs
+Vous pouvez mettre une pièce en évidence en plaçant votre souris
+sur le nom correspondant à cette pièce, tel que vous pouvez le voir sur 
+la capture d'écran ci-dessous :
 
-Dégradés
+.. figure:: whatsnew/1.1/3D3.png
+    :width: 90%
+    
+    Mise en évidence
+    
+    La part mise en évidence ici est la part L-Bracket. Elle apparait en 
+    rouge au lieu d'apparaitre en vert.
+
+
+Ombres
 ~~~~~~~~~~
 
-.. todo:: screenshots
+OpenPLM affiche les ombres dans la vue en 3D.
+
+Captures d'écran :
+
+.. list-table::
+
+   * - .. figure:: whatsnew/1.1/3D_old.png
+            :width: 60%
+            
+            Avant (sans ombres)  
+            
+            
+     - .. figure:: whatsnew/1.1/3D1.png
+            :width: 70%
+            
+            Maintenant (avec les ombres)
 
 Sélectionner la vue
 ~~~~~~~~~~~~~~~~~~~
 
 Une nouvelle bar d'outils permet de changer de vue (avant, au-dessus...).
 
-.. todo:: screenshots
 
 Couleurs aléatoires et transparence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. todo:: screenshots
+Vous pouvez choisir d'afficher votre produit avec des couleurs choisies aléatoirement
+ou revenir aux couleurs initiales.
+Vous pouvez aussi activer/désactiver la transparence et afficher/cacher les axes.
+
+
+.. figure:: whatsnew/1.1/3D2.png
+    :target: http://www.openplm.org/example3D/mendelmax2.html
+    :width: 90%
+    
+    Les nouvelles barres d'outils de la vue 3D
+    
+    Cliquez dessus, si vous voulez tester ces nouvelles barres d'outils.
 
 STL 
 ++++++++++++++
