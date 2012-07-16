@@ -247,6 +247,9 @@ add the following lines:
 .. code-block:: apache
 
     WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+    # required to enable webdav access 
+    WSGIPassAuthorization On 
+
     Alias /media /var/django/openPLM/trunk/openPLM/media
     <Directory /var/django/openPLM/trunk/openPLM/media>
         Order deny,allow
@@ -359,6 +362,9 @@ be enabled)
     <VirtualHost *:80>
 
         WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+        # required to enable webdav access 
+        WSGIPassAuthorization On 
+
         <Location "/admin">
             RewriteEngine On
             RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
