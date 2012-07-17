@@ -33,9 +33,17 @@
                 document_icon
             {%else %} {% if obj.is_part %}
                 part_icon
-            {% else %} user_icon {% endif %} {% endif %}"></div>
+            {% else %} user_icon {% endif %} {% endif %}">
+            
+            </div>
         <h2>
-            <span class="type">{{object_type}}</span> 
+            <span class="type">{{object_type}}
+            {% ifequal object_type "Timeline" %}
+            <a target="_blank" href="rss/">
+                <img style="float:none;" src="/media/img/feed_icon.png" alt="{% trans "click here to subscribe to the related feed" %}" title="{% trans "click here to subscribe to the related feed" %}">
+            </a>
+            {% endifequal %}
+            </span>
             {% if object_reference != '-' %}
                 // <span class="reference">{{object_reference}}</span> 
                 {% if obj.is_document or obj.is_part %}
