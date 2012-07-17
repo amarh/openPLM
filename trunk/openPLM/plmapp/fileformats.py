@@ -1,5 +1,5 @@
-
 import os.path
+from collections import defaultdict
 
 # extensions from http://en.wikipedia.org/wiki/List_of_file_formats#Computer-aided_design_.28CAD.29
 # + fc*, brep, stp, idv
@@ -29,3 +29,10 @@ def is_cad_file(filename):
     name, ext = os.path.splitext(filename)
     return ext.lower() in CAD_FORMATS
 
+native_to_standards = defaultdict(tuple)
+native_to_standards.update(
+    (
+    (u'.fcstd', (u'.step', u'.stp')),
+    (u'.catproduct', (u'.step', u'.stp')),
+    (u'.catpart', (u'.step', u'.stp')),
+))

@@ -36,7 +36,7 @@ from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError, P
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
-from openPLM.plmapp.native_file_management import native_to_standards
+from openPLM.plmapp.fileformats import native_to_standards
 
 
 class DocumentController(PLMObjectController):
