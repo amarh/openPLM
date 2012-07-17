@@ -212,6 +212,10 @@ WebDAV access
 
 OpenPLM can now serves all managed files through a WebDAV access.
 
+.. figure:: whatsnew/1.1/webdav_nautilus.png
+
+    A directory listing using Nautilus.
+
 
 Bugs fixed
 ------------
