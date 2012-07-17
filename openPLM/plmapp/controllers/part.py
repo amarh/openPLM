@@ -34,7 +34,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
-from openPLM.plmapp.cadformats import is_cad_file
+from openPLM.plmapp.fileformats import is_cad_file
 
 from openPLM.plmapp.exceptions import PermissionError
 
