@@ -212,8 +212,15 @@ seuls les fichiers STEP non décomposés sont gérés.
 
 .. todo:: example
 
+
 Accès WebDAV
 --------------
+
+OpenPLM propose aussi la gestion de fichier via un accés WebDAV :
+
+.. figure:: whatsnew/1.1/webdav_nautilus.png
+
+    Une liste de répertoire utilisant nautilus
 
 
 Bugs réparés
@@ -332,7 +339,7 @@ Il y a eu un grand changement sur l'agencement des applications.
 Les applications optionnelles ont été placées dans le dossier *apps*.
 
 Assurez vous que votre fichier settings.py a été mis à jour en conséquence :
-à l'exception de plmapp, les applications d'openPLM sont dorénavant notées openPLM.apps.NomDeLAppli .
+à l'exception de plmapp, les applications d'openPLM sont dorénavant nommées :samp:`openPLM.apps.{NomDeLApplication}`
 
 exemple : 
 
