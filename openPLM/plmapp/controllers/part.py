@@ -105,6 +105,8 @@ class PartController(PLMObjectController):
         :param order: order
         :type order: positive int
         :param unit: a valid unit
+
+        Extra arguments are used to create relevant :class:`.ParentChildLinkExtension`.
         
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
         :raises: :exc:`ValueError` if *quantity* or *order* are negative.
@@ -143,7 +145,8 @@ class PartController(PLMObjectController):
         history.
 
         .. note::
-            The link is not destroyed: its end_time is set to now.
+            The link is not destroyed: its :attr:`.ParentChildLink.end_time`
+            is set to now.
         
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
@@ -170,6 +173,8 @@ class PartController(PLMObjectController):
         :type new_quantity: positive float
         :param new_order: order
         :type new_order: positive int
+        
+        Extra arguments are used to modify relevant :class:`.ParentChildLinkExtension`.
         
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
@@ -260,6 +265,14 @@ class PartController(PLMObjectController):
         """
         Returns a list of all children at time *date*.
         
+        :param max_level: maximum level of children, ``-1``
+            returns all descendants, ``1`` returns direct children
+        :param related: a list of related fields that are given
+            to retrieve the :class:`.ParentChildLink`
+        :param only_official: True if the result should be pruned to
+            only include official children
+        :param only: a list of fields that are given to limit the
+            retrieved field of the :class:`.ParentChildLink`
         :rtype: list of :class:`Child`
         """
         
@@ -334,10 +347,18 @@ class PartController(PLMObjectController):
     
     def get_parents(self, max_level=1, date=None,
             related=("parent", "parent__state", "parent__lifecycle"),
-            only_official=False):
+            only_official=False, only=None):
         """
         Returns a list of all parents at time *date*.
         
+        :param max_level: maximum level of parents, ``-1``
+            returns all ancestors, ``1`` returns direct parents
+        :param related: a list of related fields that are given
+            to retrieve the :class:`.ParentChildLink`
+        :param only_official: True if the result should be pruned to
+            only include official parents
+        :param only: a list of fields that are given to limit the
+            retrieved field of the :class:`.ParentChildLink`
         :rtype: list of :class:`Parent`
         """
 
@@ -347,6 +368,8 @@ class PartController(PLMObjectController):
             links = objects.filter(end_time__exact=None)
         else:
             links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
+        if only is not None:
+            links = links.only(*only)
         res = []
         children = [self.object.id]
         level = 1
