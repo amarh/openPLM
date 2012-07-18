@@ -6,8 +6,8 @@
 Nouveautés d'OpenPLM 1.1
 =========================
 
-Changement pour l'utilisateur
-=============================
+Changements pour l'utilisateur
+==============================
 
 Nouveau téléchargement de fichiers
 ----------------------------------
@@ -99,7 +99,7 @@ de la création de son compte sera traduit en fonction de la langue choisie.
 Timeline
 ---------
 
-La timeline est un historique global qui contients :
+La timeline est un historique global qui contient :
 
  * l'historique des objets officiels
  * l'historique des objets appartenant aux groupes dont vous faites partie
@@ -108,12 +108,12 @@ La timeline est un historique global qui contients :
 Flux RSS
 ----------
 
-Vous pouvez souscrire aux flux RSS de :
+Vous pouvez souscrire aux flux RSS relatif :
 
- * objets PLM
- * Utilisateur
- * Groupe
- * la timeline
+ * aux objets PLM
+ * à un utilisateur
+ * à un groupe
+ * à la timeline
 
 Les liens pour souscrire à ces flux sont accessibles depuis les pages :
 
@@ -196,12 +196,12 @@ Vous pouvez aussi activer/désactiver la transparence et afficher/cacher les axe
     
     Les nouvelles barres d'outils de la vue 3D
     
-    Cliquez dessus, si vous voulez tester ces nouvelles barres d'outils.
+    Cliquez sur l'image pour tester ces nouvelles barres d'outils.
 
 STL 
 ++++++++++++++
 
-La vue 3D affiche aussi les fichiers type STL (ASCII et formats binaires).
+La vue 3D traite aussi les fichiers type STL (ASCII et formats binaires).
 
 
 Aperçu des fichiers STEP
@@ -265,10 +265,10 @@ Bugs réparés
 Autres amélioration
 --------------------
 
-**Nomenclature** 
-
- * téléchargement sous format PDF
- * remplacer un assemblage
+**Nomenclature**
+ * télécharger sous format PDF
+ 
+ * remplacer un assemblage ou une pièce
 
 
 **Naviguer**
@@ -285,8 +285,8 @@ Si l'objet courrant est un document vous pouvez :
 
 **Part et Document**
 
-* annulation d'objets PLM
-* clonage d'objets PLM
+ * annulation possible depuis l'onglet "CYCLE DE VIE"
+ * clonage possible depuis l'onglet "ATTRIBUTS"
 
 
 **Panneau de recherche**
@@ -303,13 +303,12 @@ de liens (ajout de document ou part).
 
 **Documentation** 
 
-    * Plus de fonctionnalités documentées
-    * disponible en anglais
+ * plus de fonctionnalités documentées
+ * disponible en anglais
 
 
 **Aperçu : nouveaux formats supportés**
-
-SolidWorks, Catia, Sketch Up, Pro Engineer 
+ SolidWorks, Catia, Sketch Up, Pro Engineer 
 
 
 Changements administrateur
@@ -322,7 +321,7 @@ Les comptes restreints représentent les utilisateurs dont le champ ``restricted
 Un utilisateur ayant un compte restreint :
 
  * ne peut ni être un contributeur ( il ne peut pas créer d'objet ou de groupe ou encore parrainer un autre utilisateur) ni être un administrateur
- * ne peut pas appartenir à un groupe
+ * ne peut pas faire partie d'un groupe
  
 Un "publieur" est un utilisateur dont le champ ``can_publish`` vaut true. Il peut publier
 tous les objets PLM officiels auxquels il a accés. Un objet publié est visible par tous,
@@ -363,7 +362,7 @@ Changement pour les développeurs
 ================================
 
 Nouvelles applications
---------------------------
+------------------------
 
 Quelques nouvelles applications ont été implémentées, voir :ref:`applications` pour plus d'informations.
 
