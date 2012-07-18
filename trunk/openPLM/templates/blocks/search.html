@@ -13,18 +13,8 @@
 {% if link_creation %}
     {% trans "Results for link creation:" %}
 {% endif %}
-<div class="Result" link_creation=
-    {% if link_creation %}
-    "true" 
-    {% else %}
-    "false" 
-    {% endif %} 
-     navigate=
-    {% if navigate_bool %}
-    "true"
-    {% else %}
-    "false"
-    {% endif %} >
+<div class="Result" link_creation="{{link_creation|yesno:"true,false"}}"
+    navigate="{{navigate_bool|yesno:"true,false"}}">
     {% for result in results %}
 
         {% if forloop.first %}
