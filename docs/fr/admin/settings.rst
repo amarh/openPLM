@@ -2,8 +2,9 @@
 :mod:`settings` --- Settings
 ====================================
 
-You can set a few variables in settings.py to adjust OpenPLM to your need.
-Here are the most common ones :
+Vous pouvez définir quelques variables dans settings.py
+pour adapter OpenPLM à vos besoins.
+Voici les plus communes :
 
 .. automodule:: settings
     :members:
