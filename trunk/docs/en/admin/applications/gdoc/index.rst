@@ -68,7 +68,7 @@ At the end of the :file:`settings.py` file, adds two variables::
 Synchronize the database
 ========================
 
-Run ``./manage.py migate gdoc``.
+Run ``./manage.py migrate gdoc``.
 
 Testing
 =========
