@@ -322,7 +322,7 @@ def generate_tarfile(files):
     """
     Returns a generator that yields *files* as a tar file.
     
-    This generator does **not** create tempory files and is designed to not
+    This generator does **not** create temporary files and is designed to not
     consume too much memory so it can be used to serve efficiently a tar file
     of large files.
 
@@ -361,7 +361,7 @@ def generate_zipfile(files):
     """
     Returns a generator that yields *files* as a zip file.
     
-    This generator does **not** create tempory files and is designed to not
+    This generator does **not** create temporary files and is designed to not
     consume too much memory so it can be used to serve efficiently a tar file
     of large files.
 
