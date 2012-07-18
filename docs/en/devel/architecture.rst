@@ -12,7 +12,9 @@ Main dependencies
 Django and Python
 +++++++++++++++++
 
-TODO
+OpenPLM is based on `Django <https://www.djangoproject.com/>`_ : a `Python <http://www.python.org/>`_ web framework.
+Django follows the `model-view-controller design`.
+
 
 Celery
 +++++++
