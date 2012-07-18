@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.base_views import get_generic_data, handle_errors
 from openPLM.plmapp.exceptions import PermissionError
@@ -9,7 +11,7 @@ from openPLM.apps.oerp import erp
 from openPLM.apps.oerp import forms
 from openPLM.apps.oerp import models
 
-
+CONNECTION_ERROR = _("Could not connect to OpenERP")
 
 @handle_errors
 def erp_summary(request, obj_type, obj_ref, obj_revi, publish=False, update=False):
@@ -36,13 +38,17 @@ def erp_summary(request, obj_type, obj_ref, obj_revi, publish=False, update=Fals
                     ctx["cost_form"] = form
             elif request.POST.get("update_erp"):
                 product = models.OERPProduct.objects.get(part=obj.object).product
-                cost = erp.get_product_data([product])[0]["standard_price"]
                 try:
-                    pc, created = models.PartCost.objects.get_or_create(part=obj.object)
-                except:
-                    pc = models.PartCost(part=obj.object)
-                pc.cost = cost
-                erp.update_cost(obj, pc)
+                    cost = erp.get_product_data([product])[0]["standard_price"]
+                except erp.ERPError:
+                    messages.error(request, CONNECTION_ERROR)
+                else:
+                    try:
+                        pc, created = models.PartCost.objects.get_or_create(part=obj.object)
+                    except:
+                        pc = models.PartCost(part=obj.object)
+                    pc.cost = cost
+                    erp.update_cost(obj, pc)
                 return HttpResponseRedirect("..")
     else:
         ctx["cost_form"] = forms.get_cost_form(obj.object)
@@ -60,7 +66,10 @@ def erp_summary(request, obj_type, obj_ref, obj_revi, publish=False, update=Fals
             if request.method == "POST":
                 form = ConfirmPasswordForm(request.user, request.POST)
                 if form.is_valid():
-                    erp.export_bom(obj)
+                    try:
+                        erp.export_bom(obj)
+                    except ERPError:
+                        messages.error(request, CONNECTION_ERROR)
                 return HttpResponseRedirect("..")
             else:
                 form = ConfirmPasswordForm(request.user)
@@ -68,8 +77,11 @@ def erp_summary(request, obj_type, obj_ref, obj_revi, publish=False, update=Fals
     else:
         # the current part has been published on openERP
         ctx["published"] = True
-        ctx["product"] = erp.get_product_data([product])[0]
-        ctx["boms"] = erp.get_bom_data(ctx["product"]["bom_ids"])
+        try:
+            ctx["product"] = erp.get_product_data([product])[0]
+            ctx["boms"] = erp.get_bom_data(ctx["product"]["bom_ids"])
+        except erp.ERPError:
+            ctx["openerp_error"] = True
     return r2r("erp_summary.html", ctx, request)
 
 

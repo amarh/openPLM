@@ -1,9 +1,14 @@
 from itertools import izip
+
+from django.conf import settings
 try:
     import oerplib
+    import oerplib.error
+    ERPError = oerplib.error.Error
+    CAN_EXPORT_TO_OERP = True
 except ImportError:
-    pass
-from django.conf import settings
+    CAN_EXPORT_TO_OERP = False
+    ERPError = Exception # fake exception for try...except block
 
 from openPLM.plmapp.units import convert_unit, UnitConversionError
 from openPLM.apps.oerp import models
@@ -39,7 +44,6 @@ def uom_to_unit(uom):
 
 
 def get_oerp():
-
     oerp = oerplib.OERP(settings.OERP_HOST,
             protocol=getattr(settings,"OERP_PROTOCOL", DEFAULT_PROTOCOL),
             port=getattr(settings, "OERP_PORT", DEFAULT_PORT))
@@ -164,19 +168,23 @@ def compute_cost(part_ctrl):
     # total erp cost
     ids.append(part_ctrl.id)
     products = models.OERPProduct.objects.filter(part__in=ids).values()
-    data = get_product_data([p["product"] for p in products])
-    products = dict((p["part_id"], d) for p, d in izip(products, data))
     try:
-        total_erp_cost = products[part_ctrl.id]["standard_price"]
-    except KeyError:
+        data = get_product_data([p["product"] for p in products])
+    except ERPError:
         total_erp_cost = 0
-    for level, link in children:
+    else:
+        products = dict((p["part_id"], d) for p, d in izip(products, data))
         try:
-            pc = products[link.child_id]
-            total_erp_cost += link.quantity * convert_unit(pc["standard_price"],
-                    link.unit, uom_to_unit(pc["uom_id"][0])) 
-        except (KeyError, UnitConversionError):
-            pass
+            total_erp_cost = products[part_ctrl.id]["standard_price"]
+        except KeyError:
+            total_erp_cost = 0
+        for level, link in children:
+            try:
+                pc = products[link.child_id]
+                total_erp_cost += link.quantity * convert_unit(pc["standard_price"],
+                        link.unit, uom_to_unit(pc["uom_id"][0])) 
+            except (KeyError, UnitConversionError):
+                pass
 
     return models.Cost(individual_cost, unit, total_local_cost, total_erp_cost)
 
