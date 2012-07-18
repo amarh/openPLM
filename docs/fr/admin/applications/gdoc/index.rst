@@ -65,7 +65,7 @@ A la fin du fichier :file:`settings.py`, ajouter les deux variables suivantes::
 Synchronisation de la base de données
 =====================================
 
-Run ``./manage.py migate gdoc``.
+Run ``./manage.py migrate gdoc``.
 
 Test
 ====
