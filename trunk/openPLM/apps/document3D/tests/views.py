@@ -186,17 +186,6 @@ class view_3dTest(CommonViewTest):
         self.assertTrue(reponse.context["extra_errors"].startswith(u"Columns reference, type, revision are not unique"))
 
 
-    def test_display_decompose_Document3D_decomposer_Error(self):
-        f=open("apps/document3D/data_test/test.stp")
-        myfile = File(f)
-        new_doc_file=self.document.add_file(myfile)
-        self.controller.attach_to_document(self.document.object)
-        data=self.update_data(new_doc_file)
-        GeometryFile.objects.filter(stp=new_doc_file).delete()
-        url = u"%sdecompose/%d/" % (self.base_url, new_doc_file.id)
-        response = self.client.post(url, data)
-        self.assertTemplateUsed(response, "error.html")
-
 def decomposition_fromPOST_data(data,product,index,group,lifecycle,part_type):
 
     if product.links:
