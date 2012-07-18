@@ -4,8 +4,8 @@
 oerp -- Application OpenERP 
 ===========================
 
-Cette application rajoute un onglet ERP à toutes les parts pour exporter un
-BOM publié dans OpenERP.
+Cette application rajoute un onglet ERP à toutes les parts pour exporter une 
+nomenclature officielle vers OpenERP.
 
 Dépendances
 ===========
@@ -93,7 +93,7 @@ Un onglet :guilabel:`ERP` devrait être disponible. Cliquer sur l'onglet puis
 sur le bouton :guilabel:`Publish on OpenERP`. Un pop-up vous demandant votre
 mot de passe OpenPLM devrait apparaitre. Renseigner les champs avant de
 valider.
-S'il n'y a eu aucune erreurs, une liste de liens en relation avec le produit
+S'il n'y a eu aucune erreur, une liste de liens en relation avec le produit
 créé devrait apparaître
 
 
