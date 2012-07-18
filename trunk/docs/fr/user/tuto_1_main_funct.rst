@@ -7,7 +7,7 @@ Ce document décrit les concepts généraux et les principales fonctions de
 openPLM, le premier véritable PLM Open Source.
 
 
-Pré requis
+Prérequis
 ==========
 
 OpenPLM est une application web, vous n'avez donc besoin que d'un navigateur
