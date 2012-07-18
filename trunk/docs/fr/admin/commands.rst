@@ -2,8 +2,8 @@
 Commandes
 ===========================================
 
-La plupart des commandes disponibles doivent être exécutée depuis le répertoire
-principal où se trouve le fichier :file:̀`manage.py`.
+La plupart des commandes disponibles doivent être exécutées depuis le répertoire
+principal où se trouve le fichier :file:`manage.py` .
 
 Ce script accepte une commande suivie d'arguments requis ou optionnels.
 
