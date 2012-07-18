@@ -82,7 +82,7 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
 
 # from http://www.redrobotstudios.com/blog/2009/02/18/securing-django-with-ssl/
 def secure_required(view_func):
-    """Decorator makes sure URL is accessed over https."""
+    """Decorator which makes sure URL is accessed over https."""
     def _wrapped_view_func(request, *args, **kwargs):
         if not request.is_secure():
             if getattr(settings, 'FORCE_HTTPS', False):
@@ -100,7 +100,7 @@ def json_view(func, API_VERSION=""):
     
     This decorator automatically adds a ``result`` field to the response if it
     was not present. Its value is ``'ok'`` if no exception was raised, and else,
-    it is ``'error'``. In that case, a field ``'error'`` is had with a short
+    it is ``'error'``. In that case, a field ``'error'`` is added with a short
     message describing the exception.
     """
     @functools.wraps(func)
@@ -177,7 +177,7 @@ def get_obj_from_form(form, user):
 def object_to_dict(plmobject):
     """
     Returns a dictionary representing *plmobject*. The returned dictionary
-    respects the format described in :ref`http-api-object`
+    respects the format described in :ref:`http-api-object`
     """
     return dict(id=plmobject.id, name=plmobject.name, type=plmobject.type,
                 revision=plmobject.revision, reference=plmobject.reference)
@@ -293,7 +293,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     :type reference: str
     :param revision: :attr:`.PLMObject.revision`
     :type revision: str
-    :return: a :class:`PLMObjectController` or a :class:`UserController`
+    :return: a :class:`.PLMObjectController` or a :class:`.UserController`
     :return: ctx
     :type ctx: dic
     :return: request.session
@@ -428,7 +428,7 @@ def register_creation_view(type_, view):
     Register a creation view for *type_* (a subclass of :class:`.PLMObject`).
     
     Most of the applications does not need to call this function which is 
-    available for special cases which cannot be handled by :func:`create_object`.
+    available for special cases which cannot be handled by :func:`.create_object`.
 
     .. note::
         
