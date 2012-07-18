@@ -28,7 +28,7 @@ def get_available_name(name, exiting_files):
 
     return name
 
-#: True if files are compressed or not according their extension
+#: True if files are compressed or not according to their extension
 ZIP_AUTO = -1
 
 #: formats that are stored uncompressed
