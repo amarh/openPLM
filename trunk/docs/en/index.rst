@@ -25,11 +25,11 @@ Table of contents:
     :numbered:   
 
     resources
+    glossary
     whatsnew-1.1
     user/index
     admin/index
     devel/index
-    glossary
     specs/index
     license
 
