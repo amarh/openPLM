@@ -2,8 +2,8 @@
 document3D -- Step et documents 3D
 ==================================
 
-Cette application ajoute un document **Document3D** qui permet l'affichage
-d'un fichier STEP dans le navigateur à l'aide de WebGL. Il ajoute aussi la
+Cette application ajoute un type de document **Document3D** qui permet l'affichage
+d'un fichier STEP dans le navigateur à l'aide de `WebGL <http://www.khronos.org/webgl/>`_. Il ajoute aussi la
 possibilité de décomposer un fichier STEP en plusieurs parts et documents,
 puis de recomposer un fichier STEP à jour.
 
@@ -63,6 +63,8 @@ Si la vue 3D fonctionne, vous pouvez essayer de décomposer le fichier STEP :
     #. Si tout est correct, votre part devrait avoir une nomenclature complète. Chaque part enfant ayant un Document3D d'attacher, visible dans l'onglet 3D.
     #. Maintenant, le fichier STEP original est liée à la nomenclature, donc si un fichier STEP enfant est mis à jour, ou si un lien de nomenclature est supprimé, le fichier STEP sera mis à jour.
 
+.. note::
+    Vous pouvez vérifier que votre navigateur supporte WebGL `ici <http://get.webgl.org>`_.
 
 
 
