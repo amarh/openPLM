@@ -24,6 +24,7 @@ If you are a core developper, you may want to read:
     http-api
     modules
     applications
+    documentation
     bom
     publication
     testing
