@@ -36,7 +36,7 @@ The :file:`docs` directory contains one directory per language (``en``, ``fr``..
 a :file:`skel` directory. This last directory is intended to simply add a language
 by copying it.
 
-Each documentation directories contains the following files and directories:
+Each documentation directory contains the following files and directories:
 
 .. highlight:: none
 
