@@ -6,7 +6,7 @@ Ce document décrit l'installation d'un serveur OpenPLM à partir de la version
 de développement.
 
 
-Pré requis
+Prérequis
 ==========
 
 Ce tutoriel a été réalisé à l'aide des logiciels suivant :
