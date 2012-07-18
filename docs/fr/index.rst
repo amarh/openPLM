@@ -25,11 +25,13 @@ Table des matières :
     :numbered:   
 
     resources
+    glossary
     whatsnew-1.1
     user/index
     admin/index
     devel/index
     specs/index
+    license
 
 
 Indices et tableaux
