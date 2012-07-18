@@ -4,6 +4,7 @@ Glossaire
 
 .. note::
     Les termes originaux (en anglais) sont notés entre parenthèses.
+    
     La plupart des définitions suivantes utilisent le terme :term:`plmobject`
     pour faire référence à une part ou un document.
 
