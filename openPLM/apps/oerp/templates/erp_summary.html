@@ -24,7 +24,7 @@
                         <div class="center">
                             <input type="submit" name="update" class="{{"Button"|button}}"
                             value="{% trans "Update" %}"/>
-                            {% if published %}
+                            {% if published and not openerp_error %}
                                 <input type="submit" name="update_erp" class="{{"Button"|button}}"
                                 value="{% trans "Update cost from OpenERP" %}"/>
                             {% endif %}
@@ -76,15 +76,19 @@
         <div>
             {% if published %}
                 <p>{% trans "This part has been published on OpenERP." %}</p>
-                <p>{% trans "Links:" %}</p>
+                {% if product %} 
+                    <p>{% trans "Links:" %}</p>
 
-                <ul>
-                    <li><a href="{{product.uri}}">{% blocktrans with product.name as name %}Product: {{name}}{% endblocktrans %}</a></li>
-                    {% for bom in boms%}
-                        <li><a href="{{bom.uri}}">{% blocktrans with bom.name as name %}BOM: {{name}}{% endblocktrans %}</a></li>
-                    {% endfor %}
+                    <ul>
+                        <li><a href="{{product.uri}}">{% blocktrans with product.name as name %}Product: {{name}}{% endblocktrans %}</a></li>
+                        {% for bom in boms%}
+                            <li><a href="{{bom.uri}}">{% blocktrans with bom.name as name %}BOM: {{name}}{% endblocktrans %}</a></li>
+                        {% endfor %}
 
-                </ul>
+                    </ul>
+                {% else %}
+                    <p>{% trans "Could not connect to OpenERP" %}</p>
+                {% endif %}
             {% else %}
                 {% if obj.is_official %}
                     {% if can_publish %}
