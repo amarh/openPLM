@@ -3,7 +3,7 @@ document3D -- Step and 3D documents
 ===============================================
 
 This application adds a **Document3D** document which can display
-a STEP file in the browser via WebGL. It also adds the ability to
+a STEP file in the browser via `WebGL <http://www.khronos.org/webgl/>`_. It also adds the ability to
 decompose a STEP file into several parts and documents and 
 to recompose an up-to-date STEP file.
 
@@ -68,5 +68,7 @@ If the 3D view is ok, you can also try to decompose the STEP file:
        or a BOM link is deleted, the STEP file is updated.
 
 
+.. note::
+    You can check whether your browser supports or not WebGL `here <http://get.webgl.org>`_.
 
 
