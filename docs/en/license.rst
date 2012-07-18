@@ -12,7 +12,7 @@ openPLM's documentation is licensed under a
 Source code and media files
 ===========================
 
-OpenPLM source code is licensed under the GNU Geperal Public License Version 3 or 
+OpenPLM source code is licensed under the GNU General Public License Version 3 or 
 any later version.
 
 .. literalinclude:: ../../openPLM/GPLv3-LICENSE.txt
