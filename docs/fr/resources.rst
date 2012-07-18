@@ -40,7 +40,7 @@ http://wiki.openplm.org/trac/wiki
 Participer
 =============
 
-Le développement d'OpenPLM se déroule sur trac: http://wiki.openplm.org/trac/timeline
+Vous pouvez suivre le développement d'OpenPLM sur trac : http://wiki.openplm.org/trac/timeline
 
 Nous vous encourageons vivement à participer au développement d'openPLM. Si vous 
 n'appréciez pas trac (pour une raison quelconque) libre à vous de nous envoyer régulièrement des *patchs*.
