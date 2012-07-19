@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-06 18:20+0100\n"
+"POT-Creation-Date: 2012-07-19 16:45+0200\n"
 "PO-Revision-Date: 2011-11-21 11:12+0100\n"
 "Last-Translator: Junko Yamano\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 
-#: plmapp/base_views.py:128
+#: plmapp/base_views.py:129
 msgid "Internal error"
 msgstr "インターナルエラー"
 
@@ -24,21 +24,17 @@ msgstr "インターナルエラー"
 msgid "Ascii"
 msgstr ""
 
-
 #: plmapp/encoding.py:5
 msgid "Big5"
 msgstr ""
-
 
 #: plmapp/encoding.py:6
 msgid "Big5hkscs"
 msgstr ""
 
-
 #: plmapp/encoding.py:7
 msgid "Charmap"
 msgstr ""
-
 
 #: plmapp/encoding.py:8
 msgid "CP-037"
@@ -272,7 +268,6 @@ msgstr ""
 msgid "ISO-8859-15"
 msgstr ""
 
-
 #: plmapp/encoding.py:66
 msgid "ISO-8859-16"
 msgstr ""
@@ -305,11 +300,9 @@ msgstr ""
 msgid "ISO-8859-8"
 msgstr ""
 
-
 #: plmapp/encoding.py:74
 msgid "ISO-8859-9"
 msgstr ""
-
 
 #: plmapp/encoding.py:75
 msgid "JOHAB"
@@ -431,357 +424,429 @@ msgstr ""
 msgid "UTF-8-sig"
 msgstr ""
 
-#: plmapp/forms.py:60
+#: plmapp/forms.py:53
 msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
 msgstr "誤ったリファレンス: '#', '?', '/' と '..' は許可されません。"
 
-
-#: plmapp/forms.py:66
+#: plmapp/forms.py:59
 msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
 msgstr "誤ったリヴィジョン: '#', '?', '/' と '..' は許可されません。"
 
-#: plmapp/forms.py:69
+#: plmapp/forms.py:62
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
 msgstr ""
 "グループの中にあるすでに始動し存在していて誤ったグループを確認してください。"
 
+#: plmapp/forms.py:145
+msgid ""
+"Checking this box, you allow OpenPLM to set the reference of the object."
+msgstr ""
 
-#: plmapp/forms.py:158
-msgid "An object with the same type, reference and revision already exists"
-msgstr "同一のタイプ、リファレンス、リビジョンのオブジェクトがすでに存在しています。"
+#: plmapp/forms.py:157
+msgid "You did not check the Auto box: the reference is required."
+msgstr ""
 
 #: plmapp/forms.py:160
-msgid ""
-"An object with the same type and revision exists, you may consider to revise it."
-msgstr "同一のタイプ、リファレンス、リビジョンのオブジェクトがすでに存在しています。リバイズする必要があります。"
+msgid "An object with the same type, reference and revision already exists"
+msgstr ""
+"同一のタイプ、リファレンス、リビジョンのオブジェクトがすでに存在しています。"
 
-#: plmapp/forms.py:222
+#: plmapp/forms.py:164
+#, fuzzy
+msgid ""
+"An object with the same type and reference exists, you may consider to "
+"revise it."
+msgstr ""
+"同一のタイプ、リファレンス、リビジョンのオブジェクトがすでに存在しています。"
+"リバイズする必要があります。"
+
+#: plmapp/forms.py:219 plmapp/forms.py:224 plmapp/forms.py:229
 msgid "Select a type"
 msgstr "タイプを選んでください。"
 
-
-#: plmapp/forms.py:317
+#: plmapp/forms.py:239
 msgid "Query"
 msgstr "申請"
 
-#: plmapp/forms.py:540
+#: plmapp/forms.py:271
+#, python-format
+msgid ""
+"The object %(type)s // %(reference)s // %(revision)s does not exist.\n"
+"Note that all fields are case-sensitive.\n"
+msgstr ""
+
+#: plmapp/forms.py:329
+#, fuzzy
+msgid "All levels"
+msgstr "すべてのレベルの署名者"
+
+#: plmapp/forms.py:330
+#, fuzzy
+msgid "First level"
+msgstr "署名者レベル"
+
+#: plmapp/forms.py:331
+#, fuzzy
+msgid "Last level"
+msgstr "レベル"
+
+#: plmapp/forms.py:332
+msgid "All status"
+msgstr ""
+
+#: plmapp/forms.py:333
+msgid "Official"
+msgstr ""
+
+#: plmapp/forms.py:501
 msgid "only search results"
 msgstr "リザルト検索のみ"
 
-#: plmapp/forms.py:541
+#: plmapp/forms.py:502
 msgid "Hierarchical"
 msgstr "ヒエラルキカル"
 
-#: plmapp/forms.py:542
+#: plmapp/forms.py:503
 msgid "Radial 1"
 msgstr ""
 
-#: plmapp/forms.py:543
+#: plmapp/forms.py:504
 msgid "Radial 2"
 msgstr ""
 
-#: plmapp/forms.py:546
+#: plmapp/forms.py:507
 msgid "layout"
 msgstr "レイアウト"
 
-#: plmapp/forms.py:553
+#: plmapp/forms.py:514
 msgid "child"
 msgstr "チャイルド"
 
-#: plmapp/forms.py:554 plmapp/models.py:684
+#: plmapp/forms.py:515 plmapp/models.py:766
 msgid "parents"
 msgstr "ペアレント"
 
-#: plmapp/forms.py:555 plmapp/forms.py:575
+#: plmapp/forms.py:516 plmapp/forms.py:536
 msgid "doc"
 msgstr "ドック"
 
-#: plmapp/forms.py:556 plmapp/forms.py:562 plmapp/forms.py:572
-#: plmapp/models.py:177 plmapp/models.py:230 plmapp/models.py:468
-#: plmapp/models.py:649 plmapp/controllers/user.py:92
+#: plmapp/forms.py:517 plmapp/forms.py:523 plmapp/forms.py:533
+#: plmapp/models.py:186 plmapp/models.py:239 plmapp/models.py:523
+#: plmapp/models.py:730 plmapp/controllers/user.py:89
 msgid "owner"
 msgstr "オーナー"
 
-#: plmapp/forms.py:557 plmapp/forms.py:563
+#: plmapp/forms.py:518 plmapp/forms.py:524
 msgid "signer"
 msgstr "署名人"
 
-#: plmapp/forms.py:558 plmapp/forms.py:564 plmapp/views/main.py:1061
+#: plmapp/forms.py:519 plmapp/forms.py:525 plmapp/views/main.py:2059
 msgid "notified"
 msgstr "ノティファイ"
 
-#: plmapp/forms.py:561 plmapp/forms.py:574
+#: plmapp/forms.py:522 plmapp/forms.py:535
 msgid "part"
 msgstr "パート"
 
-#: plmapp/forms.py:567
+#: plmapp/forms.py:528
 msgid "owned"
 msgstr "所有者がいるもの"
 
-#: plmapp/forms.py:568
+#: plmapp/forms.py:529
 msgid "to sign"
 msgstr "署名する"
 
-#: plmapp/forms.py:569
+#: plmapp/forms.py:530
 msgid "request notification from"
 msgstr "ノティファイされるためにリクエストしたもの"
 
-#: plmapp/forms.py:573
+#: plmapp/forms.py:534
 msgid "user"
 msgstr "ユーザー"
 
-#: plmapp/forms.py:596 templates/create.html:11 templates/edit.html:11
-#: templates/users/password.html:11
+#: plmapp/forms.py:559 templates/browse.html:14 templates/create.html:38
+#: templates/edit.html:11 templates/users/password.html:11
 msgid "Type"
 msgstr "タイプ"
 
-#: plmapp/forms.py:597 templates/groups/pending_invitations.html:9
+#: plmapp/forms.py:560 templates/groups/pending_invitations.html:9
 #: templates/groups/users.html:28 templates/users/delegation.html:32
 msgid "Username"
 msgstr "ユーザーネーム"
 
-#: plmapp/forms.py:641
+#: plmapp/forms.py:587
+msgid ""
+"Contributor: can create parts, documents, groups and sponsor other users"
+msgstr ""
+
+#: plmapp/forms.py:588
+msgid "Reader: can not edit or create contents"
+msgstr ""
+
+#: plmapp/forms.py:589
+msgid "Restricted account: can only access to specific contents"
+msgstr ""
+
+#: plmapp/forms.py:612
 msgid "The new user will belong to the selected groups"
 msgstr "新しいユーザーは選択されたグループに所属します。"
 
-#: plmapp/forms.py:649
+#: plmapp/forms.py:619
 msgid "Email address must be unique."
 msgstr "メールアドレスは独自のものである必要があります。"
 
-#: plmapp/forms.py:656
+#: plmapp/forms.py:626
 msgid "Email's domain not valid"
 msgstr "メールドメインが有効ではありません。"
 
-#: plmapp/forms.py:671
+#: plmapp/forms.py:646
 #, python-format
 msgid "Warning! There are homonyms: %s!"
 msgstr "警告！同じ言葉があります。: %s!"
 
-#: plmapp/forms.py:703
+#: plmapp/forms.py:654
+msgid "A contributor or reader must belong to at least one group."
+msgstr ""
+
+#: plmapp/forms.py:687
 msgid "Columns must have distinct headers."
 msgstr "各列には別のヘッダがあります。"
 
-#: plmapp/forms.py:722
+#: plmapp/forms.py:706
 msgid "Password"
 msgstr "パスワード"
 
-#: plmapp/forms.py:735
+#: plmapp/forms.py:719
 msgid "Your password was entered incorrectly. Please enter it again."
-msgstr ""
-"誤ったパスワードが入力されました。もう一度入力してください。 "
+msgstr "誤ったパスワードが入力されました。もう一度入力してください。 "
 
-#: plmapp/models.py:135
+#: plmapp/models.py:140
 msgid "administrator"
 msgstr "管理者"
 
-#: plmapp/models.py:137
+#: plmapp/models.py:142
 msgid "contributor"
 msgstr "コントリビューター"
 
-#: plmapp/models.py:139
+#: plmapp/models.py:144
+#, fuzzy
+msgid "restricted account"
+msgstr "あなたのアカウント"
+
+#: plmapp/models.py:146
 msgid "viewer"
 msgstr "ビューア"
 
-#: plmapp/models.py:179 plmapp/models.py:470 plmapp/models.py:1492
-#: plmapp/controllers/user.py:89
+#: plmapp/models.py:188 plmapp/models.py:525 plmapp/models.py:1609
 msgid "date of creation"
 msgstr "作成日"
 
-#: plmapp/models.py:181 plmapp/models.py:472 plmapp/controllers/user.py:88
+#: plmapp/models.py:190 plmapp/models.py:527
 msgid "date of last modification"
 msgstr "最終変更日"
 
-#: plmapp/models.py:229 plmapp/models.py:463
+#: plmapp/models.py:238 plmapp/models.py:518
 msgid "name"
 msgstr "ネーム"
 
-#: plmapp/models.py:229 plmapp/models.py:466 plmapp/models.py:648
-#: plmapp/controllers/user.py:91
+#: plmapp/models.py:238 plmapp/models.py:521 plmapp/models.py:729
+#: plmapp/controllers/user.py:88
 msgid "creator"
 msgstr "作成者"
 
-#: plmapp/models.py:230 plmapp/models.py:648 plmapp/models.py:649
+#: plmapp/models.py:239 plmapp/models.py:729 plmapp/models.py:730
 msgid "ctime"
 msgstr "作成日"
 
-#: plmapp/models.py:231 plmapp/models.py:650
+#: plmapp/models.py:240 plmapp/models.py:731
 msgid "mtime"
 msgstr "変更日"
 
-#: plmapp/models.py:458 plmapp/models.py:646
+#: plmapp/models.py:509 plmapp/models.py:727
 msgid "reference"
 msgstr "リファレンス"
 
-#: plmapp/models.py:459 plmapp/models.py:646
+#: plmapp/models.py:510
+msgid ""
+"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. "
+"characters"
+msgstr ""
+
+#: plmapp/models.py:511 plmapp/models.py:727
 msgid "type"
 msgstr "タイプ"
 
-#: plmapp/models.py:460 plmapp/models.py:647
+#: plmapp/models.py:512 plmapp/models.py:728
 msgid "revision"
 msgstr "リビジョン"
 
-#: plmapp/models.py:464
+#: plmapp/models.py:519
 msgid "Name of the product"
 msgstr "プロダクトネーム"
 
-#: plmapp/models.py:476 plmapp/models.py:612
-msgid "lifecycle"
-msgstr "ライフサイクル"
-
-#: plmapp/models.py:479
-msgid "state"
-msgstr "ステート"
-
-#: plmapp/models.py:507
-msgid "The object is at its last state."
-msgstr "オブジェクトは最終ステートにあります。"
-
-#: plmapp/models.py:612
-msgid "attributes"
-msgstr "アトリビュート"
-
-#: plmapp/models.py:613
-msgid "revisions"
-msgstr "リビジョン"
-
-#: plmapp/models.py:613
-msgid "history"
-msgstr "ヒストリ"
-
-#: plmapp/models.py:614
-msgid "management"
-msgstr "マネジメント"
-
-#: plmapp/models.py:650
+#: plmapp/models.py:528 plmapp/models.py:731
 msgid "group"
 msgstr "グループ"
 
-#: plmapp/models.py:684
+#: plmapp/models.py:531 plmapp/models.py:692
+msgid "lifecycle"
+msgstr "ライフサイクル"
+
+#: plmapp/models.py:534
+msgid "state"
+msgstr "ステート"
+
+#: plmapp/models.py:538
+msgid "published"
+msgstr ""
+
+#: plmapp/models.py:564
+msgid "The object is at its last state."
+msgstr "オブジェクトは最終ステートにあります。"
+
+#: plmapp/models.py:692
+msgid "attributes"
+msgstr "アトリビュート"
+
+#: plmapp/models.py:693
+msgid "revisions"
+msgstr "リビジョン"
+
+#: plmapp/models.py:693
+msgid "history"
+msgstr "ヒストリ"
+
+#: plmapp/models.py:766
 msgid "BOM-child"
 msgstr "BOMチャイルド"
 
-#: plmapp/models.py:685
+#: plmapp/models.py:767
 msgid "doc-cad"
 msgstr "ドックキャド"
 
-#: plmapp/models.py:720
+#: plmapp/models.py:802
 msgid "Some children are at a lower or draft state."
 msgstr "劣ったステートまたはドラフトステートにあるチャイルドがあります。"
 
-#: plmapp/models.py:732
+#: plmapp/models.py:814
 msgid "There are no official documents attached."
 msgstr "添付されたドキュメントはありません。"
 
-#: plmapp/models.py:912
+#: plmapp/models.py:1000
 msgid "This document has no files."
 msgstr "このドキュメントにはファイルがありません。"
 
-#: plmapp/models.py:915
+#: plmapp/models.py:1003
 msgid "Some files are locked."
 msgstr "ロックされているファイルがあります。"
 
-#: plmapp/models.py:922
+#: plmapp/models.py:1010
 msgid "files"
 msgstr "ファイル"
 
-#: plmapp/models.py:923
+#: plmapp/models.py:1011
 msgid "parts"
 msgstr "パート"
 
-#: plmapp/models.py:1494
+#: plmapp/models.py:1611
 msgid "date of validation"
 msgstr "有効日"
 
-#: plmapp/models.py:1495
+#: plmapp/models.py:1612
 msgid "True if guest created the invitation"
 msgstr "もしゲストが招待を作成した場合は正しいです。"
 
-#: plmapp/units.py:5
+#: plmapp/models.py:1677
+#, fuzzy
+msgid "date of promotion"
+msgstr "作成日"
+
+#: plmapp/units.py:18
 msgid "Amounts"
 msgstr "アマウント"
 
-#: plmapp/units.py:6
+#: plmapp/units.py:19
 msgid "Each"
 msgstr "イーチ"
 
-#: plmapp/units.py:7
+#: plmapp/units.py:20
 msgid "mol"
 msgstr "モル"
 
-#: plmapp/units.py:10
+#: plmapp/units.py:23
 msgid "Lengths"
 msgstr "長さ"
 
-#: plmapp/units.py:11
+#: plmapp/units.py:24
 msgid "mm"
 msgstr ""
 
-#: plmapp/units.py:12
+#: plmapp/units.py:25
 msgid "cm"
 msgstr ""
 
-#: plmapp/units.py:13
+#: plmapp/units.py:26
 msgid "dm"
 msgstr ""
 
-#: plmapp/units.py:14
+#: plmapp/units.py:27
 msgid "m"
 msgstr ""
 
-#: plmapp/units.py:15
+#: plmapp/units.py:28
 msgid "km"
 msgstr ""
 
-#: plmapp/units.py:18
+#: plmapp/units.py:31
 msgid "Volumes"
 msgstr "ボリューム"
 
-#: plmapp/units.py:19
+#: plmapp/units.py:32
 msgid "m³"
 msgstr ""
 
-#: plmapp/units.py:20
+#: plmapp/units.py:33
 msgid "mL"
 msgstr ""
 
-#: plmapp/units.py:21
+#: plmapp/units.py:34
 msgid "cL"
 msgstr ""
 
-#: plmapp/units.py:22
+#: plmapp/units.py:35
 msgid "dL"
 msgstr ""
 
-#: plmapp/units.py:23
+#: plmapp/units.py:36
 msgid "L"
 msgstr ""
 
-#: plmapp/units.py:26
+#: plmapp/units.py:39
 msgid "Masses"
 msgstr "マス"
 
-#: plmapp/units.py:27
+#: plmapp/units.py:40
 msgid "mg"
 msgstr ""
 
-#: plmapp/units.py:28
+#: plmapp/units.py:41
 msgid "cg"
 msgstr ""
 
-#: plmapp/units.py:29
+#: plmapp/units.py:42
 msgid "dg"
 msgstr ""
 
-#: plmapp/units.py:30
+#: plmapp/units.py:43
 msgid "g"
 msgstr ""
 
-#: plmapp/units.py:31
+#: plmapp/units.py:44
 msgid "kg"
 msgstr ""
 
-#: plmapp/controllers/user.py:90
+#: plmapp/controllers/user.py:87
 msgid "role in PLM"
 msgstr "PLMでのロール"
 
@@ -789,110 +854,328 @@ msgstr "PLMでのロール"
 msgid "Enter a valid e-mail address."
 msgstr "有効なメールアドレスを入力してください。"
 
-#: plmapp/views/main.py:1057
+#: plmapp/tests/views.py:1991
+#, fuzzy
+msgid "e-mail address"
+msgstr "有効なメールアドレスを入力してください。"
+
+#: plmapp/views/main.py:751 templates/blocks/user.html:33
+msgid "Timeline"
+msgstr ""
+
+#: plmapp/views/main.py:1720
+#, python-format
+msgid "Error: %(details)s"
+msgstr ""
+
+#: plmapp/views/main.py:1866
+msgid "It's not a valid child."
+msgstr ""
+
+#: plmapp/views/main.py:1881
+msgid "It's not a valid document."
+msgstr ""
+
+#: plmapp/views/main.py:2055
 msgid "signer level"
 msgstr "署名者レベル"
 
-#: plmapp/views/main.py:1059
+#: plmapp/views/main.py:2057
 msgid "signer all levels"
 msgstr "すべてのレベルの署名者"
 
-#: templates/404.html:17
-msgid "Error 404: page not found"
-msgstr "エラー 404: ページが見つかりません。"
+#: plmapp/views/main.py:2476 templates/base.html:137
+#: templates/blocks/supermenu.html:9 templates/blocks/supermenu.html.py:15
+msgid "Search"
+msgstr "検索"
 
-#: templates/attributes.html:23 templates/attributes.html.py:29
-#: templates/parts/bom.html:20
-msgid "EDIT"
-msgstr "編集"
+#: plmapp/views/main.py:2595 templates/blocks/supermenu.html:48
+msgid "Browse"
+msgstr ""
 
-#: templates/attributes.html:24
-msgid "PASSWORD"
-msgstr "パスワード"
+#: templates/404.html:11
+#, fuzzy
+msgid "Error 404"
+msgstr "エラー"
 
-#: templates/attributes.html:39
-msgid "Download PDF file"
+#: templates/404.html:13
+#, python-format
+msgid ""
+"\n"
+"                Error 404: it seems %(request_path)s is not a valid url.\n"
+"            "
+msgstr ""
+
+#: templates/500.html:11
+#, fuzzy
+msgid "Error 500"
+msgstr "エラー"
+
+#: templates/500.html:12
+msgid ""
+"\n"
+"                Internal server error.\n"
+"            "
+msgstr ""
+
+#: templates/attributes.html:17 templates/public.html:57
+#, python-format
+msgid "%(time_since)s ago"
+msgstr ""
+
+#: templates/attributes.html:30 templates/attributes.html.py:36
+msgid "Edit this information"
+msgstr ""
+
+#: templates/attributes.html:31
+#, fuzzy
+msgid "Change my password"
+msgstr "パスワードを変更するにはここをクリックしてください。"
+
+#: templates/attributes.html:43 templates/parts/bom.html:119
+#, fuzzy
+msgid "Download as PDF"
 msgstr "pdfファイルのダウンロード"
 
-#: templates/attributes.html:46
+#: templates/attributes.html:48
+msgid "Clone"
+msgstr ""
+
+#: templates/attributes.html:55
 msgid "Comments"
 msgstr "コメント"
 
-#: templates/attributes.html:52
+#: templates/attributes.html:61
 msgid ""
 "\n"
-"One comment has been posted.\n"
+"                        One comment has been posted.\n"
+"                    "
 msgstr ""
-"\n"
-"コメントが投稿されます。\n"
 
-#: templates/attributes.html:56
+#: templates/attributes.html:65
+#, fuzzy, python-format
 msgid ""
 "\n"
-"%(comment_count)s comments have been posted.\n"
+"                        %(comment_count)s comments have been posted.\n"
+"                    "
 msgstr ""
 "\n"
 "%(comment_count)s コメントが投稿されました。\n"
 
-#: templates/attributes.html:66
+#: templates/attributes.html:75
 msgid "Posted by:"
 msgstr "投稿者"
 
-#: templates/attributes.html:70
+#: templates/attributes.html:79
 msgid "Date:"
 msgstr "日付"
 
-#: templates/attributes.html:80
+#: templates/attributes.html:89
 msgid "No comments have been posted yet."
 msgstr "まだ投稿はされていません。"
 
-#: templates/attributes.html:86
+#: templates/attributes.html:95
 msgid "Post a comment"
 msgstr "投稿する"
 
-#: templates/attributes.html:116
+#: templates/attributes.html:125
 msgid "Post"
 msgstr "投稿"
 
-#: templates/base.html:44
+#: templates/base.html:46
 msgid "Home page"
 msgstr "ホームページ"
 
-#: templates/base.html:61
+#: templates/base.html:74
+msgid "HOME"
+msgstr ""
+
+#: templates/base.html:81
 msgid "SEARCH"
 msgstr "検索"
 
-#: templates/base.html:67 templates/create.html:36
+#: templates/base.html:88
+msgid "BROWSE"
+msgstr ""
+
+#: templates/base.html:95 templates/create.html:70
 msgid "CREATE"
 msgstr "作成"
 
-#: templates/base.html:79
+#: templates/base.html:107
 msgid "NAVIGATE"
 msgstr "ナビゲート"
 
-#: templates/base.html:88
+#: templates/base.html:116
 msgid "STUDY"
 msgstr "スタディ"
 
-#: templates/base.html:94
-msgid "EXIT"
-msgstr "終了"
+#: templates/base.html:130
+msgid "Toggle the left panel"
+msgstr ""
 
-#: templates/base.html:105
-msgid "Create"
-msgstr "作成"
-
-#: templates/base.html:115
-msgid "Search"
-msgstr "検索"
-
-#: templates/base.html:146
+#: templates/base.html:174
 msgid "You are not allowed to see this object"
 msgstr "このオブジェクトを見ることは許可されていません。"
 
-#: templates/create.html:7
+#: templates/browse.html:18 templates/groups/objects.html:12
+#, fuzzy
+msgid "Objects"
+msgstr "オブジェクト :"
+
+#: templates/browse.html:21
+#, fuzzy
+msgid "Parts"
+msgstr "パート"
+
+#: templates/browse.html:24
+#, fuzzy
+msgid "Documents"
+msgstr "コメント"
+
+#: templates/browse.html:28
+#, fuzzy
+msgid "Groups"
+msgstr "グループ"
+
+#: templates/browse.html:30 templates/groups/users.html:8
+msgid "Users"
+msgstr "ユーザー"
+
+#: templates/browse.html:37 templates/browse.html.py:67
+msgid "Recently added"
+msgstr ""
+
+#: templates/browse.html:40 templates/browse.html.py:65
+msgid "Sorted by name"
+msgstr ""
+
+#: templates/browse.html:47
+#, fuzzy
+msgid "All states"
+msgstr "ステート"
+
+#: templates/browse.html:50
+msgid "Official state"
+msgstr ""
+
+#: templates/browse.html:53
+msgid "Published"
+msgstr ""
+
+#: templates/browse.html:60 templates/browse.html.py:83
+#: templates/blocks/search.html:22 templates/search/search.html:22
+#: templates/search/search.html.py:27
+msgid "Results"
+msgstr "結果"
+
+#: templates/browse.html:73
+msgid "Only official objects"
+msgstr ""
+
+#: templates/browse.html:76
+msgid "Only published objects"
+msgstr ""
+
+#: templates/browse.html:78
+msgid "All objects"
+msgstr ""
+
+#: templates/browse.html:85 templates/search/search.html:29
+#, python-format
+msgid ""
+"\n"
+"                        (%(start)s - %(end)s on %(total)s)\n"
+"                    "
+msgstr ""
+
+#: templates/clone.html:17
+#, fuzzy
+msgid "OBJECT CLONING:"
+msgstr "オブジェクトの作成"
+
+#: templates/clone.html:28
+msgid "Links"
+msgstr ""
+
+#: templates/clone.html:38
+#, fuzzy
+msgid "No object ( part and document ) is related to this part."
+msgstr "この箇所には添付されたドキュメントはありません。"
+
+#: templates/clone.html:40
+#, fuzzy
+msgid "No part is attached to this document."
+msgstr "このドキュメントには添付ファイルはありません。"
+
+#: templates/clone.html:45
+msgid "CLONE"
+msgstr ""
+
+#: templates/clone.html:51
+#, fuzzy
+msgid "You can not clone this object since you are not a contributor."
+msgstr "あなたはコントリビューターではないためオブジェクトを作成できません。"
+
+#: templates/create.html:17
 msgid "OBJECT CREATION:"
 msgstr "オブジェクトの作成"
+
+#: templates/create.html:52
+#, python-format
+msgid ""
+" \n"
+"This part will be attached to the document %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"    "
+msgstr ""
+
+#: templates/create.html:57
+#, python-format
+msgid ""
+" \n"
+"This document will be attached to the part %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"                                "
+msgstr ""
+
+#: templates/create.html:61
+#, python-format
+msgid ""
+" \n"
+"This part will be added to the part %(related_type)s // "
+"%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
+"                                "
+msgstr ""
+
+#: templates/create.html:75
+msgid "Other creation tools:"
+msgstr ""
+
+#: templates/create.html:79
+#, fuzzy
+msgid "Import several parts or documents from CSV file."
+msgstr ""
+"CSVファイルから複数のユーザーを支持するためにはここをクリックしてください。"
+
+#: templates/create.html:84
+#, fuzzy
+msgid "Import a BOM from a CSV file."
+msgstr "csvファイルをインポートする。"
+
+#: templates/create.html:88 templates/users/sponsor.html:9
+msgid "Sponsor a new user"
+msgstr "新しいユーザーを支持する"
+
+#: templates/create.html:92
+#, fuzzy
+msgid "Sponsor several users from a CSV file."
+msgstr ""
+"CSVファイルから複数のユーザーを支持するためにはここをクリックしてください。"
+
+#: templates/create.html:98
+msgid "You can not create an object since you are not a contributor."
+msgstr "あなたはコントリビューターではないためオブジェクトを作成できません。"
 
 #: templates/edit.html:7
 msgid "OBJECT MODIFICATION:"
@@ -902,219 +1185,373 @@ msgstr "オブジェクトの変更"
 msgid "MODIFY"
 msgstr "変更する"
 
-#: templates/edit.html:28 templates/import/csv.html:69
-#: templates/parts/bom_edit.html:49 templates/snippets/undo_form.html:14
+#: templates/edit.html:28 templates/import/csv.html:82
+#: templates/parts/bom_edit.html:51 templates/snippets/undo_form.html:15
 msgid "Undo"
 msgstr "元に戻す"
 
-#: templates/error.html:9 templates/login.html:17
-msgid "openPLM LOGIN PAGE"
-msgstr "OpenPLMへのアクセスページ"
+#: templates/error.html:4
+#, fuzzy
+msgid "openPLM: error"
+msgstr "OpenPLMにログインします。"
 
-#: templates/error.html:18
-msgid "Error :"
+#: templates/error.html:12 templates/import/csv.html:29
+msgid "Error"
 msgstr "エラー"
 
-#: templates/error.html:20
+#: templates/error.html:14
 msgid "go back"
 msgstr "バックする"
 
-#: templates/home.html:19
-msgid "Your account"
-msgstr "あなたのアカウント"
-
-#: templates/home.html:22
-msgid "Click here to edit your personal information."
-msgstr "個人情報を編集するにはここをクリックしてください。"
+#: templates/home.html:13
+#, fuzzy, python-format
+msgid "Welcome %(full_name)s"
+msgstr ""
+"\n"
+" ようこそ %(first_name)s %(last_name)s!\n"
 
 #: templates/home.html:28
-msgid "Last edited objects"
-msgstr "最後に編集したオブジェクト"
-
-#: templates/home.html:61
 msgid "Groups that you own: pending invitations"
 msgstr "あなたが所有しているグループ：保留中の招待"
 
-#: templates/home.html:72
+#: templates/home.html:39
 msgid "Groups that you may join: pending invitations"
 msgstr "あなたが参加することができるグループ：保留中の招待"
 
-#: templates/lifecycle.html:16 templates/documents/revisions.html:7
-#: templates/parts/revisions.html:7
+#: templates/lifecycle.html:17
+#, fuzzy
+msgid "You have the rights of owner on this object"
+msgstr "このオブジェクトを拒否する権限がありません。"
+
+#: templates/lifecycle.html:26 templates/lifecycle.html.py:131
+#: templates/lifecycle.html:155 templates/lifecycle.html.py:179
+#: templates/documents/revisions.html:7 templates/parts/revisions.html:7
 msgid "Are you sure?"
 msgstr "間違いないですか？"
 
-#: templates/lifecycle.html:21
+#: templates/lifecycle.html:31
 msgid ""
 "If you promote or demote this object, you may not be allowed to undo this "
 "action."
 msgstr ""
-"このオブジェクトを進めるかまたは拒否した場合、元に戻すことはできません。このアクションをキャンセルします。"
+"このオブジェクトを進めるかまたは拒否した場合、元に戻すことはできません。この"
+"アクションをキャンセルします。"
 
-#: templates/lifecycle.html:32
+#: templates/lifecycle.html:37
+msgid "The following revisions will be cancelled:"
+msgstr ""
+
+#: templates/lifecycle.html:41 templates/lifecycle.html.py:53
+#, python-format
+msgid ""
+"\n"
+"                                Revision %(revision)s : %(name)s\n"
+"                            "
+msgstr ""
+
+#: templates/lifecycle.html:49
+msgid "The following revisions will be deprecated:"
+msgstr ""
+
+#: templates/lifecycle.html:77
 msgid ""
 "You can not demote this object since its state is official or more advanced."
 msgstr ""
-"そのステータスはオフィシャルあるいはそれ以上高度であるため、このオブジェクトを拒否することはできません。"
+"そのステータスはオフィシャルあるいはそれ以上高度であるため、このオブジェクト"
+"を拒否することはできません。"
 
-#: templates/lifecycle.html:35
+#: templates/lifecycle.html:80
 msgid "You do not have the permission to demote this object."
 msgstr "このオブジェクトを拒否する権限がありません。"
 
-#: templates/lifecycle.html:42
+#: templates/lifecycle.html:87
 msgid "You can not promote this object:"
 msgstr "このオブジェクトを進めることができません。"
 
-#: templates/lifecycle.html:46
+#: templates/lifecycle.html:91
 msgid "You do not have the permission to promote this object."
 msgstr "このオブジェクトを続ける権限がありません。"
 
-#: templates/login.html:28
+#: templates/lifecycle.html:99
+#, fuzzy
+msgid "You can not cancel this object since it has more than one revision."
+msgstr "あなたはコントリビューターではないためオブジェクトを作成できません。"
+
+#: templates/lifecycle.html:103
+#, fuzzy
+msgid ""
+"You can not cancel this object since it is related to an other object "
+"(part , document)."
+msgstr ""
+"そのステータスはオフィシャルあるいはそれ以上高度であるため、このオブジェクト"
+"を拒否することはできません。"
+
+#: templates/lifecycle.html:108
+#, fuzzy
+msgid "You do not have the permission to cancel this object."
+msgstr "このオブジェクトを拒否する権限がありません。"
+
+#: templates/lifecycle.html:110
+#, fuzzy
+msgid ""
+"You can not cancel this object since its state is more advanced than draft."
+msgstr ""
+"そのステータスはオフィシャルあるいはそれ以上高度であるため、このオブジェクト"
+"を拒否することはできません。"
+
+#: templates/lifecycle.html:118
+msgid "DEMOTE"
+msgstr ""
+
+#: templates/lifecycle.html:121
+msgid "PROMOTE"
+msgstr ""
+
+#: templates/lifecycle.html:138
+msgid ""
+"Warning, if you cancel this object, it won't be anymore accessible to "
+"everyone."
+msgstr ""
+
+#: templates/lifecycle.html:146
+msgid "CANCEL"
+msgstr ""
+
+#: templates/lifecycle.html:162
+msgid ""
+"Warning, if you publish this object, it will be accessible to everyone, "
+"including anonymous users."
+msgstr ""
+
+#: templates/lifecycle.html:170
+msgid "PUBLISH"
+msgstr ""
+
+#: templates/lifecycle.html:186
+msgid ""
+"Warning, if you unpublish this object, it won't be anymore accessible to "
+"everyone."
+msgstr ""
+
+#: templates/lifecycle.html:194
+msgid "UNPUBLISH"
+msgstr ""
+
+#: templates/lifecycle.html:201
+msgid "This object has been published:"
+msgstr ""
+
+#: templates/lifecycle.html:202
+msgid "Public link"
+msgstr ""
+
+#: templates/lifecycle.html:237 templates/snippets/management_block.html:25
+msgid "REPLACE"
+msgstr "置き換える"
+
+#: templates/lifecycle.html:250
+msgid "Notify"
+msgstr "通知"
+
+#: templates/lifecycle.html:255
+msgid "Unnotify me"
+msgstr "通知しない"
+
+#: templates/lifecycle.html:261
+msgid "Notify me"
+msgstr "通知する"
+
+#: templates/lifecycle.html:267
+msgid "Give access to a restricted account"
+msgstr ""
+
+#: templates/login.html:18
+msgid "openPLM LOGIN PAGE"
+msgstr "OpenPLMへのアクセスページ"
+
+#: templates/login.html:29
 msgid "Welcome to openPLM"
 msgstr "ようこそ、openPLMへ。"
 
-#: templates/login.html:38 templates/blocks/user.html:19
+#: templates/login.html:44 templates/blocks/user.html:25
 msgid "Go"
 msgstr "進む"
 
-#: templates/login.html:45
+#: templates/login.html:53
 msgid "is the first genuine open source PLM based on"
 msgstr "PLMに基づく最初のオープンソースです。"
 
-#: templates/login.html:46
+#: templates/login.html:54
 msgid ""
 "intended to provide a starting point for companies CMS/PLM/BIM projects."
 msgstr ""
-"企業CMS / PLM / BIMプロジェクトへのスターティングポイントを供給することを目的としています。"
+"企業CMS / PLM / BIMプロジェクトへのスターティングポイントを供給することを目的"
+"としています。"
 
-#: templates/login.html:47
+#: templates/login.html:55
 msgid ""
 "By integrating numerous standard reusable PLM functionalities to take care "
 "of the things that companies have in common, it lets you focus on what makes "
 "your company different."
 msgstr ""
-"企業に共通している多くの標準的で再利用可能なPLM機能をインテグレートすることによって、"
-"あなたの会社の特異性とは何かということに集中することができます。"
+"企業に共通している多くの標準的で再利用可能なPLM機能をインテグレートすることに"
+"よって、あなたの会社の特異性とは何かということに集中することができます。"
 
-#: templates/login.html:51
+#: templates/login.html:59
 msgid "For more information about openPLM, see"
 msgstr "openPLMの詳細情報についてはこちらを参照ください。"
 
-#: templates/login.html:54
+#: templates/login.html:62
 msgid "openPLM connexion :"
 msgstr "OpenPLMにログインします。"
 
-#: templates/login.html:63
+#: templates/login.html:71
 msgid "Login :"
 msgstr "ログイン"
 
-#: templates/login.html:67
+#: templates/login.html:75
 msgid "Password :"
 msgstr "パスワード :"
 
-#: templates/login.html:72
+#: templates/login.html:80
 msgid "LOGIN"
 msgstr "ログイン"
 
-#: templates/login.html:77
+#: templates/login.html:85
 msgid ""
 "If you have any trouble logging in to your account, contact your "
 "administrator"
-msgstr ""
-"ログインできない場合は管理者へ問い合わせてください。"
+msgstr "ログインできない場合は管理者へ問い合わせてください。"
 
-#: templates/login.html:79
+#: templates/login.html:89
+msgid "Browse public data."
+msgstr ""
+
+#: templates/login.html:92
 msgid "Professionals"
 msgstr "プロフェッショナル"
 
-#: templates/login.html:82
+#: templates/login.html:95
 msgid ""
 "You are planning to use openPLM in a <b>professional</b> context. If you "
 "want to work with other professionals for your project management, for other "
 "solutions plugins, for openPLM software maintenance, "
 msgstr ""
 "プロジェクトマネジメントの目的や他のソリューションとのインターフェース目的、"
-"もしくはopenPLMソフトウェアのメンテナンスのために他のプロフェッショナルと共同で作業したい場合は、"
-"OpenPLMをプロフェッショナルコンテキスト内で使うことができます。"
+"もしくはopenPLMソフトウェアのメンテナンスのために他のプロフェッショナルと共同"
+"で作業したい場合は、OpenPLMをプロフェッショナルコンテキスト内で使うことができ"
+"ます。"
 
-#: templates/login.html:84
+#: templates/login.html:97
 msgid "contact us"
 msgstr "お問い合わせ先"
-
-#: templates/management.html:13
-msgid "Notify"
-msgstr "通知"
-
-#: templates/management.html:18
-msgid "Unnotify me"
-msgstr "通知しない"
-
-#: templates/management.html:23
-msgid "Notify me"
-msgstr "通知する"
-
-#: templates/management.html:51
-msgid "REPLACE"
-msgstr "置き換える"
-
-#: templates/management.html:58
-msgid "Delete"
-msgstr "削除する"
 
 #: templates/management_replace.html:7
 msgid "Select a user for your delegation as : "
 msgstr "権限を譲渡するユーザーを選択 : "
 
-#: templates/navigate.html:38
+#: templates/navigate.html:37
 msgid "Attach document?"
 msgstr "ドキュメントを添付しますか？"
 
-#: templates/navigate.html:41
+#: templates/navigate.html:40
 msgid "Attach the selected document?"
 msgstr "選択したドキュメントを添付しますか？"
 
-#: templates/navigate.html:56
+#: templates/navigate.html:55
 msgid "Close"
 msgstr "閉じる"
 
-#: templates/navigate.html:75 templates/parts/bom.html:23
-#: templates/parts/parents.html:9
+#: templates/navigate.html:76
+msgid "Zoom out"
+msgstr ""
+
+#: templates/navigate.html:80
+msgid "Zoom in"
+msgstr ""
+
+#: templates/navigate.html:84
+msgid "Fit all"
+msgstr ""
+
+#: templates/navigate.html:88
+msgid "Original"
+msgstr ""
+
+#: templates/navigate.html:99 templates/parts/bom.html:49
+#: templates/parts/parents.html:20
 msgid "Display :"
 msgstr "表示する :"
 
-#: templates/navigate.html:79
+#: templates/navigate.html:103
 msgid "FILTER"
 msgstr "選別する"
 
-#: templates/revisions.html:15
+#: templates/public.html:16
+#, fuzzy
+msgid "Files"
+msgstr "ファイル"
+
+#: templates/public.html:27 templates/documents/files.html:110
+msgid "DOWNLOAD"
+msgstr "ダウンロード"
+
+#: templates/public.html:35 templates/documents/files.html:147
+msgid "No thumbnail available"
+msgstr "利用可能なサムネイルはありません。"
+
+#: templates/public.html:48
+#, fuzzy
+msgid "Attributes"
+msgstr "アトリビュート"
+
+#: templates/public.html:70
+#, fuzzy
+msgid "Revisions"
+msgstr "リビジョン"
+
+#: templates/public.html:92
+#, fuzzy
+msgid "Attached documents"
+msgstr "ドキュメントを添付しますか？"
+
+#: templates/public.html:94
+#, fuzzy
+msgid "Attached parts"
+msgstr "添付する"
+
+#: templates/public.html:119
+msgid "This part is unpublished."
+msgstr ""
+
+#: templates/public.html:121
+#, fuzzy
+msgid "This document is unpublished."
+msgstr "このドキュメントにはファイルがありません。"
+
+#: templates/revisions.html:22
 msgid "NEW"
 msgstr "新しい"
 
-#: templates/revisions.html:19
+#: templates/revisions.html:28
+#, fuzzy
+msgid "You can not revise this object since it is cancelled."
+msgstr "すでにリビジョンが存在するため、このオブジェクトをリバイズできません。"
+
+#: templates/revisions.html:31
+#, fuzzy
+msgid "You can not revise this object since it is deprecated."
+msgstr "すでにリビジョンが存在するため、このオブジェクトをリバイズできません。"
+
+#: templates/revisions.html:33
 msgid "You can not revise this object since a revision already exist."
 msgstr "すでにリビジョンが存在するため、このオブジェクトをリバイズできません。"
 
-#: templates/blocks/creation.html:12
-msgid "Click here to create a new object."
-msgstr "新しいオブジェクトを作成するにはここをクリックしてください。"
+#: templates/blocks/menu.html:11 templates/blocks/reference.html:43
+msgid "click here to subscribe to the related feed"
+msgstr ""
 
-#: templates/blocks/creation.html:13
-msgid "CREATE !"
-msgstr "作成！"
-
-#: templates/blocks/creation.html:19
-msgid "Import"
-msgstr "インポートする"
-
-#: templates/blocks/creation.html:24
-msgid "Import a BOM"
-msgstr "BOMにインポートする"
-
-#: templates/blocks/creation.html:30
-msgid "You can not create an object since you are not a contributor."
-msgstr "あなたはコントリビューターではないためオブジェクトを作成できません。"
-
-#: templates/blocks/search.html:7
+#: templates/blocks/search.html:7 templates/search/search.html:18
 msgid "SEARCH !"
 msgstr "検索！"
 
@@ -1122,100 +1559,283 @@ msgstr "検索！"
 msgid "Results for link creation:"
 msgstr "リンク作成のための結果 :"
 
-#: templates/blocks/search.html:21
-msgid "Results"
-msgstr "結果"
-
-#: templates/blocks/search.html:23
+#: templates/blocks/search.html:24
+#, fuzzy, python-format
 msgid ""
 "\n"
-"(1 - %(count)s on %(total)s)\n"
+"                    (1 - %(count)s on %(total)s)\n"
+"                "
 msgstr ""
 "\n"
 "(1 - %(count)s sur %(total)s)\n"
 
-#: templates/blocks/search.html:35
-msgid "Attach"
-msgstr "添付する"
+#: templates/blocks/search.html:27
+#, fuzzy
+msgid "All results"
+msgstr "結果"
 
-#: templates/blocks/search.html:36
-msgid "Add child"
-msgstr "チャイルドを追加する"
-
-#: templates/blocks/search.html:50 templates/documents/files.html:53
-#: templates/documents/parts.html:11 templates/parts/bom.html:19
-msgid "ADD"
-msgstr "追加する"
-
-#: templates/blocks/search.html:62 templates/search/search.html:38
+#: templates/blocks/search.html:40 templates/search/search.html:44
 msgid "No result matching given query"
 msgstr "検索に該当する結果はありません。"
 
-#: templates/documents/files.html:45 templates/parts/doccad.html:10
+#: templates/blocks/supermenu.html:11
+msgid "Search for a part, a document, a file and more."
+msgstr ""
+
+#: templates/blocks/supermenu.html:17
+msgid "Restricted account, search not available."
+msgstr ""
+
+#: templates/blocks/supermenu.html:29 templates/blocks/supermenu.html.py:35
+msgid "Navigate"
+msgstr ""
+
+#: templates/blocks/supermenu.html:31
+msgid "Graphically explore your parts and documents."
+msgstr ""
+
+#: templates/blocks/supermenu.html:37
+msgid "Restricted account, navigate not available."
+msgstr ""
+
+#: templates/blocks/supermenu.html:50
+msgid "Browse all parts, groups, users and documents."
+msgstr ""
+
+#: templates/blocks/supermenu.html:60 templates/blocks/supermenu.html.py:66
+msgid "Create"
+msgstr "作成"
+
+#: templates/blocks/supermenu.html:62
+msgid "Create a new part, a new document or a new group."
+msgstr ""
+
+#: templates/blocks/supermenu.html:68
+#, fuzzy
+msgid "You can not create a part or document since you are not a contributor."
+msgstr "あなたはコントリビューターではないためオブジェクトを作成できません。"
+
+#: templates/blocks/supermenu.html:76
+msgid "Study"
+msgstr ""
+
+#: templates/blocks/supermenu.html:78
+msgid "See/edit your personal data and explore your parts and document."
+msgstr ""
+
+#: templates/blocks/user.html:9
+msgid "Log in"
+msgstr ""
+
+#: templates/blocks/user.html:38
+msgid "Help"
+msgstr ""
+
+#: templates/blocks/user.html:43
+msgid "Logout"
+msgstr ""
+
+#: templates/documents/clone.html:3
+#, fuzzy
+msgid ""
+"Here is the list of parts you may want to attach to the new document. Select "
+"parts you want to attach and validate to make a new document."
+msgstr ""
+"新しいリビジョンに添付することができる部品のリストです。新しいリビジョンを作"
+"成するために添付したい箇所を選択し有効であることを確認してください。"
+
+#: templates/documents/files.html:62
+msgid "The status of this document does not allow adding/deleting files."
+msgstr ""
+
+#: templates/documents/files.html:64
+#, fuzzy
+msgid "You don't have the necessary rights to add/delete files."
+msgstr "このオブジェクトを拒否する権限がありません。"
+
+#: templates/documents/files.html:70 templates/parts/doccad.html:29
 msgid "Download all files"
 msgstr "すべてのファイルをダウンロード"
 
-#: templates/documents/files.html:56
+#: templates/documents/files.html:79 templates/documents/parts.html:36
+#: templates/parts/bom.html:39 templates/search/result.html:25
+msgid "ADD"
+msgstr "追加する"
+
+#: templates/documents/files.html:83
 msgid "DELETE"
 msgstr "削除する"
 
-#: templates/documents/files.html:71
+#: templates/documents/files.html:84
+msgid "CHECK ALL"
+msgstr ""
+
+#: templates/documents/files.html:85
+msgid "UNCHECK ALL"
+msgstr ""
+
+#: templates/documents/files.html:100
 msgid "Locked"
 msgstr "ロック"
 
-#: templates/documents/files.html:73
+#: templates/documents/files.html:102
 msgid "Unlocked"
 msgstr "ロック解除"
 
-#: templates/documents/files.html:80
-msgid "DOWNLOAD"
-msgstr "ダウンロード"
-
-#: templates/documents/files.html:88
+#: templates/documents/files.html:119
 msgid "CHECK-IN"
 msgstr "チェックイン"
 
-#: templates/documents/files.html:97
+#: templates/documents/files.html:128
 msgid "CHECK-OUT"
 msgstr "チェックアウト"
 
-#: templates/documents/files.html:102
+#: templates/documents/files.html:133
 msgid "Native related file is locked"
 msgstr "関連したネイティブファイルはロックされています。"
 
-#: templates/documents/files.html:116
-msgid "No thumbnail available"
-msgstr "利用可能なサムネイルはありません。"
-
-#: templates/documents/files.html:128 templates/parts/doccad.html:16
+#: templates/documents/files.html:159 templates/parts/doccad.html:37
 msgid "Download merged PDF files"
 msgstr "結合されたpdfファイルをダウンロードする"
 
-#: templates/documents/files.html:134
+#: templates/documents/files.html:165
 msgid "Confirm CHECK-OUT"
 msgstr "チェックアウトを確認してください。"
 
-#: templates/documents/files.html:135
+#: templates/documents/files.html:166
 msgid ""
 "You'are checking out a standardfile while a native file is available. Your "
 "native file will be deprecated and will not be usable anymore."
 msgstr ""
-"ネイティブファイルが有効である間はずっと標準ファイルの確認をします。"
-"その後ネイティブファイルは廃止され使用できなくなります。"
+"ネイティブファイルが有効である間はずっと標準ファイルの確認をします。その後ネ"
+"イティブファイルは廃止され使用できなくなります。"
 
-#: templates/documents/files.html:141
+#: templates/documents/files.html:172
 msgid "Deprecated files:"
 msgstr "廃止されたファイル:"
 
-#: templates/documents/files_add.html:7
-msgid "Add new file / Check-in file :"
+#: templates/documents/files_add.html:6
+#, fuzzy
+msgid "Add new files / Check-in file :"
 msgstr "新しいファイルを追加する / ファイルをチェックインする :"
 
-#: templates/documents/parts.html:13 templates/parts/doccad.html:61
+#: templates/documents/files_add.html:14
+msgid "You can only upload one file at a time."
+msgstr ""
+
+#: templates/documents/files_add.html:15
+msgid "Use the Validate button to send your file."
+msgstr ""
+
+#: templates/documents/files_add.html:20
+msgid "Upload"
+msgstr ""
+
+#: templates/documents/files_add.html:21
+#: templates/snippets/management_block.html:32
+msgid "Delete"
+msgstr "削除する"
+
+#: templates/documents/files_add.html:21
+msgid "Delete the files selected for upload"
+msgstr ""
+
+#: templates/documents/files_add.html:33
+msgid "Select at least one file"
+msgstr ""
+
+#: templates/documents/files_add.html:34
+msgid "A STEP file is already linked to this document."
+msgstr ""
+
+#: templates/documents/files_add.html:35
+msgid "A file named "
+msgstr ""
+
+#: templates/documents/files_add.html:36
+#, fuzzy
+msgid "is already linked to this document."
+msgstr "このドキュメントには添付ファイルはありません。"
+
+#: templates/documents/files_add.html:37
+msgid "You have already selected the file"
+msgstr ""
+
+#: templates/documents/files_add.html:38
+msgid "for upload"
+msgstr ""
+
+#: templates/documents/files_add.html:39
+msgid "remove the file from the queue"
+msgstr ""
+
+#: templates/documents/files_add.html:40
+msgid "Your upload(s) failed"
+msgstr ""
+
+#: templates/documents/files_add.html:41
+msgid "Try again"
+msgstr ""
+
+#: templates/documents/files_add.html:42
+msgid "maybe with less files. "
+msgstr ""
+
+#: templates/documents/files_add.html:43
+msgid "You are checking-in for "
+msgstr ""
+
+#: templates/documents/files_add.html:44
+msgid "You must add a file with this name."
+msgstr ""
+
+#: templates/documents/files_add.html:45
+msgid "Show/Hide the upload form"
+msgstr ""
+
+#: templates/documents/files_add.html:46
+msgid "Check-in for file "
+msgstr ""
+
+#: templates/documents/files_add.html:47
+msgid "You can only upload files, but you wont get progress of this upload"
+msgstr ""
+
+#: templates/documents/files_add.html:48
+msgid "Do not leave the current page before the upload ends"
+msgstr ""
+
+#: templates/documents/files_add.html:49
+msgid "waiting"
+msgstr ""
+
+#: templates/documents/files_add.html:50
+msgid "Total"
+msgstr ""
+
+#: templates/documents/identity_card.html:32
+#, python-format
+msgid ""
+"\n"
+"            %(file_count)s file\n"
+"            "
+msgid_plural ""
+"\n"
+"            %(file_count)s files\n"
+"        "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/documents/parts.html:42
+#, fuzzy
+msgid "Create a part and attach it to the document."
+msgstr "このドキュメントには添付ファイルはありません。"
+
+#: templates/documents/parts.html:49 templates/parts/doccad.html:99
 msgid "DISCONNECT"
 msgstr "切断"
 
-#: templates/documents/parts.html:44
+#: templates/documents/parts.html:80
 msgid "There are no parts attached to this document"
 msgstr "このドキュメントには添付ファイルはありません。"
 
@@ -1224,25 +1844,29 @@ msgid ""
 "Here is the list of parts you may want to attach to the new revision. Select "
 "parts you want to attach and validate to make a new revision."
 msgstr ""
-"新しいリビジョンに添付することができる部品のリストです。"
-"新しいリビジョンを作成するために添付したい箇所を選択し有効であることを確認してください。"
+"新しいリビジョンに添付することができる部品のリストです。新しいリビジョンを作"
+"成するために添付したい箇所を選択し有効であることを確認してください。"
 
 #: templates/groups/accept_invitation.html:5
 msgid "Accept invitation ?"
 msgstr "招待に応じますか？"
 
 #: templates/groups/accept_invitation.html:7
+#, fuzzy, python-format
 msgid ""
 "\n"
-"Accept that %(guest)s join the group %(group)s ?\n"
+"            Accept that %(guest)s join the group %(group)s ?\n"
+"        "
 msgstr ""
 "\n"
 "応じる %(guest)s グループに参加することに %(group)s ?\n"
 
 #: templates/groups/accept_invitation.html:11
+#, fuzzy, python-format
 msgid ""
 "\n"
-"Accept to join the group %(group)s ?\n"
+"            Accept to join the group %(group)s ?\n"
+"        "
 msgstr ""
 "\n"
 "グループに参加することに応じます。 %(group)s ?\n"
@@ -1256,7 +1880,7 @@ msgid "The user will receive an e-mail and could accept your invitation."
 msgstr "ユーザーはメールを受信しあなたの招待に応じることができます。"
 
 #: templates/groups/add_user.html:12
-msgid "You can not invite an user to this group."
+msgid "You can not invite a user to this group."
 msgstr "このグループにはユーザーを招待できません。"
 
 #: templates/groups/ask_to_join.html:6
@@ -1267,9 +1891,22 @@ msgstr "あなたはすでにこのグループのメンバーです。"
 msgid "Join this group ?"
 msgstr "このグループに参加しますか？"
 
+#: templates/groups/identity_card.html:7
 #: templates/groups/pending_invitations.html:7
 msgid "Group"
 msgstr "グループ"
+
+#: templates/groups/objects.html:7
+#, fuzzy
+msgid "No object belongs to this group."
+msgstr "このグループにはユーザーを招待できません。"
+
+#: templates/groups/objects.html:13
+#, fuzzy, python-format
+msgid " %(start)s - %(end)s on %(total)s "
+msgstr ""
+"\n"
+"(1 - %(count)s sur %(total)s)\n"
 
 #: templates/groups/pending_invitations.html:10 templates/groups/users.html:29
 msgid "First name"
@@ -1283,15 +1920,15 @@ msgstr "名"
 msgid "Date of the invitation"
 msgstr "招待日"
 
-#: templates/groups/pending_invitations.html:37
+#: templates/groups/pending_invitations.html:43
 msgid "Resend"
 msgstr "再送信"
 
-#: templates/groups/pending_invitations.html:45
+#: templates/groups/pending_invitations.html:57
 msgid "Accept"
 msgstr "応じる"
 
-#: templates/groups/pending_invitations.html:50
+#: templates/groups/pending_invitations.html:68
 msgid "Refuse"
 msgstr "拒否する"
 
@@ -1300,24 +1937,24 @@ msgid "Refuse invitation ?"
 msgstr "招待を拒否しますか？"
 
 #: templates/groups/refuse_invitation.html:7
+#, fuzzy, python-format
 msgid ""
 "\n"
-"Refuse that %(guest)s join the group %(group)s ?\n"
+"            Refuse that %(guest)s join the group %(group)s ?\n"
+"        "
 msgstr ""
 "\n"
 "拒否する %(guest)s グループに参加することを %(group)s ?\n"
 
 #: templates/groups/refuse_invitation.html:11
+#, fuzzy, python-format
 msgid ""
 "\n"
-"Refuse to join the group %(group)s ?\n"
+"            Refuse to join the group %(group)s ?\n"
+"        "
 msgstr ""
 "\n"
 " グループに参加することを拒否する %(group)s ?\n"
-
-#: templates/groups/users.html:8
-msgid "Users"
-msgstr "ユーザー"
 
 #: templates/groups/users.html:13
 msgid "Invite another user"
@@ -1340,50 +1977,61 @@ msgid ""
 "The following invitations have been sent but guests have not yet accepted "
 "them."
 msgstr ""
-"以下の招待が送信されましたがゲストはまだ招待に応じていません。"
-"pas encore acceptées."
+"以下の招待が送信されましたがゲストはまだ招待に応じていません。pas encore "
+"acceptées."
 
-#: templates/import/csv.html:6
+#: templates/import/csv.html:19
 msgid "Import of a csv file"
 msgstr "csvファイルをインポートする。"
 
-#: templates/import/csv.html:16
-msgid "Error"
-msgstr "エラー"
-
-#: templates/import/csv.html:22
+#: templates/import/csv.html:35
 #, python-format
 msgid " Line %(line)s "
 msgstr "ライン %(line)s"
 
-#: templates/import/csv.html:32
+#: templates/import/csv.html:45
 msgid "Error while reading the CSV file. Try upload a new file."
 msgstr ""
-"csvファイル読み取り中のエラーです。新しいファイルをアップロードしてみてください。."
+"csvファイル読み取り中のエラーです。新しいファイルをアップロードしてみてくださ"
+"い。."
 
-#: templates/import/csv.html:35
+#: templates/import/csv.html:48
 msgid ""
 "The given encoding seems wrong. Try upload a new file with the right "
 "encoding."
 msgstr ""
-"与えられたエンコーディングは誤りのようです。正しく新しいファイルをアップロードしてみてください。"
+"与えられたエンコーディングは誤りのようです。正しく新しいファイルをアップロー"
+"ドしてみてください。"
 
-#: templates/import/csv.html:50
+#: templates/import/csv.html:63
 msgid "Field"
 msgstr "フィールド"
 
-#: templates/import/csv.html:51
+#: templates/import/csv.html:64
 msgid "Header"
 msgstr "ヘッダ"
 
-#: templates/import/csv.html:53
+#: templates/import/csv.html:66
 msgid "Row"
 msgstr "ライン"
 
-#: templates/import/csv.html:68 templates/parts/bom_edit.html:48
-#: templates/snippets/undo_form.html:13
+#: templates/import/csv.html:81 templates/parts/bom_edit.html:50
+#: templates/snippets/undo_form.html:14
 msgid "Validate"
 msgstr "検証する"
+
+#: templates/import/csv.html:89
+msgid "Your csv file must have a column for each required field"
+msgstr ""
+
+#: templates/import/csv.html:90
+msgid "Examples and more precise descriptions are available in the"
+msgstr ""
+
+#: templates/import/csv.html:90
+#, fuzzy
+msgid "documentation"
+msgstr "作成日"
 
 #: templates/import/done.html:6
 msgid "Data have been successfully imported."
@@ -1401,15 +2049,15 @@ msgstr "新しいBOMをインポートするにはここをクリックしてく
 msgid "Click here to sponsor more users."
 msgstr "より多くのユーザーを持つためにはここをクリックしてください。"
 
-#: templates/mails/history.html:6
+#: templates/mails/history.html:6 templates/mails/history.txt:3
 msgid "Message from openPLM"
 msgstr "openPLMからのメッセージ"
 
-#: templates/mails/history.html:8
+#: templates/mails/history.html:8 templates/mails/history.txt:5
 msgid "Object:"
 msgstr "オブジェクト :"
 
-#: templates/mails/history.html:11
+#: templates/mails/history.html:11 templates/mails/history.txt:7
 msgid "A new action has been done:"
 msgstr "新しいアクションが実行されました。:"
 
@@ -1421,17 +2069,29 @@ msgstr "詳細"
 msgid "Click here to see more details."
 msgstr "詳細をもっと見るにはここをクリックしてください。"
 
+#: templates/mails/history.txt:9
+#, fuzzy
+msgid "Details:"
+msgstr "詳細"
+
+#: templates/mails/history.txt:14
+msgid "Url of the object:"
+msgstr ""
+
 #: templates/mails/invitation1.html:5 templates/mails/invitation2.html:5
+#, fuzzy, python-format
 msgid ""
 "\n"
-"%(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join "
 "the group %(group)s.\n"
+"        "
 msgstr ""
 "\n"
-" %(s_first_name)s %(s_last_name)s (%(s_username)s) 参加するかどうか聞く "
-"グループに %(group)s.\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s) 参加するかどうか聞く グ"
+"ループに %(group)s.\n"
 
-#: templates/mails/invitation1.html:11 templates/mails/invitation2.html:11
+#: templates/mails/invitation1.html:11 templates/mails/invitation1.txt:7
+#: templates/mails/invitation2.html:11 templates/mails/invitation2.txt:7
 msgid "Click here to accept the invitation"
 msgstr "招待に応じるためにはここをクリックしてください。"
 
@@ -1439,7 +2099,8 @@ msgstr "招待に応じるためにはここをクリックしてください。
 msgid "Accept invitation"
 msgstr "招待に応じる"
 
-#: templates/mails/invitation1.html:14 templates/mails/invitation2.html:14
+#: templates/mails/invitation1.html:14 templates/mails/invitation1.txt:10
+#: templates/mails/invitation2.html:14 templates/mails/invitation2.txt:10
 msgid "Click here to refuse the invitation"
 msgstr "招待を拒否するにはここをクリックしてください。"
 
@@ -1447,19 +2108,34 @@ msgstr "招待を拒否するにはここをクリックしてください。"
 msgid "Refuse invitation"
 msgstr "招待を拒否する"
 
-#: templates/mails/new_account.html:5
+#: templates/mails/invitation1.txt:3 templates/mails/invitation2.txt:3
+#, python-format
 msgid ""
 "\n"
-"Welcome %(first_name)s %(last_name)s!\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) ask you to join the group "
+"%(group)s.\n"
+msgstr ""
+"\n"
+" %(s_first_name)s %(s_last_name)s (%(s_username)s) 参加するかどうか聞く グ"
+"ループに %(group)s.\n"
+
+#: templates/mails/new_account.html:5
+#, fuzzy, python-format
+msgid ""
+"\n"
+"            Welcome %(first_name)s %(last_name)s!\n"
+"            "
 msgstr ""
 "\n"
 " ようこそ %(first_name)s %(last_name)s!\n"
 
 #: templates/mails/new_account.html:10
+#, fuzzy, python-format
 msgid ""
 "\n"
-"%(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
+"        %(s_first_name)s %(s_last_name)s (%(s_username)s) added you to "
 "OpenPLM.\n"
+"        "
 msgstr ""
 "\n"
 " %(s_first_name)s %(s_last_name)s (%(s_username)s) openPLMに追加した\n"
@@ -1484,23 +2160,72 @@ msgstr "パスワードを変更しなければいけません！"
 msgid "Click here to change your password"
 msgstr "パスワードを変更するにはここをクリックしてください。"
 
-#: templates/parts/bom.html:27 templates/parts/parents.html:13
+#: templates/mails/new_account.txt:3
+#, python-format
+msgid ""
+"\n"
+"Welcome %(first_name)s %(last_name)s!  \n"
+"\n"
+"%(s_first_name)s %(s_last_name)s (%(s_username)s) added you to OpenPLM.\n"
+"\n"
+"Your credentials:\n"
+"\n"
+"    - username: %(username)s\n"
+"    - password: %(password)s\n"
+"\n"
+"You should change your password !\n"
+"See http://%(domain)s/user/%(username_url)s/password/\n"
+"\n"
+msgstr ""
+
+#: templates/navigate/add_buttons.html:9
+#, fuzzy
+msgid "Attach a new document"
+msgstr "別のドキュメントを添付する"
+
+#: templates/navigate/add_buttons.html:16
+msgid "Add a new part"
+msgstr ""
+
+#: templates/navigate/add_buttons.html:28
+#, fuzzy
+msgid "Attach a new part"
+msgstr "別のドキュメントを添付する"
+
+#: templates/navigate/node.html:10
+msgid "Display thumbnails"
+msgstr ""
+
+#: templates/navigate/node.html:15
+#, fuzzy
+msgid "Show related documents"
+msgstr "選択したドキュメントを添付しますか？"
+
+#: templates/parts/bom.html:43
+msgid "Create a part and add it"
+msgstr ""
+
+#: templates/parts/bom.html:46
+msgid "EDIT"
+msgstr "編集"
+
+#: templates/parts/bom.html:53 templates/parts/parents.html:24
 msgid "GO !"
 msgstr "進む！"
 
-#: templates/parts/bom.html:31
+#: templates/parts/bom.html:61
 msgid "Level"
 msgstr "レベル"
 
-#: templates/parts/bom.html:32
+#: templates/parts/bom.html:62
 msgid "Ord."
 msgstr ""
 
-#: templates/parts/bom.html:33
+#: templates/parts/bom.html:63
 msgid "Qty"
 msgstr ""
 
-#: templates/parts/bom.html:34 templates/parts/bom_edit.html:13
+#: templates/parts/bom.html:64 templates/parts/bom_edit.html:13
 msgid "Unit"
 msgstr "ユニット"
 
@@ -1516,13 +2241,54 @@ msgstr "クオンティティ"
 msgid "Delete ?"
 msgstr "削除しますか？"
 
-#: templates/parts/doccad.html:49
+#: templates/parts/bom_edit.html:37
+msgid "(replace)"
+msgstr ""
+
+#: templates/parts/bom_replace.html:9
+#, python-format
+msgid ""
+" \n"
+"            Select a part to replace the part %(type)s // %(reference)s // "
+"%(revision)s // %(name)s.\n"
+"        "
+msgstr ""
+
+#: templates/parts/clone.html:7
+#, fuzzy
+msgid ""
+"Here is the list of documents you may want to attach to the new part. Select "
+"documents you want to attach."
+msgstr ""
+"新しいリビジョンに添付できるドキュメントリストです。添付したいドキュメントを"
+"選択してください。"
+
+#: templates/parts/clone.html:29
+#, fuzzy
+msgid ""
+"Here is the list of parts you may want to add to the new part. Select parts "
+"you want to add."
+msgstr ""
+"新しいリビジョンに添付できる箇所のリストです。添付したい箇所を選択してくださ"
+"い。"
+
+#: templates/parts/doccad.html:30
+#, fuzzy
+msgid "Download all CAD files"
+msgstr "すべてのファイルをダウンロード"
+
+#: templates/parts/doccad.html:71
 msgid "There are no documents attached to this part."
 msgstr "この箇所には添付されたドキュメントはありません。"
 
-#: templates/parts/doccad.html:58
+#: templates/parts/doccad.html:86
 msgid "Attach another document"
 msgstr "別のドキュメントを添付する"
+
+#: templates/parts/doccad.html:94
+#, fuzzy
+msgid "Create a document and attach it to the part."
+msgstr "この箇所には添付されたドキュメントはありません。"
 
 #: templates/parts/doccad_add.html:7
 msgid "Connect new document :"
@@ -1533,23 +2299,51 @@ msgid ""
 "Here is the list of documents you may want to attach to the new revision. "
 "Select documents you want to attach."
 msgstr ""
-"新しいリビジョンに添付できるドキュメントリストです。添付したいドキュメントを選択してください。"
+"新しいリビジョンに添付できるドキュメントリストです。添付したいドキュメントを"
+"選択してください。"
 
 #: templates/parts/revisions.html:35
 msgid ""
 "Here is the list of parts you may want to add to the new revision. Select "
 "parts you want to add."
 msgstr ""
-"新しいリビジョンに添付できる箇所のリストです。添付したい箇所を選択してください。"
+"新しいリビジョンに添付できる箇所のリストです。添付したい箇所を選択してくださ"
+"い。"
 
 #: templates/parts/revisions.html:57
 msgid ""
 "Here is the list of the current parents you may want to update to link to "
 "the new revision. Select parts you want to update."
 msgstr ""
-"新しいリビジョンにリンクするためにアップデートできる現在のペアレントリストです。"
-"アップデートしたい箇所を選択してください。"
+"新しいリビジョンにリンクするためにアップデートできる現在のペアレントリストで"
+"す。アップデートしたい箇所を選択してください。"
 
+#: templates/search/result.html:7
+msgid "Attach"
+msgstr "添付する"
+
+#: templates/search/result.html:8
+msgid "Add child"
+msgstr "チャイルドを追加する"
+
+#: templates/search/search.html:51
+#, fuzzy
+msgid "Previous"
+msgstr "リビジョン"
+
+#: templates/search/search.html:55
+msgid "Next"
+msgstr ""
+
+#: templates/snippets/pagination.html:8
+#, fuzzy
+msgid "First page"
+msgstr "姓"
+
+#: templates/snippets/pagination.html:26
+#, fuzzy
+msgid "Last page"
+msgstr "名"
 
 #: templates/users/delegation.html:8
 msgid "START DELEGATE :"
@@ -1599,6 +2393,21 @@ msgstr "権限譲渡を中止する"
 msgid "Resend mail"
 msgstr "メールを再送する"
 
+#: templates/users/groups.html:15
+#, fuzzy
+msgid "Click here to create another group."
+msgstr "新しいオブジェクトを作成するにはここをクリックしてください。"
+
+#: templates/users/groups.html:20
+#, fuzzy
+msgid "You are in the following groups:"
+msgstr "あなたはすでにこのグループのメンバーです。"
+
+#: templates/users/identity_card.html:7
+#, fuzzy
+msgid "User"
+msgstr "ユーザー"
+
 #: templates/users/password.html:7
 msgid "PASSWORD MODIFICATION:"
 msgstr "パスワードの変更"
@@ -1607,9 +2416,9 @@ msgstr "パスワードの変更"
 msgid "CHANGE PASSWORD"
 msgstr "パスワードを変更する"
 
-#: templates/users/sponsor.html:9
-msgid "Sponsor a new user"
-msgstr "新しいユーザーを支持する"
+#: templates/users/plmobjects.html:19
+msgid "Last edited objects"
+msgstr "最後に編集したオブジェクト"
 
 #: templates/users/sponsor.html:10
 msgid "Click here to sponsor several users from a CSV file."
@@ -1621,3 +2430,33 @@ msgid "You can not sponsor a new user since you are not a contributor."
 msgstr ""
 "コントリビューターではないので新しいユーザーを支持することはできません。"
 
+#~ msgid "management"
+#~ msgstr "マネジメント"
+
+#~ msgid "Error 404: page not found"
+#~ msgstr "エラー 404: ページが見つかりません。"
+
+#~ msgid "PASSWORD"
+#~ msgstr "パスワード"
+
+#~ msgid ""
+#~ "\n"
+#~ "One comment has been posted.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "コメントが投稿されます。\n"
+
+#~ msgid "EXIT"
+#~ msgstr "終了"
+
+#~ msgid "Click here to edit your personal information."
+#~ msgstr "個人情報を編集するにはここをクリックしてください。"
+
+#~ msgid "CREATE !"
+#~ msgstr "作成！"
+
+#~ msgid "Import"
+#~ msgstr "インポートする"
+
+#~ msgid "Import a BOM"
+#~ msgstr "BOMにインポートする"
