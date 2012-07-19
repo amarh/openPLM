@@ -76,7 +76,7 @@ class UserController(Controller):
 
         Example::
 
-            >>> ctrl.get_verbose_nam("rank")
+            >>> ctrl.get_verbose_name("rank")
             u'role in PLM'
         """
 
@@ -171,7 +171,7 @@ class UserController(Controller):
         Delegates role *role* to *user*.
         
         Possible values for *role* are:
-            ``'notified``
+            ``'notified'``
                 valid for all users
             ``'owner'``
                 valid only for contributors and administrators
