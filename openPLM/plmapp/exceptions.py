@@ -51,7 +51,7 @@ class LockError(ControllerError):
 class UnlockError(ControllerError):
     """
     Exception raised when :meth:`~Document.unlock` is called but the document
-    is unlocked or the user is not allowed to unlocked the document.
+    is unlocked or the user is not allowed to unlock the document.
     """
 
 class AddFileError(ControllerError):
@@ -61,16 +61,16 @@ class AddFileError(ControllerError):
 
 class DeleteFileError(ControllerError):
     """
-    Exception raised when an error occurs while deleting a file to a document
+    Exception raised when an error occurs while deleting a file from a document
     """
 
 class PermissionError(ControllerError):
     """
-    Exception raised when an user attempt to made an unauthorized action
+    Exception raised when a user attempt to made an unauthorized action
     """
 
 class PromotionError(ControllerError):
     """
-    Exception raised when an user attempt to promote anon-promotable object
+    Exception raised when a user attempt to promote a non-promotable object
     """
 
