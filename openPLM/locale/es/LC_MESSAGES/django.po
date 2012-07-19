@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-12 17:18+0200\n"
+"POT-Creation-Date: 2012-07-19 16:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -864,8 +864,7 @@ msgstr "Introduzca una dirección de e-mail válida."
 msgid "e-mail address"
 msgstr "dirección e-mail"
 
-#: plmapp/views/main.py:751 templates/home.html:28
-#: templates/blocks/user.html:41
+#: plmapp/views/main.py:751 templates/blocks/user.html:33
 msgid "Timeline"
 msgstr ""
 
@@ -1073,7 +1072,7 @@ msgid "Published"
 msgstr "Publicado"
 
 #: templates/browse.html:60 templates/browse.html.py:83
-#: templates/blocks/search.html:32 templates/search/search.html:22
+#: templates/blocks/search.html:22 templates/search/search.html:22
 #: templates/search/search.html.py:27
 msgid "Results"
 msgstr "Resultados"
@@ -1221,11 +1220,11 @@ msgstr "atras"
 msgid "Welcome %(full_name)s"
 msgstr "Bienvenido %(full_name)s"
 
-#: templates/home.html:36
+#: templates/home.html:28
 msgid "Groups that you own: pending invitations"
 msgstr "Grupos propios:Invitaciones pendientes"
 
-#: templates/home.html:47
+#: templates/home.html:39
 msgid "Groups that you may join: pending invitations"
 msgstr "Grupos a los que usted puede unirse: invitacion pendientes"
 
@@ -1558,7 +1557,7 @@ msgid "You can not revise this object since a revision already exist."
 msgstr ""
 "Usted no puede revisar este objeto por que ya existe una revision del mismo."
 
-#: templates/blocks/menu.html:11
+#: templates/blocks/menu.html:11 templates/blocks/reference.html:43
 msgid "click here to subscribe to the related feed"
 msgstr "click aqui para suscribirte para el relacionado feed"
 
@@ -1570,7 +1569,7 @@ msgstr "BUSCAR !"
 msgid "Results for link creation:"
 msgstr "Resultados para creación de link:"
 
-#: templates/blocks/search.html:34
+#: templates/blocks/search.html:24
 #, python-format
 msgid ""
 "\n"
@@ -1581,11 +1580,11 @@ msgstr ""
 "                    (1 - %(count)s en %(total)s)\n"
 "                "
 
-#: templates/blocks/search.html:37
+#: templates/blocks/search.html:27
 msgid "All results"
 msgstr "Todos los resultados"
 
-#: templates/blocks/search.html:50 templates/search/search.html:44
+#: templates/blocks/search.html:40 templates/search/search.html:44
 msgid "No result matching given query"
 msgstr "Ningun resultados para la consulta"
 
@@ -1637,11 +1636,11 @@ msgstr "Vea/edite sus datos personales y explore sus partes y documentos"
 msgid "Log in"
 msgstr "Entrar"
 
-#: templates/blocks/user.html:32
+#: templates/blocks/user.html:38
 msgid "Help"
 msgstr "Ayuda"
 
-#: templates/blocks/user.html:37
+#: templates/blocks/user.html:43
 msgid "Logout"
 msgstr "Salir"
 
@@ -1896,7 +1895,7 @@ msgid "The user will receive an e-mail and could accept your invitation."
 msgstr "El usuario recibira un e-mail y podrá aceptar vuestra invitación."
 
 #: templates/groups/add_user.html:12
-msgid "You can not invite an user to this group."
+msgid "You can not invite a user to this group."
 msgstr "No puede invitar un usuario a este grupo."
 
 #: templates/groups/ask_to_join.html:6
