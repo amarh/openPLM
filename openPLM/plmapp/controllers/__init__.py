@@ -50,7 +50,7 @@ For example::
     >>> controller_cls = get_controller(obj.type)
     >>> controller = controller_cls(obj, user)
 
-Then you can modify/access the attributes of the PLMObject and save the
+Then you can modify/access the attributes of the ``PLMObject`` and save the
 modifications:
 
     >>> controller.name = "New Name"
