@@ -157,7 +157,7 @@ class GroupController(Controller):
         """
         Asks *user* to join the group.
 
-        It sends to *user* an email so that he can validate its inscription.
+        An email is sent to *user* so that he can validate its inscription.
 
         :raises: :exc:`ValueError` if user's email is empty.
         """
@@ -173,7 +173,7 @@ class GroupController(Controller):
         """
         Asks to join the group.
         
-        It sends an email to the group's owner so that he can validate the
+        An email is sent to the group's owner so that he can validate the
         inscription.
         
         :raises: :exc:`ValueError` if the owner's email is empty.
