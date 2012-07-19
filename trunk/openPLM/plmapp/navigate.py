@@ -131,7 +131,7 @@ class NavigationGraph(object):
     def __init__(self, obj, results=()):
         self.object = obj
         self.results = [r.id for r in results]
-        # a PLMObject and an user may have the same id, so we add a variable
+        # a PLMObject and a user may have the same id, so we add a variable
         # which tells if results contains users
         self.users_result = self.groups_result = False
         if results:

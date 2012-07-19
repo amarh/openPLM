@@ -166,7 +166,7 @@ class UserProfile(models.Model):
    
 
 def add_profile(sender, instance, created, **kwargs):
-    """ function called when an user is created to add his profile """
+    """ function called when a user is created to add his profile """
     if sender == User and created:
         profile = UserProfile(user=instance)
         profile.save()
@@ -642,7 +642,7 @@ class PLMObject(models.Model):
     @_cache_lifecycle_stuff
     def get_current_sign_level(self):
         """
-        Returns the current sign level that an user must have to promote this
+        Returns the current sign level that a user must have to promote this
         object.
         """
         rank = LifecycleStates.objects.get(state=self.state,
@@ -652,7 +652,7 @@ class PLMObject(models.Model):
     @_cache_lifecycle_stuff
     def get_previous_sign_level(self):
         """
-        Returns the current sign level that an user must have to demote this
+        Returns the current sign level that a user must have to demote this
         object.
         """
         rank = LifecycleStates.objects.get(state=self.state,

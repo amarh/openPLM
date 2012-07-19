@@ -154,7 +154,7 @@ class ControllerTest(BaseTestCase):
 
     def test_revise_same_group(self):
         """
-        Test that an user can revise an object if it belongs to its group.
+        Test that a user can revise an object if it belongs to its group.
         """
         controller = self.create("Part1")
         user = self.get_contributor()
@@ -171,7 +171,7 @@ class ControllerTest(BaseTestCase):
 
     def test_revise_error_other_group(self):
         """
-        Tests that an user who does not belong to the group cannot revise
+        Tests that a user who does not belong to the group cannot revise
         the object.
         """
         controller = self.create("Part1")
@@ -431,7 +431,7 @@ class ControllerTest(BaseTestCase):
 
     def test_is_readable_group_ok(self):
         """
-        Tests that an user who belongs to the object's group can see the
+        Tests that a user who belongs to the object's group can see the
         object.
         """
         controller = self.create("P1")
@@ -442,7 +442,7 @@ class ControllerTest(BaseTestCase):
 
     def test_is_readable_group_invalid(self):
         """
-        Tests that an user who does not belong to the object's group can not
+        Tests that a user who does not belong to the object's group can not
         see the object.
         """
         controller = self.create("P1")

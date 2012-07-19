@@ -238,7 +238,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
     Generic object view.
 
     Permanently redirects to the attribute page of the given object if it
-    is a part, an user or a group and to the files page if it is a document.
+    is a part, a user or a group and to the files page if it is a document.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
@@ -521,7 +521,7 @@ def revise_document(obj, ctx, request):
                         part = form.instance
                         if part not in parts: 
                             # invalid data
-                            # an user should not be able to go here if he 
+                            # a user should not be able to go here if he 
                             # does not write by hand its post request
                             # so we do not need to generate an error message
                             valid_forms = False
@@ -1452,7 +1452,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     ``RequestContext``
    
     ``replace_manager_form``
-        a form to select the new manager (an user)
+        a form to select the new manager (a user)
 
     ``link_creation``
         Set to True
@@ -1514,7 +1514,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
     ``RequestContext``
    
     ``replace_manager_form``
-        a form to select the new manager (an user)
+        a form to select the new manager (a user)
 
     ``link_creation``
         Set to True
@@ -1657,7 +1657,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     # or a document
     # related_doc and related_part should be a plmobject id
     # If the related_doc/part is not a doc/part, we let python raise
-    # an AttributeError, since an user should not play with the URL
+    # an AttributeError, since a user should not play with the URL
     # and openPLM must be smart enough to produce valid URLs
     attach = related = None
     if "related_doc" in request.REQUEST:
@@ -1897,7 +1897,7 @@ def clone_document(p_form, user, data, parts):
                 part = form.instance
                 if part not in parts: 
                     # invalid data
-                    # an user should not be able to go here if he 
+                    # a user should not be able to go here if he 
                     # does not write by hand its post request
                     # so we do not need to generate an error message
                     valid_forms = False
@@ -1979,7 +1979,7 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_object_user_links"):
-        return HttpResponseBadRequest("object must be an user")
+        return HttpResponseBadRequest("object must be a user")
     objs = obj.get_object_user_links().select_related("plmobject")
     objs = objs.values("role", "plmobject__type", "plmobject__reference",
             "plmobject__revision", "plmobject__name")
@@ -2003,7 +2003,7 @@ def display_delegation(request, obj_ref):
     if obj.restricted:
         raise Http404
     if not hasattr(obj, "get_user_delegation_links"):
-        return HttpResponseBadRequest("object must be an user")
+        return HttpResponseBadRequest("object must be a user")
     if request.method == "POST":
         selected_link_id = request.POST.get('link_id')
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
@@ -2274,7 +2274,7 @@ def group_ask_to_join(request, obj_ref):
 @handle_errors
 def display_groups(request, obj_ref):
     """
-    View of the *groups* page of an user.
+    View of the *groups* page of a user.
 
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
