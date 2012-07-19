@@ -152,6 +152,8 @@ div#imgManagement
 div#zoom-toolbar,
 div#zoom-toolbar > *,
 div#imgManagement,
+div#add-buttons,
+div#add-buttons > *,
 div#slider-scale {
     z-index: 800;
 }
