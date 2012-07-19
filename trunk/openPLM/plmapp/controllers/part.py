@@ -51,7 +51,7 @@ class PartController(PLMObjectController):
 
     def check_add_child(self, child):
         """
-        Checks if *child"* can be added to *self*.
+        Checks if *child* can be added to *self*.
         If *child* can not be added, an exception is raised.
         
         :param child: child to be added
@@ -237,7 +237,7 @@ class PartController(PLMObjectController):
 
         :raises: :exc:`ValueError` if the link is invalid (already completed
                  or its parent is not the current object)
-        :raises: all permissions raised by :meth:`check_add_child`
+        :raises: all permission errors raised by :meth:`check_add_child`
         """
         if link.end_time != None or link.parent_id != self.id:
             raise ValueError("Invalid link")
@@ -783,6 +783,14 @@ class PartController(PLMObjectController):
         return res
 
     def clone(self,form, user, child_links, documents, block_mails=False, no_index=False):
+        """
+        Clones the object :
+
+        calls PLMObjectController.clone()
+
+        :param child_links: list of :class:`.ParentChildLink` selected to be cloned with the new part as parent
+        :param documents: list of :class:`.Document` selected to be attached to the new part
+        """
         new_ctrl = super(PartController, self).clone(form, user, block_mails, no_index)
         if child_links :
             for link in child_links:
@@ -796,6 +804,7 @@ class PartController(PLMObjectController):
     def has_links(self):
         """
         Return true if the part :
+        
             * is a parent or a child
             * is attached to at least one document
         """
