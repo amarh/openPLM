@@ -41,9 +41,12 @@ from django.utils.encoding import iri_to_uri
 import pygraphviz as pgv
 
 from openPLM.plmapp import models
-from openPLM.plmapp.controllers import PLMObjectController, PartController,\
-                                       GroupController
+from openPLM.plmapp.controllers import PLMObjectController, GroupController
 from openPLM.plmapp.controllers.user import UserController
+
+
+#: limit of objects displayed per link category
+OBJECTS_LIMIT = 100
 
 # just a shortcut
 OSR = "only_search_results"
@@ -94,15 +97,12 @@ class NavigationGraph(object):
         graph = NavigationGraph(a_part_controller)
         graph.set_options({'child' : True, "parents" : True })
         graph.create_edges()
-        map_str, picture_url = graph.render()
+        nodes, edges = graph.render()
 
     :param obj: root of the graph
     :type obj: :class:`.PLMObjectController` or :class:`.UserController`
     :param results: if the option *only_search_results* is set, only objects in
                     results are displayed
-
-    .. warning::
-        *results* must not be a QuerySet if it contains users.
     """
 
     GRAPH_ATTRIBUTES = dict(dpi='96.0',
@@ -239,14 +239,14 @@ class NavigationGraph(object):
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
             parts = obj.get_attached_parts().only("type", "reference", "revision", "name")
-            for part in parts:
+            for part in parts[:OBJECTS_LIMIT]:
                 if self.options[OSR] and part.id not in self.results:
                     continue
                 self.edges.add((node, part.id, " "))
                 self._set_node_attributes(part)
         else:
-            for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs):
-                if self.options[OSR] and link.part.id not in self.results:
+            for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs)[:OBJECTS_LIMIT]:
+                if self.options[OSR] and link.part_id not in self.results:
                     continue
                 # create a link part -> document:
                 # if layout is dot, the part is on top of the document
@@ -260,7 +260,7 @@ class NavigationGraph(object):
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
             docs = obj.get_attached_documents().only("type", "reference", "revision", "name")
-            for doc in docs:
+            for doc in docs[:OBJECTS_LIMIT]:
                 if self.options[OSR] and doc.id not in self.results:
                     continue
                 self.edges.add((node, doc.id, " "))
@@ -268,7 +268,7 @@ class NavigationGraph(object):
         else:
             # obj is the part id
             links = models.DocumentPartLink.objects.filter(part__id=obj).select_related("document")
-            for link in links.only(*_documents_attrs):
+            for link in links.only(*_documents_attrs)[:OBJECTS_LIMIT]:
                 if self.options[OSR] and link.document_id not in self.results:
                     continue
                 self.edges.add((obj_id or obj, link.document_id, " "))
@@ -306,7 +306,7 @@ class NavigationGraph(object):
                 qs = qs.values_list("plmobject_id", flat=True).order_by()
                 qs = models.PLMObject.objects.filter(id__in=qs)
             links = qs.values("id", "type", "reference", "revision", "name").order_by()
-            for plmobject in links:
+            for plmobject in links[:OBJECTS_LIMIT]:
                 if self.options[OSR] and plmobject["id"] not in self.results:
                     continue
                 part_doc_id = role + str(plmobject["id"])
@@ -319,7 +319,7 @@ class NavigationGraph(object):
         else:
             # signer roles
             qs = obj.plmobjectuserlink_user.filter(role__istartswith=role)
-            for link in qs.select_related("plmobject").only("role", *_plmobjects_attrs):
+            for link in qs.select_related("plmobject").only("role", *_plmobjects_attrs)[:OBJECTS_LIMIT]:
                 if self.options[OSR] and link.plmobject_id not in self.results:
                     continue
                 part_doc_id = link.role + str(link.plmobject_id)
@@ -474,7 +474,7 @@ class NavigationGraph(object):
                     title = area.get("title")
                     if title:
                         id_ =  area.get("id")
-                        left, top, x2, y2 = map(int, area.get("coords").split(","))
+                        left, top = map(int, area.get("coords").split(",")[:2])
                         s = "top:%dpx;left:%dpx;" % (top, left)
                         title = linebreaks(title.replace("\\n", "\n"))
                         div = "<div id='%s' class='edge' style='%s'>%s</div>" % (id_, s, title)
@@ -484,10 +484,10 @@ class NavigationGraph(object):
             data = self._title_to_node.get(area.get("id"), {})
             
             # compute css position of the div
-            left, top, x2, y2 = map(int, area.get("coords").split(","))
+            left, top = map(int, area.get("coords").split(",")[:2])
             style = "top:%dpx;left:%dpx;" % (top, left)
 
-            # create a div with a title, and an <a> element
+            # render the div
             id_ = "Nav-%s" % area.get("id")
             ctx = data.copy()
             ctx["style"] = style
