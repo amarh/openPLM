@@ -2238,7 +2238,7 @@ class GroupViewTestCase(CommonViewTest):
 
     def test_user_add_get(self):
         """
-        Tests the page to add an user to the group, get version.
+        Tests the page to add a user to the group, get version.
         """
         response = self.get(self.group_url + "users/add/", page="users",
                 link=True)
@@ -2246,7 +2246,7 @@ class GroupViewTestCase(CommonViewTest):
 
     def test_user_add_post(self):
         """
-        Tests the page to add an user to the group, post version.
+        Tests the page to add a user to the group, post version.
         """
         mail.outbox = []
         data = {"type" : "User", "username" : self.brian.username}
@@ -2774,7 +2774,7 @@ class SearchViewTestCase(CommonViewTest):
 
 class MechantUserViewTest(TestCase):
     """
-    Tests when an user try an unauthorized action
+    Tests when a user try an unauthorized action
     """
 
     TYPE = "Part"

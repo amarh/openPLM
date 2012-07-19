@@ -339,7 +339,7 @@ class DocumentController(PLMObjectController):
 
     def get_suggested_parts(self):
         """
-        Returns a QuerySet of parts an user may want to attach to
+        Returns a QuerySet of parts a user may want to attach to
         a future revision.
         """
         attached_parts = self.get_attached_parts().select_related("part",
