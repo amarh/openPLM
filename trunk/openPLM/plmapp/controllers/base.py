@@ -233,8 +233,8 @@ class Controller(object):
         This method checks if :attr:`_user` has permissions implied by *role*.
         For example, *role* can be *owner* or *notified*.
 
-        If the check succeed, **True** is returned. Otherwise, if *raise_* is
-        **True** (the default), an :exc:`.PermissionError` is raised and if
+        If the check succeeds, **True** is returned. Otherwise, if *raise_* is
+        **True** (the default), a :exc:`.PermissionError` is raised and if
         *raise_* is **False**, **False** is returned.
 
         .. admonition:: Implementation details
