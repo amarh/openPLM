@@ -111,7 +111,7 @@ def permission_required(func=None, role="owner"):
 class Controller(object):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
-    modification in an history
+    modification in a history
     
     :attributes:
         .. attribute:: object

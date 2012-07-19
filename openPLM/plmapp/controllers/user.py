@@ -44,7 +44,7 @@ from openPLM.plmapp.controllers.base import Controller, permission_required
 class UserController(Controller):
     u"""
     Object used to manage a :class:`~django.contrib.auth.models.User` and store his 
-    modification in an history
+    modification in a history
     
     :attributes:
         .. attribute:: object

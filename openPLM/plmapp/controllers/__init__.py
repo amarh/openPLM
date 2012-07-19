@@ -30,7 +30,7 @@ This module contains utilities to manage a :class:`.PLMObject`.
 It provides a new class, :class:`.PLMObjectController`, which can be used to
 modify its attributes, promote/demote/revise it...
 
-All modifications are recorded in an history.
+All modifications are recorded in a history.
 
 How to use this module
 ======================
