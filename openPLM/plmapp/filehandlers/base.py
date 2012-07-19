@@ -114,7 +114,7 @@ class FileHandler(object):
     @property
     def attributes(self):
         """
-        List of the attributes which has been successfully set.
+        List of the attributes which have been successfully set.
         """
         return []
 
