@@ -138,7 +138,7 @@ class view_3dTest(CommonViewTest):
            u'last_modif_microseconds' : [u'%s'%(self.document.mtime.microsecond-1)]
            })
         reponse_post = self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
-        self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process")
+        self.assertEqual(reponse_post.context["extra_errors"],"The Document3D associated with the file STEP to analyze has been modified by another user while the forms were refilled:Please restart the process")
 
 
 
