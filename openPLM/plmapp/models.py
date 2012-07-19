@@ -135,7 +135,7 @@ class UserProfile(models.Model):
 
     @property
     def rank(self):
-        u""" Rank of the user: "adminstrator", "contributor" or "viewer" """
+        u""" Rank of the user: "administrator", "contributor" or "viewer" """
         if self.is_administrator:
             return _("administrator")
         elif self.is_contributor:
@@ -231,9 +231,6 @@ class GroupInfo(Group):
     def excluded_modification_fields(cls):
         """
         Returns fields which should not be available in a modification form
-        
-        By default, it returns :attr:`attributes` less attributes returned by
-        :meth:`excluded_modification_fields`
         """
         return [ugettext_noop("name"), ugettext_noop("creator"),
                 ugettext_noop("owner"), ugettext_noop("ctime"),
@@ -241,7 +238,12 @@ class GroupInfo(Group):
 
     @classmethod
     def get_modification_fields(cls):
-        "Returns fields which should be displayed in a modification form"
+        """
+        Returns fields which should be displayed in a modification form
+              
+        By default, it returns :attr:`attributes` less attributes returned by
+        :meth:`excluded_modification_fields`
+        """
         fields = []
         for field in cls(__fake__=True).attributes:
             if field not in cls.excluded_modification_fields():
@@ -342,7 +344,7 @@ class Lifecycle(models.Model):
         Builds a Lifecycle from *cycle*. The built object is save in the database.
         This function creates states which were not in the database
         
-        :param cycle: the cycle use to build the :class:`Lifecycle`
+        :param cycle: the cycle used to build the :class:`Lifecycle`
         :type cycle: :class:`~plmapp.lifecycle.LifecycleList`
         :return: a :class:`Lifecycle`
         """
@@ -587,6 +589,8 @@ class PLMObject(models.Model):
     @property
     def is_cloneable(self):
         """
+        .. versionadded:: 1.1
+        
         Return true by default. This property may be overriden
         by custom Part or Document
         """
@@ -846,7 +850,7 @@ class DocumentStorage(FileSystemStorage):
     def get_available_name(self, name):
         """
         Returns a path for a file *name*, the path always refers to a file
-        which do not exist.
+        which does not already exist.
         
         The path is computed as follow:
             #. a directory which name is the last extension of *name*.
@@ -977,7 +981,7 @@ class Document(PLMObject):
 
     @property
     def files(self):
-        "Queryset of all no deprecated :class:`DocumentFile` linked to self"
+        "Queryset of all non deprecated :class:`DocumentFile` linked to self"
         return self.documentfile_set.exclude(deprecated=True)
         
     @property
@@ -990,7 +994,7 @@ class Document(PLMObject):
         
     def is_promotable(self):
         """
-        Returns True if the object is promotable. A documentt is promotable
+        Returns True if the object is promotable. A document is promotable
         if there is a next state in its lifecycle and if it has at least
         one file and if none of its files are locked.
         """
@@ -1246,7 +1250,7 @@ class ParentChildLink(Link):
         u"""
         Clone this link.
 
-        It is possible to pass additional arguement to override some original
+        It is possible to pass additional arguments to override some original
         values.
 
         :param save: If True, the cloned link and its extensions are saved
