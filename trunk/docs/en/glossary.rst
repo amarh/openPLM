@@ -44,4 +44,8 @@ Glossary
     clone
         duplicate a plmobject (copy all its content) without creating a link
         between the original and the new plmobjects
+        
+    decompose
+        all terms related to *decompose* refer to the fact of spliting a part in multiples
+        sub-assemblies or pieces
     
