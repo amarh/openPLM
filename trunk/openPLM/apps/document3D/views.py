@@ -208,14 +208,14 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
     if Document3D.objects.filter(PartDecompose=obj.object).exists() and not Document3D.objects.get(PartDecompose=obj.object).id==stp_file.document.id: #a same document could be re-decomposed for the same part
 
-        raise ValueError("Not allowed operation.This Part already forms a part of another decomposition ")
+        raise ValueError("Not allowed operation.This Part already forms part of another split BOM")
     try:
         doc3D=Document3D.objects.get(id=stp_file.document_id)
     except Document3D.DoesNotExist:
         raise ValueError("Not allowed operation.The document is not a subtype of document3D")
 
     if doc3D.PartDecompose and not doc3D.PartDecompose.id==obj.object.id:
-        raise ValueError("Not allowed operation.This Document already forms a part of another decomposition")
+        raise ValueError("Not allowed operation.This Document already forms part of another split BOM")
 
     document_controller=Document3DController(doc3D, User.objects.get(username=settings.COMPANY))
     if request.method == 'POST':
@@ -270,7 +270,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
                 else:
-                    extra_errors="The Document3D associated with the file STEP to decompose has been modified by another user while the forms were refilled:Please restart the process"
+                    extra_errors="The Document3D associated with the file STEP to analyze has been modified by another user while the forms were refilled:Please restart the process"
 
             else:
                 extra_errors="Error refilling the form, please check it"

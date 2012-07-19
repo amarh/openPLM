@@ -472,7 +472,7 @@ def delete_files(files, location=""):
 class Document3D_decomposer_Error(ControllerError):
 
     def __unicode__(self):
-        return u"Error while the file step was decomposed"
+        return u"Error while the file step was split"
 
 
 class Document_Generate_Bom_Error(ControllerError):
