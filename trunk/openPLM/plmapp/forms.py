@@ -84,7 +84,7 @@ def get_new_reference(cls, start=0):
     and ``DOC_000XX`` otherwise.
     
     The number is the count of Parts or Documents plus *start* plus 1.
-    It is incremented while an object with the same reference aleady exists.
+    It is incremented while an object with the same reference already exists.
     *start* can be used to create several creation forms at once.
 
     .. note::
@@ -122,12 +122,12 @@ def get_initial_creation_data(cls, start=0):
 
 def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
     u"""
-    Returns a creation form suitable to creates an object
+    Returns a creation form suitable to create an object
     of type *cls*.
 
     The returned form can be used, if it is valid, with the function
     :meth:`~plmapp.controllers.PLMObjectController.create_from_form`
-    to create a :class:`~plmapp.models.PLMObject` and his associated
+    to create a :class:`~plmapp.models.PLMObject` and its associated
     :class:`~plmapp.controllers.PLMObjectController`.
 
     If *data* is provided, it will be used to fill the form.
@@ -701,7 +701,7 @@ class ArchiveForm(forms.Form):
 
 class ConfirmPasswordForm(forms.Form):
     """
-    A form that checks the user has entered its password.
+    A form that checks the user has entered his password.
     """
     password = forms.CharField(label=_("Password"), 
             widget=forms.PasswordInput(attrs= { "autocomplete" : "off" }))
