@@ -53,7 +53,7 @@ function scale_fit_all(){
             top: (nh - dh) / 2 + "px",
             "-moz-transform-origin" : origin,
             "-o-transform-origin" : origin,
-            "-wevkit-transform-origin" : origin,
+            "-webkit-transform-origin" : origin,
             "-ms-transform-origin" : origin,
             "transform-origin" : origin
     });
@@ -81,7 +81,7 @@ function scale(new_factor) {
 
             "-moz-transform-origin" : origin,
             "-o-transform-origin" : origin,
-            "-wevkit-transform-origin" : origin,
+            "-webkit-transform-origin" : origin,
             "-ms-transform-origin" : origin,
             "transform-origin" : origin
     });
@@ -426,7 +426,7 @@ function center(){
             top: (t - top) + "px",
             "-moz-transform-origin" : origin,
             "-o-transform-origin" : origin,
-            "-wevkit-transform-origin" : origin,
+            "-webkit-transform-origin" : origin,
             "-ms-transform-origin" : origin,
             "transform-origin" : origin
     });
@@ -444,51 +444,68 @@ function getQueryVariable(variable) {
     }
 }
 
+
+/*
+ * enableDragging
+ * inspired by http://stackoverflow.com/questions/10965293/dragable-without-jquery-ui/10965447#10965447
+ * from Derek
+ * CC-By-SA
+ */
+function enableDragging(ele) {
+    var dragging = dragging || false, x, y, Ox, Oy;
+    ele.onmousedown = function(ev) {
+        dragging = true;
+        x = ev.clientX;
+        y = ev.clientY;
+        Ox = ele.offsetLeft;
+        Oy = ele.offsetTop;
+        ele.style.cursor = "move";
+        window.onmousemove = function(ev) {
+            if (dragging) {
+                var Sx = ev.clientX - x + Ox,
+                    Sy = ev.clientY - y + Oy;
+                ele.style.top = Sy + "px";
+                ele.style.left = Sx + "px";
+                return false;
+            }
+        };
+        window.onmouseup = function(ev) {
+            ele.style.cursor = "default";
+            dragging = false;
+            return false;
+        }
+    };
+}
+
 $(document).ready(function(){
 
-        // Supprime la scrollbar en JS
         $('#Navigate').css('overflow', 'hidden');
 
-        // crée un écouteur pour l'évènement de type clic sur les div qui ont l' id #rightControl
-        $('#rightControl')
-        .bind('click', function(){
-            // Move slideInner using left attribute for position
+        $('#rightControl').bind('click', function(){
             $('#DivNav').animate({
                 "left": "-=100px"
-                }, "fast");
-            });
+            }, "fast");
+        });
 
-        // crée un écouteur pour l'évènement de type clic sur les div qui ont l' id #leftControl
-        $('#leftControl')
-        .bind('click', function(){
-            // Move slideInner using left attribute for position
+        $('#leftControl').bind('click', function(){
             $('#DivNav').animate({
                 "left": "+=100px"
-                }, "fast");
-            });
+            }, "fast");
+        });
 
-        // crée un écouteur pour l'évènement de type clic sur les div qui ont l' id #topControl
-        $('#topControl')
-            .bind('click', function(){
-                    // Move slideInner using top attribute for position
-                    $('#DivNav').animate({
-                        "top": "+=100px"
-                        }, "fast");
-                    });
+        $('#topControl') .bind('click', function(){
+            $('#DivNav').animate({
+                "top": "+=100px"
+            }, "fast");
+        });
 
-        // crée un écouteur pour l'évènement de type clic sur les div qui ont l' id #bottomControl
-        $('#bottomControl')
-            .bind('click', function(){
-                    // Move slideInner using left attribute for position
-                    $('#DivNav').animate({
-                        "top": "-=100px"
-                        }, "fast");
-                    });
+        $('#bottomControl').bind('click', function(){
+            $('#DivNav').animate({
+                "top": "-=100px"
+            }, "fast");
+        });
 
-        $("#DivNav").draggable({
-cursor: 'crosshair'
-});
-
+       enableDragging(document.getElementById("DivNav"));
 
         $("#navAddForm").dialog({
             autoOpen: false,
