@@ -42,7 +42,7 @@ rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class GroupController(Controller):
     u"""
     Object used to manage a :class:`~django.contrib.auth.models.Group` and store his 
-    modification in an history
+    modification in a history
     
     :attributes:
         .. attribute:: object

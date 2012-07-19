@@ -713,7 +713,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     """
     History view.
     
-    This view displays an history of the selected object and its revisions.
+    This view displays a history of the selected object and its revisions.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/`
     :url: :samp:`/user/{username}/history/`

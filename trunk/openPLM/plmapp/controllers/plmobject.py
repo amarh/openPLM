@@ -42,7 +42,7 @@ rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class PLMObjectController(Controller):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
-    modification in an history
+    modification in a history
     
     :attributes:
         .. attribute:: object
@@ -432,7 +432,7 @@ class PLMObjectController(Controller):
         else:
             self.owner = new_owner
             self.save()
-        # we do not need to write this event in an history since save() has
+        # we do not need to write this event in a history since save() has
         # already done it
 
     def add_notified(self, new_notified):
