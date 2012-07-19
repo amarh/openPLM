@@ -824,6 +824,9 @@ class PLMObjectController(Controller):
         .. versionadded:: 1.1
         
         Clone this object and return the related controller.
+        
+        :param form: the form sent from clone view
+        :param user: the user who is cloning the object
         """
         self.check_clone()
         type_= self.object.type

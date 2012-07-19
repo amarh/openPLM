@@ -41,7 +41,7 @@ from openPLM.plmapp.fileformats import native_to_standards
 
 class DocumentController(PLMObjectController):
     """
-    A :class:`PLMObjectController` which manages 
+    A :class:`.PLMObjectController` which manages 
     :class:`.Document`
     
     It provides methods to add or delete files, (un)lock them and attach a
@@ -51,8 +51,8 @@ class DocumentController(PLMObjectController):
     def has_standard_related_locked(self, new_filename):
         """
         Returns True if :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True
-        and exits the document contains a standard locked file related to the
-        file that we want to add.
+        and exists a document that contains a standard locked file related to the
+        file we want to add.
 
         We use it to avoid to add a native file while a related standard locked
         file is present in the document.
@@ -183,7 +183,7 @@ class DocumentController(PLMObjectController):
         (like an :class:`UploadedFile`).
         
         :exceptions raised:
-            * :exc:`ValueError` if *doc_file*.document is not self.objec
+            * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`ValueError` if the file size is superior to
               :attr:`settings.MAX_FILE_SIZE`
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
@@ -242,7 +242,7 @@ class DocumentController(PLMObjectController):
     def handle_added_file(self, doc_file):
         """
         Method called when adding a file (method :meth:`add_file`) with
-        *updates_attributes* true.
+        *updates_attributes* set to True.
 
         This method may be overridden to updates attributes with data from
         *doc_file*. The default implementation does nothing.
@@ -267,7 +267,7 @@ class DocumentController(PLMObjectController):
 
     def detach_part(self, part):
         """
-        Delete link between *part* (a :class:`.Part`) and
+        Deletes link between *part* (a :class:`.Part`) and
         :attr:`~PLMObjectController.object`.
         """
         
@@ -281,7 +281,7 @@ class DocumentController(PLMObjectController):
 
     def get_attached_parts(self):
         """
-        Returns all :class:`.Part` attached to
+        Returns all parts attached to
         :attr:`~PLMObjectController.object`.
         """
         return self.object.documentpartlink_document.all()
@@ -505,6 +505,14 @@ class DocumentController(PLMObjectController):
         return res
         
     def clone(self,form, user, parts, block_mails=False, no_index=False):
+        """
+        Clones the object :
+        
+            * calls :meth:`.PLMObjectController.clone`
+            * duplicates all :class:`.DocumentFile` in self.object
+            
+        :param parts: list of :class:`.Part` selected to be attached to the new document
+        """    
         new_ctrl = super(DocumentController, self).clone(form, user, block_mails, no_index)
         
         for doc_file in self.object.files.all():
