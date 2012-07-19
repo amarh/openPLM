@@ -190,7 +190,7 @@ class CSVImporter(object):
 
     def store_errors(self, line, *errors):
         """
-        Appends *errors* to the list of errors which occurs at the line *line*.
+        Appends *errors* to the list of errors which occured at the line *line*.
         """
         for e in errors:
             if isinstance(e, Exception):
