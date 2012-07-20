@@ -164,37 +164,35 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
     When we demand the decomposition across the web form, the following tasks are realized
 
-    -We check that the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_id**) that will be decomposed has not been modified since the generation of the form
+    - We check that the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_id**) that will be decomposed has not been modified since the generation of the form
 
-    -We check the validity of the information got in the form
+    - We check the validity of the information got in the form
 
-    -If exists a :class:`.DocumentFile` native file related to :class:`.DocumentFile` (**stp_id**) that will be decomposed
+    - If exists a native :class:`.DocumentFile` file related to :class:`.DocumentFile` (**stp_id**) that will be decomposed
+        then this one was depreciated (afterwards will be promoted)
 
-        -then this one was depreciated (afterwards will be promoted)
-
-    -The :class:`.DocumentFile` (**stp_id**) was locked (afterwards will be promoted)
-
+    - The :class:`.DocumentFile` (**stp_id**) was locked (afterwards will be promoted)
 
 
-    -We call the function :meth:`.generate_part_doc_links_AUX` (with the property transaction.commit_on_success)
+    - We call the function :meth:`.generate_part_doc_links_AUX` (with the property **transaction.commit_on_success**)
 
-        -We generate the arborescense (:class:`.product`) of the :class:`.DocumentFile` (**stp_id**))
+        - We generate the arborescense (:class:`.product`) of the :class:`.DocumentFile` (**stp_id**)
 
-        -The bomb-child of Parts (in relation to the arborescense of the :class:`.DocumentFile` (**stp_id**)) has been generated
+        - The bom-child of Parts (in relation to the arborescense of the :class:`.DocumentFile` (**stp_id**)) has been generated
 
-        -For every :class:`.ParentChildLink` generated in the previous condition  we attach all the :class:`.Location_link` relatives
+        - For every :class:`.ParentChildLink` generated in the previous condition  we attach all the :class:`.Location_link` relatives
 
-        -To every generated :class:`.Part` a :class:`.Document3D` has been attached and this document as been set like the attribute PartDecompose of the :class:`.Part`
+        - To every generated :class:`.Part` a :class:`.Document3D` has been attached and this document has been set like the attribute PartDecompose of the :class:`.Part`
 
-        -The attribute doc_id of every node of the arborescense (:class:`.Product`) is now the relative id of :class:`.Document3D` generated in the previous condition
+        - The attribute doc_id of every node of the arborescense (:class:`.Product`) is now the relative id of :class:`.Document3D` generated in the previous condition
 
-        -To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP
+        - To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP
 
-        -The attribute doc_path of every node of the arborescense(:class:`.Product`) is now the path of :class:`.DocumentFile` STP generated in the previous condition
+        - The attribute doc_path of every node of the arborescense(:class:`.Product`) is now the path of :class:`.DocumentFile` STP generated in the previous condition
 
-    -We update the indexes for the objects generated
+    - We update the indexes for the objects generated
 
-    -We call the processus decomposer_all(with celeryd)
+    - We call the processus decomposer_all(with celeryd)
 
     """
 
@@ -323,41 +321,41 @@ def clear_form(request, assemblys, product, index, obj_type):
 
 
 
-    If the forms are not valide, he returns the information to refill the new forms contained in **assemblys**.
+    If the forms are not valid, it returns the information to refill the new forms contained in **assemblys**.
 
-    Refill **assemblys** with the different assemblys of the file step , we use **index** to mark and to identify the **product** s that already have been visited
+    Refill **assemblys** with the different assemblys of the file step , we use **index** to mark and to identify the **products** that already have been visited
 
     For every Assembly we have the next information:
 
-        -Name of assembly
+        - Name of assembly
 
-        -Visited , If assembly is sub-assembly of more than an assembly, this attribute will be **False** for all less one of the occurrences
+        - Visited , If assembly is sub-assembly of more than one assembly, this attribute will be **False** for all less one of the occurrences
 
             If visited is **False**, we will be able to modify only the attributes **Order** , **Quantity** and **Unit** refered to the :class:`.ParentChildLink` in the form
 
             If visited is not **False** , it will be a new id acording to **index** (>=1) generated to identify the assembly
 
-        -Depth  of assembly
+        - Depth  of assembly
 
-        -**obj_type** , type of :class:`.Part` of Assembly
+        - **obj_type** , type of :class:`.Part` of Assembly
 
-        -A list with the products that compose the assembly
+        - A list with the products that compose the assembly
 
-            for each element in the list:
+          for each element in the list:
 
-                -part_type contains the form to select the type of :class:`.Part`
+                - part_type contains the form to select the type of :class:`.Part`
 
-                -ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
+                - ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
 
-                -creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
+                - creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
 
-                -name_child_assemblys contains the name of the element
+                - name_child_assemblys contains the name of the element
 
-                -is_assembly determine if the element is a single product or another assembly
+                - is_assembly determine if the element is a single product or another assembly
 
-                -prefix contains the **index** of the assembly  if he is visited for first time , else is False
+                - prefix contains the **index** of the assembly  if he is visited for first time , else is False
 
-                -ref contains the **index** of the assembly if he was visited previously, else False
+                - ref contains the **index** of the assembly if he was visited previously, else False
 
     """
 
@@ -417,35 +415,35 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type):
 
     For every Assembly we have the next information:
 
-        -Name of assembly
+        - Name of assembly
 
-        -Visited , If assembly is sub-assembly of more than an assembly, this attribute will be **False** for all less one of the occurrences
+        - Visited , If assembly is sub-assembly of more than an assembly, this attribute will be **False** for all less one of the occurrences
 
             If visited is **False**, we will be able to modify only the attributes **Order** , **Quantity** and **Unit** refered to the :class:`.ParentChildLinkin` in the form
 
             If visited is not **False** , it will be a new id acording to **index** (>=1) generated to identify the assembly
 
-        -Depth  of assembly
+        - Depth  of assembly
 
-        -**obj_type** , type of :class:`.Part` of Assembly
+        - **obj_type** , type of :class:`.Part` of Assembly
 
-        -A list with the products that compose the assembly
+        - A list with the products that compose the assembly
 
-            for each element in the list:
+          for each element in the list:
 
-                -part_type contains the form to select the type of :class:`.Part`
+                - part_type contains the form to select the type of :class:`.Part`
 
-                -ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
+                - ord_quantity contains the forms to select Order , Quantity and Unit refered to the :class:`.ParentChildLink`
 
-                -creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
+                - creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
 
-                -name_child_assemblys contains the name of the element
+                - name_child_assemblys contains the name of the element
 
-                -is_assembly determine if the element is a single product or another assembly
+                - is_assembly determine if the element is a single product or another assembly
 
-                -prefix contains the **index** of the assembly if he is visited for first time , else is False
+                - prefix contains the **index** of the assembly if he is visited for first time , else is False
 
-                -ref contains the **index** of the assembly if he was visited previously, else False
+                - ref contains the **index** of the assembly if he was visited previously, else False
 
     """
 
@@ -497,17 +495,17 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
     Parses forms and generates:
 
 
-    -The bomb-child of Parts (in relation to the **product**)
+    - The bom-child of Parts (in relation to the **product**)
 
-    -For every :class:`.ParentChildLink` generated in the condition previous we attach all the :class:`.Location_link` relatives
+    - For every :class:`.ParentChildLink` generated in the previous condition we attach all the :class:`.Location_link` relatives
 
-    -To every generated :class:`.Part` a :class:`.Document3D` has been attached and Document3D as been set like the attribute PartDecompose of the Part
+    - To every generated :class:`.Part` a :class:`.Document3D` has been attached and Document3D has been set like the attribute PartDecompose of the Part
 
-    -The attribute doc_id of every node of the arborescense(**product**) is now the relative id of :class:`.DocumentFile` generated in the previous condition
+    - The attribute doc_id of every node of the arborescense(**product**) is now the relative id of :class:`.DocumentFile` generated in the previous condition
 
-    -To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP ( :meth:`.generateGhostDocumentFile` )
+    - To every generated :class:`.Document3D` has been added a new empty(locked) :class:`.DocumentFile` STP ( :meth:`.generateGhostDocumentFile` )
 
-    -The attribute doc_path of every node of the arborescense(**product**) is now the path of :class:`.DocumentFile` STP generated in the previous condition
+    - The attribute doc_path of every node of the arborescense(**product**) is now the path of :class:`.DocumentFile` STP generated in the previous condition
     """
 
     to_delete=[]
@@ -579,7 +577,7 @@ def generateGhostDocumentFile(product,Doc_controller):
     :param Doc_controller: :class:`.Document3DController` from which we want to generate the :class:`.DocumentFile`
 
 
-    For one :class:`.Product` (**product**) and one :class:`.Document3DController` (**Doc_controller**)generates a :class:`.DocumentFile` with a file .stp emptily without indexation
+    For one :class:`.Product` (**product**) and one :class:`.Document3DController` (**Doc_controller**), generates a :class:`.DocumentFile` with a file .stp emptily without indexation
 
     It updates the attributes **doc_id** and **doc_path** of the :class:`.Product` (**product**) in relation of the generated :class:`.DocumentFile`
 
