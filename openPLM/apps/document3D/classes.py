@@ -24,31 +24,46 @@ def get_available_name(location, name):
 
 class Product(object):
     """
-    Class used to represent the **arborescense** contained in a :class:`~django.core.files.File` **.stp**.A :class:`.Product` can be simple or an assembly, if it is an assembly in **links** we will guard the information about other :class:`.Product` that compose it.
+    Class used to represent the **arborescense** contained in a 
+    :class:`~django.core.files.File` **.stp**.A :class:`.Product` can be 
+    simple or an assembly, if it is an assembly in **links** we will 
+    guard the information about other :class:`.Product` that compose it.
 
 
-    There are two ways of generating a :class:`.Product`, reading the file **.stp** across the class :class:`.NEW_STEP_Import` ( will refill the attribute **label_reference**  for every :class:`Product`), or reading a file **.arb** related to a :class:`.ArbreFile`  
-    Therefore there exist two ways of distinguishing the different :class:`.Product`, by means of the attribute **label_reference** if this one is not False , or by means of the combination of attributes  **id** and **doc_id**.
+    There are two ways of generating a :class:`.Product`, reading the file
+    **.stp** across the class :class:`.NEW_STEP_Import` ( will refill the 
+    attribute **label_reference**  for every :class:`Product`), or reading 
+    a file **.arb** related to a :class:`.ArbreFile`  .
+    Therefore there exist two ways of distinguishing the different :class:`.Product`, 
+    by means of the attribute **label_reference** if this one is not False , 
+    or by means of the combination of attributes  **id** and **doc_id**.
     
     
     :model attributes:
 
     .. attribute:: links
              
-        If the product is an assembly, links stores one or more :class:`.openPLM.apps.document3D.classes.Link` references to the products that compose it   
+        If the product is an assembly, links stores one or more 
+        :class:`.openPLM.apps.document3D.classes.Link` references to the products that compose it   
 
 
     .. attribute:: label_reference
     
-        When we generate an arborescense using :class:`.NEW_STEP_Import` , here we will store the label that represents the :class:`.Product` ,if we generate the arborescense reading a file **.geo**, this attribute will be **False**
+        When we generate an arborescense using :class:`.NEW_STEP_Import` , 
+        here we will store the label that represents the :class:`.Product` ,
+        if we generate the arborescense reading a file **.geo**, this attribute will be **False**
         
     .. attribute:: name
     
-        Name of :class:`.Product` ,if the name is empty and there exists a :class:`.Link` at the :class:`.Product` , we will assign the name of the :class:`.Link` to the :class:`.Product`
+        Name of :class:`.Product` ,if the name is empty and there exists a 
+        :class:`.Link` at the :class:`.Product` , we will assign the name of the
+        :class:`.Link` to the :class:`.Product`
         
     .. attribute:: doc_id
     
-        Id of the :class:`.DocumentFile` that contains the :class:`.Product` , in the case of :class:`~django.core.files.File` .stp decomposed them **doc_id** maybe different for every :class:`.Product` of the arborescense    
+        Id of the :class:`.DocumentFile` that contains the :class:`.Product` , 
+        in the case of :class:`~django.core.files.File` .stp decomposed them 
+        **doc_id** may be different for every :class:`.Product` of the arborescense    
         
     .. attribute:: doc_path
     
@@ -60,7 +75,8 @@ class Product(object):
 
     .. attribute:: geometry
     
-        If geometry is True (>=1) then the :class:`.Product` is single (without **links** )  , and his value refers to the index that we will use to recover a :class:`.GeometryFile`          
+        If geometry is True (>=1) then the :class:`.Product` is single (without **links** )  
+        , and his value refers to the index that we will use to recover a :class:`.GeometryFile`          
         
     .. attribute:: deep
     
@@ -106,7 +122,7 @@ class Product(object):
     @property       
     def is_decomposed(self):
         """
-        If it is an assembly and the any :class:`.Product` contents in his **links** 
+        If it is an assembly and any :class:`.Product` contents in his **links** 
         are defined (**doc_id**) in another :class:`DocumentFile` (**doc_id**)
         """
         for link in self.links:
@@ -135,14 +151,17 @@ class Product(object):
 class Link(object):
     """
     
-    Class used to represent a :class:`Link` between a :class:`.Product`, a :class:`Link` can have several references, each one with his own name and matrix of transformation. Every :class:`Link` points at a :class:`.Product`
+    Class used to represent a :class:`Link` with a :class:`.Product`, 
+    a :class:`Link` can have several references, each one with his own name and matrix of transformation. 
+    Every :class:`Link` points at a :class:`.Product`
 
     :model attributes:
         
         
     .. attribute:: names
     
-        Name of each instances of the :class:`Link` , if the instance does not have name, he get the name of his :class:`.Product` child 
+        Name of each instances of the :class:`Link` , if the instance does not have name, 
+        it gets the name of its :class:`.Product` child 
 
     .. attribute:: locations
     
@@ -154,7 +173,7 @@ class Link(object):
         
     .. attribute:: quantity
     
-        Number of instances of the :class:`Link`  (Every instance have a **name** and **location**)
+        Number of instances of the :class:`Link`  (each instance has a **name** and **location**)
         
     .. attribute:: visited
     
@@ -217,43 +236,58 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
 
     """ 
     
-    :param arbre: chain of characters formatted (following the criteria of the function :class:`.data_for_product`) that represents an arborescense,It contains necessary information to construct :class:`.Product` and :class:`Link` 
+    :param arbre: chain of characters formatted (following the criteria of the function 
+                  :func:`.data_for_product`) that represents an arborescense. It contains necessary 
+                  information to construct :class:`.Product` and :class:`Link` 
 
-    :param product: Product that represents a arborescense , **ONLY** used in successive recursive calls of the function
+    :param product: Product that represents an arborescense , **ONLY** used in successive 
+                    recursive calls of the function
     :type plmobject: :class:`.Product`
-    :param product_root: Product that represents a root arborescense , used to determine if the product to generating is already present in the tree 
+    :param product_root: Product that represents a root arborescense , used to determine if 
+                         the product to generate is already present in the tree 
     :type plmobject: :class:`.Product`
     :param deep: depth of **product** in the arborescense
-    :param to_update_product_root: Product that represents a node of an arborescense  (sub-brach of arborescense referenced by **product_root**)
+    :param to_update_product_root: Product that represents a node of an arborescense  
+                                   (sub-branch of arborescense referenced by **product_root**)
     :type plmobject: :class:`.Product`
         
     
    
-    The :class:`.Product` generated from a file **.arb ** (The case of this function) have his attribute **label_reference** set to False
+    The :class:`.Product` generated from a file **.arb** (The case of this function) have its attribute **label_reference** set to False.
     
-    When we generate an :class:`.Product` using :class:`.NEW_STEP_Import` , the attribute **label_reference** will represents and identify the :class:`.Product` , 
+    When we generate a :class:`.Product` using :class:`.NEW_STEP_Import` , the attribute **label_reference** will represent and identify the :class:`.Product`.
     
     
-    From the information contained in a file **.arb** (**arbre**), it generates the corresponding :class:`Product`
+    From the information contained in a file **.arb** (**arbre**), it generates the corresponding :class:`Product`.
     In case of files STEP decomposed, this information can be distributed in several files **.arb** and due to the 
     nature of the decomposition, a **product** could be generated more than once , to avoid this we use the **product_root**.
     Whenever we generate a new product we verify that it is not already present in **product_root**,we use **to_update_product_root** 
-    to support updated **product_root**(**to_update_product_root** is a branch of **product_root**)
+    to support updated **product_root** (**to_update_product_root** is a branch of **product_root**)
     
     Example:
-        -If we want to generate a **product** of a single file **.arb**
-            tree =Product_from_Arb(json.loads(new_ArbreFile.file.read()))
+        - If we want to generate a **product** of a single file **.arb** :
+        
+            .. code-block:: python
+            
+                tree=Product_from_Arb(json.loads(new_ArbreFile.file.read()))
             
             
-        -If we want to generate a **product** of a single file .arb and link this one like a branch of a certain **product_root_node** of an already existing **product_root**
-         
-            product=Product_from_Arb(json.loads(new_ArbreFile.file.read()),product=False, product_root=product_root, deep=xxx, to_update_product_root=product_root_node)
+        - If we want to generate a **product** of a single file .arb and link this one like a branch 
+          of a certain **product_root_node** of an already existing **product_root**
+          
+            .. code-block:: python
+            
+                product=Product_from_Arb(json.loads(new_ArbreFile.file.read()),product=False, product_root=product_root, deep=xxx, to_update_product_root=product_root_node)
              
-            This method generates the :class:`Link` between **product_root_node** and  **product** ,**BUT** it does not add the occurrences, generally this occurrences are stored in the 
-            existing  :class:`Location_link` between :class:`Part`
+          This method generates the :class:`Link` between **product_root_node** and  **product** ,
+          **BUT** it does not add the occurrences, generally this occurrences are stored in the 
+          existing  :class:`Location_link` between :class:`Part`
             
-                After generating the **product** and the :class:`Link`, we will have to refill the :class:`Link` calling the function :meth:`.add_occurrence` for the :class:`Link`:
-                
+          After generating the **product** and the :class:`Link`, we will have to refill the 
+          :class:`Link` calling the function :meth:`.add_occurrence` for the :class:`Link`:
+          
+            .. code-block:: python
+             
                     for location in locations:
                         product_root_node.links[-1].add_occurrence(location.name,location)
     """
@@ -288,7 +322,8 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
         
 def generateLink(arbre,product,product_child):
     """ 
-    :param arbre: chain of characters formatted (following the criteria of the function :class:`.data_for_product`) that represents the different occurrences of a :class:`Link`
+    :param arbre: chain of characters formatted (following the criteria of the function :func:`.data_for_product`) 
+                  that represents the different occurrences of a :class:`Link`
     :param product: :class:`Product` root of the assembly 
     :param product_child: :class:`Product` child of the assembly 
     
