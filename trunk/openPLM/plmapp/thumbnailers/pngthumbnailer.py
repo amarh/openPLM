@@ -4,7 +4,7 @@
 This module adds an optimist thumbnailer for some files which contain
 a PNG thumbnails.
 
-This formats are:
+These formats are:
 
     * Google Sketch Up (skp)
 
@@ -20,7 +20,7 @@ file and hope it is a valid image (and the thumbnail).
 All PNG file starts with a magic number (``89 50 4E 47 0D 0A 1A 0A``).
 This thumbnailer locates this magic number and tries to read
 the image with PIL. If it succeeds, it assumes it is the thumbnail.
-If it fails, it try to find another magic number and retries.
+If it fails, it tries to find another magic number and retries.
 """
 
 
