@@ -448,6 +448,19 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
         return revise_part(obj, ctx, request)
 
 def get_id_card_data(doc_ids):
+    """
+    Get informations to display in the id-cards of all Document which id is in doc_ids
+    
+    :param doc_ids: list of Document ids to treat
+    
+    :return: a Dictionnary which contains the following informations
+    
+        * ``thumbnails``
+            list of tuple (document,thumbnail)
+            
+        * ``num_files``
+            list of tuple (document, number of file)
+    """
     ctx = { "thumbnails" : {}, "num_files" : {} }
     thumbnails = models.DocumentFile.objects.filter(deprecated=False,
                 document__in=doc_ids, thumbnail__isnull=False)
@@ -781,6 +794,10 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
 ###         All functions which manage the different html pages specific to part          ###
 #############################################################################################
 def get_children_data(obj, date, level, state):
+    """
+    Returns some informations about children that will be displayed
+    in BOM view.
+    """
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
     children = obj.get_children(max_level, date=date, only_official=only_official)
@@ -1390,6 +1407,24 @@ def add_file(request, obj_type, obj_ref, obj_revi):
 
 @csrf_exempt
 def up_file(request, obj_type, obj_ref, obj_revi):
+    """
+    This view process the file(s) upload.
+    
+    The upload is done asynchronously.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/up/`
+    
+    .. include:: views_params.txt
+    
+    :post params:
+        files
+            uploaded files
+    
+    :get params:
+        list of pair (filename, id)
+    
+    The response contains "failed" if the submitted form is not valid.
+    """
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
     return _up_file(request, obj_type, obj_ref, obj_revi)
 
@@ -1410,7 +1445,26 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
 @csrf_protect
 def up_progress(request, obj_type, obj_ref, obj_revi):
     """
-    Show upload progress for a given path
+    Show upload progress for a given progress_id
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/_up/`
+    
+    .. include:: views_params.txt
+    
+    :get params:
+        X-Progress-ID
+            progress id to search
+        
+        f_size
+            size of the original file
+            
+    The response contains the uploaded size and a status :
+
+        * waiting if the corresponding file has not been created yet
+        
+        * writing if the file is being written
+        
+        * linking if the size of the uploaded file equals the size of the original
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ret = ""
@@ -1764,7 +1818,61 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
 def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
     Manage html page to display the cloning form of the selected object
-    or clone it.
+    (part or document) or clone it.
+    
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/clone/`
+    
+    .. include:: views_params.txt 
+    
+    **Template:**
+    
+    :file:`clone.html`
+    
+    :param creation_form: the creation form that will be used to clone the object
+    
+    If the object is a part :
+    
+    :post params:
+        a valid :class:`.SelectDocumentFormset`
+            Only required if *is_linked* is True, see below.
+        a valid :class:`.SelectChildFormset`
+            Only required if *is_linked* is True, see below.
+
+    A cloned part may be attached to some documents.
+    These documents are given by :meth:`.PartController.get_suggested_documents`.
+    A cloned part may also have some children from the original revision.
+
+
+    If the object is a document :
+    
+    :post params:
+        a valid :class:`.SelectPartFormset`
+            Only required if *is_linked* is True, see below.
+            
+    A cloned document may be attached to some parts, given by :meth:`.DocumentController.get_suggested_parts`.
+
+
+    **Context:**
+
+    ``RequestContext``
+
+    ``is_linked``
+        True if the object is linked (attached) to other object , at least one.
+    
+    ``creation_form``
+        form to clone the object. Fields in this form are set according to the current object.
+
+    ``doc_formset``
+        a :class:`.SelectDocmentFormset` of documents that the new object, if it is a part,
+        may be attached to. Only set if *is_linked* is True.
+
+    ``children_formset``
+        a :class:`.SelectChildFormset` of parts that the new object, if it is a part,
+        may be linked with. Only set if *is_linked* is True.
+    
+    ``parts_formset``
+        a :class:`.SelectPartFormset` of parts that the new object, if it is a document,
+        may be attached to. Only set if *is_linked* is True.
     
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -1822,7 +1930,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
             if is_linked :
                 valid_forms = False
                 if issubclass(cls, models.Part):
-                    valid_forms, selected_children, selected_documents = clone_part(creation_form, request.user, request.POST, children, documents)
+                    valid_forms, selected_children, selected_documents = clone_part(request.user, request.POST, children, documents)
                     if valid_forms :
                         new_ctrl = obj.clone(creation_form, request.user, selected_children, selected_documents)
                         return HttpResponseRedirect(new_ctrl.plmobject_url)
@@ -1834,7 +1942,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                                 prefix="document"),
                         })
                 elif issubclass(cls, models.Document) and is_linked:
-                    valid_forms, selected_parts = clone_document(creation_form, request.user, request.POST, parts)
+                    valid_forms, selected_parts = clone_document(request.user, request.POST, parts)
                     if valid_forms:
                         new_ctrl = obj.clone(creation_form, request.user, selected_parts)
                         return HttpResponseRedirect(new_ctrl.plmobject_url) 
@@ -1850,7 +1958,23 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     ctx.update(formsets)
     return r2r('clone.html', ctx, request)
 
-def clone_part(form, user, data, children, documents):
+def clone_part(user, data, children, documents):
+    """
+    Analyze the formsets in data to return list of selected children and documents.
+    
+    :param user: user who is cloning the part
+    :param data: posted data (see post params in :func:`.clone`)
+    :param children: list of children linked to the originial part
+    :param documents: list of documents attached to the original part
+    
+    :return:
+        valid_forms
+            True if all formsets are valid
+        selected_children
+            list of children to add to the new part
+        selected_documents
+            list of documents to attach to the new part
+    """
     valid_forms = True
     selected_children = []
     selected_documents = []
@@ -1886,7 +2010,20 @@ def clone_part(form, user, data, children, documents):
             valid_forms = False
     return valid_forms, selected_children, selected_documents
                         
-def clone_document(p_form, user, data, parts):
+def clone_document(user, data, parts):
+    """
+    Analyze the formsets in data to return list of selected parts.
+    
+    :param user: user who is cloning the document
+    :param data: posted data (see post params in :func:`.clone`)
+    :param parts: list of parts attached to the original document
+    
+    :return:
+        valid_forms
+            True if all formsets are valid
+        selected_parts
+            list of parts to attach to the new document
+    """
     valid_forms= True
     selected_parts = []
     
@@ -2072,6 +2209,12 @@ def delegate(request, obj_ref, role, sign_level):
 
 @csrf_exempt
 def get_checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
+    """
+    Process to the checkin asynchronously in order to show progress 
+    when the checked-in file is uploaded.
+    
+    Calls :func:`.checkin_file` .
+    """
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
     return checkin_file(request, obj_type, obj_ref, obj_revi,file_id_value)
    
@@ -2223,6 +2366,10 @@ def navigate(request, obj_type, obj_ref, obj_revi):
 
 @handle_errors
 def display_users(request, obj_ref):
+    """
+    View of the *user* page of a group.
+     
+    """
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
         formset = forms.get_user_formset(obj, request.POST)
@@ -2260,6 +2407,10 @@ def group_add_user(request, obj_ref):
 
 @handle_errors
 def group_ask_to_join(request, obj_ref):
+    """
+    View of the *user join* page of a group
+    
+    """
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
         obj.ask_to_join()
@@ -2337,6 +2488,9 @@ def display_plmobjects(request, obj_ref):
 
 @handle_errors(undo="../../../users/")
 def accept_invitation(request, obj_ref, token):
+    """
+    Manage page to accept invitation or request to join a group.
+    """
     token = long(token)
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     inv = models.Invitation.objects.get(token=token)
@@ -2355,6 +2509,9 @@ def accept_invitation(request, obj_ref, token):
  
 @handle_errors(undo="../../../users/")
 def refuse_invitation(request, obj_ref, token):
+    """
+    Manage page to refuse invitation or request to join a group.
+    """
     token = long(token)
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     inv = models.Invitation.objects.get(token=token)
@@ -2390,6 +2547,9 @@ def send_invitation(request, obj_ref, token):
 
 @handle_errors(undo="../..")
 def import_csv_init(request, target="csv"):
+    """
+    Manage page to import a csv file.
+    """
     if not request.user.get_profile().is_contributor:
         raise PermissionError("You are not a contributor.")
     obj, ctx = get_generic_data(request)
@@ -2415,6 +2575,9 @@ def import_csv_init(request, target="csv"):
 
 @handle_errors(undo="../..")
 def import_csv_apply(request, target, filename, encoding):
+    """
+    View that display a preview of an uploaded csv file.
+    """
     obj, ctx = get_generic_data(request)
     if not request.user.get_profile().is_contributor:
         raise PermissionError("You are not a contributor.")
