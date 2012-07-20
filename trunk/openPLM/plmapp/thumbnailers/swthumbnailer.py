@@ -8,7 +8,7 @@ A SolidWorks file is an `OLE`_ file. This file contains
 an entry named ``PreviewPNG`` (or :samp:`{Something-}PreviewPNG`)
 which contains the thumbnail as a PNG file.
 
-This thumnailer uses :command:`gsf` (from ``libgsf-bin``) to find the name
+This thumbnailer uses :command:`gsf` (from ``libgsf-bin``) to find the name
 of the entry and to extract its content.
 
 .. _OLE: http://en.wikipedia.org/wiki/Object_Linking_and_Embedding
