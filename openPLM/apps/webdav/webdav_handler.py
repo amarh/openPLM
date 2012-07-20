@@ -152,7 +152,7 @@ class WebDavHandler(object):
     def handle_options(self, request):
         res = HttpResponse('', None, 200, "text/plain")
         res["Allow"] = ", ".join(self.get_supported_methods())
-        res["DAV"] = "2"
+        res["DAV"] = "1, 2"
         return res
 
     def handle_propfind(self, request):
