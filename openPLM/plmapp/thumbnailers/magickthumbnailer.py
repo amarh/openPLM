@@ -7,7 +7,7 @@ from base import ThumbnailersManager
 
 def limit_resources():
     """
-    Limit the process execution time to 60 seconds.
+    Limits the process execution time to 60 seconds.
     """
     try:
         from resource import getrlimit, setrlimit, RLIMIT_CPU
