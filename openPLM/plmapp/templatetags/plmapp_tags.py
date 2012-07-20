@@ -16,7 +16,7 @@ def trunc(string, number, dots='...'):
     Truncate the *string* to *number* characters
     and print *dots* on the end if truncated
 
-    :usage: ``"isome text to be truncated"|trunc:6``
+    :usage: ``"some text to be truncated"|trunc:6``
     :results: some te...
     """
     if not isinstance(string, basestring): 
@@ -26,34 +26,53 @@ def trunc(string, number, dots='...'):
     return string[:number]+dots
 
 @register.filter
-def can_add(child, arg):
-    parent, action = arg
+def can_add(obj, arg):
+    """
+    Test if an object can be linked to the current object.
+    
+    :param obj: object to test
+    :type obj: it can be an instance of :class:`.DocumentFile`, :class:`.Part` or :class:`.UserController`
+    
+    :param arg: arguments here are the current object and the action for link creation
+    
+    :return: True if the action can be processed on the current object
+    """
+    
+    cur_obj, action = arg
 
-    if isinstance(child, models.DocumentFile):
-        child = child.document
+    if isinstance(obj, models.DocumentFile):
+        obj = obj.document
     if action == "attach_doc":
-        return parent.can_attach_document(child)
+        return cur_obj.can_attach_document(obj)
     elif action == "attach_part":
-        return parent.can_attach_part(child)
+        return cur_obj.can_attach_part(obj)
     elif action == "add_child":
-        return parent.can_add_child(child)
+        return cur_obj.can_add_child(obj)
     elif action == "delegate":
-        if isinstance(child, (User, UserController)):
-            if child.get_profile().restricted:
+        if isinstance(obj, (User, UserController)):
+            if obj.get_profile().restricted:
                 return False
-            if hasattr(parent, "check_in_group"):
+            if hasattr(cur_obj, "check_in_group"):
                 from django.conf import settings
-                if child.username == settings.COMPANY:
+                if obj.username == settings.COMPANY:
                     return False
-                return parent.check_in_group(child)
+                return cur_obj.check_in_group(obj)
             return True
     elif action == "delegate-reader":
-        if isinstance(child, (User, UserController)):
-            return child.get_profile().restricted
+        if isinstance(obj, (User, UserController)):
+            return obj.get_profile().restricted
     return False
 
 @register.filter
 def can_add_type(parent_type, child_type):
+    """
+    Used in Bom View.
+    
+    :param parent_type: Type of the parent, the current part
+    :param child_type: type of the object that may be added as child
+    
+    :return: True if child_type is a type of object that can be added to parent_type
+    """
     c_type = models.get_all_users_and_plmobjects()[child_type]
     p_type = models.get_all_users_and_plmobjects()[parent_type]
     
@@ -63,6 +82,14 @@ def can_add_type(parent_type, child_type):
 
 @register.filter    
 def can_link(current_type, suggested_type):
+    """
+    Used in Doc-Parts views.
+    
+    :param current_type: type of the current object (part or document)
+    :param suggested_type: type of the object that may be attached to the current one
+    
+    :return: True if current_type is a type of object that can be attached to current_type object
+    """
     cur_type = models.get_all_users_and_plmobjects()[current_type]
     sug_type = models.get_all_users_and_plmobjects()[suggested_type]
     
