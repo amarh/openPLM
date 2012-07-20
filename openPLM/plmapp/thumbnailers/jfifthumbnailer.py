@@ -21,7 +21,7 @@ file and hope it is a valid image (and the thumbnail).
 All JPEG file starts with a magic number (``0xFFD8``).
 This thumbnailer locates this magic number and tries to read
 the image with PIL. If it succeeds, it assumes it is the thumbnail.
-If it fails, it try to find another magic number and retries.
+If it fails, it tries to find another magic number and retries.
 """
 
 
