@@ -13,5 +13,6 @@ Cette documentation explique comment administrer openPLM.
     settings
     applications
     commands
+    lifecycle
     publication
 
