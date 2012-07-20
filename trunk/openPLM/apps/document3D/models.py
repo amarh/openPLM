@@ -66,7 +66,7 @@ class Document3D(Document):
     @property
     def documents_related(self):
         """
-        If the :class:`.Document3D` has been decomposed, he returns a list with all the :class:`.Document3D` that form a part of the decomposition,
+        If the :class:`.Document3D` has been decomposed, it returns a list with all the :class:`.Document3D` that form part of the decomposition,
         and for every :class:`.Document3D` for ONLY ONE level of depth
         """
         document_related = []
@@ -106,9 +106,9 @@ def handle_step_file(doc_file_pk):
 
     Method called when adding :class:`~django.core.files.File` **.stp** (:meth:`.add_file` with  *updates_attributes* true) into :class:`.Document3DController`.
 
-    It calls a subprocess (:meth:`.generateGeometrys_Arborescense` ) that generates an file **.arb** and one or more files **.geo** (these files
+    It calls a subprocess (:meth:`.generateGeometrys_Arborescense` ) that generates a file **.arb** and one or more files **.geo** (these files
     are necessary for the visualization 3D and the decomposition of the :class:`~django.core.files.File` **.stp** ),
-    later this files will be attached to an :class:`.ArbreFile` and one or more :class:`.GeometryFile` and these classes with the :class:`.DocumentFile` determined by **doc_file_pk**
+    later these files will be attached to an :class:`.ArbreFile` and one or more :class:`.GeometryFile` and these classes with the :class:`.DocumentFile` determined by **doc_file_pk**
 
     """
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
@@ -158,8 +158,8 @@ def generate_relations_BD(doc_file,temp_file):
     """
     Function used when we add a new :class:`~django.core.files.File` **.stp** in a :class:`.Document3D`
     This function associates a series of files with classes :class:`.ArbreFile` and :class:`.GeometryFile`
-    and this classes to a :class:`.DocumentFile`. The files was generated before the call to this function,
-    his path are known thanks to the information supplied in the temporary file(Every line of this file represents
+    and this classes to a :class:`.DocumentFile`. The files were generated before the call to this function,
+    their paths are known thanks to the information supplied in the temporary file(Every line of this file represents
     a file, the beginning of every line indicates the type of file)
 
     :param doc_file: object which will be updated
@@ -489,7 +489,7 @@ class Location_link(ParentChildLinkExtension):
     Extend :class:`.ParentChildLinkExtension`
     Represents the matrix of transformation (rotation and translation) and the name of one relation between assemblys.
     When a file STEP is decomposed in Parts a :class:`.ParentChildLink` is generated between the Parts
-    and each of these :class:`.ParentChildLink` could have attached one o more :class:`.Location_link`
+    and each of these :class:`.ParentChildLink` could have attached one or more :class:`.Location_link`
 
     Defines a non-persistent transformation in 3D space
 
@@ -556,7 +556,7 @@ def generate_extra_location_links(link, pcl):
     For a :class:`.ParentChildLink`, it generates the whole necessary :class:`Location_link`
 
 
-    :param link: :class:`.openPLM.apps.document3D.classes.Link` which will be used to generated extra :class:`.Location_link`
+    :param link: :class:`.openPLM.apps.document3D.classes.Link` which will be used to generate extra :class:`.Location_link`
     :type plmobject: :class:`.Link`
     :param ParentChildLink: :class:`.ParentChildLink` for that the extra :class:`Location_link` are generated
     :type plmobject: :class:`.ParentChildLink`
@@ -598,14 +598,14 @@ from celery.task import task
 def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre):
     """
 
-    :param arbre: Information contained in file **.arb** that allows to generate a :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp to decompose , his nodes contains doc_id and doc_path of new :class:`.DocumentFile` create in the arborescense
+    :param arbre: Information contained in file **.arb** that allows to generate a :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp to decompose , his nodes contains doc_id and doc_path of new :class:`.DocumentFile` created in the arborescense
     :type plmobject: :class:`.Product`
-    :param stp_file_pk: primery key of a :class:`.DocumentFile` that contains the :class:`~django.core.files.File` that will be decompose
-    :param part_pk: primery key of a :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that will be decompose
-    :param native_related_pk: If exists a native file related to the :class:`.DocumentFile` that will be decompose ,  contains the primery key of the :class:`.DocumentFile` related to the native file
+    :param stp_file_pk: primery key of a :class:`.DocumentFile` that contains the :class:`~django.core.files.File` that will be decomposed
+    :param part_pk: primery key of a :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that will be decomposed
+    :param native_related_pk: If exists a native file related to the :class:`.DocumentFile` that will be decomposed ,  contains the primary key of the :class:`.DocumentFile` related to the native file
 
 
-    This function departs from a :class:`.DocumentFile` (**stp_file_pk**) associated with a :class:`.Document3D` attached to a :class:`.Part` (part_pk) and from
+    This function departs from a :class:`.DocumentFile` (**stp_file_pk**) associated with a :class:`.Document3D` attached to a :class:`.Part` (``part_pk``) and from
     the :class:`.Product` related to the :class:`.DocumentFile` in order to decompose :class:`~django.core.files.File` .stp.With this purpose it realizes a call to the subprocess
     :meth:`.generateDecomposition.py`.
 
@@ -613,11 +613,11 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
 
     -**Preconditions** ,before calling to this function, the following steps must have been realized:
 
-        -The bomb-child of Parts (in relation to the :class:`.Product` (generate across the **arbre**)) has been generated
+        -The bom-child of Parts (in relation to the :class:`.Product` (generate across the **arbre**)) has been generated
 
         -For every :class:`.ParentChildLink` generated in the previous condition we attach all the :class:`.Location_link` relatives
 
-        -To every generated :class:`.Part` a :class:`.Document3D` has been attached and the :class:`.Document3D` as been set like the attribute PartDecompose of the :class:`.Part`
+        -To every generated :class:`.Part` a :class:`.Document3D` has been attached and the :class:`.Document3D` has been set like the attribute PartDecompose of the :class:`.Part`
 
         -The attribute doc_id of every node of the :class:`.Product` (generate across the **arbre**) is now the relative id of :class:`.Document3D` generated in the previous condition
 
@@ -627,7 +627,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
 
         -The :class:`.DocumentFile` (**stp_file_pk**) is locked
 
-        -If exists a :class:`.DocumentFile` native (**native_related_pk**) related to the :class:`.DocumentFile` (**stp_file_pk**), then this one was depreciated (afterwards will be promoted)
+        -If exists a native :class:`.DocumentFile` (**native_related_pk**) related to the :class:`.DocumentFile` (**stp_file_pk**), then this one was depreciated (afterwards will be promoted)
 
 
 
@@ -646,9 +646,9 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
 
         -The root :class:`.DocumentFile` (**stp_file_pk**) has been deprecated and unlocked
 
-        -A new root :class:`.DocumentFile` has been generated acording to the situation
+        -A new root :class:`.DocumentFile` has been generated according to the situation
 
-        -If exists a :class:`.DocumentFile` native (**native_related_pk**) related to the :class:`.DocumentFile` (**stp_file_pk**), then this one was promoted
+        -If exists a native :class:`.DocumentFile` (**native_related_pk**) related to the :class:`.DocumentFile` (**stp_file_pk**), then this one was promoted
 
         -We set the :class:`.Part` (**part_pk**) like the attribute PartDecompose of the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_file_pk**)
     """
@@ -698,9 +698,9 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
 def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part):
     """
 
-    :param stp_file: :class:`.DocumentFile` that was decompose (will be deprecated)
+    :param stp_file: :class:`.DocumentFile` that was decomposed (will be deprecated)
     :param new_stp_file: :class:`.DocumentFile` that will replace the :class:`.DocumentFile` that was decomposed
-    :param product: :class:`.Product` that represents the arborescense of the :class:`.DocumentFile` that was decompose
+    :param product: :class:`.Product` that represents the arborescense of the :class:`.DocumentFile` that was decomposed
     :param part: :class:`.Part` attached to the :class:`.Document3D` that contains the :class:`.DocumentFile` that was decomposed
     :param ctrl: :class:`.Document3DController` that contains the :class:`.DocumentFile` that was decomposed
     :param file: :class:`~django.core.files.File` that contains the new file .stp root
@@ -743,12 +743,12 @@ def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part):
 
 def update_child_files_BD(product,user,old_product):
     """
-    :param product: :class:`.Product` that represents a sub-arborescense of the file **.stp** that was decompose UPDATE whit the news doc_id and doc_path generating in the bomb-child
-    :param old_product: :class:`.Product` that represents a sub-arborescense ORIGINAL of the file **.stp** that was decompose
+    :param product: :class:`.Product` that represents a sub-arborescense of the file **.stp** that was decomposed UPDATE whit the news doc_id and doc_path generating in the bomb-child
+    :param old_product: :class:`.Product` that represents a sub-arborescense ORIGINAL of the file **.stp** that was decomposed
 
 
 
-    Updates a :class:`.DocumentFile` STEP that WASNT root in a decomposition, to know which :class:`.DocumentFile` to update we use the attribute **product**.doc_id of the arborescense(**product**)
+    Updates a :class:`.DocumentFile` STEP that WAS NOT root in a decomposition, to know which :class:`.DocumentFile` to update we use the attribute **product**.doc_id of the arborescense(**product**)
 
     This update consists in:
 
