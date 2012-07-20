@@ -86,9 +86,10 @@ def convert_unit(value, original_unit, new_unit):
     Converts a value expressed in *original_unit* to
     *new_unit*
 
-    :raises: :exc:`UnitConversionError` if the conversion is not
-             possible.
+    :raises: :exc:`UnitConversionError` if the conversion is not possible.
 
+    Here is an example :
+        
         >>> convert_unit(1, 'm', 'mm')
         1000.0
         >>> convert_unit(5, 'dm', 'mm')
