@@ -232,12 +232,17 @@ class DocumentController(PLMObjectController):
         path = os.path.realpath(doc_file.file.path)
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
-        os.chmod(path, 0700)
-        os.remove(path)
-        if doc_file.thumbnail:
-            doc_file.thumbnail.delete(save=False)
-        self._save_histo("File deleted", "file : %s" % doc_file.filename)
-        doc_file.delete()
+        filename = doc_file.filename
+        if getattr(settings, "KEEP_ALL_FILES", False):
+            doc_file.deprecated = True
+            doc_file.save()
+        else:
+            os.chmod(path, 0700)
+            os.remove(path)
+            if doc_file.thumbnail:
+                doc_file.thumbnail.delete(save=False)
+            doc_file.delete()
+        self._save_histo("File deleted", "file : %s" % filename)
 
     def handle_added_file(self, doc_file):
         """
@@ -423,14 +428,22 @@ class DocumentController(PLMObjectController):
             
         if doc_file.locked:
             self.unlock(doc_file)   
-        os.chmod(doc_file.file.path, 0700)
-        os.remove(doc_file.file.path)
-        doc_file.filename = new_file.name
-        doc_file.size = new_file.size
+        if getattr(settings, "KEEP_ALL_FILES", False):
+            deprecated_df = models.DocumentFile.objects.create(
+                    document=self.object,
+                    deprecated=True,
+                    size=doc_file.size,
+                    filename=doc_file.filename,
+                    file=models.docfs.save(new_file.name, doc_file.file),
+                    thumbnail=doc_file.thumbnail)
+        else:
+            os.chmod(doc_file.file.path, 0700)
+            os.remove(doc_file.file.path)
+            if doc_file.thumbnail:
+                doc_file.thumbnail.delete(save=False)
         doc_file.file = models.docfs.save(new_file.name, new_file)
+        doc_file.size = new_file.size
         os.chmod(doc_file.file.path, 0400)
-        if doc_file.thumbnail:
-            doc_file.thumbnail.delete(save=False)
         doc_file.save()
         self._save_histo("Check-in", doc_file.filename)
         if update_attributes:

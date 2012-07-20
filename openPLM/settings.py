@@ -208,6 +208,10 @@ FORCE_HTTPS = False
 #: set to True to hide emails
 HIDE_EMAILS = False
 
+#: Never delete files. If a user deletes a file, the file is deprecated instead of being deleted.
+#: Warning, if set to True, OpenPLM may consume a lot of disk place.
+KEEP_ALL_FILES = False
+
 COMPANY = "company"
 
 # change this setting if you use an other user documentation for OpenPLM
