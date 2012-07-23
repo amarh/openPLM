@@ -196,6 +196,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("Bad file's document")
         if settings.MAX_FILE_SIZE != -1 and thumbnail_file.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
+        if doc_file.deprecated:
+            raise ValueError("File is deprecated")  
         basename = os.path.basename(thumbnail_file.name)
         name = "%d%s" % (doc_file.id, os.path.splitext(basename)[1])
         if doc_file.thumbnail:
@@ -229,6 +231,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("Bad file's document")
         if doc_file.locked:
             raise DeleteFileError("File is locked")
+        if doc_file.deprecated:
+            raise ValueError("File is deprecated")  
         path = os.path.realpath(doc_file.file.path)
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
@@ -424,7 +428,8 @@ class DocumentController(PLMObjectController):
             raise ValueError("Checkin document and document already in plm have different names")
         if settings.MAX_FILE_SIZE != -1 and new_file.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
-            
+        if doc_file.deprecated:
+            raise ValueError("File is deprecated")  
             
         if doc_file.locked:
             self.unlock(doc_file)   
@@ -559,3 +564,24 @@ class DocumentController(PLMObjectController):
         """
         res = not self.get_attached_parts()
         return res
+
+    def publish(self):
+        super(DocumentController, self).publish()
+        # publish all thumbnails
+        input_dir = settings.THUMBNAILS_DIR
+        output_dir = os.path.join(input_dir, "..", "public", "thumbnails")
+        for path in self.files.exclude(thumbnail="").values_list("thumbnail", flat=True):
+            os.symlink(os.path.join(input_dir, path),
+                       os.path.join(output_dir, path))
+    
+    def unpublish(self):
+        super(DocumentController, self).unpublish()
+        # unpublish all thumbnails
+        input_dir = settings.THUMBNAILS_DIR
+        output_dir = os.path.join(input_dir, "..", "public", "thumbnails")
+        for path in self.files.exclude(thumbnail="").values_list("thumbnail", flat=True):
+            try:
+                os.unlink(os.path.join(output_dir, path))
+            except OSError:
+                pass
+

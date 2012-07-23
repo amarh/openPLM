@@ -250,6 +250,9 @@ add the following lines:
     # required to enable webdav access 
     WSGIPassAuthorization On 
 
+    <Location /media/thumbnails>
+        WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access_restricted.wsgi
+    </Location>
     Alias /media /var/django/openPLM/trunk/openPLM/media
     <Directory /var/django/openPLM/trunk/openPLM/media>
         Order deny,allow
@@ -385,6 +388,9 @@ be enabled)
         SSLVerifyClient none
 
         WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
+        <Location /media/thumbnails>
+            WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access_restricted.wsgi
+        </Location>
         Alias /media /var/django/openPLM/trunk/openPLM/media
         <Directory /var/django/openPLM/trunk/openPLM/media>
             Order deny,allow

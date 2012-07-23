@@ -29,7 +29,7 @@
                                 </td>
                                 <td class="Content">
                                     {% if df.thumbnail %}
-                                        <img class="thumbnail" src="{{df.thumbnail.url}}"
+                                        <img class="thumbnail" src="{{MEDIA_URL}}{% if obj.published %}public/{% endif %}thumbnails/{{df.thumbnail}}"
                                         alt="Thumbnail"/>
                                     {% else %}
                                         {% trans "No thumbnail available" %}
