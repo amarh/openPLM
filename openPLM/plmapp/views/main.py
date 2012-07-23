@@ -2686,7 +2686,7 @@ def get_pagination(r_GET, object_list, type):
         page = 1
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        history = paginator.page(paginator.num_pages)
+        objects = paginator.page(paginator.num_pages)
     ctx["pages"] = get_pages_num(paginator.num_pages, page)
     ctx["thumbnails"] = {}
     ctx["num_files"] = {}
