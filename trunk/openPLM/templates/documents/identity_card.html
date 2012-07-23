@@ -4,7 +4,7 @@
 {% block thumbnail_url%}{% spaceless %}
     {% with thumbnails|key:object.id as path %}
         {% if path %}
-            {{MEDIA_URL}}thumbnails/{{path}}
+            {{MEDIA_URL}}{{suffix_url}}thumbnails/{{path}}
         {% else %}
             {{MEDIA_URL}}img/icon_doc.png
         {% endif %}

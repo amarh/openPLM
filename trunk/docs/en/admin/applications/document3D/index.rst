@@ -35,6 +35,16 @@ You must also create a directory in media:
     * ``mkdir media/3D/``
     * ``chown www-data:www-data media/3D``
 
+and edit your apache configuration file to add the following lines:
+   
+.. code-block:: apache
+
+    # WSGIScriptAlias ...
+    <Location /media/3D>
+        WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access.wsgi
+    </Location>
+    # alias media/ ...
+
 
 Synchronize the database
 ========================
