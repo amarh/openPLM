@@ -17,8 +17,8 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_pat
     :param location: Path where to store the files **.geo** and **.arb** generated     
     
       
-    For a file STEP determined by his path (**doc_file_path**),  it generates his file **.arb** and his files **.geo** having count an **id** determined by **doc_file_id** 
-    and return in stdout the list of paths of files generated
+    For a file STEP determined by its path (**doc_file_path**),  it generates its file **.arb** and its files **.geo** having count an **id** determined by **doc_file_id** 
+    and returns in stdout the list of paths of files generated
     
     """ 
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)    
@@ -33,7 +33,7 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_pat
 
 def write_ArbFile_from_Product(product,fileName,location):
     """
-    :param product: :class:`.Product` relative to the structure of assamblys of a file **.stp**
+    :param product: :class:`.Product` relative to the structure of assemblys of a file **.stp**
     :param fileName: Name of the file **.stp** for which we are going to generate the file **.arb**
     :param location: Path where to store the file **.arb** generated  
     """ 

@@ -48,7 +48,7 @@ def mesh_shape(shape,filename,_index_id, pov_dir):
  
  
  
-    The file **.geo** are a series of judgments javascript that turn the geometry of the object into representable triangles by means of Webgl
+    The files **.geo** are a series of judgments javascript that turn the geometry of the object into representable triangles by means of Webgl
 
     We can select the **opacity** and the **quality_factor** of the representation
     
@@ -160,7 +160,7 @@ class QuickTriangleMesh(object):
     
         """
         
-        :param _index_id: id to to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile` 
+        :param _index_id: id to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile` 
         :param output: :class:`~django.core.files.File` **.geo**       
                
         Divides the geometry in triangles and generates the code javascript of each of these writing in **output** 
