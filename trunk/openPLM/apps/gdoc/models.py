@@ -100,3 +100,20 @@ class GoogleDocumentController(DocumentController):
     def delete_file(self, doc_file):
         raise exc.DeleteFileError()
 
+    def clone(self, *args, **kwargs):
+        c = super(GoogleDocumentController, self).clone(*args, **kwargs)
+        # try to copy the document in google docs
+        if not hasattr(self, "client"):
+            # TODO errors
+            try:
+                self.init_gclient()
+            except InvalidCredentialException:
+                return
+        entry = self.client.get_resource_by_id(self.resource_id)
+        copy = self.client.copy_resource(entry, self.name)
+        c.object.resource_id = copy.resource_id.text
+        c.object.name = self.name
+        c.object.save()
+        return c
+
+
