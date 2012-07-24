@@ -177,6 +177,7 @@ Resources:
 Tests
 ++++++
 
+See :doc:`testing`.
 
 Others
 +++++++
@@ -186,5 +187,7 @@ A complete list of documented modules is available :doc:`here <modules>`.
 
 Custom applications
 ===================
+
+See :ref:`applications` and :ref:`how-to-app`.
 
 
