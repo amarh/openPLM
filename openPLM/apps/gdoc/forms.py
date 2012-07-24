@@ -18,5 +18,6 @@ def get_gdoc_creation_form(user, client, data=None, start=0):
     form.gdocs = dict(gdocs)
     form.fields["resource_id"] = forms.ChoiceField(choices=gdocs,
             required=True)
-    form.clean = lambda:clean_gdoc(form)
+    old_clean = form.clean
+    form.clean = lambda: old_clean() and clean_gdoc(form)
     return form
