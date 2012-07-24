@@ -324,7 +324,7 @@ def select_pdf(request, obj_type, obj_ref, obj_revi):
     """
     View to download a merged pdf file that contains all pdf files.
     
-    Redirects to :func:`select_pdf_part` or :func:`select_pdf_doc`
+    Redirects to :func:`select_pdf_part` or :func:`select_pdf_document`
     according to the type of the object.
 
     Raises :exc:`ValueError` if the object is not a part or a document.
