@@ -10,10 +10,6 @@ Publication
 This document defines how a part or a document can be published to
 be accessible to anonymous user.
 
-.. warning::
-
-    This specification is not yet implemented and is still a draft.
-
 
 Condition to publish a part or a document
 =========================================
