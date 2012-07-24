@@ -33,6 +33,7 @@ from django.conf import settings
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
+from django.template import Context, Template
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
@@ -40,6 +41,8 @@ from openPLM.plmapp.tasks import update_index
 from openPLM.plmapp.utils import generate_password
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
+
+NEW_ACCOUNT_SUBJECT = u"New account on OpenPLM"
 
 class UserController(Controller):
     u"""
@@ -228,6 +231,10 @@ class UserController(Controller):
         """
         return self.delegationlink_delegator.order_by("role", "delegatee__username")
 
+    def get_sponsor_subject(self, new_user):
+        subject = getattr(settings, "NEW_ACCOUNT_SUBJECT", NEW_ACCOUNT_SUBJECT)
+        return Template(subject).render(Context(dict(new_user=new_user, sponsor=self._user)))
+
     @permission_required(role=models.ROLE_OWNER)
     def sponsor(self, new_user, is_contributor=True, restricted=False):
         self.check_contributor()
@@ -259,7 +266,7 @@ class UserController(Controller):
                 "password" : password,
                }
         update_index.delay("auth", "user", new_user.pk)
-        self._send_mail(send_mail, "New account on openPLM", [new_user],
+        self._send_mail(send_mail, self.get_sponsor_subject(new_user), [new_user],
                 ctx, "mails/new_account") 
         models.UserHistory.objects.create(action="Create", user=self._user,
                 plmobject=self._user, details="New user: %s" % new_user.username)
@@ -289,7 +296,7 @@ class UserController(Controller):
                 "sponsor" : self._user,
                 "password" : password,
                }
-        self._send_mail(send_mail, "New account on openPLM", [new_user],
+        self._send_mail(send_mail, self.get_sponsor_subject(new_user), [new_user],
                 ctx, "mails/new_account") 
 
     def check_readable(self, raise_=True):
