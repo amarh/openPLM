@@ -170,6 +170,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 #: expeditor's mail used when sending notification emails
 EMAIL_OPENPLM = "no-reply@openplm.example.com"
 
+#XYZ:
+#: Subject of a sponsor mail.
+#: It can be a valid django template string, two variables are available:
+#: ``new_user`` and ``sponsor`` (:class:`.User` instances)
+#: for example, it could be
+#: ``u"Welcome {{new_user.get_full_name}}, {{sponsor.get_full_name}} has sponsored you on OpenPLM"``.
+NEW_ACCOUNT_SUBJECT = u"New account on OpenPLM"
+
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
 
