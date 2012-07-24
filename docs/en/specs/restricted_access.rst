@@ -6,10 +6,6 @@
 
 .. versionadded:: 1.1
 
-.. warning::
-
-    This specification is incomplete and still a draft.
-    Comments are welcomed.
 
 This document describes which contents can be accessed by an user
 who has restricted access rights.
@@ -65,6 +61,7 @@ Accessible contents
     * Change password page
     * Browse: only accessible parts and documents
     * Home page: only the browse and study buttons are enabled.
+    * Thumbnails (an administrator may deny this access)  
 
 Contents that are not in this list are inaccessible.
 
