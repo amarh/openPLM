@@ -70,6 +70,6 @@ Rights delegation
 
 A restricted account can not delegate its rights.
 
-An user (restricted or not) can not delegates its rights to a restricted account.
+An user (restricted or not) can not delegate its rights to a restricted account.
 
 
