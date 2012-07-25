@@ -39,7 +39,7 @@ def sw_thumbnailer(input_path, original_filename, output_path):
     return True
 
 #: Supported formats
-FORMATS = (".sldprt", ".sldasm", ".sldasm", ".slddrw", ".slddrt")
+FORMATS = (".sldprt", ".sldasm", ".slddrw", ".slddrt")
 
 for ext in FORMATS:
     ThumbnailersManager.register(ext, sw_thumbnailer)
