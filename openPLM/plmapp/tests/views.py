@@ -2120,7 +2120,7 @@ class UserViewTestCase(CommonViewTest):
         self.post(self.user_url + 'delegation/sponsor/mail/',
                 {"link_id" : link.id})
         self.assertEqual(1, len(mail.outbox))
-        self.assertEqual(mail.outbox[0].to, [user.email])
+        self.assertEqual(mail.outbox[0].bcc, [user.email])
         user = User.objects.get(username="dede")
         self.assertNotEqual(user.password, pwd)
 
@@ -2262,7 +2262,7 @@ class GroupViewTestCase(CommonViewTest):
         self.assertEqual([inv], list(pending))
         # check a mail has been sent to brian
         self.assertEqual(1, len(mail.outbox))
-        self.assertEqual(mail.outbox[0].to, [self.brian.email])
+        self.assertEqual(mail.outbox[0].bcc, [self.brian.email])
     
     def test_user_join_get(self):
         """
@@ -2292,7 +2292,7 @@ class GroupViewTestCase(CommonViewTest):
         self.assertEqual([inv], list(pending))
         # check a mail has been sent to brian
         self.assertEqual(1, len(mail.outbox))
-        self.assertEqual(mail.outbox[0].to, [self.user.email])
+        self.assertEqual(mail.outbox[0].bcc, [self.user.email])
 
     def _do_test_accept_invitation_get(self):
         mail.outbox = []
@@ -2366,7 +2366,7 @@ class GroupViewTestCase(CommonViewTest):
         # a notification is sent to the owner and to the guest
         recipients = set()
         for msg in mail.outbox:
-            recipients.update(msg.to)
+            recipients.update(msg.bcc)
         self.assertEqual(recipients, set([self.user.email, self.brian.email]))
         inv = m.Invitation.objects.get(group=self.group,
                 guest=self.brian, owner=self.user)
@@ -2552,7 +2552,7 @@ class GroupViewTestCase(CommonViewTest):
         # check a mail has been sent to the right user
         self.assertEqual(1, len(mail.outbox))
         email = self.brian.email if from_owner else self.user.email
-        self.assertEqual(mail.outbox[0].to, [email])
+        self.assertEqual(mail.outbox[0].bcc, [email])
 
     def test_send_invitation_from_guest_post(self):
         """
