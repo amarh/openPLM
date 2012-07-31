@@ -95,7 +95,30 @@
 
         </div>
 
+        <div id="RevisionsNav">
+        {% if obj.is_part or obj.is_document %}
+        
+            {% trans "Other revisions of the object"%}<br/>
+            {% if obj.get_previous_revisions %}
+                <a href="{% with obj.get_previous_revisions|last as prev %}{{prev.plmobject_url}}navigate/{%endwith%}">
+                    <img src="{{MEDIA_URL}}img/navigate/prev.png" alt="{% trans "previous" %}" title="{% trans "displays previous revision as current object" %}">
+                </a>
+            {% else %}
+                <img src="{{MEDIA_URL}}img/navigate/no_prev.png" alt="{% trans "previous" %}" title="{% trans "you are on the first revision of this object" %}">
+            {% endif %}
+            
+            {% if obj.get_next_revisions %}
+                <a href="{% with obj.get_next_revisions|first as next %}{{next.plmobject_url}}navigate/{%endwith%}">
+                    <img src="{{MEDIA_URL}}img/navigate/next.png" alt="{% trans "next" %}" title="{% trans "displays next revision as current object" %}">
+                </a>
+            {% else %}
+                <img src="{{MEDIA_URL}}img/navigate/no_next.png" alt="{% trans "next" %}" title="{% trans "you are on the last revision of this object" %}">
+            {% endif %}
+        
+        {% endif %}
+        </div>
         <div id="FilterNav">
+            
             {% trans "Display :" %}
             <form method="post" action="." >
                 <ul id="FilterNavUl">

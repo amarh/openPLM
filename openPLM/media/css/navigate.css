@@ -202,13 +202,24 @@ span.imgManagement {
     float: left;
 }
 
+/* Display links to previous and next revisions */
+div#RevisionsNav
+{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index : 99;
+    padding: 2px;
+    width: 250px;
+    color: #000;
+}
 /* DISPLAY A BOX IN THE NAVIGATEAREA FOR FILTER OPTIONS */
 div#FilterNav
 {
     position: absolute;
     border: 1px solid #242424;
     right: 10px;
-    top: 10px;
+    top: 60px;
     z-index: 99;
     padding: 3px;
     width: 250px;
