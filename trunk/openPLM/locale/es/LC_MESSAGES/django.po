@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-19 16:45+0200\n"
+"POT-Creation-Date: 2012-07-31 11:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -456,7 +455,6 @@ msgid "An object with the same type, reference and revision already exists"
 msgstr "Ya existe un objeto con el mismo tipo, referencia y revisión "
 
 #: plmapp/forms.py:164
-#, fuzzy
 msgid ""
 "An object with the same type and reference exists, you may consider to "
 "revise it."
@@ -525,7 +523,7 @@ msgstr "disposición"
 msgid "child"
 msgstr "hijo"
 
-#: plmapp/forms.py:515 plmapp/models.py:766
+#: plmapp/forms.py:515 plmapp/models.py:770
 msgid "parents"
 msgstr "padres"
 
@@ -534,8 +532,8 @@ msgid "doc"
 msgstr "doc"
 
 #: plmapp/forms.py:517 plmapp/forms.py:523 plmapp/forms.py:533
-#: plmapp/models.py:186 plmapp/models.py:239 plmapp/models.py:523
-#: plmapp/models.py:730 plmapp/controllers/user.py:89
+#: plmapp/models.py:186 plmapp/models.py:236 plmapp/models.py:525
+#: plmapp/models.py:734 plmapp/controllers/user.py:92
 msgid "owner"
 msgstr "propietario"
 
@@ -543,7 +541,7 @@ msgstr "propietario"
 msgid "signer"
 msgstr "firmante"
 
-#: plmapp/forms.py:519 plmapp/forms.py:525 plmapp/views/main.py:2059
+#: plmapp/forms.py:519 plmapp/forms.py:525 plmapp/views/main.py:2196
 msgid "notified"
 msgstr "notificado"
 
@@ -635,7 +633,6 @@ msgid "contributor"
 msgstr "contribuidor"
 
 #: plmapp/models.py:144
-#, fuzzy
 msgid "restricted account"
 msgstr "cuento limitado"
 
@@ -643,36 +640,36 @@ msgstr "cuento limitado"
 msgid "viewer"
 msgstr "espectador"
 
-#: plmapp/models.py:188 plmapp/models.py:525 plmapp/models.py:1609
+#: plmapp/models.py:188 plmapp/models.py:527 plmapp/models.py:1613
 msgid "date of creation"
 msgstr "fecha de creacción"
 
-#: plmapp/models.py:190 plmapp/models.py:527
+#: plmapp/models.py:190 plmapp/models.py:529
 msgid "date of last modification"
 msgstr "fecha de ultima modificación"
 
-#: plmapp/models.py:238 plmapp/models.py:518
+#: plmapp/models.py:235 plmapp/models.py:520
 msgid "name"
 msgstr "nombre"
 
-#: plmapp/models.py:238 plmapp/models.py:521 plmapp/models.py:729
-#: plmapp/controllers/user.py:88
+#: plmapp/models.py:235 plmapp/models.py:523 plmapp/models.py:733
+#: plmapp/controllers/user.py:91
 msgid "creator"
 msgstr "creador"
 
-#: plmapp/models.py:239 plmapp/models.py:729 plmapp/models.py:730
+#: plmapp/models.py:236 plmapp/models.py:733 plmapp/models.py:734
 msgid "ctime"
 msgstr "ctime"
 
-#: plmapp/models.py:240 plmapp/models.py:731
+#: plmapp/models.py:237 plmapp/models.py:735
 msgid "mtime"
 msgstr "mtime"
 
-#: plmapp/models.py:509 plmapp/models.py:727
+#: plmapp/models.py:511 plmapp/models.py:731
 msgid "reference"
 msgstr "referencia"
 
-#: plmapp/models.py:510
+#: plmapp/models.py:512
 msgid ""
 "Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. "
 "characters"
@@ -680,91 +677,91 @@ msgstr ""
 "Necesario. 50 cáracteres o menos. Cartas, números, excepto #, ?, / y .. "
 "carácteres"
 
-#: plmapp/models.py:511 plmapp/models.py:727
+#: plmapp/models.py:513 plmapp/models.py:731
 msgid "type"
 msgstr "tipo"
 
-#: plmapp/models.py:512 plmapp/models.py:728
+#: plmapp/models.py:514 plmapp/models.py:732
 msgid "revision"
 msgstr "revision"
 
-#: plmapp/models.py:519
+#: plmapp/models.py:521
 msgid "Name of the product"
 msgstr "Nombre del producto"
 
-#: plmapp/models.py:528 plmapp/models.py:731
+#: plmapp/models.py:530 plmapp/models.py:735
 msgid "group"
 msgstr "grupo"
 
-#: plmapp/models.py:531 plmapp/models.py:692
+#: plmapp/models.py:533 plmapp/models.py:696
 msgid "lifecycle"
 msgstr "ciclo de vida"
 
-#: plmapp/models.py:534
+#: plmapp/models.py:536
 msgid "state"
 msgstr "estado"
 
-#: plmapp/models.py:538
+#: plmapp/models.py:540
 msgid "published"
 msgstr "publicado"
 
-#: plmapp/models.py:564
+#: plmapp/models.py:566
 msgid "The object is at its last state."
 msgstr "El objeto esta en su ultimo estado."
 
-#: plmapp/models.py:692
+#: plmapp/models.py:696
 msgid "attributes"
 msgstr "atributos"
 
-#: plmapp/models.py:693
+#: plmapp/models.py:697
 msgid "revisions"
 msgstr "revisiones"
 
-#: plmapp/models.py:693
+#: plmapp/models.py:697
 msgid "history"
 msgstr "historia"
 
-#: plmapp/models.py:766
+#: plmapp/models.py:770
 msgid "BOM-child"
 msgstr "BOM-hijo"
 
-#: plmapp/models.py:767
+#: plmapp/models.py:771
 msgid "doc-cad"
 msgstr "doc-cad"
 
-#: plmapp/models.py:802
+#: plmapp/models.py:806
 msgid "Some children are at a lower or draft state."
 msgstr "Algunos hijos están en un estado inferior o preliminar."
 
-#: plmapp/models.py:814
+#: plmapp/models.py:818
 msgid "There are no official documents attached."
 msgstr "No hay documentos oficiales adjuntos para esta parte"
 
-#: plmapp/models.py:1000
+#: plmapp/models.py:1004
 msgid "This document has no files."
 msgstr "Esta documento no tiene archivos"
 
-#: plmapp/models.py:1003
+#: plmapp/models.py:1007
 msgid "Some files are locked."
 msgstr "Algunos archivos estan cerrados"
 
-#: plmapp/models.py:1010
+#: plmapp/models.py:1014
 msgid "files"
 msgstr "archivos"
 
-#: plmapp/models.py:1011
+#: plmapp/models.py:1015
 msgid "parts"
 msgstr "partes"
 
-#: plmapp/models.py:1611
+#: plmapp/models.py:1615
 msgid "date of validation"
 msgstr "fecha de validación"
 
-#: plmapp/models.py:1612
+#: plmapp/models.py:1616
 msgid "True if guest created the invitation"
 msgstr "Verdadero si el visitante creo la invitación"
 
-#: plmapp/models.py:1677
+#: plmapp/models.py:1681
 msgid "date of promotion"
 msgstr "fecha de creacción"
 
@@ -852,7 +849,7 @@ msgstr "g"
 msgid "kg"
 msgstr "kg"
 
-#: plmapp/controllers/user.py:87
+#: plmapp/controllers/user.py:90
 msgid "role in PLM"
 msgstr "rol en PLM"
 
@@ -864,37 +861,37 @@ msgstr "Introduzca una dirección de e-mail válida."
 msgid "e-mail address"
 msgstr "dirección e-mail"
 
-#: plmapp/views/main.py:751 templates/blocks/user.html:33
+#: plmapp/views/main.py:764 templates/blocks/user.html:33
 msgid "Timeline"
 msgstr ""
 
-#: plmapp/views/main.py:1720
+#: plmapp/views/main.py:1774
 #, python-format
 msgid "Error: %(details)s"
 msgstr "Error: %(details)s"
 
-#: plmapp/views/main.py:1866
+#: plmapp/views/main.py:1990
 msgid "It's not a valid child."
 msgstr "No es un hijo valide."
 
-#: plmapp/views/main.py:1881
+#: plmapp/views/main.py:2005
 msgid "It's not a valid document."
 msgstr "No es un documento valide."
 
-#: plmapp/views/main.py:2055
+#: plmapp/views/main.py:2192
 msgid "signer level"
 msgstr "nivel del firmante"
 
-#: plmapp/views/main.py:2057
+#: plmapp/views/main.py:2194
 msgid "signer all levels"
 msgstr "firmante a todos los niveles "
 
-#: plmapp/views/main.py:2476 templates/base.html:137
+#: plmapp/views/main.py:2639 templates/base.html:137
 #: templates/blocks/supermenu.html:9 templates/blocks/supermenu.html.py:15
 msgid "Search"
 msgstr "Buscar"
 
-#: plmapp/views/main.py:2595 templates/blocks/supermenu.html:48
+#: plmapp/views/main.py:2758 templates/blocks/supermenu.html:48
 msgid "Browse"
 msgstr "Explorar"
 
@@ -1495,12 +1492,40 @@ msgstr "Centrar"
 msgid "Original"
 msgstr "Original"
 
-#: templates/navigate.html:99 templates/parts/bom.html:49
+#: templates/navigate.html:101
+msgid "Other revisions of the object"
+msgstr "Otras revisiones del objeto"
+
+#: templates/navigate.html:104 templates/navigate.html.py:107
+msgid "previous"
+msgstr "anterior"
+
+#: templates/navigate.html:104
+msgid "displays previous revision as current object"
+msgstr "mostra la revision anterior del objeto"
+
+#: templates/navigate.html:107
+msgid "you are on the first revision of this object"
+msgstr "el objeto mostrado es la primera revision "
+
+#: templates/navigate.html:112 templates/navigate.html.py:115
+msgid "next"
+msgstr "siguiente"
+
+#: templates/navigate.html:112
+msgid "displays next revision as current object"
+msgstr "mostra la revision siguiente del objeto"
+
+#: templates/navigate.html:115
+msgid "you are on the last revision of this object"
+msgstr "el objeto mostrado es la ultima revision"
+
+#: templates/navigate.html:122 templates/parts/bom.html:49
 #: templates/parts/parents.html:20
 msgid "Display :"
 msgstr "Mostrar :"
 
-#: templates/navigate.html:103
+#: templates/navigate.html:126
 msgid "FILTER"
 msgstr "FILTRAR"
 
