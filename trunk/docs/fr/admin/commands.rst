@@ -228,4 +228,106 @@ Utilisation : :samp:`./manage.py createcompany [options]`
 Commandes relatives à la traduction
 ====================================
 
+makemessages
+------------------------------------
 
+La commande :program:`./manage.py makemessages` crée/met à jour les fichiers contenant les traductions (fichiers .po). Ces
+fichiers se trouvent dans le répertoire conf/locale (dans l'arborescence de django) ou locale (pour le projet et les applications).
+
+Usage :samp:`./manage.py makemessages [options]`
+
+.. program:: ./manage.py makemessages
+
+.. option:: -v VERBOSITY, --verbosity=VERBOSITY
+
+    Verbosity level; 0=minimal output, 1=normal output, 2=all output
+
+.. option:: --settings=SETTINGS   
+
+    The Python path to a settings module, e.g. "myproject.settings.main". 
+    If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be
+    used.
+
+.. option:: --pythonpath=PYTHONPATH
+
+    A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".
+
+.. option:: --traceback           
+    
+    Print traceback on exception
+
+.. option:: -l LOCALE, --locale=LOCALE
+
+    Creates or updates the message files only for the given locale (e.g. pt_BR).
+
+.. option:: -a, --all             
+
+    Reexamines all source code and templates for new translation strings and updates all message files for
+    all available languages.
+    
+.. option:: -e EXTENSIONS, --extension=EXTENSIONS
+
+    The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e
+    multiple times)
+
+.. option:: -i PATTERN, --ignore=PATTERN
+
+    Ignore files or directories matching this glob-style
+    pattern. Use multiple times to ignore more.
+
+.. seealso::
+
+    Plus de documentations disponibles 
+    `ici <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
+    
+.. note::
+
+    Pour la création/mise à jour des traductions dans l'application principale, utilisez 
+    :program:`./manage.py makemessages - -ignore=apps/* [options]` .
+    
+    Pour la création/mise à jour des traductions d'une application ciblée , placez
+    vous dans le répertoire de cette application et exécutez la commande de création de messages.
+    
+    
+compilemessages
+------------------------------------
+
+La commande :program:`./manage.py compilemessages` compile les fichiers .po vers des fichiers .mo .
+
+Usage :samp:`./manage.py compilemessages [options]`
+
+.. program:: ./manage.py compilemessages
+
+.. option:: -v VERBOSITY, --verbosity=VERBOSITY
+
+    Verbosity level; 0=minimal output, 1=normal output, 2=all output
+
+.. option:: --settings=SETTINGS   
+
+    The Python path to a settings module, e.g. "myproject.settings.main". 
+    If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be
+    used.
+
+.. option:: --pythonpath=PYTHONPATH
+
+    A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".
+
+.. option:: --traceback           
+    
+    Print traceback on exception
+
+.. option:: -l LOCALE, --locale=LOCALE
+
+    The locale to process. Default is to process all.
+
+.. seealso::
+
+    Plus de documentations
+    `ici <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
+    
+.. note::
+
+    Pour compiler les traductions d'une application ciblée , placez
+    vous dans le répertoire de cette application puis compilez vos traductions.
+    
+     
