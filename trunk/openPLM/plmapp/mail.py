@@ -188,7 +188,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
             message = _(render_to_string(template + ".txt", ctx))
             subj_translation = _(subject)
             msg = EmailMultiAlternatives(subj_translation, message, settings.EMAIL_OPENPLM,
-                emails)
+                bcc=emails)
             msg.attach_alternative(html_content, "text/html")
             msg.send(fail_silently=True)
         
