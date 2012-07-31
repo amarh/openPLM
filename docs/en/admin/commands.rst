@@ -228,4 +228,106 @@ Usage :samp:`./manage.py createcompany [options]`
 Translation related commands
 ===============================
 
+makemessages
+------------------------------------
 
+The command :program:`./manage.py makemessages` creates/updates a message file (extensions : .po) in the conf/locale
+(in the django tree) or locale (for project and application) directory.
+
+Usage :samp:`./manage.py makemessages [options]`
+
+.. program:: ./manage.py makemessages
+
+.. option:: -v VERBOSITY, --verbosity=VERBOSITY
+
+    Verbosity level; 0=minimal output, 1=normal output, 2=all output
+
+.. option:: --settings=SETTINGS   
+
+    The Python path to a settings module, e.g. "myproject.settings.main". 
+    If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be
+    used.
+
+.. option:: --pythonpath=PYTHONPATH
+
+    A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".
+
+.. option:: --traceback           
+    
+    Print traceback on exception
+
+.. option:: -l LOCALE, --locale=LOCALE
+
+    Creates or updates the message files only for the given locale (e.g. pt_BR).
+
+.. option:: -a, --all             
+
+    Reexamines all source code and templates for new translation strings and updates all message files for
+    all available languages.
+    
+.. option:: -e EXTENSIONS, --extension=EXTENSIONS
+
+    The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e
+    multiple times)
+
+.. option:: -i PATTERN, --ignore=PATTERN
+
+    Ignore files or directories matching this glob-style
+    pattern. Use multiple times to ignore more.
+
+.. seealso::
+
+    More documentation on these commands is available
+    `here <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
+    
+.. note::
+
+    When you create/update message files for the main application use 
+    :program:`./manage.py makemessages - -ignore=apps/* [options]`
+    
+    If you want to create/update message files for a given application, first change your current
+    directory to the application directory.
+    
+    
+compilemessages
+------------------------------------
+
+The command :program:`./manage.py compilemessages` compiles message files (.po) to .mo files .
+
+Usage :samp:`./manage.py compilemessages [options]`
+
+.. program:: ./manage.py compilemessages
+
+.. option:: -v VERBOSITY, --verbosity=VERBOSITY
+
+    Verbosity level; 0=minimal output, 1=normal output, 2=all output
+
+.. option:: --settings=SETTINGS   
+
+    The Python path to a settings module, e.g. "myproject.settings.main". 
+    If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be
+    used.
+
+.. option:: --pythonpath=PYTHONPATH
+
+    A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".
+
+.. option:: --traceback           
+    
+    Print traceback on exception
+
+.. option:: -l LOCALE, --locale=LOCALE
+
+    The locale to process. Default is to process all.
+
+.. seealso::
+
+    More documentation on these commands is available
+    `here <http://django-haystack.readthedocs.org/en/v1.2.7/management_commands.html>`__.
+    
+.. note::
+
+    If you want to compile message files for a given application, first change your current
+    directory to the application directory.
+    
+ 
