@@ -41,7 +41,7 @@ and edit your apache configuration file to add the following lines:
 
     # WSGIScriptAlias ...
     <Location /media/3D>
-        WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access.wsgi
+        WSGIAccessScript /var/django/openPLM/trunk/openPLM/apache/access.wsgi
     </Location>
     # alias media/ ...
 
