@@ -251,7 +251,7 @@ add the following lines:
     WSGIPassAuthorization On 
 
     <Location /media/thumbnails>
-        WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access_restricted.wsgi
+        WSGIAccessScript /var/django/openPLM/trunk/openPLM/apache/access_restricted.wsgi
     </Location>
     Alias /media /var/django/openPLM/trunk/openPLM/media
     <Directory /var/django/openPLM/trunk/openPLM/media>
@@ -389,7 +389,7 @@ be enabled)
 
         WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
         <Location /media/thumbnails>
-            WSGIAccessScript /var/django.openPLM/trunk/openPLM/apache/access_restricted.wsgi
+            WSGIAccessScript /var/django/openPLM/trunk/openPLM/apache/access_restricted.wsgi
         </Location>
         Alias /media /var/django/openPLM/trunk/openPLM/media
         <Directory /var/django/openPLM/trunk/openPLM/media>
