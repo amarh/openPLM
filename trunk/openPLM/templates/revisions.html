@@ -10,7 +10,7 @@
     </style>
 {% endblock %}
 {% block content %}
-    {% if add_revision_form and obj.is_revisable %}
+    {% if add_revision_form and obj.is_revisable and user.get_profile.is_contributor %}
         <form id="form-revision" method="POST"
             {% if confirmation %} class="confirmation" {% endif %} action="">
             {{ add_revision_form }}
@@ -22,18 +22,22 @@
             <input type="submit" class="{{"Button"|button}}" value="{% trans "NEW" %}"/>
         </form>
     {% else %}
-        {% if is_readable %}
+        {% if not user.get_profile.is_contributor %}
+            {% trans "You can not revise this object since you are not a contributor." %}
+        {% else %}
+            {% if is_readable %}
 
-            {% if obj.is_cancelled %}
-                {% trans "You can not revise this object since it is cancelled." %}
-            {% else %}
-                {% if obj.is_deprecated %}
-                    {% trans "You can not revise this object since it is deprecated." %}
+                {% if obj.is_cancelled %}
+                    {% trans "You can not revise this object since it is cancelled." %}
                 {% else %}
-                    {% trans "You can not revise this object since a revision already exist." %}
+                    {% if obj.is_deprecated %}
+                        {% trans "You can not revise this object since it is deprecated." %}
+                    {% else %}
+                        {% trans "You can not revise this object since a revision already exist." %}
+                    {% endif %}
                 {% endif %}
-            {% endif %}
 
+            {% endif %}
         {% endif %}
     {% endif %}
     <div id="rev_list" class="Content">
