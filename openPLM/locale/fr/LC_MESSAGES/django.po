@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-31 11:55+0200\n"
+"POT-Creation-Date: 2012-08-07 13:59+0200\n"
 "PO-Revision-Date: 2011-11-21 11:12+0100\n"
 "Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -1568,15 +1568,20 @@ msgstr "Ce document n'est plus public."
 msgid "NEW"
 msgstr "NOUVEAU"
 
-#: templates/revisions.html:28
+#: templates/revisions.html:26
+msgid "You can not revise this object since you are not a contributor."
+msgstr ""
+"Vous ne pouvez pas reviser cet objet puisque vous n'êtes pas un contributeur."
+
+#: templates/revisions.html:31
 msgid "You can not revise this object since it is cancelled."
 msgstr "Vous ne pouvez pas reviser cet objet car il a été annulé."
 
-#: templates/revisions.html:31
+#: templates/revisions.html:34
 msgid "You can not revise this object since it is deprecated."
 msgstr "Vous ne pouvez pas reviser cet objet car il a été déprécié."
 
-#: templates/revisions.html:33
+#: templates/revisions.html:36
 msgid "You can not revise this object since a revision already exist."
 msgstr ""
 "Vous ne pouvez pas reviser cet objet car une révision plus récente existe "

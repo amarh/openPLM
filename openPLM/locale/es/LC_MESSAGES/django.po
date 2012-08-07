@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-31 11:55+0200\n"
+"POT-Creation-Date: 2012-08-07 13:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1569,15 +1569,19 @@ msgstr "Este documento no es publico."
 msgid "NEW"
 msgstr "NUEVO"
 
-#: templates/revisions.html:28
-msgid "You can not revise this object since it is cancelled."
-msgstr "Usted no pued revisar este objeto por que es cancelado."
+#: templates/revisions.html:26
+msgid "You can not revise this object since you are not a contributor."
+msgstr "Usted no puede revisar este objeto si no es contribuidor."
 
 #: templates/revisions.html:31
+msgid "You can not revise this object since it is cancelled."
+msgstr "Usted no puede revisar este objeto por que es cancelado."
+
+#: templates/revisions.html:34
 msgid "You can not revise this object since it is deprecated."
 msgstr "Usted no puede revisar este objeto por que es depreciado."
 
-#: templates/revisions.html:33
+#: templates/revisions.html:36
 msgid "You can not revise this object since a revision already exist."
 msgstr ""
 "Usted no puede revisar este objeto por que ya existe una revision del mismo."
