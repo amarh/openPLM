@@ -116,7 +116,18 @@
                                     {% ifequal field.name "url" %} style="display:none;"{% endifequal %}
                                     {% ifequal field.name "title" %} style="display:none;"{% endifequal %}
                                     >
-                                    {{ field }}
+                                    {% if field.name == "name" or field.name == "email" %}
+                                        <input type="text"
+                                        id="id_{{field.name}}" name="{{field.name}}"
+                                        {% ifequal field.name "name" %}
+                                            max_length=50 value="{{request.user.get_full_name}}"
+                                        {% else %}
+                                            value="{{request.user.email}}"
+                                        {% endifequal %}
+                                        >
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         {% endfor %}
