@@ -17,7 +17,7 @@ class Command(BaseCommand):
         import openPLM.apps.badges as b
         from openPLM.apps.badges import views
         
-        badges = b.models.Badge.objects.all().order_by("level")
+        badges = b.models.Badge.objects.active().order_by("level")
         users = User.objects.all()
         
         for u in users:
