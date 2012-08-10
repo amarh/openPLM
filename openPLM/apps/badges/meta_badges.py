@@ -425,7 +425,7 @@ class Guru(MetaBadge):
     Create XX groups 
     """
     id="guru"
-    model = Group
+    model = GroupInfo
     one_time_only = True
     
     title = _("Guru")

@@ -59,7 +59,7 @@ class Badge(models.Model):
     def get_absolute_url(self):
         return reverse('badge_detail', kwargs={'slug': self.id})
     
-    def award_to(self, user):
+    def award_to(self, user, ignore_message=False):
         has_badge = self in user.badges.all()
         if self.meta_badge.one_time_only and has_badge:
             return False
@@ -70,8 +70,9 @@ class Badge(models.Model):
                 
         badge_awarded.send(sender=self.meta_badge, user=user, badge=self)
         
-        message_template = _(u"You just got the %s Badge!")
-        user.message_set.create(message = message_template % self.title)
+        if not ignore_message:
+            message_template = _(u"You just got the %s Badge!")
+            user.message_set.create(message = message_template % self.title)
         
         return BadgeToUser.objects.filter(badge=self, user=user).count()
 
