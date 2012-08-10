@@ -1,0 +1,22 @@
+{% comment %}
+	This template is for displaying the badges a user has earned next to their name. It 
+	expects that you will pass it a list of badge objects called badges.
+
+	Here is an easy way to do that:
+
+	{% with badges as post.user.badges %}
+		{% include "badges/badges_display.html %}
+	{% endwith %}
+
+{% endcomment %}
+
+
+
+{% load badges_tags %}
+<span class="badge">
+{% for level in u|badge_count %}
+	{% if level.count %}
+		<span title="{{level.count}} {{level.badge__level|level_title}} badge{{level.count|pluralize}}"><span class="level_{{level.badge__level}} metal">●</span>{{level.count}}</span>
+	{% endif %}
+{% endfor %}
+</span>

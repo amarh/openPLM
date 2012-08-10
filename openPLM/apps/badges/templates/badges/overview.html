@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load badges_tags i18n %}
+{% load humanize %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/badges.css" />
+{% endblock %}
+{% block leftcolumn %} 
+{% endblock %}
+{% block main %}
+    <div id="ActiveBox" class="{{class4div}}">
+    {% block reference %}
+        {% include "blocks/reference.html" %}
+    {% endblock %}
+
+        <div id="ActiveArea">
+            <div id="main_content">
+            {% block rightColumn %}
+            <div id="badge_sys">
+            {% blocktrans %}
+	        <h3 style="margin-top:0">The Badge System</h3>
+		    <p><!-- description badge and why--></p>
+		    <p><span style="color:#855e42">Bronze Badges</span> are given for completing basic tasks.</p><br/>
+		    <p><span style="color:#a8a8a8">Silver Badges</span> are given for being an active member.</p><br/>
+		    <p><span style="color:#cd7f32">Gold Badges</span> are given for going above the role of active participation.</p><br/>
+		    <p><span style="color:#cdcdcd">Diamond Badges</span> are the one you may not win except if you really want them.</p><br/>
+		    {% endblocktrans %}
+		        {% block back_to_list %}
+		        {% endblock %}
+		    </div>
+            {% endblock %}	
+            {% block body %}
+                <div id="badges_tank" style="margin-right:350px;">
+                    <p class="info_blurb">
+                        <!-- List of badges (a quick but good presentation)-->
+                    </p>
+	                <p class="info_blurb">
+	                    {% blocktrans %}Badges are fun! They're just little reminders that <strong>you are awesome</strong> {% endblocktrans %}
+	                    <span class="faces">☺</span>
+	                </p>
+	                <br/>
+	                <table class="badges">
+	                    <tr class="header">
+		                    <th title="{% trans "Badges you have won are checked" %}">{% trans "Got it" %}</th>
+		                    <th>{% trans "Badge" %}</th>
+		                    <th title="{% trans "Number of users who won the badge" %}">Won</th>
+		                    <th>{% trans "Description" %}</th>
+		                </tr>
+		            {% for badge in badges %}
+		                <tr class="{% cycle 'highlighted' 'lowlighted' %}">
+			                <td class="checkmarks">
+				                {% if badge|is_in:request.user.badges.all %}<span title="{% trans "You have earned this badge" %}">✔</span>
+				                {% endif %}&nbsp;
+			                </td>
+			                <td class="badge">
+				            {% include "badges/badge.html" %}
+				            </td>
+				            <td class="awarded">
+				            {{ badge.user.count|intcomma }}
+			                </td>
+			                <td class="badge_description">{{ badge.description }}</td>
+		                </tr>
+		            {% endfor %}
+	                </table>
+                </div>
+            {% endblock %}
+
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "badges/overview.html" %}
+{% load badges_tags i18n %}
+{% load humanize %}
+
+{% block back_to_list %}
+<p>{% blocktrans %}<a href="/badges/">List</a> of all badges available{% endblocktrans %}</p><br/>
+{% endblock %}
+
+{% block body %}
+<div id="badges_tank">
+    <p><span class="level_{{badge.level}} metal">&nbsp;</span> {% trans "Level :" %}{{badge.level}}</p>
+    <p class="info_blurb">{{ badge.description }}</p><br/>
+    <p>{% trans "Users who won this badge :" %}</p>
+	<ul class="users">
+		{% for u in users %}
+			<li><a href='/user/{{u.username}}'>{{ u.username }}</a></li>
+		{% empty %}
+			<li>{% trans "Nobody has earned this badge!" %}</li>
+		{% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
