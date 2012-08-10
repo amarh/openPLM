@@ -1,3 +1,7 @@
+"""
+.. module:: meta_badges
+"""
+
 from django.contrib.comments import Comment
 from django.utils.translation import ugettext_lazy as _
 
@@ -163,11 +167,13 @@ def string_in(src, str_list):
 
 def is_pony(src, file_names=None, found_name=False):
     """
-    Test if src is in the file_names list
+    Test if src contains at least one file name from file_names list
     
     :param src: file name to test
     :param file_names: list of suggested files name (pony names)
-    :param found_name: if True return the file_names without the founded name 
+    :param found_name: if True return the file name which was founded
+    
+    :return: True if src contains a file name from file_names and a string
     """
     if not file_names:
         file_names=["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"]
@@ -192,6 +198,10 @@ def remove_pony(pony,pony_names):
 def has_all_pony(f_names, pony_names):
     """
     Test if a list of file names contains files named by all pony
+    
+    :param f_names: list of file names to test
+    :param pony_names: list of pony names
+    
     """ 
     if not pony_names:
         return True
@@ -363,24 +373,6 @@ class HiruleHero(MetaBadge):
         linked = self.model.objects.filter(user=user, action="Link : document-part").count()
         return linked
 
-        
-        
-#class Pacman(MetaBadge):
-#    """
-#    Badge won by user who created XXX files using the decomposition 
-#    """
-#    id="pacman"
-#    model = DocumentFile
-#    one_time_only = True
-#    
-#    title = _("Pacman")
-#    description = _("Created XXX files using the decomposition")
-#    level = "3"
-#    
-#    # until the number of files is set
-#    progress_finish = 10
-#    
-
 class WelcomeToHogwarts(MetaBadge):
     """
     Create a Part named "Wizard Wand"    
@@ -462,25 +454,6 @@ class Archivist(MetaBadge):
         deprecated = self.model.objects.filter(user=user, action="Promote", details__contains=" to deprecated").count()
         return deprecated
 
-#class Architect(MetaBadge):
-#    """
-#    decompose a document into 50+ objects 
-#    """
-#    id="architect"
-#    model = 
-#    one_time_only = True
-#    
-#    title = _("Architect")
-#    description = _("Decomposed a document into 50 objects or more")
-#    level = "3"
-#    
-#    progress_finish = 50
-#    
-#    def get_user(self, instance):
-#        return 
-#        
-#    def get_progress(self, user):
-#        return 
 
 class WisedOne(MetaBadge):
     """
@@ -560,24 +533,6 @@ class Tipiak(MetaBadge):
         progress = 0 if not cloned else 1
         return progress
         
-                        
-#class Curious(MetaBadge):
-#    """
-#    Badge won by user who clicked on the help link 
-#    """
-#    id="curious"
-#    model = 
-#    one_time_only = True
-#    
-#    title = _("Curious")
-#    description = _("Clicked on the help link")
-#    level = "1"
-#    
-#    def get_user(self, instance):
-#        return
-#        
-#    def get_progress(self, user):
-#        return 
         
 
 #: property badges        
@@ -659,17 +614,6 @@ class DarthVader(MetaBadge):
     def check_has_posted_comment(self, instance):
         user = instance.user
         return self.model.objects.filter(user=user).exists()
-        
-
-def contains_smiley(src):
-    #list of regex or list of smileys
-    #smileys_regex =[]
-    available_smileys = [" :) "," (: "]
-    
-    for smiley in available_smileys:
-        if smiley in src:
-            return True
-    return False
     
                 
 class RadicalEdward(MetaBadge):
