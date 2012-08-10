@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -20,11 +19,11 @@ msgstr ""
 
 #: meta_badges.py:16
 msgid "Autobiographer"
-msgstr ""
+msgstr "Autobiógrafo(a)"
 
 #: meta_badges.py:17
 msgid "Completed the User Profile"
-msgstr ""
+msgstr "Ha completado su prefile"
 
 #: meta_badges.py:52
 msgid "Serial Killer"
@@ -32,7 +31,7 @@ msgstr ""
 
 #: meta_badges.py:53
 msgid "Cancelled XX objects"
-msgstr ""
+msgstr "Ha cancellado XX objetos"
 
 #: meta_badges.py:78
 msgid "Welcome A.A."
@@ -40,7 +39,7 @@ msgstr ""
 
 #: meta_badges.py:79
 msgid "Sponsored 4 users"
-msgstr ""
+msgstr "Ha patrocinado 4 usarios"
 
 #: meta_badges.py:104
 msgid "God Father"
@@ -48,7 +47,7 @@ msgstr ""
 
 #: meta_badges.py:105
 msgid "Sponsored more than 10 users"
-msgstr ""
+msgstr "Ha patrocinado mas que 10 usarios"
 
 #: meta_badges.py:130
 msgid "Who's the boss now"
@@ -56,7 +55,7 @@ msgstr ""
 
 #: meta_badges.py:131
 msgid "Delegate right(s) to his (her) sponsor"
-msgstr ""
+msgstr "Ha delegado derecho(s) a su patrocinador(a)"
 
 #: meta_badges.py:220
 msgid "Pony Rider"
@@ -67,6 +66,8 @@ msgid ""
 "Added a file named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash or fluttershy"
 msgstr ""
+"Ha añadido un fichiero nombrado pinkie pie, applejack, twilight sparkle, rarity, rainbow "
+"dash o fluttershy"
 
 #: meta_badges.py:246
 msgid "Super Pony Rider"
@@ -77,6 +78,8 @@ msgid ""
 "Added files named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash and fluttershy"
 msgstr ""
+"Ha añadido fichieros nombrado pinkie pie, applejack, twilight sparkle, rarity, rainbow "
+"dash y fluttershy"
 
 #: meta_badges.py:276
 msgid "Dragon Slayer"
@@ -84,7 +87,7 @@ msgstr ""
 
 #: meta_badges.py:277
 msgid "Added and destroyed a file named spike"
-msgstr ""
+msgstr "Ha añadido e borrado un fichiero nombrado spike"
 
 #: meta_badges.py:307
 msgid "Herald"
@@ -92,15 +95,15 @@ msgstr ""
 
 #: meta_badges.py:308
 msgid "Notified 50 users"
-msgstr ""
+msgstr "Ha avisado 50 usarios"
 
 #: meta_badges.py:327
 msgid "Journalist"
-msgstr ""
+msgstr "Periodista"
 
 #: meta_badges.py:328
 msgid "Published XX objects"
-msgstr ""
+msgstr "Ha publicado XX objetos"
 
 #: meta_badges.py:356
 msgid "Hirule's Hero"
@@ -108,7 +111,7 @@ msgstr ""
 
 #: meta_badges.py:357
 msgid "Created 100 part-documents links"
-msgstr ""
+msgstr "Ha creado 100 relaciones partes-documentos"
 
 #: meta_badges.py:392
 msgid "Welcome To Hogwarts"
@@ -116,7 +119,7 @@ msgstr ""
 
 #: meta_badges.py:393
 msgid "Created a Part named `Wizard Wand`"
-msgstr ""
+msgstr "Ha creado una parte nombrada Wizard Wand"
 
 #: meta_badges.py:413
 msgid "Emmett Brown"
@@ -124,31 +127,31 @@ msgstr ""
 
 #: meta_badges.py:414
 msgid "Created 121 parts and documents"
-msgstr ""
+msgstr "Ha creado 121 partes y documentos"
 
 #: meta_badges.py:431
 msgid "Guru"
-msgstr ""
+msgstr "Gurú"
 
 #: meta_badges.py:432
 msgid "Created XX groups"
-msgstr ""
+msgstr "Ha creado XX grupos"
 
 #: meta_badges.py:454
 msgid "Archivist"
-msgstr ""
+msgstr "Archivero(a)"
 
 #: meta_badges.py:455
 msgid "Deprecated XX documents"
-msgstr ""
+msgstr "Ha depreciado XX documentos"
 
 #: meta_badges.py:493
 msgid "Wised One"
-msgstr ""
+msgstr "Sabio"
 
 #: meta_badges.py:494
 msgid "Rejected 500 documents signatures (or demoted 500 objects)"
-msgstr ""
+msgstr "Ha rechezado 500 firmas de documentos (o ha degrado 500 objetos)"
 
 #: meta_badges.py:512
 msgid "Replicant"
@@ -156,7 +159,7 @@ msgstr ""
 
 #: meta_badges.py:513
 msgid "Cloned a part/document"
-msgstr ""
+msgstr "Ha clonado una parte/un documento"
 
 #: meta_badges.py:528
 msgid "Frankeinstein"
@@ -164,7 +167,7 @@ msgstr ""
 
 #: meta_badges.py:529
 msgid "Cloned a cancelled or deprecated object"
-msgstr ""
+msgstr "Ha clonado un objeto cancellado o depreciado"
 
 #: meta_badges.py:550
 msgid "Tipiak"
@@ -172,23 +175,23 @@ msgstr ""
 
 #: meta_badges.py:551
 msgid "Cloned object owned and created by another user"
-msgstr ""
+msgstr "Ha clonado un objeto que no le pertenece"
 
 #: meta_badges.py:592
 msgid "Materialistic"
-msgstr ""
+msgstr "Materialista"
 
 #: meta_badges.py:593
 msgid "Owns more than 1000 objects"
-msgstr ""
+msgstr "Tiene mas que 1000 objetos"
 
 #: meta_badges.py:614
 msgid "Popular"
-msgstr ""
+msgstr "Popular"
 
 #: meta_badges.py:615
 msgid "Belongs to 20 groups or more"
-msgstr ""
+msgstr "Pertenece a 20 gupos o mas"
 
 #: meta_badges.py:646
 msgid "Darth Vader"
@@ -196,45 +199,45 @@ msgstr ""
 
 #: meta_badges.py:647
 msgid "Posted the comment `Chocking Hazard`"
-msgstr ""
+msgstr "Ha publicado el commentario Chocking Hazard"
 
 #: meta_badges.py:683
 msgid "Radical Edward"
-msgstr ""
+msgstr "Radical Edward"
 
 #: meta_badges.py:684
 msgid "Posted 100 :) comments"
-msgstr ""
+msgstr "Ha publicado 100 commentario con :)"
 
 #: models.py:73
 #, python-format
 msgid "You just got the %s Badge!"
-msgstr ""
+msgstr "Has ganado la medalla de %s! "
 
 #: views.py:18
 msgid "Badges"
-msgstr ""
+msgstr "Medallas"
 
 #: views.py:29
 #, python-format
 msgid "Badge : %s"
-msgstr ""
+msgstr "Medalla : %s"
 
 #: templates/badges/detail.html:6 templates/user/badges_overview.html:6
 msgid "<a href=\"/badges/\">List</a> of all badges available"
-msgstr ""
+msgstr "<a href=\"/badges/\">Lista</a> de todas las medallas a disposición"
 
 #: templates/badges/detail.html:11
 msgid "Level :"
-msgstr ""
+msgstr "Nivel :"
 
 #: templates/badges/detail.html:13
 msgid "Users who won this badge :"
-msgstr ""
+msgstr "Usarios quiénes han ganado esta medalla :"
 
 #: templates/badges/detail.html:18
 msgid "Nobody has earned this badge!"
-msgstr ""
+msgstr "Ningun ha ganado esta medalla!"
 
 #: templates/badges/overview.html:20
 msgid ""
@@ -251,33 +254,47 @@ msgid ""
 "you may not win except if you really want them.</p><br/>\n"
 "\t\t    "
 msgstr ""
+"\n"
+"\t        <h3 style=\"margin-top:0\">El sistema de las Medallas</h3>\n"
+"\t\t    <p><!-- description badge and why--></p>\n"
+"\t\t    <p><span style=\"color:#855e42\">Las medallas de Bronze</span> son concedidas cuando "
+"ha completado basicas tareas.</p><br/>\n"
+"\t\t    <p><span style=\"color:#a8a8a8\">Las medallas de Plata</span> son concedidas a"
+"los usarios actives.</p><br/>\n"
+"\t\t    <p><span style=\"color:#cd7f32\">Las medallas de Oro</span> son concedidas a "
+"los usarios quienes participan mas.</p><br/>\n"
+"\t\t    <p><span style=\"color:#cdcdcd\">Las medallas de Diamante</span> son concedidas solo "
+" a los usarios quienes las querian.</p><br/>\n"
+"\t\t    "
 
 #: templates/badges/overview.html:38 templates/user/badges_overview.html:11
 msgid ""
 "Badges are fun! They're just little reminders that <strong>you are awesome</"
 "strong> "
 msgstr ""
+"Las medallas estan divertidas! Estan justo recuerdos que <strong> estas formidable</"
+"strong> "
 
 #: templates/badges/overview.html:44
 msgid "Badges you have won are checked"
-msgstr ""
+msgstr "Las medallas que usted ha ganado estan marcadas"
 
 #: templates/badges/overview.html:44
 msgid "Got it"
-msgstr ""
+msgstr "Le ha ganado"
 
 #: templates/badges/overview.html:45 templates/user/badges_overview.html:19
 msgid "Badge"
-msgstr ""
+msgstr "Medalla"
 
 #: templates/badges/overview.html:46
 msgid "Number of users who won the badge"
-msgstr ""
+msgstr "Numero de usarios quiene han ganado la medalla"
 
 #: templates/badges/overview.html:47 templates/user/badges_overview.html:20
 msgid "Description"
-msgstr ""
+msgstr "Descripcion"
 
 #: templates/badges/overview.html:52
 msgid "You have earned this badge"
-msgstr ""
+msgstr "Usted ha ganado esta medalla"
