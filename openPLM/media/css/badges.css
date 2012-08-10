@@ -1,0 +1,62 @@
+
+#badge_sys {
+    float:right; 
+    width:300px;
+    background-color : #585455;
+    color:#FFF;
+}
+
+#badge_sys *{
+    color : #FFF;
+}
+
+#badge_sys p{
+    padding: 2px;
+}
+table.badges{
+    width : 100%
+    border-collapse: separate;
+    border-spacing : 1px;
+    border : 1px solid grey;
+}
+
+tr.header th {
+    border-collapse: separate;
+    border-spacing : 1px;
+    border : 1px solid grey;
+    padding : 5px;
+    background-color : #585455;
+    color : #FFF;
+}
+
+table tr.highlighted {
+    background-color : #E4E3E1;
+}
+
+td{
+    border-collapse : separate;
+    border-spacing : 1px;
+    padding : 5px;
+    border : 0px solid grey;
+    border-width: 0 1px 0 1px;
+}
+
+span.metal{
+    float: left;
+    width: 16px;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+span.level_1{
+    background-image : url('../img/badges/bronze.png');
+}
+span.level_2{
+    background-image : url('../img/badges/silver.png');
+}
+span.level_3{
+    background-image: url('../img/badges/gold.png');
+}
+span.level_4{
+    background-image: url('../img/badges/diamond.png')
+}
