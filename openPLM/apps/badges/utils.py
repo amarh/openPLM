@@ -87,6 +87,10 @@ class MetaBadge(object):
         return all( fn(instance) for fn in condition_callbacks )
     
     def get_user(self, instance):
+        """
+        This function should be overriden if the user can not be
+        reached using `instance.user`
+        """
         return instance.user
 
     def get_progress(self, user):
@@ -95,6 +99,9 @@ class MetaBadge(object):
         return 0
     
     def get_progress_percentage(self, progress=None, user=None):
+        """
+        Return the percentage of progress for a user.
+        """
         if user is None and progress is None:
             raise RequiresUserOrProgress("This method requires either a user or progress keyword argument")
 
