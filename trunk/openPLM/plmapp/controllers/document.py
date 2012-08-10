@@ -556,6 +556,8 @@ class DocumentController(PLMObjectController):
             for part in parts:
                 models.DocumentPartLink.objects.create(part=part,
                     document=new_ctrl.object)
+        details = "to %s//%s//%s//%s " %(new_ctrl.type, new_ctrl.reference, new_ctrl.revision, new_ctrl.name)
+        self._save_histo("Clone", details)
         return new_ctrl
         
     def has_links(self):
