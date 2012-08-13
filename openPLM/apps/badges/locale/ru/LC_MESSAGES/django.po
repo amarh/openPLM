@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 09:38+0200\n"
+"POT-Creation-Date: 2012-08-13 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,209 +19,209 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: meta_badges.py:16
+#: meta_badges.py:20
 msgid "Autobiographer"
 msgstr ""
 
-#: meta_badges.py:17
+#: meta_badges.py:21
 msgid "Completed the User Profile"
 msgstr ""
 
-#: meta_badges.py:52
+#: meta_badges.py:56
 msgid "Serial Killer"
 msgstr ""
 
-#: meta_badges.py:53
+#: meta_badges.py:57
 msgid "Cancelled XX objects"
 msgstr ""
 
-#: meta_badges.py:78
+#: meta_badges.py:82
 msgid "Welcome A.A."
 msgstr ""
 
-#: meta_badges.py:79
+#: meta_badges.py:83
 msgid "Sponsored 4 users"
 msgstr ""
 
-#: meta_badges.py:104
+#: meta_badges.py:108
 msgid "God Father"
 msgstr ""
 
-#: meta_badges.py:105
+#: meta_badges.py:109
 msgid "Sponsored more than 10 users"
 msgstr ""
 
-#: meta_badges.py:130
+#: meta_badges.py:134
 msgid "Who's the boss now"
 msgstr ""
 
-#: meta_badges.py:131
+#: meta_badges.py:135
 msgid "Delegate right(s) to his (her) sponsor"
 msgstr ""
 
-#: meta_badges.py:220
+#: meta_badges.py:230
 msgid "Pony Rider"
 msgstr ""
 
-#: meta_badges.py:221
+#: meta_badges.py:231
 msgid ""
 "Added a file named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash or fluttershy"
 msgstr ""
 
-#: meta_badges.py:246
+#: meta_badges.py:256
 msgid "Super Pony Rider"
 msgstr ""
 
-#: meta_badges.py:247
+#: meta_badges.py:257
 msgid ""
 "Added files named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash and fluttershy"
 msgstr ""
 
-#: meta_badges.py:276
+#: meta_badges.py:286
 msgid "Dragon Slayer"
 msgstr ""
 
-#: meta_badges.py:277
+#: meta_badges.py:287
 msgid "Added and destroyed a file named spike"
 msgstr ""
 
-#: meta_badges.py:307
+#: meta_badges.py:317
 msgid "Herald"
 msgstr ""
 
-#: meta_badges.py:308
+#: meta_badges.py:318
 msgid "Notified 50 users"
 msgstr ""
 
-#: meta_badges.py:327
+#: meta_badges.py:337
 msgid "Journalist"
 msgstr ""
 
-#: meta_badges.py:328
+#: meta_badges.py:338
 msgid "Published XX objects"
 msgstr ""
 
-#: meta_badges.py:356
+#: meta_badges.py:366
 msgid "Hirule's Hero"
 msgstr ""
 
-#: meta_badges.py:357
+#: meta_badges.py:367
 msgid "Created 100 part-documents links"
 msgstr ""
 
-#: meta_badges.py:392
+#: meta_badges.py:384
 msgid "Welcome To Hogwarts"
 msgstr ""
 
-#: meta_badges.py:393
+#: meta_badges.py:385
 msgid "Created a Part named `Wizard Wand`"
 msgstr ""
 
-#: meta_badges.py:413
+#: meta_badges.py:405
 msgid "Emmett Brown"
 msgstr ""
 
-#: meta_badges.py:414
+#: meta_badges.py:406
 msgid "Created 121 parts and documents"
 msgstr ""
 
-#: meta_badges.py:431
+#: meta_badges.py:423
 msgid "Guru"
 msgstr ""
 
-#: meta_badges.py:432
+#: meta_badges.py:424
 msgid "Created XX groups"
 msgstr ""
 
-#: meta_badges.py:454
+#: meta_badges.py:446
 msgid "Archivist"
 msgstr ""
 
-#: meta_badges.py:455
+#: meta_badges.py:447
 msgid "Deprecated XX documents"
 msgstr ""
 
-#: meta_badges.py:493
+#: meta_badges.py:466
 msgid "Wised One"
 msgstr ""
 
-#: meta_badges.py:494
+#: meta_badges.py:467
 msgid "Rejected 500 documents signatures (or demoted 500 objects)"
 msgstr ""
 
-#: meta_badges.py:512
+#: meta_badges.py:485
 msgid "Replicant"
 msgstr ""
 
-#: meta_badges.py:513
+#: meta_badges.py:486
 msgid "Cloned a part/document"
 msgstr ""
 
-#: meta_badges.py:528
+#: meta_badges.py:501
 msgid "Frankeinstein"
 msgstr ""
 
-#: meta_badges.py:529
+#: meta_badges.py:502
 msgid "Cloned a cancelled or deprecated object"
 msgstr ""
 
-#: meta_badges.py:550
+#: meta_badges.py:523
 msgid "Tipiak"
 msgstr ""
 
-#: meta_badges.py:551
+#: meta_badges.py:524
 msgid "Cloned object owned and created by another user"
 msgstr ""
 
-#: meta_badges.py:592
+#: meta_badges.py:547
 msgid "Materialistic"
 msgstr ""
 
-#: meta_badges.py:593
+#: meta_badges.py:548
 msgid "Owns more than 1000 objects"
 msgstr ""
 
-#: meta_badges.py:614
+#: meta_badges.py:569
 msgid "Popular"
 msgstr ""
 
-#: meta_badges.py:615
+#: meta_badges.py:570
 msgid "Belongs to 20 groups or more"
 msgstr ""
 
-#: meta_badges.py:646
+#: meta_badges.py:601
 msgid "Darth Vader"
 msgstr ""
 
-#: meta_badges.py:647
+#: meta_badges.py:602
 msgid "Posted the comment `Chocking Hazard`"
 msgstr ""
 
-#: meta_badges.py:683
+#: meta_badges.py:627
 msgid "Radical Edward"
 msgstr ""
 
-#: meta_badges.py:684
+#: meta_badges.py:628
 msgid "Posted 100 :) comments"
 msgstr ""
 
-#: models.py:73
+#: models.py:74
 #, python-format
 msgid "You just got the %s Badge!"
 msgstr ""
 
-#: views.py:18
+#: views.py:39
 msgid "Badges"
 msgstr ""
 
-#: views.py:29
+#: views.py:70
 #, python-format
 msgid "Badge : %s"
 msgstr ""
 
-#: templates/badges/detail.html:6 templates/user/badges_overview.html:6
+#: templates/badges/detail.html:6 templates/user/badges_overview.html:22
 msgid "<a href=\"/badges/\">List</a> of all badges available"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgid ""
 "\t\t    "
 msgstr ""
 
-#: templates/badges/overview.html:38 templates/user/badges_overview.html:11
+#: templates/badges/overview.html:38 templates/user/badges_overview.html:27
 msgid ""
 "Badges are fun! They're just little reminders that <strong>you are awesome</"
 "strong> "
@@ -267,7 +267,7 @@ msgstr ""
 msgid "Got it"
 msgstr ""
 
-#: templates/badges/overview.html:45 templates/user/badges_overview.html:19
+#: templates/badges/overview.html:45 templates/user/badges_overview.html:33
 msgid "Badge"
 msgstr ""
 
@@ -275,10 +275,26 @@ msgstr ""
 msgid "Number of users who won the badge"
 msgstr ""
 
-#: templates/badges/overview.html:47 templates/user/badges_overview.html:20
+#: templates/badges/overview.html:47 templates/user/badges_overview.html:34
 msgid "Description"
 msgstr ""
 
 #: templates/badges/overview.html:52
 msgid "You have earned this badge"
+msgstr ""
+
+#: templates/user/badges_overview.html:14
+msgid ""
+"\n"
+"    <h3 style=\"margin-top:0\">The Badge System</h3>\n"
+"    <p><!-- description badge and why--></p>\n"
+"    <p><span style=\"color:#855e42\">Bronze Badges</span> are given for "
+"completing basic tasks.</p><br/>\n"
+"    <p><span style=\"color:#a8a8a8\">Silver Badges</span> are given for "
+"being an active member.</p><br/>\n"
+"    <p><span style=\"color:#cd7f32\">Gold Badges</span> are given for going "
+"above the role of active participation.</p><br/>\n"
+"    <p><span style=\"color:#cdcdcd\">Diamond Badges</span> are the one you "
+"may not win except if you really want them.</p><br/>\n"
+"    "
 msgstr ""

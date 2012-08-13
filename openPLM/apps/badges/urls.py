@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 
+import meta_badges
 from openPLM.apps.badges import views
 
 user_url = r'^user/(?P<obj_ref>[^/]+)/'
