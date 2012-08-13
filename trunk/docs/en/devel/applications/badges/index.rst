@@ -4,7 +4,7 @@ Badges
 
 .. toctree::
 
-    meta_badges
+    utils
     
     views
 
