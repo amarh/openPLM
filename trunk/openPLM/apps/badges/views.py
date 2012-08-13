@@ -6,9 +6,30 @@ from openPLM.plmapp.base_views import get_generic_data
 from openPLM.plmapp.views.main import r2r
 
 from openPLM.apps.badges.models import Badge
-import meta_badges
+
 
 def overview(request, extra_context={}):
+    """
+    Badges view :
+        display all badges available in OpenPLM
+
+    :url: :samp:`/badges/`
+    
+    **Template:**
+    
+    :file:`badges/overview.html`
+
+    **Context:**
+
+    ``RequestContext``
+ 
+    ``badges``
+        List of all badges available
+
+    ``object_type``
+        Name of the page
+
+    """
     obj, ctx = get_generic_data(request, search=False)
     
     badges = Badge.objects.active().order_by("level")
@@ -19,6 +40,31 @@ def overview(request, extra_context={}):
     return r2r("badges/overview.html",ctx,request)
 
 def detail(request, slug, extra_context={}):
+    """
+    Badge description view.
+
+    :url: :samp:`/badges/{{slug}}`
+    
+    **Template:**
+    
+    :file:`badges/detail.html`
+
+    **Context:**
+
+    ``RequestContext``
+ 
+    ``badge``
+        Badge object corresponding to the id given in
+        *slug*.
+
+    ``users``
+        List of users who won the badge
+        
+    ``object_type``
+        component of the title of the page. Here the name
+        of the badge.
+
+    """
     obj, ctx = get_generic_data(request, search=False)
     badge = get_object_or_404(Badge, id=slug)
     users = badge.user.all()
@@ -31,6 +77,26 @@ def detail(request, slug, extra_context={}):
     return r2r("badges/detail.html", ctx, request)
     
 def display_userbadges(request, obj_type, obj_ref, obj_revi):
+    """
+    Badge tab in user view.
+
+    :url: :samp:`/user/{{username}}/badges`
+    
+    **Template:**
+    
+    :file:`users/badges_overview.html`
+
+    **Context:**
+
+    ``RequestContext``
+ 
+    ``badges``
+        List of badges won by the user
+
+    ``current_page``
+        name of the tab
+
+    """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     badges = Badge.objects.active().filter(user=obj.object).order_by("level")
