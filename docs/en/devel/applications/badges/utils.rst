@@ -1,8 +1,6 @@
 =================================================
-:mod:`badges.meta_badges` --- badges 
+:mod:`badges.utils`
 =================================================
-
-This module contains all available badges and their condition.
 
 
 MetaBadge

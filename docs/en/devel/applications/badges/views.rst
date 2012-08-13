@@ -1,5 +1,7 @@
 =================================================
-:mod:`badges.views` --- views
+:mod:`badges.views` --- views for badges
 =================================================
 
-.. todo
+.. automodule:: openPLM.apps.badges.views
+    :members:
+    :show-inheritance:
