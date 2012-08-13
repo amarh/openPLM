@@ -15,7 +15,7 @@ class Command(BaseCommand):
         from django.contrib.auth.models import User
         
         import openPLM.apps.badges as b
-        from openPLM.apps.badges import views
+        from openPLM.apps.badges import meta_badges
         
         badges = b.models.Badge.objects.active().order_by("level")
         users = User.objects.all()
