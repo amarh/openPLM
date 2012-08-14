@@ -299,16 +299,7 @@ Ouvrer votre navigateur et accéder à la page suivante : ::
 .. image:: images/company_login.png
 
 
-Cliquer sur Étudier->Delegation->Parrain
-Vous devriez arriver sur une page permettant de parrainer un nouvel
-utilisateur. Remplissez le formulaire en n'oubliant pas d'ajouter un groupe
-(un groupe par défaut a été créé lors de l'installation), et assurez vous de
-renseigner une adresse email valide. Ensuite, valider.
-
-.. image:: images/sponsor.png
-
-Le nouvel utilisateur a été créé et un email contenant ses paramètres de
-connexion à été envoyé.
+Ensuite suivez les instructions décrites dans :ref:`add-user`
 
 Créer d'autres utilisateurs si nécessaire, puis déconnectez vous et
 reconnectez vous depuis votre nouveau compte utilisateur.

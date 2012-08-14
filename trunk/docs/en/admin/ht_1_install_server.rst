@@ -320,15 +320,7 @@ Open your web browser and go to: ::
 .. image:: images/company_login.png
 
 
-Go to Study->Delegation->Sponsor
-You should see a page allowing you to sponsor a new user. Fill the form, add
-the user to a group (a default group exist has already been created), and
-make sure the email address is correct. Then Validate
-
-.. image:: images/sponsor.png
-
-The new user has been created and he should have received an email with his
-connexion informations.
+Then follow the steps described in :ref:`add-user`.
 
 Create other users if needed, then logout and login as your new user account.
 
