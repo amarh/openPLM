@@ -67,6 +67,8 @@ class MetaBadge(object):
     one_time_only = False
     model = models.Model
 
+    link_to_doc = None
+    
     progress_start = 0
     progress_finish = 1
     

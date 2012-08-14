@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-13 13:20+0200\n"
+"POT-Creation-Date: 2012-08-14 14:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,206 +18,215 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: meta_badges.py:20
+#: meta_badges.py:22
 msgid "Autobiographer"
 msgstr ""
 
-#: meta_badges.py:21
+#: meta_badges.py:23
 msgid "Completed the User Profile"
 msgstr ""
 
-#: meta_badges.py:56
+#: meta_badges.py:58
 msgid "Serial Killer"
 msgstr ""
 
-#: meta_badges.py:57
+#: meta_badges.py:59
 msgid "Cancelled XX objects"
 msgstr ""
 
-#: meta_badges.py:82
+#: meta_badges.py:84
 msgid "Welcome A.A."
 msgstr ""
 
-#: meta_badges.py:83
+#: meta_badges.py:85
 msgid "Sponsored 4 users"
 msgstr ""
 
-#: meta_badges.py:108
+#: meta_badges.py:110
 msgid "God Father"
 msgstr ""
 
-#: meta_badges.py:109
+#: meta_badges.py:111
 msgid "Sponsored more than 10 users"
 msgstr ""
 
-#: meta_badges.py:134
+#: meta_badges.py:136
 msgid "Who's the boss now"
 msgstr ""
 
-#: meta_badges.py:135
+#: meta_badges.py:137
 msgid "Delegate right(s) to his (her) sponsor"
 msgstr ""
 
-#: meta_badges.py:230
+#: meta_badges.py:233
 msgid "Pony Rider"
 msgstr ""
 
-#: meta_badges.py:231
+#: meta_badges.py:234
 msgid ""
 "Added a file named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash or fluttershy"
 msgstr ""
 
-#: meta_badges.py:256
+#: meta_badges.py:262
 msgid "Super Pony Rider"
 msgstr ""
 
-#: meta_badges.py:257
+#: meta_badges.py:263
 msgid ""
 "Added files named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
 "dash and fluttershy"
 msgstr ""
 
-#: meta_badges.py:286
+#: meta_badges.py:295
 msgid "Dragon Slayer"
 msgstr ""
 
-#: meta_badges.py:287
+#: meta_badges.py:296
 msgid "Added and destroyed a file named spike"
 msgstr ""
 
-#: meta_badges.py:317
+#: meta_badges.py:325
 msgid "Herald"
 msgstr ""
 
-#: meta_badges.py:318
+#: meta_badges.py:326
 msgid "Notified 50 users"
 msgstr ""
 
-#: meta_badges.py:337
+#: meta_badges.py:348
 msgid "Journalist"
 msgstr ""
 
-#: meta_badges.py:338
+#: meta_badges.py:349
 msgid "Published XX objects"
 msgstr ""
 
-#: meta_badges.py:366
+#: meta_badges.py:380
 msgid "Hirule's Hero"
 msgstr ""
 
-#: meta_badges.py:367
+#: meta_badges.py:381
 msgid "Created 100 part-documents links"
 msgstr ""
 
-#: meta_badges.py:384
+#: meta_badges.py:402
 msgid "Welcome To Hogwarts"
 msgstr ""
 
-#: meta_badges.py:385
+#: meta_badges.py:403
 msgid "Created a Part named `Wizard Wand`"
 msgstr ""
 
-#: meta_badges.py:405
+#: meta_badges.py:423
 msgid "Emmett Brown"
 msgstr ""
 
-#: meta_badges.py:406
+#: meta_badges.py:424
 msgid "Created 121 parts and documents"
 msgstr ""
 
-#: meta_badges.py:423
+#: meta_badges.py:446
 msgid "Guru"
 msgstr ""
 
-#: meta_badges.py:424
+#: meta_badges.py:447
 msgid "Created XX groups"
 msgstr ""
 
-#: meta_badges.py:446
+#: meta_badges.py:472
 msgid "Archivist"
 msgstr ""
 
-#: meta_badges.py:447
+#: meta_badges.py:473
 msgid "Deprecated XX documents"
 msgstr ""
 
-#: meta_badges.py:466
+#: meta_badges.py:501
 msgid "Wised One"
 msgstr ""
 
-#: meta_badges.py:467
-msgid "Rejected 500 documents signatures (or demoted 500 objects)"
-msgstr ""
-
-#: meta_badges.py:485
-msgid "Replicant"
-msgstr ""
-
-#: meta_badges.py:486
-msgid "Cloned a part/document"
-msgstr ""
-
-#: meta_badges.py:501
-msgid "Frankeinstein"
-msgstr ""
-
 #: meta_badges.py:502
-msgid "Cloned a cancelled or deprecated object"
-msgstr ""
-
-#: meta_badges.py:523
-msgid "Tipiak"
+msgid "Rejected 500 objects signatures (or demoted 500 objects)"
 msgstr ""
 
 #: meta_badges.py:524
+msgid "Replicant"
+msgstr ""
+
+#: meta_badges.py:525
+msgid "Cloned a part/document"
+msgstr ""
+
+#: meta_badges.py:545
+msgid "Frankeinstein"
+msgstr ""
+
+#: meta_badges.py:546
+msgid "Cloned a cancelled or deprecated object"
+msgstr ""
+
+#: meta_badges.py:571
+msgid "Tipiak"
+msgstr ""
+
+#: meta_badges.py:572
 msgid "Cloned object owned and created by another user"
 msgstr ""
 
-#: meta_badges.py:547
+#: meta_badges.py:598
 msgid "Materialistic"
 msgstr ""
 
-#: meta_badges.py:548
+#: meta_badges.py:599
 msgid "Owns more than 1000 objects"
 msgstr ""
 
-#: meta_badges.py:569
+#: meta_badges.py:620
 msgid "Popular"
 msgstr ""
 
-#: meta_badges.py:570
+#: meta_badges.py:621
 msgid "Belongs to 20 groups or more"
 msgstr ""
 
-#: meta_badges.py:601
+#: meta_badges.py:653
 msgid "Darth Vader"
 msgstr ""
 
-#: meta_badges.py:602
+#: meta_badges.py:654
 msgid "Posted the comment `Chocking Hazard`"
 msgstr ""
 
-#: meta_badges.py:627
+#: meta_badges.py:676
 msgid "Radical Edward"
 msgstr ""
 
-#: meta_badges.py:628
+#: meta_badges.py:677
 msgid "Posted 100 :) comments"
 msgstr ""
 
-#: models.py:74
+#: models.py:81
 #, python-format
 msgid "You just got the %s Badge!"
 msgstr ""
 
-#: views.py:39
+#: views.py:40
 msgid "Badges"
 msgstr ""
 
-#: views.py:70
+#: views.py:77
 #, python-format
 msgid "Badge : %s"
+msgstr ""
+
+#: templates/badges/badges_display.html:13
+#, python-format
+msgid ""
+"\n"
+"        <a href=%(link)s target=\"_blank\"><img src=\"/media/img/focus.png\" "
+"title=\"Related documentation\"/></a>\n"
+"    "
 msgstr ""
 
 #: templates/badges/detail.html:6 templates/user/badges_overview.html:22
@@ -228,11 +237,20 @@ msgstr ""
 msgid "Level :"
 msgstr ""
 
-#: templates/badges/detail.html:13
+#: templates/badges/detail.html:14
+#, python-format
+msgid ""
+"\n"
+"        <a href=%(link)s target=\"_blank\"><img src=\"/media/img/focus.png\" "
+"title=\"Related documentation\"/></a>\n"
+"        "
+msgstr ""
+
+#: templates/badges/detail.html:19
 msgid "Users who won this badge :"
 msgstr ""
 
-#: templates/badges/detail.html:18
+#: templates/badges/detail.html:24
 msgid "Nobody has earned this badge!"
 msgstr ""
 
