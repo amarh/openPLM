@@ -55,6 +55,9 @@ class Badge(models.Model):
         
     @property
     def link(self):
+        """
+        Returns a link to the user documentation if link_to_doc is set in the meta_badge.
+        """
         if self.meta_badge.link_to_doc:
             return "%s%s" %(settings.DOCUMENTATION_URL, self.meta_badge.link_to_doc)
         else:
