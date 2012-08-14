@@ -52,6 +52,13 @@ class Badge(models.Model):
     @property
     def description(self):
         return self.meta_badge.description
+        
+    @property
+    def link(self):
+        if self.meta_badge.link_to_doc:
+            return "%s%s" %(settings.DOCUMENTATION_URL, self.meta_badge.link_to_doc)
+        else:
+            return None
     
     def __unicode__(self):
         return u"%s" % self.title

@@ -8,8 +8,14 @@
 
 {% block body %}
 <div id="badges_tank">
-    <p><span class="level_{{badge.level}} metal">&nbsp;</span> {% trans "Level :" %}{{badge.level}}</p>
-    <p class="info_blurb">{{ badge.description }}</p><br/>
+    <p><span class="level_{{badge.level}} metal">&nbsp;</span> {% trans "Level :" %}{{badge.level}}</p><br/>
+    <p class="info_blurb">{{ badge.description }}
+    {% if badge.link %}
+        {% blocktrans with badge.link as link %}
+        <a href={{link}} target="_blank"><img src="/media/img/focus.png" title="Related documentation"/></a>
+        {% endblocktrans %}
+    {% endif %}
+    </p><br/>
     <p>{% trans "Users who won this badge :" %}</p>
 	<ul class="users">
 		{% for u in users %}

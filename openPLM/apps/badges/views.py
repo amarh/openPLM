@@ -2,12 +2,13 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
-from openPLM.plmapp.base_views import get_generic_data
+from openPLM.plmapp.base_views import get_generic_data, handle_errors
 from openPLM.plmapp.views.main import r2r
 
 from openPLM.apps.badges.models import Badge
 
 
+@handle_errors
 def overview(request, extra_context={}):
     """
     Badges view :
@@ -39,6 +40,7 @@ def overview(request, extra_context={}):
     ctx["object_type"]=_("Badges")
     return r2r("badges/overview.html",ctx,request)
 
+@handle_errors
 def detail(request, slug, extra_context={}):
     """
     Badge description view.
@@ -75,7 +77,9 @@ def detail(request, slug, extra_context={}):
     object_type = _(u"Badge : %s")
     ctx["object_type"]=object_type %(badge.title)
     return r2r("badges/detail.html", ctx, request)
-    
+
+
+@handle_errors    
 def display_userbadges(request, obj_type, obj_ref, obj_revi):
     """
     Badge tab in user view.
