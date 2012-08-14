@@ -78,6 +78,29 @@ Si vous avez les autorisations nécessaires, vous pouvez
   * **Révoquer** un parrainage.
 
 
+.. _add-user:
+
+Ajouter un utilisateur (parrainer)
+++++++++++++++++++++++++++++++++++++++
+
+Rendez-vous sur votre page utilisateur :
+
+    * en cliquant sur le bouton ETUDIER dans la page d'accueil,
+    * en cliquant sur votre nom .
+    
+À partir de l'onglet DELEGATION cliquez sur le bouton Parrain.
+Vous devriez arriver sur une page permettant de parrainer un nouvel
+utilisateur. Remplissez le formulaire en n'oubliant pas d'ajouter un groupe
+(un groupe par défaut a été créé lors de l'installation), et assurez vous de
+renseigner une adresse email valide. Ensuite, valider.
+
+.. image:: images/sponsor.png
+
+
+Le nouvel utilisateur a été créé et un email contenant ses paramètres de
+connexion à été envoyé.
+
+
 GROUPES
 ========================================================
 Affiche les Groupes auxquels appartient l'utilisateur.

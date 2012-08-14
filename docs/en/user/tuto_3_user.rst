@@ -53,6 +53,7 @@ PARTS-DOC-CAD
 Displays related Parts and Documents of the current user.
 
 
+
 DELEGATION
 ========================================================
 Display Users delegated by the current user and their assigned roles.
@@ -62,6 +63,27 @@ If you have necessary rights, you can :
 
   * **Stop** delegation.
 
+
+.. _add-user:
+
+Add a user (sponsor)
+++++++++++++++++++++++
+
+Go to your user page :
+
+    * clicking on the STUDY button from home page,
+    * clicking on your name .
+    
+From the DELEGATION tab click on Sponsor button.
+You should see a page allowing you to sponsor a new user. Fill the form, add
+the user to a group (a default group has already been created), and
+make sure the email address is correct. Then Validate
+
+.. image:: images/sponsor.png
+
+   
+The new user has been created and he should have received an email with his
+connexion informations.
 
 GROUPS
 ========================================================
