@@ -31,7 +31,12 @@ This fields need to be set so the badge can be identified and displayed.
     :linenos:
     :end-before: not required
     
-    
+
+If you want to point to a section in the user documentation set the field link_to_doc with it, otherwise don't define this field.
+
+Example :
+    To point to http://wiki.openplm.org/docs/dev/en/user/tuto_3_user.html#delegation set link_to_doc to "tuto_3_user.html#delegation"
+
 Functions
 -------------------- 
 

@@ -5,6 +5,7 @@ class Autobiographer(MetaBadge):
 
     title = "Autobiographer"
     description = "Completed the User Profile"
+    link_to_doc = ""
     level = "1"
 
     # not required
