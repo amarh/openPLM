@@ -42,6 +42,7 @@ Pour commencer, il faut satisfaire quelques dépendances :
     #. ``apt-get install python-xapian rabbitmq-server python-django python-docutils``
     #. ``apt-get install python-django-celery python-django-south python-pisa``
     #. ``apt-get install postgresql python-psycopg2``
+    #. ``apt-get install libgsf-bin``
     #. ``pip install odfpy 'django-haystack<2' lepl``
 
 Les dépendances suivantes sont aussi nécessaires pour permettre la recherche
