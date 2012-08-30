@@ -1,5 +1,5 @@
 ===================================================
-How to install openPLM server 1.0
+How to install openPLM server 1.1
 ===================================================
 
 This document describes how to install an openPLM server using the 1.0 version
@@ -42,7 +42,6 @@ First, you must install some dependencies:
     #. ``apt-get install python-django-celery python-django-south python-pisa``
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install odfpy 'django-haystack<2' lepl``
-    #. ``pip install --upgrade docutils``
 
 To enable plain text search on files, you need to install the following
 dependencies:
@@ -53,11 +52,11 @@ dependencies:
 Get the tarball containing the code
 ===================================
 
-    * ``wget -O openplm-1.0.tar.gz http://wiki.openplm.org/trac/downloads/3``
+    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/4``
 
 Extract the code in /var and rename the directory to django
 
-    * ``tar xzf openplm-1.0.tar.gz /var/``
+    * ``tar xzf openplm-1.1.tar.gz /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -179,15 +178,6 @@ Then execute the following commands:
         The company can access all contents from openPLM and should sponsor other users.
         The admin is here to administrate openPLM via its admin interface.
 
-
-
-Compile message files
-=====================
-
-Run the following commands:
-    
-    #. ``make``
-    #. ``./manage.py compilemessages``.
    
 Configure where the files are saved
 ===================================

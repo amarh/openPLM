@@ -1,5 +1,5 @@
 ===========================================
-Installation de OpenPLM serveur version 1.0
+Installation de OpenPLM serveur version 1.1
 ===========================================
 
 Ce document décrit l'installation d'un serveur OpenPLM en version stable 1.0
@@ -43,7 +43,6 @@ Pour commencer, il faut satisfaire quelques dépendances :
     #. ``apt-get install python-django-celery python-django-south python-pisa``
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install odfpy 'django-haystack<2' lepl``
-    #. ``pip install --upgrade docutils``
 
 Les dépendances suivantes sont aussi nécessaires pour permettre la recherche
 textuelle dans les fichiers :
@@ -54,11 +53,11 @@ textuelle dans les fichiers :
 Récupération de l'archive contenant le code source
 ==================================================
 
-    * ``wget -O openplm-1.0.tar.gz http://wiki.openplm.org/trac/downloads/3``
+    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/4``
 
 On extrait le code dans /var et l'on renomme le répertoire en django
 
-    * ``tar xzf openplm-1.0.tar.gz /var/``
+    * ``tar xzf openplm-1.1.tar.gz /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -189,15 +188,6 @@ On exécute ensuite les commandes suivantes :
         devrait être utilisé pour sponsoriser d'autres utilisateurs.
 
 
-
-Compilation des 'message files'
-===============================
-
-Exécuter les commandes suivantes :
-    
-    #. ``make``
-    #. ``./manage.py compilemessages``.
-   
 Configuration du stockage des fichiers
 ======================================
 
