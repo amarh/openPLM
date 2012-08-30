@@ -60,6 +60,10 @@ def format_iso8601_datetime(dt):
 
 
 def get_propfind_properties_from_xml(xmlstring):
+    if not xmlstring:
+        return ["{DAV:}getcontentlength", "{DAV:}getlastmodified", "{DAV:}creationdate",
+                "{DAV:}resourcetype", "{DAV:}checked-in","{DAV:}checked-out",
+                "{http://apache.org/dav/props/}executable", "{DAV:}supportedlock",]
     ret = []
     tree = ET.fromstring(xmlstring)
     props = tree.findall("{DAV:}prop")
