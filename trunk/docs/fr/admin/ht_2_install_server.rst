@@ -255,14 +255,9 @@ Configuration du serveur Apache
 
 Éditer le fichier de configuration d'Apache (:file:`/etc/apache2/httpd.conf`) et ajouter les lignes suivantes :
     
-.. code-block:: apache
+.. literalinclude:: apache/simple.conf
+    :language: apache
 
-    WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
-    Alias /media /var/django/openPLM/trunk/openPLM/media
-    <Directory /var/django/openPLM/trunk/openPLM/media>
-        Order deny,allow
-        Allow from all
-    </Directory>
 
 Redémarrage du serveur Apache
 =============================
@@ -361,39 +356,9 @@ Toutes les connexion HTTP seront rediriger sur des connexions HTTPS.
 
 Une configuration possible de apache (avec les modules rewrite et ssl activés) :
 
-.. code-block:: apache
+.. literalinclude:: apache/ssl.conf
+    :language: apache
 
-    NameVirtualHost *:80
-    <VirtualHost *:80>
-
-        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
-        <Location "/admin">
-            RewriteEngine On
-            RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-        </Location>
-        <Location "/media">
-            RewriteEngine On
-            RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-        </Location>
-
-    </VirtualHost>
-
-    NameVirtualHost *:443
-    <VirtualHost *:443>
-
-        SSLEngine on
-        SSLCertificateFile    /etc/ssl/mycert.crt
-        SSLCertificateKeyFile /etc/ssl/mykey.key
-        SSLVerifyClient none
-
-        WSGIScriptAlias / /var/django/openPLM/trunk/openPLM/apache/django.wsgi
-        Alias /media /var/django/openPLM/trunk/openPLM/media
-        <Directory /var/django/openPLM/trunk/openPLM/media>
-            Order deny,allow
-            Allow from all
-        </Directory>
-
-    </VirtualHost>
 
 Configuration des Emails
 =========================

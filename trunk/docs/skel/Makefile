@@ -48,8 +48,8 @@ tuto:
 oxt:
 	-rm -f user/download/openplm*.oxt
 	cd ../../plugins/openoffice ; \
-	zip -r ../../docs/$()/user/download/openplm-win.oxt pythonpath Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
-	zip -r ../../docs/$()user/download/openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
+	zip -r ../../docs/$(LANGUAGE)/user/download/openplm-win.oxt pythonpath Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
+	zip -r ../../docs/$(LANGUAGE)/user/download/openplm.oxt Addons.xcu META-INF/manifest.xml openplm.py  -x \*.svn* ; \
 	cd ../../docs
 
 dl: tuto oxt
