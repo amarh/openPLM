@@ -41,6 +41,7 @@ First, you must install some dependencies:
     #. ``apt-get install python-xapian rabbitmq-server python-django python-docutils``
     #. ``apt-get install python-django-celery python-django-south python-pisa``
     #. ``apt-get install postgresql python-psycopg2``
+    #. ``apt-get install libgsf-bin``
     #. ``pip install odfpy 'django-haystack<2' lepl``
 
 To enable plain text search on files, you need to install the following
