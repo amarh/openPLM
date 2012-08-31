@@ -37,18 +37,15 @@ First, you must install some dependencies:
     #. ``apt-get install apache2 libapache2-mod-wsgi``
     #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
     #. ``pip install odfpy``
-    #. ``apt-get install graphviz graphviz-dev``
-    #. ``pip install 'pygraphviz>=1.1'``
+    #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
     #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django python-docutils``
-    #. ``pip install 'south>=0.7'``
-    #. ``pip install celery``
+    #. ``apt-get install python-django python-django-south``
+    #. ``pip install docutils``
     #. ``pip install django-celery``
     #. ``pip install 'django-haystack<2'``
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install lepl``
-    #. ``apt-get install python-pisa``
-    #. ``apt-get install libgsf-bin``
+    #. ``apt-get install python-pisa libgsf-bin``
 
 To enable plain text search on files, you need to install the following
 dependencies:
