@@ -10,12 +10,12 @@ Requirements
 
 This HowTo is based on:
 
-    * Ubuntu 10.04 LTS server edition (also tested on Debian Squeeze)
-    * Apache Server version: Apache/2.2.14 (Ubuntu)
+    * Debian Squeeze
+    * Apache Server version: Apache/2.2.16 (from Debian)
     * PostgreSQL 8.4.4
     * Python 2.6.X
     * Django 1.2.X
-    * Celery 2.3.X
+    * Celery 2.3.X to 2.5.X
     * Haystack 1.2.X
     * Xapian 1.2.X
     * Lepl 5.0
