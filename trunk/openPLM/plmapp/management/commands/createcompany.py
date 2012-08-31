@@ -1,5 +1,5 @@
 """
-Management utility to create superusers.
+Management utility to create a "company" user.
 """
 
 import getpass
@@ -36,7 +36,7 @@ class Command(BaseCommand):
                  'superusers created with --noinput will not be able to log in '  \
                  'until they\'re given a valid password.'),
     )
-    help = 'Used to create a superuser.'
+    help = 'Used to create a "company" user.'
 
     def handle(self, *args, **options):
         from django.conf import settings
