@@ -153,7 +153,7 @@ Compile message files
 Run the following commands:
     
     #. ``make``
-    #. ``./manage.py compilemessages``.
+    #. ``./bin/translate_all.sh compile all``.
    
 Configure where the files are saved
 ===================================
