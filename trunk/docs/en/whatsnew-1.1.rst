@@ -14,10 +14,10 @@ New files uploading
 
 You can now upload your files and keep an eye on the list of your files.
 
-Multiple files upload is available :
+Multiple files upload is available:
 you can select more than one file to upload.
 
-Progress-bars appear while uploading files :
+Progress-bars appear while uploading files:
   * one per files
 
   * one for the total progress
@@ -57,7 +57,7 @@ Lifecycle and management
 
 The lifecycle and management pages have been merged into the lifecycle page.
 
-Replacing a signer is now much more intuitive, see the screenshot :
+Replacing a signer is now much more intuitive, see the screenshot:
 
 .. image:: whatsnew/1.1/Capture_openPLM_lifecycle_management.png
 
@@ -84,7 +84,7 @@ would not be able to modify it or see other confidential data.
 To create a restricted account, you only have to sponsor a new user and
 select the "restricted account" option.
 
-Screenshot :
+Screenshot:
 
 .. image:: whatsnew/1.1/Capture_openPLM_sponsor.png
 
@@ -92,14 +92,14 @@ Screenshot :
 As you can see on the screenshot above, it is now possible to sponsor a
 new user who can access mostly all contents but can not modify them.
 
-You can also select a language , the "new account" mail sent should be translated 
+You can also select a language, the "new account" mail sent should be translated 
 according to the chosen language.
 
 
 Timeline
 ---------
 
-The timeline is like a global history which contains :
+The timeline is like a global history which contains:
 
  * all history events related to official objects
  * all history events related to objects owned by groups you are in
@@ -108,14 +108,14 @@ The timeline is like a global history which contains :
 RSS feeds
 ----------
 
-You can now subscribe to rss feeds for :
+You can now subscribe to rss feeds for:
 
  * PLM objects
  * User
  * Group
  * the timeline
 
-You can subscribre to these feeds from :
+You can subscribre to these feeds from:
 
  * "History" pages
  * "Timeline" page
@@ -156,7 +156,7 @@ Shading
 
 Now there are shades displayed for 3D view.
 
-Screenshots before and now :
+Screenshots before and now:
 
 .. list-table::
 
@@ -266,12 +266,12 @@ Other enhancements
 
 **Navigate view**
 
-If the current object is a part you can :
+If the current object is a part you can:
 
  * attach a new document,
  * add a new part (child).
  
-If the current object is a document you can :
+If the current object is a document you can:
 
  * attach a new part.
 
@@ -311,7 +311,7 @@ Restricted accounts and publishers
 -----------------------------------
 
 Restricted accounts represent a user with the ``restricted`` field set to true.
-A user with restricted access can :
+A user with restricted access can:
 
  * neither be a contributor ( imply he(she) can't create object or group, sponsor user) neither an administrator
  * not be member of a group
@@ -320,8 +320,8 @@ A publisher is a user with the ``can_publish`` field set to true. He(she) can pu
 all official PLM objects he(she) can read. A published object is accessible to everyone,
 even anonymous users.
 
-The ``restricted`` and ``can_publish`` fields can be set via the admin interface .
-For more informations see :ref:`rest-account-specs` and :ref:`publication-specs` .
+The ``restricted`` and ``can_publish`` fields can be set via the admin interface.
+For more informations see :ref:`rest-account-specs` and :ref:`publication-specs`.
 
 
 
@@ -331,7 +331,7 @@ Applications layout
 A big change has been made to the application layout. Optionnals applications
 are now located in the apps folder.
 
-Make sure that your settings.py file has been update in consequences : 
+Make sure that your settings.py file has been update in consequences: 
 with the exception of plmapp, openPLM applications are now named :samp:`openPLM.apps.{ApplicationName}`
 
 Example:: 
@@ -341,6 +341,11 @@ Example::
     'openPLM.apps.cae',
     'openPLM.apps.office',
 
+New optional dependency
+-------------------------
+
+:command:`gsf` (package ``libgsf-bin`` in Debian/Ubuntu) is now used to generate a thumnail from a SolidWorks file.
+
 document3D
 -----------
 
@@ -349,7 +354,7 @@ New optional dependency: povray
 New application: oerp
 ----------------------
 
-This application depends on oerplib and require an update of your setting.py file, see :ref:`oerp-admin`
+This application depends on oerplib and require an update of your setting.py file, see :ref:`oerp-admin`.
 
 
 Developer changes
@@ -358,6 +363,6 @@ Developer changes
 New applications
 -----------------
 
-Some new applications were implemented , more details in :ref:`applications`
+Some new applications were implemented , more details in :ref:`applications`.
 
 
