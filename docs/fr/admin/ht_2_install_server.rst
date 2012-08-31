@@ -155,13 +155,13 @@ On exécute ensuite les commandes suivantes :
 
 
 
-Compilation des 'message files'
-===============================
+Compilation des fichiers de traduction
+======================================
 
 Exécuter les commandes suivantes :
     
     #. ``make``
-    #. ``./manage.py compilemessages``.
+    #. ``./bin/translate_all.sh compile all``.
    
 Configuration du stockage des fichiers
 ======================================
