@@ -2,7 +2,7 @@
 How to install openPLM server 1.1
 ===================================================
 
-This document describes how to install an openPLM server using the 1.0 version
+This document describes how to install an openPLM server using the 1.1 version
 tarball.
 
 

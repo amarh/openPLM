@@ -2,7 +2,7 @@
 Installation de OpenPLM serveur version 1.1
 ===========================================
 
-Ce document décrit l'installation d'un serveur OpenPLM en version stable 1.0
+Ce document décrit l'installation d'un serveur OpenPLM en version stable 1.1
 
 
 Prérequis
