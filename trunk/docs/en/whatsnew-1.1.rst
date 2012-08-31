@@ -142,7 +142,7 @@ Highlighting
 ~~~~~~~~~~~~~~~
 
 You can highlight a sub-assembly by moving your mouse over the sub-assembly name as show on 
-the screenshot below :
+the screenshot below:
 
 .. figure:: whatsnew/1.1/3D3.png
     
@@ -363,6 +363,56 @@ Developer changes
 New applications
 -----------------
 
-Some new applications were implemented , more details in :ref:`applications`.
+Some new applications were implemented, more details in :ref:`applications`.
 
+Library changes
+----------------
+
+:mod:`openPLM.plmapp.models`
++++++++++++++++++++++++++++++++
+
+    * :attr:`.UserProfile.can_publish`: added: True if user can publish a plmobject
+    * :attr:`.UserProfile.restricted`: added: True if user has a restricted account
+    * :attr:`.PLMObject.published`: added.
+    * :attr:`.PLMObject.reference_number`: added.
+    * :attr:`.PLMObject.is_cloneable`: added.
+    * :attr:`.PLMObject.published_attributes`: added.
+
+:mod:`plmapp.controllers.plmobject`
+++++++++++++++++++++++++++++++++++++++++
+
+    * :meth:`.PLMObjectController.check_publish`: added.
+    * :meth:`.PLMObjectController.can_publish`: added.
+    * :meth:`.PLMObjectController.publish`: added.
+    * :meth:`.PLMObjectController.check_unpublish`: added.
+    * :meth:`.PLMObjectController.can_unpublish`: added.
+    * :meth:`.PLMObjectController.unpublish`: added.
+    * :meth:`.PLMObjectController.check_cancel`: added.
+    * :meth:`.PLMObjectController.can_cancel`: added.
+    * :meth:`.PLMObjectController.check_clone`: added.
+    * :meth:`.PLMObjectController.can_clone`: added.
+    * :meth:`.PLMObjectController.clone`: added.
+
+New modules
++++++++++++
+
+    * :mod:`plmapp.thumbnailers.jfifthumbnailer`
+    * :mod:`plmapp.thumbnailers.pngthumbnailer`
+    * :mod:`plmapp.thumbnailers.swthumbnailer`
+
+The modules ``plmapp.native_file_management`` and ``plmapp.cadformats`` have been merged
+into a new module: :mod:`plmapp.fileformats`.
+
+:mod:`plmapp.units`
+++++++++++++++++++++++++
+
+    * :exc:`.UnitConversionError`: added.
+    * :func:`.convert_unit`: added.
+
+:mod:`plmapp.utils`
++++++++++++++++++++++++
+
+    * :class:`.SeekedFile`: added.
+    * :func:`.get_ext`: added.
+    * :func:`.get_pages_num`: added.
 
