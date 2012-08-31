@@ -19,7 +19,7 @@
 #
 # Contact :
 #    Philippe Joulaud : ninoo.fr@gmail.com
-#    Pierre Cosquer : pierre.cosquer@insa-rennes.fr
+#    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
 from django.shortcuts import render_to_response
