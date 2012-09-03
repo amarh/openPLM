@@ -1,6 +1,6 @@
-==========================
-Plugin pour OpenOffice.org
-==========================
+======================================
+Plugin pour OpenOffice.org/LibreOffice
+======================================
 
 
 Compilation et Installation
@@ -14,8 +14,8 @@ Ce plugin est disponible sur le svn dans le répertoire :file:`trunk/plugins/ope
 Dépendances
 -----------
 
-Vous avez bien entendu besoin d'OpenOffice.org. Ce plugin a été testé avec la
-version 3.2. Vous avez aussi besoin d'un environnement python (version 2.6)
+Vous avez bien entendu besoin d'OpenOffice.org ou de LibreOffice. Ce plugin a été testé avec la
+version 3.2. Sous Linux, vous avez aussi besoin d'un environnement python (version 2.6)
 avec la bibliothèque Poster (disponible `ici <http://atlee.ca/software/poster/#download>`_).
 
 Compilation
