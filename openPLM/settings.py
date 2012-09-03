@@ -121,7 +121,6 @@ INSTALLED_APPS = (
     'openPLM.apps.cae',
     'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
-    # also decomment the line CELERY_ROUTES!
     # 'openPLM.apps.document3D',
 )
 
@@ -134,11 +133,12 @@ CELERY_ROUTES = {
     "openPLM.plmapp.tasks.remove_index": {"queue": "index"},
     "openPLM.plmapp.mail.do_send_histories_mail" : {"queue" : "mails"},
     "openPLM.plmapp.mail.do_send_mail" : {"queue" : "mails"},
-    #XYZ: uncomment this line if you enable document3D
-    # "openPLM.document3d.models.handle_step_file": {"queue": "step"},
-    # "openPLM.document3d.decomposer.decomposer_all": {"queue": "step"},
-
 }
+if "openPLM.apps.document3D" in INSTALLED_APPS:
+    CELERY_ROUTES.update({
+        "openPLM.apps.document3d.models.handle_step_file": {"queue": "step"},
+        "openPLM.apps.document3d.models.decomposer_all": {"queue": "step"},
+    })
 
 #XYZ: EMAIL settings
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST

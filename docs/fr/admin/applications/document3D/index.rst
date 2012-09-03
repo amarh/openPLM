@@ -25,8 +25,6 @@ Pour pouvoir utiliser l'application *Document3D*, il faut qu'elle est été
 activé dans le fichier settings : 
 ajouter ``'openPLM.apps.document3D'`` à la liste des applications installées (:const:`INSTALLED_APPS`).
 
-La ligne suivante ``"openPLM.document3d.handle_step_file": {"queue": "step"},`` doit être rajouté dans la variable :const:`CELERY_ROUTES`.
-
 Enfin, il est nécessaire de crée un répertoire dans le dossier media : 
 
     * ``mkdir media/3D/``
