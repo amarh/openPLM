@@ -27,9 +27,6 @@ To enable the *document3D* application, it must be enabled in the settings file:
 ``'openPLM.apps.document3D'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
-The following line ``"openPLM.document3d.handle_step_file": {"queue": "step"},`` must
-also be added to the :const:`CELERY_ROUTES` variable.
-
 You must also create a directory in media:
 
     * ``mkdir media/3D/``
