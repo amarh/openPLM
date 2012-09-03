@@ -1,6 +1,6 @@
-============================
-Plugin for OpenOffice.org
-============================
+=====================================
+Plugin for OpenOffice.org/LibreOffice
+=====================================
 
 
 Build and Installation
@@ -14,8 +14,8 @@ This plugin is available on the svn in the directory :file:`trunk/plugins/openof
 Dependances
 -------------
 
-Of course, you need OpenOffice, this plugin has been test with the version 3.2.
-You also need to have a valid Python environment (version 2.6) with the library
+Of course, you need OpenOffice or LibreOffice, this plugin has been test with the version 3.2.
+On Linux, you also need to have a valid Python environment (version 2.6) with the library
 Poster (available `here <http://atlee.ca/software/poster/#download>`_).
 
 Build
