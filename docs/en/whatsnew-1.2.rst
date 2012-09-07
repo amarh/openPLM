@@ -9,14 +9,25 @@ What's new in OpenPLM 1.2
 User changes
 ===============
 
+Navigate
+--------
+
+Two links to the previous and next revisions are now displayed.
+
+Badges
+------
+
+
+
 Administrator changes
 =======================
+
+New application: badges
+-----------------------
 
 Developer changes
 ==================
 
-
-------
 
 Previous versions
 =================
