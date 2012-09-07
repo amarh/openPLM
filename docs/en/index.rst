@@ -26,7 +26,7 @@ Table of contents:
 
     resources
     glossary
-    whatsnew-1.1
+    whatsnew-1.2
     user/index
     admin/index
     devel/index
