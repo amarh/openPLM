@@ -27,7 +27,7 @@ Screenshots:
 
 .. list-table::
 
-    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_add.png
+    * - .. figure:: /whatsnew/1.1/Capture_openPLM_file_add.png
            :width: 100%
 
            New "Files" page
@@ -35,7 +35,7 @@ Screenshots:
            As you can see, the upload form and the list of files are both displayed on the "Files" page.
 
 
-    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_progress.png
+    * - .. figure:: /whatsnew/1.1/Capture_openPLM_file_progress.png
            :width: 100%
                
            Progress-bars
@@ -59,7 +59,7 @@ The lifecycle and management pages have been merged into the lifecycle page.
 
 Replacing a signer is now much more intuitive, see the screenshot:
 
-.. image:: whatsnew/1.1/Capture_openPLM_lifecycle_management.png
+.. image:: /whatsnew/1.1/Capture_openPLM_lifecycle_management.png
 
 
 
@@ -86,7 +86,7 @@ select the "restricted account" option.
 
 Screenshot:
 
-.. image:: whatsnew/1.1/Capture_openPLM_sponsor.png
+.. image:: /whatsnew/1.1/Capture_openPLM_sponsor.png
 
 
 As you can see on the screenshot above, it is now possible to sponsor a
@@ -144,7 +144,7 @@ Highlighting
 You can highlight a sub-assembly by moving your mouse over the sub-assembly name as show on 
 the screenshot below:
 
-.. figure:: whatsnew/1.1/3D3.png
+.. figure:: /whatsnew/1.1/3D3.png
     
     Highlithing
     
@@ -160,13 +160,13 @@ Screenshots before and now:
 
 .. list-table::
 
-   * - .. figure:: whatsnew/1.1/3D_old.png
+   * - .. figure:: /whatsnew/1.1/3D_old.png
             :width: 60%
             
             Before   
             
             
-     - .. figure:: whatsnew/1.1/3D1.png
+     - .. figure:: /whatsnew/1.1/3D1.png
             :width: 70%
             
             Now
@@ -185,7 +185,7 @@ You can switch between random colors or initial colors.
 You can also toggle (enable/disable) the transparency and chose to display or hide axis.
 
 
-.. figure:: whatsnew/1.1/3D2.png
+.. figure:: /whatsnew/1.1/3D2.png
     :target: http://www.openplm.org/example3D/mendelmax2.html
     
     3D view new toolbars
@@ -212,7 +212,7 @@ WebDAV access
 
 OpenPLM can now serves all managed files through a WebDAV access.
 
-.. figure:: whatsnew/1.1/webdav_nautilus.png
+.. figure:: /whatsnew/1.1/webdav_nautilus.png
 
     A directory listing using Nautilus.
 
