@@ -52,6 +52,18 @@
               // <span class="name">{% firstof obj.name obj.get_full_name%}</span>
             {% endif%}
         </h2>
+        {% if object_reference != '-' %}
+            <div id="mtime-wrapper">
+                {% if request.user.is_authenticated and not restricted %}
+                    <a href="{{ obj.plmobject_url }}history/">
+                {% endif %}
+                    {% blocktrans with obj.mtime|timesince as mtime %}Last modified {{mtime}} ago{% endblocktrans %}
+                {% if request.user.is_authenticated and not restricted %}
+                    </a>
+                {% endif %}
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
 

@@ -389,6 +389,20 @@ div#ReferenceArea
     border-bottom: solid 1px #b2b0b0;
 }
 
+#mtime-wrapper {
+    font-size: small;
+    float: right;
+    margin-right: 0.5em;
+    margin-top: -1.5em;
+}
+
+#mtime-wrapper a {
+    text-decoration: none;
+    border-bottom: 1px dotted #BBBBBB;
+}
+
+
+
 /* ACTIVE AREA */
 div#ActiveArea
 {
