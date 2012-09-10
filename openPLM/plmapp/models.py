@@ -93,7 +93,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
-from openPLM.plmapp.fileformats import native_to_standards
+from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
