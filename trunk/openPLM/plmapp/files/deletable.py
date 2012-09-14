@@ -42,6 +42,10 @@ class Selector(object):
         return []
 
 class KeepLastNFiles(Selector):
+    """
+    A selector which keeps only the last *count* revisions
+    (last one include).
+    """
 
     def __init__(self, count):
         self.count = count
@@ -51,11 +55,21 @@ class KeepLastNFiles(Selector):
         return doc_file.older_files.filter(deleted=False, revision__lte=rev)
 
 class KeepAllFiles(Selector):
+    """
+    A selector which keeps all files: :meth:`~KeepAllFiles.get_deletable_files`
+    always returns an empty list.
+    """
 
     def get_deletable_files(self, doc_file):
         return []
 
 class DeleteAllFiles(Selector):
+    """
+    A selector which returns all undeleted files.
+    
+    If *include_last_revision* is True, the given document file is also
+    included in the returned list.
+    """
 
     def __init__(self, include_last_revision=False):
         self.include_last_revision = include_last_revision
