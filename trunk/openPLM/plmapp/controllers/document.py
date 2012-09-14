@@ -27,6 +27,7 @@
 
 import os
 import shutil
+import datetime
 
 import Image
 from django.conf import settings
@@ -37,6 +38,8 @@ from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.thumbnailers import generate_thumbnail
 from openPLM.plmapp.files.formats import native_to_standards
+from openPLM.plmapp.files.deletable import (get_deletable_files, ON_CHECKIN_SELECTORS,
+        ON_DEPRECATE_SELECTORS, ON_DELETE_SELECTORS, ON_CANCEL_SELECTORS)
 
 
 class DocumentController(PLMObjectController):
@@ -237,15 +240,9 @@ class DocumentController(PLMObjectController):
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
         filename = doc_file.filename
-        if getattr(settings, "KEEP_ALL_FILES", False):
-            doc_file.deprecated = True
-            doc_file.save()
-        else:
-            os.chmod(path, 0700)
-            os.remove(path)
-            if doc_file.thumbnail:
-                doc_file.thumbnail.delete(save=False)
-            doc_file.delete()
+        self._delete_old_files(doc_file, ON_DELETE_SELECTORS)
+        doc_file.deprecated = True
+        doc_file.save()
         self._save_histo("File deleted", "file : %s" % filename)
 
     def handle_added_file(self, doc_file):
@@ -433,29 +430,55 @@ class DocumentController(PLMObjectController):
             
         if doc_file.locked:
             self.unlock(doc_file)   
-        if getattr(settings, "KEEP_ALL_FILES", False):
-            deprecated_df = models.DocumentFile.objects.create(
+        now = datetime.datetime.utcnow()
+        previous_revision = doc_file.previous_revision
+        doc_file.previous_revision = None
+        doc_file.save()
+        deprecated_df = models.DocumentFile.objects.create(
                     document=self.object,
                     deprecated=True,
                     size=doc_file.size,
                     filename=doc_file.filename,
                     file=models.docfs.save(new_file.name, doc_file.file),
-                    thumbnail=doc_file.thumbnail)
-        else:
-            os.chmod(doc_file.file.path, 0700)
-            os.remove(doc_file.file.path)
-            if doc_file.thumbnail:
-                doc_file.thumbnail.delete(save=False)
+                    thumbnail=None,
+                    ctime=doc_file.ctime,
+                    revision=doc_file.revision,
+                    end_time=now,
+                    previous_revision=previous_revision,
+                    last_revision=doc_file)
+        if doc_file.thumbnail:
+            path = models.thumbnailfs.save("%d.png" % deprecated_df.id, doc_file.thumbnail)
+            deprecated_df.thumbnail = os.path.basename(path)
+            deprecated_df.save()
+        # update the doc_file
         doc_file.file = models.docfs.save(new_file.name, new_file)
         doc_file.size = new_file.size
+        doc_file.previous_revision = deprecated_df
+        doc_file.revision += 1
+        doc_file.ctime = now
         os.chmod(doc_file.file.path, 0400)
         doc_file.save()
+        # delete "old" files (not the document file)
+        self._delete_old_files(doc_file, ON_CHECKIN_SELECTORS)
         self._save_histo("Check-in", doc_file.filename)
         if update_attributes:
             self.handle_added_file(doc_file)
         if thumbnail:
             generate_thumbnail.delay(doc_file.id)
-            
+
+    def _delete_old_files(self, doc_file, selectors):
+        for df in get_deletable_files(doc_file, selectors):
+            os.chmod(df.file.path, 0700)
+            os.remove(df.file.path)
+            if df.thumbnail:
+                df.thumbnail.delete(save=False)
+                df.thumbnail = None
+            if df.end_time is None:
+                df.end_time = datetime.datetime.utcnow()
+            df.deleted = True
+            df.deprecated = True
+            df.save()
+
     def update_rel_part(self, formset):
         u"""
         Updates related part informations with data from *formset*
@@ -513,6 +536,8 @@ class DocumentController(PLMObjectController):
         """
         super(DocumentController, self).cancel()
         self.get_attached_parts().delete()
+        for doc_file in self.files:
+            self._delete_old_files(doc_file, ON_CANCEL_SELECTORS)
 
     def check_cancel(self, raise_=True):
         res = super(DocumentController, self).check_cancel(raise_=raise_)
@@ -586,4 +611,9 @@ class DocumentController(PLMObjectController):
                 os.unlink(os.path.join(output_dir, path))
             except OSError:
                 pass
+
+    def _deprecate(self):
+        super(DocumentController, self)._deprecate()
+        for doc_file in self.files:
+            self._delete_old_files(doc_file, ON_DEPRECATE_SELECTORS)
 

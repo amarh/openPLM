@@ -932,6 +932,15 @@ class DocumentFile(models.Model):
                                default=lambda: None)
     document = models.ForeignKey('Document')
     deprecated = models.BooleanField(default=lambda: False)
+
+    ctime = models.DateTimeField(auto_now_add=False, default=datetime.datetime.utcnow)
+    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
+    deleted = models.BooleanField(default=False)
+    revision = models.IntegerField(default=1)
+    previous_revision = models.OneToOneField('self',
+            related_name="next_revision", default=None, null=True)
+    last_revision = models.ForeignKey('self',
+            related_name="older_files", default=None, null=True)
         
     @property
     def native_related(self):

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block content %}
+
+    <div>
+        <h3> {{ last_revision.filename }} </h3>
+        <div>
+            <div style="display:inline-block">
+                <p>
+                {% if last_revision.thumbnail %}
+                <img class="thumbnail" src="{{last_revision.thumbnail.url}}" align="left"/>
+            {% endif %}
+                {% if last_revision.deleted %}
+                    <p>{% trans "Deleted." %}
+                {% else %}
+                    <a class="{{"Button"|button}}" href="/file/{{last_revision.id}}/{{last_revision.filename|urlencode}}">
+                        <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
+                    </a>
+                {% endif %}
+                {% if last_revision.deprecated %}
+                    {% trans "Deprecated." %}
+                {% else %}
+                    {% if is_owner and obj.is_editable %}
+
+                        {% if last_revision.locked %}
+                            <a class="{{"Button"|button}}" href="./checkin/{{last_revision.id|urlencode }}/">
+                                <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                            </a>
+                        {% else %}
+
+                            {% if last_revision.checkout_valid %}
+
+                                <a class="{{"Button"|button}}
+                                    {% if last_revision.native_related %}check-out {% endif %}"
+                                    href="./checkout/{{last_revision.id|urlencode }}/">
+                                    <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                </a>                                    
+
+                            {% else %}
+                                {% trans "Native related file is locked" %}
+                            {% endif %}
+                        {% endif %} 
+
+                    {% else %}
+                        {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
+                    {% endif %}
+                {% endif %}
+                </p>
+            </div>
+
+            <div>
+                <table class="Content">
+                    <tr class="Content">
+                        <td class="Content description">{% trans "Filename" %}</td>
+                        <td class="Content">{{ last_revision.filename }}</td>
+                    </tr>
+                    <tr class="Content">
+                        <td class="Content description">{% trans "Revision" %}</td>
+                        <td class="Content">{{ last_revision.revision }}</td>
+                    </tr>
+                    <tr class="Content">
+                        <td class="Content description">{% trans "Size" %}</td>
+                        <td class="Content">{{ last_revision.size|filesizeformat }}</td>
+                    </tr>
+                    <tr class="Content">
+                        <td class="Content description">{% trans "Date of creation" %}</td>
+                        <td class="Content">
+                            {{ last_revision.ctime|date:"DATETIME_FORMAT" }} — 
+                            {% blocktrans with last_revision.ctime|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h3> {% blocktrans with last_revision.filename as filename %}Previous revisions of {{ filename}}{%endblocktrans %} </h3>
+
+        <div>
+            {% if doc_files %}
+            <table class="Content">
+                <thead>
+                    <th>{% trans "Revision" %}</th>
+                    <th>{% trans "Size" %}</th>
+                    <th>{% trans "Download" %}</th>
+                    <th>{% trans "Thumbnail" %}</th>
+                    <th>{% trans "Date of creation" %}</th>
+                </thead>
+                <tbody>
+                {% for doc_file in doc_files %}
+
+                    <tr class="Content">
+                        <td>
+                            <span>{{ doc_file.revision }}</span>
+                        </td>
+
+                        <td class="Content">{{doc_file.size|filesizeformat}}</td>
+                        <td class="Content">
+                            {% if doc_file.deleted %}
+                                <span>{% trans  "File deleted"%} </span>
+                            {% else %}
+                                <a class="{{"Button"|button}}" href="/file/{{doc_file.id}}/{{doc_file.filename|urlencode}}">
+                                    <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="Content">
+                            {% if doc_file.thumbnail %}
+                                <img class="thumbnail" src="{{doc_file.thumbnail.url}}"
+                                alt="Thumbnail"/>
+                            {% else %}
+                                {% trans "No thumbnail available" %}
+                            {% endif %}
+                        </td>
+                        <td class="Content">
+                            {{ doc_file.ctime|date:"DATETIME_FORMAT" }} — 
+                            {% blocktrans with doc_file.ctime|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                        </td>
+                    </tr>
+                {% endfor %}	    
+            </tbody>
+            </table>
+        {% else %}
+            <p>{% trans "No previous revisions." %}</p>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+

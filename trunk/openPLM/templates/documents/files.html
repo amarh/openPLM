@@ -140,6 +140,9 @@
 
                         </td>
                         <td class="Content">
+                            <a href="/file/revisions/{{instance.id}}/">{{ instance.revision }}</a>
+                        </td>
+                        <td class="Content">
                             {% if instance.thumbnail %}
                                 <img class="thumbnail" src="{{instance.thumbnail.url}}"
                                 alt="Thumbnail"/>
@@ -171,7 +174,7 @@
         <div id="deprecated_files">
             <h6>{% trans "Deprecated files:" %}</h6>
             {% for doc_file in deprecated_files %}        
-                <p><a href="/file/{{doc_file.id|urlencode }}/">{{doc_file.filename}}</a></p>            
+                <p><a href="/file/revisions/{{doc_file.id}}/">{{doc_file.filename}}</a></p>            
             {% endfor %}    
         </div>
     {% endif %}
