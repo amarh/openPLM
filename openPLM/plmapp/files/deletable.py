@@ -1,5 +1,32 @@
+"""
+.. versionadded:: 1.2
+
+Module to select which files should be deleted (physically removed) after:
+
+    * a checkin of a :class:`.DocumentFile`
+    * a deletion of a :class:`.DocumentFile`
+    * a cancellation of a :class:`.Document`
+    * a deprecation of a :class:`.Document`
+
+Each case can have a different behaviour specified by:
+
+    * :const:`ON_CHECKIN_SELECTORS`
+    * :const:`ON_DELETE_SELECTORS`
+    * :const:`ON_CANCEL_SELECTORS`
+    * :const:`ON_DEPRECATE_SELECTORS`
+
+These constants are lists of tuples (*test*, *selector*) where:
+
+    * *test* is a function that takes a :class:`.DocumentFile` and
+      returns True if *selector* applies to the given file
+    * *selector* is an instance of :class:`Selector` which returns
+      a list of :class:`.DocumentFile` to be deleted.
+
+They can be given to :func:`get_deletable_files` to retrieve the list of
+:class:`.DocumentFile` to delete.
+"""
+
 import fnmatch
-import datetime
 
 from django.conf import settings
 from django.db.models import Q, Sum
@@ -7,6 +34,11 @@ from django.db.models import Q, Sum
 class Selector(object):
 
     def get_deletable_files(self, doc_file):
+        """
+        Returns the list of :class:`.DocumentFile` to delete.
+
+        :param doc_file: the last revision of the file
+        """
         return []
 
 class KeepLastNFiles(Selector):
@@ -94,12 +126,27 @@ class YoungerThan(Selector):
             return doc_file.older_files.filter(ctime__gt=time)
 
 def pattern(*patterns):
+    """
+    Returns a function which takes a :class:`.DocumentFile` and returns
+    True if its filename matches one of the given patterns (like ``*.txt``).
+    patterns are not case sensitive.
+    """
     return lambda df: any(fnmatch.fnmatch(df.filename.lower(), pat) for pat in patterns)
 
 def yes(x):
+    "A simple function that always returns True"
     return True
 
 def get_deletable_files(doc_file, selectors):
+    """
+    Returns the list of :class:`.DocumentFile` to delete.
+
+    Returns an empty list if :const:`settings.KEEP_ALL_FILES` is True.
+    
+    :param doc_file: the last revision of the file
+    :param selectors: list of tuples (*test*, *selector*) to determine which
+        selectors should be called
+    """
     if getattr(settings, "KEEP_ALL_FILES", False):
         return []
     for test, selector in selectors:
@@ -107,19 +154,23 @@ def get_deletable_files(doc_file, selectors):
             return selector.get_deletable_files(doc_file)
     return []
 
+#: default selectors called after a checkin
 ON_CHECKIN_SELECTORS = [
     #(pattern("*.txt"), KeepAllFiles()),
     (yes, KeepLastNFiles(10)),
 ]
 
+#: default selectors called after a deletion
 ON_DELETE_SELECTORS = [
     (yes, DeleteAllFiles(True)),
 ]
 
+#: default selectors called after a deprecation
 ON_DEPRECATE_SELECTORS = [
     (yes, DeleteAllFiles(False)),
 ]
 
+#: default selectors called after a cancellation
 ON_CANCEL_SELECTORS = [
     (yes, DeleteAllFiles(False)),
 ]
