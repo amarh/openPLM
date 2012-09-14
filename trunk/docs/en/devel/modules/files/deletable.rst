@@ -5,5 +5,4 @@
 .. automodule:: plmapp.files.deletable
     :members:
     :show-inheritance:
-    :undoc-members:
   
