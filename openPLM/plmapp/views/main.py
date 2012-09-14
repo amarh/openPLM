@@ -1354,7 +1354,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     ctx.update({'current_page':'files', 
                 'file_formset': formset,
                 'archive_form' : archive_form,
-                'deprecated_files' : obj.deprecated_files,
+                'deprecated_files' : obj.deprecated_files.filter(last_revision__isnull=True),
                 'add_file_form': add_file_form,
                })
     return r2r('documents/files.html', ctx, request)
@@ -2330,6 +2330,28 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
         return response
     return HttpResponseForbidden()
+
+@handle_errors 
+def file_revisions(request, docfile_id):
+    """
+    View to download a document file.
+    
+    :param request: :class:`django.http.QueryDict`
+    :param docfile_id: :attr:`.DocumentFile.id`
+    :type docfile_id: str
+    :return: a :class:`django.http.HttpResponse`
+    """
+    doc_file = models.DocumentFile.objects.get(id=docfile_id)
+    ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
+    obj, ctx = get_generic_data(request, doc_file.document.type, doc_file.document.reference,
+            doc_file.document.revision)
+    last_revision = doc_file.last_revision if doc_file.last_revision else doc_file
+    doc_files = last_revision.older_files.order_by("-revision")
+    ctx["last_revision"] = last_revision
+    ctx["doc_files"] = doc_files
+    return r2r("documents/file_revisions.html", ctx, request)
+
+
 ##########################################################################################
 @handle_errors 
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):

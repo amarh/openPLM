@@ -178,6 +178,7 @@ urlpatterns += patterns('',
     (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
     (r'^file/public/(?P<docfile_id>\d+)/$', public_download),
     (r'^file/public/(?P<docfile_id>\d+)/(?P<filename>.*)$', public_download),
+    (r'^file/revisions/(?P<docfile_id>\d+)/', file_revisions),
 )
 
 # urls related to the api
