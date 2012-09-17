@@ -899,6 +899,10 @@ thumbnailfs = FileSystemStorage(location=settings.THUMBNAILS_DIR,
 
 class DocumentFile(models.Model):
     """
+    .. versionchanged:: 1.2
+        New attributes: :attr:`ctime`, :attr:`end_time`, :attr:`deleted`,
+        :attr:`revision`, :attr:`previous_revision`, :attr:`last_revision`
+
     Model which stores informations of a file bounded to a :class:`Document`
     
     :model attributes:
@@ -921,6 +925,27 @@ class DocumentFile(models.Model):
         .. attribute:: document
 
             :class:`Document` bounded to the file (required)
+        .. attribute:: ctime
+
+            date of creation of the document file
+        .. attribute:: end_time
+
+            date of creation of the next revision or None if it is
+            the last revision
+        .. attribute:: revision
+
+            revision number (starts at 1)
+        .. attribute:: previous_revision
+
+            :class:`DocumentFile` or None if it's the first revision
+        .. attribute:: last_revision
+
+            foreign key to the last revision (:class:`DocumentFile`)
+            or None it it'is the last_revision
+        .. attribute:: deleted
+
+            True if the file has been physically removed
+            
     """
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to=".", storage=docfs)
