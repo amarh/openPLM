@@ -147,8 +147,9 @@ EMAIL_PORT = 1025
 
 #: directory that stores documents. Make sure to use a trailing slash.
 DOCUMENTS_DIR = "/var/openPLM/docs/"
-THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails/")
 #: directory that stores thumbnails. Make sure to use a trailing slash.
+THUMBNAILS_DIR = os.path.join(MEDIA_ROOT, "thumbnails/")
+#: URL where thumbnails are located . Make sure to use a trailing slash.
 THUMBNAILS_URL = MEDIA_URL + "thumbnails/"
 
 # Cookie used for session is temporary and is deleted when browser is closed
