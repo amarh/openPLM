@@ -114,8 +114,8 @@ class DeletionTestCase(BaseTestCase):
         d, = self.controller.files.all()
         self.assertNotDeleted(d.previous_revision)
 
-    def test_checkin_maxsize_older(self):
-        # start to delete older revisions
+    def test_checkin_maxsize_oldest(self):
+        # start to delete oldest revisions
         dlt.ON_CHECKIN_SELECTORS[:] = [(dlt.yes, dlt.MaximumTotalSize(20))]
         d = self.controller.add_file(self.get_file(data="d"))
         self.controller.checkin(d, self.get_file(data="p" *18))
@@ -158,8 +158,8 @@ class DeletionTestCase(BaseTestCase):
         self.assertNotDeleted(d.older_files.get(revision=3))
         self.assertDeleted(d.older_files.get(revision=4))
 
-    def test_checkin_maxsize_bigger(self):
-        # start delete bigger revisions 
+    def test_checkin_maxsize_biggest(self):
+        # start testing biggest revisions 
         dlt.ON_CHECKIN_SELECTORS[:] = [(dlt.yes, dlt.MaximumTotalSize(20, "-size"))]
         d = self.controller.add_file(self.get_file(data="d"))
         self.controller.checkin(d, self.get_file(data="p" *18))

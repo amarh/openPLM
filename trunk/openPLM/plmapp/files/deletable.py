@@ -82,6 +82,25 @@ class DeleteAllFiles(Selector):
         return files + list(doc_file.older_files.filter(deleted=False))
 
 class MaximumTotalSize(Selector):
+    """
+    A selector which ensures that the size of files related to a revision 
+    does not exceed *max_size*.
+
+    :param max_size: maximum size in bytes
+    :param order: ordering field used to select which files must be deleted
+                  if the total size exceeds *max_size*
+
+    Possible values for *order* are:
+
+        ``revision``
+            first deletes the most recent revisions
+        ``-revision``
+            first deletes the oldest revisions
+        ``size``
+            first deletes the biggest files
+        ``-size``
+            first deletes the smallest files
+    """
 
     def __init__(self, max_size, order="revision"):
         self.max_size = max_size
