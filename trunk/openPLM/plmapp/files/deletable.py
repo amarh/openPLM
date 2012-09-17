@@ -147,7 +147,7 @@ class Modulo(Selector):
     *modulo*.
 
     For example, ``Modulo(4, 1)`` keeps a revision of four, and the intial revision is
-    keeped.
+    kept.
     """
 
     def __init__(self, number, modulo=1):
