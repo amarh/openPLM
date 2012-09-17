@@ -136,7 +136,7 @@ class DeletionTestCase(BaseTestCase):
         self.assertNotDeleted(d.previous_revision)
         self.controller.checkin(d, self.get_file(data="p" *18))
         d, = self.controller.files.all()
-        # 1st revision: keeped
+        # 1st revision: kept
         # 2nd revision: deleted
         self.assertDeleted(d.previous_revision)
         self.assertNotDeleted(d.previous_revision.previous_revision)
@@ -149,9 +149,9 @@ class DeletionTestCase(BaseTestCase):
         # add another one
         self.controller.checkin(d, self.get_file(data="p" *18))
         d, = self.controller.files.all()
-        # 1st revision: keeped
+        # 1st revision: kept
         # 2nd revision: deleted
-        # 3nd revision: keeped
+        # 3nd revision: kept
         # 4th revision: deleted
         self.assertNotDeleted(d.older_files.get(revision=1))
         self.assertDeleted(d.older_files.get(revision=2))
