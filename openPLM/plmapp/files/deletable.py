@@ -120,6 +120,13 @@ class MaximumTotalSize(Selector):
         return []
 
 class MaxPerDate(Selector):
+    """
+    A selector which keeps at most *maximum* per *frequency*
+    (``day``, ``month``, ``year``).
+
+    If the number of revisions exceeds *maximum*, most recent revisions
+    are first deleted.
+    """
 
     def __init__(self, frequency, maximum):
         self.frequency = frequency
@@ -135,6 +142,13 @@ class MaxPerDate(Selector):
         return doc_file.older_files.filter(query).order_by("revision")[self.maximum-1:]
 
 class Modulo(Selector):
+    """
+    A selector which only keeps revisions if the revision modulo *number* equals to
+    *modulo*.
+
+    For example, ``Modulo(4, 1)`` keeps a revision of four, and the intial revision is
+    keeped.
+    """
 
     def __init__(self, number, modulo=1):
         self._extra = ["revision %% %d != %d" % (number, modulo)]
