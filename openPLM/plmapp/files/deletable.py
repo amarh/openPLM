@@ -157,6 +157,16 @@ class Modulo(Selector):
         return doc_file.older_files.filter(deleted=False).extra(where=self._extra)
 
 class YoungerThan(Selector):
+    """
+    A selector which deletes too frequent updates.
+
+    A revision is deleted if the difference between the date of creation of
+    the last revision and its creation time is lesser than *timedelta*
+    (a :class:`.datetime.timedelta` object).
+
+    If *incremental* is True (the default), only the previous revision is tested.
+    This behaviour should be used after a checkin.
+    """
 
     def __init__(self, timedelta, incremental=True):
         self.timedelta = timedelta
