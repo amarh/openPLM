@@ -96,7 +96,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
                                                   self.user, self.DATA)
 
     def tearDown(self):
-        models.registered_PCLEs = self.registered_PCLEs
+        models.registered_PCLEs[:] = self.registered_PCLEs
         super(ParentChildLinkExtensionTestCase, self).tearDown()
    
     def test_clone_PCLE(self):

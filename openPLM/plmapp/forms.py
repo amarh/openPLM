@@ -250,7 +250,7 @@ class SimpleSearchForm(SearchForm):
         if self.is_valid():
             cls = m.get_all_users_and_plmobjects()[self.cleaned_data["type"]]
             d = {}
-            m._get_all_subclasses(cls, d)
+            m.get_all_subclasses(cls, d)
             mods = d.values()
             query = self.cleaned_data["q"].strip()
             if issubclass(cls, m.Document) and query not in ("", "*"):

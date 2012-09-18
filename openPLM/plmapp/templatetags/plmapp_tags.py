@@ -148,7 +148,7 @@ def is_documentfile(result):
     """
     return issubclass(result.model, models.DocumentFile)
 
-@models._cache_lifecycle_stuff
+@models.cache_lifecycle_stuff
 def get_state_class(plmobject):
     """
     Returns the state class ("cancelled", "draft", "proposed", "official",
