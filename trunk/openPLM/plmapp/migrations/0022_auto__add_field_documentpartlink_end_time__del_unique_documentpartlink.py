@@ -1,29 +1,87 @@
 # encoding: utf-8
 import datetime
-import os
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Set the ctime field of all document files"
-        from django.conf import settings
-        now = datetime.datetime.now()
-        for df in orm.DocumentFile.objects.all():
-            try:
-                path = os.path.join(settings.DOCUMENTS_DIR, df.file.name)
-                df.ctime = datetime.datetime.fromtimestamp(os.stat(path).st_mtime)
-                if df.deprecated:
-                    df.end_time = now
-                df.save()
-            except (OSError, IOError) as e:
-                print e
-                pass
+        
+        # Removing unique constraint on 'DelegationLink', fields ['delegatee', 'role', 'delegator']
+        db.delete_unique('plmapp_delegationlink', ['delegator_id', 'delegatee_id', 'role'])
+
+        # Removing unique constraint on 'PLMObjectUserLink', fields ['plmobject', 'role', 'user']
+        db.delete_unique('plmapp_plmobjectuserlink', ['plmobject_id', 'user_id', 'role'])
+
+        # Removing unique constraint on 'RevisionLink', fields ['new', 'old']
+        db.delete_unique('plmapp_revisionlink', ['old_id', 'new_id'])
+
+        # Removing unique constraint on 'DocumentPartLink', fields ['part', 'document']
+        db.delete_unique('plmapp_documentpartlink', ['document_id', 'part_id'])
+
+        # Adding field 'DocumentPartLink.end_time'
+        db.add_column('plmapp_documentpartlink', 'end_time', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True), keep_default=False)
+
+        # Adding unique constraint on 'DocumentPartLink', fields ['part', 'document', 'end_time']
+        db.create_unique('plmapp_documentpartlink', ['document_id', 'part_id', 'end_time'])
+
+        # Adding field 'RevisionLink.end_time'
+        db.add_column('plmapp_revisionlink', 'end_time', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True), keep_default=False)
+
+        # Adding unique constraint on 'RevisionLink', fields ['new', 'old', 'end_time']
+        db.create_unique('plmapp_revisionlink', ['old_id', 'new_id', 'end_time'])
+
+        # Adding field 'PLMObjectUserLink.end_time'
+        db.add_column('plmapp_plmobjectuserlink', 'end_time', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True), keep_default=False)
+
+        # Adding unique constraint on 'PLMObjectUserLink', fields ['plmobject', 'role', 'user', 'end_time']
+        db.create_unique('plmapp_plmobjectuserlink', ['plmobject_id', 'user_id', 'role', 'end_time'])
+
+        # Adding field 'DelegationLink.end_time'
+        db.add_column('plmapp_delegationlink', 'end_time', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True), keep_default=False)
+
+        # Adding unique constraint on 'DelegationLink', fields ['delegatee', 'role', 'end_time', 'delegator']
+        db.create_unique('plmapp_delegationlink', ['delegator_id', 'delegatee_id', 'role', 'end_time'])
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        
+        # Removing unique constraint on 'DelegationLink', fields ['delegatee', 'role', 'end_time', 'delegator']
+        db.delete_unique('plmapp_delegationlink', ['delegator_id', 'delegatee_id', 'role', 'end_time'])
+
+        # Removing unique constraint on 'PLMObjectUserLink', fields ['plmobject', 'role', 'user', 'end_time']
+        db.delete_unique('plmapp_plmobjectuserlink', ['plmobject_id', 'user_id', 'role', 'end_time'])
+
+        # Removing unique constraint on 'RevisionLink', fields ['new', 'old', 'end_time']
+        db.delete_unique('plmapp_revisionlink', ['old_id', 'new_id', 'end_time'])
+
+        # Removing unique constraint on 'DocumentPartLink', fields ['part', 'document', 'end_time']
+        db.delete_unique('plmapp_documentpartlink', ['document_id', 'part_id', 'end_time'])
+
+        # Deleting field 'DocumentPartLink.end_time'
+        db.delete_column('plmapp_documentpartlink', 'end_time')
+
+        # Adding unique constraint on 'DocumentPartLink', fields ['part', 'document']
+        db.create_unique('plmapp_documentpartlink', ['document_id', 'part_id'])
+
+        # Deleting field 'RevisionLink.end_time'
+        db.delete_column('plmapp_revisionlink', 'end_time')
+
+        # Adding unique constraint on 'RevisionLink', fields ['new', 'old']
+        db.create_unique('plmapp_revisionlink', ['old_id', 'new_id'])
+
+        # Deleting field 'PLMObjectUserLink.end_time'
+        db.delete_column('plmapp_plmobjectuserlink', 'end_time')
+
+        # Adding unique constraint on 'PLMObjectUserLink', fields ['plmobject', 'role', 'user']
+        db.create_unique('plmapp_plmobjectuserlink', ['plmobject_id', 'user_id', 'role'])
+
+        # Deleting field 'DelegationLink.end_time'
+        db.delete_column('plmapp_delegationlink', 'end_time')
+
+        # Adding unique constraint on 'DelegationLink', fields ['delegatee', 'role', 'delegator']
+        db.create_unique('plmapp_delegationlink', ['delegator_id', 'delegatee_id', 'role'])
 
 
     models = {
@@ -64,10 +122,11 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'plmapp.delegationlink': {
-            'Meta': {'unique_together': "(('delegator', 'delegatee', 'role'),)", 'object_name': 'DelegationLink'},
+            'Meta': {'unique_together': "(('delegator', 'delegatee', 'role', 'end_time'),)", 'object_name': 'DelegationLink'},
             'ctime': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'delegatee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'delegationlink_delegatee'", 'to': "orm['auth.User']"}),
             'delegator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'delegationlink_delegator'", 'to': "orm['auth.User']"}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_index': 'True'})
         },
@@ -94,9 +153,10 @@ class Migration(DataMigration):
             'thumbnail': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         'plmapp.documentpartlink': {
-            'Meta': {'unique_together': "(('document', 'part'),)", 'object_name': 'DocumentPartLink'},
+            'Meta': {'unique_together': "(('document', 'part', 'end_time'),)", 'object_name': 'DocumentPartLink'},
             'ctime': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'document': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'documentpartlink_document'", 'to': "orm['plmapp.Document']"}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'part': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'documentpartlink_part'", 'to': "orm['plmapp.Part']"})
         },
@@ -112,7 +172,7 @@ class Migration(DataMigration):
         'plmapp.groupinfo': {
             'Meta': {'object_name': 'GroupInfo', '_ormbases': ['auth.Group']},
             'creator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'groupinfo_creator'", 'to': "orm['auth.User']"}),
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 14, 11, 51, 32, 315664)'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 18, 17, 47, 4, 310317)'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'group_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.Group']", 'unique': 'True', 'primary_key': 'True'}),
             'mtime': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -129,13 +189,13 @@ class Migration(DataMigration):
         },
         'plmapp.invitation': {
             'Meta': {'object_name': 'Invitation'},
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 14, 11, 51, 32, 267197)'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 18, 17, 47, 4, 310830)'}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.GroupInfo']"}),
             'guest': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'invitation_inv_guest'", 'to': "orm['auth.User']"}),
             'guest_asked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'invitation_inv_owner'", 'to': "orm['auth.User']"}),
             'state': ('django.db.models.fields.CharField', [], {'default': "'p'", 'max_length': '1'}),
-            'token': ('django.db.models.fields.CharField', [], {'default': "'10547947313526386606536776744414721615374330640746812615455009303183855131940462499605061490209795087493978867904693694065885918823156683565534078375527713'", 'max_length': '155', 'primary_key': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'9625900053902926915913167322085781014828631141497939325125372659037490885163860096715012292867099516832157984029221838957944082100235258732458333235018784'", 'max_length': '155', 'primary_key': 'True'}),
             'validation_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         },
         'plmapp.lifecycle': {
@@ -174,7 +234,7 @@ class Migration(DataMigration):
         'plmapp.plmobject': {
             'Meta': {'ordering': "['type', 'reference', 'revision']", 'unique_together': "(('reference', 'type', 'revision'),)", 'object_name': 'PLMObject'},
             'creator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobject_creator'", 'to': "orm['auth.User']"}),
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 14, 11, 51, 32, 317741)'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 18, 17, 47, 4, 313700)'}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobject_group'", 'to': "orm['plmapp.GroupInfo']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lifecycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobject_lifecyle'", 'to': "orm['plmapp.Lifecycle']"}),
@@ -189,16 +249,18 @@ class Migration(DataMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'plmapp.plmobjectuserlink': {
-            'Meta': {'ordering': "['user', 'role', 'plmobject__type', 'plmobject__reference', 'plmobject__revision']", 'unique_together': "(('plmobject', 'user', 'role'),)", 'object_name': 'PLMObjectUserLink'},
+            'Meta': {'ordering': "['user', 'role', 'plmobject__type', 'plmobject__reference', 'plmobject__revision']", 'unique_together': "(('plmobject', 'user', 'role', 'end_time'),)", 'object_name': 'PLMObjectUserLink'},
             'ctime': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobjectuserlink_plmobject'", 'to': "orm['plmapp.PLMObject']"}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobjectuserlink_user'", 'to': "orm['auth.User']"})
         },
         'plmapp.revisionlink': {
-            'Meta': {'unique_together': "(('old', 'new'),)", 'object_name': 'RevisionLink'},
+            'Meta': {'unique_together': "(('old', 'new', 'end_time'),)", 'object_name': 'RevisionLink'},
             'ctime': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'new': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'revisionlink_new'", 'to': "orm['plmapp.PLMObject']"}),
             'old': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'revisionlink_old'", 'to': "orm['plmapp.PLMObject']"})
@@ -213,7 +275,7 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lifecycle': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.Lifecycle']"}),
             'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.PLMObject']"}),
-            'start_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 14, 11, 51, 32, 267849)'}),
+            'start_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 18, 17, 47, 4, 317140)'}),
             'state': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.State']"}),
             'state_category': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
         },

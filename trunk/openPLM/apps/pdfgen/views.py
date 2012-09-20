@@ -291,7 +291,7 @@ def select_pdf_part(request, ctx, obj):
     self_link = FakeLink("self", child=obj.object)
     for level, link in [(0, self_link)] + list(children):
         link.formsets = []
-        for l in link.child.documentpartlink_part.all():
+        for l in link.child.documentpartlink_part.now():
             doc = l.document
             ctrl = get_controller(doc.type)(doc, request.user)
             if ctrl.check_readable(raise_=False):

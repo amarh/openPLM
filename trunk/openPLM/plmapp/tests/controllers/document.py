@@ -27,6 +27,7 @@ This module contains some tests for openPLM.
 """
 
 import os
+import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -235,8 +236,10 @@ class DocumentControllerTest(ControllerTest):
     def test_detach_part(self):
         part = self.get_part()
         self.controller.attach_to_part(part)
+        t = datetime.datetime.now()
         self.controller.detach_part(part)
         self.assertEqual(self.controller.get_attached_parts().count(), 0)
+        self.assertEqual([part.object], [l.part for l in self.controller.get_attached_parts(t)])
 
     def test_get_attached_parts(self):
         part = self.get_part()

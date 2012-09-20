@@ -280,17 +280,17 @@ class DocumentController(PLMObjectController):
         self.check_attach_part(part, True)
         if isinstance(part, PLMObjectController):
             part = part.object
-        link = self.documentpartlink_document.get(part=part)
-        link.delete()
+        link = self.documentpartlink_document.now().get(part=part)
+        link.end()
         self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
                          "Part : %s - Document : %s" % (part, self.object))
 
-    def get_attached_parts(self):
+    def get_attached_parts(self, time=None):
         """
         Returns all parts attached to
         :attr:`~PLMObjectController.object`.
         """
-        return self.object.documentpartlink_document.all()
+        return self.object.documentpartlink_document.at(time)
     
     def get_detachable_parts(self):
         """
@@ -301,7 +301,7 @@ class DocumentController(PLMObjectController):
             part = link.part
             if self.can_detach_part(part):
                 links.append(link.id)
-        return self.documentpartlink_document.filter(id__in=links)
+        return self.documentpartlink_document.filter(id__in=links).now()
     
     def is_part_attached(self, part):
         """
@@ -310,7 +310,7 @@ class DocumentController(PLMObjectController):
 
         if isinstance(part, PLMObjectController):
             part = part.object
-        return self.documentpartlink_document.filter(part=part).exists()
+        return self.documentpartlink_document.filter(part=part).now().exists()
 
     def check_attach_part(self, part, detach=False):
         if not (hasattr(part, "is_part") and part.is_part):
@@ -430,7 +430,7 @@ class DocumentController(PLMObjectController):
             
         if doc_file.locked:
             self.unlock(doc_file)   
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now()
         previous_revision = doc_file.previous_revision
         doc_file.previous_revision = None
         doc_file.save()
@@ -474,7 +474,7 @@ class DocumentController(PLMObjectController):
                 df.thumbnail.delete(save=False)
                 df.thumbnail = None
             if df.end_time is None:
-                df.end_time = datetime.datetime.utcnow()
+                df.end_time = datetime.datetime.now()
             df.deleted = True
             df.deprecated = True
             df.save()
@@ -501,7 +501,7 @@ class DocumentController(PLMObjectController):
                 for part in parts:
                     self.detach_part(part)
                 ids = (p.id for p in parts)
-                self.documentpartlink_document.filter(part__in=ids).delete()
+                self.documentpartlink_document.filter(part__in=ids).end()
 
     def update_file(self, formset):
         u"""
@@ -535,7 +535,7 @@ class DocumentController(PLMObjectController):
             * removes all :class:`.DocumentPartLink` related to the object
         """
         super(DocumentController, self).cancel()
-        self.get_attached_parts().delete()
+        self.get_attached_parts().end()
         for doc_file in self.files:
             self._delete_old_files(doc_file, ON_CANCEL_SELECTORS)
 
@@ -589,8 +589,7 @@ class DocumentController(PLMObjectController):
         """
         Return true if the document is attached to at least one part.
         """
-        res = not self.get_attached_parts()
-        return res
+        return not self.get_attached_parts().exists()
 
     def publish(self):
         super(DocumentController, self).publish()

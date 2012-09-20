@@ -46,7 +46,7 @@ from openPLM.plmapp.models import User, UserProfile, DelegationLink, ROLE_OWNER,
 def get_recipients(obj, roles, users):
     recipients = set(users)
     if hasattr(obj, "plmobjectuserlink_plmobject"):
-        manager = obj.plmobjectuserlink_plmobject.order_by()
+        manager = obj.plmobjectuserlink_plmobject.now().order_by()
         roles_filter = Q()
 
         for role in roles:
@@ -56,7 +56,7 @@ def get_recipients(obj, roles, users):
                 roles_filter |= Q(role=role)
         users = manager.filter(roles_filter).values_list("user", flat=True)
         recipients.update(users)
-        links = DelegationLink.objects.filter(roles_filter)\
+        links = DelegationLink.current_objects.filter(roles_filter)\
                         .values_list("delegator", "delegatee")
         gr = kjbuckets.kjGraph(tuple(links))
         for u in users:

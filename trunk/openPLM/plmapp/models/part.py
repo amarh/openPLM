@@ -60,7 +60,7 @@ class Part(PLMObject):
             # check that at least one document is attached and its state is official
             # see ticket #57
             found = False
-            links = self.documentpartlink_part.all()
+            links = self.documentpartlink_part.now()
             for link in links:
                 found = link.document.is_official
                 if found:

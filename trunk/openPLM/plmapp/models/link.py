@@ -1,3 +1,4 @@
+import datetime
 import kjbuckets
 
 
@@ -12,6 +13,69 @@ from .plmobject import PLMObject
 from .part import Part
 from .document import Document
 
+class LinkQuerySet(QuerySet):
+    """ QuerySet with utility methods to filter links alive at a given time."""
+
+    def now(self):
+        """
+        Filters links: keeps only alive links (end_time is null).
+        """
+        return self.filter(end_time__isnull=True)
+
+    def at(self, time):
+        """
+        Filters links: keeps alive links at time *time*.
+
+        :param time: a :class:`~datetime.datetime` or None
+        """
+        if time is None:
+            return self.now()
+        return self.filter(ctime__lte=time).exclude(end_time__lt=time)
+
+    def end(self):
+        """
+        Ends all alive links: sets theur :attr:`end_time` to the current time and saves them
+        if there :attr:`end_time` are not already set.
+        """
+        return self.now().update(end_time=datetime.datetime.now())
+
+
+class LinkManager(models.Manager):
+    """Links manager, returns a :class:`LinkQuerySet`."""
+
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return LinkQuerySet(self.model)
+
+    def now(self):
+        """
+        Shorcut for ``self.get_query_set().now()``. See :meth:`LinkQuerySet.now`.
+        """
+        return self.get_query_set().now()
+
+    def at(self, time):
+        """
+        Shorcut for ``self.get_query_set().at(time)``. See :meth:`LinkQuerySet.at`.
+        """
+        return self.get_query_set().at(time)
+
+    def end(self):
+        """
+        Shorcut for ``self.get_query_set().end()``. See :meth:`LinkQuerySet.end`.
+        """
+        return self.get_query_set().end()
+
+
+class CurrentLinkManager(LinkManager):
+    """
+    Manager which returns alive links.
+    """
+
+    def get_query_set(self):
+        return LinkQuerySet(self.model).now()
+
+
 class Link(models.Model):
     u"""
     Abstract link base class.
@@ -22,18 +86,42 @@ class Link(models.Model):
         .. attribute:: ctime
 
             date of creation of the link (automatically set)
+        .. attribute:: end_time
+
+            date of deletion of the link (default: None, the link is still active)
 
     :class attributes:
         .. attribute:: ACTION_NAME
 
             an identifier used to set :attr:`.History.action` field
+        .. attribute:: objects
+
+            default manager: instance of :class:`LinkManager`
+
+        .. attribute:: current_objects
+
+            alternate manager (:class:`CurrentLinkManager`) which returns alive links.
     """
 
     ctime = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
+
+    objects = LinkManager()
+    current_objects = CurrentLinkManager()
 
     ACTION_NAME = "Link"
+
     class Meta:
         abstract = True  
+
+    def end(self):
+        """
+        Ends the link: sets its :attr:`end_time` to the current time and saves it
+        if its :attr:`end_time` is not already set.
+        """
+        if self.end_time is None:
+            self.end_time = datetime.datetime.now()
+            self.save()
 
 class ParentChildLink(Link):
     """
@@ -55,9 +143,6 @@ class ParentChildLink(Link):
         .. attribute:: order
             
             positive integer
-        .. attribute:: end_time
-            
-            date of end of the link, None if the link is still alive
 
     """
 
@@ -69,7 +154,6 @@ class ParentChildLink(Link):
     unit = models.CharField(max_length=4, choices=UNITS,
             default=lambda: DEFAULT_UNIT)
     order = models.PositiveSmallIntegerField(default=lambda: 1)
-    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     
     class Meta:
         app_label = "plmapp"
@@ -318,7 +402,7 @@ class RevisionLink(Link):
     
     class Meta:
         app_label = "plmapp"
-        unique_together = ("old", "new")
+        unique_together = ("old", "new", "end_time")
     
     ACTION_NAME = "Link : revision"
     old = models.ForeignKey(PLMObject, related_name="%(class)s_old")    
@@ -347,7 +431,7 @@ class DocumentPartLink(Link):
 
     class Meta:
         app_label = "plmapp"
-        unique_together = ("document", "part")
+        unique_together = ("document", "part", "end_time")
 
     def __unicode__(self):
         return u"DocumentPartLink<%s, %s>" % (self.document, self.part)
@@ -391,7 +475,7 @@ class DelegationLink(Link):
 
     class Meta:
         app_label = "plmapp"
-        unique_together = ("delegator", "delegatee", "role")
+        unique_together = ("delegator", "delegatee", "role", "end_time")
 
     def __unicode__(self):
         return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
@@ -403,7 +487,7 @@ class DelegationLink(Link):
         Returns the list of user's id of the delegators of *user* for the role
         *role*.
         """
-        links = cls.objects.filter(role=role).values_list("delegatee", "delegator")
+        links = cls.current_objects.filter(role=role).values_list("delegatee", "delegator")
         gr = kjbuckets.kjGraph(tuple(links))
         return gr.reachable(user.id).items()
 
@@ -434,7 +518,7 @@ class PLMObjectUserLink(Link):
 
     class Meta:
         app_label = "plmapp"
-        unique_together = ("plmobject", "user", "role")
+        unique_together = ("plmobject", "user", "role", "end_time")
         ordering = ["user", "role", "plmobject__type", "plmobject__reference",
                 "plmobject__revision"]
 

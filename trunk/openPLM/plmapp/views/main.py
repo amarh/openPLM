@@ -338,7 +338,7 @@ def get_lifecycle_data(obj):
     state = obj.state.name
     object_lifecycle = []
     roles = dict((r, (id, u)) for r, id, u in
-            obj.plmobjectuserlink_plmobject.values_list("role", "id", "user__username"))
+            obj.plmobjectuserlink_plmobject.now().values_list("role", "id", "user__username"))
     lcs = obj.lifecycle.to_states_list()
     for i, st in enumerate(lcs):
         link_id, signer = roles.get(level_to_sign_str(i), (None, None))
@@ -402,7 +402,7 @@ def get_management_data(obj, user):
             form to notify *user*
     """
     ctx = {}
-    links = models.PLMObjectUserLink.objects.filter(plmobject=obj).order_by("role")
+    links = models.PLMObjectUserLink.current_objects.filter(plmobject=obj).order_by("role")
     if not obj.check_permission("owner", False):
         link = links.filter(role="notified", user=user)
         ctx["is_notified"] = bool(link)
@@ -1519,7 +1519,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         the role of the link
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    link = models.PLMObjectUserLink.objects.get(id=int(link_id))
+    link = models.PLMObjectUserLink.current_objects.get(id=int(link_id))
     if obj.object.id != link.plmobject.id:
         raise ValueError("Bad link id")
     
@@ -1620,7 +1620,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         try:
             link_id = int(request.POST["link_id"])
-            link = models.PLMObjectUserLink.objects.get(id=link_id)
+            link = models.PLMObjectUserLink.current_objects.get(id=link_id)
             if link.role == models.ROLE_NOTIFIED:
                 obj.remove_notified(link.user)
             else:
@@ -2771,7 +2771,7 @@ def browse(request, type="object"):
         })
         query = Q(published=True)
         if user.is_authenticated():
-            readable = user.plmobjectuserlink_user.filter(role=models.ROLE_READER)
+            readable = user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
         object_list = cls.objects.filter(query)
 
@@ -2837,7 +2837,7 @@ def public(request, obj_type, obj_ref, obj_revi):
     if request.user.is_anonymous():
         test = lambda x: x.published
     else:
-        readable = request.user.plmobjectuserlink_user.filter(role=models.ROLE_READER)\
+        readable = request.user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)\
                 .values_list("plmobject_id", flat=True)
         test = lambda x: x.published or x.id in readable
 

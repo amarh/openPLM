@@ -633,17 +633,17 @@ class PartController(PLMObjectController):
         self.check_attach_document(document, True)
         if isinstance(document, PLMObjectController):
             document = document.object
-        link = self.documentpartlink_part.get(document=document)
-        link.delete()
+        link = self.documentpartlink_part.now().get(document=document)
+        link.end()
         self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
                          "Part : %s - Document : %s" % (self.object, document))
 
-    def get_attached_documents(self):
+    def get_attached_documents(self, time=None):
         """
         Returns all :class:`.Document` attached to
         :attr:`~PLMObjectController.object`.
         """
-        return self.documentpartlink_part.all()
+        return self.documentpartlink_part.at(time)
 
     def get_detachable_documents(self):
         """
@@ -663,7 +663,7 @@ class PartController(PLMObjectController):
 
         if isinstance(document, PLMObjectController):
             document = document.object
-        return self.documentpartlink_part.filter(document=document).exists()
+        return self.documentpartlink_part.now().filter(document=document).exists()
     
     def check_attach_document(self, document, detach=False):
         if not hasattr(document, "is_document") or not document.is_document:
@@ -754,7 +754,7 @@ class PartController(PLMObjectController):
                 for doc in docs:
                     self.check_attach_document(doc, True)
                 ids = (d.id for d in docs)
-                self.documentpartlink_part.filter(document__in=ids).delete()
+                self.documentpartlink_part.filter(document__in=ids).end()
 
     def cancel(self):
         """
@@ -765,7 +765,7 @@ class PartController(PLMObjectController):
             * removes all children/parents link (set their end_time)
         """
         super(PartController, self).cancel()
-        self.get_attached_documents().delete()
+        self.get_attached_documents().end()
         q = Q(parent=self.object) | Q(child=self.object)
         now = datetime.datetime.today()
         models.ParentChildLink.objects.filter(q, end_time=None).update(end_time=now)
@@ -777,7 +777,7 @@ class PartController(PLMObjectController):
             res = res and not models.ParentChildLink.objects.filter(q, end_time=None).exists()
             if (not res) and raise_ :
                 raise PermissionError("This part is related to an other part.")
-            res = res and not self.get_attached_documents()
+            res = res and not self.get_attached_documents().exists()
             if (not res) and raise_ :
                 raise PermissionError("This part has a document related to it.")
         return res
@@ -826,7 +826,7 @@ class PartController(PLMObjectController):
         children = self.get_children(-1, related=("child",))
         children_ids = set(c.link.child_id for c in children)
         children_ids.add(self.id)
-        links = models.DocumentPartLink.objects.filter(part__in=children_ids)
+        links = models.DocumentPartLink.current_objects.filter(part__in=children_ids)
         docs = links.values_list("document", flat=True)
         d_o_u = "document__owner__username"
         files = models.DocumentFile.objects.filter(deprecated=False,

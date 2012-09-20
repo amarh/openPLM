@@ -90,7 +90,7 @@ class WelcomeAA(MetaBadge):
         return instance.delegator
         
     def get_progress(self, user):
-        sponsored = self.model.objects.filter(delegator=user,role='sponsor').count()
+        sponsored = self.model.current_objects.filter(delegator=user,role='sponsor').count()
         return sponsored
             
     def check_role(self, instance):
@@ -116,7 +116,7 @@ class GodFather(MetaBadge):
         return instance.delegator
         
     def get_progress(self, user):
-        sponsored = self.model.objects.filter(delegator=user,role='sponsor').count()
+        sponsored = self.model.current_objects.filter(delegator=user,role='sponsor').count()
         return sponsored
             
     def check_role(self, instance):
@@ -140,12 +140,12 @@ class DelegateSponsor(MetaBadge):
         return instance.delegator
         
     def get_progress (self, user):
-        sponsor_qs = self.model.objects.filter(delegatee = user, role='sponsor')
+        sponsor_qs = self.model.current_objects.filter(delegatee = user, role='sponsor')
         if not sponsor_qs :
             return 0
             
         sponsor = sponsor_qs[0].delegator
-        progress = 1 if self.model.objects.filter(delegator = user, delegatee = sponsor).exists() else 0
+        progress = int(self.model.current_objects.filter(delegator = user, delegatee = sponsor).exists())
         return progress
 
         

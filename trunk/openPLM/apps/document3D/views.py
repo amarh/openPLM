@@ -86,7 +86,7 @@ class StepDecomposer(Decomposer):
     def is_decomposable(self, msg=True):
         decompose_valid = []
         if not Document3D.objects.filter(PartDecompose=self.part).exists():
-            links = DocumentPartLink.objects.filter(part=self.part,
+            links = DocumentPartLink.objects.now().filter(part=self.part,
                     document__type="Document3D",
                     document__document3d__PartDecompose=None).values_list("document", flat=True)
             for doc_id in links:
@@ -121,7 +121,7 @@ class StepDecomposer(Decomposer):
         # invalid parts are parts already decomposed by a StepDecomposer
         invalid_parts = Document3D.objects.filter(PartDecompose__in=parts)\
                 .values_list("PartDecompose", flat=True)
-        links = list(DocumentPartLink.objects.filter(part__in=parts,
+        links = list(DocumentPartLink.objects.now().filter(part__in=parts,
                 document__type="Document3D", # Document3D has no subclasses
                 document__document3d__PartDecompose=None). \
                 exclude(part__in=invalid_parts).values_list("document", "part"))

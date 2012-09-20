@@ -298,7 +298,7 @@ class Document3DController(DocumentController):
             if self._stps is None:
                 children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
                     only=("child__id", "parent__id",))]
-                docs = DocumentPartLink.objects.filter(document__type="Document3D",
+                docs = DocumentPartLink.objects.now().filter(document__type="Document3D",
                         part__in=children_ids).values_list("document", flat=True)
                 dfs = DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("id", flat=True)
                 self._stps = dfs
@@ -335,7 +335,7 @@ class Document3DController(DocumentController):
                 links, children_ids = zip(*[(c.link.id, c.link.child_id) for c in children])
                 docs = []
                 part_to_docs = defaultdict(list)
-                for doc, part in DocumentPartLink.objects.filter(document__type="Document3D",
+                for doc, part in DocumentPartLink.current_objects.filter(document__type="Document3D",
                         part__in=children_ids).values_list("document", "part").order_by("-ctime"):
                     # order by -ctime to test the most recently attached document first
                     part_to_docs[part].append(doc)
