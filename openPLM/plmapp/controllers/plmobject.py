@@ -121,7 +121,7 @@ class PLMObjectController(Controller):
         # add links
         models.PLMObjectUserLink.objects.create(plmobject=obj, user=user, role="owner")
         try:
-            l = models.DelegationLink.objects.get(delegatee=user,
+            l = models.DelegationLink.current_objects.get(delegatee=user,
                     role=models.ROLE_SPONSOR)
             sponsor = l.delegator
             if sponsor.username == settings.COMPANY:
@@ -278,11 +278,11 @@ class PLMObjectController(Controller):
     def has_permission(self, role):
         if role == models.ROLE_OWNER and self.owner == self._user:
             return True
-        if self.plmobjectuserlink_plmobject.filter(user=self._user, role=role).exists():
+        if self.plmobjectuserlink_plmobject.now().filter(user=self._user, role=role).exists():
             return True
 
         users = models.DelegationLink.get_delegators(self._user, role)
-        qset = self.plmobjectuserlink_plmobject.filter(user__in=users,
+        qset = self.plmobjectuserlink_plmobject.now().filter(user__in=users,
                                                           role=role)
         return qset.exists()
 
@@ -328,7 +328,7 @@ class PLMObjectController(Controller):
             raise RevisionError("Bad value for new_revision")
         if self.is_cancelled or self.is_deprecated:
             raise RevisionError("Object is deprecated or cancelled.")
-        if models.RevisionLink.objects.filter(old=self.object.pk).exists():
+        if models.RevisionLink.objects.now().filter(old=self.object.pk).exists():
             raise RevisionError("A revision already exists for %s" % self.object)
         data = {}
         fields = self.get_modification_fields() + self.get_creation_fields()
@@ -358,7 +358,7 @@ class PLMObjectController(Controller):
         # objects.get fails if a link does not exist
         # we can revise if any links exist
         try:
-            models.RevisionLink.objects.get(old=self.object.pk)
+            models.RevisionLink.objects.now().get(old=self.object.pk)
             return False
         except ObjectDoesNotExist:
             if check_user:
@@ -368,7 +368,7 @@ class PLMObjectController(Controller):
     
     def get_previous_revisions(self):
         try:
-            link = models.RevisionLink.objects.get(new=self.object.pk)
+            link = models.RevisionLink.objects.now().get(new=self.object.pk)
             controller = type(self)(link.old, self._user)
             return controller.get_previous_revisions() + [link.old]
         except ObjectDoesNotExist:
@@ -376,7 +376,7 @@ class PLMObjectController(Controller):
 
     def get_next_revisions(self):
         try:
-            link = models.RevisionLink.objects.get(old=self.object.pk)
+            link = models.RevisionLink.objects.now().get(old=self.object.pk)
             controller = type(self)(link.new, self._user)
             return [link.new] + controller.get_next_revisions()
         except ObjectDoesNotExist:
@@ -421,9 +421,9 @@ class PLMObjectController(Controller):
                 if self.is_editable:
                     raise ValueError("The company cannot own an editable object.")
 
-        links = models.PLMObjectUserLink.objects.filter(plmobject=self.object,
+        links = models.PLMObjectUserLink.objects.now().filter(plmobject=self.object,
                 role="owner")
-        links.delete()
+        links.end()
         models.PLMObjectUserLink.objects.create(user=new_owner,
                plmobject=self.object, role="owner")
         if dirty:
@@ -483,12 +483,11 @@ class PLMObjectController(Controller):
         
         if notified != self._user:
             self.check_permission("owner")
-        link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+        link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=notified, role="notified")
-        link.delete()
+        link.end()
         details = u"user: %s" % notified
         self._save_histo("Notified removed", details) 
-
 
     def remove_reader(self, reader):
         """
@@ -502,9 +501,9 @@ class PLMObjectController(Controller):
         """
         
         self.check_in_group(self._user)
-        link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+        link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=reader, role=models.ROLE_READER)
-        link.delete()
+        link.end()
         details = u"user: %s" % reader
         self._save_histo("Reader removed", details) 
 
@@ -532,10 +531,10 @@ class PLMObjectController(Controller):
         # remove old signer
         old_signer = None
         try:
-            link = models.PLMObjectUserLink.objects.get(plmobject=self.object,
+            link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                role=role)
             old_signer = link.user
-            link.delete()
+            link.end()
         except ObjectDoesNotExist:
             pass
         # check if the role is valid
@@ -629,7 +628,7 @@ class PLMObjectController(Controller):
         self.lifecycle = models.get_cancelled_lifecycle()
         self.state = models.get_cancelled_state()
         self.set_owner(company, True)
-        self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).delete()
+        self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).end()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
         self._update_state_history()

@@ -912,7 +912,7 @@ class PartControllerTest(ControllerTest):
         less_or_equal = len(new_children) <= len(children)
         self.assertTrue(less_or_equal)
         for link in new_children:
-            child_cloned = child_cloned and ctrl.parentchildlink_parent.filter(child= link.child).exists()
+            child_cloned = child_cloned and ctrl.parentchildlink_parent.filter(child=link.child).exists()
         self.assertTrue(child_cloned)
         
         

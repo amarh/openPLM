@@ -53,12 +53,12 @@ class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
         self.ctrl.object.save()
         self.ctrl.add_reader(self.restricted_user)
         self.assertTrue(self.rctrl.check_restricted_readable())
-        self.assertTrue(self.restricted_user.plmobjectuserlink_user.filter(role=models.ROLE_READER,
+        self.assertTrue(self.restricted_user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER,
             plmobject=self.ctrl.object).exists())
         self.ctrl.remove_reader(self.restricted_user)
         self.rctrl.clear_permissions_cache()
         self.assertFalse(self.rctrl.check_restricted_readable(raise_=False))
-        self.assertFalse(self.restricted_user.plmobjectuserlink_user.filter(role=models.ROLE_READER,
+        self.assertFalse(self.restricted_user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER,
             plmobject=self.ctrl.object).exists())
 
     def test_add_reader_error_not_official(self):
@@ -472,7 +472,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         doc = DocumentController.create("Doc", "Document", "a", self.user, self.DATA)
         self.assertViewErrorPost(self.ctrl.plmobject_url + "doc-cad/",
                 type="Document", reference="Doc", revision="a")
-        self.assertEquals(0, models.DocumentPartLink.objects.count())
+        self.assertEquals(0, models.DocumentPartLink.current_objects.count())
 
     def test_files(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user, self.DATA)

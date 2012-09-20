@@ -441,14 +441,14 @@ class ViewTest(CommonViewTest):
         data = dict(type="User", username=self.brian.username)
         self.brian.groups.add(self.group)
         response = self.post(self.base_url + "management/add/", data)
-        self.assertTrue(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertTrue(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED))
 
     def test_management_replace_get(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
         self.controller.set_signer(self.brian, role)
-        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+        link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         response = self.get(self.base_url + "management/replace/%d/" % link.id,
                 link=True, page="lifecycle")
@@ -460,24 +460,24 @@ class ViewTest(CommonViewTest):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
         self.controller.set_signer(self.brian, role)
-        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+        link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         data = dict(type="User", username=self.user.username)
         response = self.post(self.base_url + "management/replace/%d/" % link.id,
                         data)
-        self.assertFalse(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertFalse(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.brian, role=role))
-        self.assertTrue(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertTrue(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.user, role=role))
 
     def test_management_delete(self):
         self.brian.groups.add(self.group)
         self.controller.add_notified(self.brian)
-        link = m.PLMObjectUserLink.objects.get(plmobject=self.controller.object,
+        link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED)
         data = {"link_id" : link.id }
         response = self.post(self.base_url + "management/delete/", data)
-        self.assertFalse(m.PLMObjectUserLink.objects.filter(plmobject=self.controller.object,
+        self.assertFalse(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.brian, role=m.ROLE_NOTIFIED))
 
     def test_publish_post(self):
@@ -866,7 +866,7 @@ class DocumentViewTestCase(ViewTest):
         parts = self.controller.get_attached_parts().values_list("part", flat=True)
         self.assertEqual([part.id], list(parts))
         # ensure part is not attached to the new revision
-        self.assertFalse(bool(rev.documentpartlink_document.all()))
+        self.assertFalse(rev.documentpartlink_document.now().exists())
         # ensure only the old revision is attached to part 
         self.assertEqual([self.controller.id],
             list(part.get_attached_documents().values_list("document", flat=True)))
@@ -966,7 +966,7 @@ class DocumentViewTestCase(ViewTest):
         parts = self.controller.get_attached_parts().values_list("part", flat=True)
         self.assertEqual([part.id], list(parts))
         # ensure part is not attached to the new revision
-        self.assertFalse(bool(rev.documentpartlink_document.all()))
+        self.assertFalse(rev.documentpartlink_document.now().exists())
         # ensure only the old revision is attached to part 
         self.assertEqual([self.controller.id],
             list(part.get_attached_documents().values_list("document", flat=True)))
@@ -1073,7 +1073,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual("Docc", obj.name)
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
-        link = m.DocumentPartLink.objects.get(document=obj, part=part.id)
+        link = m.DocumentPartLink.current_objects.get(document=obj, part=part.id)
 
     def test_create_and_attach_post_error(self):
         part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
@@ -1101,7 +1101,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual("Docc", obj.name)
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
-        self.assertFalse(m.DocumentPartLink.objects.filter(
+        self.assertFalse(m.DocumentPartLink.current_objects.filter(
             document=obj, part=part.id).exists())
 
 
@@ -1143,7 +1143,7 @@ class PartViewTestCase(ViewTest):
         self.assertEqual("MaPart", obj.name)
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
-        link = m.DocumentPartLink.objects.get(document=doc.object, part=obj)
+        link = m.DocumentPartLink.current_objects.get(document=doc.object, part=obj)
 
     def test_create_and_attach_post_error(self):
         doc = self.attach_to_official_document()
@@ -1171,7 +1171,7 @@ class PartViewTestCase(ViewTest):
         self.assertEqual("MaPart", obj.name)
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
-        self.assertFalse(m.DocumentPartLink.objects.filter(
+        self.assertFalse(m.DocumentPartLink.current_objects.filter(
             document=doc.object, part=obj).exists())
 
     def test_children(self):
@@ -1472,7 +1472,7 @@ class PartViewTestCase(ViewTest):
         documents = self.controller.get_attached_documents().values_list("document", flat=True)
         self.assertEqual([document.id], list(documents))
         # ensure document is not attached to the new revision
-        self.assertFalse(bool(rev.documentpartlink_part.all()))
+        self.assertFalse(rev.documentpartlink_part.now().exists())
         # ensure only the old revision is attached to document 
         self.assertEqual([self.controller.id],
             list(document.get_attached_parts().values_list("part", flat=True)))
@@ -1581,7 +1581,7 @@ class PartViewTestCase(ViewTest):
         documents = self.controller.get_attached_documents().values_list("document", flat=True)
         self.assertEqual([document.id], list(documents))
         # ensure document is not attached to the new revision
-        self.assertFalse(bool(rev.documentpartlink_part.all()))
+        self.assertFalse(rev.documentpartlink_part.now().exists())
         # ensure only the old revision is attached to document 
         self.assertEqual([self.controller.id],
             list(document.get_attached_parts().values_list("part", flat=True)))
@@ -2617,8 +2617,7 @@ class SearchViewTestCase(CommonViewTest):
     def test_empty(self):
         "Test a search with an empty database"
         # clear all plmobject so results is empty
-        for obj in m.PLMObject.objects.all():
-            obj.delete()
+        m.PLMObject.objects.all().delete()
         results = self.search({"type" : self.TYPE}) 
         self.assertEqual(results, [])
 

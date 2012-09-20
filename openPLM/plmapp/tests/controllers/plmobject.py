@@ -26,13 +26,15 @@
 This module contains some tests for openPLM.
 """
 
+import datetime
+
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.exceptions as exc
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController, get_controller
+from openPLM.plmapp.controllers import PLMObjectController
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -61,7 +63,7 @@ class ControllerTest(BaseTestCase):
                 revision=controller.revision, type=controller.type)
         self.assertEqual(obj.owner, self.user)
         self.assertEqual(obj.creator, self.user)
-        models.PLMObjectUserLink.objects.get(plmobject=obj, user=self.user,
+        models.PLMObjectUserLink.current_objects.get(plmobject=obj, user=self.user,
                 role=models.ROLE_OWNER)
         self.failUnless(obj.is_editable)
 
@@ -290,7 +292,7 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         user = self.get_contributor()
         controller.set_signer(user, level_to_sign_str(0))
-        link = models.PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+        link = models.PLMObjectUserLink.current_objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
@@ -323,7 +325,7 @@ class ControllerTest(BaseTestCase):
         user.save()
         user.groups.add(controller.group)
         controller.add_notified(user)
-        models.PLMObjectUserLink.objects.get(user=user, plmobject=controller.object,
+        models.PLMObjectUserLink.current_objects.get(user=user, plmobject=controller.object,
                                       role="notified")
 
     def test_add_notified_error_not_in_group(self):
@@ -335,11 +337,26 @@ class ControllerTest(BaseTestCase):
     def test_remove_notified(self):
         controller = self.create("Part1")
         controller.add_notified(self.user)
-        models.PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
+        link = models.PLMObjectUserLink.current_objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
+        ids = [link.id]
+        t = datetime.datetime.now()
         controller.remove_notified(self.user)
-        self.assertEqual(0, len(models.PLMObjectUserLink.objects.filter(
+        self.assertEqual(0, len(models.PLMObjectUserLink.current_objects.filter(
             plmobject=controller.object, role="notified")))
+        self.assertNotEqual(None, models.PLMObjectUserLink.objects.get(id=link.id).end_time)
+        # check it can again add self.user
+        controller.add_notified(self.user)
+        link = models.PLMObjectUserLink.current_objects.get(user=self.user, plmobject=controller.object,
+                role="notified")
+        self.assertNotEqual(ids[0], link.id)
+        ids.append(link.id)
+        self.assertEqual(set(ids), set(controller.plmobjectuserlink_plmobject.filter(user=self.user, 
+             role="notified").values_list("id", flat=True)))
+        # get the old link
+        link = models.PLMObjectUserLink.objects.at(t).get(user=self.user, plmobject=controller.object,
+                role="notified")
+        self.assertEqual(ids[0], link.id)
 
     def test_set_role(self):
         controller = self.create("Part1")
@@ -347,10 +364,10 @@ class ControllerTest(BaseTestCase):
         controller.set_role(user, "owner")
         self.assertEqual(controller.owner, user)
         controller.set_role(self.user, "notified")
-        models.PLMObjectUserLink.objects.get(user=self.user, plmobject=controller.object,
+        models.PLMObjectUserLink.current_objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         controller.set_role(user, level_to_sign_str(0))
-        link = models.PLMObjectUserLink.objects.get(role=level_to_sign_str(0),
+        link = models.PLMObjectUserLink.current_objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
@@ -411,7 +428,7 @@ class ControllerTest(BaseTestCase):
         self.assertFalse(ctrl.is_revisable())
         self.assertFalse(ctrl.is_promotable())
         self.assertFalse(ctrl.is_editable)
-        signers = ctrl.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN)
+        signers = ctrl.plmobjectuserlink_plmobject.now().filter(role__startswith=models.ROLE_SIGN)
         self.assertEqual(0, signers.count())
 
     def test_is_readable_owner(self):

@@ -152,6 +152,7 @@ class NavigationGraph(object):
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
         self._title_to_node = {}
         self._part_to_node = {}
+        self.time = None
 
     def set_options(self, options):
         """
@@ -206,7 +207,7 @@ class NavigationGraph(object):
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
-        for child_l in obj.get_children(max_level=-1, related=("child",)):
+        for child_l in obj.get_children(max_level=-1, related=("child",), date=self.time):
             link = child_l.link
             if self.options[OSR] and link.child.id not in self.results:
                 continue
@@ -221,7 +222,7 @@ class NavigationGraph(object):
     def _create_parents_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
-        for parent_l in obj.get_parents(max_level=-1, related=("parent",)):
+        for parent_l in obj.get_parents(max_level=-1, related=("parent",), date=self.time):
             link = parent_l.link
             if self.options[OSR] and link.parent.id not in self.results:
                 continue
@@ -245,7 +246,7 @@ class NavigationGraph(object):
                 self.edges.add((node, part.id, " "))
                 self._set_node_attributes(part)
         else:
-            for link in obj.get_attached_parts().select_related("part").only(*_parts_attrs)[:OBJECTS_LIMIT]:
+            for link in obj.get_attached_parts(self.time).select_related("part").only(*_parts_attrs)[:OBJECTS_LIMIT]:
                 if self.options[OSR] and link.part_id not in self.results:
                     continue
                 # create a link part -> document:
@@ -267,7 +268,7 @@ class NavigationGraph(object):
                 self._set_node_attributes(doc)
         else:
             # obj is the part id
-            links = models.DocumentPartLink.objects.filter(part__id=obj).select_related("document")
+            links = models.DocumentPartLink.objects.at(self.time).filter(part__id=obj).select_related("document")
             for link in links.only(*_documents_attrs)[:OBJECTS_LIMIT]:
                 if self.options[OSR] and link.document_id not in self.results:
                     continue
@@ -283,7 +284,7 @@ class NavigationGraph(object):
             else:
                 users = ((u, role) for u in obj.user_set.all())
         else:
-            users = obj.plmobjectuserlink_plmobject.filter(role__istartswith=role)
+            users = obj.plmobjectuserlink_plmobject.at(self.time).filter(role__istartswith=role)
             users = ((u.user, u.role) for u in users.all())
         node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
         for user, role in users:
@@ -302,7 +303,7 @@ class NavigationGraph(object):
             if role == "owner":
                 qs = obj.plmobject_owner
             else:
-                qs = obj.plmobjectuserlink_user.filter(role=role)
+                qs = obj.plmobjectuserlink_user.at(self.time).filter(role=role)
                 qs = qs.values_list("plmobject_id", flat=True).order_by()
                 qs = models.PLMObject.objects.filter(id__in=qs)
             links = qs.values("id", "type", "reference", "revision", "name").order_by()
@@ -318,7 +319,7 @@ class NavigationGraph(object):
 
         else:
             # signer roles
-            qs = obj.plmobjectuserlink_user.filter(role__istartswith=role)
+            qs = obj.plmobjectuserlink_user.at(self.time).filter(role__istartswith=role)
             for link in qs.select_related("plmobject").only("role", *_plmobjects_attrs)[:OBJECTS_LIMIT]:
                 if self.options[OSR] and link.plmobject_id not in self.results:
                     continue
@@ -368,7 +369,7 @@ class NavigationGraph(object):
             if not (self.options[OSR] and not self.plmobjects_result):
                 if isinstance(self.object, GroupController):
                     self._create_doc_edges(self.object, None)
-                links = models.DocumentPartLink.objects.\
+                links = models.DocumentPartLink.objects.at(self.time).\
                         filter(part__in=self._part_to_node.keys())
                 for link in links.select_related("document"):
                     if self.options[OSR] and link.document_id not in self.results:
@@ -380,7 +381,7 @@ class NavigationGraph(object):
         elif not isinstance(self.object, UserController):
             if not (self.options[OSR] and not self.plmobjects_result):
                 ids = self.options["doc_parts"].intersection(self._part_to_node.keys()) 
-                links = models.DocumentPartLink.objects.filter(part__in=ids)
+                links = models.DocumentPartLink.objects.at(self.time).filter(part__in=ids)
                 for link in links.select_related("document"):
                     if self.options[OSR] and link.document_id not in self.results:
                         continue
@@ -390,7 +391,7 @@ class NavigationGraph(object):
 
         # treats the parts to see if they have an attached document
         if not self.options["doc"]:
-            parts = models.DocumentPartLink.objects.\
+            parts = models.DocumentPartLink.objects.at(self.time).\
                     filter(part__in=self._part_to_node.keys()).\
                     values_list("part_id", flat=True)
             for id_ in parts:

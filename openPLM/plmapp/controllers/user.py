@@ -166,7 +166,7 @@ class UserController(Controller):
         """
         Returns all :class:`.Part` attached to :attr:`object`.
         """
-        return self.plmobjectuserlink_user.all()
+        return self.plmobjectuserlink_user.now()
 
     @permission_required(role=models.ROLE_OWNER)
     def delegate(self, user, role):
@@ -198,13 +198,13 @@ class UserController(Controller):
         if self.object.get_profile().is_viewer and role != 'notified':
             raise PermissionError("%s can not have role %s" % (self.object, role))
         if role == "sign*":
-            qset = models.PLMObjectUserLink.objects.filter(user=self.object,
+            qset = models.PLMObjectUserLink.current_objects.filter(user=self.object,
                         role__startswith="sign_").only("role")
             roles = set(link.role for link in qset)
         else:
             roles = [role]
         for r in roles:
-            models.DelegationLink.objects.get_or_create(delegator=self.object,
+            models.DelegationLink.current_objects.get_or_create(delegator=self.object,
                         delegatee=user, role=r)
         details = "%(delegator)s delegates the role %(role)s to %(delegatee)s"
         details = details % dict(role=role, delegator=self.object,
@@ -223,13 +223,13 @@ class UserController(Controller):
         details = details % dict(role=delegation_link.role, delegator=self.object,
                                  delegatee=delegation_link.delegatee)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
-        delegation_link.delete()
+        delegation_link.end()
         
     def get_user_delegation_links(self):
         """
         Returns all delegatees of :attr:`object`.
         """
-        return self.delegationlink_delegator.order_by("role", "delegatee__username")
+        return self.delegationlink_delegator.now().order_by("role", "delegatee__username")
 
     def get_sponsor_subject(self, new_user):
         subject = getattr(settings, "NEW_ACCOUNT_SUBJECT", NEW_ACCOUNT_SUBJECT)
@@ -276,7 +276,7 @@ class UserController(Controller):
     @permission_required(role=models.ROLE_OWNER)
     def resend_sponsor_mail(self, new_user):
         try:
-            link = models.DelegationLink.objects.get(delegator=self._user,
+            link = models.DelegationLink.current_objects.get(delegator=self._user,
                 delegatee=new_user, role=models.ROLE_SPONSOR)
         except models.DelegationLink.DoesNotExist:
             raise PermissionError("You did not sponsored %s"

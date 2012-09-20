@@ -137,7 +137,7 @@ class DocumentFile(models.Model):
     document = models.ForeignKey('Document')
     deprecated = models.BooleanField(default=lambda: False)
 
-    ctime = models.DateTimeField(auto_now_add=False, default=datetime.datetime.utcnow)
+    ctime = models.DateTimeField(auto_now_add=False, default=datetime.datetime.now)
     end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     deleted = models.BooleanField(default=False)
     revision = models.IntegerField(default=1)
