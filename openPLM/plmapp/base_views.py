@@ -26,6 +26,7 @@
 
 
 import re
+import datetime
 from functools import wraps
 import functools
 import traceback
@@ -394,8 +395,9 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         form = FilterForm(initial)
         request.session.update(initial)
     if not form.is_valid():
-        raise ValueError("Invalid form")
-    options = form.cleaned_data
+        options = initial
+    else:
+        options = form.cleaned_data
     if options[OSR]:
         results = [r.object for r in ctx.get("results", [])]
     else:
@@ -412,6 +414,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     graph.create_edges()
     map_string, edges = graph.render()
     width, height = edges["width"], edges["height"]
+    past = graph.time and datetime.datetime.now() - graph.time > datetime.timedelta(minutes=5)
     ctx.update({
         'filter_object_form': form,
         'map_areas': map_string,
@@ -419,6 +422,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
         'img_height' : height,
         'navigate_bool': True,
         'edges' : edges,
+        'past' : past,
     })
     return ctx
 

@@ -28,6 +28,7 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 """
 
 import re
+import datetime
 import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
@@ -50,6 +51,9 @@ OBJECTS_LIMIT = 100
 
 # just a shortcut
 OSR = "only_search_results"
+
+TIME_FORMAT = "%Y-%m-%d:%H:%M:%S/"
+
 class FrozenAGraph(pgv.AGraph):
     '''
     A frozen AGraph
@@ -203,6 +207,16 @@ class NavigationGraph(object):
         self.options.update(options)
         if self.options["prog"] == "twopi":
             self.graph.graph_attr["ranksep"] = "1.2"
+        date = self.options.get("date")
+        time = self.options.get("time")
+        if date is not None or time is not None:
+            if date == datetime.date.today() and time is None:
+                self.time = None
+            else:
+                self.time = datetime.datetime.combine(date or datetime.date.today(),
+                    time or datetime.time())
+        else:
+            self.time = None 
        
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
@@ -469,6 +483,7 @@ class NavigationGraph(object):
     def _convert_map(self, map_string):
         elements = []
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
+        time_str = "" if not self.time else self.time.strftime(TIME_FORMAT)
         for area in ET.fromstring(map_string).findall("area"):
             if area.get("href") == ".":
                 if area.get("shape") == "rect":
@@ -497,6 +512,7 @@ class NavigationGraph(object):
             ctx["main"] = main
             ctx["href"] = area.get("href")
             ctx["documents_url"] = ajax_navigate
+            ctx["time"] = time_str
             div = render_to_string("navigate/node.html", ctx)
             if main:
                 # the main node must be the first item, since it is

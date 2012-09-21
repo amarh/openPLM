@@ -509,6 +509,10 @@ class NavigateFilterForm(forms.Form):
                                 widget=forms.HiddenInput())
     update = forms.BooleanField(initial=False, required=False,
            widget=forms.HiddenInput() )
+    date = forms.DateField(required=False,
+        widget=forms.DateInput(attrs={"size":10}))
+    time = forms.DateField(required=False,
+            widget=forms.TimeInput(attrs={"size":8}))
 
 class PartNavigateFilterForm(NavigateFilterForm):
     child = forms.BooleanField(initial=True, required=False, label=_("child"))

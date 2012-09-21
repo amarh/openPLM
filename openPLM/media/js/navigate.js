@@ -1,5 +1,6 @@
 var edges;
 var paper;
+var past;
 function draw_edges(data, width, height){
     var r = Raphael("navholder", width, height);
     var s = r.set();
@@ -92,7 +93,7 @@ function scale(new_factor) {
 function show_thumbnails_panel(node){
     if ($("#navThumbnails").is(":hidden")) {
         $("#navThumbnails").show();
-        $("#FilterNav").css("right", "190px");
+        $("#FilterNav, #RevisionsNav").css("right", "190px");
         var width = node.width();
         if (node.offset().left + width > $("#navThumbnails").offset().left){
             var left = $("#DivNav").position().left - 180;
@@ -103,7 +104,7 @@ function show_thumbnails_panel(node){
 
 function hide_thumbnails_panel(){
     $("#navThumbnails").hide();
-    $("#FilterNav").css("right", "10px");
+    $("#FilterNav, #RevisionsNav").css("right", "10px");
 }
 
 function display_thumbnails(node_id, ajax_url){
@@ -113,13 +114,19 @@ function display_thumbnails(node_id, ajax_url){
         success: function( data ) {
             var list = $("#thumbnailsList");
             $.each(data["files"], function(index, value){
-                var name = value[0];
-                var url = value[1];
-                var img = value[2];
-                var title = "Download " + name;
-                list.append(
-                    $("<div><a href='"+ url +"'><div> <img src='" + img + "' title='" + title + "' /></div></a></div>"));
-                });
+                var url = value.url;
+                var img = value.img;
+                var title = "Download " + value["name"];
+                if (value.deprecated) {
+                    title += " ! deprecated !";
+                }
+                if (value.deleted) {
+                    div = "<div><span>" + value.name + " - deleted" + "</span></div>";
+                } else {
+                    div = "<div><a href='"+ url +"'><div> <img src='" + img + "' title='" + title + "' /><span>" + value.name + "</span></div></a></div>";
+                }
+                list.append($(div));
+            });
             $("#navDocument").text(data["doc"]);
             show_thumbnails_panel($("#" + node_id));
             list.outerHeight(list.parent().innerHeight() - $("#navDocument").outerHeight()-2);
@@ -144,7 +151,10 @@ function update_nav(focus_node_id, data){
     var submit = $("#FilterNav").find("li").last().clone();
     $("#FilterNavUl").html(data.form);
     $("#FilterNavUl").append(submit);
-    $("#add-buttons").html(data.add_buttons);
+    past = data["past"];
+    if (! past){
+        $("#add-buttons").html(data.add_buttons);
+    }
     make_combobox();
     
     var new_offset = $(focus_node_id).offset();
@@ -154,6 +164,7 @@ function update_nav(focus_node_id, data){
         left: '-=' + delta_left + "px",
         top: '-=' + delta_top + "px"});
     init();
+    hide_thumbnails_panel();
     draw_edges(data.edges, data.width, data.height);
 }
 
@@ -293,6 +304,7 @@ function show_attach(plmobject, form_child){
 
 function init(){
 
+        $( "#id_date" ).datepicker();
 
         $("div.node").mouseenter(
         function () {
@@ -327,48 +339,54 @@ function init(){
         var cache1 = new Object();
         var cache2 = new Object();
         var main_node = $("div.main_node");
-        $("li.Result").hoverIntent(
-            function() { 
-                var li = $(this);
-                var form = li.children("form").first();
-                var add = can_add_child(main_node, form, cache1);
-                li.find("div.toolbar > button.add_child").button("option", "disabled", !add).button( "refresh" );
-                var attach = can_attach(main_node, form, cache2);
-                li.find("div.toolbar > button.attach").button("option", "disabled", !attach).button( "refresh" ); 
 
-            },
-            function() { 
-                $(this).find("div.toolbar > button").button("disable").button( "refresh" );
-            }
-        );
+        if (! past){
+            $("li.Result div.toolbar").show();
+            $("li.Result").hoverIntent(
+                function() { 
+                    var li = $(this);
+                    var form = li.children("form").first();
+                    var add = can_add_child(main_node, form, cache1);
+                    li.find("div.toolbar > button.add_child").button("option", "disabled", !add).button( "refresh" );
+                    var attach = can_attach(main_node, form, cache2);
+                    li.find("div.toolbar > button.attach").button("option", "disabled", !attach).button( "refresh" ); 
 
-        $("button.add_child").button({
+                },
+                function() { 
+                    $(this).find("div.toolbar > button").button("disable").button( "refresh" );
+                }
+            );
+
+            $("button.add_child").button({
                 icons: {
                     primary: "ui-icon-plus"
                 },
                 text: false,
                 disabled: true
             }).click(
-            function () {
-                var form = $(this).closest("li.Result").children("form");
-                show_add_child($("div.main_node"), form.serialize());
-            }
-        );
-        
-        $("button.attach").button({
+                function () {
+                    var form = $(this).closest("li.Result").children("form");
+                    show_add_child($("div.main_node"), form.serialize());
+                }
+            );
+
+            $("button.attach").button({
                 icons: {
                     primary: "ui-icon-link"
                 },
                 text: false,
                 disabled: true
             }).click(
-            function () {
-                var form = $(this).closest("li.Result").children("form");
-                show_attach($("div.main_node"), form);
-            }
-        );
-        
-       
+                function () {
+                    var form = $(this).closest("li.Result").children("form");
+                    show_attach($("div.main_node"), form);
+                }
+            );
+
+        }else {
+            $("li.Result div.toolbar").hide();
+        }
+
         $("#FilterNav").find("form").submit(function (e){
                 return false;
         });
@@ -481,6 +499,7 @@ $(document).ready(function(){
 
         $('#Navigate').css('overflow', 'hidden');
 
+
         $('#rightControl').bind('click', function(){
             $('#DivNav').animate({
                 "left": "-=100px"
@@ -522,9 +541,13 @@ $(document).ready(function(){
 
         $("#FilterNav").hoverIntent({
             over: function() { $("#FilterNav ul").show();},
-            out: function() { $("#FilterNav ul").hide();},
+            out: function() {
+                if (! $("#ui-datepicker-div").is(":visible")){
+                    $("#FilterNav ul").hide();
+                }
+            },
             timeout: 500
-             } );
+        });
         
         $.Topic("show_left_panel").subscribe(function (){
                 $("#DivNav").css({left : "-=330px"});

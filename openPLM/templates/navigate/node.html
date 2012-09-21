@@ -8,7 +8,7 @@
 
     {% if thumbnails %}
         <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="{% trans "Display thumbnails" %}"
-        onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{path}}');"/>
+        onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{time}}{{path}}');"/>
     {% endif %}
 
     {% if show_documents %}

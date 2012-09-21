@@ -212,9 +212,8 @@ class AjaxTestCase(CommonViewTest):
         files = data["files"]
         self.assertEqual(1, len(files))
         # download the file and the thumbnail
-        name, url, img = files[0]
-        response_file = self.client.get(url)
+        response_file = self.client.get(files[0]["url"])
         self.assertEqual(response_file.status_code, 200)
-        response_img = self.client.get(img)
+        response_img = self.client.get(files[0]["img"])
         self.assertEqual(response_img.status_code, 200)
 
