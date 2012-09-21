@@ -24,7 +24,10 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
+import time
+import datetime
 import urlparse
+
 
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
@@ -39,6 +42,8 @@ from openPLM.plmapp.controllers import PLMObjectController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
         json_view, get_navigate_data, secure_required, get_creation_view 
+
+from openPLM.plmapp.navigate import TIME_FORMAT
 
 ajax_login_required = user_passes_test(lambda u: (u.is_authenticated()
     and not u.get_profile().restricted))
@@ -116,7 +121,7 @@ def ajax_autocomplete(request, obj_type, field):
 
 @ajax_login_required
 @json_view
-def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
+def ajax_thumbnails(request, obj_type, obj_ref, obj_revi, date=None):
     """
     Ajax view to get files and thumbnails of a document.
 
@@ -131,12 +136,25 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi):
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     files = []
     doc = "|".join((obj_type, obj_ref, obj_revi))
-    for f in obj.files:
+    if date:
+        d = datetime.datetime(*time.strptime(date, TIME_FORMAT)[:6])
+        fileset = obj.documentfile_set.filter(ctime__lte=d).exclude(end_time__gt=d)
+    else:
+        fileset = obj.files
+    missing_url = urlparse.urljoin(settings.MEDIA_URL, "img/image-missing.png")
+    for f in fileset:
         if f.thumbnail:
             img = f.thumbnail.url 
         else:
-            img = urlparse.urljoin(settings.MEDIA_URL, "img/image-missing.png")
-        files.append((f.filename, "/file/%d/" % f.id, img))
+            img = missing_url 
+        files.append({
+            "name": f.filename,
+            "url": "/file/%d/" % f.id,
+            "img": img,
+            "revision" : f.revision,
+            "deleted" : f.deleted,
+            "deprecated" : f.deprecated,
+        })
     return dict(files=files, doc=doc)
 
 
@@ -150,7 +168,8 @@ def ajax_navigate(request, obj_type, obj_ref, obj_revi):
             "divs" : context["map_areas"],
             "form" : context["filter_object_form"].as_ul(),
             "edges" : context["edges"],
-            "add_buttons" : render_to_string("navigate/add_buttons.html", context)
+            "add_buttons" : render_to_string("navigate/add_buttons.html", context),
+            "past" : context["past"],
             }
     return data
 

@@ -110,6 +110,9 @@ div#thumbnailsList img {
 div#thumbnailsList a > div {
     border-bottom: 1px solid #7f7c7c;
 }
+div#thumbnailsList a span {
+    color: #eee;
+}
 
 div#thumbnailsList > * {
     display: block;
