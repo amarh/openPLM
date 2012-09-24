@@ -282,9 +282,12 @@ class PLMObjectController(Controller):
             return True
 
         users = models.DelegationLink.get_delegators(self._user, role)
-        qset = self.plmobjectuserlink_plmobject.now().filter(user__in=users,
+        if users:
+            qset = self.plmobjectuserlink_plmobject.now().filter(user__in=users,
                                                           role=role)
-        return qset.exists()
+            return qset.exists()
+        else:
+            return False
 
     def check_editable(self):
         """

@@ -307,7 +307,7 @@ class PartController(PLMObjectController):
                             break
             last_children = last 
             level += 1
-        if only_official:
+        if only_official and res:
             # retrieves all official children at *date* and then prunes the
             # tree so that we only run one query
             res2 = []
@@ -393,7 +393,7 @@ class PartController(PLMObjectController):
                             break
             last_parents = last 
             level += 1
-        if only_official:
+        if only_official and res:
             # retrieves all official children at *date* and then prunes the
             # tree so that we only run one query
             res2 = []
@@ -542,7 +542,10 @@ class PartController(PLMObjectController):
             for rev in other_revisions:
                 if rev.is_official or rev.is_draft:
                     docs.append(rev.id)
-        return models.Document.objects.filter(id__in=docs)
+        if docs:
+            return models.Document.objects.filter(id__in=docs)
+        else:
+            return models.Document.objects.none()
 
     def get_suggested_parents(self):
         """
@@ -654,7 +657,10 @@ class PartController(PLMObjectController):
             doc = link.document
             if self.can_detach_document(doc):
                 links.append(link.id)
-        return self.documentpartlink_part.filter(id__in=links)
+        if links:
+            return self.documentpartlink_part.filter(id__in=links)
+        else:
+            return models.DocumentPartLink.objects.none()
      
     def is_document_attached(self, document):
         """

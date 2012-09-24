@@ -383,14 +383,15 @@ class NavigationGraph(object):
             if not (self.options[OSR] and not self.plmobjects_result):
                 if isinstance(self.object, GroupController):
                     self._create_doc_edges(self.object, None)
-                links = models.DocumentPartLink.objects.at(self.time).\
-                        filter(part__in=self._part_to_node.keys())
-                for link in links.select_related("document"):
-                    if self.options[OSR] and link.document_id not in self.results:
-                        continue
-                    
-                    self.edges.add((link.part_id, link.document_id, " "))
-                    self._set_node_attributes(link.document)
+                if self._part_to_node:
+                    links = models.DocumentPartLink.objects.at(self.time).\
+                            filter(part__in=self._part_to_node.keys())
+                    for link in links.select_related("document"):
+                        if self.options[OSR] and link.document_id not in self.results:
+                            continue
+                        
+                        self.edges.add((link.part_id, link.document_id, " "))
+                        self._set_node_attributes(link.document)
 
         elif not isinstance(self.object, UserController):
             if not (self.options[OSR] and not self.plmobjects_result):
@@ -404,7 +405,7 @@ class NavigationGraph(object):
                     self._set_node_attributes(link.document)
 
         # treats the parts to see if they have an attached document
-        if not self.options["doc"]:
+        if not self.options["doc"] and self._part_to_node:
             parts = models.DocumentPartLink.objects.at(self.time).\
                     filter(part__in=self._part_to_node.keys()).\
                     values_list("part_id", flat=True)
