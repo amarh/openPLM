@@ -462,14 +462,15 @@ def get_id_card_data(doc_ids):
             list of tuple (document, number of file)
     """
     ctx = { "thumbnails" : {}, "num_files" : {} }
-    thumbnails = models.DocumentFile.objects.filter(deprecated=False,
-                document__in=doc_ids, thumbnail__isnull=False)
-    ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
-    num_files = dict.fromkeys(doc_ids, 0)
-    for doc_id in models.DocumentFile.objects.filter(deprecated=False,
-        document__in=doc_ids).values_list("document", flat=True):
-            num_files[doc_id] += 1
-            ctx["num_files"] = num_files
+    if doc_ids:
+        thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                    document__in=doc_ids, thumbnail__isnull=False)
+        ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
+        num_files = dict.fromkeys(doc_ids, 0)
+        for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+            document__in=doc_ids).values_list("document", flat=True):
+                num_files[doc_id] += 1
+                ctx["num_files"] = num_files
     return ctx
 
 def revise_document(obj, ctx, request):
@@ -814,15 +815,16 @@ def get_children_data(obj, date, level, state):
     # pcle
     extra_columns = []
     extension_data = defaultdict(dict)
-    for PCLE in models.get_PCLEs(obj.object):
-        fields = PCLE.get_visible_fields()
-        if fields:
-            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
-                    for f in fields)
-            pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
-            pcles = pcles.values("link_id", *fields)
-            for pcle in pcles:
-                extension_data[pcle["link_id"]].update(pcle)
+    if children:
+        for PCLE in models.get_PCLEs(obj.object):
+            fields = PCLE.get_visible_fields()
+            if fields:
+                extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                        for f in fields)
+                pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
+                pcles = pcles.values("link_id", *fields)
+                for pcle in pcles:
+                    extension_data[pcle["link_id"]].update(pcle)
     return children, extra_columns, extension_data
 
 

@@ -152,17 +152,18 @@ def compute_cost(part_ctrl):
 
     ids = []
     children = part_ctrl.get_children(-1)
-    for level, link in children:
-        ids.append(link.child_id)
-    # total local cost
-    pcs = models.PartCost.objects.filter(part__in=ids).values()
-    pcs = dict((p["part_id"], p) for p in pcs)
-    for level, link in children:
-        try:
-            pc = pcs[link.child_id]
-            cost += link.quantity * convert_unit(pc["cost"], link.unit, pc["unit"]) 
-        except (KeyError, UnitConversionError):
-            pass
+    if children:
+        for level, link in children:
+            ids.append(link.child_id)
+        # total local cost
+        pcs = models.PartCost.objects.filter(part__in=ids).values()
+        pcs = dict((p["part_id"], p) for p in pcs)
+        for level, link in children:
+            try:
+                pc = pcs[link.child_id]
+                cost += link.quantity * convert_unit(pc["cost"], link.unit, pc["unit"]) 
+            except (KeyError, UnitConversionError):
+                pass
     total_local_cost = cost
 
     # total erp cost

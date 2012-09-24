@@ -298,10 +298,14 @@ class Document3DController(DocumentController):
             if self._stps is None:
                 children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
                     only=("child__id", "parent__id",))]
-                docs = DocumentPartLink.objects.now().filter(document__type="Document3D",
-                        part__in=children_ids).values_list("document", flat=True)
-                dfs = DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("id", flat=True)
-                self._stps = dfs
+                if children_ids:
+                    docs = DocumentPartLink.objects.now().filter(document__type="Document3D",
+                            part__in=children_ids).values_list("document", flat=True)
+                    dfs = DocumentFile.objects.filter(document__in=docs, deprecated=False)\
+                            .filter(is_stp).values_list("id", flat=True)
+                    self._stps = dfs
+                else:
+                    self._stps = DocumentFile.objects.none().values_list("id", flat=True)
             q = Q(stp=doc_file) | Q(stp__in=self._stps)
             gfs = GeometryFile.objects.filter(q)
         else:
@@ -340,8 +344,11 @@ class Document3DController(DocumentController):
                     # order by -ctime to test the most recently attached document first
                     part_to_docs[part].append(doc)
                     docs.append(doc)
+                if not docs:
+                    return product
                 
-                dfs = dict(DocumentFile.objects.filter(document__in=docs).filter(is_stp).values_list("document", "id"))
+                dfs = dict(DocumentFile.objects.filter(document__in=docs, deprecated=False)\
+                        .filter(is_stp).values_list("document", "id"))
                 # cache this values as it may be useful for get_all_geometry_files
                 self._stps = dfs.values()
                 locs = defaultdict(list)

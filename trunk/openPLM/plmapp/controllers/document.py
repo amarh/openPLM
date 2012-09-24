@@ -301,7 +301,10 @@ class DocumentController(PLMObjectController):
             part = link.part
             if self.can_detach_part(part):
                 links.append(link.id)
-        return self.documentpartlink_document.filter(id__in=links).now()
+        if links:
+            return self.documentpartlink_document.filter(id__in=links).now()
+        else:
+            return models.DocumentPartLink.objects.none()
     
     def is_part_attached(self, part):
         """
@@ -364,9 +367,12 @@ class DocumentController(PLMObjectController):
             except models.RevisionLink.DoesNotExist:
                 if not part.is_deprecated:
                     parts.append(part)
-        qs = models.Part.objects.filter(id__in=(p.id for p in parts))
-        qs = qs.select_related('type', 'reference', 'revision', 'name')
-        return qs
+        if parts:
+            qs = models.Part.objects.filter(id__in=(p.id for p in parts))
+            qs = qs.select_related('type', 'reference', 'revision', 'name')
+            return qs
+        else:
+            return models.Part.objects.none()
 
     def revise(self, new_revision, selected_parts=()):
         # same as PLMObjectController + duplicate files (and their thumbnails)
