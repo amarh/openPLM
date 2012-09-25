@@ -334,6 +334,8 @@ class DisplayChildrenForm(forms.Form):
     level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
     date = forms.SplitDateTimeField(required=False)
     state = forms.ChoiceField(choices=STATES, initial="all")
+    show_documents = forms.BooleanField(label=_("Show documents"),
+            required=False, initial=False)
 
 class ModifyChildForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)

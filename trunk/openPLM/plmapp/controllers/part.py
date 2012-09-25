@@ -305,8 +305,7 @@ class PartController(PLMObjectController):
             # retrieves all official children at *date* and then prunes the
             # tree so that we only run one query
             res2 = []
-            sh = models.StateHistory.objects.at(date).filter(plmobject__in=children_ids,
-                    state_category=models.StateHistory.OFFICIAL)
+            sh = models.StateHistory.objects.at(date).officials().filter(plmobject__in=children_ids)
             valid_children = set(sh.values_list("plmobject_id", flat=True))
             # level_threshold is used to cut a "branch" of the tree
             level_threshold = len(res) + 1 # all levels are inferior to this value
@@ -383,8 +382,7 @@ class PartController(PLMObjectController):
             # retrieves all official children at *date* and then prunes the
             # tree so that we only run one query
             res2 = []
-            sh = models.StateHistory.objects.at(date).filter(plmobject__in=parents_ids,
-                    state_category=models.StateHistory.OFFICIAL)
+            sh = models.StateHistory.objects.at(date).officials().filter(plmobject__in=parents_ids)
             valid_parents = set(sh.values_list("plmobject_id", flat=True))
             # level_threshold is used to cut a "branch" of the tree
             level_threshold = len(res) + 1 # all levels are inferior to this value

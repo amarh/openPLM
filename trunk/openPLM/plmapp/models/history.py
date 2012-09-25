@@ -96,6 +96,12 @@ class StateHistoryQuerySet(QuerySet):
             return self.now()
         return self.filter(start_time__lte=time).exclude(end_time__lt=time)
 
+    def officials(self):
+        """
+        Filters only official state histories.
+        """
+        return self.filter(state_category=StateHistory.OFFICIAL)
+
 
 class StateHistoryManager(models.Manager):
     """state histories manager, returns a :class:`StateHistoryQuerySet`."""
@@ -117,6 +123,11 @@ class StateHistoryManager(models.Manager):
         """
         return self.get_query_set().at(time)
     
+    def officials(self):
+        """
+        Shorcut for ``self.get_query_set().officials()``. See :meth:`StateHistoryQuerySet.officials()`.
+        """
+        return self.get_query_set().officials()
 
 
 class StateHistory(models.Model):
