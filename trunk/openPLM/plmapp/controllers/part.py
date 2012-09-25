@@ -76,7 +76,7 @@ class PartController(PLMObjectController):
         if self.is_ancestor(child):
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
-        link = self.parentchildlink_parent.filter(child=child, end_time=None)
+        link = self.parentchildlink_parent.now().filter(child=child)
         if link.exists():
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
@@ -157,9 +157,8 @@ class PartController(PLMObjectController):
         self.check_editable()
         if isinstance(child, PLMObjectController):
             child = child.object
-        link = self.parentchildlink_parent.get(child=child, end_time=None)
-        link.end_time = datetime.datetime.today()
-        link.save()
+        link = self.parentchildlink_parent.now().get(child=child)
+        link.end()
         self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
 
     def modify_child(self, child, new_quantity, new_order, new_unit,
@@ -187,8 +186,8 @@ class PartController(PLMObjectController):
             child = child.object
         if new_order < 0 or new_quantity < 0:
             raise ValueError("Quantity or order is negative")
-        link = models.ParentChildLink.objects.get(parent=self.object,
-                                                  child=child, end_time=None)
+        link = models.ParentChildLink.current_objects.get(parent=self.object,
+                                                  child=child)
         original_extension_data = link.get_extension_data()
 
         if (link.quantity == new_quantity and link.order == new_order and
@@ -246,8 +245,7 @@ class PartController(PLMObjectController):
         if link.child == new_child:
             return link
         self.check_add_child(new_child)
-        link.end_time = datetime.datetime.today()
-        link.save()
+        link.end()
         # make a new link
         link2, extensions = link.clone(child=new_child, end_time=None)
         details = u"Child changes from %s to %s" % (link.child, new_child)
@@ -276,12 +274,8 @@ class PartController(PLMObjectController):
         :rtype: list of :class:`Child`
         """
         
-        objects = models.ParentChildLink.objects.order_by("-order")\
+        links = models.ParentChildLink.objects.at(date).order_by("-order")\
                 .select_related(*related)
-        if date is None:
-            links = objects.filter(end_time__exact=None)
-        else:
-            links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
         if only is not None:
             links = links.only(*only)
         res = []
@@ -335,7 +329,7 @@ class PartController(PLMObjectController):
         """
         Returns True if *part* is an ancestor of the current object.
         """
-        links = models.ParentChildLink.objects.filter(end_time__exact=None)
+        links = models.ParentChildLink.current_objects
         parents = [part.id]
         last_children = []
         while parents:
@@ -362,12 +356,8 @@ class PartController(PLMObjectController):
         :rtype: list of :class:`Parent`
         """
 
-        objects = models.ParentChildLink.objects.order_by("-order")\
+        links = models.ParentChildLink.objects.at(date).order_by("-order")\
                 .select_related(*related)
-        if not date:
-            links = objects.filter(end_time__exact=None)
-        else:
-            links = objects.filter(ctime__lte=date).exclude(end_time__lt=date)
         if only is not None:
             links = links.only(*only)
         res = []
@@ -773,14 +763,13 @@ class PartController(PLMObjectController):
         super(PartController, self).cancel()
         self.get_attached_documents().end()
         q = Q(parent=self.object) | Q(child=self.object)
-        now = datetime.datetime.today()
-        models.ParentChildLink.objects.filter(q, end_time=None).update(end_time=now)
-        
+        models.ParentChildLink.current_objects.filter(q).end()
+
     def check_cancel(self,raise_=True):
         res = super(PartController, self).check_cancel(raise_=raise_)
         if res :
             q = Q(parent=self.object) | Q(child=self.object)
-            res = res and not models.ParentChildLink.objects.filter(q, end_time=None).exists()
+            res = res and not models.ParentChildLink.current_objects.filter(q).exists()
             if (not res) and raise_ :
                 raise PermissionError("This part is related to an other part.")
             res = res and not self.get_attached_documents().exists()
@@ -817,7 +806,7 @@ class PartController(PLMObjectController):
             * is attached to at least one document
         """
         q = Q(parent=self.object) | Q(child=self.object)
-        res = not models.ParentChildLink.objects.filter(q, end_time=None).exists()
+        res = not models.ParentChildLink.current_objects.filter(q).exists()
         res = res and not self.get_attached_documents().exists()
         return res
 
