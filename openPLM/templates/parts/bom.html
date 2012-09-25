@@ -12,30 +12,30 @@
             var Part_group = $("#search_id_type").children("[label='Part']");
             var part_types=[];
             $.each($(Part_group).children(), function(i,v){
-                part_types.push($(v).val());
-            });
+                    part_types.push($(v).val());
+                    });
             if($.inArray(suggested_type,part_types)!=-1){
                 $(add_link).attr("href","./add/?q=&type="+suggested_type);               
             }else{
                 $(add_link).attr("href","./add/?q=&type=Part");
             }
         }        
-        
-        $(function() {
-            $( "#id_date_0" ).datepicker();
+
+$(function() {
+        $( "#id_date_0" ).datepicker();
         });
-    </script>
+</script>
 
 {% endblock %}
 
 {% block content %}
-    
+
     {% if is_owner and obj.is_editable %}
         <a class="{{"Button"|button}}" 
             {% if obj.type|can_add_type:request.session.type %}
-            href="./add/{% add_get type=request.session.type q='' %}"
+                href="./add/{% add_get type=request.session.type q='' %}"
             {% else %}
-            href="./add/{% add_get type='Part' q='' %}"
+                href="./add/{% add_get type='Part' q='' %}"
             {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>
 
         <a class="{{"Button"|button}}"
@@ -56,62 +56,7 @@
         {{ decomposition_msg|safe }}
     </div>
     <div>
-        <table class="Content">
-            <tr class="Content">
-                <th class="Content" style="width:50px"> {% trans "Level" %} </th>
-                <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
-                <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
-                <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
-                <th class="Content"> {{ obj.reference }} </th>
-                <th class="Content"> {{ obj.revision }} </th>
-                <th class="Content"> {{ obj.type }} </th>
-                <th class="Content"> {{ obj.name }} </th>
-                {% for field, verbose_name in extra_columns %}
-                    <th class="Content"> {{ verbose_name|capfirst }} </th>
-                {% endfor %}
-                <th class="Content"> {{ obj.state.name }} </th>
-            </tr>
-            {% for c in children %}
-
-                <tr class="Content"> 
-                    <td class="Content {% if level != "last" %} expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
-                        {% if forloop.last or level == "last" %}
-                            <span class="not_expander">{{c.level}}</span>
-                        {% else %}
-                            {% with forloop.counter as next %}
-                                {% with children|indice:next as ci%}
-                                    {% if ci.level > c.level %}
-                                        <span class="expander">{{c.level}}</span>
-                                    {% else %}
-                                        <span class="not_expander">{{c.level}}</span>
-                                    {% endif %}
-                                {% endwith %}
-                            {% endwith %}
-                        {% endif %}
-                    </td>
-                    {% with c.link as link %}
-                        <td class="Content"> {{ link.order }} </td>
-                        <td class="Content"> {{ link.quantity }} </td>
-                        <td class="Content"> {{ link.get_unit_display }} </td>
-                        {% with link.child as child %}
-                            <td class="Content"> 
-                                <a href="{{child.plmobject_url}}"
-                                    {% if child.id in decomposable_children %}class="decomposable"{% endif %}>
-                                    {{ child.reference }}
-                                </a>
-                            </td>
-                            <td class="Content"> {{ child.revision }} </td>
-                            <td class="Content"> {{ child.type }} </td>
-                            <td class="Content"> {{ child.name }} </td>
-                            {% for field, verbose_name in extra_columns %}
-                                <td class="Content"> {{ extension_data|key:link.id|key:field }} </td>
-                            {% endfor %}
-                            <td class="Content"> {{ child.state.name }} </td>
-                        {% endwith %}
-                    {% endwith %}
-                </tr>
-            {% endfor %}
-        </table>
+        {% include "parts/bom_table.html" %}        
     </div>
     {% if can_generate_pdf %}
         <div class="center">

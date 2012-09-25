@@ -794,7 +794,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
 #############################################################################################
 ###         All functions which manage the different html pages specific to part          ###
 #############################################################################################
-def get_children_data(obj, date, level, state):
+def get_children_data(obj, date, level, state, show_documents=False):
     """
     Returns some informations about children that will be displayed
     in BOM view.
@@ -825,7 +825,24 @@ def get_children_data(obj, date, level, state):
                 pcles = pcles.values("link_id", *fields)
                 for pcle in pcles:
                     extension_data[pcle["link_id"]].update(pcle)
-    return children, extra_columns, extension_data
+    documents = defaultdict(list)
+    ids = set([obj.id] + [c.link.child_id for c in children])
+    doc_ids = set()
+    if show_documents:
+        links = models.DocumentPartLink.objects.at(date).filter(part__in=ids).\
+                order_by("document").select_related("document", "document__state")
+        for link in links:
+            documents[link.part_id].append(link.document)
+            doc_ids.add(link.document_id)
+    states = models.StateHistory.objects.at(date).filter(plmobject__in=ids | doc_ids)
+    if only_official:
+        states = states.officials()
+    states = dict(states.values_list("plmobject", "state"))
+    if only_official and show_documents:
+        for docs in documents.itervalues():
+            official_docs = (d for d in docs if d.id in states)
+            docs[:] = official_docs
+    return children, extra_columns, extension_data, states, documents
 
 
 @handle_errors
@@ -871,16 +888,19 @@ def display_children(request, obj_type, obj_ref, obj_revi):
     date = None
     level = "first"
     state = "all"
+    show_documents = False
     if request.GET:
         display_form = forms.DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
+            show_documents = display_form.cleaned_data["show_documents"]
     else:
         display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state":"all"})
-    children, extra_columns, extension_data = get_children_data(obj, date, level, state)
+    data = get_children_data(obj, date, level, state, show_documents)
+    children, extra_columns, extension_data, states, documents = data 
     # decomposition
     if DecomposersManager.count() > 0:
         children_ids = (c.link.child_id for c in children)
@@ -897,6 +917,8 @@ def display_children(request, obj_type, obj_ref, obj_revi):
                 'decomposable_children' : decomposable_children,
                 "display_form" : display_form,
                 'level' : level,
+                'states' : states,
+                'documents' : documents,
                 })
     return r2r('parts/bom.html', ctx, request)
 
@@ -1100,6 +1122,8 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
     else:
         display_form = forms.DisplayChildrenForm(initial=dict(date=datetime.datetime.now(),
             level="first", state="all"))
+    # FIXME: show attached documents if asked
+    del display_form.fields["show_documents"]
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
     parents = obj.get_parents(max_level, date=date, only_official=only_official)

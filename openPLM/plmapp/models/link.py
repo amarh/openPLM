@@ -30,7 +30,8 @@ class LinkQuerySet(QuerySet):
         """
         if time is None:
             return self.now()
-        return self.filter(ctime__lte=time).exclude(end_time__lt=time)
+        return self.filter(ctime__lte=time).exclude(end_time__isnull=False,
+                end_time__lt=time)
 
     def end(self):
         """

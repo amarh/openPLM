@@ -349,19 +349,24 @@ def bom_pdf(request, obj_type, obj_ref, obj_revi):
     date = None
     level = "first"
     state = "all"
+    show_documents = False
     if request.GET:
         display_form = DisplayChildrenForm(request.GET)
         if display_form.is_valid():
             date = display_form.cleaned_data["date"]
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
-    children, extra_columns, extension_data = get_children_data(obj, date, level, state)
+            show_documents = display_form.cleaned_data["show_documents"]
+    data = get_children_data(obj, date, level, state, show_documents)
+    children, extra_columns, extension_data, states, documents = data 
     ctx.update({
                 'children' : children,
                 'extra_columns' : extra_columns,
                 'extension_data' : extension_data,
                 'level' : level,
                 'date' : date or datetime.datetime.utcnow(),
+                'states' : states,
+                'documents' : documents,
                 })
 
     filename = u"%s_%s_%s-bom.pdf" % (obj_type, obj_ref, obj_revi)
