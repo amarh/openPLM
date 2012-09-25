@@ -2,6 +2,7 @@
 import datetime
 
 from django.db import models
+from django.db.models.query import QuerySet
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
@@ -76,6 +77,47 @@ class GroupHistory(AbstractHistory):
         app_label = "plmapp"
     plmobject = models.ForeignKey(Group)
 
+class StateHistoryQuerySet(QuerySet):
+    """ QuerySet with utility methods to filter :class:`StateHistory` alive at a given time."""
+
+    def now(self):
+        """
+        Filters state histories: keeps only alive state histories (end_time is null).
+        """
+        return self.filter(end_time__isnull=True)
+
+    def at(self, time):
+        """
+        Filters state histories: keeps alive state histories at time *time*.
+
+        :param time: a :class:`~datetime.datetime` or None
+        """
+        if time is None:
+            return self.now()
+        return self.filter(start_time__lte=time).exclude(end_time__lt=time)
+
+
+class StateHistoryManager(models.Manager):
+    """state histories manager, returns a :class:`StateHistoryQuerySet`."""
+
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return StateHistoryQuerySet(self.model)
+
+    def now(self):
+        """
+        Shorcut for ``self.get_query_set().now()``. See :meth:`StateHistoryQuerySet.now`.
+        """
+        return self.get_query_set().now()
+
+    def at(self, time):
+        """
+        Shorcut for ``self.get_query_set().at(time)``. See :meth:`StateHistoryQuerySet.at`.
+        """
+        return self.get_query_set().at(time)
+    
+
 
 class StateHistory(models.Model):
     """
@@ -144,6 +186,8 @@ class StateHistory(models.Model):
             default=datetime.datetime.today, auto_now_add=False)
     end_time = models.DateTimeField(null=True)
     state_category = models.PositiveSmallIntegerField(choices=STATE_CATEGORIES)
+
+    objects = StateHistoryManager()
 
     def save(self, *args, **kwargs):
         if self.state == get_cancelled_state():
