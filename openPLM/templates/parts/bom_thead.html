@@ -1,0 +1,35 @@
+{% load i18n plmapp_tags %}
+
+<tr class="Content">
+    <th class="Content" style="width:50px"> {% trans "Level" %} </th>
+    <th class="Content" style="width:50px"> {% trans "Ord." %} </th>
+    <th class="Content" style="width:50px"> {% trans "Qty" %}</th>
+    <th class="Content" style="width:50px"> {% trans "Unit" %}</th>
+    <th class="Content"> {% trans "Reference" %} </th>
+    <th class="Content"> {% trans "Revision" %} </th>
+    <th class="Content"> {% trans "Type" %} </th>
+    <th class="Content"> {% trans "Name" %} </th>
+    {% for field, verbose_name in extra_columns %}
+    <th class="Content"> {{ verbose_name|capfirst }} </th>
+    {% endfor %}
+    <th class="Content"> {% trans "Current state" %} </th>
+    <th class="Content"> {% trans "Old state" %} </th>
+</tr>
+
+<tr class="Content">
+    <th class="Content" style="width:50px"> - </th>
+    <th class="Content" style="width:50px"> - </th>
+    <th class="Content" style="width:50px"> - </th>
+    <th class="Content" style="width:50px"> - </th>
+    <th class="Content"> {{ obj.reference }} </th>
+    <th class="Content"> {{ obj.revision }} </th>
+    <th class="Content"> {{ obj.type }} </th>
+    <th class="Content"> {{ obj.name }} </th>
+    {% for field, verbose_name in extra_columns %}
+    <th class="Content"> - </th>
+    {% endfor %}
+    <th class="Content"> {{ obj.state.name }} </th>
+    <th class="Content"> {{ states|key:obj.id }} </th>
+</tr>
+
+

@@ -23,29 +23,29 @@
         </ul>
         <input type="submit" class="{{"Button"|button}}" value="{% trans "GO !" %}"/><br/>
     </form>
-	<table class="Content">
-        <tr>
-            <th class="Content"> </th>
-            <th class="Content"> {{ obj.reference }} </th>
-            <th class="Content"> {{ obj.revision }} </th>
-            <th class="Content"> {{ obj.type }} </th>
-            <th class="Content"> {{ obj.name }} </th>
-            <th class="Content"> {{ obj.state.name }} </th>
-        </tr>
+    <table class="Content">
+
+        {% include "parts/bom_thead.html" %}
         {% for level, link in parents %}
-        <tr class="Content"> 
-            <td class="Content">-{{ level}}</td>
-            <td class="Content"> 
-                <a href="/object/{{link.parent.type|urlencode }}/{{link.parent.reference|urlencode }}/{{link.parent.revision|urlencode }}/">
-                    {{ link.parent.reference }}
-                </a>
-            </td>
-            <td class="Content"> {{ link.parent.revision }} </td>
-            <td class="Content"> {{ link.parent.type }} </td>
-            <td class="Content"> {{ link.parent.name }} </td>
-            <td class="Content"> {{ link.parent.state.name }} </td>
-        </tr>
+            <tr class="Content"> 
+                <td class="Content">-{{ level }}</td>
+                <td class="Content"> {{ link.order }} </td>
+                <td class="Content"> {{ link.quantity }} </td>
+                <td class="Content"> {{ link.get_unit_display }} </td>
+                {% with link.parent as parent %}
+                    <td class="Content"> 
+                        <a href="{{parent.plmobject_url}}">
+                            {{ parent.reference }}
+                        </a>
+                    </td>
+                    <td class="Content"> {{ parent.revision }} </td>
+                    <td class="Content"> {{ parent.type }} </td>
+                    <td class="Content"> {{ parent.name }} </td>
+                    <td class="Content"> {{ parent.state.name }} </td>
+                    <td class="Content"> {{ states|key:parent.id }} </td>
+                {% endwith %}
+            </tr>
         {% endfor %}
-	</table>
+    </table>
 {% endblock %}
 
