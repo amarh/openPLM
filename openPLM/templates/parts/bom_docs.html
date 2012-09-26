@@ -1,0 +1,22 @@
+{% load i18n plmapp_tags %}
+
+{% for doc in documents %}
+
+    <tr class="Content document"> 
+        <td class="Content expander level{{level}}" colspan="3">  </td>
+        <td class="Content"> {% trans "Doc" %} </td>
+        <td class="Content"> 
+            <a href="{{doc.plmobject_url}}"> {{ doc.reference }} </a>
+        </td>
+        <td class="Content"> {{ doc.revision }} </td>
+        <td class="Content"> {{ doc.type }} </td>
+        <td class="Content"> {{ doc.name }} </td>
+        {% for field, verbose_name in extra_columns %}
+            <td class="Content"> </td>
+        {% endfor %}
+        <td class="Content"> {{ doc.state.name }} </td>
+        <td class="Content"> {{ states|key:doc.id }} </td>
+    </tr>
+
+{% endfor %}
+

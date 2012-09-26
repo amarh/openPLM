@@ -5,25 +5,9 @@
 
         {% include "parts/bom_thead.html" %}
 
-        {% for doc in documents|key:obj.id %}
-
-            <tr class="Content document"> 
-                <td class="Content" colspan="3">  </td>
-                <td class="Content"> {% trans "Doc" %} </td>
-                <td class="Content"> 
-                    <a href="{{doc.plmobject_url}}"> {{ doc.reference }} </a>
-                </td>
-                <td class="Content"> {{ doc.revision }} </td>
-                <td class="Content"> {{ doc.type }} </td>
-                <td class="Content"> {{ doc.name }} </td>
-                {% for field, verbose_name in extra_columns %}
-                    <td class="Content"> </td>
-                {% endfor %}
-                <td class="Content"> {{ doc.state.name }} </td>
-                <td class="Content"> {{ states|key:doc.id }} </td>
-            </tr>
-
-        {% endfor %}
+        {% with documents|key:obj.id as documents %} 
+            {% include "parts/bom_docs.html" %} 
+        {% endwith %}
 
         {% for c in children %}
 
@@ -65,26 +49,11 @@
                     {% endwith %}
                 {% endwith %}
             </tr>
-            {% for doc in documents|key:c.link.child_id %}
-
-                <tr class="Content document"> 
-                    <td class="Content expander level{{c.level|add:1}}" colspan="3">  </td>
-                    <td class="Content"> {% trans "Doc" %} </td>
-                    <td class="Content"> 
-                        <a href="{{doc.plmobject_url}}"> {{ doc.reference }} </a>
-                    </td>
-                    <td class="Content"> {{ doc.revision }} </td>
-                    <td class="Content"> {{ doc.type }} </td>
-                    <td class="Content"> {{ doc.name }} </td>
-                    {% for field, verbose_name in extra_columns %}
-                        <td class="Content"> </td>
-                    {% endfor %}
-                    <td class="Content"> {{ doc.state.name }} </td>
-                    <td class="Content"> {{ states|key:doc.id }} </td>
-                </tr>
-
-            {% endfor %}
-
+            {% with documents|key:c.link.child_id as documents %} 
+                {% with c.level|add:1 as level %} 
+                    {% include "parts/bom_docs.html" %} 
+                {% endwith %}
+            {% endwith %}
         {% endfor %}
     </table>
 {% endblock %}
