@@ -842,8 +842,15 @@ def get_children_data(obj, date, level, state, show_documents=False):
         for docs in documents.itervalues():
             official_docs = (d for d in docs if d.id in states)
             docs[:] = official_docs
-    return children, extra_columns, extension_data, states, documents
-
+    return {
+            'children' : children,
+            'extra_columns' : extra_columns,
+            'extension_data' : extension_data,
+            'level' : level,
+            'states' : states,
+            'documents' : documents,
+            'level' : level,
+            }
 
 @handle_errors
 def display_children(request, obj_type, obj_ref, obj_revi):
@@ -899,26 +906,19 @@ def display_children(request, obj_type, obj_ref, obj_revi):
     else:
         display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state":"all"})
-    data = get_children_data(obj, date, level, state, show_documents)
-    children, extra_columns, extension_data, states, documents = data 
+    ctx.update(get_children_data(obj, date, level, state, show_documents))
     # decomposition
     if DecomposersManager.count() > 0:
-        children_ids = (c.link.child_id for c in children)
+        children_ids = (c.link.child_id for c in ctx["children"])
         decomposable_children = DecomposersManager.get_decomposable_parts(children_ids)
         decomposition_msg = DecomposersManager.get_decomposition_message(obj)
     else:
         decomposition_msg = ""
         decomposable_children = []
     ctx.update({'current_page' : 'BOM-child',
-                'children' : children,
-                'extra_columns' : extra_columns,
-                'extension_data' : extension_data,
                 'decomposition_msg' : decomposition_msg,
                 'decomposable_children' : decomposable_children,
                 "display_form" : display_form,
-                'level' : level,
-                'states' : states,
-                'documents' : documents,
                 })
     return r2r('parts/bom.html', ctx, request)
 
