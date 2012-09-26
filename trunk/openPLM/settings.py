@@ -146,6 +146,10 @@ if "openPLM.apps.document3D" in INSTALLED_APPS:
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 
+#: True if mails sending should fail silently. If False, all connection errors
+#: to the SMTP server will be logged by celery (`/var/log/celery/*.log`).
+EMAIL_FAIL_SILENTLY = True
+
 #: directory that stores documents. Make sure to use a trailing slash.
 DOCUMENTS_DIR = "/var/openPLM/docs/"
 #: directory that stores thumbnails. Make sure to use a trailing slash.

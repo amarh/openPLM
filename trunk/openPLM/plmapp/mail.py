@@ -145,10 +145,6 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
     :type user: :class:`~django.contrib.auth.models.User` 
     :param blacklist: list of emails whose no mail should be sent (empty by default).
 
-    .. note::
-
-        This function fails silently if it can not send the mail.
-        The mail is sent in a separated thread. 
     """
     plmobject = unserialize(plmobject)
     recipients = get_recipients(plmobject, roles, users) 
@@ -190,7 +186,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
             msg = EmailMultiAlternatives(subj_translation, message, settings.EMAIL_OPENPLM,
                 bcc=emails)
             msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=True)
+            msg.send(fail_silently=getattr(settings, "EMAIL_FAIL_SILENTLY", True))
         
         if lang_to_email:
             translation.deactivate()
