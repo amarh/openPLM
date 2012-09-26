@@ -1127,6 +1127,9 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
     max_level = 1 if level == "first" else -1
     only_official = state == "official"
     parents = obj.get_parents(max_level, date=date, only_official=only_official)
+    ids = set([obj.id])
+    for level, link in parents:
+        ids.add(link.parent_id)
     if level == "last" and parents:
         previous_level = 0
         max_parents = []
@@ -1136,9 +1139,17 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
             max_parents.append(c)
             previous_level = c.level
         parents = max_parents
+
+    states = models.StateHistory.objects.at(date).filter(plmobject__in=ids)
+    if only_official:
+        states = states.officials()
+    states = dict(states.values_list("plmobject", "state"))
+    
     ctx.update({'current_page':'parents',
                 'parents' :  parents,
-                'display_form' : display_form, })
+                'display_form' : display_form,
+                'states' : states,
+                })
     return r2r('parts/parents.html', ctx, request)
 
 ##########################################################################################
