@@ -1,7 +1,7 @@
 {% load i18n plmapp_tags %}
 
 {% block content %}
-    <table class="Content">
+    <table class="Content bom">
 
         {% include "parts/bom_thead.html" %}
 
@@ -12,24 +12,28 @@
         {% for c in children %}
 
             <tr class="Content part"> 
-                <td class="Content {% if level != "last" %} expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}0px;" >
-                    {% if forloop.last or level == "last" and not documents|key:c.link.child_id %}
-                        <span class="not_expander">{{c.level}}</span>
+                <td class="Content {% if level != "last" %} level expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}.5em;" >
+                    {% if documents|key:c.link.child_id %}
+                        <span class="expander">{{c.level}}</span>
                     {% else %}
-                        {% with forloop.counter as next %}
-                            {% with children|indice:next as ci%}
-                                {% if ci.level > c.level or documents|key:c.link.child_id %}
-                                    <span class="expander">{{c.level}}</span>
-                                {% else %}
-                                    <span class="not_expander">{{c.level}}</span>
-                                {% endif %}
+                        {% if forloop.last or level == "last" %}
+                            <span class="not_expander">{{c.level}}</span>
+                        {% else %}
+                            {% with forloop.counter as next %}
+                                {% with children|indice:next as ci%}
+                                    {% if ci.level > c.level %}
+                                        <span class="expander">{{c.level}}</span>
+                                    {% else %}
+                                        <span class="not_expander">{{c.level}}</span>
+                                    {% endif %}
+                                {% endwith %}
                             {% endwith %}
-                        {% endwith %}
+                        {% endif %}
                     {% endif %}
                 </td>
                 {% with c.link as link %}
-                    <td class="Content"> {{ link.order }} </td>
-                    <td class="Content"> {{ link.quantity }} </td>
+                    <td class="Content order"> {{ link.order }} </td>
+                    <td class="Content quantity"> {{ link.quantity }} </td>
                     <td class="Content"> {{ link.get_unit_display }} </td>
                     {% with link.child as child %}
                         <td class="Content"> 
