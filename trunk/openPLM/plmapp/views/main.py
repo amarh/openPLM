@@ -830,7 +830,8 @@ def get_children_data(obj, date, level, state, show_documents=False):
     doc_ids = set()
     if show_documents:
         links = models.DocumentPartLink.objects.at(date).filter(part__in=ids).\
-                order_by("document").select_related("document", "document__state")
+                order_by("document__reference", "document__revision").\
+                select_related("document", "document__state")
         for link in links:
             documents[link.part_id].append(link.document)
             doc_ids.add(link.document_id)
