@@ -568,49 +568,51 @@ div#comments{
 div#comment_form {
     margin-top: 1em;
 }
+tr.Content.part {
+    background: url("../img/dark/bg_tr_part.png") repeat;
+}
 
-td.expander span.not_expander {
-    margin-top: auto;
-    margin-bottom: auto;
-    display:block; min-width:36px; height:16px;
-    text-indent: 36px;
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    padding-left:4px;
-    margin-left:6px;
-    color:black;
-    text-align:right;
-    background-image: url("../img/puce.png");
+tr.Content.document {
+    /*background: url("../img/dark/bg_tr_doc.png") repeat;*/
+}
+
+tr.part:nth-child(odd), tr.document:nth-child(odd) {
+    background-color: #e4e3e1;
+}
+tr.part:nth-child(even), tr.document:nth-child(even) {
+    background-color: #d4d3d1;
+}
+
+tr.Content.part td, tr.Content.document td {
+    background: none;
 }
 
 td.expander span.expander {
     cursor: pointer;
-    margin-top: auto;
-    margin-bottom: auto;
-    display:block; min-width:36px; height:16px;
-    text-indent: 36px;
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    padding-left:4px;
-    margin-left:6px;
-    color:black;
-    text-align:right;
 }
 
-td.expanded span.expander {
-    background-image: url("../img/expander_normal_puce.png");
+td.expanded span.expander:after {
+    content: "  ▸";
 }
 
-td.expanded span.expander:hover {
-    background-image: url("../img/expander_normal_hover_puce.png");
+td.open span.expander:after {
+    content: "  ▾";
 }
 
-td.open span.expander {
-    background-image: url("../img/expander_open_puce.png");
+table.bom tr {
+    line-height: 1.2em;
 }
 
-td.open span.expander:hover {
-    background-image: url("../img/expander_open_hover_puce.png");
+table.bom tr.part *,
+table.bom tr.document * {
+    color: #111;
+}
+
+table.bom tr.document td.level {
+    background-color: #cdcccb;
+}
+table.bom tr.document td.level:after {
+    content: "  ╺";
 }
 
 /** simple search **/

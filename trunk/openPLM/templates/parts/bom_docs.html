@@ -3,7 +3,7 @@
 {% for doc in documents %}
 
     <tr class="Content document"> 
-        <td class="Content expander level{{level}}" colspan="3">  </td>
+        <td class="Content expander level level{{level}}" style="padding-left:{{level}}em;" colspan="3">  </td>
         <td class="Content"> {% trans "Doc" %} </td>
         <td class="Content"> 
             <a href="{{doc.plmobject_url}}"> {{ doc.reference }} </a>
