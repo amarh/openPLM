@@ -30,6 +30,7 @@ div#content-box {
     width: 700px;
     padding: 1em;
     margin: auto;
+    margin-bottom: 33px;
     background-color: #C8C6C5;
 }
 
@@ -68,9 +69,9 @@ div#LoginBox
     display: inline-block;
     vertical-align: middle;
     line-height: 30px;
-    width: 45%;
+    width: 70%;
     position: relative;
-    left: 25%;
+    left: 15%;
     margin: auto;
     margin-top: 20px;
     margin-bottom: 20px;
