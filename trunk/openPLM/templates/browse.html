@@ -20,6 +20,9 @@
                 <li {% if type == "part"%}class="selected"{% endif %} >
                 <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
                 </li>
+                <li {% if type == "topassembly"%}class="selected"{% endif %} >
+                <a href="/browse/topassembly/{% add_get page='1'%}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
+                </li>
                 <li {% if type == "document"%}class="selected"{% endif %} >
                 <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
                 </li>
@@ -39,7 +42,17 @@
                 <li>
                 <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
                 </li>
-            </ul>
+                {% if type == "part" or type == "topassembly" %}
+                    <li>
+                    <a href="{% add_get sort='children' %}"><span>{% trans "Number of children" %}</span></a>
+                    </li>
+                {% endif %}
+                {% if type == "part" %}
+                    <li>
+                    <a href="{% add_get sort='most-used' %}"><span>{% trans "Most used" %}</span></a>
+                    </li>
+                {% endif %}
+                </ul>
             {% if plmobjects and not restricted %}
                 <hr/>
                 <ul>
@@ -64,7 +77,15 @@
                     {% if sort == "name" %}
                         {% trans "Sorted by name" %}.
                     {% else %}
-                        {% trans "Recently added" %}.
+                        {% if type in "part topassembly" and sort == "children" %}
+                            {% trans "Number of children" %}.
+                        {% else %}
+                            {% if type == "part" and sort == "most-used" %}
+                                {% trans "Most used" %}.
+                            {% else %}
+                                {% trans "Recently added" %}.
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                 </span>
                 {% if plmobjects %}
