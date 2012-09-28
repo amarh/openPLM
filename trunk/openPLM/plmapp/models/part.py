@@ -1,3 +1,5 @@
+from django.db import models
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from openPLM.plmapp.utils import memoize_noarg
@@ -7,7 +9,95 @@ from .plmobject import (PLMObject, get_all_subclasses,
 
 # parts stuff
 
-class Part(PLMObject):
+class PartQuerySet(QuerySet):
+    """
+    A QuerySet with extra methods to annotate results
+    with the number of children or parents.
+    """
+
+    def with_children_counts(self):
+        """
+        Annotates results with the number of children (field ``num_children``).
+        """
+        return self.extra(select={"num_children" : 
+"""
+SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
+    WHERE plmapp_parentchildlink.end_time IS NULL AND
+    plmapp_parentchildlink.parent_id = plmapp_part.plmobject_ptr_id 
+"""})
+
+    def with_parents_counts(self):
+        """
+        Annotates results with the number of parents (field ``num_parents``).
+        """
+        return self.extra(select={"num_parents" : 
+"""
+SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
+    WHERE plmapp_parentchildlink.end_time IS NULL AND
+    plmapp_parentchildlink.child_id = plmapp_part.plmobject_ptr_id 
+"""})
+
+
+class PartManager(models.Manager):
+    """
+    Manager for :class:`Part`. Uses a :class:`PartQuerySet`.
+    """
+
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return PartQuerySet(self.model)
+
+    def with_children_counts(self):
+        """
+        Shorcut for ``self.get_query_set().with_children_counts()``.
+        See :meth:`PartQuerySet.with_children_counts`.
+        """
+        return self.get_query_set().with_children_counts() 
+
+    def with_parents_counts(self):
+        """
+        Shorcut for ``self.get_query_set().with_parents_counts()``.
+        See :meth:`PartQuerySet.with_parents_counts`.
+        """
+        return self.get_query_set().with_parents_counts() 
+
+
+class TopAssemblyManager(PartManager):
+    """
+    A :class:`PartManager` that returns only top assemblies.
+    A top assemblies is a part with at least one child and no parents.
+    """
+
+    def get_query_set(self):
+        from openPLM.plmapp.models.link import ParentChildLink 
+        current_pcl = ParentChildLink.current_objects
+        return super(TopAssemblyManager, self).get_query_set().\
+                exclude(id__in=current_pcl.values_list("child")).\
+                filter(id__in=current_pcl.values_list("parent"))
+
+
+class AbstractPart(models.Model):
+    """
+    Abstract model that defines two managers:
+
+    .. attribute:: objects
+
+        default manager, a :class:`.PartManager`
+
+    .. attribute:: top_assemblies:
+
+        a :class:`TopAssemblyManager`
+    """
+    class Meta:
+        abstract = True
+
+    objects = PartManager()
+    top_assemblies = TopAssemblyManager()
+
+
+# first extends AbstractPart to inherit objects
+class Part(AbstractPart, PLMObject):
     """
     Model for parts
     """
