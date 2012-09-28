@@ -2730,27 +2730,13 @@ def get_pagination(r_GET, object_list, type):
     # TODO: move topassembly/children stuff to a Manager
     ctx = {}
     sort = r_GET.get("sort", "children" if type == "topassembly" else "recently-added")
-    if type == "topassembly":
-        current_pcl = models.ParentChildLink.current_objects
-        object_list = object_list.exclude(id__in=current_pcl.values_list("child")).\
-            filter(id__in=current_pcl.values_list("parent"))
     if sort == "name" :
         sort_critera = "username" if type == "user" else "name"
     elif type in ("part", "topassembly") and sort == "children":
-        object_list = object_list.extra(select={"num_children" : 
-"""
-SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
-    WHERE plmapp_parentchildlink.end_time IS NULL AND
-    plmapp_parentchildlink.parent_id = plmapp_part.plmobject_ptr_id 
-"""})
+        object_list = object_list.with_children_counts() 
         sort_critera = "-num_children,reference,revision"
     elif type == "part" and sort == "most-used":
-        object_list = object_list.extra(select={"num_parents" : 
-"""
-SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
-    WHERE plmapp_parentchildlink.end_time IS NULL AND
-    plmapp_parentchildlink.child_id = plmapp_part.plmobject_ptr_id 
-"""})
+        object_list = object_list.with_parents_counts() 
         sort_critera = "-num_parents,reference,revision"
     else:
         sort_critera = "-date_joined" if type == "user" else "-ctime"
@@ -2790,16 +2776,16 @@ def browse(request, type="object"):
         obj, ctx = get_generic_data(request, search=False)
         try:
             cls = {
-                "object" : models.PLMObject, 
-                "part" : models.Part,
-                "topassembly" : models.Part,
-                "document" : models.Document,
-                "group" : models.GroupInfo,
-                "user" : User,
+                "object" : models.PLMObject.objects, 
+                "part" : models.Part.objects,
+                "topassembly" : models.Part.top_assemblies,
+                "document" : models.Document.objects,
+                "group" : models.GroupInfo.objects,
+                "user" : User.objects,
             }[type]
         except KeyError:
             raise Http404
-        object_list = cls.objects.all()
+        object_list = cls.all()
         # this only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
         if type in ("object", "part", "topassembly", "document"):
@@ -2815,10 +2801,10 @@ def browse(request, type="object"):
     else:
         try:
             cls = {
-                "object" : models.PLMObject, 
-                "part" : models.Part,
-                "topassembly" : models.Part,
-                "document" : models.Document,
+                "object" : models.PLMObject.objects, 
+                "part" : models.Part.objects,
+                "topassembly" : models.Part.top_assemblies,
+                "document" : models.Document.objects,
             }[type]
         except KeyError:
             raise Http404
@@ -2834,7 +2820,7 @@ def browse(request, type="object"):
         if user.is_authenticated():
             readable = user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
-        object_list = cls.objects.filter(query)
+        object_list = cls.filter(query)
 
     ctx.update(get_pagination(request.GET, object_list, type))
     ctx.update({
