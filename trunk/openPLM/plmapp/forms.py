@@ -367,13 +367,24 @@ class ModifyChildForm(forms.ModelForm):
         return self.cleaned_data
 
 class BaseChildrenFormSet(BaseModelFormSet):
+
+    def __init__(self, *args, **kwargs):
+        # all form instances have the same parent
+        # a cache parent id -> pcles reduces the number of queries
+        # to get the leaf object and its pcles
+        self.pcle_cache = {}
+        super(BaseChildrenFormSet, self).__init__(*args, **kwargs)
+
     def add_fields(self, form, index):
         super(BaseChildrenFormSet, self).add_fields(form, index)
         form.PCLEs = defaultdict(list)
-        parent = form.instance.parent.get_leaf_object()
-        for PCLE in m.get_PCLEs(parent):
-            if not PCLE.one_per_link():
-                continue
+        try:
+            pcles = self.pcle_cache[form.instance.parent_id]
+        except KeyError:
+            parent = form.instance.parent.get_leaf_object()
+            pcles = [p for p in m.get_PCLEs(parent) if p.one_per_link()]
+            self.pcle_cache[parent.id] = pcles
+        for PCLE in pcles:
             try:
                 ext = PCLE.objects.get(link=form.instance)
             except PCLE.DoesNotExist:
@@ -392,8 +403,8 @@ ChildrenFormset = modelformset_factory(m.ParentChildLink,
        form=ModifyChildForm, extra=0, formset=BaseChildrenFormSet)
 def get_children_formset(controller, data=None):
     if data is None:
-        queryset = m.ParentChildLink.objects.filter(parent=controller,
-                                                    end_time__exact=None)
+        queryset = m.ParentChildLink.current_objects.filter(parent=controller)
+        queryset = queryset.select_related("child__state") 
         formset = ChildrenFormset(queryset=queryset)
     else:
         formset = ChildrenFormset(data=data)
