@@ -2,9 +2,22 @@
 
 .. Images come later, once we are sure we would not have to update them ;)
 
-=========================
+
+===========================
 What's new in OpenPLM 1.1
-=========================
+===========================
+
+###########################
+What's new in OpenPLM 1.1.1
+###########################
+
+This release fixes a XSS security issue inside the template
+:file:`templates/blocks/reference.html` where the name of
+the current part/document was not escaped.
+
+#########################
+What's new in OpenPLM 1.1
+#########################
 
 User changes
 ===============
