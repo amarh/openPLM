@@ -54,7 +54,7 @@ textuelle dans les fichiers :
 Récupération de l'archive contenant le code source
 ==================================================
 
-    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/4``
+    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/5``
 
 On extrait le code dans /var et l'on renomme le répertoire en django
 
