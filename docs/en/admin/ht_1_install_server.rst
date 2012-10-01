@@ -53,7 +53,7 @@ dependencies:
 Get the tarball containing the code
 ===================================
 
-    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/4``
+    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/5``
 
 Extract the code in /var and rename the directory to django
 
