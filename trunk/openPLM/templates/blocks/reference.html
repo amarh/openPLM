@@ -49,7 +49,7 @@
                 {% if obj.is_document or obj.is_part %}
                     // <span class="revision">{{object_revision}}</span> 
                 {% endif %}    
-              // <span class="name">{% firstof obj.name obj.get_full_name%}</span>
+                // <span class="name">{% filter force_escape %}{% firstof obj.name obj.get_full_name%}{% endfilter %}</span>
             {% endif%}
         </h2>
         {% if object_reference != '-' %}
