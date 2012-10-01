@@ -593,10 +593,12 @@ td.expander span.expander {
 
 td.expanded span.expander:after {
     content: "  ▸";
+    font-size: 1.4em;
 }
 
 td.open span.expander:after {
     content: "  ▾";
+    font-size: 1.4em;
 }
 
 table.bom tr {
