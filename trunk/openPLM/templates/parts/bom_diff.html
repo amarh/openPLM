@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block scripts %}
+    <script type="text/javascript"> $(function() {$("#id_date_0, #id_date2_0").datepicker();}); </script>
+
+{% endblock %}
+
+{% block content %}
+    <form method="GET" action="">
+        {% trans "Choose two dates and display options:" %}
+        <ul>
+            {{cmp_form.as_ul}}
+        </ul>
+        <input type="submit" class="{{"Button"|button}}" value="{% trans "Compare" %}"/>
+    </form>
+
+    <div>
+
+        <table class="Content bom">
+
+            <tr>
+                <th class="Content" colspan="{{compact|yesno:"6,10"}}"> {{ date1|date:"DATETIME_FORMAT" }} </td>
+                <th class="Content" colspan="{{compact|yesno:"6,10"}}"> {{ date2|date:"DATETIME_FORMAT" }} </td>
+            </tr>
+            <tr class="Content">
+                {% for d in boms %} 
+                    <th class="Content bom{{forloop.counter}}"> {% trans "Level" %} </th>
+                    <th class="Content"> {% trans "Ord." %} </th>
+                    <th class="Content"> {% trans "Qty" %}</th>
+                    <th class="Content"> {% trans "Unit" %}</th>
+                    {% if compact %}
+                        <th class="Content"> {% trans "Type/ref./rev." %}</th>
+                    {% else %}
+                        <th class="Content"> {% trans "Reference" %} </th>
+                        <th class="Content"> {% trans "Revision" %} </th>
+                        <th class="Content"> {% trans "Type" %} </th>
+                        <th class="Content"> {% trans "Name" %} </th>
+                    {% endif %}
+                    {% for field, verbose_name in d.extra_columns %}
+                        <th class="Content"> {{ verbose_name|capfirst }} </th>
+                    {% endfor %}
+                    {% if compact %}
+                        <th class="Content"> {% trans "Current/old states" %} </th>
+                    {% else %}
+                        <th class="Content"> {% trans "Current state" %} </th>
+                        <th class="Content"> {% trans "Old state" %} </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+
+            <tr class="Content">
+                {% for d in boms %} 
+                    <th class="Content bom{{forloop.counter}}"> - </th>
+                    <th class="Content"> - </th>
+                    <th class="Content"> - </th>
+                    <th class="Content"> - </th>
+                    {% if compact %}
+                        <th class="Content"> {{ d.obj.type }} / {{ d.obj.reference }} /{{ d.obj.revision }} </th>
+                    {% else %}
+                        <th class="Content"> {{ d.obj.reference }} </th>
+                        <th class="Content"> {{ d.obj.revision }} </th>
+                        <th class="Content"> {{ d.obj.type }} </th>
+                        <th class="Content"> {{ d.obj.name }} </th>
+                    {% endif %}
+                    {% for field, verbose_name in d.extra_columns %}
+                        <th class="Content"> - </th>
+                    {% endfor %}
+                    {% if compact %}
+                        <th class="Content"> {{ d.obj.state.name }} / {{ d.states|key:d.obj.id }} </th>
+                    {% else %}
+                        <th class="Content"> {{ d.obj.state.name }} </th>
+                        <th class="Content"> {{ d.states|key:d.obj.id }} </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+
+            {% for tag, lines in diff %}
+                {% for rows in lines %}
+
+                    <tr class="Content diff-{{tag}}"> 
+                        {% for row in rows %}
+                            {% if row.0 == "part" %}
+                                {% with row.1 as c %}
+                                    <td class="Content part bom{{forloop.counter}} {% if level != "last" %} level expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}.5em;" >
+                                        <span>{{c.level}}</span>
+                                    </td>
+                                    {% with c.link as link %}
+                                        <td class="Content part order"> {{ link.order }} </td>
+                                        <td class="Content part quantity"> {{ link.quantity }} </td>
+                                        <td class="Content part"> {{ link.get_unit_display }} </td>
+                                        {% with link.child as child %}
+                                            {% if compact %}
+                                                <td class="Content"> 
+                                                    {{ child.type }} /
+                                                    <a href="{{child.plmobject_url}}"> {{ child.reference }}</a>
+                                                    / {{ child.revision }}                                            </td>
+                                            {% else %}
+                                                <td class="Content"> 
+                                                    <a href="{{child.plmobject_url}}"> {{ child.reference }} </a>
+                                                </td>
+                                                <td class="Content"> {{ child.revision }} </td>
+                                                <td class="Content"> {{ child.type }} </td>
+                                                <td class="Content"> {{ child.name }} </td>
+                                            {% endif %}
+                                            {% for v in row.3 %}
+                                                <td class="Content"> {{ v }} </td>
+                                            {% endfor %}
+                                            {% if compact %}
+                                                <td class="Content"> {{ child.state.name }} / {{ row.2 }} </td>
+                                            {% else %}  
+                                                <td class="Content"> {{ child.state.name }} </td>
+                                                <td class="Content"> {{ row.2 }} </td>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endwith %}
+
+                                {% endwith %}
+                            {% else %}
+                                {% if row.0 == "document" %}
+                                    {% with row.1 as doc %} 
+                                        <td class="Content bom{{forloop.counter}} expander level level{{level}}" style="padding-left:{{level}}em;" colspan="3">  </td>
+                                        <td class="Content"> {% trans "Doc" %} </td>
+                                        {% if compact %}
+                                            <td class="Content"> 
+                                                {{ doc.type }} /
+                                                <a href="{{doc.plmobject_url}}"> {{ doc.reference }}</a>
+                                                / {{ doc.revision }}                                            </td>
+                                        {% else %}
+                                            <td class="Content"> 
+                                                <a href="{{doc.plmobject_url}}"> {{ doc.reference }} </a>
+                                            </td>
+                                            <td class="Content"> {{ doc.revision }} </td>
+                                            <td class="Content"> {{ doc.type }} </td>
+                                            <td class="Content"> {{ doc.name }} </td>
+                                        {% endif %}
+
+                                        {% for field, verbose_name in boms.0.extra_columns %}
+                                            <td class="Content"> </td>
+                                        {% endfor %}
+                                        {% if compact %}
+                                            <td class="Content"> {{ doc.state.name }} / {{ row.2}} </td>
+                                        {% else %}
+                                            <td class="Content"> {{ doc.state.name }} </td>
+                                            <td class="Content"> {{ row.2}} </td>
+                                        {% endif %}
+
+                                    {% endwith %}
+                                {% else %}
+                                    <td class="Content bom{{forloop.counter}} "
+                                        {% if compact %}
+                                            colspan={{boms.0.extra_columns|length|add:6}}
+                                        {% else %}
+                                            colspan={{boms.0.extra_columns|length|add:10}}
+                                        {% endif %}
+
+                                        > </td>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+
+

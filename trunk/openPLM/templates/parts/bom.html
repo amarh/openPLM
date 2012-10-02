@@ -50,7 +50,8 @@ $(function() {
         <ul>
             {{display_form.as_ul}}
         </ul>
-        <input type="submit" class="{{"Button"|button}}" value="{% trans "GO !" %}"/>
+        <input type="submit" class="{{"Button"|button}}" name="update" value="{% trans "Update view" %}"/>
+        <input type="submit" class="{{"Button"|button}}" name="diff" value="{% trans "Compare two BOMs" %}"/>
     </form>
     <div id="decompose">
         {{ decomposition_msg|safe }}

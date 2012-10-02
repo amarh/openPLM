@@ -617,6 +617,21 @@ table.bom tr.document td.level:after {
     content: "  ╺";
 }
 
+table.bom tr.diff-delete td {
+    background-color: #dd3333;
+}
+table.bom tr.diff-insert td {
+    background-color: lightgreen;
+}
+table.bom tr.diff-replace td {
+    background-color: orange;
+}
+
+table.bom td.bom2, table.bom th.bom2 {
+    border-left: 12px solid #007ec3;
+}
+
+
 /** simple search **/
 
 div.Result {
