@@ -830,6 +830,9 @@ def display_children(request, obj_type, obj_ref, obj_revi):
     ``decomposable_children``
         a set of child part ids that are decomposable
     """
+    if "diff" in request.GET:
+        query = request.GET.urlencode() + "&compact=on"
+        return HttpResponseRedirect("%sdiff/?%s" % (request.path, query))
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     
     if not hasattr(obj, "get_children"):
@@ -1020,6 +1023,39 @@ def add_child(request, obj_type, obj_ref, obj_revi):
                 'add_child_form': add_child_form,
                 'attach' : (obj, "add_child")})
     return r2r('parts/bom_add.html', ctx, request)
+
+def compare_bom(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if not hasattr(obj, "get_children"):
+        return HttpResponseBadRequest("object must be a part")
+    date = date2 = None
+    level = "first"
+    state = "all"
+    show_documents = False
+    compact = True
+    now = datetime.datetime.now()
+    if request.GET:
+        cmp_form = forms.CompareBOMForm(request.GET)
+        if cmp_form.is_valid():
+            date = cmp_form.cleaned_data["date"]
+            date2 = cmp_form.cleaned_data["date2"]
+            level = cmp_form.cleaned_data["level"]
+            state = cmp_form.cleaned_data["state"]
+            show_documents = cmp_form.cleaned_data["show_documents"]
+            compact = cmp_form.cleaned_data.get("compact", compact)
+    else:
+        initial = {"date" : now, "date2" : now, "level" : "first",
+            "state" : "all", "compact" : compact, } 
+        cmp_form = forms.CompareBOMForm(initial=initial)
+    ctx.update(obj.cmp_bom(date, date2, level, state, show_documents))
+    ctx.update({'current_page' : 'BOM-child',
+                "cmp_form" : cmp_form,
+                'compact' : compact,
+                'date1' : date or now,
+                'date2' : date2 or now,
+                })
+    return r2r('parts/bom_diff.html', ctx, request)
+
     
 ##########################################################################################    
 @handle_errors

@@ -337,6 +337,17 @@ class DisplayChildrenForm(forms.Form):
     show_documents = forms.BooleanField(label=_("Show documents"),
             required=False, initial=False)
 
+class CompareBOMForm(DisplayChildrenForm):
+    date = forms.SplitDateTimeField(label=_("Fisrt date"), required=False)
+    date2 = forms.SplitDateTimeField(label=_("Second date"), required=False)
+    compact = forms.BooleanField(initial=True, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(CompareBOMForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder =  ("date", "date2", "level", "state", "show_documents",
+                "compact")
+
+
 class ModifyChildForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
     parent = forms.ModelChoiceField(queryset=m.Part.objects.all(),

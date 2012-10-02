@@ -24,8 +24,9 @@
 
 """
 """
-
+import difflib
 import datetime
+from itertools import izip_longest
 from collections import namedtuple, defaultdict
 
 from django.db.models.query import Q
@@ -40,6 +41,19 @@ from openPLM.plmapp.exceptions import PermissionError
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
+
+def flatten_bom(data):
+    flatten = []
+    for doc in data["documents"][data["obj"].id]:
+        flatten.append(("document", doc, data["states"][doc.id]))
+    for child in data["children"]:
+        link = child.link
+        ext_data = data["extension_data"][link.id]
+        ext = tuple(ext_data.get(key, "") for key, name in data["extra_columns"])
+        flatten.append(("part", child, data["states"][link.child_id], ext))
+        for doc in data["documents"][link.child_id]:
+            flatten.append(("document", doc, data["states"][doc.id]))
+    return flatten
 
 class PartController(PLMObjectController):
     u"""
@@ -485,7 +499,22 @@ class PartController(PLMObjectController):
                 'states' : states,
                 'documents' : documents,
                 'level' : level,
+                'obj' : self,
                 }
+
+    def cmp_bom(self, date1, date2, level="first", state="all", show_documents=False):
+        data1 = self.get_bom(date1, level, state, show_documents)
+        data2 = self.get_bom(date2, level, state, show_documents)
+        s1 = flatten_bom(data1)
+        s2 = flatten_bom(data2)
+        matcher = difflib.SequenceMatcher(None, s1, s2)
+        diff = ((tag, izip_longest(s1[i1:i2], s2[j1:j2]))
+            for tag, i1, i2, j1, j2 in matcher.get_opcodes())
+        ctx = {
+                "diff" : diff,
+                "boms" : (data1, data2),
+                }
+        return ctx
 
     def revise(self, new_revision, child_links=None, documents=(),
             parents=()):
