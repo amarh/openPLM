@@ -26,7 +26,7 @@
 """
 
 import datetime
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from django.db.models.query import Q
 
@@ -427,6 +427,65 @@ class PartController(PLMObjectController):
                     unit = form.cleaned_data["unit"]
                     self.modify_child(child, quantity, order, unit,
                             **form.extensions)
+
+    def get_bom(self, date, level, state="all", show_documents=False):
+        """
+        Returns some informations about children that will be displayed
+        in BOM view.
+        """
+        max_level = 1 if level == "first" else -1
+        only_official = state == "official"
+        children = self.get_children(max_level, date=date, only_official=only_official)
+        if level == "last" and children:
+            previous_level = 0
+            max_children = []
+            for c in children:
+                if max_children and c.level > previous_level:
+                    del max_children[-1]
+                max_children.append(c)
+                previous_level = c.level
+            children = max_children
+        children = list(children)
+        # pcle
+        extra_columns = []
+        extension_data = defaultdict(dict)
+        if children:
+            for PCLE in models.get_PCLEs(self.object):
+                fields = PCLE.get_visible_fields()
+                if fields:
+                    extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                            for f in fields)
+                    pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
+                    pcles = pcles.values("link_id", *fields)
+                    for pcle in pcles:
+                        extension_data[pcle["link_id"]].update(pcle)
+        documents = defaultdict(list)
+        ids = set([self.id] + [c.link.child_id for c in children])
+        doc_ids = set()
+        if show_documents:
+            links = models.DocumentPartLink.objects.at(date).filter(part__in=ids).\
+                    order_by("document__reference", "document__revision").\
+                    select_related("document", "document__state")
+            for link in links:
+                documents[link.part_id].append(link.document)
+                doc_ids.add(link.document_id)
+        states = models.StateHistory.objects.at(date).filter(plmobject__in=ids | doc_ids)
+        if only_official:
+            states = states.officials()
+        states = dict(states.values_list("plmobject", "state"))
+        if only_official and show_documents:
+            for docs in documents.itervalues():
+                official_docs = (d for d in docs if d.id in states)
+                docs[:] = official_docs
+        return {
+                'children' : children,
+                'extra_columns' : extra_columns,
+                'extension_data' : extension_data,
+                'level' : level,
+                'states' : states,
+                'documents' : documents,
+                'level' : level,
+                }
 
     def revise(self, new_revision, child_links=None, documents=(),
             parents=()):

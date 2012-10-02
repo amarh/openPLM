@@ -45,7 +45,7 @@ import cStringIO as StringIO
 
 from openPLM.plmapp.base_views import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
-from openPLM.plmapp.views import r2r, get_children_data
+from openPLM.plmapp.views import r2r
 from openPLM.plmapp.forms import DisplayChildrenForm
 from openPLM.apps.pdfgen.forms import get_pdf_formset
 
@@ -357,7 +357,7 @@ def bom_pdf(request, obj_type, obj_ref, obj_revi):
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
             show_documents = display_form.cleaned_data["show_documents"]
-    ctx.update(get_children_data(obj, date, level, state, show_documents))
+    ctx.update(obj.get_bom(date, level, state, show_documents))
     ctx["date"] = date or datetime.datetime.utcnow()
     filename = u"%s_%s_%s-bom.pdf" % (obj_type, obj_ref, obj_revi)
     return render_to_pdf("bom.xhtml", ctx, filename)
