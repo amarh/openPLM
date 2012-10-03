@@ -605,6 +605,10 @@ table.bom tr {
     line-height: 1.2em;
 }
 
+table.bom td.skipped {
+    text-align: center;
+}
+
 table.bom tr.part *,
 table.bom tr.document * {
     color: #111;
