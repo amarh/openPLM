@@ -228,6 +228,13 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     ctx["is_contributor"] = obj._user.get_profile().is_contributor
     ctx.update({'current_page' : 'attributes',
                 'object_attributes' : object_attributes_list})
+    if isinstance(obj.object, models.PLMObject):
+        if obj.is_part:
+            ctx["attach"] = (obj, "attach_doc")
+            ctx["link_creation_action"] = u"%sdoc-cad/add/" % obj.plmobject_url
+        elif obj.is_document:
+            ctx["attach"] = (obj, "attach_part")
+            ctx["link_creation_action"] = u"%sparts/add/" % obj.plmobject_url
     return r2r('attributes.html', ctx, request)
 
 ##########################################################################################
