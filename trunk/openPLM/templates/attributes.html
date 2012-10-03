@@ -9,12 +9,14 @@
     {% if obj.is_part or obj.is_document %}
         <div id="related_content">
             <h3>{% trans "Similar contents" %} </h3>
-            <ul>
-            {% more_like_this obj.object as related_content limit 5 %}
-            {% for r in related_content %}
-                <li> {{ r.rendered|safe}}</li>
-            {% endfor %}
-        </ul>
+            <ul class="Result">
+                {% more_like_this obj.object as related_content limit 5 %}
+                {% with 1 as link_creation %}
+                    {% for result in related_content %}
+                        {% include "search/result.html" %}
+                    {% endfor %}
+                {% endwith %}
+            </ul>
         </div>
     {% endif %}
 

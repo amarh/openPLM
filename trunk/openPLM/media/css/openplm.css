@@ -712,9 +712,22 @@ span#numresults {
 
 #related_content ul li {
     list-style: none !important;
-    margin-left: 1em !important;
-    line-height: 1.5em;
+    margin-left: 0em !important;
+    line-height: 1em;
+    background: none;
+    padding: 0em;
+    position: relative;
 }
+#related_content ul li form {
+    position: absolute;
+    top: 0;
+    right: 3px;
+}
+#related_content ul li:hover {
+    background: none;
+}
+    
+
 
 /** input **/
 input[type=text],

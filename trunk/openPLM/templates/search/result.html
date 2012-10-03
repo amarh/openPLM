@@ -19,7 +19,7 @@
     {{ result.highlighted.text|hide_emails|safe }}
 </div>
 {% if link_creation or navigate_bool %}
-    <form method="post" action="." enctype="multipart/form-data">
+    <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">
         {{result.rendered_add|safe}}
         {% if link_creation and result.object|can_add:attach %}
             <input type="submit" class="{{"Button"|button}}" value="{% trans "ADD" %}"/>
