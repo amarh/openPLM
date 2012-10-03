@@ -539,7 +539,21 @@ class SearchBackend(BaseSearchBackend):
         
         for match in self._get_enquire_mset(database, enquire, 0, end_offset):
             rset.add_document(match.docid)
-                
+        
+        if rset.empty():
+            # this should not be possible... except if the instance has not
+            # been indexed
+            return {
+                'results': [],
+                'hits': 0,
+                'facets': {
+                    'fields': {},
+                    'dates': {},
+                    'queries': {},
+                },
+                'spelling_suggestion': None,
+            }
+
         query = xapian.Query(
             xapian.Query.OP_ELITE_SET,
             [expand.term for expand in enquire.get_eset(match.document.termlist_count(), rset, XHExpandDecider())],

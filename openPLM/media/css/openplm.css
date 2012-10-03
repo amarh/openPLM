@@ -696,6 +696,26 @@ span#numresults {
     font-weight: normal;
 }
 
+/* related content */
+#related_content {
+    float: right;
+    width: 25%;
+    padding-bottom: 1em;
+    margin: 1em;
+    background-color: #e4e3e1;
+    border: 1px solid #afacab;
+}
+
+#related_content h3 {
+    margin: 0 0 0.5em 0;
+}
+
+#related_content ul li {
+    list-style: none !important;
+    margin-left: 1em !important;
+    line-height: 1.5em;
+}
+
 /** input **/
 input[type=text],
 input[type=file],
@@ -1149,6 +1169,7 @@ a.decomposable {
 
 div#attributes {
     margin: 1em;
+    width: 70%;
  }
 
 div.identity_card {
