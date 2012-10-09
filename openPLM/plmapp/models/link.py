@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.utils import level_to_sign_str
 
+from .lifecycle import State
 from .plmobject import PLMObject
 from .part import Part
 from .document import Document
@@ -526,4 +527,34 @@ class PLMObjectUserLink(Link):
     def __unicode__(self):
         return u"PLMObjectUserLink<%s, %s, %s>" % (self.plmobject, self.user, self.role)
 
+
+class PromotionApproval(Link):
+    """
+    .. versionadded:: 1.2
+
+    Model to track a promotion approval
+    
+    :model attributes:
+        .. attribute:: plmobject
+
+            approved :class:`.PLMObject`
+        .. attribute:: user
+
+            :class:`.User` who approved the promotion
+        .. attribute:: current_state
+
+            current :class:`.State` of :attr:`plmobject`
+        .. attribute:: next_state
+
+            next :class:`.State` of :attr:`plmobject` when if will be promoted
+
+    """
+    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
+    user = models.ForeignKey(User, related_name="%(class)s_user")    
+    current_state = models.ForeignKey(State, related_name="%(class)s_current_state")
+    next_state = models.ForeignKey(State, related_name="%(class)s_next_state")
+
+    class Meta:
+        app_label = "plmapp"
+        unique_together = ("plmobject", "user", "current_state", "next_state", "end_time")
 
