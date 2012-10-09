@@ -165,7 +165,7 @@ class PLMObjectController(Controller):
     
     def promote(self):
         u"""
-        Promotes :attr:`object` in his lifecycle and writes his promotion in
+        Promotes :attr:`object` in its lifecycle and writes its promotion in
         the history
         
         :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
@@ -237,7 +237,7 @@ class PLMObjectController(Controller):
 
     def demote(self):
         u"""
-        Demotes :attr:`object` in his lifecycle and writes his demotion in the
+        Demotes :attr:`object` in irs lifecycle and writes irs demotion in the
         history
         
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
