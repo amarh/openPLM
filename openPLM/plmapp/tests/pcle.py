@@ -127,7 +127,8 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
     def test_clone_link(self):
         # clone a link without saving it
         link, ext = self.get_link_and_ext()
-        clone, exts = link.clone()
+        link.end()
+        clone, exts = link.clone(end_time=None)
         self.assertEqual(1, len(exts))
         self.assertNotEqual(link.id, clone.id)
         self.assertEqual(3, clone.quantity)
@@ -141,7 +142,8 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
                 child=self.controller3.object, quantity=3, order=4, unit="m")
         ext1 = InvisibleMockExtension.objects.create(link=link, attr1="slt", attr2=5)
         ext2 = InvisibleMockExtension.objects.create(link=link, attr1="st", attr2=6)
-        clone, exts = link.clone(save=True)
+        link.end()
+        clone, exts = link.clone(save=True, end_time=None)
         self.assertEqual(2, len(exts))
         e1 = InvisibleMockExtension.objects.filter(link=clone, attr1="slt")[0]
         e2 = InvisibleMockExtension.objects.filter(link=clone, attr1="st")[0]
@@ -153,7 +155,8 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
     def test_clone_link_with_saving(self):
         # clone a link with saving
         link, ext = self.get_link_and_ext()
-        clone, exts = link.clone(save=True, order=8)
+        link.end()
+        clone, exts = link.clone(save=True, order=8, end_time=None)
         self.assertNotEqual(link.id, clone.id)
         self.assertEqual(1, len(exts))
         self.assertEqual(3, clone.quantity)
@@ -166,7 +169,8 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
     def test_clone_with_extension_modification(self):
         # clone a link and modify its extension
         link, ext = self.get_link_and_ext()
-        clone, exts = link.clone(save=True,
+        link.end()
+        clone, exts = link.clone(save=True, end_time=None,
                 extension_data={mockext:{"custom_attribute":"yo"}})
         self.assertNotEqual(link.id, clone.id)
         self.assertEqual(1, len(exts))
