@@ -2,7 +2,8 @@ import datetime
 import kjbuckets
 
 
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, IntegrityError
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 
@@ -115,6 +116,40 @@ class Link(models.Model):
 
     class Meta:
         abstract = True  
+
+    def clean(self):
+        """
+        Check for instances with null values in unique_together fields.
+        """
+        super(Link, self).clean()
+
+        for field_tuple in self._meta.unique_together[:]:
+            unique_filter = {}
+            unique_fields = []
+            null_found = False
+            for field_name in field_tuple:
+                field_value = getattr(self, field_name)
+                if getattr(self, field_name) is None:
+                    unique_filter['%s__isnull'%field_name] = True
+                    null_found = True
+                else:
+                    unique_filter['%s'%field_name] = field_value
+                    unique_fields.append(field_name)
+            if null_found:
+                unique_queryset = self.__class__.objects.filter(**unique_filter)
+                if self.pk:
+                    unique_queryset = unique_queryset.exclude(pk=self.pk)
+                if unique_queryset.exists():
+                    msg = self.unique_error_message(self.__class__, tuple(unique_fields))
+                    raise ValidationError(msg)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.end_time is None:
+            try:
+                self.clean()
+            except ValidationError as e:
+                raise IntegrityError(e)
+        super(Link, self).save(*args, **kwargs)
 
     def end(self):
         """
