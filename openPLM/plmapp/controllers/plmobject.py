@@ -162,8 +162,76 @@ class PLMObjectController(Controller):
             return obj
         else:
             raise ValueError("form is invalid")
-    
-    def promote(self):
+   
+    def can_approve_promotion(self, user=None):
+        return bool(self.get_represented_approvers(user))
+
+    def get_current_signers(self):
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
+      
+    def get_represented_approvers(self, user=None):
+        if user is None:
+            user = self._user
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        delegators = set(models.DelegationLink.get_delegators(self._user, role))
+        delegators.add(self._user.id)
+        delegators.difference_update(self.get_approvers())
+        delegators.intersection_update(self.get_current_signers())
+        return delegators
+
+    def get_approvers(self):
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        next_state = lcl.next_state(self.state.name)
+        approvers = models.PromotionApproval.current_objects.filter(plmobject=self.object,
+             current_state=self.object.state, next_state=next_state).values_list("user", flat=True)
+        return approvers
+
+    def is_last_promoter(self):
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        is_signer = self.has_permission(role)
+        represented = self.get_represented_approvers()
+        if is_signer and represented:
+            approvers = self.get_approvers()
+            other_signers = self.get_current_signers()\
+                    .exclude(user__in=approvers).exclude(user__in=represented)
+            return not other_signers.exists()
+        else:
+            return False
+
+    def _all_approved(self):
+        not_approvers = self.get_current_signers().exclude(user__in=self.get_approvers())
+        return not not_approvers.exists()
+   
+    def approve_promotion(self):
+        if self.object.is_promotable():
+            lcl = self.lifecycle.to_states_list()
+            role = level_to_sign_str(lcl.index(self.state.name))
+            self.check_permission(role)
+            
+            represented = self.get_represented_approvers()
+            if not represented:
+                raise PromotionError()
+            next_state = lcl.next_state(self.state.name)
+            nxt = models.State.objects.get(name=next_state)
+            for uid in represented:
+                user = models.User.objects.get(id=uid)
+                models.PromotionApproval.current_objects.create(plmobject=self.object, user=user,
+                    current_state=self.object.state, next_state=nxt)
+                # TODO histo
+            if self._all_approved():
+                self.promote(checked=True)
+        else:
+            raise PromotionError()
+
+    def _clear_approvals(self):
+        models.PromotionApproval.current_objects.filter(plmobject=self.object).end()
+
+    def promote(self, checked=False):
         u"""
         Promotes :attr:`object` in its lifecycle and writes its promotion in
         the history
@@ -171,11 +239,12 @@ class PLMObjectController(Controller):
         :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
-        if self.object.is_promotable():
+        if checked or self.object.is_promotable():
             state = self.object.state
             lifecycle = self.object.lifecycle
             lcl = lifecycle.to_states_list()
-            self.check_permission(level_to_sign_str(lcl.index(state.name)))
+            if not checked:
+                self.check_permission(level_to_sign_str(lcl.index(state.name)))
             try:
                 new_state = lcl.next_state(state.name)
                 self.object.state = models.State.objects.get_or_create(name=new_state)[0]
@@ -186,6 +255,7 @@ class PLMObjectController(Controller):
                 if self.object.state == lifecycle.official_state:
                     self._officialize()
                 self._update_state_history()
+                self._clear_approvals()
             except IndexError:
                 # FIXME raises it ?
                 pass
@@ -232,6 +302,7 @@ class PLMObjectController(Controller):
         cie = models.User.objects.get(username=settings.COMPANY)
         self.state = self.lifecycle.last_state
         self.set_owner(cie, True)
+        self._clear_approvals()
         self.save()
         self._update_state_history()
 
@@ -252,6 +323,7 @@ class PLMObjectController(Controller):
             self.check_permission(level_to_sign_str(lcl.index(new_state)))
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
+            self._clear_approvals()
             details = "change state from %(first)s to %(second)s" % \
                     {"first" :state.name, "second" : new_state}
             self._save_histo("Demote", details, roles=["sign_"])
@@ -632,6 +704,7 @@ class PLMObjectController(Controller):
         self.state = models.get_cancelled_state()
         self.set_owner(company, True)
         self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).end()
+        self._clear_approvals()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
         self._update_state_history()

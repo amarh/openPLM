@@ -34,7 +34,7 @@ from django.contrib.auth.models import User
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.exceptions as exc
 import openPLM.plmapp.models as models
-from openPLM.plmapp.controllers import PLMObjectController
+from openPLM.plmapp.controllers import PLMObjectController, UserController
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -381,7 +381,7 @@ class ControllerTest(BaseTestCase):
         def always_false():
             return False
         controller.object.is_promotable = always_false
-        self.assertRaises(exc.PromotionError, controller.promote)
+        self.assertRaises(exc.PromotionError, controller.approve_promotion)
 
     def test_promote_to_official_status(self):
         """
@@ -390,7 +390,7 @@ class ControllerTest(BaseTestCase):
         """
         controller = self.create("Part1")
         controller.object.is_promotable = lambda: True
-        controller.promote()
+        controller.approve_promotion()
         self.assertEqual(self.cie, controller.owner)
         self.assertEqual("official", controller.state.name)
         self.assertTrue(controller.is_official)
@@ -417,6 +417,84 @@ class ControllerTest(BaseTestCase):
         self.assertTrue(controller.is_deprecated)
         self.assertFalse(controller.is_cancelled)
         controller.check_readable()
+
+    def test_approve_promotion_two_signers(self):
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        user = self.get_contributor("gege")
+        models.PLMObjectUserLink.objects.create(user=user, plmobject=controller.object,
+                role=level_to_sign_str(0))
+        draft_state = controller.state
+        self.assertFalse(controller.is_last_promoter())
+        controller.approve_promotion()
+        self.assertFalse(controller.can_approve_promotion())
+        self.assertEqual(draft_state, controller.state)
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        self.assertTrue(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        obj = models.PLMObject.objects.get(id=controller.id)
+        self.assertEqual(self.cie, obj.owner)
+        self.assertEqual("official", obj.state.name)
+
+    def test_approve_promotion_delegator(self):
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        user = self.get_contributor("gege")
+        UserController(self.user, self.user).delegate(user, level_to_sign_str(0))
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        self.assertTrue(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        obj = models.PLMObject.objects.get(id=controller.id)
+        self.assertEqual(self.cie, obj.owner)
+        self.assertEqual("official", obj.state.name)
+
+    def test_approve_promotion_delegator_and_signer(self):
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        user = self.get_contributor("gege")
+        UserController(self.user, self.user).delegate(user, level_to_sign_str(0))
+        models.PLMObjectUserLink.objects.create(user=user, plmobject=controller.object,
+                role=level_to_sign_str(0))
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        self.assertTrue(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        obj = models.PLMObject.objects.get(id=controller.id)
+        self.assertEqual(self.cie, obj.owner)
+        self.assertEqual("official", obj.state.name)
+
+    def test_approve_promotion_signer_then_delegator(self):
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        user = self.get_contributor("gege")
+        models.PLMObjectUserLink.objects.create(user=user, plmobject=controller.object,
+                role=level_to_sign_str(0))
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        self.assertFalse(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        self.assertFalse(ctrl2.can_approve_promotion())
+        UserController(self.user, self.user).delegate(user, level_to_sign_str(0))
+        self.assertTrue(ctrl2.can_approve_promotion())
+        self.assertTrue(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        obj = models.PLMObject.objects.get(id=controller.id)
+        self.assertEqual(self.cie, obj.owner)
+        self.assertEqual("official", obj.state.name)
+
+    def test_approve_promotion_two_delegators(self):
+        controller = self.create("Part1")
+        controller.object.is_promotable = lambda: True
+        user = self.get_contributor("gege")
+        UserController(self.user, self.user).delegate(user, level_to_sign_str(0))
+        user2 = self.get_contributor("misterpink")
+        UserController(user2, user2).delegate(user, level_to_sign_str(0))
+        models.PLMObjectUserLink.objects.create(user=user2, plmobject=controller.object,
+                role=level_to_sign_str(0))
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        self.assertTrue(ctrl2.is_last_promoter())
+        ctrl2.approve_promotion()
+        obj = models.PLMObject.objects.get(id=controller.id)
+        self.assertEqual(self.cie, obj.owner)
+        self.assertEqual("official", obj.state.name)
 
     def check_cancelled_object(self, ctrl):
         """ Checks a cancelled plmobject."""
