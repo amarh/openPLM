@@ -82,8 +82,8 @@ class SubversionRepositoryController(DocumentController):
     def delete_file(self, doc_file):
         raise exc.DeleteFileError()
 
-    def promote(self):
-        super(SubversionRepositoryController, self).promote()
+    def promote(self, *args, **kwargs):
+        super(SubversionRepositoryController, self).promote(*args, **kwargs)
         if self.state == self.lifecycle.official_state and\
                 self.svn_revision == "HEAD":
             # try to retreive the revision number and replace svn_revision

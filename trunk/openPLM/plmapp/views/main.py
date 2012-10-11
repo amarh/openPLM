@@ -287,7 +287,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
-        actions = (("demote", obj.demote), ("promote", obj.promote),
+        actions = (("demote", obj.demote), ("promote", obj.approve_promotion),
                    ("publish", obj.publish), ("unpublish", obj.unpublish),
                    ("cancel", obj.safe_cancel,))
         if password_form.is_valid():
