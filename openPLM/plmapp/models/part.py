@@ -136,7 +136,7 @@ class Part(AbstractPart, PLMObject):
         if not self.is_editable:
             return True
         # check children
-        children = self.parentchildlink_parent.filter(end_time__exact=None).only("child")
+        children = self.parentchildlink_parent.now().only("child")
         lcs = self.lifecycle.to_states_list()
         rank = lcs.index(self.state.name)
         for link in children:
