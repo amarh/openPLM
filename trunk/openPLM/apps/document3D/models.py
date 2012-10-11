@@ -72,7 +72,7 @@ class Document3D(Document):
         document_related = []
         part = self.PartDecompose
         if part:
-            links = ParentChildLink.objects.filter(parent=part, end_time=None)
+            links = ParentChildLink.current_objects.filter(parent=part)
             for link in links:
                 if Location_link.objects.filter(link=links).exists():
                     document_related.append(Document3D.objects.get(PartDecompose=link.child))
