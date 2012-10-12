@@ -379,7 +379,7 @@ class DocumentController(PLMObjectController):
         rev = super(DocumentController, self).revise(new_revision)
         for doc_file in self.object.files.all():
             filename = doc_file.filename
-            path = models.docfs.get_available_name(filename)
+            path = models.docfs.get_available_name(filename.encode("utf-8"))
             shutil.copy(doc_file.file.path, models.docfs.path(path))
             new_doc = models.DocumentFile.objects.create(file=path,
                 filename=filename, size=doc_file.size, document=rev.object)
@@ -440,6 +440,7 @@ class DocumentController(PLMObjectController):
         previous_revision = doc_file.previous_revision
         doc_file.previous_revision = None
         doc_file.save()
+        new_file.name = new_file.name.encode("utf-8")
         deprecated_df = models.DocumentFile.objects.create(
                     document=self.object,
                     deprecated=True,
