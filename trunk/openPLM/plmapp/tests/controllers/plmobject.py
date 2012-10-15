@@ -288,20 +288,40 @@ class ControllerTest(BaseTestCase):
         user.groups.remove(self.group)
         self.assertRaises(exc.PermissionError, controller.set_owner, user)
 
-    def test_set_sign1(self):
+    def test_replace_sign1(self):
         controller = self.create("Part1")
         user = self.get_contributor()
-        controller.set_signer(user, level_to_sign_str(0))
+        controller.replace_signer(self.user, user, level_to_sign_str(0))
         link = models.PLMObjectUserLink.current_objects.get(role=level_to_sign_str(0),
                                              plmobject=controller.object)
         self.assertEqual(user, link.user)
 
-    def test_set_sign_error1(self):
+    def test_add_signer(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.add_signer(user, level_to_sign_str(0))
+        self.assertEqual(2, len(controller.get_current_signers()))
+
+    def test_add_sign_error1(self):
         """Test sign error : bad level"""
         controller = self.create("Part1")
         user = self.get_contributor()
-        self.assertRaises(exc.PermissionError, controller.set_role, user,
+        self.assertRaises(exc.PermissionError, controller.add_signer, user,
                           level_to_sign_str(1664))
+
+    def test_add_sign_error_already_signer(self):
+        """Test sign error : bad level"""
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        self.assertRaises(IntegrityError, controller.add_signer, self.user,
+                          level_to_sign_str(0))
+
+    def test_replace_sign_error1(self):
+        """Test replace signer error : bad level"""
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        self.assertRaises(exc.PermissionError, controller.replace_signer,
+                self.user, user, level_to_sign_str(1789))
 
     def test_set_sign_error2(self):
         """Test sign error : user is not a contributor"""    
@@ -312,7 +332,49 @@ class ControllerTest(BaseTestCase):
         self.assertRaises(exc.PermissionError, controller.set_role, user,
                           level_to_sign_str(0))
 
-    def test_set_signerr_error_not_in_group(self):
+    def test_add_signer_error_approved(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.add_signer(user, level_to_sign_str(0))
+        controller.object.is_promotable = lambda: True
+        controller.approve_promotion()
+        user2 = self.get_contributor("toto")
+        self.assertRaises(exc.PermissionError, controller.add_signer,
+                user2, level_to_sign_str(0))
+        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
+
+    def test_remove_signer_error_approved(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.add_signer(user, level_to_sign_str(0))
+        controller.object.is_promotable = lambda: True
+        controller.approve_promotion()
+        self.assertRaises(exc.PermissionError, controller.remove_signer,
+                user, level_to_sign_str(0))
+        self.assertTrue(controller.plmobjectuserlink_plmobject.now().filter(user=user).exists())
+
+    def test_remove_signer_error_one_signer(self):
+        controller = self.create("Part1")
+        self.assertRaises(exc.PermissionError, controller.remove_signer,
+                self.user, level_to_sign_str(0))
+        self.assertTrue(controller.plmobjectuserlink_plmobject.now().filter(user=self.user).exists())
+        
+
+    def test_replace_signer_error_approved(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.add_signer(user, level_to_sign_str(0))
+        controller.object.is_promotable = lambda: True
+        controller.approve_promotion()
+        user2 = self.get_contributor("toto")
+        self.assertRaises(exc.PermissionError, controller.replace_signer,
+                user, user2, level_to_sign_str(0))
+        self.assertRaises(exc.PermissionError, controller.replace_signer,
+                self.user, user2, level_to_sign_str(0))
+        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
+        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
+
+    def test_set_signer_error_not_in_group(self):
         controller = self.create("Part1")
         user = self.get_contributor()
         user.groups.remove(self.group)
@@ -552,7 +614,7 @@ class ControllerTest(BaseTestCase):
         controller = self.create("P1")
         controller.object.lifecycle = models.Lifecycle.objects.get(name="draft_proposed_official_deprecated")
         controller.object.save()
-        controller.set_signer(self.user, level_to_sign_str(2))
+        controller.add_signer(self.user, level_to_sign_str(2))
         controller.object.is_promotable = lambda: True
         robert = models.User.objects.create_user("Robert", "pwd", "robert@p.txt")
         robert.groups.add(self.group)
