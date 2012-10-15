@@ -6,10 +6,43 @@ EXCLUDED_APPS = getattr(settings, 'TEST_EXCLUDE', [])
 from django.test.simple import DjangoTestSuiteRunner
 from django_xml_test_runner.xmltestrunner import XMLTestSuiteRunner
 
+COLORS = False
 if os.environ.get("TEST_OUTPUT", "stdin") == "xml":
     TestSuiteRunner = XMLTestSuiteRunner
 else:
     TestSuiteRunner= DjangoTestSuiteRunner
+
+    try:
+        from pygments import highlight
+        from pygments.lexers import PythonTracebackLexer
+        from pygments.formatters import Terminal256Formatter
+        PYGMENTS = True
+    except ImportError:
+        PYGMENTS = False
+
+    if PYGMENTS:
+        try:
+            from django.utils.unittest import TextTestRunner, TextTestResult
+            COLORS = True
+        except ImportError:
+            try:
+                from unittest2 import TextTestRunner, TextTestResult
+                COLORS = True
+            except ImportError:
+                pass
+    
+    if COLORS:
+
+        class HighlightedTextTestResult(TextTestResult):
+
+            def _exc_info_to_string(self, err, test):
+                code = super(HighlightedTextTestResult, self)._exc_info_to_string(err, test)
+                return highlight(code, PythonTracebackLexer(),
+                        Terminal256Formatter(style="vim"))
+
+        class HighlightedTextTestRunner(TextTestRunner):
+            resultclass = HighlightedTextTestResult
+
 
 class OpenPLMTestSuiteRunner(TestSuiteRunner):
     def __init__(self, *args, **kwargs):
@@ -29,3 +62,9 @@ class OpenPLMTestSuiteRunner(TestSuiteRunner):
                     tests.append(case)
             suite._tests = tests 
         return suite
+
+    if COLORS:
+        def run_suite(self, suite, **kwargs):
+            return HighlightedTextTestRunner(
+                verbosity=self.verbosity, failfast=self.failfast).run(suite)
+
