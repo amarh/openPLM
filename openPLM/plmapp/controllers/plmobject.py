@@ -530,7 +530,7 @@ class PLMObjectController(Controller):
         self.check_in_group(new_notified)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
-        details = "user: %s" % new_notified
+        details = u"user: %s" % new_notified
         self._save_histo("New notified", details) 
 
     def add_reader(self, new_reader):
@@ -544,6 +544,29 @@ class PLMObjectController(Controller):
         details = "user: %s" % new_reader
         self._save_histo("New reader", details) 
 
+    def check_edit_signer(self, raise_=True):
+        r = self.check_permission("owner", raise_=raise_)
+        if r and self.promotionapproval_plmobject.now().exists():
+            if raise_:
+                raise PermissionError("One user has appproved a promotion.")
+            return False
+        return r
+
+    def can_edit_signer(self):
+        return self.check_edit_signer(raise_=False)
+
+    def check_signer(self, user, role):
+        self.check_contributor(user)
+        self.check_in_group(user)
+        self.check_valid_role(role)
+
+    def add_signer(self, new_signer, role):
+        self.check_edit_signer()
+        self.check_signer(new_signer, role)
+        models.PLMObjectUserLink.objects.create(plmobject=self.object,
+            user=new_signer, role=role)
+        details = u"user: %s" % new_signer
+        self._save_histo("New %s" % role, details, roles=(role,)) 
 
     def remove_notified(self, notified):
         """
@@ -581,6 +604,46 @@ class PLMObjectController(Controller):
         link.end()
         details = u"user: %s" % reader
         self._save_histo("Reader removed", details) 
+        
+    def remove_signer(self, signer, role):
+        """
+        """ 
+        self.check_edit_signer()
+        if self.plmobjectuserlink_plmobject.now().filter(role=role).count() <= 1:
+            raise PermissionError("Can not remove signer, there is only one signer.")
+        link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
+                user=signer, role=role)
+        link.end()
+        details = u"user: %s" % signer
+        self._save_histo("Notified removed", details) 
+        details = u"user: %s" % (signer, role)
+        self._save_histo("%s removed" % role, details, roles=(role,)) 
+
+    def check_valid_role(self, role):
+        # check if the role is valid
+        max_level = self.lifecycle.nb_states - 1
+        level = int(re.search(r"\d+", role).group(0))
+        if level > max_level:
+            # TODO better exception ?
+            raise PermissionError("bad role")
+
+    def replace_signer(self, old_signer, new_signer, role):
+        self.check_edit_signer()
+        self.check_signer(new_signer, role)
+        
+        # remove old signer
+        try:
+            link = self.plmobjectuserlink_plmobject.now().get(user=old_signer,
+               role=role)
+        except models.PLMObjectUserLink.ObjectDoesNotExist:
+            raise ValueError("Invalid old signer")
+        link.end()
+        # add new signer
+        models.PLMObjectUserLink.objects.create(plmobject=self.object,
+                                                user=new_signer, role=role)
+        details = u"new signer: %s" % new_signer
+        details += u", old signer: %s" % old_signer
+        self._save_histo("New %s" % role, details, roles=(role,)) 
 
     def set_signer(self, signer, role):
         """
