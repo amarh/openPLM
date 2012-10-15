@@ -567,7 +567,7 @@ class DocumentController(PLMObjectController):
         
         for doc_file in self.object.files.all():
             filename = doc_file.filename
-            path = models.docfs.get_available_name(filename)
+            path = models.docfs.get_available_name(filename.encode("utf-8"))
             shutil.copy(doc_file.file.path, models.docfs.path(path))
             new_doc = models.DocumentFile.objects.create(file=path,
                 filename=filename, size=doc_file.size, document=new_ctrl.object)
