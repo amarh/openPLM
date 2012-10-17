@@ -218,13 +218,16 @@ class PLMObjectController(Controller):
                 raise PromotionError()
             next_state = lcl.next_state(self.state.name)
             nxt = models.State.objects.get(name=next_state)
-            for uid in represented:
-                user = models.User.objects.get(id=uid)
+            users = list(models.User.objects.filter(id__in=represented))
+            for user in users:
                 models.PromotionApproval.current_objects.create(plmobject=self.object, user=user,
                     current_state=self.object.state, next_state=nxt)
-                # TODO histo
             if self._all_approved():
                 self.promote(checked=True)
+            else:
+                details = u"Current state: %s, next state:%s\n" % (self.state.name, next_state)
+                details += u"Represented users: %s" % u", ".join(u.username for u in users)
+                self._save_histo(u"Approved promotion", details, roles=(role,)) 
         else:
             raise PromotionError()
 
