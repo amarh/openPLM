@@ -584,8 +584,8 @@ class PromotionApproval(Link):
             next :class:`.State` of :attr:`plmobject` when if will be promoted
 
     """
-    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
-    user = models.ForeignKey(User, related_name="%(class)s_user")    
+    plmobject = models.ForeignKey(PLMObject, related_name="approvals") 
+    user = models.ForeignKey(User, related_name="approvals")  
     current_state = models.ForeignKey(State, related_name="%(class)s_current_state")
     next_state = models.ForeignKey(State, related_name="%(class)s_next_state")
 

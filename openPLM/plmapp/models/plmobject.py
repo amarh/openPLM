@@ -206,7 +206,7 @@ class PLMObject(models.Model):
         """
         True if the object is not in a non editable state
         """
-        return self.is_draft and not self.promotionapproval_plmobject.now().exists()
+        return self.is_draft and not self.approvals.now().exists()
 
     @property
     @cache_lifecycle_stuff

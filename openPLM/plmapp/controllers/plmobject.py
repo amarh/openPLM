@@ -1,4 +1,4 @@
-############################################################################
+###########################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
 # 
@@ -188,8 +188,8 @@ class PLMObjectController(Controller):
         lcl = self.lifecycle.to_states_list()
         role = level_to_sign_str(lcl.index(self.state.name))
         next_state = lcl.next_state(self.state.name)
-        approvers = models.PromotionApproval.current_objects.filter(plmobject=self.object,
-             current_state=self.object.state, next_state=next_state).values_list("user", flat=True)
+        approvers = self.approvals.now().filter(current_state=self.object.state,
+                next_state=next_state).values_list("user", flat=True)
         return approvers
 
     def is_last_promoter(self):
@@ -221,8 +221,7 @@ class PLMObjectController(Controller):
             nxt = models.State.objects.get(name=next_state)
             users = list(models.User.objects.filter(id__in=represented))
             for user in users:
-                models.PromotionApproval.current_objects.create(plmobject=self.object, user=user,
-                    current_state=self.object.state, next_state=nxt)
+                self.approvals.create(user=user, current_state=self.object.state, next_state=nxt)
             if self._all_approved():
                 self.promote(checked=True)
             else:
@@ -240,7 +239,7 @@ class PLMObjectController(Controller):
         self._save_histo(u"Removed promotion approvals", details, roles=(role,)) 
 
     def _clear_approvals(self):
-        models.PromotionApproval.current_objects.filter(plmobject=self.object).end()
+        self.approvals.now().end()
 
     def promote(self, checked=False):
         u"""
@@ -557,7 +556,7 @@ class PLMObjectController(Controller):
 
     def check_edit_signer(self, raise_=True):
         r = self.check_permission("owner", raise_=raise_)
-        if r and self.promotionapproval_plmobject.now().exists():
+        if r and self.approvals.now().exists():
             if raise_:
                 raise PermissionError("One user has appproved a promotion.")
             return False
