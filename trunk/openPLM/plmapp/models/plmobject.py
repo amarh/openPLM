@@ -205,9 +205,8 @@ class PLMObject(models.Model):
     def is_editable(self):
         """
         True if the object is not in a non editable state
-        (equivalent to :meth:`.is_draft`).
         """
-        return self.is_draft
+        return self.is_draft and not self.promotionapproval_plmobject.now().exists()
 
     @property
     @cache_lifecycle_stuff
