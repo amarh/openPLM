@@ -615,8 +615,6 @@ class PLMObjectController(Controller):
                 user=signer, role=role)
         link.end()
         details = u"user: %s" % signer
-        self._save_histo("Notified removed", details) 
-        details = u"user: %s" % (signer, role)
         self._save_histo("%s removed" % role, details, roles=(role,)) 
 
     def check_valid_role(self, role):
@@ -707,15 +705,25 @@ class PLMObjectController(Controller):
         if role == "owner":
             self.check_permission("owner")
             self.set_owner(user)
-        elif role == "notified":
+        elif role == models.ROLE_NOTIFIED:
             self.add_notified(user)
-        elif role.startswith("sign"):
+        elif role.startswith(models.ROLE_SIGN):
             self.check_permission("owner")
-            self.set_signer(user, role)
+            self.add_signer(user, role)
         elif role == models.ROLE_READER:
             self.add_reader(user)
         else:
             raise ValueError("bad value for role")
+
+    def remove_user(self, link):
+        if link.role == models.ROLE_NOTIFIED:
+            self.remove_notified(link.user)
+        elif link.role == models.ROLE_READER:
+            self.remove_reader(link.user)
+        elif link.role.startswith(models.ROLE_SIGN):
+            self.remove_signer(link.user, link.role)
+        else:
+            raise ValueError("Bad link")
 
     def check_permission(self, role, raise_=True):
         if self._user.username == settings.COMPANY:

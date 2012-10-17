@@ -21,7 +21,7 @@
     {# promotion form #}
     <form id ="form-promote" class="confirmation" style="display: inline;"
         action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-        {% if is_signer or is_signer_dm %}
+        {% if is_signer and can_approve or is_signer_dm %}
             <div id="form-promote-dialog"
                 title="{% trans "Are you sure?" %}"
                 {% if password_form.is_bound and not password_form.is_valid %} 
@@ -33,30 +33,30 @@
                 {# show the list of previous revisions that will be cancelled/deprecated #}
 
                 <div class="msg" style="border-style:hidden; color: #000000;">
-                {% if cancelled_revisions %}
-                    <p> {% trans "The following revisions will be cancelled:" %} </p>
-                    <ul>
-                        {% for rev in cancelled_revisions %}
-                            <li>
-                            {% blocktrans with rev.revision as revision and rev.name as name %}
-                                Revision {{ revision }} : {{ name }}
-                            {% endblocktrans %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if deprecated_revisions %}
-                    <p> {% trans "The following revisions will be deprecated:" %} </p>
-                    <ul>
-                        {% for rev in deprecated_revisions %}
-                            <li>
-                            {% blocktrans with rev.revision as revision and rev.name as name %}
-                                Revision {{ revision }} : {{ name }}
-                            {% endblocktrans %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                    {% if cancelled_revisions %}
+                        <p> {% trans "The following revisions will be cancelled:" %} </p>
+                        <ul>
+                            {% for rev in cancelled_revisions %}
+                                <li>
+                                {% blocktrans with rev.revision as revision and rev.name as name %}
+                                    Revision {{ revision }} : {{ name }}
+                                {% endblocktrans %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if deprecated_revisions %}
+                        <p> {% trans "The following revisions will be deprecated:" %} </p>
+                        <ul>
+                            {% for rev in deprecated_revisions %}
+                                <li>
+                                {% blocktrans with rev.revision as revision and rev.name as name %}
+                                    Revision {{ revision }} : {{ name }}
+                                {% endblocktrans %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
 
                 <div class="password">
@@ -68,8 +68,8 @@
 
         {# first put error messages, then put buttons #}
         {% spaceless %}
-        <div class="msg">
-            {# demote #}
+            <div class="msg">
+                {# demote #}
 
                 {% if obj.state != obj.lifecycle.first_state %}
                     {% if is_signer_dm %}
@@ -86,11 +86,15 @@
                     {% if not obj.is_promotable %}
                         <p>{% trans "You can not promote this object:" %}</p>
                         {{ obj.promotion_errors.as_ul }}
+                    {% else %}
+                        {% if not can_approve %}
+                            {% trans "You already have approved this promotion." %}
+                        {% endif %}
                     {% endif %}
                 {% else %}
                     <p>{% trans "You do not have the permission to promote this object." %}</p>
                 {% endif %}
-                
+
                 {# cancel #}
                 {% if obj.is_draft and is_owner %}
                     {% if not obj.can_cancel %}
@@ -100,25 +104,30 @@
                             {% endif %}
                         {% endwith %}
                         {% if obj.has_links %}
-                             <p>{% trans "You can not cancel this object since it is related to an other object (part , document)." %}</p>
+                            <p>{% trans "You can not cancel this object since it is related to another object (part, document)." %}</p>
                         {% endif %}
-                     {% endif %}
+                    {% endif %}
                 {% else %}
                     {% if not is_owner %}
-                    <p>{% trans "You do not have the permission to cancel this object." %}</p>
+                        <p>{% trans "You do not have the permission to cancel this object." %}</p>
                     {% else %}
-                    <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}</p>
+                        <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}</p>
                     {% endif %}
                 {% endif %}
-        </div>
+            </div>
         {% endspaceless %}
 
         {# buttons #}
         {% if obj.state != obj.lifecycle.first_state and is_signer_dm and obj.is_proposed %}
             <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
         {% endif %}
-        {% if is_signer and obj.is_promotable %}
-            <input name="promote" type="submit" class="{{"Button"|button}}" value="{% trans "PROMOTE" %}" />
+        {% if is_signer and can_approve and obj.is_promotable %}
+            <input name="promote" type="submit" class="{{"Button"|button}}" 
+            {% if obj.is_last_promoter %}
+                value="{% trans "PROMOTE" %}"
+            {% else %}
+                value="{% trans "Approve the promotion" %}"
+            {% endif %} />
         {% endif %}
 
     </form>
@@ -206,7 +215,7 @@
 
     {# lifecycle : display all states #}
     <div class="lifecycle">
-        {% for status, is_current_state, signer, link_id in object_lifecycle %}
+        {% for status, is_current_state, links in object_lifecycle %}
             <div class="state_wrapper">
                 <div class="state
                     {% if forloop.first %}
@@ -229,14 +238,33 @@
             {% if not forloop.last %}
                 <div class="management">
                     <div class="arrow {% if is_current_state %} active {% endif %}" style="">&gt;</div>
-                    {% if signer %}
+                    {% for link in links %}
                         <span class="signer">
-                            <a href="/user/{{signer|urlencode }}/">{{signer}}</a>
-                            <br/>
-                            {% if is_owner %}
-                                <a class="{{"Button"|button}}" href="../management/replace/{{link_id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                            <a href="{{link.user.plmobject_url}}">{{link.user.username}}</a>
+                            {% if can_edit_signer %}
+                                <a title="{% trans "Replace" %}" class="{{"Button"|button:"button-icon-only"}}" href="../management/replace/{{link.id}}/?q=&type=User">
+                                    <span class="ui-button-text">{% trans "REPLACE" %}</span>
+                                    <span class="ui-button-icon-primary ui-icon ui-icon-refresh">&nbsp;</span>
+                                </a>
+                                {% if links|length > 1 %}
+                                    <form style="display:inline" method="POST" action="../management/delete/">
+                                        <input type="hidden" name="link_id" value="{{ link.id }}"/>
+                                        <input name="action" type="submit"
+                                        class="{{"Button"|button}}" value="—" 
+                                        title="{% trans "Remove" %}"/>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                {% if is_current_state and link.user_id in approvers %}
+                                    <span class="approver">{% trans "Approved" %}</span>
+                                {% endif %}
+
                             {% endif %}
                         </span>
+                        <br/>
+                    {% endfor %}
+                    {% if can_edit_signer %}
+                        <a class="{{"Button"|button}}" href="../management/add-signer{{forloop.counter0}}/?q=&type=User"><span class="ui-button-text">{% trans "Add" %}</span></a>
                     {% endif %}
                 </div>
             {% endif %}

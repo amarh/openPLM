@@ -279,16 +279,16 @@ class ViewTest(CommonViewTest):
         form = response.context["modification_form"]
         self.assertFalse(form.is_valid())
 
-    def _remove_link_id(self, lifecycle):
-        return tuple(x[:-1] for x in lifecycle)
+    def _remove_link_id(self, lifecycles):
+        return tuple((x[0], x[1], [l.user.username for l in x[2]]) for x in lifecycles)
 
     def test_lifecycle(self):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
-        wanted = (("draft", True, self.user.username),
-                  ("official", False, self.user.username),
-                  ("deprecated", False, None))
+        wanted = (("draft", True, [self.user.username]),
+                  ("official", False, [self.user.username]),
+                  ("deprecated", False, []))
         self.assertFalse(response.context["cancelled_revisions"])
         self.assertFalse(response.context["deprecated_revisions"])
         self.assertEqual(lifecycles, wanted)
@@ -297,9 +297,9 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"promote" : "on", "password" : "password"})
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
-        wanted = (("draft", False, self.user.username),
-                  ("official", True, self.user.username),
-                  ("deprecated", False, None))
+        wanted = (("draft", False, [self.user.username]),
+                  ("official", True, [self.user.username]),
+                  ("deprecated", False, []))
         self.assertEqual(lifecycles, wanted)
         # demote
         lcl = LifecycleList("diop", "official", "draft", 
@@ -313,10 +313,10 @@ class ViewTest(CommonViewTest):
         response = self.post(self.base_url + "lifecycle/apply/", 
                 {"demote" : "on", "password":"password"})
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
-        wanted = (("draft", True, self.user.username),
-                  ("issue1", False, self.user.username),
-                  ("official", False, None),
-                  ("deprecated", False, None))
+        wanted = (("draft", True, [self.user.username]),
+                  ("issue1", False, [self.user.username]),
+                  ("official", False, []),
+                  ("deprecated", False, []))
         self.assertEqual(lifecycles, wanted)
 
     def test_lifecycle_warn_previous_revisions(self):
@@ -361,9 +361,9 @@ class ViewTest(CommonViewTest):
         self.attach_to_official_document()
         response = self.get(self.base_url + "lifecycle/")
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
-        wanted = (("draft", True, self.user.username),
-                  ("official", False, self.user.username),
-                  ("deprecated", False, None))
+        wanted = (("draft", True, [self.user.username]),
+                  ("official", False, [self.user.username]),
+                  ("deprecated", False, []))
         self.assertEqual(lifecycles, wanted)
         # try to promote
         response = self.post(self.base_url + "lifecycle/apply/", 
