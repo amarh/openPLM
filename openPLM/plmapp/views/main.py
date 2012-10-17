@@ -51,6 +51,7 @@ import glob
 import datetime
 import tempfile
 import itertools
+from collections import defaultdict
 from mimetypes import guess_type
 
 from django.conf import settings
@@ -343,19 +344,26 @@ def get_lifecycle_data(obj):
     ctx = {}
     state = obj.state.name
     object_lifecycle = []
-    roles = dict((r, (id, u)) for r, id, u in
-            obj.plmobjectuserlink_plmobject.now().values_list("role", "id", "user__username"))
+    roles = defaultdict(list)
+    for link in obj.plmobjectuserlink_plmobject.now().order_by("ctime").select_related("user"):
+        roles[link.role].append(link)
     lcs = obj.lifecycle.to_states_list()
     for i, st in enumerate(lcs):
-        link_id, signer = roles.get(level_to_sign_str(i), (None, None))
-        object_lifecycle.append((st, st == state, signer, link_id))
+        links = roles.get(level_to_sign_str(i), [])
+        object_lifecycle.append((st, st == state, links))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
+    can_approve = obj.can_approve_promotion()
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
+    if obj.can_edit_signer():
+        ctx["can_edit_signer"] = True
+    else:
+        ctx["can_edit_signer"] = False
+        ctx["approvers"] = set(obj.get_approvers())
 
     # warning if a previous revision will be cancelled/deprecated
     cancelled = []
     deprecated = []
-    if is_signer:
+    if is_signer and can_approve:
         if lcs[-1] != state:
             if lcs.next_state(state) == obj.lifecycle.official_state.name:
                 for rev in obj.get_previous_revisions():
@@ -371,6 +379,7 @@ def get_lifecycle_data(obj):
         'object_lifecycle' : object_lifecycle,
         'is_signer' : is_signer, 
         'is_signer_dm' : is_signer_dm,
+        'can_approve' : can_approve,
     })
     return ctx
     
@@ -1550,11 +1559,14 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         if replace_manager_form.is_valid():
             if replace_manager_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(replace_manager_form, request.user)
-                obj.set_role(user_obj.object, link.role)
-                if link.role == models.ROLE_NOTIFIED:
-                    obj.remove_notified(link.user)
-                elif link.role == models.ROLE_READER:
-                    obj.remove_reader(link.user)
+                if link.role.startswith(models.ROLE_SIGN):
+                    obj.replace_signer(link.user, user_obj.object, link.role)
+                else:
+                    obj.set_role(user_obj.object, link.role)
+                    if link.role == models.ROLE_NOTIFIED:
+                        obj.remove_notified(link.user)
+                    elif link.role == models.ROLE_READER:
+                        obj.remove_reader(link.user)
             return HttpResponseRedirect("../../../lifecycle/")
     else:
         replace_manager_form = forms.SelectUserForm()
@@ -1568,7 +1580,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
 
 ##########################################################################################    
 @handle_errors(undo="../../lifecycle/")
-def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
+def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=None):
     """
     View to add a manager (notified user or restricted reader).
 
@@ -1604,7 +1616,10 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False):
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    role =  models.ROLE_READER if reader else models.ROLE_NOTIFIED
+    if level is None:
+        role =  models.ROLE_READER if reader else models.ROLE_NOTIFIED
+    else:
+        role = level_to_sign_str(int(level))
     if request.method == "POST":
         add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
@@ -1643,10 +1658,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
         try:
             link_id = int(request.POST["link_id"])
             link = models.PLMObjectUserLink.current_objects.get(id=link_id)
-            if link.role == models.ROLE_NOTIFIED:
-                obj.remove_notified(link.user)
-            else:
-                obj.remove_reader(link.user)
+            obj.remove_user(link)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
     return HttpResponseRedirect("../../lifecycle/")

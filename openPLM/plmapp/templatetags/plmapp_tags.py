@@ -109,9 +109,9 @@ def button(css_class, options=""):
         opt = opt.strip()
         if opt:
             if opt.startswith("icon"):
-                classes.remove("ui-button-text-only")
+                classes.discard("ui-button-text-only")
             if opt.startswith("corner"):
-                classes.remove("ui-corner-all")
+                classes.discard("ui-corner-all")
             classes.add("ui-" + opt)
     return " ".join(classes)
 

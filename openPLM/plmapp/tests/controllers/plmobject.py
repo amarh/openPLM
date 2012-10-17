@@ -429,9 +429,10 @@ class ControllerTest(BaseTestCase):
         models.PLMObjectUserLink.current_objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         controller.set_role(user, level_to_sign_str(0))
-        link = models.PLMObjectUserLink.current_objects.get(role=level_to_sign_str(0),
-                                             plmobject=controller.object)
-        self.assertEqual(user, link.user)
+        users = models.PLMObjectUserLink.current_objects.filter(role=level_to_sign_str(0),
+                             plmobject=controller.object).values_list("user", flat=True)
+        self.assertTrue(user.id in users)
+        self.assertTrue(self.user.id in users)
 
     def test_promote_error(self):
         """
