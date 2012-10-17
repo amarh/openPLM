@@ -13,8 +13,8 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('ctime', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('end_time', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-            ('plmobject', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promotionapproval_plmobject', to=orm['plmapp.PLMObject'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promotionapproval_user', to=orm['auth.User'])),
+            ('plmobject', self.gf('django.db.models.fields.related.ForeignKey')(related_name='approvals', to=orm['plmapp.PLMObject'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='approvals', to=orm['auth.User'])),
             ('current_state', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promotionapproval_current_state', to=orm['plmapp.State'])),
             ('next_state', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promotionapproval_next_state', to=orm['plmapp.State'])),
         ))
@@ -212,8 +212,8 @@ class Migration(SchemaMigration):
             'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'next_state': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'promotionapproval_next_state'", 'to': "orm['plmapp.State']"}),
-            'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'promotionapproval_plmobject'", 'to': "orm['plmapp.PLMObject']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'promotionapproval_user'", 'to': "orm['auth.User']"})
+            'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'approvals'", 'to': "orm['plmapp.PLMObject']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'approvals'", 'to': "orm['auth.User']"})
         },
         'plmapp.revisionlink': {
             'Meta': {'unique_together': "(('old', 'new', 'end_time'),)", 'object_name': 'RevisionLink'},
