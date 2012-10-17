@@ -28,7 +28,10 @@
                     class="c-error action-{{ action }}"
                 {% endif %}
                 >
-                <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{% trans "If you promote or demote this object, you may not be allowed to undo this action." %}</p>
+                <p>
+                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                {% trans "If you promote or demote this object, you may not be allowed to undo this action." %}
+                </p>
 
                 {# show the list of previous revisions that will be cancelled/deprecated #}
 
@@ -131,6 +134,30 @@
         {% endif %}
 
     </form>
+
+    {# discard approvals #}
+    {% if is_signer and approvers %}
+        <form id ="form-discard" class="confirmation" style="display: inline;"
+            action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
+            <div id="form-discard-dialog"
+                title="{% trans "Are you sure?" %}"
+                {% if password_form.is_bound and not password_form.is_valid %} 
+                    class="c-error action-{{ action }}"
+                {% endif %}
+                >
+                <p>
+                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                {% trans "Warning, all signers will have to approve again the promotion." %}</p>
+
+                <div class="password">
+                    {{ password_form.as_p }}
+                </div>
+            </div>
+
+            <input name="discard" type="submit" class="{{"Button"|button}}"
+            value="{% trans "Discard approvals" %}"/>
+        </form>
+    {% endif %}
 
     {# cancel #}
     {% if obj.can_cancel %}

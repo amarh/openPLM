@@ -166,16 +166,18 @@ class PLMObjectController(Controller):
     def can_approve_promotion(self, user=None):
         return bool(self.get_represented_approvers(user))
 
-    def get_current_signers(self):
+    def get_current_signer_role(self):
         lcl = self.lifecycle.to_states_list()
-        role = level_to_sign_str(lcl.index(self.state.name))
+        return level_to_sign_str(lcl.index(self.state.name))
+
+    def get_current_signers(self):
+        role = self.get_current_signer_role()
         return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
       
     def get_represented_approvers(self, user=None):
         if user is None:
             user = self._user
-        lcl = self.lifecycle.to_states_list()
-        role = level_to_sign_str(lcl.index(self.state.name))
+        role = self.get_current_signer_role()
         delegators = set(models.DelegationLink.get_delegators(self._user, role))
         delegators.add(self._user.id)
         delegators.difference_update(self.get_approvers())
@@ -191,8 +193,7 @@ class PLMObjectController(Controller):
         return approvers
 
     def is_last_promoter(self):
-        lcl = self.lifecycle.to_states_list()
-        role = level_to_sign_str(lcl.index(self.state.name))
+        role = self.get_current_signer_role()
         is_signer = self.has_permission(role)
         represented = self.get_represented_approvers()
         if is_signer and represented:
@@ -230,6 +231,13 @@ class PLMObjectController(Controller):
                 self._save_histo(u"Approved promotion", details, roles=(role,)) 
         else:
             raise PromotionError()
+
+    def discard_approvals(self):
+        role = self.get_current_signer_role()
+        self.check_permission(role)
+        self._clear_approvals() 
+        details = u"Current state:%s" % self.state.name
+        self._save_histo(u"Removed promotion approvals", details, roles=(role,)) 
 
     def _clear_approvals(self):
         models.PromotionApproval.current_objects.filter(plmobject=self.object).end()
