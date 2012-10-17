@@ -586,8 +586,8 @@ class PromotionApproval(Link):
     """
     plmobject = models.ForeignKey(PLMObject, related_name="approvals") 
     user = models.ForeignKey(User, related_name="approvals")  
-    current_state = models.ForeignKey(State, related_name="%(class)s_current_state")
-    next_state = models.ForeignKey(State, related_name="%(class)s_next_state")
+    current_state = models.ForeignKey(State, related_name="+")
+    next_state = models.ForeignKey(State, related_name="+")
 
     class Meta:
         app_label = "plmapp"
