@@ -86,7 +86,7 @@
 
                 {# promote #}
                 {% if is_signer %}
-                    {% if not obj.is_promotable %}
+                    {% if not is_promotable %}
                         <p>{% trans "You can not promote this object:" %}</p>
                         {{ obj.promotion_errors.as_ul }}
                     {% else %}
@@ -100,7 +100,7 @@
 
                 {# cancel #}
                 {% if obj.is_draft and is_owner %}
-                    {% if not obj.can_cancel %}
+                    {% if not can_cancel %}
                         {% with obj.get_all_revisions|length as nb_revision %}
                             {% if nb_revision > 1 %}
                                 <p>{% trans "You can not cancel this object since it has more than one revision." %}</p>
@@ -124,7 +124,7 @@
         {% if obj.state != obj.lifecycle.first_state and is_signer_dm and obj.is_proposed %}
             <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
         {% endif %}
-        {% if is_signer and can_approve and obj.is_promotable %}
+        {% if is_signer and can_approve and is_promotable %}
             <input name="promote" type="submit" class="{{"Button"|button}}" 
             {% if obj.is_last_promoter %}
                 value="{% trans "PROMOTE" %}"
@@ -160,7 +160,7 @@
     {% endif %}
 
     {# cancel #}
-    {% if obj.can_cancel %}
+    {% if can_cancel %}
         <form id ="form-cancel" class="confirmation" style="display: inline;"
             action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
             <div id="form-cancel-dialog"
@@ -207,31 +207,31 @@
         </form>
     {% endif %}
 
-    {# unpublish #}
-    {% if obj.can_unpublish %}
-        <form id ="form-unpublish" class="confirmation" style="display: inline;"
-            action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-            <div id="form-unpublish-dialog"
-                title="{% trans "Are you sure?" %}"
-                {% if password_form.is_bound and not password_form.is_valid %} 
-                    class="c-error action-{{ action }}"
-                {% endif %}
-                >
-                <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                {% trans "Warning, if you unpublish this object, it won't be anymore accessible to everyone." %}</p>
-
-                <div class="password">
-                    {{ password_form.as_p }}
-                </div>
-            </div>
-
-            {# button #}
-            <input name="unpublish" type="submit" class="{{"Button"|button}}" value="{% trans "UNPUBLISH" %}" />
-        </form>
-    {% endif %}
-
     {% if obj.published %}
+        {# unpublish #}
+        {% if obj.can_unpublish %}
+            <form id ="form-unpublish" class="confirmation" style="display: inline;"
+                action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
+                <div id="form-unpublish-dialog"
+                    title="{% trans "Are you sure?" %}"
+                    {% if password_form.is_bound and not password_form.is_valid %} 
+                        class="c-error action-{{ action }}"
+                    {% endif %}
+                    >
+                    <p>
+                    <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                    {% trans "Warning, if you unpublish this object, it won't be anymore accessible to everyone." %}</p>
+
+                    <div class="password">
+                        {{ password_form.as_p }}
+                    </div>
+                </div>
+
+                {# button #}
+                <input name="unpublish" type="submit" class="{{"Button"|button}}" value="{% trans "UNPUBLISH" %}" />
+            </form>
+        {% endif %}
+
         <div id="published-info">
             <p>
             {% trans "This object has been published:" %}

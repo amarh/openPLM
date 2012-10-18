@@ -381,7 +381,9 @@ def get_lifecycle_data(obj):
         'object_lifecycle' : object_lifecycle,
         'is_signer' : is_signer, 
         'is_signer_dm' : is_signer_dm,
+        'is_promotable' : obj.is_promotable(),
         'can_approve' : can_approve,
+        'can_cancel' : obj.can_cancel(),
     })
     return ctx
     
@@ -419,7 +421,7 @@ def get_management_data(obj, user):
             form to notify *user*
     """
     ctx = {}
-    links = models.PLMObjectUserLink.current_objects.filter(plmobject=obj).order_by("role")
+    links = obj.plmobjectuserlink_plmobject.now().select_related("user").order_by("role")
     if not obj.check_permission("owner", False):
         link = links.filter(role="notified", user=user)
         ctx["is_notified"] = bool(link)
