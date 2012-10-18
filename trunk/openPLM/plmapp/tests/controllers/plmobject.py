@@ -306,8 +306,9 @@ class ControllerTest(BaseTestCase):
         """Test sign error : bad level"""
         controller = self.create("Part1")
         user = self.get_contributor()
-        self.assertRaises(exc.PermissionError, controller.add_signer, user,
-                          level_to_sign_str(1664))
+        for i in (2, 3, 1664):
+            self.assertRaises(ValueError, controller.add_signer, user,
+                          level_to_sign_str(i))
 
     def test_add_sign_error_already_signer(self):
         """Test sign error : bad level"""
@@ -320,7 +321,7 @@ class ControllerTest(BaseTestCase):
         """Test replace signer error : bad level"""
         controller = self.create("Part1")
         user = self.get_contributor()
-        self.assertRaises(exc.PermissionError, controller.replace_signer,
+        self.assertRaises(ValueError, controller.replace_signer,
                 self.user, user, level_to_sign_str(1789))
 
     def test_set_sign_error2(self):

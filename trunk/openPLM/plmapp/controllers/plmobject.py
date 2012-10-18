@@ -566,9 +566,23 @@ class PLMObjectController(Controller):
         return self.check_edit_signer(raise_=False)
 
     def check_signer(self, user, role):
+        """
+        .. versionadded:: 1.2
+
+        Checks that *user* can become a signer.
+
+        :raise: :exc:`.PermissionError` if *user* is not a contributor
+        :raise: :exc:`.PermissionError` if *user* is not in the object's group
+        :raise: :exc:`ValueError` if *role* is not a valid signer role according to
+                the object's lifecycle
+        """
         self.check_contributor(user)
         self.check_in_group(user)
-        self.check_valid_role(role)
+        # check if the role is valid
+        max_level = self.lifecycle.nb_states - 1
+        level = int(re.search(r"\d+", role).group(0))
+        if level > max_level:
+            raise ValueError("bad role")
 
     def add_signer(self, new_signer, role):
         self.check_edit_signer()
@@ -626,14 +640,6 @@ class PLMObjectController(Controller):
         link.end()
         details = u"user: %s" % signer
         self._save_histo("%s removed" % role, details, roles=(role,)) 
-
-    def check_valid_role(self, role):
-        # check if the role is valid
-        max_level = self.lifecycle.nb_states - 1
-        level = int(re.search(r"\d+", role).group(0))
-        if level > max_level:
-            # TODO better exception ?
-            raise PermissionError("bad role")
 
     def replace_signer(self, old_signer, new_signer, role):
         self.check_edit_signer()
@@ -702,12 +708,9 @@ class PLMObjectController(Controller):
         Sets role *role* (like `owner` or `notified`) for *user*
 
         .. note::
-            If *role* is `owner` or a sign role, the old user who had
-            this role will lose it. Only the owner can changes these
-            roles.
-
-            If *role* is notified, others roles are preserved.
-
+            If *role* is :const:`.ROLE_OWNER`, the previous owner is
+            replaced by *user*.
+            
         :raise: :exc:`ValueError` if *role* is invalid
         :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
