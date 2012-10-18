@@ -421,9 +421,10 @@ def get_management_data(obj, user):
             form to notify *user*
     """
     ctx = {}
-    links = obj.plmobjectuserlink_plmobject.now().select_related("user").order_by("role")
+    # evaluates now PLMObjectLinks to make one sql query
+    links = list(obj.plmobjectuserlink_plmobject.now().select_related("user"))
     if not obj.check_permission("owner", False):
-        link = links.filter(role="notified", user=user)
+        link = [l for l in links if l.role == models.ROLE_NOTIFIED and l.user == user]
         ctx["is_notified"] = bool(link)
         if link:
             ctx["remove_notify_link"] = link[0]
@@ -438,9 +439,9 @@ def get_management_data(obj, user):
             else:
                 ctx["can_notify"] = False
     ctx.update({
-        'notified_list' : links.filter(role=models.ROLE_NOTIFIED),
-        'owner_list' : links.filter(role=models.ROLE_OWNER),
-        'reader_list' : links.filter(role=models.ROLE_READER),
+        'notified_list' : [l for l in links if l.role == models.ROLE_NOTIFIED],
+        'owner_list' :[l for l in links if l.role == models.ROLE_OWNER],
+        'reader_list' :[l for l in links if l.role == models.ROLE_READER],
     })
     return ctx
     

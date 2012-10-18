@@ -1,13 +1,11 @@
 {% load i18n plmapp_tags %}
 
-{% regroup object_management_list|dictsort:"role" by role as links %}
-
-{% for group in links %}
+{% if links %}
     <div class="timeline">
-        <h3>{% trans group.grouper|capfirst %}</h3>
+        <h3>{% trans links.0.role|capfirst %}</h3>
 
         <dl>
-            {% for link in group.list|dictsort:"plmobject.type" %}
+            {% for link in links %}
                 <dt class="changeset">
                 <span>{{link.user.first_name}}</span>
                 <span>{{link.user.last_name}},</span>
@@ -40,4 +38,4 @@
         </dl>
     </div>
 
-{% endfor %}
+{% endif %}
