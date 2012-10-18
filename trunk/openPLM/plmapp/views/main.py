@@ -286,6 +286,8 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
         Name of the action ("demote" or "promote") that the user tries to do.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if obj.is_cancelled:
+        return r2r("lifecycle_cancelled.html", ctx, request)
     if request.method == 'POST':
         password_form = forms.ConfirmPasswordForm(request.user, request.POST)
         actions = (("demote", obj.demote), ("promote", obj.approve_promotion),
@@ -309,7 +311,7 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     ctx['in_group'] = obj.check_in_group(request.user, raise_=False)
     ctx.update(get_management_data(obj, request.user))
     ctx.update(get_lifecycle_data(obj))
-    return r2r('lifecycle.html',ctx,request)
+    return r2r('lifecycle.html', ctx, request)
     
     
 def get_lifecycle_data(obj):

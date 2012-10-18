@@ -90,6 +90,8 @@ class Lifecycle(models.Model):
 
     @property
     def nb_states(self):
+        if self._states_list is not None:
+            return len(self._states_list)
         return self.lifecyclestates_set.count()
 
     def __iter__(self):
