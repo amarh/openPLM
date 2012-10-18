@@ -375,7 +375,7 @@ class ControllerTest(BaseTestCase):
         self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
         self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
 
-    def test_set_signer_error_not_in_group(self):
+    def test_add_signer_error_not_in_group(self):
         controller = self.create("Part1")
         user = self.get_contributor()
         user.groups.remove(self.group)

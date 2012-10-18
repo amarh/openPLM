@@ -642,6 +642,24 @@ class PLMObjectController(Controller):
         self._save_histo("%s removed" % role, details, roles=(role,)) 
 
     def replace_signer(self, old_signer, new_signer, role):
+        """
+        .. versionadded:: 1.2
+
+        Sets *new_signer* as current signer instead of *old_signer* for *role*.
+        *role* must be a valid sign role (see :func:`.level_to_sign_str` to get a role from a
+        sign level (int)).
+
+        :param old_signer: the replaced signer
+        :type old_signer: :class:`~django.contrib.auth.models.User`
+        :param new_signer: the new signer
+        :type new_signer: :class:`~django.contrib.auth.models.User`
+        :param str role: the sign role
+        :raise: :exc:`.PermissionError` if *signer* is not a contributor
+        :raise: :exc:`.PermissionError` if *new_signer* does not belong to
+                the object's group.
+        :raise: :exc:`.ValueError` if *role* is invalid (level to high)
+        """
+
         self.check_edit_signer()
         self.check_signer(new_signer, role)
         
@@ -658,50 +676,6 @@ class PLMObjectController(Controller):
         details = u"new signer: %s" % new_signer
         details += u", old signer: %s" % old_signer
         self._save_histo("New %s" % role, details, roles=(role,)) 
-
-    def set_signer(self, signer, role):
-        """
-        Sets *signer* as current signer for *role*. *role* must be a valid
-        sign role (see :func:`.level_to_sign_str` to get a role from a
-        sign level (int))
-        
-        :param signer: the new signer
-        :type signer: :class:`~django.contrib.auth.models.User`
-        :param str role: the sign role
-        :raise: :exc:`.PermissionError` if *signer* is not a contributor
-        :raise: :exc:`.PermissionError` if *role* is invalid (level to high)
-
-        .. versionchanged:: 1.0.1
-
-        :raise: :exc:`.PermissionError` if *signer* does not belong to
-                the object's group.
-        """
-
-        self.check_contributor(signer)
-        self.check_in_group(signer)
-        
-        # remove old signer
-        old_signer = None
-        try:
-            link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
-               role=role)
-            old_signer = link.user
-            link.end()
-        except ObjectDoesNotExist:
-            pass
-        # check if the role is valid
-        max_level = self.lifecycle.nb_states - 1
-        level = int(re.search(r"\d+", role).group(0))
-        if level > max_level:
-            # TODO better exception ?
-            raise PermissionError("bad role")
-        # add new signer
-        models.PLMObjectUserLink.objects.create(plmobject=self.object,
-                                                user=signer, role=role)
-        details = u"signer: %s, level : %d" % (signer, level)
-        if old_signer:
-            details += u", old signer: %s" % old_signer
-        self._save_histo("New signer", details) 
 
     def set_role(self, user, role):
         """
