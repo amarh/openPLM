@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/lifecycle.css" type="text/css" charset="utf-8" />
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="lifecycle">
+        <div class="state_wrapper">
+            <div class="state cancelled">
+                <span class="state">{% trans "Cancelled" %}</span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -74,7 +74,7 @@
             <div class="msg">
                 {# demote #}
 
-                {% if obj.state != obj.lifecycle.first_state %}
+                {% if not obj.is_draft %}
                     {% if is_signer_dm %}
                         {% if not obj.is_proposed %}
                             <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
@@ -121,7 +121,7 @@
         {% endspaceless %}
 
         {# buttons #}
-        {% if obj.state != obj.lifecycle.first_state and is_signer_dm and obj.is_proposed %}
+        {% if is_signer_dm and obj.is_proposed %}
             <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
         {% endif %}
         {% if is_signer and can_approve and is_promotable %}
