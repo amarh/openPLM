@@ -321,17 +321,17 @@
         {% if obj.is_official and in_group %}
             <a class="{{"Button"|button}}" href="../management/add-reader/" ><span class="ui-button-text">{% trans "Give access to a restricted account" %}</span></a>
         {% endif %}
-        {% with reader_list as object_management_list %}
+        {% with reader_list as links %}
             {% with in_group as can_delete %}
                 {% include "snippets/management_block.html" %}
             {% endwith %} 
         {% endwith %} 
-        {% with notified_list as object_management_list %}
+        {% with notified_list as links %}
             {% with is_owner as can_delete %}
                 {% include "snippets/management_block.html" %}
             {% endwith %}
         {% endwith %} 
-        {% with owner_list as object_management_list %}
+        {% with owner_list as links %}
             {% with is_owner as can_delete %}
                 {% include "snippets/management_block.html" %}
             {% endwith %}
