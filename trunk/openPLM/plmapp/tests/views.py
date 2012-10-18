@@ -447,7 +447,7 @@ class ViewTest(CommonViewTest):
     def test_management_replace_get(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
-        self.controller.set_signer(self.brian, role)
+        self.controller.replace_signer(self.user, self.brian, role)
         link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         response = self.get(self.base_url + "management/replace/%d/" % link.id,
@@ -459,7 +459,7 @@ class ViewTest(CommonViewTest):
     def test_management_replace_post(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
-        self.controller.set_signer(self.brian, role)
+        self.controller.replace_signer(self.user, self.brian, role)
         link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
             user=self.brian, role=role)
         data = dict(type="User", username=self.user.username)
