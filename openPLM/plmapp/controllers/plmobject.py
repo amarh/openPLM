@@ -613,13 +613,12 @@ class PLMObjectController(Controller):
 
     def remove_reader(self, reader):
         """
-        Removes *reader* to the list of users reader when :attr:`object`
+        Removes *reader* to the list of restricted readers when :attr:`object`
         changes.
         
         :param reader: the user who would be no more reader
         :type reader: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`ObjectDoesNotExist` if *reader* is not reader
-            when :attr:`object` changes
         """
         
         self.check_in_group(self._user)
@@ -631,8 +630,23 @@ class PLMObjectController(Controller):
         
     def remove_signer(self, signer, role):
         """
+        .. versionadded:: 1.2
+
+        Removes *signer* to the list of signers for role *role*.
+        
+        :param signer: the user who would be no more signer
+        :type signer: :class:`~django.contrib.auth.models.User`
+        :raise: :exc:`.PermissionError` if:
+
+            * user is not the owner
+            * one signer has approved the promotion
+            * there is only one signer
+
+        :raise: :exc:`ObjectDoesNotExist` if *signer* is not a signer
         """ 
         self.check_edit_signer()
+        if not role.startswith(models.ROLE_SIGN):
+            raise ValueError("Not a sign role")
         if self.plmobjectuserlink_plmobject.now().filter(role=role).count() <= 1:
             raise PermissionError("Can not remove signer, there is only one signer.")
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
@@ -745,6 +759,13 @@ class PLMObjectController(Controller):
         return False
 
     def check_restricted_readable(self, raise_=True):
+        """
+        Returns ``True`` if the user can read (is allowed to) the restricted
+        data of this object.
+
+        Raises a :exc:`.PermissionError` if the user cannot read the object
+        and *raise_* is ``True`` (the default).
+        """
         if not self._user.get_profile().restricted:
             return self.check_readable(raise_)
         return super(PLMObjectController, self).check_permission(models.ROLE_READER, raise_)
