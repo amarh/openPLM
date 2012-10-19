@@ -424,6 +424,7 @@ def show_error(message, parent):
     dialog.setIcon(qt.QMessageBox.Warning)    
     dialog.exec_()
 
+BANNER_PATH = os.path.join(os.path.dirname(__file__), "banner_openplm.png")
 class Dialog(qt.QDialog):
 
     TITLE = "..."
@@ -431,11 +432,21 @@ class Dialog(qt.QDialog):
 
     def __init__(self):
         qt.QDialog.__init__(self)
+        qt.QDialog.__init__(self)
         self.setWindowTitle(self.TITLE)
+        box = qt.QVBoxLayout()
         self.vbox = qt.QVBoxLayout()
-        self.setLayout(self.vbox)
-        self.instance = PLUGIN
+        banner = qt.QLabel()
+        picture = qt.QPixmap(BANNER_PATH)
+        banner.setPixmap(picture)
+        box.addWidget(banner)
+        box.addLayout(self.vbox)
+        box.setMargin(0)
+        self.vbox.setMargin(12)
+        self.setLayout(box)
         self.update_ui()
+
+
 
     def get_value(self, entry, field=None):
         value = None
