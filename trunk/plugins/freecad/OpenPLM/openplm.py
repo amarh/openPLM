@@ -8,7 +8,7 @@ import tempfile
 
 # poster makes it possible to send http request with files
 # sudo easy_install poster
-from poster.encode import multipart_encode
+from poster.encode import multipart_encode, MultipartParam
 import poster.streaminghttp as shttp
 
 import urllib2
@@ -114,27 +114,27 @@ class OpenPLMPluginInstance(object):
                 # directory already exists, just ignores the exception
                 pass
             gdoc = FreeCAD.ActiveDocument
+            filename = filename.decode("utf8")
             path = os.path.join(rep, filename)
             fileName, fileExtension = os.path.splitext(filename)
-            path_stp=os.path.join(rep, (fileName+".stp"))
+            path_stp=os.path.join(rep, (fileName+".stp")).encode("utf-8")
             #create temporal file stp  
-            Part.export(gdoc.Objects,path_stp)
+            Part.export(gdoc.Objects, path_stp)
             gdoc.FileName = path
             save(gdoc)
             
             #upload stp and freecad object
-            doc_step_file=self.upload_file(doc, path_stp) # XXX
-            doc_file = self.upload_file(doc, path) # XXX
+            doc_step_file=self.upload_file(doc, path_stp)
+            doc_file = self.upload_file(doc, path.encode("utf-8"))
             
             #remove temporal file stp  
             os.remove(path_stp)
             
-            
             self.add_managed_file(doc, doc_file, path)
             self.load_file(doc, doc_file["id"], path, gdoc)
             if not unlock:
-                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"])) # XXX
-                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step_file["id"])) # XXX
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file["id"]))
+                self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step_file["id"]))
             else:
                 self.send_thumbnail(gdoc)
                 self.forget(gdoc)
@@ -158,19 +158,23 @@ class OpenPLMPluginInstance(object):
 
     def upload_file(self, doc, path):
         url = self.SERVER + "api/object/%s/add_file/" % doc["id"]
-        datagen, headers = multipart_encode({"filename": open(path, "rb")})
-        # Create the Request object
-        request = urllib2.Request(url, datagen, headers)
-        res = json.load(self.opener.open(request))
-        return res["doc_file"]
-        
-        
+        return self.upload(url, path)["doc_file"]
 
+    def upload(self, url, path):
+        if isinstance(path, unicode):
+            name = path
+            path = path.encode("utf-8")
+        else:
+            name = path.decode("utf-8")
+        with open(path, "rb") as f:
+            mp = MultipartParam("filename", fileobj=f, filename=name)
+            datagen, headers = multipart_encode({"filename": mp})
+            # Create the Request object
+            request = urllib2.Request(url, datagen, headers)
+            res = json.load(self.opener.open(request))
+        return res
         
-
     def download(self, doc, doc_file):
-    
-    
     
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
         rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
@@ -181,7 +185,7 @@ class OpenPLMPluginInstance(object):
             # directory already exists, just ignores the exception
             pass
         dst_name = os.path.join(rep, doc_file["filename"])
-        dst = open(dst_name, "wb")
+        dst = open(dst_name.encode("utf-8"), "wb")
         shutil.copyfileobj(f, dst)
         f.close()
         dst.close()
@@ -278,10 +282,11 @@ class OpenPLMPluginInstance(object):
             root, f_name = os.path.split(path)
             fileName, fileExtension = os.path.splitext(f_name)
             doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
-            if not len(doc_step)==0:    
+            if doc_step:
                 self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_step[0]["id"]))
   
-            #end unlocker    
+            #end unlocker
+            path = path.encode("utf-8")
                           
             if delete and os.path.exists(path):
                 os.remove(path)
@@ -294,7 +299,7 @@ class OpenPLMPluginInstance(object):
 
     def load_file(self, doc, doc_file_id, path, gdoc=None):
         try:
-            document = gdoc or FreeCAD.openDocument(path)
+            document = gdoc or FreeCAD.openDocument(path.encode("utf-8"))
         except IOError:
             show_error("Can not load %s" % path, self.window)
             return
@@ -311,11 +316,6 @@ class OpenPLMPluginInstance(object):
             #doc_file_name = self.documents[gdoc]["openplm_file_name"]
             path = self.documents[gdoc]["openplm_path"]
             def func():
-                # headers contains the necessary Content-Type and Content-Length>
-                # datagen is a generator object that yields the encoded parameters
-                datagen, headers = multipart_encode({"filename": open(path, "rb")})
-                # Create the Request object
-                
                 
                 #check-in fichier step asscocies if exists
                 #api/doc_id/files/[all/]
@@ -324,36 +324,26 @@ class OpenPLMPluginInstance(object):
                 root, f_name = os.path.split(path)
                 fileName, fileExtension = os.path.splitext(f_name)
                 doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
-                
-                if len(doc_step)==0:    #il faut generer un nouvelle fichier step
 
-                    fileName, fileExtension = os.path.splitext(path)
-                    path_stp=fileName+".stp"
-                    Part.export(gdoc.Objects,path_stp)
+                fileName, fileExtension = os.path.splitext(path)
+                path_stp= (fileName + ".stp").encode("utf-8")
+                Part.export(gdoc.Objects, path_stp)
+                
+                if not doc_step:    #il faut generer un nouvelle fichier step
                     doc_step_file=self.upload_file(doc,path_stp) # XXX
                     doc_step.append(doc_step_file)
-
                 else:                   #il faut un check-in
- 
-                    fileName, fileExtension = os.path.splitext(path)
-                    Part.export(gdoc.Objects,fileName+".stp")
-                    datagen, headers = multipart_encode({"filename": open(fileName+".stp", "rb")})
                     url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_step[0]["id"]) # XXX
-                    request = urllib2.Request(url, datagen, headers)
-                    res = self.opener.open(request)
-                    os.remove(fileName+".stp")                 
-                
-                
+                    self.upload(url, path_stp)
+                    os.remove(path_stp)           
                 
                 url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id) # XXX
-                request = urllib2.Request(url, datagen, headers)                
-                res = self.opener.open(request)
-                
+                self.upload(url, path)
 
-                
                 if not unlock:
                     self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_file_id)) # XXX
-                    self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step[0]["id"])) # XXX
+                    if doc_step:
+                        self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step[0]["id"])) # XXX
                 else:
                     self.send_thumbnail(gdoc)
                     self.forget(gdoc)
@@ -450,10 +440,10 @@ class Dialog(qt.QDialog):
     def get_value(self, entry, field=None):
         value = None
         if isinstance(entry, qt.QLineEdit):
-            value = unicode(entry.text(), "utf-8")
+            value = unicode(entry.text()).encode("utf-8")
         elif isinstance(entry, qt.QComboBox):
             if not field:
-                value = unicode(entry.currentText(), "utf-8")
+                value = unicode(entry.currentText()).encode("utf-8")
             else:
                 value = field["choices"][entry.currentIndex()][0]
         elif isinstance(entry, qt.QCheckBox):
@@ -462,9 +452,13 @@ class Dialog(qt.QDialog):
 
     def set_value(self, entry, value, field=None):
         if isinstance(entry, qt.QLineEdit):
+            if isinstance(value, str):
+                value = value.decode("utf-8")
             entry.setText(value or '')
         elif isinstance(entry, qt.QComboBox):
             choices = [c[0] for c in field["choices"]]
+            if isinstance(value, str):
+                value = value.decode("utf-8")
             entry.setCurrentIndex(choices.index(value or ''))
         elif isinstance(entry, qt.QCheckBox):
             entry.setChecked(value)
@@ -877,6 +871,7 @@ class CreateDialog(SearchDialog):
             self.advanced_fields.append((field, widget))
 
     def action_cb(self):
+        data = self.get_creation_data()
         b, error = PLUGIN.create(self.get_creation_data(),
                                  self.get_value(self.filename_entry, None),
                                  self.get_value(self.unlock_button, None))
