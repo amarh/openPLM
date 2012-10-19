@@ -897,7 +897,7 @@ class OpenPLMLogin:
         dialog.exec_()
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Login', 'ToolTip': 'Login'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Login', 'ToolTip': 'Login'} 
 
 FreeCADGui.addCommand('OpenPLM_Login', OpenPLMLogin())
 
@@ -908,7 +908,7 @@ class OpenPLMConfigure:
         dialog.exec_()
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Configure', 'ToolTip': 'Configure'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Configure', 'ToolTip': 'Configure'} 
 
 FreeCADGui.addCommand('OpenPLM_Configure', OpenPLMConfigure())
 
@@ -919,7 +919,7 @@ class OpenPLMCheckOut:
         dialog.exec_()
     
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Check-out', 'ToolTip': 'Check-out'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Check-out', 'ToolTip': 'Check-out'} 
     
     def IsActive(self):
         return PLUGIN.connected
@@ -934,7 +934,7 @@ class OpenPLMDownload:
         dialog.exec_()
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Download', 'ToolTip': 'Download'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Download', 'ToolTip': 'Download'} 
     
     def IsActive(self):
         return PLUGIN.connected
@@ -947,7 +947,7 @@ class OpenPLMForget:
         PLUGIN.forget(close_doc=True)
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Forget current file',
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Forget current file',
                 'ToolTip': 'Forget and delete current file'} 
 
     def IsActive(self):
@@ -975,7 +975,7 @@ class OpenPLMCheckIn:
             show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Check-in', 'ToolTip': 'Check-in'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Check-in', 'ToolTip': 'Check-in'} 
 
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
@@ -1009,7 +1009,7 @@ class OpenPLMRevise:
             show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Revise', 'ToolTip': 'Revise'} 
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Revise', 'ToolTip': 'Revise'} 
     
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
@@ -1029,7 +1029,7 @@ class OpenPLMAttach:
             show_error("Document not stored in OpenPLM", win)
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Attach to a part',
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Attach to a part',
                 'ToolTip': 'Attach to a part'} 
     
     def IsActive(self):
@@ -1054,7 +1054,7 @@ class OpenPLMCreate:
             close(gdoc)
 
     def GetResources(self): 
-        return {'Pixmap' : 'plop.png', 'MenuText': 'Create a Document',
+        return {'Pixmap' : 'logo_small.png', 'MenuText': 'Create a Document',
                 'ToolTip': 'Create a document'}
     
     def IsActive(self):
