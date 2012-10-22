@@ -48,7 +48,7 @@ def can_add(obj, arg):
         return cur_obj.can_attach_part(obj)
     elif action == "add_child":
         return cur_obj.can_add_child(obj)
-    elif action == "delegate":
+    elif action == "delegate" or (action.startswith("add_") and action != "add_reader"):
         if isinstance(obj, (User, UserController)):
             if obj.get_profile().restricted:
                 return False
@@ -56,11 +56,20 @@ def can_add(obj, arg):
                 from django.conf import settings
                 if obj.username == settings.COMPANY:
                     return False
-                return cur_obj.check_in_group(obj)
+                if cur_obj.check_in_group(obj):
+                    if action.startswith("add_"):
+                        role = action[4:]
+                        return not cur_obj.plmobjectuserlink_plmobject.now().filter(user=obj,
+                            role=role).exists()
+                    return True
             return True
-    elif action == "delegate-reader":
+    elif action in ("delegate-reader", "add_reader"):
         if isinstance(obj, (User, UserController)):
-            return obj.get_profile().restricted
+            if obj.get_profile().restricted:
+                if action == "add_reader":
+                    return not cur_obj.plmobjectuserlink_plmobject.now().filter(user=obj,
+                            role=models.ROLE_READER).exists()
+                return True
     return False
 
 @register.filter
