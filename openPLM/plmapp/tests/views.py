@@ -443,8 +443,14 @@ class ViewTest(CommonViewTest):
         self.assertTrue(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.brian, role=role).exists())
 
-    def test_management_add_reader_get(self):
+    def test_management_add_notified_get(self):
         self.do_test_management_add_get(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+
+    def test_management_add_reader_get(self):
+        self.brian.get_profile().restricted = True
+        self.brian.get_profile().save()
+        self.controller.promote(checked=True)
+        self.do_test_management_add_get(self.base_url + "management/add-reader/", m.ROLE_READER)
     
     def test_management_add_signer0_get(self):
         self.do_test_management_add_get(self.base_url + "management/add-signer0/",
@@ -455,7 +461,10 @@ class ViewTest(CommonViewTest):
                 level_to_sign_str(1))
 
     def test_management_add_reader_post(self):
-        self.do_test_management_add_post(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+        self.brian.get_profile().restricted = True
+        self.brian.get_profile().save()
+        self.controller.promote(checked=True)
+        self.do_test_management_add_post(self.base_url + "management/add-reader/", m.ROLE_READER)
     
     def test_management_add_signer0_post(self):
         self.do_test_management_add_post(self.base_url + "management/add-signer0/",
@@ -465,6 +474,9 @@ class ViewTest(CommonViewTest):
         self.do_test_management_add_post(self.base_url + "management/add-signer1/",
                 level_to_sign_str(1))
 
+    def test_management_add_notified_post(self):
+        self.do_test_management_add_post(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+    
     def test_management_replace_signer_get(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
