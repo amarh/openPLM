@@ -1553,8 +1553,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         role of the link being replace
 
     ``attach``
-        set to (*obj*, "delegate") or (*obj*, "delegate-reader*) according to
-        the role of the link
+        set to (*obj*, :samp`"add_{role}"`)
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = models.PLMObjectUserLink.current_objects.get(id=int(link_id))
@@ -1582,7 +1581,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
                 'replace_manager_form': replace_manager_form,
                 'link_creation': True,
                 'role' : link.role,
-                'attach' : (obj, "delegate-reader" if link.role == models.ROLE_READER else "delegate")})
+                'attach' : (obj, "add_" + link.role)})
     return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
