@@ -288,14 +288,6 @@ class ControllerTest(BaseTestCase):
         user.groups.remove(self.group)
         self.assertRaises(exc.PermissionError, controller.set_owner, user)
 
-    def test_replace_sign1(self):
-        controller = self.create("Part1")
-        user = self.get_contributor()
-        controller.replace_signer(self.user, user, level_to_sign_str(0))
-        link = models.PLMObjectUserLink.current_objects.get(role=level_to_sign_str(0),
-                                             plmobject=controller.object)
-        self.assertEqual(user, link.user)
-
     def test_add_signer(self):
         controller = self.create("Part1")
         user = self.get_contributor()
@@ -359,7 +351,14 @@ class ControllerTest(BaseTestCase):
         self.assertRaises(exc.PermissionError, controller.remove_signer,
                 self.user, level_to_sign_str(0))
         self.assertTrue(controller.plmobjectuserlink_plmobject.now().filter(user=self.user).exists())
-        
+
+    def test_remove_signer(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.add_signer(user, level_to_sign_str(0))
+        controller.remove_signer(self.user, level_to_sign_str(0))
+        self.assertRaises(exc.PermissionError, controller.approve_promotion)
+                
 
     def test_replace_signer_error_approved(self):
         controller = self.create("Part1")
