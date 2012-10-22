@@ -375,6 +375,17 @@ class ControllerTest(BaseTestCase):
         self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
         self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
 
+    def test_replace_signer(self):
+        controller = self.create("Part1")
+        user = self.get_contributor()
+        controller.replace_signer(self.user, user, level_to_sign_str(0))
+        controller.object.is_promotable = lambda: True
+        self.assertEqual(list(controller.get_current_signers()), [user.id])
+        self.assertRaises(exc.PermissionError, controller.approve_promotion)
+        ctrl2 = self.CONTROLLER(controller.object, user)
+        ctrl2.approve_promotion()
+        self.assertEqual("official", controller.object.state.name)
+
     def test_add_signer_error_not_in_group(self):
         controller = self.create("Part1")
         user = self.get_contributor()
