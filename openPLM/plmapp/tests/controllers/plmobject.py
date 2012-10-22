@@ -357,6 +357,7 @@ class ControllerTest(BaseTestCase):
         user = self.get_contributor()
         controller.add_signer(user, level_to_sign_str(0))
         controller.remove_signer(self.user, level_to_sign_str(0))
+        controller.object.is_promotable = lambda: True
         self.assertRaises(exc.PermissionError, controller.approve_promotion)
                 
 
