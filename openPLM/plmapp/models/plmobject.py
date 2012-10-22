@@ -359,6 +359,24 @@ class PLMObject(models.Model):
     def get_leaf_object(self):
         return get_all_plmobjects()[self.type].objects.get(id=self.id)
 
+    def get_current_signer_role(self):
+        lcl = self.lifecycle.to_states_list()
+        return level_to_sign_str(lcl.index(self.state.name))
+
+    def get_current_signers(self):
+        role = self.get_current_signer_role()
+        return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
+    
+    def get_approvers(self):
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        next_state = lcl.next_state(self.state.name)
+        approvers = self.approvals.now().filter(current_state=self.state,
+                next_state=next_state).values_list("user", flat=True)
+        return approvers
+
+  
+
 def get_all_subclasses(base, d):
     if base.__name__ not in d and not base._deferred:
         d[base.__name__] = base

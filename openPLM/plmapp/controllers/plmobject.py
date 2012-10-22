@@ -166,14 +166,6 @@ class PLMObjectController(Controller):
     def can_approve_promotion(self, user=None):
         return bool(self.get_represented_approvers(user))
 
-    def get_current_signer_role(self):
-        lcl = self.lifecycle.to_states_list()
-        return level_to_sign_str(lcl.index(self.state.name))
-
-    def get_current_signers(self):
-        role = self.get_current_signer_role()
-        return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
-      
     def get_represented_approvers(self, user=None):
         if user is None:
             user = self._user
@@ -183,14 +175,6 @@ class PLMObjectController(Controller):
         delegators.difference_update(self.get_approvers())
         delegators.intersection_update(self.get_current_signers())
         return delegators
-
-    def get_approvers(self):
-        lcl = self.lifecycle.to_states_list()
-        role = level_to_sign_str(lcl.index(self.state.name))
-        next_state = lcl.next_state(self.state.name)
-        approvers = self.approvals.now().filter(current_state=self.object.state,
-                next_state=next_state).values_list("user", flat=True)
-        return approvers
 
     def is_last_promoter(self):
         role = self.get_current_signer_role()
