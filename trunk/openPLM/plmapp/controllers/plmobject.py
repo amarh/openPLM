@@ -556,6 +556,8 @@ class PLMObjectController(Controller):
 
     def check_edit_signer(self, raise_=True):
         """
+        .. versionadded:: 1.2
+
         Checks that the current user can edit the signers of the object:
 
             * He must own the object
@@ -574,6 +576,8 @@ class PLMObjectController(Controller):
 
     def can_edit_signer(self):
         """
+        .. versionadded:: 1.2
+
         Returns True if the user can edit signers of the object.
         """
         return self.check_edit_signer(raise_=False)
@@ -601,6 +605,8 @@ class PLMObjectController(Controller):
 
     def add_signer(self, new_signer, role):
         """
+        .. versionadded:: 1.2
+
         Adds *new_signer* to the list of signer for the role *role*.
 
         :raise: exceptions raised by :meth:`check_edit_signer`
