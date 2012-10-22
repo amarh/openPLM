@@ -434,7 +434,7 @@ class ViewTest(CommonViewTest):
         response = self.get(url, link=True, page="lifecycle")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
-        self.assertEqual("delegate", attach[1])
+        self.assertEqual("add_" + role, attach[1])
     
     def do_test_management_add_post(self, url, role):
         data = dict(type="User", username=self.brian.username)

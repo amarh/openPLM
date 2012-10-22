@@ -1618,8 +1618,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
         role of the new user (:const:`.ROLE_NOTIFIED` or :const:`.ROLE_READER`)
 
     ``attach``
-        set to (*obj*, "delegate") or (*obj*, "delegate-reader*) according to
-        *reader*
+        set to (*obj*, :samp:`"add_{role}"`)
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -1641,7 +1640,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
                 'replace_manager_form': add_management_form,
                 'link_creation': True,
                 'role' : role,
-                "attach" : (obj, "delegate-reader" if reader else "delegate")})
+                "attach" : (obj, "add_" + role)})
     return r2r('management_replace.html', ctx, request)
 
 ##########################################################################################    
