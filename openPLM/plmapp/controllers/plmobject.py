@@ -600,6 +600,12 @@ class PLMObjectController(Controller):
             raise ValueError("Invalid role")
 
     def add_signer(self, new_signer, role):
+        """
+        Adds *new_signer* to the list of signer for the role *role*.
+
+        :raise: exceptions raised by :meth:`check_edit_signer`
+        :raise: exceptions raised by :meth:`check_signer`
+        """
         self.check_edit_signer()
         self.check_signer(new_signer, role)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
