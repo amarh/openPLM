@@ -579,10 +579,12 @@ class PLMObjectController(Controller):
         self.check_contributor(user)
         self.check_in_group(user)
         # check if the role is valid
+        if not role.startswith(models.ROLE_SIGN):
+            raise ValueError("Invalid role")
         max_level = self.lifecycle.nb_states - 1
         level = int(re.search(r"\d+", role).group(0))
         if level > max_level:
-            raise ValueError("bad role")
+            raise ValueError("Invalid role")
 
     def add_signer(self, new_signer, role):
         self.check_edit_signer()
