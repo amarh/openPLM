@@ -555,6 +555,16 @@ class PLMObjectController(Controller):
         self._save_histo("New reader", details) 
 
     def check_edit_signer(self, raise_=True):
+        """
+        Checks that the current user can edit the signers of the object:
+
+            * He must own the object
+            * No user should have approved the promotion
+
+        :raise: :exc:`.PermissionError` if *raise_* is True and one of the
+                above conditions is not met
+        :return: True if the user can edit the signers
+        """
         r = self.check_permission("owner", raise_=raise_)
         if r and self.approvals.now().exists():
             if raise_:
@@ -563,6 +573,9 @@ class PLMObjectController(Controller):
         return r
 
     def can_edit_signer(self):
+        """
+        Returns True if the user can edit signers of the object.
+        """
         return self.check_edit_signer(raise_=False)
 
     def check_signer(self, user, role):
