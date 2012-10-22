@@ -360,7 +360,6 @@ class ControllerTest(BaseTestCase):
         controller.object.is_promotable = lambda: True
         self.assertRaises(exc.PermissionError, controller.approve_promotion)
                 
-
     def test_replace_signer_error_approved(self):
         controller = self.create("Part1")
         user = self.get_contributor()

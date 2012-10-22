@@ -430,19 +430,40 @@ class ViewTest(CommonViewTest):
         self.assertEqual("User", form.initial["type"])
         self.assertEqual(self.user.username, form.initial["username"])
 
-    def test_management_add_get(self):
-        response = self.get(self.base_url + "management/add/",
-               link=True, page="lifecycle")
+    def do_test_management_add_get(self, url, role):
+        response = self.get(url, link=True, page="lifecycle")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("delegate", attach[1])
-
-    def test_management_add_post(self):
+    
+    def do_test_management_add_post(self, url, role):
         data = dict(type="User", username=self.brian.username)
         self.brian.groups.add(self.group)
-        response = self.post(self.base_url + "management/add/", data)
+        response = self.post(url, data)
         self.assertTrue(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
-            user=self.brian, role=m.ROLE_NOTIFIED))
+            user=self.brian, role=role).exists())
+
+    def test_management_add_reader_get(self):
+        self.do_test_management_add_get(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+    
+    def test_management_add_signer0_get(self):
+        self.do_test_management_add_get(self.base_url + "management/add-signer0/",
+                level_to_sign_str(0))
+
+    def test_management_add_signer1_get(self):
+        self.do_test_management_add_get(self.base_url + "management/add-signer1/",
+                level_to_sign_str(1))
+
+    def test_management_add_reader_post(self):
+        self.do_test_management_add_post(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+    
+    def test_management_add_signer0_post(self):
+        self.do_test_management_add_post(self.base_url + "management/add-signer0/",
+                level_to_sign_str(0))
+
+    def test_management_add_signer1_post(self):
+        self.do_test_management_add_post(self.base_url + "management/add-signer1/",
+                level_to_sign_str(1))
 
     def test_management_replace_get(self):
         role = level_to_sign_str(0)
