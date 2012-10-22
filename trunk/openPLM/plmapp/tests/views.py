@@ -465,7 +465,7 @@ class ViewTest(CommonViewTest):
         self.do_test_management_add_post(self.base_url + "management/add-signer1/",
                 level_to_sign_str(1))
 
-    def test_management_replace_get(self):
+    def test_management_replace_signer_get(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
         self.controller.replace_signer(self.user, self.brian, role)
@@ -475,9 +475,9 @@ class ViewTest(CommonViewTest):
                 link=True, page="lifecycle")
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
-        self.assertEqual("delegate", attach[1])
+        self.assertEqual("add_" + role, attach[1])
     
-    def test_management_replace_post(self):
+    def test_management_replace_signer_post(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
         self.controller.replace_signer(self.user, self.brian, role)
