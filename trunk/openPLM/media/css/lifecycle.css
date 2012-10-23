@@ -8,14 +8,15 @@
     border-radius: 4px;
 }
 
-.msg:empty{
+.msg:empty {
     display:none;
 }
 
 div.lifecycle {
     background-color: #E4E3E2;
     display: block;
-    margin: 1em;
+    margin: 1em 0.5em 1em 0em;
+    padding: 0.5em;
 }
 
 div.lifecycle > div {
@@ -68,6 +69,7 @@ div.lifecycle div.deprecated {
 }
 
 div.lifecycle div.deprecated span.state {
+    display: block;
     -moz-transform: rotate(-45deg);
     -o-transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
