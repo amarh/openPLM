@@ -476,6 +476,31 @@ class ViewTest(CommonViewTest):
 
     def test_management_add_notified_post(self):
         self.do_test_management_add_post(self.base_url + "management/add/", m.ROLE_NOTIFIED)
+ 
+    def do_test_management_delete_post(self, url, role):
+        self.brian.groups.add(self.group)
+        self.controller.set_role(self.brian, role)
+        link_id = self.controller.plmobjectuserlink_plmobject.get(user=self.brian, role=role).id
+        response = self.post(url, {"link_id" : link_id})
+        self.assertFalse(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
+            user=self.brian, role=role).exists())
+
+    def test_management_delete_reader_post(self):
+        self.brian.get_profile().restricted = True
+        self.brian.get_profile().save()
+        self.controller.promote(checked=True)
+        self.do_test_management_delete_post(self.base_url + "management/delete/", m.ROLE_READER)
+    
+    def test_management_delete_signer0_post(self):
+        self.do_test_management_delete_post(self.base_url + "management/delete/",
+                level_to_sign_str(0))
+
+    def test_management_delete_signer1_post(self):
+        self.do_test_management_delete_post(self.base_url + "management/delete/",
+                level_to_sign_str(1))
+   
+    def test_management_delete_notified_post(self):
+        self.do_test_management_delete_post(self.base_url + "management/delete/", m.ROLE_NOTIFIED)
     
     def test_management_replace_signer_get(self):
         role = level_to_sign_str(0)
