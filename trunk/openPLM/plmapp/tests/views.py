@@ -528,16 +528,6 @@ class ViewTest(CommonViewTest):
         self.assertTrue(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.user, role=role))
 
-    def test_management_delete(self):
-        self.brian.groups.add(self.group)
-        self.controller.add_notified(self.brian)
-        link = m.PLMObjectUserLink.current_objects.get(plmobject=self.controller.object,
-            user=self.brian, role=m.ROLE_NOTIFIED)
-        data = {"link_id" : link.id }
-        response = self.post(self.base_url + "management/delete/", data)
-        self.assertFalse(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
-            user=self.brian, role=m.ROLE_NOTIFIED))
-
     def test_publish_post(self):
         """ Tests a publication. """
         self.controller.object.state = m.State.objects.get(name="official")
