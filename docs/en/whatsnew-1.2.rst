@@ -14,6 +14,15 @@ Navigate
 
 Two links to the previous and next revisions are now displayed.
 
+Lifecycle
+---------
+
+BOM
+----
+
+Files
+-------
+
 Badges
 ------
 
