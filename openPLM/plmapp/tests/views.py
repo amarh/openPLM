@@ -372,6 +372,16 @@ class ViewTest(CommonViewTest):
         self.assertEqual(lifecycles, wanted)
         self.assertFalse(response.context["password_form"].is_valid())
 
+    def test_lifecycle_deprecated(self):
+        """ Tests the lifecycle page of a deprecated object."""
+        self.controller.promote(checked=True)
+        self.controller.promote(checked=True)
+        self.assertTrue(self.controller.is_deprecated)
+        response = self.get(self.base_url +  "lifecycle/")
+        root = lxml.html.fromstring(response.content.decode("utf-8"))
+        self.assertFalse(root.xpath('//input[@name="promote"]'))
+        self.assertFalse(root.xpath('//input[@name="demote"]'))
+
     def test_revisions_get(self):
         response = self.get(self.base_url + "revisions/")
         revisions = response.context["revisions"]

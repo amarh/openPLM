@@ -368,6 +368,8 @@ class PLMObject(models.Model):
         return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
     
     def get_approvers(self):
+        if self.is_deprecated or self.is_cancelled:
+            return self.approvals.none()
         lcl = self.lifecycle.to_states_list()
         role = level_to_sign_str(lcl.index(self.state.name))
         next_state = lcl.next_state(self.state.name)
