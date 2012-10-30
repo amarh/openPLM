@@ -2,18 +2,17 @@
 
 <div class="identity_card ic-{{type}}">
 
-
-    <div class="id_thumbnail">
-        <div class="id_thumbnail_inner">
-            <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
+    <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
+        <div class="id_thumbnail">
+            <div class="id_thumbnail_inner">
                 <img src="{% block thumbnail_url %}{% endblock %}"/>
-            </a>
+            </div>
         </div>
-    </div>
-    <div class="id_details">
+        <div class="id_details">
 
-        {% block id_details %}
-        {% endblock %}
-    </div>
+            {% block id_details %}
+            {% endblock %}
+        </div>
+    </a>
 
 </div>

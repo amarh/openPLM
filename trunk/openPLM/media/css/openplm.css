@@ -1198,11 +1198,11 @@ div.identity_card {
     position: relative;
 }
 
-div.identity_card > div.id_thumbnail,
-div.identity_card > div.id_details {
+div.identity_card div.id_thumbnail,
+div.identity_card div.id_details {
     display: block;
 }
-div.identity_card > div.id_thumbnail {
+div.identity_card div.id_thumbnail {
     width: 100px;
     height: 100px;
     float: left;
@@ -1218,14 +1218,14 @@ div.identity_card div.id_thumbnail_inner {
     width: 100px;
 }
 
-div.identity_card > div.id_thumbnail img {
+div.identity_card div.id_thumbnail img {
     max-width: 100px;
     max-height: 100px;
     margin:auto;
     float: none;
     display: block;
 }
-div.identity_card > div.id_details {
+div.identity_card div.id_details {
     height: 120px;
     border-left: 1px solid #ccc;
     padding: 0 1em;
