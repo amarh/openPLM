@@ -50,9 +50,9 @@ def flatten_bom(data):
         link = child.link
         ext_data = data["extension_data"][link.id]
         ext = tuple(ext_data.get(key, "") for key, name in data["extra_columns"])
-        flatten.append(("part", child, data["states"][link.child_id], ext))
+        flatten.append(("part", child, data["states"].get(link.child_id), ext))
         for doc in data["documents"][link.child_id]:
-            flatten.append(("document", doc, data["states"][doc.id]))
+            flatten.append(("document", doc, data["states"].get(doc.id)))
     return flatten
 
 class PartController(PLMObjectController):
