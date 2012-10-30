@@ -1193,10 +1193,20 @@ div.identity_card {
     box-shadow: 1px 1px 3px #888;
     width: 20em;
     height: 130px;
-    padding: 5px;
     margin: 0.5em;
     position: relative;
 }
+
+div.identity_card:hover {
+    background-color: #f3f3f1;
+    box-shadow: 1px 1px 3px #555;
+}
+
+div.identity_card > a {
+    padding: 5px;
+    display: block;
+}
+
 
 div.identity_card div.id_thumbnail,
 div.identity_card div.id_details {
