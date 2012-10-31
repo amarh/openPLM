@@ -55,8 +55,6 @@
             </dl>
         </div>
     {% endfor %}
-    {% with object_history as objects %}
-        {% include "snippets/pagination.html" %}
-    {% endwith %}
+    {% show_pages_bar object_history request %}
 {% endblock %}
 
