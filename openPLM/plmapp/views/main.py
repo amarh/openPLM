@@ -87,8 +87,7 @@ from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
 from openPLM.plmapp.controllers import get_controller 
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
-from openPLM.plmapp.utils import (level_to_sign_str, get_next_revision,
-        get_pages_num)
+from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
 from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
 
 
@@ -805,7 +804,6 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     except EmptyPage:
         history = paginator.page(paginator.num_pages)
     ctx.update({
-        'pages' : get_pages_num(paginator.num_pages, page),
         'current_page' : 'history', 
         'object_history' : history,
         'show_identifiers' : timeline,
@@ -2755,7 +2753,6 @@ def get_pagination(r_GET, object_list, type):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         objects = paginator.page(paginator.num_pages)
-    ctx["pages"] = get_pages_num(paginator.num_pages, page)
     ctx["thumbnails"] = {}
     ctx["num_files"] = {}
 

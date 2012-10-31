@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.template import Node, resolve_variable
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp import models
+from openPLM.plmapp.utils import get_pages_num
 
 
 register = template.Library()
@@ -248,3 +249,12 @@ def add_get(parser, token):
         s = pair.split('=', 1)
         values[s[0]] = parser.compile_filter(s[1])
     return AddGetParameter(values)
+
+
+@register.inclusion_tag('snippets/pagination.html')
+def show_pages_bar(page, request):
+    return {
+            "objects" : page,
+            "request" : request,
+            "pages" : get_pages_num(page.paginator.num_pages, page.number),
+            }
