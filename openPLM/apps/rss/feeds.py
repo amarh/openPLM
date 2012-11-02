@@ -110,13 +110,8 @@ class RssFeed(HTTPAuthFeed):
         return make_desc(i_action, i_details, i_user)
     
     def item_link(self, item):
-        if isinstance(item, models.History):
-            t = "object"
-        elif isinstance(item, models.GroupHistory):
-            t = "group"
-        else:
-            t = "user"
-        return u"/history_item/%s/%d/" % (t, item.id)
+        return item.get_redirect_url()
+
 
 class AtomFeed(RssFeed):
     feed_type = Atom1Feed
