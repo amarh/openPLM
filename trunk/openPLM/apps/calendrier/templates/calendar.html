@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+{% load humanize %}
+
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/calendar.css" />
+
+{% endblock %}
+
+{% block extrahead %}
+    <link rel="alternate" type="application/atom+xml" href="../atom/">
+    <link rel="alternate" type="application/rss+xml" href="../rss/">
+{% endblock %}
+{% block content %}
+
+    <div id="calendar">
+        <div id="months">
+            {% if previous_month %}
+                <a id="previous_month" href="{{prefix_url}}{{previous_month.year}}/{{previous_month.month}}/">
+                    <span class="month" >{{previous_month|date:"F Y"}}</span>
+                </a>
+            {% endif %}
+
+            <span id="current_month" class="month" >{{current_month|date:"F Y"}}</span>
+
+            {% if next_month %}
+                <a  id="next_month" href="{{prefix_url}}{{next_month.year}}/{{next_month.month}}/">
+                    <span class="month"> {{next_month|date:"F Y"}}</span>
+                </a>
+            {% endif %}
+
+        </div>
+
+        {{ calendar }}
+
+    </div>
+
+{% endblock %}
+
