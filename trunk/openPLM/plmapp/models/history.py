@@ -67,15 +67,24 @@ class History(AbstractHistory):
         app_label = "plmapp"
     plmobject = models.ForeignKey(PLMObject)
 
+    def get_redirect_url(self):
+        return "/history_item/object/%d/" % self.id
+
 class UserHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
     plmobject = models.ForeignKey(User)
 
+    def get_redirect_url(self):
+        return "/history_item/user/%d/" % self.id
+
 class GroupHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
     plmobject = models.ForeignKey(Group)
+    
+    def get_redirect_url(self):
+        return "/history_item/group/%d/" % self.id
 
 class StateHistoryQuerySet(QuerySet):
     """ QuerySet with utility methods to filter :class:`StateHistory` alive at a given time."""
