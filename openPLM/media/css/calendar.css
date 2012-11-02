@@ -1,0 +1,121 @@
+#calendar table {
+    width: 100%;
+    margin: 0;
+    border: 1px solid #575453;
+}
+
+
+#calendar td.filled,
+#calendar td.weeknumber,
+#calendar td.empty {
+}
+
+#calendar td ul {
+    max-height: 7em;
+    height: 7em;
+    min-height: 7em;
+    overflow-y: auto;
+}
+
+#main_content #calendar li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.4em;
+    font-size: 85%;
+}
+
+
+#calendar td.filled * {
+}
+
+#calendar th {
+    padding: 0.5em;
+    border: 1px solid #575453;
+
+}
+#calendar td {
+    width: 16%;
+    height: 8em;
+    padding: 0;
+    background-color: #fdfdfd;
+}
+#calendar td > * {
+    padding: 0.3em;
+}
+#calendar td.empty {
+    background-color: #fdfdfd;
+
+}
+#calendar td.weeknumber {
+    background-color: #E0BDD7;
+    width: 2%;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#calendar td.today {
+    background-color: #FFE79C;
+}
+#calendar td.noday,
+#calendar td.empty
+{
+    width: 9%;
+}
+#calendar td.noday {
+    background-color: #efefef;
+}
+#calendar div.daynumber {
+    line-height: 1em;
+    text-align: right;
+    margin: 0;
+    background-color: #f7f7f7;
+}
+
+#calendar td.filled div.daynumber {
+    background-color: #BCCFE8;
+}
+#calendar td.today div.daynumber {
+    font-weight: bold;
+    background-color: #F7E093;
+}
+
+#months {
+    width: 100%;
+    position: relative;
+    height: 2em;
+    text-align: center;
+}
+
+#calendar a {
+    text-decoration: none;
+}
+
+#previous_month {
+    display: block;
+    position: absolute;
+    left: 0.5em;
+    top: 0em;
+}
+
+#next_month {
+    display: block;
+    top: 0em;
+    position: absolute;
+    right: 0.5em;
+}
+#current_month{
+    display: block;
+    margin: 0.5em auto;
+}
+
+#previous_month:before {
+    content: "←";
+}
+
+#next_month:after  {
+    content: "→"
+}
+
+span.month {
+    font-weight: bold;
+}

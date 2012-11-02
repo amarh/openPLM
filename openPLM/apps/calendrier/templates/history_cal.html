@@ -1,0 +1,13 @@
+{% extends "history.html" %}
+{% load i18n plmapp_tags %}
+{% load humanize %}
+
+
+{% block content %}
+    <div>
+        <a id="calendar_link" href="./calendar/">{% trans "Calendar" %}</a>
+    </div>
+
+    {{ block.super }}
+
+{% endblock %}
