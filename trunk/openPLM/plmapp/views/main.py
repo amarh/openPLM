@@ -744,7 +744,8 @@ def redirect_history(request, type, hid):
 
 
 @handle_errors
-def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", timeline=False):
+def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", timeline=False,
+        template="history.html"):
     """
     History view.
     
@@ -808,7 +809,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         'object_history' : history,
         'show_identifiers' : timeline,
         })
-    return r2r('history.html', ctx, request)
+    return r2r(template, ctx, request)
 
 
 #############################################################################################
