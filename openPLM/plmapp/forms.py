@@ -535,7 +535,7 @@ class NavigateFilterForm(forms.Form):
            widget=forms.HiddenInput() )
     date = forms.DateField(required=False,
         widget=forms.DateInput(attrs={"size":10}))
-    time = forms.DateField(required=False,
+    time = forms.TimeField(required=False,
             widget=forms.TimeInput(attrs={"size":8}))
 
 class PartNavigateFilterForm(NavigateFilterForm):
