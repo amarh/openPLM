@@ -33,10 +33,11 @@
     padding: 20%;
     background-color:#82979f;
 }
-.marker:hover{
+.marker:hover {
     z-index: 100;
     cursor: help;
 }
+
 .marker:hover .info{
     display:inline;
     min-width: 200px;
@@ -93,7 +94,7 @@
 }
 
 #navigate_options{
-    top: 15%;
+    top: 24%;
     left: 94%;
 }
 
