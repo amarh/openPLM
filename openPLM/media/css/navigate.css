@@ -29,6 +29,7 @@ div.node {
     height: 70px;
 }
 
+
 div.node, div.node * {
     z-index: 5;
 }
@@ -46,7 +47,7 @@ div.node > div.table {
 
 }
 
-div.node p {
+div.node.nocard p {
     color: #fff;
     font-weight: bold;
     display: table-cell;
@@ -58,7 +59,76 @@ div.node p {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
-div.main_node p {
+
+div.node.card {
+    width: 200px;
+    height: 100px;
+}
+div.node.card.n_part {
+    width: 150px;
+}
+
+div.main_node.card div.identity_card {
+    border: 2px solid #E6007E;
+}
+
+
+div.main_node.card.n_part div.identity_card {
+    border-color: #009FE3;
+}
+div.main_node.card.n_document div.identity_card {
+    border-color: #312783;
+}
+
+
+div.identity_card {
+    width: 195px;
+    height: 95px;
+    margin: 0;
+}
+div.n_part .identity_card {
+    height: 95px;
+    width: 145px;
+}
+div.n_part.card div.id_thumbnail {
+    display: none;
+}
+
+div.identity_card div.id_details {
+    height: 95px;
+    left: 100px;
+    width: 95px;
+    border-left: none;
+}
+.n_part .identity_card div.id_details {
+    left: -6px;
+    width: 145px;
+}
+div.identity_card div.id_thumbnail {
+    width: 70px;
+    height: 90px;
+    margin: 2px;
+    border-radius: 2px;
+}
+
+div.identity_card div.id_thumbnail_inner {
+    height: 90px;
+    width: 70px;
+}
+
+div.identity_card div.id_thumbnail img {
+    max-width: 70px;
+    max-height: 90px;
+}
+div.identity_card div.id_details {
+    height: 90px;
+    padding: 0 0.5em;
+    left: 80px;
+    font-size: 80%;
+}
+
+
+div.main_node.nocard p {
     color: #343434;
     text-shadow: 1px 1px #ccc;
 }
@@ -253,28 +323,28 @@ div#FilterNav > form > ul > li
     padding: 5px;
 }
 
-div.n_part {
+div.n_part.nocard {
     background-image: url("/media/img/navigate/part.png");
 }
-div.n_document {
+div.n_document.nocard  {
     background-image: url("/media/img/navigate/document.png");
 }
-div.n_group {
+div.n_group.nocard  {
     background-image: url("/media/img/navigate/user.png");
 }
-div.n_user {
+div.n_user.nocard  {
     background-image: url("/media/img/navigate/user.png");
 }
-div.n_part.main_node {
+div.n_part.main_node.nocard  {
     background-image: url("/media/img/navigate/part_main.png");
 }
-div.n_document.main_node {
+div.n_document.main_node.nocard  {
     background-image: url("/media/img/navigate/document_main.png");
 }
-div.n_group.main_node {
+div.n_group.main_node.nocard  {
     background-image: url("/media/img/navigate/user_main.png");
 }
-div.n_user.main_node {
+div.n_user.main_node.nocard {
     background-image: url("/media/img/navigate/user_main.png");
 }
 

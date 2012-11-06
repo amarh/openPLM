@@ -1,22 +1,32 @@
 {% load i18n %}
 {% spaceless %}
-<div id="{{id|safe}}" class="node n_{{type}} {{main|yesno:"main_node, "}}" style="{{style|safe}}"
-    title="{{title_}}">
-    <div class="table">
-        {{label|linebreaks}}
+    <div id="{{id|safe}}" class="node n_{{type}} {{main|yesno:"main_node, "}} {{card|yesno:"card,nocard"}}" style="{{style|safe}}"
+        title="{{title_}}">
+
+        {% if card %}
+            {% with type|add:"s/identity_card.html" as tpl %}
+                {% filter removetags:"a" %}
+                    {% include tpl %}
+                {% endfilter %}
+            {% endwith %}
+
+        {% else %}
+            <div class="table">
+                {{label|linebreaks}}
+            </div>
+        {% endif %}
+
+        {% if type == "document" %}
+            <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="{% trans "Display thumbnails" %}"
+            onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{time}}{{path}}');"/>
+        {% endif %}
+
+        {% if show_documents %}
+            <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all" title="{% trans "Show related documents" %}"
+            onclick="dd('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');"/>
+        {% endif %}
+
+        <a href="{{href|safe}}"><span>&nbsp;</span></a>
+
     </div>
-
-    {% if thumbnails %}
-        <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="{% trans "Display thumbnails" %}"
-        onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{time}}{{path}}');"/>
-    {% endif %}
-
-    {% if show_documents %}
-        <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all" title="{% trans "Show related documents" %}"
-        onclick="dd('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');"/>
-    {% endif %}
-
-    <a href="{{href|safe}}"><span>&nbsp;</span></a>
-
-</div>
 {% endspaceless %}
