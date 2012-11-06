@@ -54,6 +54,32 @@ OSR = "only_search_results"
 
 TIME_FORMAT = "%Y-%m-%d:%H:%M:%S/"
 
+def get_id_card_data(doc_ids, date=None):
+    """
+    Get informations to display in the id-cards of all Document which id is in doc_ids
+    
+    :param doc_ids: list of Document ids to treat
+    
+    :return: a Dictionnary which contains the following informations
+    
+        * ``thumbnails``
+            list of tuple (document,thumbnail)
+            
+        * ``num_files``
+            list of tuple (document, number of file)
+    """
+    ctx = { "thumbnails" : {}, "num_files" : {} }
+    if doc_ids:
+        thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                    document__in=doc_ids, thumbnail__isnull=False)
+        ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
+        num_files = dict.fromkeys(doc_ids, 0)
+        for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+            document__in=doc_ids).values_list("document", flat=True):
+                num_files[doc_id] += 1
+                ctx["num_files"] = num_files
+    return ctx
+
 class FrozenAGraph(pgv.AGraph):
     '''
     A frozen AGraph
@@ -147,6 +173,7 @@ class NavigationGraph(object):
                    "request_notification_from", OSR) 
         self.options = dict.fromkeys(options, False)
         self.options["prog"] = "dot"
+        self.options["cards"] = True
         self.options["doc_parts"] = []
         self.nodes = defaultdict(dict)
         self.edges = set()
@@ -156,6 +183,7 @@ class NavigationGraph(object):
         self.graph.edge_attr.update(self.EDGE_ATTRIBUTES)
         self._title_to_node = {}
         self._part_to_node = {}
+        self._doc_ids = []
         self.time = None
 
     def set_options(self, options):
@@ -360,8 +388,9 @@ class NavigationGraph(object):
         node = self.nodes[id_]
         self._set_node_attributes(self.object, id_)
         self.main_node = node["id"]
-        node["width"] = 110. / 96 
-        node["height"] = 80. / 96 
+        if not self.options["cards"]:
+            node["width"] = 110. / 96 
+            node["height"] = 80. / 96 
         opt_to_meth = {
             'child' : (self._create_child_edges, None),
             'parents' : (self._create_parents_edges, None),
@@ -433,6 +462,7 @@ class NavigationGraph(object):
         # in _convert_map
         data = {}
         url = None 
+
         # set node attributes according to its type
         if type_ == "plmobject":
             ref = (obj["type"], obj["reference"], obj["revision"])
@@ -448,6 +478,8 @@ class NavigationGraph(object):
                 data["path"] = iri_to_uri("/".join(ref))
                 data["thumbnails"] = True
                 type_ = "document"
+                self._doc_ids.append(id_)
+            data["object"] = obj
 
         elif isinstance(obj, (PLMObjectController, models.PLMObject)):
             # display the object's name if it is not empty
@@ -459,18 +491,29 @@ class NavigationGraph(object):
                 data["path"] = get_path(obj)
                 data["thumbnails"] = True
                 type_ = "document"
+                self._doc_ids.append(id_)
             else:
                 type_ = "part"
-                # this will be used later to see if it has an attached document
+                # this will be used later to test if it has an attached document
                 self._part_to_node[id_] = data
+            
+            data["object"] = {"id" : obj.id, "reference" : obj.reference,
+                    "revision": obj.revision, "type" : obj.type, 
+                    "name" : obj.name, "state_id" : obj.state_id }
         elif isinstance(obj, (User, UserController)):
             full_name = u'%s\n%s' % (obj.first_name, obj.last_name)
             label = full_name.strip() or obj.username
             data["title_"] = obj.username
             type_ = "user"
+            data["object"] = {"id" : obj.id, "username" : obj.username,
+                    "first_name" :obj.first_name, "last_name" : obj.last_name,
+                    "get_full_name": obj.get_full_name(),
+                    "type" : "User"}
         else:
             label = obj.name
             type_ = "group"
+            data["object"] = {"id" : obj.id, "name" : obj.name,
+                    "type" : "Group"}
         id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), id_)
 
         data["label"] = label + "\n" + extra_label if extra_label else label
@@ -479,12 +522,24 @@ class NavigationGraph(object):
                 URL=(url or obj.plmobject_url) + "navigate/",
                 id=id_,
                 )
+        if self.options["cards"]:
+            self.nodes[obj_id]["width"] = ([200., 150.][type_ == "part"]) / 96
+            self.nodes[obj_id]["height"] = 100. / 96 
         self._title_to_node[id_] = data
 
     def _convert_map(self, map_string):
         elements = []
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         time_str = "" if not self.time else self.time.strftime(TIME_FORMAT)
+        if self.options["cards"]:
+            card_data = get_id_card_data(self._doc_ids)
+            ids = self._doc_ids + self._part_to_node.keys()
+            if ids:
+                states = dict(models.StateHistory.objects.at(self.time).filter(
+                plmobject__in=ids).values_list("plmobject", "state"))
+            else:
+                states = {}
+
         for area in ET.fromstring(map_string).findall("area"):
             if area.get("href") == ".":
                 if area.get("shape") == "rect":
@@ -507,6 +562,11 @@ class NavigationGraph(object):
             # render the div
             id_ = "Nav-%s" % area.get("id")
             ctx = data.copy()
+            ctx["card"] = self.options["cards"]
+            if ctx["card"]:
+                ctx.update(card_data)
+                if ctx["type"] in ("part", "document"):
+                    ctx["object"]["state_id"] = states.get(ctx["object"]["id"])
             ctx["style"] = style
             ctx["id"] = id_
             main = self.main_node == area.get("id")
@@ -514,6 +574,7 @@ class NavigationGraph(object):
             ctx["href"] = area.get("href")
             ctx["documents_url"] = ajax_navigate
             ctx["time"] = time_str
+            ctx["MEDIA_URL"] = "/media/"
             div = render_to_string("navigate/node.html", ctx)
             if main:
                 # the main node must be the first item, since it is
