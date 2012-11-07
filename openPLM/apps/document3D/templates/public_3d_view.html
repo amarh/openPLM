@@ -1,0 +1,30 @@
+{% extends "Display3D.htm" %}
+
+{% block toolbar %} {% endblock %}
+{% block leftcolumn %} {% endblock %}
+
+{% block scripts %} 
+    {% if javascript_arborescense or stl %}
+
+        <script type="text/javascript" src="/media/js/3D/three-min.js"></script> 
+        <script type="text/javascript" src="/media/js/3D/struct.js"></script> 
+        <script type="text/javascript">
+            THREE.Vertex = function ( position ) { return position; };
+        </script>
+        <script type="text/javascript" src="/3D/public/{{obj.id}}"></script>
+        {%  if javascript_arborescense %}
+            <script type="text/javascript"> {{javascript_arborescense|safe}}</script>
+        {% endif %}
+        <script type="text/javascript" src="/media/js/3D/view.js"></script> 
+        <script type="text/javascript">
+            $( function () {
+                {% if stl %}
+                    view = new View3D(false, '/file/public/{{stl_file.id}}/');
+                {% else %}
+                    view = new View3D(true);
+                {% endif %}
+                view.render();
+            });
+        </script>
+    {% endif %}
+{% endblock %}

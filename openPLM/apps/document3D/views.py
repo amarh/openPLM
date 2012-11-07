@@ -1,19 +1,24 @@
+import fileinput
 from collections import namedtuple
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
+from django.db import transaction
+from django.http import (HttpResponse, HttpResponseRedirect,
+        HttpResponseForbidden, Http404)
 
-from openPLM.plmapp.base_views import handle_errors, secure_required, get_generic_data
+from openPLM.plmapp.base_views import (handle_errors, secure_required,
+        get_generic_data, get_obj, get_obj_by_id, init_ctx)
 from openPLM.apps.document3D.forms import *
 from openPLM.apps.document3D.models import *
 from openPLM.apps.document3D.arborescense import JSGenerator
 from openPLM.apps.document3D.classes import *
 from openPLM.plmapp.forms import *
 from openPLM.plmapp.models import get_all_plmobjects
-from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponseForbidden
 from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
-from django.contrib.auth.decorators import login_required
 from openPLM.plmapp.views.main import r2r
 import os
 
@@ -56,6 +61,66 @@ def display_3d(request, obj_ref, obj_revi):
         'javascript_arborescense' : javascript_arborescense , })
 
     return r2r('Display3D.htm', ctx, request)
+
+
+@secure_required
+def display_public_3d(request, obj_ref, obj_revi):
+    obj = get_obj("Document3D", obj_ref, obj_revi, request.user)
+    if not obj.published and request.user.is_anonymous():
+        return redirect_to_login(request.get_full_path())
+    elif not obj.published and not obj.check_restricted_readable(False):
+        raise Http404
+
+    ctx = init_ctx("Document3D", obj_ref, obj_revi)
+    ctx['stl'] = False
+
+    try:
+        doc_file = obj.files.filter(is_stp)[0]
+    except IndexError:
+        doc_file = None
+
+        javascript_arborescense=""
+        try:
+            doc_file = obj.files.filter(is_stl)[0]
+            ctx["stl"] = True
+            ctx["stl_file"] = doc_file
+        except IndexError:
+            pass
+    else:
+        product = obj.get_product(doc_file, True)
+        javascript_arborescense = JSGenerator(product).get_js()
+
+    ctx.update({
+        'is_readable' : True,
+        # disable the menu and the navigation_history
+        'object_menu' : [],
+        'navigation_history' : [],
+        'obj' : obj,
+        'javascript_arborescense' : javascript_arborescense, 
+    })
+
+    return r2r("public_3d_view.html", ctx, request)
+
+@secure_required
+def public_3d_js(request, obj_id):
+    obj = get_obj_by_id(int(obj_id), request.user)
+    if not obj.is_document and not obj.type == "Document3D":
+        raise Http404
+    if not obj.published and request.user.is_anonymous():
+        return redirect_to_login(request.get_full_path())
+    elif not obj.published and not obj.check_restricted_readable(False):
+        raise Http404
+    try:
+        doc_file = obj.files.filter(is_stp)[0]
+    except IndexError:
+        js_files = []
+    else:
+        js_files = obj.get_all_geometry_files(doc_file)
+    if not js_files:
+        return HttpResponse("")
+    f = fileinput.FileInput(os.path.join(settings.MEDIA_ROOT, "3D", p) for p in js_files)
+    response = HttpResponse(f, mimetype="text/script")
+    return response
 
 
 class StepDecomposer(Decomposer):
