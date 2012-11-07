@@ -20,6 +20,13 @@ Lifecycle
 BOM
 ----
 
+
+Comparison
+++++++++++++
+
+Attached documents
++++++++++++++++++++
+
 Files
 -------
 
