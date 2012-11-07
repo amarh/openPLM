@@ -269,3 +269,25 @@ A custom controller can create them but it would not have to handle their clonin
     register(Location)
     register_PCLE(Location)
 
+.. _bom_comparison:
+
+.. versionadded:: 1.2
+
+BOMs comparison
+================
+
+Since the version 1.2, it's possible to compare two BOMs at two different dates
+and renders a diff view showing differences side by side (like in trac).
+
+The method :meth:`.PartController.cmp_bom` performs the comparison and the view
+:func:`.compare_bom` renders the result.
+
+This comparison relies :meth:`.difflib.SequenceMatcher.get_opcodes`.
+The standard :mod:`.difflib` module can compare strings and any types of finite
+sequences. Using this module is only a matter of input formats. In OpenPLM, BOMs
+are flatten (see :func:`.flatten_bom`) and three lines of code do the comparison.
+
+
+
+
+
