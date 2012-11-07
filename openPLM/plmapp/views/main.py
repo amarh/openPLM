@@ -2829,7 +2829,7 @@ def browse(request, type="object"):
     return r2r("browse.html", ctx, request)
 
 @secure_required
-def public(request, obj_type, obj_ref, obj_revi):
+def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
     """
     .. versionadded:: 1.1
 
@@ -2903,7 +2903,7 @@ def public(request, obj_type, obj_ref, obj_revi):
         'attached' : attached,
     })
 
-    return r2r("public.html", ctx, request)
+    return r2r(template, ctx, request)
 
 
 @handle_errors
