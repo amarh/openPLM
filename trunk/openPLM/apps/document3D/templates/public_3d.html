@@ -1,0 +1,18 @@
+{% extends "public.html" %}
+{% load i18n plmapp_tags %}
+
+{# template to display a pulished object #}
+
+{% block content %}
+
+    {% if obj.published or is_readable %}
+        <div id="v3d">
+            <h3>{% trans "3D" %}</h3>
+            <div>
+                <a href="./3D">{% trans "View in 3D" %}</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}
