@@ -194,6 +194,7 @@ Change rights:
 Change rights for the directory where thumbnails will be stored:
     
     * ``chown www-data:www-data /var/django/openPLM/media/thumbnails``
+    * ``chown www-data:www-data /var/django/openPLM/media/public/thumbnails``
  
 .. _search-engine:
 
