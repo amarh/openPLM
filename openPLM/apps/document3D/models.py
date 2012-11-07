@@ -309,7 +309,7 @@ class Document3DController(DocumentController):
             q = Q(stp=doc_file)
             stps = list(self._stps)
             if stps:
-                q |= Q(stp__in=self._stps)
+                q |= Q(stp__in=stps)
             gfs = GeometryFile.objects.filter(q)
         else:
             gfs = GeometryFile.objects.filter(stp=doc_file)
