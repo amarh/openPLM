@@ -444,8 +444,41 @@ class PartController(PLMObjectController):
 
     def get_bom(self, date, level, state="all", show_documents=False):
         """
-        Returns some informations about children that will be displayed
+        .. versionadded:: 1.2
+
+        Returns some data about children that will be displayed
         in BOM view.
+
+        :param date: date of the BOM (see :meth:`.get_children`)
+        :param level: level of the BOM, valid options are
+                      ``"first"``, ``"all"`` and ``"last"``.
+        :param state: set to ``"official"`` to hide unofficial parts and document
+        :param show_documents: True if attached document are displayed
+        
+        It returns a dictionary containing the following keys:
+
+        ``children``
+            list of :class:`Child`, see :meth:`.get_children`
+        
+        ``extra_columens``
+            list of extra column headers (field name, verbose name):
+            its the list of BOMs extensions bound to the object
+
+        ``extension_data``
+            dictionary (link id -> extension values)
+
+        ``level``
+            the given *level*
+
+        ``documents``
+            dictionary (part id -> document)
+
+        ``states``
+            dictionary (plmobject id -> state) containing the state (str)
+            of displayed objects at date *date*
+
+        ``obj``
+            this controller
         """
         max_level = 1 if level == "first" else -1
         only_official = state == "official"
@@ -495,7 +528,6 @@ class PartController(PLMObjectController):
                 'children' : children,
                 'extra_columns' : extra_columns,
                 'extension_data' : extension_data,
-                'level' : level,
                 'states' : states,
                 'documents' : documents,
                 'level' : level,
@@ -503,16 +535,34 @@ class PartController(PLMObjectController):
                 }
 
     def cmp_bom(self, date1, date2, level="first", state="all", show_documents=False):
-        data1 = self.get_bom(date1, level, state, show_documents)
-        data2 = self.get_bom(date2, level, state, show_documents)
-        s1 = flatten_bom(data1)
-        s2 = flatten_bom(data2)
+        """
+        .. versionadded:: 1.2
+
+        Compares two BOMs at date *date1* and *date2*.
+
+        dates, *level*, *state* and *show_documents* are described in :meth:`.get_bom`.
+
+        It returns a dictionary containing the following keys:
+
+        ``diff``
+            diff result, it is a sequence of tuples
+            (tag, first BOM rows, second BOM rows)
+            (see :meth:`.difflib.SequenceMatcher.get_opcodes`)
+
+        ``boms``
+            tuple of BOMs (at date *date1* and date *date2*)
+
+        """
+        bom1 = self.get_bom(date1, level, state, show_documents)
+        bom2 = self.get_bom(date2, level, state, show_documents)
+        s1 = flatten_bom(bom1)
+        s2 = flatten_bom(bom2)
         matcher = difflib.SequenceMatcher(None, s1, s2)
         diff = ((tag, izip_longest(s1[i1:i2], s2[j1:j2]))
             for tag, i1, i2, j1, j2 in matcher.get_opcodes())
         ctx = {
                 "diff" : diff,
-                "boms" : (data1, data2),
+                "boms" : (bom1, bom2),
                 }
         return ctx
 
