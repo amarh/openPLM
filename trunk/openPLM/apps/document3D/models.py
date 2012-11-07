@@ -233,7 +233,7 @@ class Document3DController(DocumentController):
                 tempfile_size=composer_step(STP_file[0])
                 if tempfile_size:
                     filename = new_STP_file.filename
-                    path = docfs.get_available_name(filename)
+                    path = docfs.get_available_name(filename.encode("utf-8"))
                     shutil.copy(tempfile_size[0].name, docfs.path(path))
                     new_doc = DocumentFile.objects.create(file=path,
                         filename=filename, size=tempfile_size[1], document=rev.object)
@@ -306,7 +306,10 @@ class Document3DController(DocumentController):
                     self._stps = dfs
                 else:
                     self._stps = DocumentFile.objects.none().values_list("id", flat=True)
-            q = Q(stp=doc_file) | Q(stp__in=self._stps)
+            q = Q(stp=doc_file)
+            stps = list(self._stps)
+            if stps:
+                q |= Q(stp__in=self._stps)
             gfs = GeometryFile.objects.filter(q)
         else:
             gfs = GeometryFile.objects.filter(stp=doc_file)
@@ -669,7 +672,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         product=Product_from_Arb(json.loads(arbre))   #whit doc_id and doc_path updated for every node
         old_product=Product_from_Arb(json.loads(old_arbre)) # doc_id and doc_path original
         new_stp_file=DocumentFile()
-        name = new_stp_file.file.storage.get_available_name(product.name+".stp".encode("utf-8"))
+        name = new_stp_file.file.storage.get_available_name((product.name+".stp").encode("utf-8"))
         new_stp_path = os.path.join(new_stp_file.file.storage.location, name)
         f = File(open(new_stp_path, 'w'))
         f.close()
