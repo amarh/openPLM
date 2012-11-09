@@ -73,6 +73,8 @@ class GroupController(Controller):
             raise PermissionError("%s is not a contributor" % user)
         if profile.restricted:
             raise PermissionError("Restricted account can not create a group.")
+        if not user.is_active:
+            raise PermissionError(u"%s's account is inactive" % user)
         if not name:
             raise ValueError("name must not be empty")
         if rx_bad_ref.search(name):
@@ -115,8 +117,9 @@ class GroupController(Controller):
         else:
             raise ValueError("form is invalid")
 
-
     def has_permission(self, role):
+        if not self._user.is_active:
+            return False
         if role == models.ROLE_OWNER:
             return self.owner == self._user
         return False
@@ -165,6 +168,8 @@ class GroupController(Controller):
             raise ValueError("user's email is empty")
         if user.get_profile().restricted:
             raise ValueError("Restricted account can not join a group")
+        if not user.is_active:
+            raise ValueError(u"%s's account is inactive" % user)
         inv = models.Invitation.objects.create(group=self.object, owner=self._user,
                 guest=user, guest_asked=False)
         self.send_invitation_to_guest(inv)
@@ -182,6 +187,8 @@ class GroupController(Controller):
             raise ValueError("user's email is empty")
         if self._user.get_profile().restricted:
             raise ValueError("Restricted account can not join a group")
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         inv = models.Invitation.objects.create(group=self.object, owner=self.owner,
                 guest=self._user, guest_asked=True)
         self.send_invitation_to_owner(inv)
@@ -204,6 +211,8 @@ class GroupController(Controller):
         else:
             if self._user != invitation.guest:
                 raise PermissionError("You can not accept this invitation.")
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
             
         invitation.state = models.Invitation.ACCEPTED
         invitation.validation_time = datetime.datetime.now()
@@ -228,6 +237,8 @@ class GroupController(Controller):
             raise ValueError("Invalid invitation")
         if self._user != invitation.guest:
             raise PermissionError("You can not send this invitation.")
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         ctx = { "group" : self.object,
                 "invitation" : invitation,
                 "guest" : self._user,
@@ -249,6 +260,8 @@ class GroupController(Controller):
             raise ValueError("Invalid invitation")
         if self._user != invitation.owner:
             raise PermissionError("You can not send this invitation.")
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         ctx = { "group" : self.object,
                 "invitation" : invitation,
                 }
@@ -275,6 +288,8 @@ class GroupController(Controller):
         else:
             if self._user != invitation.guest:
                 raise PermissionError("You can not refuse this invitation.")
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         invitation.state = models.Invitation.REFUSED
         invitation.validation_time = datetime.datetime.now()
         invitation.save()
@@ -297,8 +312,8 @@ class GroupController(Controller):
         return self.plmobject_group.filter(type__in=types)
 
     def check_readable(self, raise_=True):
-        if self._user.get_profile().restricted:
+        if self._user.get_profile().restricted or not self._user.is_active:
             if raise_:
-                raise PermissionError("You can not see this user account")
+                raise PermissionError("You can not see this group")
             return False
         return True
