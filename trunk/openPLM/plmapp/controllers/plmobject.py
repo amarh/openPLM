@@ -82,6 +82,8 @@ class PLMObjectController(Controller):
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
+        if not user.is_active:
+            raise PermissionError(u"%s's account is inactive" % user)
         if profile.restricted:
             raise PermissionError("Restricted account can not create a part or document.")
         if not reference or not type or not revision:
