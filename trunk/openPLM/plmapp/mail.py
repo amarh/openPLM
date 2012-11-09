@@ -165,11 +165,14 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
         lang_to_email = defaultdict(set)
         if len(recipients) == 1:
             recipient = User.objects.get(id=recipients.pop())
+            if not recipient.is_active:
+                return
             if not recipient.email or recipient.email in blacklist:
                 return
             lang_to_email[recipient.get_profile().language].add(recipient.email)
         else:
-            qs = UserProfile.objects.filter(user__in=recipients).exclude(user__email="")
+            qs = UserProfile.objects.filter(user__in=recipients,
+                    user__is_active=True).exclude(user__email="")
             for lang, email in qs.values_list("language", "user__email"):
                 if email not in blacklist:
                     lang_to_email[lang].add(email)
