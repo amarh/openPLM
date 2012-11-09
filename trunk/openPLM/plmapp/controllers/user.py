@@ -93,14 +93,19 @@ class UserController(Controller):
             item = names.get(attr_name, attr_name)
         return item
 
-    @permission_required(role=models.ROLE_OWNER)
     def update_from_form(self, form):
         u"""
         Updates :attr:`object` from data of *form*
         
         This method raises :exc:`ValueError` if *form* is invalid.
         """
+        self.check_update_data()
         if form.is_valid():
+            if self._user != self.object:
+                # to an user who has not yet logged in,
+                # it is quite surprising to receive a mail saying something
+                # has been modified
+                self.block_mails()
             need_save = False
             for key, value in form.cleaned_data.iteritems():
                 if key not in ["username"]:
@@ -110,6 +115,30 @@ class UserController(Controller):
                 self.save()
         else:
             raise ValueError("form is invalid")
+
+    def check_update_data(self):
+        try:
+            self.check_permission(models.ROLE_OWNER)
+        except PermissionError as e:
+            # its sponsor has permission to edit this form
+            # if the user has not yet logged in
+            try:
+                link = models.DelegationLink.current_objects.get(delegator=self._user,
+                    delegatee=self.object, role=models.ROLE_SPONSOR)
+            except models.DelegationLink.DoesNotExist:
+                raise e
+            if self.object.last_login >= link.ctime:
+                raise e
+
+    def can_update_data(self):
+        # for templates
+        try:
+            self.check_update_data()
+        except PermissionError:
+            can = False
+        else:
+            can = True
+        return can
 
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly

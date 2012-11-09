@@ -2098,6 +2098,42 @@ class UserViewTestCase(CommonViewTest):
         user = User.objects.get(username=self.user.username)
         self.assertEqual("Snow", user.last_name)
 
+    def test_modify_sponsored_user(self):
+        data0 = dict(sponsor=self.user.id, 
+                    username="loser", first_name="You", last_name="Lost",
+                    email="you.lost@example.com", groups=[self.group.pk],
+                    language=self.user.get_profile().language)
+        response = self.post(self.user_url + "delegation/sponsor/", data0)
+        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
+         # brian can not edit these data
+        self.client.login(username=self.brian.username, password="life")
+        response = self.client.post("/user/loser/modify/", data)
+        user = User.objects.get(username="loser")
+        self.assertEqual(user.email, data0["email"])
+        self.assertEqual(user.first_name, data0["first_name"])
+        self.assertEqual(user.last_name, data0["last_name"])
+        
+        # self.user can edit these data
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.post("/user/loser/modify/", data)
+        user = User.objects.get(username="loser")
+        self.assertEqual(user.email, data["email"])
+        self.assertEqual(user.first_name, data["first_name"])
+        self.assertEqual(user.last_name, data["last_name"])
+
+        # it should not be possible to edit data once loser has logged in
+        user.set_password("pwd")
+        user.save()
+        self.client.login(username=user.username, password="pwd")
+        self.client.get("/home/")
+        self.client.login(username=self.user.username, password="password")
+        data2 = {"last_name":"Snow2", "email":"user2@test.com", "first_name":"John2"}
+        response = self.client.post("/user/loser/modify/", data2)
+        user = User.objects.get(username="loser")
+        self.assertEqual(user.email, data["email"])
+        self.assertEqual(user.first_name, data["first_name"])
+        self.assertEqual(user.last_name, data["last_name"])
+
     def test_password_get(self):
         response = self.get(self.user_url + "password/")
         self.assertTrue(response.context["modification_form"])

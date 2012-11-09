@@ -2099,8 +2099,7 @@ def modify_user(request, obj_ref):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
-    if obj.object != request.user:
-        raise PermissionError("You are not the user")
+    obj.check_update_data()
     if request.method == 'POST' and request.POST:
         modification_form = forms.OpenPLMUserChangeForm(request.POST)
         if modification_form.is_valid():
