@@ -342,6 +342,8 @@ class PLMObjectController(Controller):
                 blacklist, roles, users)
 
     def has_permission(self, role):
+        if not self._user.is_active:
+            return False
         if role == models.ROLE_OWNER and self.owner == self._user:
             return True
         if self.plmobjectuserlink_plmobject.now().filter(user=self._user, role=role).exists():
@@ -521,6 +523,8 @@ class PLMObjectController(Controller):
         """
         if new_notified != self._user:
             self.check_permission("owner")
+        if not new_notified.is_active:
+            raise PermissionError(u"%s's account is inactive" % new_notified)
         self.check_in_group(new_notified)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
@@ -532,6 +536,8 @@ class PLMObjectController(Controller):
             raise ValueError("Object is not official")
         if not new_reader.get_profile().restricted:
             raise ValueError("Not a restricted account")
+        if not new_reader.is_active:
+            raise PermissionError(u"%s's account is inactive" % new_reader)
         self.check_in_group(self._user)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_reader, role=models.ROLE_READER)
@@ -755,6 +761,8 @@ class PLMObjectController(Controller):
         Raises a :exc:`.PermissionError` if the user cannot read the object
         and *raise_* is ``True`` (the default).
         """
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         if not self._user.get_profile().restricted:
             if self.is_official or self.is_deprecated or self.is_cancelled:
                 return True
@@ -777,6 +785,8 @@ class PLMObjectController(Controller):
         Raises a :exc:`.PermissionError` if the user cannot read the object
         and *raise_* is ``True`` (the default).
         """
+        if not self._user.is_active:
+            raise PermissionError(u"%s's account is inactive" % self._user)
         if not self._user.get_profile().restricted:
             return self.check_readable(raise_)
         return super(PLMObjectController, self).check_permission(models.ROLE_READER, raise_)
