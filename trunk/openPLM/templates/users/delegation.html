@@ -49,7 +49,7 @@
                             </form>
                         </td>
                     {% else %}
-                        {% if link.delegatee.last_login <= link.ctime %}
+                        {% if link.delegatee.last_login <= link.ctime and link.delegatee.is_active %}
                             <td class="Content">
                                 <form method="post" action="sponsor/mail/">
                                     <input type="hidden" name="link_id" value="{{link.id}}" />
