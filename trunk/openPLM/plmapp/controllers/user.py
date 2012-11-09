@@ -218,6 +218,8 @@ class UserController(Controller):
         """
         if user == self.object:
             raise ValueError("Bad delegatee (self)")
+        if not user.is_active:
+            raise ValueError("User account is inactive")
         if self._user.get_profile().restricted:
             raise PermissionError("A restricted account can not delegate a right")
         if user.get_profile().restricted:
