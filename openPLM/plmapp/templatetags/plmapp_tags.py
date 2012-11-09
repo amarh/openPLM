@@ -51,6 +51,8 @@ def can_add(obj, arg):
         return cur_obj.can_add_child(obj)
     elif action == "delegate" or (action.startswith("add_") and action != "add_reader"):
         if isinstance(obj, (User, UserController)):
+            if not obj.is_active:
+                return False
             if obj.get_profile().restricted:
                 return False
             if hasattr(cur_obj, "check_in_group"):
@@ -66,6 +68,8 @@ def can_add(obj, arg):
             return True
     elif action in ("delegate-reader", "add_reader"):
         if isinstance(obj, (User, UserController)):
+            if not obj.is_active:
+                return False
             if obj.get_profile().restricted:
                 if action == "add_reader":
                     return not cur_obj.plmobjectuserlink_plmobject.now().filter(user=obj,

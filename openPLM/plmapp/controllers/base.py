@@ -268,12 +268,14 @@ class Controller(object):
         
         if not user:
             user = self._user
+        if not user.is_active:
+            raise PermissionError(u"%s's account is inactive" % user)
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
-            raise PermissionError("%s is not a contributor" % user)
+            raise PermissionError(u"%s is not a contributor" % user)
         if profile.restricted:
             # should not be possible, but an admin may have done a mistake 
-            raise PermissionError("%s is not a contributor" % user)
+            raise PermissionError(u"%s is not a contributor" % user)
 
     def check_editable(self):
         return True
