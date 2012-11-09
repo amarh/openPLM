@@ -26,6 +26,14 @@
                     <span class="time">
                         {{histo.date|date:"G:i"}}
                     </span>
+                    {% spaceless %}
+                    <a href="/user/{{histo.user|urlencode }}/">
+                        <span class="user">{{histo.user}}</span>
+                    </a>
+                    {% endspaceless %}
+                    <span class="action">
+                        {{histo.action}}
+                    </span>
                     {% if show_identifiers %}
                         <a href="{{ histo.plmobject.plmobject_url}}">
                             <span class="type">{{ histo.plmobject.type }}</span>
@@ -37,14 +45,6 @@
                     {% if show_revisions %}
                         <span class="revision">{{ histo.plmobject.revision }}</span>
                     {% endif %}
-                    <span class="action">
-                        {{histo.action}}
-                    </span>
-                    <a href="/user/{{histo.user|urlencode }}/">
-                        <span class="user">
-                            {{histo.user}}
-                        </span>
-                    </a>
                     </dt>
                     <dd>
                     <div class="details">
