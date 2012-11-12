@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
@@ -154,12 +155,8 @@ class Part(AbstractPart, PLMObject):
         if not children:
             # check that at least one document is attached and its state is official
             # see ticket #57
-            found = False
-            links = self.documentpartlink_part.now()
-            for link in links:
-                found = link.document.is_official
-                if found:
-                    break
+            links = self.documentpartlink_part.now().filter(document__state=F("document__lifecycle__official_state"))
+            found = links.exists()
             if not found:
                 self._promotion_errors.append(_("There are no official documents attached."))
             return found
