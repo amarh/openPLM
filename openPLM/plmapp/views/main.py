@@ -975,7 +975,8 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
         set to (*obj*, "add_child")
     """
     link_id = int(link_id)
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi,
+            load_all=True)
     link = models.ParentChildLink.objects.get(id=link_id)
     if request.method == "POST":
         form = forms.AddPartForm(request.POST)
@@ -984,6 +985,8 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
             return HttpResponseRedirect("../..")
     else:
         form = forms.AddPartForm()
+    if ctx["results"]:
+        obj.precompute_can_add_child2()
     ctx["replace_child_form"] = form
     ctx["link"] = link
     ctx["attach"] = (obj, "add_child")
@@ -1021,7 +1024,8 @@ def add_child(request, obj_type, obj_ref, obj_revi):
         set to (*obj*, "add_child")
 
     """
-    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi,
+            load_all=True)
     
     if request.method == "POST" and request.POST:
         add_child_form = forms.AddChildForm(obj.object, request.POST)
@@ -1041,6 +1045,8 @@ def add_child(request, obj_type, obj_ref, obj_revi):
             initial = None
         add_child_form = forms.AddChildForm(obj.object, initial=initial)
         ctx['current_page'] = 'BOM-child'
+    if ctx["results"]:
+        obj.precompute_can_add_child2()
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
                 'attach' : (obj, "add_child")})

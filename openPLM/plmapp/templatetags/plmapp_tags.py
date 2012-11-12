@@ -48,7 +48,7 @@ def can_add(obj, arg):
     elif action == "attach_part":
         return cur_obj.can_attach_part(obj)
     elif action == "add_child":
-        return cur_obj.can_add_child(obj)
+        return cur_obj.can_add_child2(obj)
     elif action == "delegate" or (action.startswith("add_") and action != "add_reader"):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:

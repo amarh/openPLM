@@ -63,6 +63,14 @@ class PartController(PLMObjectController):
     Parts.
     """
 
+    __slots__ = PLMObjectController.__slots__ + ("can_add_child2", )
+
+    def __init__(self, *args, **kwargs):
+        super(PartController, self).__init__(*args, **kwargs)
+        # an optimized version of can_add_child can be computed
+        # to test several objects (for example: search results)
+        self.can_add_child2 = lambda c: self.can_add_child(c)
+
     def check_add_child(self, child):
         """
         Checks if *child* can be added to *self*.
@@ -94,6 +102,23 @@ class PartController(PLMObjectController):
         if link.exists():
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
+
+    def precompute_can_add_child2(self):
+        is_owner = self.check_permission("owner", raise_=False)
+        if is_owner and self.is_editable:
+            parents = set(p.link.parent_id for p in self.get_parents(-1))
+            children = set(self.parentchildlink_parent.now().values_list("child", flat=True))
+            invalid_ids = parents | children 
+            invalid_ids.add(self.object.id)
+            def can_add(child):
+                if child.is_part and child.id not in invalid_ids:
+                    valid_state = not (child.is_cancelled or child.is_deprecated)
+                    if valid_state:
+                        return get_controller(child.type)(child, self._user).check_readable(False)
+                return False
+            self.can_add_child2 = can_add
+        else:
+            self.can_add_child2 = lambda y: False
 
     def can_add_child(self, child):
         """

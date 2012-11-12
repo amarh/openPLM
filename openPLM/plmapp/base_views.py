@@ -281,7 +281,8 @@ def update_navigation_history(request, obj, type_, reference, revision):
     return False
 
 _SEARCH_ID = "search_id_%s"
-def get_generic_data(request, type_='-', reference='-', revision='-', search=True):
+def get_generic_data(request, type_='-', reference='-', revision='-', search=True,
+        load_all=False):
     """
     Get a request and return a controller, a context dictionnary with elements common to all pages
     (search form, search data, search results, ...) and another dictionnary to update the
@@ -314,7 +315,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         
     if not restricted: # a restricted account can not perform a search
         # Builds, update and treat Search form
-        search_needed = "results" not in request.session
+        search_needed = "results" not in request.session or load_all
         if request.method == "GET" and "type" in request.GET:
             search_form = SimpleSearchForm(request.GET, auto_id=_SEARCH_ID)
             request.session["type"] = request.GET["type"]
@@ -331,6 +332,8 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         if search and search_needed and search_form.is_valid():
             search_query = search_form.cleaned_data["q"]
             qset = search_form.search()
+            if load_all:
+                qset = qset.load_all()
             request.session["search_query"] = search_query
             search_count = request.session["search_count"] = qset.count()
             qset = qset[:30]
