@@ -142,17 +142,15 @@ class Part(AbstractPart, PLMObject):
         if partset is not None:
             return self.is_set_promotable(partset)
         # check children
-        children = self.parentchildlink_parent.now().only("child")
         lcs = self.lifecycle.to_states_list()
         rank = lcs.index(self.state.name)
-        for link in children:
-            child = link.child
-            if child.lifecycle == self.lifecycle:
-                rank_c = lcs.index(child.state.name)
-                if rank_c == 0 or rank_c < rank:
-                    self._promotion_errors.append(_("Some children are at a lower or draft state."))
-                    return False
-        if not children:
+        invalid_states = [lcs[0]] + lcs[:rank]
+        invalid_children = self.parentchildlink_parent.now().\
+                filter(child__lifecycle=self.lifecycle, child__state__in=invalid_states)
+        if invalid_children.exists():
+            self._promotion_errors.append(_("Some children are at a lower or draft state."))
+            return False
+        if not self.parentchildlink_parent.now().exists():
             # check that at least one document is attached and its state is official
             # see ticket #57
             links = self.documentpartlink_part.now().filter(document__state=F("document__lifecycle__official_state"))
