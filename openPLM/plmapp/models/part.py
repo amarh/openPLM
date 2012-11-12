@@ -135,6 +135,11 @@ class Part(AbstractPart, PLMObject):
             return False
         if not self.is_editable:
             return True
+        # is this part synchronized with other parts
+        from .link import SynchronizedPartSet
+        partset = SynchronizedPartSet.get_partset(self)
+        if partset is not None:
+            return self.is_set_promotable(partset)
         # check children
         children = self.parentchildlink_parent.now().only("child")
         lcs = self.lifecycle.to_states_list()
@@ -159,6 +164,11 @@ class Part(AbstractPart, PLMObject):
                 self._promotion_errors.append(_("There are no official documents attached."))
             return found
         return True
+
+    def is_set_promotable(self, partset):
+        # TODO : this code is too restrictive (a parent may be promotable)
+        # (it is also very inefficient)
+        return all(p.is_promotable() for p in partset.parts.all())
 
     @property
     def is_part(self):

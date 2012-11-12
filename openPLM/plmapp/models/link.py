@@ -593,3 +593,56 @@ class PromotionApproval(Link):
         app_label = "plmapp"
         unique_together = ("plmobject", "user", "current_state", "next_state", "end_time")
 
+class PartSet(Link):
+
+    parts = models.ManyToManyField(Part, related_name="%(class)ss")
+
+    class Meta:
+        app_label = "plmapp"
+        abstract = True
+
+    # classmethods to remember that a new partset is returned
+    @classmethod
+    def add_part(cls, old_partset, part):
+        new_partset = cls.objects.create()
+        new_partset.parts.add(part, *old_partset.parts.all())
+        old_partset.end()
+        return new_partset
+
+    @classmethod
+    def remove_part(cls, old_partset, part):
+        if len(old_partset.parts) == 1:
+            old_partset.end()
+            return None
+        else:
+            new_partset = cls.objects.create()
+            new_partset.parts.add(p for p in old_partset.parts if p != part)
+            old_partset.end()
+            return new_partset
+
+    @classmethod
+    def join(cls, part, part_or_set):
+        if isinstance(part_or_set, cls):
+            return cls.add_part(part_or_set, part)
+        partset = cls.get_partset(part_or_set)
+        if partset is None:
+            new_partset = cls.objects.create()
+            new_partset.parts.add(part, part_or_set)
+            return new_partset
+        else:
+            return cls.add_part(partset, part)
+
+    @classmethod
+    def get_partset(cls, part):
+        try:
+           partset = getattr(part, "%ss" % cls.__name__.lower()).now().get()
+           return partset
+        except cls.DoesNotExist:
+            return None
+
+
+class SynchronizedPartSet(PartSet):
+
+    class Meta:
+        app_label = "plmapp"
+
