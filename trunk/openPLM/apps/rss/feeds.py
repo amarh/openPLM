@@ -1,7 +1,5 @@
 import base64
 
-from django.conf import settings
-from django.db.models import Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from django.contrib.syndication.views import Feed
@@ -11,7 +9,7 @@ from django.utils.feedgenerator import Atom1Feed
 from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.base_views import get_obj
-from openPLM.plmapp import models
+from openPLM.plmapp.models import timeline_histories
 
 
 def make_desc(action, details, username):
@@ -82,21 +80,11 @@ class RssFeed(HTTPAuthFeed):
             return iri_to_uri(u"/user/%s/" % obj.username)
         
     def description(self, obj):
-        ret = _("Updates on changes on ")
-        if hasattr(obj,'is_part'):
-            return ret +obj.object.reference+"//"+obj.object.revision+"//"+obj.object.name
-        elif hasattr(obj,'username'):
-            return ret + obj.object.username
-        else:
-            return ret + obj.object.name
+        ret = _("Updates on changes on %(title)s")
+        return ret % {"title" : self.title(obj)}
             
     def items(self,obj):
-        #return the history items
-        if hasattr(obj,'get_all_revisions'):
-            objects = [o.id for o in obj.get_all_revisions()]
-            return obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')[:10]
-        else:
-            return obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')[:10]
+        return obj.histories[:10]
    
     def item_title(self, item):
         i_date = item.date.strftime("%B %d, %Y") 
@@ -132,12 +120,7 @@ class TimelineRssFeed(RssFeed):
         return _("Timeline")
 
     def items(self, obj):
-        q = Q(plmobject__owner__username=settings.COMPANY)
-        q |= Q(plmobject__group__in=obj.groups.all())
-        history = models.History.objects.filter(q).order_by('-date')
-        history = history.select_related("user", "plmobject__type", "plmobject__reference",
-            "plmobject__revision")
-        return history[:10]
+        return timeline_histories(obj)[:10]
 
 class TimelineAtomFeed(TimelineRssFeed):
     feed_type = Atom1Feed
