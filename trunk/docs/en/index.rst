@@ -10,7 +10,7 @@ Quick start
 ------------
 
 
-If you are an user, click :doc:`here </user/index>`.
+If you are a user, click :doc:`here </user/index>`.
 
 If you are an administrator, click :doc:`here </admin/index>`.
 
