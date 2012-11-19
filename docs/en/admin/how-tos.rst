@@ -1,7 +1,7 @@
 .. _how-tos:
 
 ================================
-List of how-to's
+How to install OpenPLM
 ================================
 
 .. toctree::
