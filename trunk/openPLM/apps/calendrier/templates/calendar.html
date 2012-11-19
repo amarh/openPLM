@@ -8,10 +8,6 @@
 
 {% endblock %}
 
-{% block extrahead %}
-    <link rel="alternate" type="application/atom+xml" href="../atom/">
-    <link rel="alternate" type="application/rss+xml" href="../rss/">
-{% endblock %}
 {% block content %}
 
     <div id="calendar">
@@ -35,6 +31,14 @@
         {{ calendar }}
 
     </div>
+    {% if ical_installed %}
+        <div class="center">
+            <a href="./ics/">{% trans "Download as iCalendar (.ics)" %}</a>
+        </div>
+
+    {% endif %}
+
+
 
 {% endblock %}
 

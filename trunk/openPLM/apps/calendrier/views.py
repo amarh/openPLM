@@ -11,12 +11,32 @@ from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+try:
+    from django_ical.views import ICalFeed
+    from openPLM.apps.rss.feeds import RssFeed, TimelineRssFeed
+    ICAL_INSTALLED = True
+except ImportError:
+    ICAL_INSTALLED = False
+
 from openPLM.plmapp.base_views import handle_errors, get_generic_data
 from openPLM.plmapp.views.main import r2r, display_object_history
 from openPLM.plmapp import models
 
 # inspired by http://uggedal.com/journal/creating-a-flexible-monthly-calendar-in-django/
 # by Eivind Uggedal
+
+def parse_date(year, month):
+    if year is not None:
+        year = int(year)
+    else:
+        year = date.today().year
+    if month is not None:
+        month = int(month)
+    else:
+        month = date.today().month
+    if year < MINYEAR or year > MAXYEAR or month < 1 or month > 12:
+        return ValueError("Month or year are out of range")
+    return year, month
 
 class HistoryCalendar(HTMLCalendar):
 
@@ -152,42 +172,25 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
     prefix = ""
     if year is not None:
         prefix = "../"
-        year = int(year)
-    else:
-        year = date.today().year
-        
     if month is not None:
         prefix += "../"
-        month = int(month)
-    else:
-        month = date.today().month
   
-    if year < MINYEAR or year > MAXYEAR or month < 1 or month > 12:
-        return ValueError("Month or year are out of range")
+    year, month = parse_date(year, month)
 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if timeline:
         hcls = TimelineCalendar
-        # global timeline: shows objects owned by the company and readable objects
-        q = Q(plmobject__owner__username=settings.COMPANY)
-        q |= Q(plmobject__group__in=request.user.groups.all())
-        history = models.History.objects.filter(q)
-        history = history.select_related("plmobject__type", "plmobject__reference",
-            "plmobject__revision")
+        histories = models.timeline_histories(request.user)
         ctx['object_type'] = _("Timeline")
     elif hasattr(obj, "get_all_revisions"):
         # display history of all revisions
-        objects = [o.id for o in obj.get_all_revisions()]
-        history = obj.HISTORY.objects.filter(plmobject__in=objects)
-        history = history.select_related("plmobject__revision")
+        histories = obj.histories
         hcls = RevisionHistoryCalendar
     else:
-        history = obj.HISTORY.objects.filter(plmobject=obj.object)
+        histories = obj.histories
         hcls = HistoryCalendar
-    history = history.order_by('date').filter(
-        date__year=int(year), date__month=month
-        )
-    cal = hcls(history).formatmonth(year, month)
+    histories = histories.filter(date__year=year, date__month=month).order_by("date")
+    cal = hcls(histories).formatmonth(year, month)
 
     current_month = date(year=year, month=month, day=1)
     if month == 1:
@@ -214,6 +217,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
         'next_month' : next_month,
         'previous_month' : previous_month,
         'prefix_url' : prefix,
+        'ical_installed' : ICAL_INSTALLED,
         })
     return r2r('calendar.html', ctx, request)
 
@@ -223,4 +227,55 @@ def history(request, *args, **kwargs):
     kwargs["template"] = HISTORY_TPL
     return display_object_history(request, *args, **kwargs)
 
+if ICAL_INSTALLED:
+    class CalendarFeed(RssFeed, ICalFeed):
+       
+        def get_object(self, request, year=None, month=None, obj_type="-", obj_ref="-", obj_revi="-"):
+            year, month = parse_date(year, month)
+            obj = super(CalendarFeed, self).get_object(request, obj_type, obj_ref, obj_revi)
+            obj.object.h_month = month 
+            obj.object.h_year = year 
+            return obj
+
+        def items(self, obj):
+            year = obj.h_year
+            month = obj.h_month
+            return obj.histories.filter(date__year=year, date__month=month).order_by("date")
+
+
+        def item_title(self, item):
+            if hasattr(item.plmobject, 'is_part'):
+                return u"%s // %s // %s - %s" % (item.plmobject.type,
+                    item.plmobject.reference, item.plmobject.revision,
+                    item.action)
+            elif hasattr(item.plmobject, 'username'):
+                return u"%s %s (%s) - %s" % (item.plmobject.first_name,
+                        item.plmobject.last_name, item.plmobject.username,
+                        item.action)
+            else:
+                return u"Group %s - %s" % (item.plmobject.name, item.action)
+
+        def item_start_datetime(self, item):
+            return item.date
+
+    class TimelineCalendarFeed(TimelineRssFeed, ICalFeed):
+
+        def get_object(self, request, year=None, month=None):
+            year, month = parse_date(year, month)
+            obj = request.user
+            obj.h_month = month 
+            obj.h_year = year 
+            return obj
+
+        def items(self, obj):
+            year = obj.h_year
+            month = obj.h_month
+            return models.timeline_histories(obj).filter(date__year=year, date__month=month).order_by("date")
+
+        def item_title(self, item):
+            return u"%s // %s // %s - %s" % (item.plmobject.type,
+                    item.plmobject.reference, item.plmobject.revision,
+                    item.action)
+        def item_start_datetime(self, item):
+            return item.date
 
