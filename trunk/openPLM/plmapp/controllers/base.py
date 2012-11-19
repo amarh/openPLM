@@ -302,3 +302,8 @@ class Controller(object):
         else:
             func(*args)
 
+    @property
+    def histories(self):
+        return self.HISTORY.objects.filter(plmobject=self.object).\
+                order_by("-date").select_related("user")
+

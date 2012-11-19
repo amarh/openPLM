@@ -779,22 +779,15 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if timeline:
         # global timeline: shows objects owned by the company and readable objects
-        q = Q(plmobject__owner__username=settings.COMPANY)
-        q |= Q(plmobject__group__in=request.user.groups.all())
-        history = models.History.objects.filter(q).order_by('-date')
-        history = history.select_related("user", "plmobject__type", "plmobject__reference",
-            "plmobject__revision")
+        history = models.timeline_histories(obj)
         ctx['object_type'] = _("Timeline")
     elif hasattr(obj, "get_all_revisions"):
         # display history of all revisions
-        objects = [o.id for o in obj.get_all_revisions()]
-        history = obj.HISTORY.objects.filter(plmobject__in=objects).order_by('-date')
-        history = history.select_related("user", "plmobject__revision")
+        history = obj.histories
         ctx["show_revisions"] = True
     else:
-        history = obj.HISTORY.objects.filter(plmobject=obj.object).order_by('-date')
         ctx["show_revisions"] = False
-        history = history.select_related("user")
+        history = obj.histories
     paginator = Paginator(history, ITEMS_PER_HISTORY)
     page = request.GET.get('page', 1)
     try:

@@ -1,6 +1,7 @@
 
 import datetime
 
+from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User, Group
@@ -223,4 +224,10 @@ class StateHistory(models.Model):
         self.state_category = category
         super(StateHistory, self).save(*args, **kwargs)
 
+def timeline_histories(user):
+    q = models.Q(plmobject__owner__username=settings.COMPANY)
+    q |= models.Q(plmobject__group__in=user.groups.all())
+    histories = History.objects.filter(q).order_by('-date')
+    return histories.select_related("user", "plmobject__type", "plmobject__reference",
+        "plmobject__revision")
 
