@@ -1021,3 +1021,10 @@ class PLMObjectController(Controller):
             return new_ctrl
         else:
             raise ValueError("form is invalid")
+    
+    @property
+    def histories(self):
+        objects = [o.id for o in self.get_all_revisions()]
+        return self.HISTORY.objects.filter(plmobject__in=objects).\
+                order_by('-date').select_related("user", "plmobject__revision")
+
