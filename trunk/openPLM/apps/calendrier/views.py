@@ -167,7 +167,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
 
     ``current_month``, ``next_month``, ``previous_month``
         :class:`.datetime.date` objects representing the current, next and previous
-        monthes (may be None if the date is 1900/01 or 9999/12).
+        months (may be None if the date is 1900/01 or 9999/12).
 
     ``ical_installed``
         True if django-ical is installed and iCalendar file can be generated
