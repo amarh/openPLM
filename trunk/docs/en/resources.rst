@@ -53,6 +53,18 @@ Development of openPLM happens at trac: http://wiki.openplm.org/trac/timeline
 You are highly encouraged to participate in the development of openPLM. If you
 don’t like trac (for some reason) you’re welcome to send regular patches.
 
+All kinds of contributions are welcome, not only technical contributions.
+For example, you can:
+
+    * suggest ideas
+    * explain what you (dis)like in OpenPLM
+    * report bugs
+    * help other users to use or install OpenPLM
+    * help translating OpenPLM
+    * write documentation and tutorials
+    * fix bugs
+
+
 License
 ==========
 
