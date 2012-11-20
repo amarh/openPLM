@@ -701,6 +701,8 @@ class SearchBackend(BaseSearchBackend):
             `text` -- The text to be highlighted
         """
         for term in query:
+            if term.startswith("XCONTENT"):
+                continue
             for match in re.findall('[^A-Z]+', term): # Ignore field identifiers
                 match_re = re.compile(match, re.I)
                 content = match_re.sub('<%s>%s</%s>' % (tag, match, tag), content)
