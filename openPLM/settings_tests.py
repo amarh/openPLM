@@ -106,6 +106,7 @@ INSTALLED_APPS = (
     'openPLM.plmapp',
     'openPLM.apps.rss',
     'openPLM.apps.pdfgen',
+    'openPLM.apps.calendrier',
     # you can add your application after this line
     'openPLM.apps.cad',
     'openPLM.apps.computer',
