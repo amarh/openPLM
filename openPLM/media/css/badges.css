@@ -13,14 +13,14 @@
 #badge_sys p{
     padding: 2px;
 }
-table.badges{
+table.badges {
     width : 100%
     border-collapse: separate;
     border-spacing : 1px;
     border : 1px solid grey;
 }
 
-tr.header th {
+table.badges tr.header th {
     border-collapse: separate;
     border-spacing : 1px;
     border : 1px solid grey;
@@ -33,7 +33,7 @@ table tr.highlighted {
     background-color : #E4E3E1;
 }
 
-td{
+table.badges td{
     border-collapse : separate;
     border-spacing : 1px;
     padding : 5px;
