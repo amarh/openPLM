@@ -58,7 +58,7 @@ License
 
 This software is licensed under the *GNU GENERAL PUBLIC LICENSE Version 3, or
 any later version*. See the :file:`GPLv3-LICENSE.txt` file in the top
-distribution directory for the full license text.
+distribution directory for the full license text or read all :doc:`licenses <license>`.
 
 
 
