@@ -20,10 +20,17 @@ from openPLM.plmapp.base_views import handle_errors, get_generic_data
 from openPLM.plmapp.views.main import r2r, display_object_history
 from openPLM.plmapp import models
 
-# inspired by http://uggedal.com/journal/creating-a-flexible-monthly-calendar-in-django/
-# by Eivind Uggedal
-
 def parse_date(year, month):
+    """ Parse *year* and *month* (string, integer or None) and
+    returns a tuple of int (*year*, *month*).
+
+    If *year* is None, the current year is returned.
+    If *month* is None, the current month is returned.
+
+    :raise: :exc:`.ValueError` if *year* < 1900, *year* > 9999,
+        *month* < 1, *month* > 12 or *month* and *year* can not
+        be converted to an integer
+    """
     if year is not None:
         year = int(year)
     else:
@@ -35,6 +42,9 @@ def parse_date(year, month):
     if year < MINYEAR or year > MAXYEAR or month < 1 or month > 12:
         return ValueError("Month or year are out of range")
     return year, month
+
+# inspired by http://uggedal.com/journal/creating-a-flexible-monthly-calendar-in-django/
+# by Eivind Uggedal
 
 class HistoryCalendar(HTMLCalendar):
 
