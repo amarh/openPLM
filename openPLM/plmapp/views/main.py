@@ -183,11 +183,11 @@ def display_home_page(request):
         # always empty if restricted -> do not hit the database
         pending_invitations_owner = obj.invitation_inv_owner. \
                 filter(state=models.Invitation.PENDING).order_by("group__name").\
-                select_related("guest", "owner")
+                select_related("guest", "owner", "group")
         ctx["pending_invitations_owner"] = pending_invitations_owner
         pending_invitations_guest = obj.invitation_inv_guest. \
                 filter(state=models.Invitation.PENDING).order_by("group__name").\
-                select_related("guest", "owner")
+                select_related("guest", "owner", "group")
         ctx["pending_invitations_guest"] = pending_invitations_guest
         ctx["display_group"] = True
 
