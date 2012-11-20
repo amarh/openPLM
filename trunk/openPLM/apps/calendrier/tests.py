@@ -1,3 +1,5 @@
+from icalendar import Calendar
+
 from openPLM.plmapp.tests.views import CommonViewTest
 
 class CalendarTestCase(CommonViewTest):
@@ -50,3 +52,13 @@ class CalendarTestCase(CommonViewTest):
         response = self.get("/timeline/calendar/")
         calendar = response.context["calendar"]
 
+    def test_icalendar_part(self):
+        ics = self.client.get(self.base_url + "history/calendar/ics/").content
+        cal = Calendar.from_ical(ics)
+        first_event = cal.walk('vevent')[0]
+        self.assertTrue(first_event["summary"].startswith("Part // %s" % self.controller.reference))
+    
+    def test_icalendar_timeline(self):
+        ics = self.client.get("/timeline/history/calendar/ics/").content
+        cal = Calendar.from_ical(ics)
+        first_event = cal.walk('vevent')[0]
