@@ -16,7 +16,11 @@
             {% for inv in pending_invitations %}
                 <tr class="Content">
                     {% if display_group %}
-                        <td class="Content"> {{ inv.group.name }} </td>
+                        <td class="Content">
+                            <a href="{{ inv.group.plmobject_url }}">
+                                {{ inv.group.name }}
+                            </a>
+                        </td>
                     {% endif %}
                     {% with inv.guest as guest %}
                         <td class="Content"> 
