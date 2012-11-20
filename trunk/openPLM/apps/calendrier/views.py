@@ -137,34 +137,44 @@ class TimelineCalendar(HistoryCalendar):
 @handle_errors
 def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", obj_revi="-", timeline=False):
     """
-    History view.
+    Calendar view.
     
     This view displays a history of the selected object and its revisions.
 
-    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/`
-    :url: :samp:`/user/{username}/history/`
-    :url: :samp:`/group/{group_name}/history/`
-    :url: :samp:`/timeline/`
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/calendar/[{year}/][{month}/]`
+    :url: :samp:`/user/{username}/history/calendar/[{year}/][{month}/]``
+    :url: :samp:`/group/{group_name}/history/calendar/[{year}/][{month}/]``
+    :url: :samp:`/timeline/calendar/[{year}/][{month}/]``
     
-    .. include:: views_params.txt 
+    .. include:: ../../modules/views/views_params.txt 
 
     **Template:**
     
-    :file:`attribute.html`
+    :file:`calendar.html`
 
     **Context:**
 
     ``RequestContext``
 
-    ``object_history``
-        list of :class:`.AbstractHistory`
+    ``calendar``
+        the HTML calendar
 
-    ``show_revisions``
-        True if the template should show the revision of each history row
-    
-    ``show_identifiers``
-        True if the template should show the type, reference and revision
-        of each history row
+    ``year``
+        the given year (or the current year if not given)
+
+    ``month``
+        the given month (or the current month if not given)
+
+    ``current_month``, ``next_month``, ``previous_month``
+        :class:`.datetime.date` objects representing the current, next and previous
+        monthes (may be None if the date is 1900/01 or 9999/12).
+
+    ``ical_installed``
+        True if django-ical is installed and iCalendar file can be generated
+
+    ``prefix_url``
+        a prefix to prepend to the url to go to the next and previous monthes.
+        (can be ``""``, ``"../"`` or ``"../../"``).
     """
 
     prefix = ""
