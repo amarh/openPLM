@@ -18,6 +18,13 @@ Forum
 
 We also have a forum at http://wiki.openplm.org/trac/discussion
 
+Frequently Asked Questions
++++++++++++++++++++++++++++
+
+A `FAQ`_ is hosted on our wiki.
+
+.. _FAQ: http://wiki.openplm.org/trac/wiki/WikiStart/FrequentlyAskedquestion
+
 Commercial support
 +++++++++++++++++++
 
@@ -36,6 +43,7 @@ Wiki
 =======
 
 http://wiki.openplm.org/trac/wiki
+
 
 Contributing
 =============
