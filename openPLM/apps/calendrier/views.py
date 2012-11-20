@@ -4,8 +4,6 @@ from itertools import groupby
 # the datetime strftime() methods require year >= 1900
 MINYEAR = 1900
 
-from django.db.models import Q
-from django.conf import settings
 from django.utils.dates import WEEKDAYS
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
