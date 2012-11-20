@@ -232,6 +232,8 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
 
 HISTORY_TPL = "history_cal.html"
 def history(request, *args, **kwargs):
+    """A simple view that wraps :func:`.display_object_history`
+    to use the template :file:`history_cal.html`"""
     kwargs["template"] = HISTORY_TPL
     return display_object_history(request, *args, **kwargs)
 
