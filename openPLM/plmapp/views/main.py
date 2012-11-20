@@ -182,10 +182,12 @@ def display_home_page(request):
     if not obj.restricted:
         # always empty if restricted -> do not hit the database
         pending_invitations_owner = obj.invitation_inv_owner. \
-                filter(state=models.Invitation.PENDING).order_by("group__name")
+                filter(state=models.Invitation.PENDING).order_by("group__name").\
+                select_related("guest", "owner")
         ctx["pending_invitations_owner"] = pending_invitations_owner
         pending_invitations_guest = obj.invitation_inv_guest. \
-                filter(state=models.Invitation.PENDING).order_by("group__name")
+                filter(state=models.Invitation.PENDING).order_by("group__name").\
+                select_related("guest", "owner")
         ctx["pending_invitations_guest"] = pending_invitations_guest
         ctx["display_group"] = True
 
@@ -2438,7 +2440,7 @@ def display_users(request, obj_ref):
         formset = forms.get_user_formset(obj)
     ctx["user_formset"] = formset
     ctx["pending_invitations"] = obj.invitation_set.filter(
-            state=models.Invitation.PENDING)
+            state=models.Invitation.PENDING).select_related("guest", "owner")
     ctx['current_page'] = 'users' 
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
     return r2r("groups/users.html", ctx, request)
