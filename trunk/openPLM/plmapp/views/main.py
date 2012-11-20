@@ -762,7 +762,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
 
     **Template:**
     
-    :file:`attribute.html`
+    :file:`history.html`
 
     **Context:**
 
