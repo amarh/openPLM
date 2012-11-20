@@ -59,6 +59,6 @@ class CalendarTestCase(CommonViewTest):
         self.assertTrue(first_event["summary"].startswith("Part // %s" % self.controller.reference))
     
     def test_icalendar_timeline(self):
-        ics = self.client.get("/timeline/history/calendar/ics/").content
+        ics = self.client.get("/timeline/calendar/ics/").content
         cal = Calendar.from_ical(ics)
         first_event = cal.walk('vevent')[0]
