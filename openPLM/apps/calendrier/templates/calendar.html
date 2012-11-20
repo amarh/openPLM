@@ -2,10 +2,8 @@
 {% load i18n plmapp_tags %}
 {% load humanize %}
 
-
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/calendar.css" />
-
 {% endblock %}
 
 {% block content %}
@@ -25,20 +23,17 @@
                     <span class="month"> {{next_month|date:"F Y"}}</span>
                 </a>
             {% endif %}
-
         </div>
 
         {{ calendar }}
 
     </div>
+
     {% if ical_installed %}
         <div class="center">
             <a href="./ics/">{% trans "Download as iCalendar (.ics)" %}</a>
         </div>
-
     {% endif %}
-
-
 
 {% endblock %}
 
