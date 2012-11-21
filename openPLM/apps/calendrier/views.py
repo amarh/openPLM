@@ -29,7 +29,7 @@ def parse_date(year, month):
 
     :raise: :exc:`.ValueError` if *year* < 1900, *year* > 9999,
         *month* < 1, *month* > 12 or *month* and *year* can not
-        be converted to an integer
+        be converted to an integer or (*year* == 9999 and *month* == 12)
     """
     if year is not None:
         year = int(year)
@@ -39,8 +39,9 @@ def parse_date(year, month):
         month = int(month)
     else:
         month = date.today().month
-    if year < MINYEAR or year > MAXYEAR or month < 1 or month > 12:
-        return ValueError("Month or year are out of range")
+    if (year < MINYEAR or year > MAXYEAR or month < 1 or month > 12
+        or (year == MAXYEAR and month == 12)):
+        raise ValueError("Month or year are out of range")
     return year, month
 
 # inspired by http://uggedal.com/journal/creating-a-flexible-monthly-calendar-in-django/
@@ -223,6 +224,8 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
             next_month = None
         else:
             next_month = date(year=year + 1, month=1, day=1)
+    elif month == 11 and year == MAXYEAR:
+        next_month = None
     else:
         next_month = date(year=year, month=month + 1, day=1)
 
