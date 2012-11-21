@@ -94,7 +94,11 @@ class PartController(PLMObjectController):
         # check if child is not a parent
         if child.id == self.object.id:
             raise ValueError("Can not add child: child is current object")
-        get_controller(child.type)(child, self._user).check_readable()
+        if isinstance(child, PartController):
+            child.check_readable()
+            child = child.object
+        else:
+            get_controller(child.type)(child, self._user).check_readable()
         if self.is_ancestor(child):
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
