@@ -2,6 +2,8 @@
 calendrier -- Calendar views
 ===============================================
 
+.. versionadded:: 1.2
+
 This application adds the following features:
 
     * show timeline and history pages as a calendar

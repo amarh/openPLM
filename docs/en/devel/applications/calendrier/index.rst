@@ -2,6 +2,8 @@
 calendrier -- calendar generations
 ===================================
 
+.. versionadded:: 1.2
+
 This application can generate HTML calendars and iCalendar files.
 Currently it can generate a month view of an history page or 
 of the timeline page.
@@ -24,7 +26,6 @@ How iCalendar files are generated
 Short answer: using `django-ical`_.
 
 .. _django-ical: https://bitbucket.org/IanLewis/django-ical/
-
 
 Views
 ========
