@@ -646,3 +646,10 @@ class SynchronizedPartSet(PartSet):
     class Meta:
         app_label = "plmapp"
 
+
+class AlternatePartSet(PartSet):
+
+    class Meta:
+        app_label = "plmapp"
+
+
