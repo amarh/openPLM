@@ -987,3 +987,44 @@ class PartController(PLMObjectController):
         # each file and testing their extension
         return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
 
+    def check_add_alternate(self, part):
+        self.check_readable()
+        self.check_permission("owner")
+        if not part.is_part:
+            raise ValueError("Not a part")
+        if part.id == self.id:
+            raise ValueError("same part")
+        raise ValueError("Still in developpement")
+
+    def add_alternate(self, part):
+        self.check_add_alternate(part)
+        # TODO
+
+    def can_add_alternate(self, part):
+        can = True
+        try:
+            self.check_add_alternate(part)
+        except:
+            can = False
+        return can
+
+    def is_alternate(self, part):
+        my_partset = models.AlternatePartSet.get_partset(self.object)
+        if my_partset is None:
+            return False
+        other_partset = models.AlternatePartSet.get_partset(part)
+        return my_partset == other_partset
+
+    def delete_alternate(self, part):
+        partset = models.AlternatePartSet.get_partset(self.object)
+        # TODO: histo
+        return partset.remove_part(part)
+
+    def get_alternates(self, date=None):
+        try:
+            partset = self.alternatepartsets.at(date).get()
+            return partset.part
+        except models.AlternatePartSet.DoesNotExist:
+            return []
+
+
