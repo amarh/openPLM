@@ -67,6 +67,8 @@ class PartControllerTest(ControllerTest):
 
         children = self.controller.get_children()
         self.assertEqual(len(children), 0)
+        self.controller.precompute_can_add_child2()
+        self.assertTrue(self.controller.can_add_child2(self.controller2.object))
         self.add_child()
         children = self.controller.get_children()
         self.assertEqual(len(children), 1)
@@ -103,6 +105,8 @@ class PartControllerTest(ControllerTest):
         self.controller2.add_child(self.controller, 10, 15)
         def fail():
             self.add_child()
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
     
@@ -111,9 +115,13 @@ class PartControllerTest(ControllerTest):
         Tests that add_child raises a ValueError if the given child
         is already a child.
         """
+        self.controller.precompute_can_add_child2()
+        self.assertTrue(self.controller.can_add_child2(self.controller2.object))
         self.add_child()
         def fail():
             self.add_child()
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(ValueError, fail)
     
     def test_add_child_error_child_is_document(self):
@@ -123,6 +131,8 @@ class PartControllerTest(ControllerTest):
         """
         def fail():
             doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
+            self.controller.precompute_can_add_child2()
+            self.assertFalse(self.controller.can_add_child2(doc))
             self.controller.add_child(doc, 10, 15)
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
@@ -134,6 +144,8 @@ class PartControllerTest(ControllerTest):
         """
         def fail():
             self.controller.add_child(self.controller, 10, 15)
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller.object))
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
 
@@ -146,6 +158,8 @@ class PartControllerTest(ControllerTest):
         ctrl = self.CONTROLLER(self.controller.object, user)
         def fail():
             ctrl.add_child(self.controller2.object, 10, 15, "kg")
+        ctrl.precompute_can_add_child2()
+        self.assertFalse(ctrl.can_add_child2(self.controller2.object))
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
     
@@ -158,6 +172,8 @@ class PartControllerTest(ControllerTest):
         ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
         def fail():
             ctrl.add_child(self.controller2.object, 10, 15, "m")
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
 
@@ -169,6 +185,8 @@ class PartControllerTest(ControllerTest):
         self.controller2.promote()
         def fail():
             self.add_child()
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
 
@@ -179,6 +197,8 @@ class PartControllerTest(ControllerTest):
         self.controller.cancel()
         def fail():
             self.add_child()
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
 
@@ -190,6 +210,8 @@ class PartControllerTest(ControllerTest):
         ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
         def fail():
             ctrl.add_child(self.controller2.object, 10, 15, "m")
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
 
