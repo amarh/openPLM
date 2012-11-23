@@ -106,8 +106,12 @@ class PartController(PLMObjectController):
         if link.exists():
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
+        # FIXME: alternates !
+        # child not in alternates,
+        # child not in ancestor of alternates
 
     def precompute_can_add_child2(self):
+        # FIXME: alternates !
         is_owner = self.check_permission("owner", raise_=False)
         if is_owner and self.is_editable:
             parents = set(p.link.parent_id for p in self.get_parents(-1))
@@ -369,7 +373,6 @@ class PartController(PLMObjectController):
         """
         links = models.ParentChildLink.current_objects
         parents = [part.id]
-        last_children = []
         while parents:
             parents = links.filter(parent__in=parents).values_list("child", 
                     flat=True)
@@ -990,10 +993,63 @@ class PartController(PLMObjectController):
     def check_add_alternate(self, part):
         self.check_readable()
         self.check_permission("owner")
+        # FIXME: untested !!!
+        # TODO: better error messages, permissions
+
         if not part.is_part:
             raise ValueError("Not a part")
         if part.id == self.id:
             raise ValueError("same part")
+        # get alternate part sets
+        partset = None
+        try:
+            partset = self.alternatepartsets.now().get()
+        except models.AlternatePartSet.DoesNotExist:
+            pass
+        try:
+            other_partset = part.alternatepartsets.now().get()
+        except models.AlternatePartSet.DoesNotExist:
+            other_partset = None
+        if partset is not None and other_partset is not None:
+            if partset == other_partset:
+                raise ValueError("Already an alternate part")
+            else:
+                raise ValueError("Merging of two alternate part sets is not yet supported")
+        # 3 cases:
+        #  - self and part have no alternates
+        #  - self has alternates
+        #  - part has alternates
+        alternates = []
+        if partset is not None:
+            alternates = list(partset.parts)
+            tested_part = part
+        elif other_partset is not None:
+            alternates = list(other_partset.parts)
+            tested_part = self.object
+
+        # revisions
+        if not alternates:
+            revision_valid = self.type == part.type and self.reference == part.reference
+        else:
+            revision_valid = all((p.type, p.reference) != (tested_part.type, tested_part.reference)
+                    for p in alternates)
+        if not revision_valid:
+            raise ValueError("Invalid revision")
+        
+        # ancestors
+        links = models.ParentChildLink.current_objects
+        parents = [part.id, self.id] + [p.id for p in alternates]
+        built_set = parents[:]
+        while parents:
+            parents = list(links.filter(parent__in=parents).values_list("child", 
+                    flat=True))
+            if parents:
+                ps = models.AlternatePartSet.objects.now().filter(parts__in=parents).distinct()
+                parents += list(models.Part.objects.filter(alternatepartsets__in=ps).values_list("id", flat=True))
+            for p in built_set:
+                if p in parents:
+                    raise ValueError("Ancestor")
+
         raise ValueError("Still in developpement")
 
     def add_alternate(self, part):
@@ -1016,6 +1072,8 @@ class PartController(PLMObjectController):
         return my_partset == other_partset
 
     def delete_alternate(self, part):
+        # permissions ?
+        self.check_permission("owner")
         partset = models.AlternatePartSet.get_partset(self.object)
         # TODO: histo
         return partset.remove_part(part)
@@ -1023,7 +1081,7 @@ class PartController(PLMObjectController):
     def get_alternates(self, date=None):
         try:
             partset = self.alternatepartsets.at(date).get()
-            return partset.part
+            return partset.parts
         except models.AlternatePartSet.DoesNotExist:
             return []
 
