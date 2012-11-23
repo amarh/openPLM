@@ -601,23 +601,20 @@ class PartSet(Link):
         app_label = "plmapp"
         abstract = True
 
-    # classmethods to remember that a new partset is returned
-    @classmethod
-    def add_part(cls, old_partset, part):
-        new_partset = cls.objects.create()
-        new_partset.parts.add(part, *old_partset.parts.all())
-        old_partset.end()
+    def add_part(self, part):
+        new_partset = self.__class__.objects.create()
+        new_partset.parts.add(part, *self.parts.all())
+        self.end()
         return new_partset
 
-    @classmethod
-    def remove_part(cls, old_partset, part):
-        if len(old_partset.parts) == 1:
-            old_partset.end()
+    def remove_part(self, part):
+        if len(self.parts) == 1:
+            self.end()
             return None
         else:
-            new_partset = cls.objects.create()
-            new_partset.parts.add(p for p in old_partset.parts if p != part)
-            old_partset.end()
+            new_partset = self.__class__.objects.create()
+            new_partset.parts.add(p for p in self.parts if p != part)
+            self.end()
             return new_partset
 
     @classmethod
