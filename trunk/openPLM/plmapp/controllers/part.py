@@ -1041,7 +1041,7 @@ class PartController(PLMObjectController):
         parents = [part.id, self.id] + [p.id for p in alternates]
         built_set = parents[:]
         while parents:
-            parents = list(links.filter(parent__in=parents).values_list("child", 
+            parents = list(links.filter(child__in=parents).values_list("parent", 
                     flat=True))
             if parents:
                 ps = models.AlternatePartSet.objects.now().filter(parts__in=parents).distinct()
