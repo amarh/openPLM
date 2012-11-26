@@ -44,12 +44,9 @@ class PartControllerTest(ControllerTest):
    
     def setUp(self):
         super(PartControllerTest, self).setUp()
-        self.controller = self.CONTROLLER.create("aPart1", self.TYPE, "a",
-                                                 self.user, self.DATA)
-        self.controller2 = self.CONTROLLER.create("aPart2", self.TYPE, "a",
-                                                  self.user, self.DATA)
-        self.controller3 = self.CONTROLLER.create("aPart3", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        self.controller = self.create("aPart1")
+        self.controller2 = self.create("aPart2")
+        self.controller3 = self.create("aPart3")
         self.document = DocumentController.create("Doc1", "Document", "a",
                 self.user, self.DATA)
         self.document.add_file(self.get_file())
@@ -131,11 +128,11 @@ class PartControllerTest(ControllerTest):
         is a document.
         """
         def fail():
-            doc = PLMObjectController.create("e", "PLMObject", "1", self.user)
+            doc = PLMObjectController.create("e", "Document", "1", self.user, self.DATA)
             self.controller.precompute_can_add_child2()
             self.assertFalse(self.controller.can_add_child2(doc))
             self.controller.add_child(doc, 10, 15)
-        self.assertRaises(ValueError, fail)
+        self.assertRaises(TypeError, fail)
         self.assertFalse(self.controller.get_children())
 
     def test_add_child_error_child_is_self(self):
@@ -336,8 +333,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(1, len(self.controller.get_children()))
 
     def test_get_children(self):
-        controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        controller4 = self.create("aPart4")
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 25)
@@ -388,8 +384,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(children, wanted)
 
     def test_get_parents(self):
-        controller4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        controller4 = self.create("aPart4")
         self.controller.add_child(self.controller2, 10, 15)
         date = datetime.datetime.now()
         self.controller2.add_child(self.controller3, 10, 15)
@@ -1043,8 +1038,7 @@ class PartControllerTest(ControllerTest):
               +---> Part4 (alternate)
         """
         self.controller.add_child(self.controller2, 1, 4)
-        ctrl4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        ctrl4 = self.create("aPart4")
         self.controller3.add_alternate(ctrl4)
         self.controller.add_child(self.controller3, 5, 6)
         self.assertAddAlternateFails(self.controller, ctrl4)
@@ -1083,13 +1077,11 @@ class PartControllerTest(ControllerTest):
         """
         self.controller.add_child(self.controller2, 1, 3)
         self.controller2.add_child(self.controller3, 7, 54)
-        ctrl4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        ctrl4 = self.create("aPart4")
         self.controller3.add_alternate(ctrl4)
         self.assertAddAlternateFails(self.controller, ctrl4.object)
         self.assertAddAlternateFails(self.controller2, ctrl4)
-        ctrl5 = self.CONTROLLER.create("aPart5", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        ctrl5 = self.create("aPart5")
         self.controller3.add_alternate(ctrl5)
         self.assertAddAlternateFails(self.controller, ctrl5.object)
         self.assertAddAlternateFails(self.controller2, ctrl5)
@@ -1107,10 +1099,8 @@ class PartControllerTest(ControllerTest):
         """
         self.controller.add_alternate(self.controller2)
         self.controller.add_child(self.controller3, 44, 7)
-        c4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
-        c5 = self.CONTROLLER.create("aPart5", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        c4 = self.create("aPart4")
+        c5 = self.create("aPart5")
         self.controller3.add_child(c4, 54, 4545)
         self.controller2.add_child(c5, 54, 4545)
 
@@ -1153,14 +1143,11 @@ class PartControllerTest(ControllerTest):
         """
         self.controller.add_alternate(self.controller2)
         self.controller.add_child(self.controller3, 44, 7)
-        c4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
-                                                  self.user, self.DATA)
-        c5 = self.CONTROLLER.create("aPart5", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        c4 = self.create("aPart4")
+        c5 = self.create("aPart5")
         self.controller3.add_child(c4, 54, 4545)
         self.controller2.add_child(c5, 54, 4545)
-        c6 = self.CONTROLLER.create("aPart6", self.TYPE, "a",
-                                                  self.user, self.DATA)
+        c6 = self.create("aPart6")
         c6.add_child(self.controller2, 25, 15)
 
         # invalid alternate links
@@ -1198,8 +1185,7 @@ class PartControllerTest(ControllerTest):
         """
         ctrls = []
         for i in range(10):
-            ctrls.append(self.CONTROLLER.create("x%d" % i, self.TYPE,
-                "a", self.user, self.DATA))
+            ctrls.append(self.create("x%d" % i))
        
         for i in range(1, 8, 2):
             ctrls[i].add_alternate(ctrls[i+1])
@@ -1208,4 +1194,15 @@ class PartControllerTest(ControllerTest):
 
         for x, y in itertools.product(ctrls, repeat=2):
             self.assertAddAlternateFails(x, y)
+
+    def test_add_alternate_error_two_sets(self):
+        """
+        Merging of two alternate sets is not yet implemented.
+        """
+        c4 = self.create("part4")
+        self.controller.add_alternate(self.controller2)
+        self.controller3.add_alternate(c4)
+
+        self.assertAddAlternateFails(self.controller, c4)
+        self.assertAddAlternateFails(self.controller3, self.controller2)
 
