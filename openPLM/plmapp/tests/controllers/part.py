@@ -1055,7 +1055,14 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(self.controller3.can_add_child2(ctrl4.object))
         self.assertRaises(ValueError, self.controller3.add_child, ctrl4, 12, 12)
 
-
-
-
-
+    def test_add_alternate_error_ancestor(self):
+        """
+        Part1
+        +--> Part2 (child)
+             +--> Part3 (child)
+        """
+        self.controller.add_child(self.controller2, 1, 5)
+        self.controller2.add_child(self.controller3, 1, 5)
+        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller2)
+        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller)
+        self.assertRaises(ValueError, self.controller.add_alternate, self.controller)
