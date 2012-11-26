@@ -140,10 +140,8 @@ class PartController(PLMObjectController):
                 if child.is_part and child.id not in invalid_ids:
                     valid_state = not (child.is_cancelled or child.is_deprecated)
                     if valid_state:
-                        # get alternates of child
                         child_ctrl = get_controller(child.type)(child, self._user)
-                        if children.isdisjoint(p.id for p in child_ctrl.get_alternates()):
-                            return child_ctrl.check_readable(False)
+                        return child_ctrl.check_readable(False)
                 return False
             self.can_add_child2 = can_add
         else:
