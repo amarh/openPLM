@@ -996,8 +996,8 @@ class PartControllerTest(ControllerTest):
         alternates = set(self.controller.get_alternates())
         alternates2 = set(self.controller2.get_alternates())
         alternates3 = set(self.controller3.get_alternates())
-        wanted = set([self.controller.object, self.controller2.object,
-            self.controller3.object])
+        wanted = set([self.controller.object.part, self.controller2.object.part,
+            self.controller3.object.part])
         for alt in (alternates, alternates2, alternates3):
             self.assertEqual(wanted, alt)
 
