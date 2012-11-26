@@ -1000,3 +1000,19 @@ class PartControllerTest(ControllerTest):
             self.controller3.object])
         for alt in (alternates, alternates2, alternates3):
             self.assertEqual(wanted, alt)
+
+    def test_add_alternate_error_revision(self):
+        # revision of the controller
+        revb = self.controller.revise("b")
+        self.assertRaises(ValueError, self.controller.add_alternate, revb)
+        self.assertRaises(ValueError, revb.add_alternate, self.controller)
+        self.assertFalse(self.controller.can_add_alternate(revb))
+        self.assertFalse(revb.can_add_alternate(self.controller))
+        # revision of an alternate part
+        revb.add_alternate(self.controller2)
+        rev2b = self.controller2.revise("2b")
+        self.assertRaises(ValueError, revb.add_alternate, rev2b)
+        self.assertRaises(ValueError, rev2b.add_alternate, revb)
+        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller)
+        
+
