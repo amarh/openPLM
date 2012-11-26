@@ -120,18 +120,30 @@ class PartController(PLMObjectController):
         
 
     def precompute_can_add_child2(self):
-        # FIXME: alternates !
         is_owner = self.check_permission("owner", raise_=False)
         if is_owner and self.is_editable:
-            parents = set(p.link.parent_id for p in self.get_parents(-1))
+            links = models.ParentChildLink.current_objects
+            parents = set([self.id])
+            parents.update(models.AlternatePartSet.get_related_parts(parents))
+            invalid_ids = set(parents)
+            while parents:
+                parents = set(links.filter(child__in=parents).values_list("parent", 
+                        flat=True))
+                parents.update(models.AlternatePartSet.get_related_parts(parents))
+                parents.difference_update(invalid_ids)
+                invalid_ids.update(parents)
             children = set(self.parentchildlink_parent.now().values_list("child", flat=True))
-            invalid_ids = parents | children 
+            children.update(models.AlternatePartSet.get_related_parts(children))
+            invalid_ids.update(children)
             invalid_ids.add(self.object.id)
             def can_add(child):
                 if child.is_part and child.id not in invalid_ids:
                     valid_state = not (child.is_cancelled or child.is_deprecated)
                     if valid_state:
-                        return get_controller(child.type)(child, self._user).check_readable(False)
+                        # get alternates of child
+                        child_ctrl = get_controller(child.type)(child, self._user)
+                        if children.isdisjoint(p.id for p in child_ctrl.get_alternates()):
+                            return child_ctrl.check_readable(False)
                 return False
             self.can_add_child2 = can_add
         else:
