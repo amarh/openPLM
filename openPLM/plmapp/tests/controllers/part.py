@@ -27,6 +27,7 @@ This module contains some tests for openPLM.
 """
 
 import datetime
+import itertools
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController, \
         DocumentController
@@ -1187,4 +1188,24 @@ class PartControllerTest(ControllerTest):
         c3.add_alternate(c5)
         self.assertAddAlternateFails(c4, c5)
 
+    def test_add_alternate_error_ancestors3(self):
+        """
+        P0
+        +--> P1 (child)
+             +--> P2 (alternate)
+                  +--> P3 (child)
+                       +--> ...
+        """
+        ctrls = []
+        for i in range(10):
+            ctrls.append(self.CONTROLLER.create("x%d" % i, self.TYPE,
+                "a", self.user, self.DATA))
+       
+        for i in range(1, 8, 2):
+            ctrls[i].add_alternate(ctrls[i+1])
+        for i in range(0, 9, 2):
+            ctrls[i].add_child(ctrls[i+1], 1, 1)
+
+        for x, y in itertools.product(ctrls, repeat=2):
+            self.assertAddAlternateFails(x, y)
 
