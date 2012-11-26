@@ -1005,6 +1005,7 @@ class PartControllerTest(ControllerTest):
         # revision of the controller
         revb = self.controller.revise("b")
         self.assertRaises(ValueError, self.controller.add_alternate, revb)
+        self.assertFalse(self.controller.get_alternates())
         self.assertRaises(ValueError, revb.add_alternate, self.controller)
         self.assertFalse(self.controller.can_add_alternate(revb))
         self.assertFalse(revb.can_add_alternate(self.controller))
@@ -1014,5 +1015,12 @@ class PartControllerTest(ControllerTest):
         self.assertRaises(ValueError, revb.add_alternate, rev2b)
         self.assertRaises(ValueError, rev2b.add_alternate, revb)
         self.assertRaises(ValueError, self.controller2.add_alternate, self.controller)
-        
+
+    def test_add_alternate_error_child(self):
+        self.controller.add_child(self.controller2, 1, 4)
+        self.assertRaises(ValueError, self.controller.add_alternate, self.controller2)
+        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller)
+        self.assertFalse(self.controller.get_alternates())
+        self.assertFalse(self.controller2.get_alternates())
+
 
