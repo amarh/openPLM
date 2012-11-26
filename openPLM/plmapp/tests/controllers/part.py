@@ -1212,4 +1212,11 @@ class PartControllerTest(ControllerTest):
         self.controller.precompute_can_add_child2()
         self.assertFalse(self.controller.can_add_child2(self.controller2.object))
 
+    def test_add_child_error_alternate_of_child(self):
+        self.controller3.add_alternate(self.controller2)
+        self.controller.add_child(self.controller3, 4, 5)
+        self.assertRaises(ValueError, self.add_child)
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
+
 
