@@ -1206,3 +1206,10 @@ class PartControllerTest(ControllerTest):
         self.assertAddAlternateFails(self.controller, c4)
         self.assertAddAlternateFails(self.controller3, self.controller2)
 
+    def test_add_child_error_alternate(self):
+        self.controller.add_alternate(self.controller2)
+        self.assertRaises(ValueError, self.add_child)
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(self.controller2.object))
+
+
