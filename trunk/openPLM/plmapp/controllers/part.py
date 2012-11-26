@@ -408,10 +408,11 @@ class PartController(PLMObjectController):
         tested_parts = set(p.id for p in alternates)
         tested_parts.add(self.id)
         parents = [part.id]
+        parents += models.AlternatePartSet.get_related_parts(parents)
         while parents:
+            parents += models.AlternatePartSet.get_related_parts(parents)
             parents = list(links.filter(parent__in=parents).values_list("child", 
                     flat=True))
-            parents += models.AlternatePartSet.get_related_parts(parents)
             if not tested_parts.isdisjoint(parents):
                 return True
         return False
