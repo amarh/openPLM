@@ -1063,18 +1063,18 @@ class PartController(PLMObjectController):
         #  - part has alternates
         alternates = []
         if partset is not None:
-            alternates = list(partset.parts)
+            alternates = list(partset.parts.all())
             tested_part = part
         elif other_partset is not None:
-            alternates = list(other_partset.parts)
+            alternates = list(other_partset.parts.all())
             tested_part = self.object
 
         # revisions
         if not alternates:
-            revision_valid = self.type == part.type and self.reference == part.reference
+            revision_valid = not (self.type == part.type and self.reference == part.reference)
         else:
             revision_valid = all((p.type, p.reference) != (tested_part.type, tested_part.reference)
-                    for p in alternates)
+                    for p in alternates if p.id != tested_part.id)
         if not revision_valid:
             raise ValueError("Invalid revision")
         
@@ -1089,7 +1089,7 @@ class PartController(PLMObjectController):
             if not built_set.isdisjoint(parents):
                 raise ValueError("Ancestor")
 
-        # TODO siblings
+        # siblings
         if not alternates:
             p1 = set(links.filter(child=self.object).values_list("parent", flat=True))
             p2 = set(links.filter(child=part).values_list("parent", flat=True))
@@ -1099,11 +1099,9 @@ class PartController(PLMObjectController):
         if p1 & p2:
             raise ValueError("sibling")
 
-        raise ValueError("Still in developpement")
-
     def add_alternate(self, part):
         self.check_add_alternate(part)
-        partset = models.AlternatePartSet.join(self.object, part)
+        partset = models.AlternatePartSet.join(self.object, getattr(part, "object", part))
         # TODO: HISTO
         return partset
 
@@ -1132,7 +1130,7 @@ class PartController(PLMObjectController):
     def get_alternates(self, date=None):
         try:
             partset = self.alternatepartsets.at(date).get()
-            return partset.parts
+            return partset.parts.all()
         except models.AlternatePartSet.DoesNotExist:
             return []
 

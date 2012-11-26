@@ -988,3 +988,15 @@ class PartControllerTest(ControllerTest):
         self.promote_to_deprecated(ctrl)
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, [], [])
+
+    def test_add_alternate_simple(self):
+        # no children, no parents
+        self.controller.add_alternate(self.controller2)
+        self.controller.add_alternate(self.controller3)
+        alternates = set(self.controller.get_alternates())
+        alternates2 = set(self.controller2.get_alternates())
+        alternates3 = set(self.controller3.get_alternates())
+        wanted = set([self.controller.object, self.controller2.object,
+            self.controller3.object])
+        for alt in (alternates, alternates2, alternates3):
+            self.assertEqual(wanted, alt)
