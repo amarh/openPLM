@@ -1071,3 +1071,27 @@ class PartControllerTest(ControllerTest):
         self.assertAddAlternateFails(self.controller3, self.controller2)
         self.assertAddAlternateFails(self.controller3, self.controller)
         self.assertAddAlternateFails(self.controller, self.controller)
+
+    def test_add_alternate_error_ancestor_of_alternate(self):
+        """
+        Part1
+        +--> Part2 (child)
+             +--> Part3 (child)
+                  |--> Part4 (alternate)
+                  +--> Part5 (alternate)  
+        """
+        self.controller.add_child(self.controller2, 1, 3)
+        self.controller2.add_child(self.controller3, 7, 54)
+        ctrl4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
+                                                  self.user, self.DATA)
+        self.controller3.add_alternate(ctrl4)
+        self.assertAddAlternateFails(self.controller, ctrl4.object)
+        self.assertAddAlternateFails(self.controller2, ctrl4)
+        ctrl5 = self.CONTROLLER.create("aPart5", self.TYPE, "a",
+                                                  self.user, self.DATA)
+        self.controller3.add_alternate(ctrl5)
+        self.assertAddAlternateFails(self.controller, ctrl5.object)
+        self.assertAddAlternateFails(self.controller2, ctrl5)
+
+
+
