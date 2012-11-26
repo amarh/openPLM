@@ -608,12 +608,12 @@ class PartSet(Link):
         return new_partset
 
     def remove_part(self, part):
-        if len(self.parts) == 1:
+        if self.parts.all().count() == 2:
             self.end()
             return None
         else:
             new_partset = self.__class__.objects.create()
-            new_partset.parts.add(p for p in self.parts if p != part)
+            new_partset.parts.add(*[p for p in self.parts.all() if p != part])
             self.end()
             return new_partset
 

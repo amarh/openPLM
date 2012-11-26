@@ -1093,5 +1093,47 @@ class PartControllerTest(ControllerTest):
         self.assertAddAlternateFails(self.controller, ctrl5.object)
         self.assertAddAlternateFails(self.controller2, ctrl5)
 
+    def test_add_alternate_error_ancestors(self):
+        """
 
+        Part1
+        |--> Part2 (alternate)
+             +--> Part5 (child)
+        +--> Part3 (child)
+             +--> Part4 (child)
+
+        Valid Alternate: (3, 5) or (4, 5) (not both)
+        """
+        self.controller.add_alternate(self.controller2)
+        self.controller.add_child(self.controller3, 44, 7)
+        c4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
+                                                  self.user, self.DATA)
+        c5 = self.CONTROLLER.create("aPart5", self.TYPE, "a",
+                                                  self.user, self.DATA)
+        self.controller3.add_child(c4, 54, 4545)
+        self.controller2.add_child(c5, 54, 4545)
+
+        # invalid alternate links
+        c1 = self.controller
+        c2 = self.controller2
+        c3 = self.controller3
+        for x, y in ((c1, c1), (c1, c2), (c1, c3), (c1, c4), (c1, c5),
+                (c2, c2), (c2, c3), (c2, c4), (c2, c5),
+                (c3, c3), (c3, c4), (c4, c4), (c4, c4)):
+            self.assertAddAlternateFails(x, y)
+            self.assertAddAlternateFails(y, x)
+
+        # valid links
+        self.assertTrue(c3.can_add_alternate(c5))
+        self.assertTrue(c4.can_add_alternate(c5))
+        self.assertTrue(c5.can_add_alternate(c3))
+        self.assertTrue(c5.can_add_alternate(c4))
+
+        # assert that (c3 <-> c5) and (c4 <-> c5) is not valid
+        c4.add_alternate(c5)
+        self.assertAddAlternateFails(c3, c5)
+
+        c4.delete_alternate(c5)
+        c3.add_alternate(c5)
+        self.assertAddAlternateFails(c4, c5)
 
