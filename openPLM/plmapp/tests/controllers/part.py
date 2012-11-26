@@ -1023,4 +1023,39 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(self.controller.get_alternates())
         self.assertFalse(self.controller2.get_alternates())
 
+    def test_add_alternate_error_siblings(self):
+        self.controller.add_child(self.controller2, 1, 4)
+        self.controller.add_child(self.controller3, 4, 5)
+        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller3)
+        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller2)
+
+    def test_add_alternate_error_siblings2(self):
+        """
+        Part1
+        |---> Part2 (child)
+        +---> Part3 (child)
+              +---> Part4 (alternate)
+        """
+        self.controller.add_child(self.controller2, 1, 4)
+        ctrl4 = self.CONTROLLER.create("aPart4", self.TYPE, "a",
+                                                  self.user, self.DATA)
+        self.controller3.add_alternate(ctrl4)
+        self.controller.add_child(self.controller3, 5, 6)
+        self.assertRaises(ValueError, self.controller.add_alternate, ctrl4)
+        self.assertRaises(ValueError, self.controller2.add_alternate, ctrl4)
+        self.assertRaises(ValueError, self.controller3.add_alternate, ctrl4)
+        self.assertRaises(ValueError, ctrl4.add_alternate, self.controller2)
+        self.assertRaises(ValueError, self.controller.add_child, ctrl4, 12, 12)
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(ctrl4.object))
+        self.assertTrue(self.controller2.can_add_child(ctrl4))
+        self.controller2.precompute_can_add_child2()
+        self.assertTrue(self.controller2.can_add_child2(ctrl4.object))
+        self.controller3.precompute_can_add_child2()
+        self.assertFalse(self.controller3.can_add_child2(ctrl4.object))
+        self.assertRaises(ValueError, self.controller3.add_child, ctrl4, 12, 12)
+
+
+
+
 
