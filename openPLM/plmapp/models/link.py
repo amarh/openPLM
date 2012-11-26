@@ -620,14 +620,17 @@ class PartSet(Link):
     @classmethod
     def join(cls, part, part_or_set):
         if isinstance(part_or_set, cls):
-            return cls.add_part(part_or_set, part)
+            return part_or_set.add_part(part)
         partset = cls.get_partset(part_or_set)
         if partset is None:
+            partset = cls.get_partset(part)
+            if partset is not None:
+                return partset.add_part(part_or_set)
             new_partset = cls.objects.create()
             new_partset.parts.add(part, part_or_set)
             return new_partset
         else:
-            return cls.add_part(partset, part)
+            return partset.add_part(part)
 
     @classmethod
     def get_partset(cls, part):
@@ -636,6 +639,15 @@ class PartSet(Link):
            return partset
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def get_related_parts(cls, parts):
+        if not parts:
+            return []
+        ps = cls.objects.now().filter(parts__in=parts).distinct()
+        query = {"%ss__in" % cls.__name__.lower() : ps}
+        return list(set(Part.objects.filter(**query).values_list("id", flat=True)))
+        
 
 
 class SynchronizedPartSet(PartSet):

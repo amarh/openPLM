@@ -96,19 +96,28 @@ class PartController(PLMObjectController):
             raise ValueError("Can not add child: child is current object")
         if isinstance(child, PartController):
             child.check_readable()
+            child_ctrl = child
             child = child.object
         else:
-            get_controller(child.type)(child, self._user).check_readable()
-        if self.is_ancestor(child):
+            child_ctrl = get_controller(child.type)(child, self._user)
+            child_ctrl.check_readable()
+        if self.is_ancestor2(child):
             raise ValueError("Can not add child %s to %s, it is a parent" %
                                 (child, self.object))
         link = self.parentchildlink_parent.now().filter(child=child)
         if link.exists():
             raise ValueError("Can not add child, %s is already a child of %s" %
                                 (child, self.object))
-        # FIXME: alternates !
-        # child not in alternates,
-        # child not in ancestor of alternates
+
+        if self.is_alternate(child):
+            raise ValueError("Can not add child, %s is an alternate part of %s" %
+                                (child, self.object))
+        # alternate siblings
+        children = [c.link.child_id for c in self.get_children(1)]
+        children += models.AlternatePartSet.get_related_parts(children)
+        if set(p.id for p in child_ctrl.get_alternates()) & set(children):
+            raise ValueError("Can not add child, %s is an alternate part of one of the children" % child)
+        
 
     def precompute_can_add_child2(self):
         # FIXME: alternates !
@@ -379,6 +388,22 @@ class PartController(PLMObjectController):
             if self.id in parents:
                 return True
         return False
+
+    def is_ancestor2(self, part):
+        # TODO: rename this method
+        links = models.ParentChildLink.current_objects
+        alternates = self.get_alternates()
+        tested_parts = set(p.id for p in alternates)
+        tested_parts.add(self.id)
+        parents = [part.id]
+        while parents:
+            parents = list(links.filter(parent__in=parents).values_list("child", 
+                    flat=True))
+            parents += models.AlternatePartSet.get_related_parts(parents)
+            if not tested_parts.isdisjoint(parents):
+                return True
+        return False
+
     
     def get_parents(self, max_level=1, date=None,
             related=("parent", "parent__state", "parent__lifecycle"),
@@ -991,11 +1016,16 @@ class PartController(PLMObjectController):
         return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
 
     def check_add_alternate(self, part):
-        self.check_readable()
         self.check_permission("owner")
+        self.check_editable()
         # FIXME: untested !!!
+        
         # TODO: better error messages, permissions
 
+        if part.is_cancelled:
+            raise ValueError("Can not add alternate: part is cancelled.")
+        if part.is_deprecated:
+            raise ValueError("Can not add alternate: part is deprecated.")
         if not part.is_part:
             raise ValueError("Not a part")
         if part.id == self.id:
@@ -1039,22 +1069,31 @@ class PartController(PLMObjectController):
         # ancestors
         links = models.ParentChildLink.current_objects
         parents = [part.id, self.id] + [p.id for p in alternates]
-        built_set = parents[:]
+        built_set = set(parents[:])
         while parents:
             parents = list(links.filter(child__in=parents).values_list("parent", 
                     flat=True))
-            if parents:
-                ps = models.AlternatePartSet.objects.now().filter(parts__in=parents).distinct()
-                parents += list(models.Part.objects.filter(alternatepartsets__in=ps).values_list("id", flat=True))
-            for p in built_set:
-                if p in parents:
-                    raise ValueError("Ancestor")
+            parents += models.AlternatePartSet.get_related_parts(parents)
+            if not built_set.isdisjoint(parents):
+                raise ValueError("Ancestor")
+
+        # TODO siblings
+        if not alternates:
+            p1 = set(links.filter(child=self.object).values_list("parent", flat=True))
+            p2 = set(links.filter(child=part).values_list("parent", flat=True))
+        else:
+            p1 = set(links.filter(child=tested_part).values_list("parent", flat=True))
+            p2 = set(links.filter(child__in=alternates).values_list("parent", flat=True))
+        if p1 & p2:
+            raise ValueError("sibling")
 
         raise ValueError("Still in developpement")
 
     def add_alternate(self, part):
         self.check_add_alternate(part)
-        # TODO
+        partset = models.AlternatePartSet.join(self.object, part)
+        # TODO: HISTO
+        return partset
 
     def can_add_alternate(self, part):
         can = True
