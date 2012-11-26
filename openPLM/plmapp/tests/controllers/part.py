@@ -989,6 +989,11 @@ class PartControllerTest(ControllerTest):
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, [], [])
 
+    def assertAddAlternateFails(self, ctrl, part):
+        is_alternate = ctrl.is_alternate(part)
+        self.assertRaises(ValueError, ctrl.add_alternate, part)
+        self.assertEquals(is_alternate, ctrl.is_alternate(part))
+
     def test_add_alternate_simple(self):
         # no children, no parents
         self.controller.add_alternate(self.controller2)
@@ -1004,30 +1009,30 @@ class PartControllerTest(ControllerTest):
     def test_add_alternate_error_revision(self):
         # revision of the controller
         revb = self.controller.revise("b")
-        self.assertRaises(ValueError, self.controller.add_alternate, revb)
+        self.assertAddAlternateFails(self.controller, revb)
         self.assertFalse(self.controller.get_alternates())
-        self.assertRaises(ValueError, revb.add_alternate, self.controller)
+        self.assertAddAlternateFails(revb, self.controller)
         self.assertFalse(self.controller.can_add_alternate(revb))
         self.assertFalse(revb.can_add_alternate(self.controller))
         # revision of an alternate part
         revb.add_alternate(self.controller2)
         rev2b = self.controller2.revise("2b")
-        self.assertRaises(ValueError, revb.add_alternate, rev2b)
-        self.assertRaises(ValueError, rev2b.add_alternate, revb)
-        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller)
+        self.assertAddAlternateFails(revb, rev2b)
+        self.assertAddAlternateFails(rev2b, revb)
+        self.assertAddAlternateFails(self.controller2, self.controller)
 
     def test_add_alternate_error_child(self):
         self.controller.add_child(self.controller2, 1, 4)
-        self.assertRaises(ValueError, self.controller.add_alternate, self.controller2)
-        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller)
+        self.assertAddAlternateFails(self.controller, self.controller2)
+        self.assertAddAlternateFails(self.controller2, self.controller)
         self.assertFalse(self.controller.get_alternates())
         self.assertFalse(self.controller2.get_alternates())
 
     def test_add_alternate_error_siblings(self):
         self.controller.add_child(self.controller2, 1, 4)
         self.controller.add_child(self.controller3, 4, 5)
-        self.assertRaises(ValueError, self.controller2.add_alternate, self.controller3)
-        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller2)
+        self.assertAddAlternateFails(self.controller2, self.controller3)
+        self.assertAddAlternateFails(self.controller3, self.controller2)
 
     def test_add_alternate_error_siblings2(self):
         """
@@ -1041,10 +1046,10 @@ class PartControllerTest(ControllerTest):
                                                   self.user, self.DATA)
         self.controller3.add_alternate(ctrl4)
         self.controller.add_child(self.controller3, 5, 6)
-        self.assertRaises(ValueError, self.controller.add_alternate, ctrl4)
-        self.assertRaises(ValueError, self.controller2.add_alternate, ctrl4)
-        self.assertRaises(ValueError, self.controller3.add_alternate, ctrl4)
-        self.assertRaises(ValueError, ctrl4.add_alternate, self.controller2)
+        self.assertAddAlternateFails(self.controller, ctrl4)
+        self.assertAddAlternateFails(self.controller2, ctrl4)
+        self.assertAddAlternateFails(self.controller3, ctrl4)
+        self.assertAddAlternateFails(ctrl4, self.controller2)
         self.assertRaises(ValueError, self.controller.add_child, ctrl4, 12, 12)
         self.controller.precompute_can_add_child2()
         self.assertFalse(self.controller.can_add_child2(ctrl4.object))
@@ -1063,6 +1068,6 @@ class PartControllerTest(ControllerTest):
         """
         self.controller.add_child(self.controller2, 1, 5)
         self.controller2.add_child(self.controller3, 1, 5)
-        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller2)
-        self.assertRaises(ValueError, self.controller3.add_alternate, self.controller)
-        self.assertRaises(ValueError, self.controller.add_alternate, self.controller)
+        self.assertAddAlternateFails(self.controller3, self.controller2)
+        self.assertAddAlternateFails(self.controller3, self.controller)
+        self.assertAddAlternateFails(self.controller, self.controller)
