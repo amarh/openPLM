@@ -1267,3 +1267,26 @@ class PartControllerTest(ControllerTest):
         self.controller.precompute_can_add_child2()
         self.assertFalse(self.controller.can_add_child2(self.controller2.object))
 
+    # naming tests is painful
+    def test_add_child_error_alt_of_parent_of_alt(self):
+        """
+        Part4
+        +--> Part3 (alternate)
+             +--> Part2 (child)
+                  +--> Part1 (alternate)
+
+        asserts that Part1 --> Part4 (child) is forbidden
+        Part4 --> Part1 (child) is allowed
+        """
+        c4 = self.create("p4")
+        c4.add_alternate(self.controller3)
+        self.controller3.add_child(self.controller2, 1, 1)
+        self.controller.add_alternate(self.controller2)
+
+        self.assertRaises(ValueError, self.controller.add_child, c4, 2, 2)
+        self.controller.precompute_can_add_child2()
+        self.assertFalse(self.controller.can_add_child2(c4.object))
+        self.assertTrue(c4.can_add_child(self.controller))
+        c4.precompute_can_add_child2()
+        self.assertTrue(c4.can_add_child2(self.controller.object))
+
