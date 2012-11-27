@@ -160,15 +160,16 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
                 ref = cleaned_data.get("reference", "")
                 rev = cleaned_data.get("revision", "")
                 auto = cleaned_data.get("auto", False)
+                inbulk = getattr(self, "inbulk_cache")
                 if auto and not ref:
-                    cleaned_data["reference"] = ref = get_new_reference(cls, start, inbulk_cache)
+                    cleaned_data["reference"] = ref = get_new_reference(cls, start, inbulk)
                 if not auto and not ref:
                     self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
                     else:
-                        cleaned_data["reference"] = get_new_reference(cls, start, inbulk_cache)
+                        cleaned_data["reference"] = get_new_reference(cls, start, inbulk)
                 elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
                     raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
                 return cleaned_data
@@ -190,6 +191,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         # display only valid groups
         field = form.fields["group"]
         field.cache_choices = inbulk_cache is not None
+        form.inbulk_cache = inbulk_cache
         if inbulk_cache is None or "group" not in inbulk_cache:
             groups = user.groups.all().values_list("id", flat=True)
             field.queryset = m.GroupInfo.objects.filter(id__in=groups)
