@@ -75,7 +75,7 @@ def auto_complete_fields(form, cls):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
             form_field.widget = JQueryAutoComplete(source)
 
-def get_new_reference(cls, start=0):
+def get_new_reference(cls, start=0, inbulk_cache=None):
     u"""
     Returns a new reference for creating a :class:`.PLMObject` of type
     *cls*.
@@ -95,15 +95,20 @@ def get_new_reference(cls, start=0):
         base_cls, name = m.Part, "PART"
     else:
         base_cls, name = m.Document, "DOC"
-    try:
-        max_ref = base_cls.objects.order_by("-reference_number")\
-            .values_list("reference_number", flat=True)[0]
-    except IndexError:
-        max_ref = 0
+    if inbulk_cache is not None and "max_" + name in inbulk_cache:
+        max_ref = inbulk_cache["max_" + name]
+    else:
+        try:
+            max_ref = base_cls.objects.order_by("-reference_number")\
+                .values_list("reference_number", flat=True)[0]
+        except IndexError:
+            max_ref = 0
+        if inbulk_cache is not None:
+            inbulk_cache["max_" + name] = max_ref
     nb = max_ref + start + 1
     return "%s_%05d" % (name, nb)
 
-def get_initial_creation_data(cls, start=0):
+def get_initial_creation_data(cls, start=0, inbulk_cache=None):
     u"""
     Returns initial data to create a new object (from :func:`get_creation_form`).
 
@@ -112,7 +117,7 @@ def get_initial_creation_data(cls, start=0):
     """
     if issubclass(cls, m.PLMObject):
         data = {
-                'reference' : get_new_reference(cls, start), 
+                'reference' : get_new_reference(cls, start, inbulk_cache), 
                 'revision' : 'a',
                 'lifecycle' : str(m.get_default_lifecycle().pk),
         }
@@ -120,7 +125,7 @@ def get_initial_creation_data(cls, start=0):
         data = {}
     return data
 
-def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
+def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=None, **kwargs):
     u"""
     Returns a creation form suitable to create an object
     of type *cls*.
@@ -134,6 +139,10 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
 
     *start* is used if *data* is ``None``, it's usefull if you need to show
     several initial creation forms at once and you want different references.
+
+    *inbulk_cache* may be a dictionary to cache lifecycles, groups and other
+    values. It is useful if a page renders several creation forms bound to the same
+    user
     """
     Form = get_creation_form.cache.get(cls)
     if Form is None:
@@ -152,34 +161,64 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, **kwargs):
                 rev = cleaned_data.get("revision", "")
                 auto = cleaned_data.get("auto", False)
                 if auto and not ref:
-                    cleaned_data["reference"] = ref = get_new_reference(cls, start)
+                    cleaned_data["reference"] = ref = get_new_reference(cls, start, inbulk_cache)
                 if not auto and not ref:
                     self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
                     else:
-                        cleaned_data["reference"] = get_new_reference(cls, start)
+                        cleaned_data["reference"] = get_new_reference(cls, start, inbulk_cache)
                 elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
                     raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
                 return cleaned_data
             Form.clean = _clean
         get_creation_form.cache[cls] = Form
     if data is None:
-        initial = get_initial_creation_data(cls, start)
+        initial = get_initial_creation_data(cls, start, inbulk_cache)
         initial.update(kwargs.pop("initial", {}))
         form = Form(initial=initial, **kwargs)
     else:
         form = Form(data=data, **kwargs)
     if issubclass(cls, m.PLMObject):
+        # lifecycles and groups are cached if inbulk_cache is a dictionary
+        # this is an optimization if several creation forms are displayed 
+        # in one request
+        # for example, the decomposition of a STEP file can display
+        # a lot of creation forms
+
         # display only valid groups
-        groups = user.groups.all().values_list("id", flat=True)
         field = form.fields["group"]
-        field.queryset = m.GroupInfo.objects.filter(id__in=groups)
+        field.cache_choices = inbulk_cache is not None
+        if inbulk_cache is None or "group" not in inbulk_cache:
+            groups = user.groups.all().values_list("id", flat=True)
+            field.queryset = m.GroupInfo.objects.filter(id__in=groups)
+            if inbulk_cache is not None:
+                # a bit ugly but ModelChoiceField reevalute the
+                # queryset if cache_choices is False and choice_cache
+                # is not populated
+                inbulk_cache["group"] = field.queryset
+                list(field.choices) # populates choice_cache
+                inbulk_cache["gr_cache"] = field.choice_cache
+        else:
+            field.queryset = inbulk_cache["group"]
+            field.choice_cache = inbulk_cache["gr_cache"]
         field.error_messages["invalid_choice"] = INVALID_GROUP
+
         # do not accept the cancelled lifecycle
-        lifecycles = m.Lifecycle.objects.exclude(pk=m.get_cancelled_lifecycle().pk)
-        form.fields["lifecycle"].queryset = lifecycles
+        field = form.fields["lifecycle"]
+        field.cache_choices = inbulk_cache is not None
+        if inbulk_cache is None or "lifecycles" not in inbulk_cache:
+            lifecycles = m.Lifecycle.objects.exclude(pk=m.get_cancelled_lifecycle().pk)
+            form.fields["lifecycle"].queryset = lifecycles
+            if inbulk_cache is not None:
+                inbulk_cache["lifecycles"] = lifecycles
+                list(field.choices)
+                inbulk_cache["lc_cache"] = field.choice_cache
+        else:
+            lifecycles = inbulk_cache["lifecycles"]
+            form.fields["lifecycle"].queryset = lifecycles
+            field.choice_cache = inbulk_cache["lc_cache"]
     return form
 get_creation_form.cache = {}
         
