@@ -294,7 +294,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             old_microseconds = last_mtime.cleaned_data['last_modif_microseconds']
 
             index=[1]
-            if clear_form(request,assemblys,product,index,obj_type):
+            if clear_form(request,assemblys,product,index,obj_type, {}):
 
                 if (same_time(old_time, old_microseconds, document_controller.mtime)
                     and stp_file.checkout_valid and not stp_file.locked):
@@ -352,7 +352,8 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
-        initialize_assemblies(assemblys,product,group,request.user,index,obj_type)
+        inbulk_cache = {}
+        initialize_assemblies(assemblys,product,group,request.user,index,obj_type, inbulk_cache)
         extra_errors = ""
 
     deep_assemblys=sort_assemblys_by_depth(assemblys)
@@ -375,7 +376,7 @@ def sort_assemblys_by_depth(assemblys):
     return new_assembly
 
 
-def clear_form(request, assemblys, product, index, obj_type):
+def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
 
     """
 
@@ -446,9 +447,9 @@ def clear_form(request, assemblys, product, index, obj_type):
                 part = part_type.cleaned_data["type_part"]
                 cls = get_all_plmobjects()[part]
                 part_cform = get_creation_form(request.user, cls, request.POST,
-                        prefix=str(index[0])+"-part")
-                doc_cform = get_creation_form(request.user, Document3D,
-                        request.POST, prefix=str(index[0])+"-document")
+                        inbulk_cache=inbulk_cache, prefix=str(index[0])+"-part")
+                doc_cform = get_creation_form(request.user, Document3D, request.POST,
+                        inbulk_cache=inbulk_cache, prefix=str(index[0])+"-document")
                 if not part_cform.is_valid():
                     valid = False
                 if not doc_cform.is_valid():
@@ -457,7 +458,7 @@ def clear_form(request, assemblys, product, index, obj_type):
                 part_docs.append(PartDoc(part_type, oq, (part_cform, doc_cform), name, is_assembly,
                     prefix, None))
                 index[0]+=1
-                if not clear_form(request, assemblys, link.product,index, part):
+                if not clear_form(request, assemblys, link.product,index, part, inbulk_cache):
                     valid = False
             else:
                 index[0]+=1
@@ -467,7 +468,7 @@ def clear_form(request, assemblys, product, index, obj_type):
     return valid
 
 
-def initialize_assemblies(assemblys,product,group,user,index, obj_type):
+def initialize_assemblies(assemblys,product,group,user,index, obj_type, inbulk_cache):
     """
 
     :param assemblys: will be refill whit the information necessary the generate the forms
@@ -513,7 +514,6 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type):
                 - ref contains the **index** of the assembly if he was visited previously, else False
 
     """
-
     if product.links:
         part_docs = []
         for order, link in enumerate(product.links):
@@ -526,11 +526,11 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type):
             if not link.product.visited:
                 link.product.visited = index[0]
                 part_type = Doc_Part_type_Form(prefix=index[0])
-                part_cform = get_creation_form(user, Part, None, (index[1])) # index[0].initial=1 -> -1
+                part_cform = get_creation_form(user, Part, None, index[1], inbulk_cache) # index[0].initial=1 -> -1
                 part_cform.prefix = str(index[0])+"-part"
                 part_cform.fields["group"].initial = group
                 part_cform.fields["name"].initial = link.product.name
-                doc_cform = get_creation_form(user, Document3D, None, (index[1]))
+                doc_cform = get_creation_form(user, Document3D, None, index[1], inbulk_cache)
                 doc_cform.prefix = str(index[0])+"-document"
                 doc_cform.fields["name"].initial = link.product.name
                 doc_cform.fields["group"].initial = group
@@ -540,7 +540,7 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type):
                     prefix, None))
                 index[0]+=1
                 index[1]+=1
-                initialize_assemblies(assemblys,link.product,group,user,index, "Part")
+                initialize_assemblies(assemblys,link.product,group,user,index, "Part", inbulk_cache)
             else:
                 index[0]+=1
                 part_docs.append(PartDoc(False, oq, False, name, is_assembly, None, link.product.visited))
@@ -551,9 +551,9 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type):
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances,doc3D):
     # wraps generate_part_doc_links with @commit_on_succes
     # it is not possible to decorate this function since it is recursive
-    generate_part_doc_links(request,product, parent_ctrl,instances,doc3D)
+    generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, {})
 
-def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
+def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk_cache):
     """
     :param product: :class:`.Product` that represents the arborescense
     :param parent_ctrl: :class:`.Part` from which we want to realize the decomposition
@@ -577,7 +577,6 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
 
     to_delete=[]
     user = parent_ctrl._user
-
     for link in product.links:
         try:
 
@@ -591,10 +590,11 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
             if not link.product.part_to_decompose:
 
                 part_ctype=Doc_Part_type_Form(request.POST,prefix=link.product.visited)
-                part_ctype.is_valid();options=part_ctype.cleaned_data
+                part_ctype.is_valid()
+                options = part_ctype.cleaned_data
                 cls = get_all_plmobjects()[options["type_part"]]
                 part_form = get_creation_form(user, cls, request.POST,
-                            prefix=str(link.product.visited)+"-part")
+                    inbulk_cache=inbulk_cache, prefix=str(link.product.visited)+"-part")
 
                 part_ctrl = parent_ctrl.create_from_form(part_form, user, True, True)
 
@@ -605,8 +605,8 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
 
                 generate_extra_location_links(link, c_link)
 
-                doc_form = get_creation_form(user, Document3D,
-                        request.POST, prefix=str(link.product.visited)+"-document")
+                doc_form = get_creation_form(user, Document3D, request.POST,
+                    inbulk_cache=inbulk_cache, prefix=str(link.product.visited)+"-document")
                 doc_ctrl = Document3DController.create_from_form(doc_form,
                         user, True, True)
 
@@ -628,7 +628,7 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D):
                         doc_file.document=new_Doc3D
                         doc_file.save()
 
-                generate_part_doc_links(request,link.product, part_ctrl,instances,doc3D)
+                generate_part_doc_links(request,link.product, part_ctrl,instances,doc3D, inbulk_cache)
 
             else:
 
