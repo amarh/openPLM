@@ -137,7 +137,7 @@ class Part(AbstractPart, PLMObject):
         if not self.is_editable:
             return True
         # is this part synchronized with other parts
-        from .link import SynchronizedPartSet
+        from .link import SynchronizedPartSet, AlternatePartSet
         partset = SynchronizedPartSet.get_partset(self)
         if partset is not None:
             return self.is_set_promotable(partset)
@@ -145,11 +145,29 @@ class Part(AbstractPart, PLMObject):
         lcs = self.lifecycle.to_states_list()
         rank = lcs.index(self.state.name)
         invalid_states = [lcs[0]] + lcs[:rank]
-        invalid_children = self.parentchildlink_parent.now().\
-                filter(child__lifecycle=self.lifecycle, child__state__in=invalid_states)
-        if invalid_children.exists():
-            self._promotion_errors.append(_("Some children are at a lower or draft state."))
-            return False
+        invalid_children = list(self.parentchildlink_parent.now().\
+                filter(child__lifecycle=self.lifecycle, child__state__in=invalid_states).\
+                values_list("child", flat=True))
+        if invalid_children:
+            # one of their alternate parts may be at the right state
+            ps = AlternatePartSet.objects.now().filter(parts__in=invalid_children).distinct()
+            alt = dict(Part.objects.filter(alternatepartsets__in=ps).
+                    extra(select={"psid":"alternatepartset_id"}).values_list("id", "psid"))
+            if alt:
+                valid_alternates = Part.objects.filter(id__in=alt.keys(),
+                        lifecycle=self.lifecycle).exclude(state__in=invalid_states)
+                valid_alternates = set(valid_alternates.values_list("id", flat=True))
+                valid_partsets = set(s for p, s in alt.iteritems() if p in valid_alternates)
+                valid = True
+                for child in invalid_children:
+                    if alt.get(child) not in valid_partsets:
+                        valid = False
+                        break
+            else:
+                valid = False
+            if not valid:
+                self._promotion_errors.append(_("Some children are at a lower or draft state."))
+            return valid
         if not self.parentchildlink_parent.now().exists():
             # check that at least one document is attached and its state is official
             # see ticket #57
@@ -162,6 +180,7 @@ class Part(AbstractPart, PLMObject):
 
     def is_set_promotable(self, partset):
         # current implementation: at most 4 requests 
+        # FIXME: handle alternate links
         from .link import ParentChildLink, DocumentPartLink
         part_ids = set(partset.parts.values_list("id", flat=True))
         # get all direct children of all parts
