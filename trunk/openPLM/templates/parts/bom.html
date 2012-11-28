@@ -33,7 +33,7 @@ $(function() {
     {% if is_owner and obj.is_editable %}
         <a class="{{"Button"|button}}" 
             {% if obj.type|can_add_type:request.session.type %}
-                href="./add/{% add_get type=request.session.type q='' %}"
+                href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
             {% else %}
                 href="./add/{% add_get type='Part' q='' %}"
             {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>

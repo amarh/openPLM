@@ -29,7 +29,7 @@
             {% if not obj.is_cancelled %}
             <a class="{{"Button"|button}}" 
             {% if obj.type|can_link:request.session.type %}
-            href="./add/{% add_get type=request.session.type q='' %}"
+            href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
             {% else %}
             href="./add/{% add_get type='Part' q='' %}"
             {% endif %}>
