@@ -120,10 +120,16 @@
 
                                             {% endwith %}
                                         {% else %}
-                                            {% if row.0 == "document" %}
+                                            {% if row.0 == "document" or row.0 == "alternate" %}
                                                 {% with row.1 as doc %} 
                                                     <td class="Content bom{{forloop.counter}} expander level level{{level}}" style="padding-left:{{level}}em;" colspan="3">  </td>
-                                                    <td class="Content"> {% trans "Doc" %} </td>
+                                                    <td class="Content"> 
+                                                        {% if row.0 == "document" %}
+                                                            {% trans "Doc" %}
+                                                        {% else %}
+                                                            {% trans "Alt" %}
+                                                        {% endif %}
+                                                    </td>
                                                     {% if compact %}
                                                         <td class="Content"> 
                                                             {{ doc.type }} / <a href="{{doc.plmobject_url}}"> {{ doc.reference }}</a> / {{ doc.revision }}                       

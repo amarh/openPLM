@@ -857,7 +857,7 @@ def display_children(request, obj_type, obj_ref, obj_revi):
     date = None
     level = "first"
     state = "all"
-    show_documents = False
+    show_documents = show_alternates = False
     if request.GET:
         display_form = forms.DisplayChildrenForm(request.GET)
         if display_form.is_valid():
@@ -865,10 +865,11 @@ def display_children(request, obj_type, obj_ref, obj_revi):
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
             show_documents = display_form.cleaned_data["show_documents"]
+            show_alternates = display_form.cleaned_data["show_alternates"]
     else:
         display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
             "level" : "first", "state":"all"})
-    ctx.update(obj.get_bom(date, level, state, show_documents))
+    ctx.update(obj.get_bom(date, level, state, show_documents, show_alternates))
     # decomposition
     if DecomposersManager.count() > 0:
         children_ids = (c.link.child_id for c in ctx["children"])
@@ -1054,7 +1055,7 @@ def compare_bom(request, obj_type, obj_ref, obj_revi):
     date = date2 = None
     level = "first"
     state = "all"
-    show_documents = False
+    show_documents = show_alternates = False
     compact = True
     now = datetime.datetime.now()
     if request.GET:
@@ -1065,12 +1066,13 @@ def compare_bom(request, obj_type, obj_ref, obj_revi):
             level = cmp_form.cleaned_data["level"]
             state = cmp_form.cleaned_data["state"]
             show_documents = cmp_form.cleaned_data["show_documents"]
+            show_alternates = cmp_form.cleaned_data["show_documents"]
             compact = cmp_form.cleaned_data.get("compact", compact)
     else:
         initial = {"date" : now, "date2" : now, "level" : "first",
             "state" : "all", "compact" : compact, } 
         cmp_form = forms.CompareBOMForm(initial=initial)
-    ctx.update(obj.cmp_bom(date, date2, level, state, show_documents))
+    ctx.update(obj.cmp_bom(date, date2, level, state, show_documents, show_alternates))
     ctx.update({'current_page' : 'BOM-child',
                 "cmp_form" : cmp_form,
                 'compact' : compact,

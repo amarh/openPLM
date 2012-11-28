@@ -375,6 +375,8 @@ class DisplayChildrenForm(forms.Form):
     level = forms.ChoiceField(choices=LEVELS, widget=forms.RadioSelect())
     date = forms.SplitDateTimeField(required=False)
     state = forms.ChoiceField(choices=STATES, initial="all")
+    show_alternates = forms.BooleanField(label=_("Show alternates"),
+            required=False, initial=False)
     show_documents = forms.BooleanField(label=_("Show documents"),
             required=False, initial=False)
 
@@ -385,8 +387,8 @@ class CompareBOMForm(DisplayChildrenForm):
 
     def __init__(self, *args, **kwargs):
         super(CompareBOMForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder =  ("date", "date2", "level", "state", "show_documents",
-                "compact")
+        self.fields.keyOrder =  ("date", "date2", "level", "state",
+                "show_alternates", "show_documents", "compact")
 
 
 class ModifyChildForm(forms.ModelForm):

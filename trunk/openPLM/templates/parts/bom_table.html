@@ -9,11 +9,18 @@
             {% include "parts/bom_docs.html" %} 
         {% endwith %}
 
+        {# alternates #}
+        {% with alternates|key:obj.id as alternates %} 
+            {% with c.level|add:1 as level %} 
+                {% include "parts/bom_alt.html" %} 
+            {% endwith %}
+        {% endwith %}
+
         {% for c in children %}
 
             <tr class="Content part"> 
                 <td class="Content {% if level != "last" %} level expander open{% endif%} level{{c.level}}" style="padding-left:{{c.level|add:"-1"}}.5em;" >
-                    {% if documents|key:c.link.child_id %}
+                    {% if documents|key:c.link.child_id or alternates|key:c.link.child_id %}
                         <span class="expander">{{c.level}}</span>
                     {% else %}
                         {% if forloop.last or level == "last" %}
@@ -53,11 +60,21 @@
                     {% endwith %}
                 {% endwith %}
             </tr>
+
+            {# documents #}
             {% with documents|key:c.link.child_id as documents %} 
                 {% with c.level|add:1 as level %} 
                     {% include "parts/bom_docs.html" %} 
                 {% endwith %}
             {% endwith %}
+
+            {# alternates #}
+            {% with alternates|key:c.link.child_id as alternates %} 
+                {% with c.level|add:1 as level %} 
+                    {% include "parts/bom_alt.html" %} 
+                {% endwith %}
+            {% endwith %}
+
         {% endfor %}
     </table>
 {% endblock %}
