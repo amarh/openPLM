@@ -87,12 +87,8 @@ def can_add_type(parent_type, child_type):
     
     :return: True if child_type is a type of object that can be added to parent_type
     """
-    c_type = models.get_all_users_and_plmobjects()[child_type]
-    p_type = models.get_all_users_and_plmobjects()[parent_type]
-    
-    if p_type.__subclasscheck__(c_type):
-        return True
-    return False
+    part_types = models.get_all_parts()
+    return parent_type in part_types and child_type in part_types
 
 @register.filter    
 def can_link(current_type, suggested_type):
@@ -104,14 +100,10 @@ def can_link(current_type, suggested_type):
     
     :return: True if current_type is a type of object that can be attached to current_type object
     """
-    cur_type = models.get_all_users_and_plmobjects()[current_type]
-    sug_type = models.get_all_users_and_plmobjects()[suggested_type]
-    
-    if issubclass(cur_type,models.Part) and issubclass(sug_type,models.Document):
-        return True
-    elif issubclass(cur_type,models.Document) and issubclass(sug_type,models.Part):
-        return True
-    return False    
+    doc_types = models.get_all_documents()
+    part_types = models.get_all_parts()
+    return ((current_type in doc_types and suggested_type in part_types) or
+            (current_type in part_types and suggested_type in doc_types))
     
 @register.filter
 def button(css_class, options=""):
