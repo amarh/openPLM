@@ -552,6 +552,7 @@ class PartController(PLMObjectController):
         only_official = state == "official"
         children = self.get_children(max_level, date=date, only_official=only_official)
         if level == "last" and children:
+            # only get "leaf" children
             previous_level = 0
             max_children = []
             for c in children:
@@ -574,7 +575,8 @@ class PartController(PLMObjectController):
                     pcles = pcles.values("link_id", *fields)
                     for pcle in pcles:
                         extension_data[pcle["link_id"]].update(pcle)
-        documents = defaultdict(list)
+        # get attached documents
+        documents = defaultdict(list) # part id -> list of documents
         ids = set([self.id] + [c.link.child_id for c in children])
         doc_ids = set()
         if show_documents:
@@ -584,14 +586,16 @@ class PartController(PLMObjectController):
             for link in links:
                 documents[link.part_id].append(link.document)
                 doc_ids.add(link.document_id)
+        # get state of object at *date*
         states = models.StateHistory.objects.at(date).filter(plmobject__in=ids | doc_ids)
         if only_official:
             states = states.officials()
         states = dict(states.values_list("plmobject", "state"))
         if only_official and show_documents:
+            # remove unofficial documents
             for docs in documents.itervalues():
                 official_docs = (d for d in docs if d.id in states)
-                docs[:] = official_docs
+                docs[:] = official_docs # in place copy
         return {
                 'children' : children,
                 'extra_columns' : extra_columns,
