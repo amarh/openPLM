@@ -46,6 +46,8 @@ def flatten_bom(data):
     flatten = []
     for doc in data["documents"][data["obj"].id]:
         flatten.append(("document", doc, data["states"][doc.id]))
+    for part in data["alternates"][data["obj"].id]:
+        flatten.append(("alternate", part, data["states"][part.id]))
     for child in data["children"]:
         link = child.link
         ext_data = data["extension_data"][link.id]
@@ -53,6 +55,8 @@ def flatten_bom(data):
         flatten.append(("part", child, data["states"].get(link.child_id), ext))
         for doc in data["documents"][link.child_id]:
             flatten.append(("document", doc, data["states"].get(doc.id)))
+        for part in data["alternates"][link.child_id]:
+            flatten.append(("alternate", part, data["states"][part.id]))
     return flatten
 
 class PartController(PLMObjectController):
@@ -510,7 +514,7 @@ class PartController(PLMObjectController):
                     self.modify_child(child, quantity, order, unit,
                             **form.extensions)
 
-    def get_bom(self, date, level, state="all", show_documents=False):
+    def get_bom(self, date, level, state="all", show_documents=False, show_alternates=False):
         """
         .. versionadded:: 1.2
 
@@ -575,9 +579,29 @@ class PartController(PLMObjectController):
                     pcles = pcles.values("link_id", *fields)
                     for pcle in pcles:
                         extension_data[pcle["link_id"]].update(pcle)
+
+        ids = set([self.id] + [c.link.child_id for c in children])
+        # alternates
+        alternates = defaultdict(list) # part id -> list of alternate parts
+        if show_alternates:
+            ps = models.AlternatePartSet.objects.at(date).filter(parts__in=ids).distinct()
+            alt = list(models.Part.objects.filter(alternatepartsets__in=ps).\
+                    extra(select={"psid":"alternatepartset_id"}))
+            if only_official and alt:
+                sh = models.StateHistory.objects.at(date).officials().filter(plmobject__in=alt)
+                official_alt = set(sh.values_list("plmobject_id", flat=True))
+                alt = [p for p in alt if p.id in official_alt] 
+            id2ps = dict((p.id, p.psid) for p in alt)
+            for part_id in ids:
+                try:
+                    psid = id2ps[part_id]
+                    alternates[part_id] = [p for p in alt if p.psid == psid and p.id != part_id]
+                except KeyError:
+                    pass
+            ids.update(p.id for p in alt)
+
         # get attached documents
         documents = defaultdict(list) # part id -> list of documents
-        ids = set([self.id] + [c.link.child_id for c in children])
         doc_ids = set()
         if show_documents:
             links = models.DocumentPartLink.objects.at(date).filter(part__in=ids).\
@@ -604,9 +628,11 @@ class PartController(PLMObjectController):
                 'documents' : documents,
                 'level' : level,
                 'obj' : self,
+                'alternates' : alternates,
                 }
 
-    def cmp_bom(self, date1, date2, level="first", state="all", show_documents=False):
+    def cmp_bom(self, date1, date2, level="first", state="all", show_documents=False,
+            show_alternates=False):
         """
         .. versionadded:: 1.2
 
@@ -625,8 +651,8 @@ class PartController(PLMObjectController):
             tuple of BOMs (at date *date1* and date *date2*)
 
         """
-        bom1 = self.get_bom(date1, level, state, show_documents)
-        bom2 = self.get_bom(date2, level, state, show_documents)
+        bom1 = self.get_bom(date1, level, state, show_documents, show_alternates)
+        bom2 = self.get_bom(date2, level, state, show_documents, show_alternates)
         s1 = flatten_bom(bom1)
         s2 = flatten_bom(bom2)
         matcher = difflib.SequenceMatcher(None, s1, s2)

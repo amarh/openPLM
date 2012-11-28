@@ -1,0 +1,29 @@
+{% load i18n plmapp_tags %}
+
+{% for part in alternates %}
+
+    <tr class="Content part"> 
+        <td class="Content expander level level{{level}}" style="padding-left:{{level}}em;" colspan="3">  </td>
+        <td class="Content"> {% trans "alt" %} </td>
+        <td class="Content"> 
+            <a href="{{part.plmobject_url}}"> {{ part.reference }} </a>
+        </td>
+        <td class="Content"> {{ part.revision }} </td>
+        <td class="Content"> {{ part.type }} </td>
+        <td class="Content"> {{ part.name }} </td>
+        {% for field, verbose_name in extra_columns %}
+            <td class="Content"> </td>
+        {% endfor %}
+        <td class="Content"> {{ part.state.name }} </td>
+        <td class="Content"> {{ states|key:part.id }} </td>
+    </tr>
+
+            {# documents #}
+            {% with documents|key:part.id as documents %} 
+                {% with c.level|add:1 as level %} 
+                    {% include "parts/bom_docs.html" %} 
+                {% endwith %}
+            {% endwith %}
+
+{% endfor %}
+
