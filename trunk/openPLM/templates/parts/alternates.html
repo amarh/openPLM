@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block content %}
+    <p> Warning, alternates are still in development, use at your own risk! </p>
+
+    {# toolbar #}
+    {% if is_owner and obj.is_editable %}
+        <div class="toolbar">
+            <a class="{{"Button"|button}}" 
+                {% if obj.type|can_add_type:request.session.type %}
+                    href="./add/{% add_get type=request.session.type q='' %}"
+                {% else %}
+                    href="./add/{% add_get type='Part' q='' %}"
+                {% endif %}>
+                <span class="ui-button-text">{% trans "Add an alternate part" %}</span>
+            </a>
+        </div>
+
+    {% endif %}
+
+    {# list of alternates #}
+    <div>
+
+        {% for object in alternates %} 
+            {% if object.id != obj.id %}
+                {% include "parts/identity_card.html" %}
+            {% endif %}
+        {% empty %}
+            {% trans "No alternate parts." %}
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
+
+

@@ -38,7 +38,8 @@ def can_add(obj, arg):
     
     :return: True if the action can be processed on the current object
     """
-    
+   
+    # TODO: replace this with the callable (cur_obj.can_attach_document...)
     cur_obj, action = arg
 
     if isinstance(obj, models.DocumentFile):
@@ -49,6 +50,10 @@ def can_add(obj, arg):
         return cur_obj.can_attach_part(obj)
     elif action == "add_child":
         return cur_obj.can_add_child2(obj)
+    elif action == "add_alternate":
+        # FIXME: can_add_alternate is slow
+        # something like can_add_chil2 could improve performance (less queries)
+        return cur_obj.can_add_alternate(obj)
     elif action == "delegate" or (action.startswith("add_") and action != "add_reader"):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:

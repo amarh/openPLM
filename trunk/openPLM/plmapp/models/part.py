@@ -110,7 +110,7 @@ class Part(AbstractPart, PLMObject):
     def menu_items(self):
         items = list(super(Part, self).menu_items)
         items.extend([ugettext_noop("BOM-child"), ugettext_noop("parents"), 
-                      ugettext_noop("doc-cad")])
+                      ugettext_noop("alternates"), ugettext_noop("doc-cad")])
         return items
 
     def is_promotable(self):

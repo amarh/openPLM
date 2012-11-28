@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block content %} 
+    {% with add_part_form as form %}
+        {% include "snippets/undo_form.html" %}
+    {% endwith %}
+{% endblock %}
+
+

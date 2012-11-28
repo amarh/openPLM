@@ -1153,6 +1153,32 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
                 })
     return r2r('parts/parents.html', ctx, request)
 
+@handle_errors
+def alternates(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    ctx.update({
+        "current_page" : "alternates",
+        "alternates" : obj.get_alternates(),
+    })
+    return r2r('parts/alternates.html', ctx, request)
+
+@handle_errors
+def add_alternate(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if request.POST:
+        add_part_form = forms.AddPartForm(request.POST)
+        if add_part_form.is_valid():
+            part_obj = get_obj_from_form(add_part_form, request.user)
+            obj.add_alternate(part_obj)
+            return HttpResponseRedirect(obj.plmobject_url + "alternates/")
+    else:
+        add_part_form = forms.AddPartForm()
+    ctx.update({'link_creation': True,
+                'add_part_form': add_part_form,
+                'attach' : (obj, "add_alternate") })
+    return r2r('parts/alternates_add.html', ctx, request)
+
+
 ##########################################################################################
 @handle_errors
 def display_doc_cad(request, obj_type, obj_ref, obj_revi):
