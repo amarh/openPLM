@@ -1290,3 +1290,54 @@ class PartControllerTest(ControllerTest):
         c4.precompute_can_add_child2()
         self.assertTrue(c4.can_add_child2(self.controller.object))
 
+    def test_is_promotable_with_alternate_child(self):
+        """
+        Test cases:
+
+        Part1
+        +--> Part2 (child, draft)
+             +--> Part3 (alternate, draft)
+        :- Part1 not promotable
+
+        ----
+
+        Part1
+        +--> Part2 (child, draft)
+             +--> Part3 (alternate, official)
+        :- Part1 promotable
+
+        ----
+
+        Part1
+        |--> Part2 (child, draft)
+             +--> Part3 (alternate, official)
+        +--> Part4 (child, draft)
+        :- Part1 not promotable
+        """
+
+        self.add_child()
+        self.controller3.add_alternate(self.controller2)
+        self.assertFalse(self.controller.is_promotable())
+        self.controller3.promote(True)
+        self.assertTrue(self.controller.is_promotable())
+        c4 = self.create("p4")
+        self.controller.add_child(c4, 18, 155)
+        self.assertFalse(self.controller.is_promotable())
+    
+    def test_is_promotable_with_alternate(self):
+        """
+        Test cases:
+
+        Part3 (draft, no document)
+        +--> Part2 (draft, one official document)
+        :- Part3 not promotable, Part2 promotable
+
+        Part3 (draft, no document)
+        +--> Part2 (official)
+        :- Part3 not promotable
+        """
+        self.controller3.add_alternate(self.controller2)
+        self.assertFalse(self.controller3.is_promotable())
+        self.controller2.promote()
+        self.assertFalse(self.controller3.is_promotable())
+
