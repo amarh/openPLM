@@ -432,7 +432,7 @@ class Dialog(qt.QDialog):
 
     def __init__(self):
         qt.QDialog.__init__(self)
-        qt.QDialog.__init__(self)
+        self.instance = PLUGIN
         self.setWindowTitle(self.TITLE)
         box = qt.QVBoxLayout()
         self.vbox = qt.QVBoxLayout()
@@ -445,8 +445,6 @@ class Dialog(qt.QDialog):
         self.vbox.setMargin(12)
         self.setLayout(box)
         self.update_ui()
-
-
 
     def get_value(self, entry, field=None):
         value = None
