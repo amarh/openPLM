@@ -703,7 +703,7 @@ class PLMObjectController(Controller):
         try:
             link = self.plmobjectuserlink_plmobject.now().get(user=old_signer,
                role=role)
-        except models.PLMObjectUserLink.ObjectDoesNotExist:
+        except models.PLMObjectUserLink.DoesNotExist:
             raise ValueError("Invalid old signer")
         link.end()
         # add new signer
