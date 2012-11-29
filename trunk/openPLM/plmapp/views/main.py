@@ -492,8 +492,8 @@ def get_id_card_data(doc_ids):
         num_files = dict.fromkeys(doc_ids, 0)
         for doc_id in models.DocumentFile.objects.filter(deprecated=False,
             document__in=doc_ids).values_list("document", flat=True):
-                num_files[doc_id] += 1
-                ctx["num_files"] = num_files
+            num_files[doc_id] += 1
+        ctx["num_files"] = num_files
     return ctx
 
 def revise_document(obj, ctx, request):
