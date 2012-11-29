@@ -118,7 +118,8 @@ def search(request, editable_only="true", with_file_only="true"):
     if request.GET and "type" in request.GET:
         form = forms.SimpleSearchForm(request.GET)
         if form.is_valid():
-            results = [r.object for r in form.search().load_all()[:30]]
+            # object may have been deleted but not yet unindexed
+            results = [r.object for r in form.search().load_all()[:30] if r is not None]
             objects = []
             ids = set()
             for res in results:
