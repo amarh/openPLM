@@ -30,6 +30,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
@@ -440,20 +441,12 @@ class PLMObjectController(Controller):
                 return True
     
     def get_previous_revisions(self):
-        try:
-            link = models.RevisionLink.objects.now().get(new=self.object.pk)
-            controller = type(self)(link.old, self._user)
-            return controller.get_previous_revisions() + [link.old]
-        except ObjectDoesNotExist:
-            return []
+        all_revisions = self.get_all_revisions()
+        return all_revisions[:all_revisions.index(self.object.plmobject_ptr)]
 
     def get_next_revisions(self):
-        try:
-            link = models.RevisionLink.objects.now().get(old=self.object.pk)
-            controller = type(self)(link.new, self._user)
-            return [link.new] + controller.get_next_revisions()
-        except ObjectDoesNotExist:
-            return []
+        all_revisions = self.get_all_revisions()
+        return all_revisions[all_revisions.index(self.object.plmobject_ptr)+1:]
 
     def get_all_revisions(self):
         """
@@ -461,8 +454,19 @@ class PLMObjectController(Controller):
         
         :rtype: list of :class:`.PLMObject`
         """
-        return self.get_previous_revisions() + [self.object] +\
-               self.get_next_revisions()
+        objects = list(models.PLMObject.objects.filter(type=self.type,
+            reference=self.reference))
+        # maybe we could simply sort objects by their ctime...
+        if len(objects) == 1:
+            return objects
+        rev_links = models.RevisionLink.current_objects.filter(old__in=objects).values_list("old", "new")
+        id2obj = dict((o.id, o) for o in objects)
+        for old, new in rev_links:
+            old_obj = id2obj[old]
+            new_obj = id2obj[new]
+            objects.remove(old_obj)
+            objects.insert(objects.index(new_obj), old_obj)
+        return objects
 
     def set_owner(self, new_owner, dirty=False):
         """
