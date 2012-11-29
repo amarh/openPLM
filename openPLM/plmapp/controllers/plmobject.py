@@ -30,7 +30,6 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
