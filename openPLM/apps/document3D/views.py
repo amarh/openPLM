@@ -1,3 +1,4 @@
+import os
 import fileinput
 from collections import namedtuple
 
@@ -7,6 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
 from django.http import (HttpResponse, HttpResponseRedirect,
         HttpResponseForbidden, Http404)
+import django.utils.simplejson as json
 
 from openPLM.plmapp.base_views import (handle_errors, secure_required,
         get_generic_data, get_obj, get_obj_by_id, init_ctx)
@@ -20,7 +22,6 @@ from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
 from openPLM.plmapp.views.main import r2r
-import os
 
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
@@ -42,8 +43,7 @@ def display_3d(request, obj_ref, obj_revi):
         doc_file = obj.files.filter(is_stp)[0]
     except IndexError:
         doc_file = None
-
-        GeometryFiles=[]
+        geometry_files = []
         javascript_arborescense=""
         try:
             doc_file = obj.files.filter(is_stl)[0]
@@ -53,11 +53,12 @@ def display_3d(request, obj_ref, obj_revi):
             pass
     else:
         product = obj.get_product(doc_file, True)
-        GeometryFiles= obj.get_all_geometry_files(doc_file)
+        geometry_files = obj.get_all_geometry_files(doc_file)
+        geometry_files = [os.path.join(settings.MEDIA_URL, "3D", p) for p in geometry_files]
         javascript_arborescense = JSGenerator(product).get_js()
 
     ctx.update({
-        'GeometryFiles' : GeometryFiles ,
+        'GeometryFiles' : json.dumps(geometry_files),
         'javascript_arborescense' : javascript_arborescense , })
 
     return r2r('Display3D.htm', ctx, request)
