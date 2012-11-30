@@ -1341,3 +1341,6 @@ class PartControllerTest(ControllerTest):
         self.controller2.promote()
         self.assertFalse(self.controller3.is_promotable())
 
+    def test_promote_update_alternate(self):
+        pass
+

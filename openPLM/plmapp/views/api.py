@@ -327,6 +327,7 @@ def get_creation_fields(request, typename):
     return {"fields" : get_fields_from_form(form)}
 
 @csrf_exempt
+@secure_required
 @json_view
 def api_login(request):
     """
