@@ -83,6 +83,7 @@ View3D.prototype = {
 
     render: function (){
         var self = this;
+        $("#main_content").showLoading();
         if (this.stl_file !== undefined) {
             var xhr = new XMLHttpRequest();
             geometry = new THREE.Geometry();
@@ -147,6 +148,7 @@ View3D.prototype = {
                 self.object3D.add(self.object2);
                 self.part_to_object['part2'] = self.object2;
                 self.init();
+                $("#main_content").hideLoading();
                 self.animate();
 
             };
@@ -155,6 +157,7 @@ View3D.prototype = {
         }
         else {
             self.init();
+            $("#main_content").hideLoading();
             self.animate();
         }
 
