@@ -1354,7 +1354,7 @@ class PartControllerTest(ControllerTest):
         # cancelled previous revision
         revb.promote()
         obj = self.controller.object
-        self.controller.object = type(obj).objects.get(id=obj)
+        self.controller.object = type(obj).objects.get(id=obj.id)
         self.assertTrue(self.controller.object.is_cancelled)
         self.assertFalse(self.controller.is_alternate(self.controller2.object))
         self.assertTrue(revb.is_alternate(self.controller2.object))
