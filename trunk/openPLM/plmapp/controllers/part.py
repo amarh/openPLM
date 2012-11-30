@@ -978,6 +978,10 @@ class PartController(PLMObjectController):
                 ids = (d.id for d in docs)
                 self.documentpartlink_part.filter(document__in=ids).end()
 
+    def _deprecate(self):
+        super(PartController, self)._deprecate()
+        self.end_alternate()
+
     def cancel(self):
         """
         Cancels the object:
@@ -988,6 +992,7 @@ class PartController(PLMObjectController):
         """
         super(PartController, self).cancel()
         self.get_attached_documents().end()
+        self.end_alternate()
         q = Q(parent=self.object) | Q(child=self.object)
         models.ParentChildLink.current_objects.filter(q).end()
 
@@ -1056,9 +1061,10 @@ class PartController(PLMObjectController):
         # each file and testing their extension
         return (df for df in files.select_related(d_o_u) if is_cad_file(df.filename))
 
-    def check_add_alternate(self, part):
-        self.check_permission("owner")
-        self.check_editable()
+    def check_add_alternate(self, part, check_perm=True):
+        if check_perm:
+            self.check_permission("owner")
+            self.check_editable()
         # FIXME: untested !!!
         
         # TODO: better error messages, permissions
@@ -1128,8 +1134,8 @@ class PartController(PLMObjectController):
         if p1 & p2:
             raise ValueError("sibling")
 
-    def add_alternate(self, part):
-        self.check_add_alternate(part)
+    def add_alternate(self, part, check_perm=True):
+        self.check_add_alternate(part, check_perm)
         partset = models.AlternatePartSet.join(self.object, getattr(part, "object", part))
         # TODO: HISTO
         return partset
@@ -1156,6 +1162,13 @@ class PartController(PLMObjectController):
         # TODO: histo
         return partset.remove_part(part)
 
+    def end_alternate(self):
+        # FIXME : rename me
+        partset = models.AlternatePartSet.get_partset(self.object)
+        if partset:
+            return partset.remove_part(self.object)
+        return None        
+
     def get_alternates(self, date=None):
         try:
             partset = self.alternatepartsets.at(date).get()
@@ -1163,4 +1176,25 @@ class PartController(PLMObjectController):
         except models.AlternatePartSet.DoesNotExist:
             return []
 
+    def promote(self, *args, **kwargs):
+        # replace alternate links of previous revision
+        try:
+            previous_revision = self.revisionlink_new.now().get().old.part
+            partset = models.AlternatePartSet.get_partset(previous_revision)
+        except models.RevisionLink.DoesNotExist:
+            partset = None
+        r = super(PartController, self).promote(*args, **kwargs)
+        if partset and self.is_official:
+            # previous_revision has been deprecated or cancelled
+            # and partset has been ended by _deprecated() or cancel()
+            # self should replace previous_revision
+            try:
+                other_part = partset.parts.exclude(id=previous_revision.id)[0]
+                # do not check owner permission since the company owns the part 
+                self.add_alternate(other_part, check_perm=False)
+            except (ValueError, PermissionError) as e:
+                # it should not failed, except if another alternate set was built
+                # or if alternate/bom rules are not respected
+                pass
+        return r
 
