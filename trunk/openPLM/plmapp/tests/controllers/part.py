@@ -1341,6 +1341,30 @@ class PartControllerTest(ControllerTest):
         self.controller2.promote()
         self.assertFalse(self.controller3.is_promotable())
 
-    def test_promote_update_alternate(self):
-        pass
+    def test_promote_update_alternates(self):
+        """
+        Asserts that alternates are updated when a new revision is officialized.
+        """
+        self.controller.add_alternate(self.controller2)
+        revb = self.controller.revise("b")
+        revb.attach_to_document(self.document)
+        self.assertFalse(revb.get_alternates())
+        self.assertTrue(self.controller.is_alternate(self.controller2.object))
+
+        # cancelled previous revision
+        revb.promote()
+        obj = self.controller.object
+        self.controller.object = type(obj).objects.get(id=obj)
+        self.assertTrue(self.controller.object.is_cancelled)
+        self.assertFalse(self.controller.is_alternate(self.controller2.object))
+        self.assertTrue(revb.is_alternate(self.controller2.object))
+
+        # deprecated previous revision
+        revc = revb.revise("c")
+        revc.attach_to_document(self.document)
+        revc.promote()
+        revb.object = type(revb.object).objects.get(id=revb.id)
+        self.assertTrue(revb.is_deprecated)
+        self.assertFalse(revb.is_alternate(self.controller2.object))
+        self.assertTrue(revc.is_alternate(self.controller2.object))
 
