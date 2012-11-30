@@ -378,7 +378,6 @@ View3D.prototype = {
         );
     },
 
-
     has_webgl : function(){
         return !!window.WebGLRenderingContext;
     },
