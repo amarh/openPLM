@@ -376,7 +376,6 @@ View3D.prototype = {
                 self.unhighlight_part(p);
             }
         );
-
     },
 
 
