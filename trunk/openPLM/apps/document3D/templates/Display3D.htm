@@ -85,11 +85,12 @@
         <script type="text/javascript">
             THREE.Vertex = function ( position ) { return position; };
         </script>
-        {% for path in GeometryFiles %}
-            <script type="text/javascript" src="/media/3D/{{ path }}"></script>
-        {% endfor %}
         {%  if javascript_arborescense %}
-            <script type="text/javascript"> {{javascript_arborescense|safe}}</script>
+            <script type="text/javascript"> 
+                function build_tree () {
+                    $.globalEval("{{javascript_arborescense|escapejs}}");
+                } 
+            </script>
         {% endif %}
         <script type="text/javascript" src="/media/js/3D/view.js"></script> 
         <script type="text/javascript">
@@ -97,7 +98,7 @@
                 {% if stl %}
                     view = new View3D(false, '/file/{{stl_file.id}}/');
                 {% else %}
-                    view = new View3D(true);
+                    view = new View3D(true, null, {{ GeometryFiles|safe }});
                 {% endif %}
                 view.render();
             });

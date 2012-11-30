@@ -5,6 +5,7 @@ from openPLM.plmapp.tests.views import CommonViewTest
 from openPLM.apps.document3D.models import Document3DController
 from openPLM.plmapp.decomposers import DecomposersManager
 from django.core.files import File
+from django.utils.simplejson import loads
 
 
 
@@ -45,12 +46,12 @@ class view_3dTest(CommonViewTest):
         self.assertTrue(DecomposersManager.is_decomposable(self.controller.object))
         self.post(self.base_url+"decompose/"+str(new_doc_file.id)+"/",data)
         self.assertFalse(DecomposersManager.is_decomposable(self.controller.object))
-        reponse = self.get(self.document.object.plmobject_url+"3D/")
-        self.assertEqual(len(reponse.context["GeometryFiles"]), 5)
+        response = self.get(self.document.object.plmobject_url+"3D/")
+        self.assertEqual(len(loads(response.context["GeometryFiles"])), 5)
 
     def test_3D_no_stp_associe(self):
         response = self.get(self.document.object.plmobject_url+"3D/")
-        self.assertFalse(response.context["GeometryFiles"])
+        self.assertFalse(loads(response.context["GeometryFiles"]))
         self.assertFalse(response.context["javascript_arborescense"])
 
     def test_3D_stp_associe_sans_arborescense(self):
@@ -59,7 +60,7 @@ class view_3dTest(CommonViewTest):
         new_doc_file=self.document.add_file(myfile)
         ArbreFile.objects.get(stp=new_doc_file).delete()
         response = self.get(self.document.object.plmobject_url+"3D/")
-        self.assertEqual(3, len(list(response.context["GeometryFiles"])))
+        self.assertEqual(3, len(loads(response.context["GeometryFiles"])))
         self.assertFalse(response.context["javascript_arborescense"])
 
     def test_3D_stp_valide_no_info(self):
@@ -67,7 +68,7 @@ class view_3dTest(CommonViewTest):
         myfile = File(f)
         new_doc_file=self.document.add_file(myfile)
         response = self.get(self.document.object.plmobject_url+"3D/")
-        self.assertFalse(response.context["GeometryFiles"])
+        self.assertFalse(loads(response.context["GeometryFiles"]))
         self.assertTrue(response.context["javascript_arborescense"])
 
     def test_3D_stp_associe_sans_geometry_with_arborescense(self):
@@ -76,7 +77,7 @@ class view_3dTest(CommonViewTest):
         new_doc_file=self.document.add_file(myfile)
         GeometryFile.objects.filter(stp=new_doc_file).delete()
         response = self.get(self.document.object.plmobject_url+"3D/")
-        self.assertFalse(response.context["GeometryFiles"])
+        self.assertFalse(loads(response.context["GeometryFiles"]))
         self.assertTrue(response.context["javascript_arborescense"])
 
     def test_decompose_bom_child(self):

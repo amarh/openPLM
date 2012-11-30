@@ -12,9 +12,12 @@
         <script type="text/javascript">
             THREE.Vertex = function ( position ) { return position; };
         </script>
-        <script type="text/javascript" src="/3D/public/{{obj.id}}"></script>
         {%  if javascript_arborescense %}
-            <script type="text/javascript"> {{javascript_arborescense|safe}}</script>
+            <script type="text/javascript"> 
+                function build_tree () {
+                    $.globalEval("{{javascript_arborescense|escapejs}}");
+                } 
+            </script>
         {% endif %}
         <script type="text/javascript" src="/media/js/3D/view.js"></script> 
         <script type="text/javascript">
@@ -22,7 +25,7 @@
                 {% if stl %}
                     view = new View3D(false, '/file/public/{{stl_file.id}}/');
                 {% else %}
-                    view = new View3D(true);
+                    view = new View3D(true, null, ["/3D/public/{{obj.id}}"]);
                 {% endif %}
                 view.render();
             });

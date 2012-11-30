@@ -1,3 +1,10 @@
+// from http://api.jquery.com/jQuery.getScript/#comment-34269778
+jQuery.getScripts = function(scripts, onComplete) {
+    var i = 1;
+    var ii = scripts.length;
+    var onScriptLoaded = function(data, response) { if (i++ == ii) onComplete(); } ;
+    for(var s in scripts) { $.getScript(scripts[s], onScriptLoaded); } ;
+};
 /**
 * old AxisHelper
 * @author sroucheray / http://sroucheray.org/
@@ -64,10 +71,11 @@ $(function() {
         };
     }  
 });
-View3D = function(has_menu, stl_file) {
+View3D = function(has_menu, stl_file, js_files) {
 
     this.has_menu = has_menu;
     this.stl_file = stl_file;
+    this.js_files = js_files;
     this.zoom_var=50;	
 }
 
@@ -84,7 +92,7 @@ View3D.prototype = {
     render: function (){
         var self = this;
         $("#main_content").showLoading();
-        if (this.stl_file !== undefined) {
+        if (this.stl_file !== null) {
             var xhr = new XMLHttpRequest();
             geometry = new THREE.Geometry();
             self.object3D = new THREE.Object3D();
@@ -156,9 +164,16 @@ View3D.prototype = {
             xhr.send();
         }
         else {
-            self.init();
-            $("#main_content").hideLoading();
-            self.animate();
+            jQuery.getScripts(self.js_files, function (){
+                build_tree();
+                self.menu =  window.menu;
+                self.part_to_object = window.part_to_object || {};
+                self.part_to_parts = window.part_to_parts || {};
+                self.object3D = window.object3D || null;
+                self.init();
+                $("#main_content").hideLoading();
+                self.animate();
+            });
         }
 
     },
