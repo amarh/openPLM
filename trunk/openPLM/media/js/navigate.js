@@ -88,6 +88,7 @@ function scale(new_factor) {
     });
     scale_level = new_factor;
     $("#slider-scale").slider('value', scale_level*100);
+    $.cookie("navigate_scale", scale_level, { path: '/' });
 }
 
 function show_thumbnails_panel(node){
@@ -580,6 +581,10 @@ $(document).ready(function(){
 
         init();
         center();
+        var saved_level = $.cookie("navigate_scale");
+        if (saved_level > 0) {
+            scale(saved_level);
+        }
         if (getQueryVariable("add") === "t") {
             var q = window.location.search.substring(1).replace("add=t&", "");
             show_add_child($("div.main_node"), q);
