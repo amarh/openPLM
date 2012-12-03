@@ -254,12 +254,6 @@ class TypeForm(forms.Form):
     type = forms.TypedChoiceField(choices=LIST)
     type.widget.attrs["autocomplete"] = "off"
 
-class TypeFormWithoutUser(forms.Form):
-    LIST_WO_USER = group_types(m.get_all_plmobjects_with_level())
-    type = forms.TypedChoiceField(choices=LIST_WO_USER,
-            label=_("Select a type"))
-    type.widget.attrs["autocomplete"] = "off"
-
 class PartTypeForm(forms.Form):
     LIST = m.get_all_parts_with_level()
     type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
