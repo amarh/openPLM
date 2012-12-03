@@ -18,201 +18,75 @@
         {% endif %}
     </div>
 
-    {# promotion form #}
-    <form id ="form-promote" class="confirmation" style="display: inline;"
-        action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-        {% if is_signer and can_approve or is_signer_dm %}
-            <div id="form-promote-dialog"
-                title="{% trans "Are you sure?" %}"
-                {% if password_form.is_bound and not password_form.is_valid %} 
-                    class="c-error action-{{ action }}"
-                {% endif %}
-                >
-                <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                {% trans "If you promote or demote this object, you may not be allowed to undo this action." %}
-                </p>
+    {# first put error messages, then put buttons #}
+    {% spaceless %}
+        <div class="msg">
+            {# demote #}
 
-                {# show the list of previous revisions that will be cancelled/deprecated #}
-
-                <div class="msg" style="border-style:hidden; color: #000000;">
-                    {% if cancelled_revisions %}
-                        <p> {% trans "The following revisions will be cancelled:" %} </p>
-                        <ul>
-                            {% for rev in cancelled_revisions %}
-                                <li>
-                                {% blocktrans with rev.revision as revision and rev.name as name %}
-                                    Revision {{ revision }} : {{ name }}
-                                {% endblocktrans %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if deprecated_revisions %}
-                        <p> {% trans "The following revisions will be deprecated:" %} </p>
-                        <ul>
-                            {% for rev in deprecated_revisions %}
-                                <li>
-                                {% blocktrans with rev.revision as revision and rev.name as name %}
-                                    Revision {{ revision }} : {{ name }}
-                                {% endblocktrans %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div class="password">
-                    {{ password_form.as_p }}
-                </div>
-            </div>
-        {% endif %}
-
-
-        {# first put error messages, then put buttons #}
-        {% spaceless %}
-            <div class="msg">
-                {# demote #}
-
-                {% if not obj.is_draft %}
-                    {% if is_signer_dm %}
-                        {% if not obj.is_proposed %}
-                            <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
-                        {% endif %}
-                    {% else %}
-                        <p>{% trans "You do not have the permission to demote this object." %}</p>
-                    {% endif %}
-                {% endif %}
-
-                {# promote #}
-                {% if is_signer %}
-                    {% if not is_promotable %}
-                        <p>{% trans "You can not promote this object:" %}</p>
-                        {{ obj.promotion_errors.as_ul }}
-                    {% else %}
-                        {% if not can_approve %}
-                            {% trans "You already have approved this promotion." %}
-                        {% endif %}
+            {% if not obj.is_draft %}
+                {% if is_signer_dm %}
+                    {% if not obj.is_proposed %}
+                        <p>{% trans "You can not demote this object since its state is official or more advanced." %}</p>
                     {% endif %}
                 {% else %}
-                    <p>{% trans "You do not have the permission to promote this object." %}</p>
+                    <p>{% trans "You do not have the permission to demote this object." %}</p>
                 {% endif %}
+            {% endif %}
 
-                {# cancel #}
-                {% if obj.is_draft and is_owner %}
-                    {% if not can_cancel %}
-                        {% with obj.get_all_revisions|length as nb_revision %}
-                            {% if nb_revision > 1 %}
-                                <p>{% trans "You can not cancel this object since it has more than one revision." %}</p>
-                            {% endif %}
-                        {% endwith %}
-                        {% if obj.has_links %}
-                            <p>{% trans "You can not cancel this object since it is related to another object (part, document)." %}</p>
-                        {% endif %}
-                    {% endif %}
+            {# promote #}
+            {% if is_signer %}
+                {% if not is_promotable %}
+                    <p>{% trans "You can not promote this object:" %}</p>
+                    {{ obj.promotion_errors.as_ul }}
                 {% else %}
-                    {% if not is_owner %}
-                        <p>{% trans "You do not have the permission to cancel this object." %}</p>
-                    {% else %}
-                        <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}</p>
+                    {% if not can_approve %}
+                        {% trans "You already have approved this promotion." %}
                     {% endif %}
                 {% endif %}
-            </div>
-        {% endspaceless %}
-
-        {# buttons #}
-        {% if is_signer_dm and obj.is_proposed %}
-            <input name="demote" type="submit" class="{{"Button"|button}}" value="{% trans "DEMOTE" %}" />
-        {% endif %}
-        {% if is_signer and can_approve and is_promotable %}
-            <input name="promote" type="submit" class="{{"Button"|button}}" 
-            {% if obj.is_last_promoter %}
-                value="{% trans "PROMOTE" %}"
             {% else %}
-                value="{% trans "Approve the promotion" %}"
-            {% endif %} />
+                <p>{% trans "You do not have the permission to promote this object." %}</p>
+            {% endif %}
+
+            {# cancel #}
+            {% if obj.is_draft and is_owner %}
+                {% if not can_cancel %}
+                    {% with obj.get_all_revisions|length as nb_revision %}
+                        {% if nb_revision > 1 %}
+                            <p>{% trans "You can not cancel this object since it has more than one revision." %}</p>
+                        {% endif %}
+                    {% endwith %}
+                    {% if obj.has_links %}
+                        <p>{% trans "You can not cancel this object since it is related to another object (part, document)." %}</p>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                {% if not is_owner %}
+                    <p>{% trans "You do not have the permission to cancel this object." %}</p>
+                {% else %}
+                    <p>{% trans "You can not cancel this object since its state is more advanced than draft." %}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endspaceless %}
+
+    {% with obj.plmobject_url|add:"lifecycle/apply/" as action_url %}
+
+        {# demote #}
+        {% if is_signer_dm and obj.is_proposed %}
+            {% with "demote" as action %}
+                {% with _("DEMOTE") as action_label %}
+                    {% with _("Are you sure you want to demote this object.") as msg %}
+                        {% include "snippets/confirmation_form.html" %}
+                    {% endwith %}
+                {% endwith %}
+            {% endwith %}
         {% endif %}
 
-    </form>
-
-    {# discard approvals #}
-    {% if is_signer and approvers %}
-        <form id ="form-discard" class="confirmation" style="display: inline;"
-            action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-            <div id="form-discard-dialog"
-                title="{% trans "Are you sure?" %}"
-                {% if password_form.is_bound and not password_form.is_valid %} 
-                    class="c-error action-{{ action }}"
-                {% endif %}
-                >
-                <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                {% trans "Warning, all signers will have to approve again the promotion." %}</p>
-
-                <div class="password">
-                    {{ password_form.as_p }}
-                </div>
-            </div>
-
-            <input name="discard" type="submit" class="{{"Button"|button}}"
-            value="{% trans "Discard approvals" %}"/>
-        </form>
-    {% endif %}
-
-    {# cancel #}
-    {% if can_cancel %}
-        <form id ="form-cancel" class="confirmation" style="display: inline;"
-            action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-            <div id="form-cancel-dialog"
-                title="{% trans "Are you sure?" %}"
-                {% if password_form.is_bound and not password_form.is_valid %} 
-                    class="c-error action-{{ action }}"
-                {% endif %}
-                >
-                <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                {% trans "Warning, if you cancel this object, it won't be anymore accessible to everyone." %}</p>
-
-                <div class="password">
-                    {{ password_form.as_p }}
-                </div>
-            </div>
-
-            {# button #}
-            <input name="cancel" type="submit" class="{{"Button"|button}}" value="{% trans "CANCEL" %}"/>
-        </form>
-    {% endif %}
-
-    {# publish #}
-    {% if obj.can_publish %}
-        <form id ="form-publish" class="confirmation" style="display: inline;"
-            action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-            <div id="form-publish-dialog"
-                title="{% trans "Are you sure?" %}"
-                {% if password_form.is_bound and not password_form.is_valid %} 
-                    class="c-error action-{{ action }}"
-                {% endif %}
-                >
-                <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                {% trans "Warning, if you publish this object, it will be accessible to everyone, including anonymous users." %}</p>
-
-                <div class="password">
-                    {{ password_form.as_p }}
-                </div>
-            </div>
-
-            {# button #}
-            <input name="publish" type="submit" class="{{"Button"|button}}" value="{% trans "PUBLISH" %}" />
-        </form>
-    {% endif %}
-
-    {% if obj.published %}
-        {# unpublish #}
-        {% if obj.can_unpublish %}
-            <form id ="form-unpublish" class="confirmation" style="display: inline;"
+        {# promotion form #}
+        {% if is_signer and can_approve and is_promotable %}
+            <form id ="form-promote" class="confirmation" style="display: inline;"
                 action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
-                <div id="form-unpublish-dialog"
+                <div id="form-promote-dialog"
                     title="{% trans "Are you sure?" %}"
                     {% if password_form.is_bound and not password_form.is_valid %} 
                         class="c-error action-{{ action }}"
@@ -220,25 +94,109 @@
                     >
                     <p>
                     <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                    {% trans "Warning, if you unpublish this object, it won't be anymore accessible to everyone." %}</p>
+                    {% trans "If you promote or demote this object, you may not be allowed to undo this action." %}
+                    </p>
+
+                    {# show the list of previous revisions that will be cancelled/deprecated #}
+
+                    <div class="msg" style="border-style:hidden; color: #000000;">
+                        {% if cancelled_revisions %}
+                            <p> {% trans "The following revisions will be cancelled:" %} </p>
+                            <ul>
+                                {% for rev in cancelled_revisions %}
+                                    <li>
+                                    {% blocktrans with rev.revision as revision and rev.name as name %}
+                                        Revision {{ revision }} : {{ name }}
+                                    {% endblocktrans %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if deprecated_revisions %}
+                            <p> {% trans "The following revisions will be deprecated:" %} </p>
+                            <ul>
+                                {% for rev in deprecated_revisions %}
+                                    <li>
+                                    {% blocktrans with rev.revision as revision and rev.name as name %}
+                                        Revision {{ revision }} : {{ name }}
+                                    {% endblocktrans %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
 
                     <div class="password">
                         {{ password_form.as_p }}
                     </div>
                 </div>
 
-                {# button #}
-                <input name="unpublish" type="submit" class="{{"Button"|button}}" value="{% trans "UNPUBLISH" %}" />
+                {# buttons #}
+                <input name="promote" type="submit" class="{{"Button"|button}}" 
+                {% if obj.is_last_promoter %}
+                    value="{% trans "PROMOTE" %}"
+                {% else %}
+                    value="{% trans "Approve the promotion" %}"
+                {% endif %} />
+
             </form>
         {% endif %}
 
-        <div id="published-info">
-            <p>
-            {% trans "This object has been published:" %}
-            <a href="{{obj.plmobject_url}}public/">{% trans "Public link" %}</a>
-            </p>
-        </div>
-    {% endif %}
+        {# discard approvals #}
+        {% if is_signer and approvers %}
+            {% with "discard" as action %}
+                {% with _("Discard approvals") as action_label %}
+                    {% with _("Warning, all signers will have to approve again the promotion.") as msg %}
+                        {% include "snippets/confirmation_form.html" %}
+                    {% endwith %}
+                {% endwith %}
+            {% endwith %}
+        {% endif %}
+
+        {# cancel #}
+        {% if can_cancel %}
+            {% with "cancel" as action %}
+                {% with _("CANCEL") as action_label %}
+                    {% with _("Warning, if you cancel this object, it won't be anymore accessible to everyone.") as msg %}
+                        {% include "snippets/confirmation_form.html" %}
+                    {% endwith %}
+                {% endwith %}
+            {% endwith %}
+        {% endif %}
+
+
+        {# publish #}
+        {% if obj.can_publish %}
+            {% with "publish" as action %}
+                {% with _("PUBLISH") as action_label %}
+                    {% with _("Warning, if you publish this object, it will be accessible to everyone, including anonymous users.") as msg %}
+                        {% include "snippets/confirmation_form.html" %}
+                    {% endwith %}
+                {% endwith %}
+            {% endwith %}
+        {% endif %}
+
+        {% if obj.published %}
+            {# unpublish #}
+            {% if obj.can_unpublish %}
+                {% with "unpublish" as action %}
+                    {% with _("UNPUBLISH") as action_label %}
+                        {% with _("Warning, if you unpublish this object, it won't be anymore accessible to everyone.") as msg %}
+                            {% include "snippets/confirmation_form.html" %}
+                        {% endwith %}
+                    {% endwith %}
+                {% endwith %}
+            {% endif %}
+
+            <div id="published-info">
+                <p>
+                {% trans "This object has been published:" %}
+                <a href="{{obj.plmobject_url}}public/">{% trans "Public link" %}</a>
+                </p>
+            </div>
+        {% endif %}
+
+    {% endwith %}
 
     {# lifecycle : display all states #}
     <div class="lifecycle">

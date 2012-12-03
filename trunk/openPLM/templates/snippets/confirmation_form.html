@@ -1,0 +1,23 @@
+{% load i18n plmapp_tags %}
+
+<form id="form-{{action}}" class="confirmation" style="display: inline;"
+    action="{{action_url}}" method="POST">
+    <div id="form-{{action}}-dialog"
+        title="{% trans "Are you sure?" %}"
+        {% if password_form.is_bound and not password_form.is_valid %} 
+            class="c-error action-{{ action }}"
+        {% endif %}
+        >
+        <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        {{ msg }}
+        </p>
+
+        <div class="password">
+            {{ password_form.as_p }}
+        </div>
+    </div>
+
+    <input name="{{action}}" type="submit" class="{{"Button"|button}}"
+    value="{{ action_label }}"/>
+</form>
