@@ -1194,6 +1194,7 @@ def delete_alternate(request, obj_type, obj_ref, obj_revi):
         obj.delete_alternate(obj.object)
     return HttpResponseRedirect(obj.plmobject_url + "alternates/")
 
+@handle_errors
 def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Attached documents view.
