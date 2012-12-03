@@ -1196,5 +1196,7 @@ class PartController(PLMObjectController):
                 # it should not failed, except if another alternate set was built
                 # or if alternate/bom rules are not respected
                 pass
+        if self.is_deprecated:
+            self.end_alternate()
         return r
 

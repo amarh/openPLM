@@ -1363,3 +1363,11 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(revb.is_alternate(self.controller2.object))
         self.assertTrue(revc.is_alternate(self.controller2.object))
 
+    def test_deprecate_remove_alternates(self):
+        self.controller.add_alternate(self.controller2)
+        self.controller.promote()
+        self.controller.promote()
+        self.assertTrue(self.controller.is_deprecated)
+        self.assertFalse(self.controller.is_alternate(self.controller2))
+    
+
