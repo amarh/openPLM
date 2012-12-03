@@ -1158,6 +1158,7 @@ class PartController(PLMObjectController):
     def delete_alternate(self, part):
         # permissions ?
         self.check_permission("owner")
+        self.check_editable()
         partset = models.AlternatePartSet.get_partset(self.object)
         # TODO: histo
         return partset.remove_part(part)

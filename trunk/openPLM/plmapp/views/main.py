@@ -1187,9 +1187,13 @@ def add_alternate(request, obj_type, obj_ref, obj_revi):
                 'attach' : (obj, "add_alternate") })
     return r2r('parts/alternates_add.html', ctx, request)
 
-
-##########################################################################################
 @handle_errors
+def delete_alternate(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    if request.POST:
+        obj.delete_alternate(obj.object)
+    return HttpResponseRedirect(obj.plmobject_url + "alternates/")
+
 def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Attached documents view.
