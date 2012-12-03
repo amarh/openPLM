@@ -308,7 +308,7 @@ class SimpleSearchForm(SearchForm):
             return EmptySearchQuerySet()
         
 
-OBJECT_DOES_NOT_EXISTS_MSG = _(
+OBJECT_DOES_NOT_EXIST_MSG = _(
 """The object %(type)s // %(reference)s // %(revision)s does not exist.
 Note that all fields are case-sensitive.
 """
@@ -330,7 +330,7 @@ class PLMObjectForm(forms.Form):
         if type_ and reference and revision:
             d = dict(type=type_, reference=reference, revision=revision)
             if not m.PLMObject.objects.filter(**d).exists():
-                raise ValidationError(OBJECT_DOES_NOT_EXISTS_MSG % d)
+                raise ValidationError(OBJECT_DOES_NOT_EXIST_MSG % d)
         return cleaned_data
 
     
@@ -626,11 +626,25 @@ class OpenPLMUserChangeForm(forms.ModelForm):
                 'last_login', 'date_joined', 'groups', 'user_permissions',
                 'password')
 
+USER_DOES_NOT_EXIST_MSG = _(
+"""The user "%(username)s" does not exist.
+Note that all fields are case-sensitive.
+"""
+)
 class SelectUserForm(forms.Form):
     type = forms.CharField(label=_("Type"), initial="User")
     username = forms.CharField(label=_("Username"))
+
+    def clean(self):
+        cleaned_data = super(SelectUserForm, self).clean()
+        username = cleaned_data.get("username")
+        if username:
+            if not User.objects.filter(username=username).exists():
+                raise ValidationError(USER_DOES_NOT_EXIST_MSG %
+                        {"username" : username})
+        return cleaned_data
     
-    
+
 class ModifyUserForm(forms.Form):
     delete = forms.BooleanField(required=False, initial=False)
     user = forms.ModelChoiceField(queryset=User.objects.all(),
