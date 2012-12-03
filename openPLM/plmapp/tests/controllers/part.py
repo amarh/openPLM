@@ -994,13 +994,8 @@ class PartControllerTest(ControllerTest):
         # no children, no parents
         self.controller.add_alternate(self.controller2)
         self.controller.add_alternate(self.controller3)
-        alternates = set(self.controller.get_alternates())
-        alternates2 = set(self.controller2.get_alternates())
-        alternates3 = set(self.controller3.get_alternates())
-        wanted = set([self.controller.object.part, self.controller2.object.part,
-            self.controller3.object.part])
-        for alt in (alternates, alternates2, alternates3):
-            self.assertEqual(wanted, alt)
+        self.assertTrue(self.controller.is_alternate(self.controller2))
+        self.assertTrue(self.controller.is_alternate(self.controller3))
 
     def test_add_alternate_error_revision(self):
         # revision of the controller

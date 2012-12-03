@@ -1172,7 +1172,7 @@ class PartController(PLMObjectController):
     def get_alternates(self, date=None):
         try:
             partset = self.alternatepartsets.at(date).get()
-            return partset.parts.all()
+            return partset.parts.exclude(id=self.id)
         except models.AlternatePartSet.DoesNotExist:
             return []
 
