@@ -613,7 +613,7 @@ class PartSet(Link):
             return None
         else:
             new_partset = self.__class__.objects.create()
-            new_partset.parts.add(*[p for p in self.parts.all() if p != part])
+            new_partset.parts.add(*[p for p in self.parts.all() if p.id != part.id])
             self.end()
             return new_partset
 
