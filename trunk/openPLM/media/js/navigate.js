@@ -304,7 +304,6 @@ function show_attach(plmobject, form_child){
 }
 
 function init(){
-
         $( "#id_date" ).datepicker();
 
         $("div.node").mouseenter(
@@ -463,37 +462,52 @@ function getQueryVariable(variable) {
     }
 }
 
+// https://gist.github.com/1330150
+$.fn.draggable = function() {
+    var $document = $(document)
+    , mouse = { update: function(e) {this.x = e.pageX; this.y = e.pageY;} };
 
-/*
- * enableDragging
- * inspired by http://stackoverflow.com/questions/10965293/dragable-without-jquery-ui/10965447#10965447
- * from Derek
- * CC-By-SA
- */
-function enableDragging(ele) {
-    var dragging = dragging || false, x, y, Ox, Oy;
-    ele.onmousedown = function(ev) {
-        dragging = true;
-        x = ev.clientX;
-        y = ev.clientY;
-        Ox = ele.offsetLeft;
-        Oy = ele.offsetTop;
-        ele.style.cursor = "move";
-        window.onmousemove = function(ev) {
-            if (dragging) {
-                var Sx = ev.clientX - x + Ox,
-                    Sy = ev.clientY - y + Oy;
-                ele.style.top = Sy + "px";
-                ele.style.left = Sx + "px";
-                return false;
+    return this.each(function(){
+        var $elem = $(this);
+        $elem.bind('mousedown.drag', function(e) {
+            mouse.update(e);
+            $elem.css("cursor", "move");
+            if ( !/^(relative|absolute)$/.test($elem.css('position') ) ) {
+                $elem.css('position', 'relative');
             }
-        };
-        window.onmouseup = function(ev) {
-            ele.style.cursor = "default";
-            dragging = false;
-            return false;
-        }
-    };
+            var links = $elem.find("a");
+            var images = $elem.find("img");
+            var click_prevented = false;
+            $document.bind('mousemove.drag', function(e) {
+                if (! click_prevented ){
+                    links.bind("click.prevent", function(event) { event.preventDefault(); });
+                    images.each(function (i){
+                        $(this).attr("data-onclick", $(this).attr("onclick"));
+                        $(this).attr("onclick", "");
+                    });
+                    click_prevented = true;
+                }
+                $elem.css({
+                    left: (parseInt($elem.css('left'))||0) + (e.pageX - mouse.x) + 'px',
+                    top: (parseInt($elem.css('top'))||0) + (e.pageY - mouse.y) + 'px'
+                });
+                mouse.update(e);
+                e.preventDefault();
+            });
+            $document.one('mouseup.drag', function(e) {
+                $elem.css("cursor",  "default");
+                window.setTimeout(function() {
+                    links.unbind("click.prevent");
+                    images.each(function (i){
+                        $(this).attr("onclick", $(this).attr("data-onclick"));
+                    });
+                }, 300);
+                $document.unbind('mousemove.drag');
+                e.preventDefault();
+            });
+            e.preventDefault();
+        });
+    });
 }
 
 $(document).ready(function(){
@@ -525,7 +539,7 @@ $(document).ready(function(){
             }, "fast");
         });
 
-       enableDragging(document.getElementById("DivNav"));
+        $("#DivNav).draggable();
 
         $("#navAddForm").dialog({
             autoOpen: false,
