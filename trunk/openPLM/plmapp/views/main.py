@@ -368,18 +368,25 @@ def get_lifecycle_data(obj):
     # warning if a previous revision will be cancelled/deprecated
     cancelled = []
     deprecated = []
+    previous_alternates = []
+    alternates = obj.get_alternates() if obj.is_part else []
     if is_signer and can_approve:
         if lcs[-1] != state:
             if lcs.next_state(state) == obj.lifecycle.official_state.name:
-                for rev in obj.get_previous_revisions():
+                revisions = obj.get_previous_revisions()
+                for rev in revisions:
                     if rev.is_official:
                         deprecated.append(rev)
                     elif rev.is_draft or rev.is_proposed:
                         cancelled.append(rev)
-    ctx["cancelled_revisions"] = cancelled
-    ctx["deprecated_revisions"] = deprecated
+                if obj.is_part and not alternates and revisions:
+                    previous_alternates = type(obj)(revisions[-1].part, None).get_alternates()
 
     ctx.update({
+        'cancelled_revisions' : cancelled,
+        'deprecated_revisions' : deprecated,
+        'alternates' : alternates,
+        'previous_alternates' : previous_alternates,
         'current_page' : 'lifecycle', 
         'object_lifecycle' : object_lifecycle,
         'is_signer' : is_signer, 
