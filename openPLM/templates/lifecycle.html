@@ -94,7 +94,7 @@
                     >
                     <p>
                     <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                    {% trans "If you promote or demote this object, you may not be allowed to undo this action." %}
+                    {% trans "If you promote this object, you may not be allowed to undo this action." %}
                     </p>
 
                     {# show the list of previous revisions that will be cancelled/deprecated #}
@@ -120,6 +120,26 @@
                                     {% blocktrans with rev.revision as revision and rev.name as name %}
                                         Revision {{ revision }} : {{ name }}
                                     {% endblocktrans %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if previous_alternates %}
+                            <p> {% trans "The following alternate links will switch from the previous revision to the current one:" %} </p>
+                            <ul>
+                                {% for part in previous_alternates %}
+                                    <li>
+                                        {{ part.type }} // {{part.reference }} // {{ part.revision }} // {{ part.name }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if alternates and obj.is_official %}
+                            <p> {% trans "Current alternate links will be dropped:" %} </p>
+                            <ul>
+                                {% for part in alternates %}
+                                    <li>
+                                        {{ part.type }} // {{part.reference }} // {{ part.revision }} // {{ part.name }}
                                     </li>
                                 {% endfor %}
                             </ul>
