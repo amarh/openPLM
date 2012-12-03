@@ -622,7 +622,7 @@ class OpenPLMUserChangeForm(forms.ModelForm):
 
 USER_DOES_NOT_EXIST_MSG = _(
 """The user "%(username)s" does not exist.
-Note that all fields are case-sensitive.
+Note that username field is case-sensitive.
 """
 )
 class SelectUserForm(forms.Form):
