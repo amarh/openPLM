@@ -539,7 +539,7 @@ $(document).ready(function(){
             }, "fast");
         });
 
-        $("#DivNav).draggable();
+        $("#DivNav").draggable();
 
         $("#navAddForm").dialog({
             autoOpen: false,
