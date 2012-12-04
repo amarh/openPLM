@@ -11,6 +11,19 @@
         <div class="id_details">
 
             {% block id_details %}
+                <p>
+                <span class="type">{{object.type}}</span>
+                </p>
+                <p>
+                <span class="reference">{{object.reference}}</span>
+                <span class="revision">{{object.revision}}</span>
+                </p>
+                <p>
+                <span class="name">{{object.name}}</span>
+                </p>
+                <p>
+                <span class="state">{{object.state_id}}</span>
+                </p>
             {% endblock %}
         </div>
     </a>

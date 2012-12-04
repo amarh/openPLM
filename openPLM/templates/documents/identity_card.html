@@ -12,19 +12,7 @@
 {% endspaceless %}{% endblock %}
 
 {% block id_details%}
-    <p>
-    <span class="type">{{object.type}}</span>
-    </p>
-    <p>
-    <span class="reference">{{object.reference}}</span>
-    <span class="revision">{{object.revision}}</span>
-    </p>
-    <p>
-    <span class="name">{{object.name}}</span>
-    </p>
-    <p>
-    <span class="state">{{object.state_id}}</span>
-    </p>
+    {{ block.super }}
     <p>
     <span class="num_files">
         {% blocktrans count num_files|key:object.id as file_count %}
