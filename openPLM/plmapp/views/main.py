@@ -2825,7 +2825,7 @@ def browse(request, type="object"):
         except KeyError:
             raise Http404
         object_list = cls.all()
-        # this only relevant for authenticated users
+        # this is only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
         if type in ("object", "part", "topassembly", "document"):
             ctx["plmobjects"] = True
