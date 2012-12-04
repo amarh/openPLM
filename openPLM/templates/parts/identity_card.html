@@ -4,4 +4,36 @@
 {% block thumbnail_url%}{{MEDIA_URL}}img/icon_part.png{% endblock %}
 {% block id_details%}
     {{ block.super }}
+    
+    {% if sort == "children" %}
+        <p>
+        <span class="sort">
+            {% if object.num_children == 0 %}
+                {% trans "No children" %}
+            {% else %}
+                {% blocktrans count object.num_children as num_children %}
+{{num_children}} child
+{% plural %}
+{{num_children}} children
+                {% endblocktrans %}
+            {% endif %}
+        </span>
+        </p>
+    {% endif %}
+
+    {% if sort == "most-used" %}
+        <p>
+        <span class="sort">
+            {% if object.num_parents == 0 %}
+                {% trans "No parents" %}
+            {% else %}
+                {% blocktrans count object.num_parents as num_parents %}
+{{ num_parents }} parent
+{% plural %}
+{{ num_parents }} parents
+                {% endblocktrans %}
+            {% endif %}
+        </span>
+        </p>
+    {% endif %}
 {% endblock %}
