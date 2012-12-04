@@ -2767,7 +2767,6 @@ def get_pagination(r_GET, object_list, type):
 
     Called in view which returns a template where object id cards are displayed.
     """
-    # TODO: move topassembly/children stuff to a Manager
     ctx = {}
     sort = r_GET.get("sort", "children" if type == "topassembly" else "recently-added")
     if sort == "name" :
