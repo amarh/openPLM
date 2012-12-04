@@ -524,7 +524,7 @@ class NavigationGraph(object):
                 )
         if self.options["cards"]:
             self.nodes[obj_id]["width"] = ([200., 150.][type_ == "part"]) / 96
-            self.nodes[obj_id]["height"] = 100. / 96 
+            self.nodes[obj_id]["height"] = 107. / 96 
         self._title_to_node[id_] = data
 
     def _convert_map(self, map_string):

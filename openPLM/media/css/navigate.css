@@ -62,22 +62,40 @@ div.node.nocard p {
 
 div.node.card {
     width: 200px;
-    height: 100px;
+    height: 107px;
 }
 div.node.card.n_part {
     width: 150px;
 }
 
+div.card div.bar {
+    width: 5em;
+    margin-left: 1em;
+    height: 8px;
+    border-radius: 5px 5px 0 0;
+    background-color: transparent;
+    position: relative;
+    margin-bottom: -2px;
+    z-index: 10;
+}
+
 div.main_node.card div.identity_card {
     border: 2px solid #E6007E;
 }
-
-
 div.main_node.card.n_part div.identity_card {
     border-color: #009FE3;
 }
 div.main_node.card.n_document div.identity_card {
     border-color: #312783;
+}
+div.main_node.card div.bar {
+    background-color: #E6007E;
+}
+div.main_node.card.n_part div.bar {
+    background-color: #009FE3;
+}
+div.main_node.card.n_document div.bar {
+    background-color: #312783;
 }
 
 
@@ -85,6 +103,7 @@ div.identity_card {
     width: 195px;
     height: 95px;
     margin: 0;
+    box-shadow: none;
 }
 div.n_part .identity_card {
     height: 95px;
@@ -370,9 +389,8 @@ div.n_user.main_node.nocard {
     text-shadow: 1px 1px #ccc;
 }
 
-/* Override main_content and ActiveArea to remove margins and paddings */
+/* Override main_content and ActiveArea to remove paddings */
 #main_content, #ActiveArea {
-    margin: 0 !important;
     padding: 0 !important;
 }
 
