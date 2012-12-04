@@ -463,7 +463,7 @@ function getQueryVariable(variable) {
 }
 
 // https://gist.github.com/1330150
-$.fn.draggable = function() {
+$.fn.draggable2 = function() {
     var $document = $(document)
     , mouse = { update: function(e) {this.x = e.pageX; this.y = e.pageY;} };
 
@@ -539,7 +539,7 @@ $(document).ready(function(){
             }, "fast");
         });
 
-        $("#DivNav").draggable();
+        $("#DivNav").draggable2();
 
         $("#navAddForm").dialog({
             autoOpen: false,
