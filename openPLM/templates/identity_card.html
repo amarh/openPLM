@@ -24,6 +24,13 @@
                 <p>
                 <span class="state">{{object.state_id}}</span>
                 </p>
+                {% if sort == "recently-added" %}
+                <p>
+                <span class="sort">
+                    {% blocktrans with object.ctime|timesince as ctime %}created {{ctime}} ago{% endblocktrans %}
+                </span>
+                </p>
+                {% endif %}
             {% endblock %}
         </div>
     </a>

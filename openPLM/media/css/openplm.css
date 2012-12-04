@@ -1195,7 +1195,7 @@ div.identity_card {
     border-radius: 0.4em;
     box-shadow: 1px 1px 3px #888;
     width: 20em;
-    height: 130px;
+    height: 160px;
     margin: 0.5em;
     position: relative;
 }
@@ -1221,7 +1221,7 @@ div.identity_card div.id_thumbnail {
     float: left;
     background-color: #343434;
     border: 1px solid #343434;
-    margin-top: 15px;
+    margin-top: 25px;
     display: table-cell;
 }
 div.identity_card div.id_thumbnail_inner {
@@ -1239,7 +1239,7 @@ div.identity_card div.id_thumbnail img {
     display: block;
 }
 div.identity_card div.id_details {
-    height: 120px;
+    height: 150px;
     border-left: 1px solid #ccc;
     padding: 0 1em;
     position: absolute;
