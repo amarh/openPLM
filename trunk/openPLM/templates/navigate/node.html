@@ -4,6 +4,7 @@
         title="{{title_}}">
 
         {% if card %}
+            <div class="bar"></div>
             {% with type|add:"s/identity_card.html" as tpl %}
                 {% filter removetags:"a" %}
                     {% include tpl %}
