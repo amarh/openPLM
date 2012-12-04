@@ -38,8 +38,8 @@
                 <h3 class="alternate">{% trans "Sort" %} </h3>
             </div>
             <ul>
-                <li {% if sort == "recently-used"%}class="selected"{% endif %} > 
-                <a href="{% add_get sort='recently-used' %}"><span>{% trans "Recently added" %}</span></a>
+                <li {% if sort == "recently-added"%}class="selected"{% endif %} > 
+                <a href="{% add_get sort='recently-added' %}"><span>{% trans "Recently added" %}</span></a>
                 </li>
                 <li {% if sort == "name"%}class="selected"{% endif %} >
                 <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
