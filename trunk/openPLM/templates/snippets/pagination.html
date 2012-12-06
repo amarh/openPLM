@@ -9,16 +9,23 @@
             </a>
 
         {% endif %}
+        {% if objects.has_previous %}
+            <a href="{% add_get page=objects.previous_page_number%}">« {% trans "Prev." %}</a>
+        {% endif %}
 
         {% for page in pages %}
             <a 
                 {% if page = objects.number %}
                     style="font-weight:bold"
+                    class="current-page"
                 {% else %}
                     href="{% add_get page=page %}"
                 {% endif %}
                 >{{page}}</a>
         {% endfor %}
+        {% if objects.has_next %}
+            <a href="{% add_get page=objects.next_page_number%}">{% trans "Next." %} »</a>
+        {% endif %}
 
         {% if objects.has_next  and objects.paginator.num_pages not in pages %}
             {% if objects.paginator.num_pages|add:'-1' not in pages %}
