@@ -30,7 +30,7 @@ div.node {
 }
 
 
-div.node, div.node * {
+.node, .node * {
     z-index: 5;
 }
 
@@ -220,12 +220,18 @@ div.node > a > span {
     text-decoration:none;
 }
 
-img.node_thumbnails, img.node_show_docs {
+.node-toolbar {
     position:absolute;
-    right: 0;
-    bottom: 0;
+    right: 2px;
+    bottom: 2px;
     display:none;
     z-index:50;
+}
+
+.node-toolbar button, .node-toolbar a {
+    z-index:50;
+    width: 24px;
+    height: 24px;
 }
 
 

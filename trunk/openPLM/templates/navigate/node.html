@@ -17,15 +17,16 @@
             </div>
         {% endif %}
 
-        {% if type == "document" %}
-            <img src="/media/img/search.png" class="node_thumbnails ui-button ui-widget ui-state-default ui-corner-all " title="{% trans "Display thumbnails" %}"
-            onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{time}}{{path}}');"/>
-        {% endif %}
+        <div class="node-toolbar">
+            {% if type == "document" %}
+                <button onclick="dt('{{id|safe}}', '/ajax/thumbnails/{{time}}{{path}}');" class="node_thumbnails">{% trans "Display thumbnails" %}</button>
+            {% endif %}
 
-        {% if show_documents %}
-            <img src="/media/img/{{doc_img_add|yesno:"add,remove"}}.png" class="node_show_docs ui-button ui-widget ui-state-default ui-corner-all" title="{% trans "Show related documents" %}"
-            onclick="dd('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');"/>
-        {% endif %}
+            {% if show_documents %}
+                <button onclick="dd('{{id|safe}}', '{{documents_url}}', '{{parts|safe}}');" class="node_show_docs {{doc_img_add|yesno:"add,remove"}}">{% trans "Show related documents" %}</button>
+            {% endif %}
+            <a class="study-btn" href="{{href}}../" >{% trans "Study" %}</a>
+        </div>
 
         <a href="{{href|safe}}"><span>&nbsp;</span></a>
 
