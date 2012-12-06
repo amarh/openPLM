@@ -309,14 +309,12 @@ function init(){
         $("div.node").mouseenter(
         function () {
             if (scale_level >= 0.5){
-                $(this).find(".node_thumbnails").show();
-                $(this).find(".node_show_docs").show();
+                $(this).find(".node-toolbar").show();
             }
         }); 
         $("div.node").mouseleave(
         function () {
-            $(this).find(".node_thumbnails").hide();
-            $(this).find(".node_show_docs").hide();
+            $(this).find(".node-toolbar").hide();
         }
         );
 
@@ -387,6 +385,32 @@ function init(){
             $("li.Result div.toolbar").hide();
         }
 
+        $( ".node_thumbnails" ).button({
+            icons: {
+                primary: "ui-icon-document"
+            },
+            text: false
+        });
+
+        $( ".node_show_docs.add" ).button({
+            icons: {
+                primary: "ui-icon-plus"
+            },
+            text: false
+        });
+        $( ".node_show_docs.remove" ).button({
+            icons: {
+                primary: "ui-icon-minus"
+            },
+            text: false
+        });
+
+        $( ".study-btn" ).button({
+            icons: {
+                primary: "ui-icon-pencil"
+            },
+            text: false
+        });
         $("#FilterNav").find("form").submit(function (e){
                 return false;
         });
@@ -476,12 +500,12 @@ $.fn.draggable2 = function() {
                 $elem.css('position', 'relative');
             }
             var links = $elem.find("a");
-            var images = $elem.find("img");
+            var buttons = $elem.find("button");
             var click_prevented = false;
             $document.bind('mousemove.drag', function(e) {
                 if (! click_prevented ){
                     links.bind("click.prevent", function(event) { event.preventDefault(); });
-                    images.each(function (i){
+                    buttons.each(function (i){
                         $(this).attr("data-onclick", $(this).attr("onclick"));
                         $(this).attr("onclick", "");
                     });
@@ -498,7 +522,7 @@ $.fn.draggable2 = function() {
                 $elem.css("cursor",  "default");
                 window.setTimeout(function() {
                     links.unbind("click.prevent");
-                    images.each(function (i){
+                    buttons.each(function (i){
                         $(this).attr("onclick", $(this).attr("data-onclick"));
                     });
                 }, 300);
