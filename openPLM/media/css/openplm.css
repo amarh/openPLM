@@ -1265,8 +1265,8 @@ div#type-panel {
     height: 100%;
     position: absolute;
 }
-div#type-panel h3 {
-    margin: 0;
+div#type-panel h3:first-child {
+    margin-top: 0;
 }
 div#type-panel li {
     list-style: none;
