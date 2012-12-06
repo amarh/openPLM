@@ -1315,3 +1315,7 @@ div#browser {
     position: relative;
     min-height: 500px;
 }
+
+#add-file-nojs {
+    float: right;
+}
