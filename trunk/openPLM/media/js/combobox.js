@@ -81,5 +81,10 @@ $(
                 $(this).find("div.quick_link").hide();
             }
         });
+
+        $("#SetLangForm select").change(function () {
+            $("#SetLangForm").submit()
+        });
+        $("#SetLangForm input[type=submit]").hide();
     }
 );
