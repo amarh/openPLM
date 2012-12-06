@@ -123,6 +123,8 @@ for key, model in models.get_all_plmobjects().iteritems():
         creator = CharField(model_attr="creator__username")
         state = CharField(model_attr="state__name")
         lifecycle = CharField(model_attr="lifecycle__name")
+        state_class = CharField()
+        group= CharField(model_attr="group__name")
 
         ctime = DateTimeField(model_attr="ctime")
         mtime = DateTimeField(model_attr="mtime")
@@ -135,6 +137,19 @@ for key, model in models.get_all_plmobjects().iteritems():
 
         def prepare_mtime(self, obj):
             return prepare_date(obj.mtime)
+
+        def prepare_state_class(self, obj):
+            if obj.is_cancelled:
+                cls = "cancelled"
+            elif obj.is_official:
+                cls = "official"
+            elif obj.is_draft:
+                cls = "draft"
+            elif obj.is_deprecated:
+                cls = "deprecated"
+            else:
+                cls = "proposed"
+            return "state-" + cls
 
         def index_queryset(self):
             return self.model.objects.filter(type=self.key)
@@ -151,6 +166,8 @@ class DocumentFileIndex(QueuedModelSearchIndex):
     text = CharField(document=True, use_template=True)
     filename = CharField(model_attr='filename')
     file = CharField(model_attr='file', stored=False)
+    group = CharField(model_attr="document__group__name")
+    document_id = IntegerField(model_attr="document__id", indexed=False)
     
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
@@ -165,7 +182,7 @@ class DocumentFileIndex(QueuedModelSearchIndex):
             content = codecs.open(path, encoding="utf-8", errors="ignore").read(size)
         else:
             p = Popen([settings.EXTRACTOR, path], stdout=PIPE, close_fds=True)
-            content = p.stdout.read(size)
+            content = p.stdout.read(size).decode("utf-8", "ignore")
         return content
 
     def index_queryset(self):

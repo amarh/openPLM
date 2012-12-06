@@ -1,8 +1,12 @@
 {% load i18n plmapp_tags highlight %}
 
 <div class="identity_card ic-{{type}}">
-
-    <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
+    {% is_object_readable %}
+    {% if not hide_links %}
+        {% if is_object_readable or suffix_url == "public/" %}
+            <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
+            {% endif %}
+        {% endif %}
         <div class="id_thumbnail">
             <div class="id_thumbnail_inner">
                 <img src="{% block thumbnail_url %}{% endblock %}"/>
@@ -25,14 +29,18 @@
                 <span class="state">{{object.state_id}}</span>
                 </p>
                 {% if sort == "recently-added" %}
-                <p>
-                <span class="sort">
-                    {% blocktrans with object.ctime|timesince as ctime %}created {{ctime}} ago{% endblocktrans %}
-                </span>
-                </p>
+                    <p>
+                    <span class="sort">
+                        {% blocktrans with object.ctime|timesince as ctime %}created {{ctime}} ago{% endblocktrans %}
+                    </span>
+                    </p>
                 {% endif %}
             {% endblock %}
         </div>
-    </a>
-
+        {% if not hide_links %}
+            {% if is_object_readable or suffix_url == "public/" %}
+            </a>
+        {% endif %}
+    {% endif %}
 </div>
+

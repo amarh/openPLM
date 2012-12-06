@@ -3,6 +3,9 @@ import re
 from django import template
 from django.contrib.auth.models import User
 from django.template import Node, resolve_variable
+
+from haystack.models import SearchResult
+
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp import models
 from openPLM.plmapp.utils import get_pages_num
@@ -182,6 +185,8 @@ def result_class(result):
     """
     Returns a css class according to result.
     """
+    if result.state_class:
+        return result.state_class
     if issubclass(result.model, (models.PLMObject, models.DocumentFile)):
         result.state_id = result.state
         result.lifecycle_id = result.lifecycle
@@ -259,3 +264,79 @@ def show_pages_bar(page, request):
             "request" : request,
             "pages" : get_pages_num(page.paginator.num_pages, page.number),
             }
+
+
+class IsObjectReadableNode(template.Node):
+    def render(self, context):
+        obj = context["object"]
+        try:
+            user = context["request"].user
+            context["is_object_readable"] = is_readable(obj, user)
+        except KeyError, AttributeError:
+            context["is_object_readable"] = True
+        return ''
+
+def do_is_object_readable(parser, token):
+    try:
+        tag_name, = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%r tag requires no arguments" % token.contents.split()[0]
+    return IsObjectReadableNode()    
+register.tag('is_object_readable', do_is_object_readable)
+
+@register.filter
+def is_readable(obj, user):
+    from django.conf import settings
+    if user.username == settings.COMPANY:
+        return True
+    # plmobjects are readable if:
+    #  * they are official, deprecated or cancelled
+    #  * user is their owner
+    #  * user is in their group
+    if isinstance(obj, models.PLMObject):
+        if obj.is_official or obj.is_deprecated or obj.is_cancelled:
+            return True
+        if obj.owner_id == user.id:
+            return True
+        if not hasattr(user, "group_ids"):
+            # cache group ids as it may be used to test another object
+            # in the page
+            user.group_ids = set(user.groups.all().values_list("id", flat=True))
+        return obj.group_id in user.group_ids
+    elif isinstance(obj, SearchResult):
+        if is_plmobject(obj) or is_documentfile(obj):
+            if not hasattr(user, "group_names"):
+                user.group_names = set(user.groups.all().values_list("name", flat=True))
+        if is_plmobject(obj):
+            state_class = result_class(obj)
+            if state_class in ("state-official", "state-deprecated", "state-cancelled"):
+                return True
+            if obj.owner == user.username:
+                return True
+            if obj.group is None:
+                try:
+                    gr = models.PLMObject.objects.filter(id=obj.pk).values_list("group__name", flat=True)[0]
+                except IndexError: # deleted object, not yet unindexed
+                    return False
+                return gr in user.group_names
+            return obj.group in user.group_names
+        elif is_documentfile(obj):
+            if obj.group:
+                if obj.group in user.group_names:
+                    return True
+                else:
+                    # the document may be official, deprecated...
+                    s, l = (models.PLMObject.objects.filter(id=obj.document_id)
+                            .values_list("state", "lifecycle"))[0]
+                    obj.state_id = s
+                    obj.lifecycle_id = l
+                    return get_state_class(obj) in ("official", "deprecated",
+                            "cancelled")
+            # document file indexed before the revision [1848]
+            if obj.object is None: # deleted object
+                return False
+            doc = obj.object.document
+            return is_readable(doc, user)
+
+    # other objects: readable
+    return True
