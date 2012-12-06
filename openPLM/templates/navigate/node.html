@@ -6,9 +6,9 @@
         {% if card %}
             <div class="bar"></div>
             {% with type|add:"s/identity_card.html" as tpl %}
-                {% filter removetags:"a" %}
+                {% with "true" as hide_link %}
                     {% include tpl %}
-                {% endfilter %}
+                {% endwith %}
             {% endwith %}
 
         {% else %}
