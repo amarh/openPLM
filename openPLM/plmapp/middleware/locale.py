@@ -16,8 +16,23 @@ class ProfileLocaleMiddleware(LocaleMiddleware):
     """
 
     def process_request(self, request):
+        # related tickets: #81 and #157
         if request.user.is_authenticated():
-            language = request.user.get_profile().language
+            # priority order:
+            # 1. session
+            # 2. profile
+            # if the user select a language before log in
+            # the session language is used
+            # otherwise, the profile language is used
+            language = request.session.get("django_language")
+            profile = request.user.get_profile()
+            saved_language = profile.language
+            if language is None:
+                language = saved_language
+            else:
+                # session language set at the login page: update the profile
+                profile.language = language
+                profile.save()
         else:            
             language = translation.get_language_from_request(request)
         translation.activate(language)
