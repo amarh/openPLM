@@ -125,19 +125,19 @@ div.identity_card div.id_details {
 }
 div.identity_card div.id_thumbnail {
     width: 70px;
-    height: 90px;
+    height: 80px;
     margin: 2px;
     border-radius: 2px;
 }
 
 div.identity_card div.id_thumbnail_inner {
-    height: 90px;
+    height: 80px;
     width: 70px;
 }
 
 div.identity_card div.id_thumbnail img {
     max-width: 70px;
-    max-height: 90px;
+    max-height: 80px;
 }
 div.identity_card div.id_details {
     height: 90px;
