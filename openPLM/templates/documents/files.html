@@ -55,6 +55,7 @@
 {% block content %}
 {% if is_owner and obj.is_editable %}
 <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
+    <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
 {% include "documents/files_add.html" %}
 </div>
 {% else %}
