@@ -579,18 +579,7 @@ def generate_extra_location_links(link, pcl):
         array=link.locations[i].to_array()
 
         loc.name=link.names[i]
-        loc.x1=array[0]
-        loc.x2=array[1]
-        loc.x3=array[2]
-        loc.x4=array[3]
-        loc.y1=array[4]
-        loc.y2=array[5]
-        loc.y3=array[6]
-        loc.y4=array[7]
-        loc.z1=array[8]
-        loc.z2=array[9]
-        loc.z3=array[10]
-        loc.z4=array[11]
+        loc.x1, loc.x2, loc.x3, loc.x4, loc.y1, loc.y2, loc.y3, loc.y4, loc.z1, loc.z2, loc.z3, loc.z4 = map(lambda x: 0.0 if abs(x) < 1e-50 else x, array)
 
         loc.save()
 
