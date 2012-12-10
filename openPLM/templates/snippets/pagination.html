@@ -1,41 +1,42 @@
 {% load i18n plmapp_tags %}
 
-<div class="pagination">
-    <span class="step-links">
+<div class="tb-pagination tb-pagination-centered">
+    <ul class="tb tbi">
         {% if objects.has_previous and 1 not in pages %}
-
+            <li>
             <a href="{% add_get page='1'%}">
-                {% if objects.number > 4 %} {% trans "First page" %} {% else %} 1 {% endif %}
+            {% if objects.number > 4 %} {% trans "First page" %} {% else %} 1 {% endif %}
             </a>
-
+            </li>
         {% endif %}
+
         {% if objects.has_previous %}
+            <li>
             <a href="{% add_get page=objects.previous_page_number%}">« {% trans "Prev." %}</a>
+            </li>
         {% endif %}
 
         {% for page in pages %}
-            <a 
-                {% if page = objects.number %}
-                    style="font-weight:bold"
-                    class="current-page"
-                {% else %}
-                    href="{% add_get page=page %}"
-                {% endif %}
-                >{{page}}</a>
+            <li {% if page = objects.number %} class="tb-active" {% endif %} >
+            <a href="{% add_get page=page %}" >{{page}}</a>
+            </li>
         {% endfor %}
+
         {% if objects.has_next %}
+            <li>
             <a href="{% add_get page=objects.next_page_number%}">{% trans "Next." %} »</a>
+            </li>
         {% endif %}
 
         {% if objects.has_next  and objects.paginator.num_pages not in pages %}
+            <li>
             {% if objects.paginator.num_pages|add:'-1' not in pages %}
-                —
                 <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "Last page" %}</a>
             {% else %}
                 <a href="{% add_get page=objects.paginator.num_pages %}">{{objects.paginator.num_pages}}</a>
             {% endif %}
-
+            </li>
         {% endif %}
-    </span>
+    </ul>
 </div>
 
