@@ -377,14 +377,14 @@ class PLMObject(models.Model):
                 next_state=next_state).values_list("user", flat=True)
         return approvers
 
-  
 
 def get_all_subclasses(base, d):
     if base.__name__ not in d and not base._deferred:
         d[base.__name__] = base
-    for part in base.__subclasses__():
-        get_all_subclasses(part, d)
-
+    subclasses = base.__subclasses__()
+    subclasses.sort(key=lambda c: c.__name__)
+    for cls in subclasses:
+        get_all_subclasses(cls, d)
 
 
 @memoize_noarg
@@ -392,7 +392,6 @@ def get_all_plmobjects():
     u"""
     Returns a dict<name, class> of all available :class:`.PLMObject` subclasses
     """
-
     res = {}
     get_all_subclasses(PLMObject, res)
     res["Group"] = GroupInfo
@@ -411,8 +410,10 @@ def get_all_subclasses_with_level(base, lst, level):
     level = "=" + level
     if base.__name__ not in lst:
         lst.append((base.__name__,level[3:] + base.__name__))
-    for part in base.__subclasses__():
-        get_all_subclasses_with_level(part, lst, level)
+    subclasses = base.__subclasses__()
+    subclasses.sort(key=lambda c: c.__name__)
+    for cls in subclasses:
+        get_all_subclasses_with_level(cls, lst, level)
 
 
 @memoize_noarg
