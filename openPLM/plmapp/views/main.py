@@ -1405,8 +1405,8 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     ``file_formset``
         a formset to remove files
 
-    ``archive_form``
-        form to download all files in a single archive (tar, zip)
+    ``archive_formats``
+        list of available archive formats
     
     ``add_file_form``
         form to add a file
@@ -1426,11 +1426,10 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     else:
         formset = forms.get_file_formset(obj)
     add_file_form = forms.AddFileForm()
-    archive_form = forms.ArchiveForm()
     
     ctx.update({'current_page':'files', 
                 'file_formset': formset,
-                'archive_form' : archive_form,
+                'archive_formats' : ARCHIVE_FORMATS,
                 'deprecated_files' : obj.deprecated_files.filter(last_revision__isnull=True),
                 'add_file_form': add_file_form,
                })
