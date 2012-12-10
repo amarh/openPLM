@@ -10,13 +10,13 @@
 
             {{ user_formset.management_form }}
             {% if is_owner %}
-                <a class="{{"Button"|button}}" href="./add/"><span class="ui-button-text">{% trans "Invite another user" %}</span></a>
+                <a class="tb-btn" href="./add/"><span class="ui-button-text">{% trans "Invite another user" %}</span></a>
                 {% if user_formset.forms %}
-                    <input type="submit" class="{{"Button"|button}}" value="{% trans "Remove selected users" %}"/>
+                    <input type="submit" class="tb-btn" value="{% trans "Remove selected users" %}"/>
                 {% endif %}
             {% else %}
                 {% if not in_group %}
-                    <a class="{{"Button"|button}}" href="./join/"><span class="ui-button-text">{% trans "Ask to join this group" %}</span></a>
+                    <a class="tb-btn" href="./join/"><span class="ui-button-text">{% trans "Ask to join this group" %}</span></a>
                 {% endif %}
             {% endif %}
 

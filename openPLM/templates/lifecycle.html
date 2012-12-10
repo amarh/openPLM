@@ -152,7 +152,7 @@
                 </div>
 
                 {# buttons #}
-                <input name="promote" type="submit" class="{{"Button"|button}}" 
+                <input name="promote" type="submit" class="tb-btn" 
                 {% if obj.is_last_promoter %}
                     value="{% trans "PROMOTE" %}"
                 {% else %}
@@ -255,7 +255,7 @@
                                     <form style="display:inline" method="POST" action="../management/delete/">
                                         <input type="hidden" name="link_id" value="{{ link.id }}"/>
                                         <input name="action" type="submit"
-                                        class="{{"Button"|button}}" value="—" 
+                                        class="tb-btn" value="—" 
                                         title="{% trans "Remove" %}"/>
                                     </form>
                                 {% endif %}
@@ -269,7 +269,7 @@
                         <br/>
                     {% endfor %}
                     {% if can_edit_signer %}
-                        <a class="{{"Button"|button}}" href="../management/add-signer{{forloop.counter0}}/?q=&type=User"><span class="ui-button-text">{% trans "Add" %}</span></a>
+                        <a class="tb-btn" href="../management/add-signer{{forloop.counter0}}/?q=&type=User"><span class="ui-button-text">{% trans "Add" %}</span></a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -280,24 +280,24 @@
     {# owner and notified users #}
     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
         {% if is_owner %}
-            <a class="{{"Button"|button}}" href="../management/add/?q=&type=User" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
+            <a class="tb-btn" href="../management/add/?q=&type=User" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
         {% else %}
             {% if is_notified %}
                 <form  method="POST" action="../management/delete/">
                     <input type="hidden" name="link_id" value="{{ remove_notify_link.id }}"/>
-                    <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Unnotify me" %}" />
+                    <input name="action" type="submit" class="tb-btn" value="{% trans "Unnotify me" %}" />
                 </form>
             {% else %}
                 {% if can_notify %}
                     <form  method="POST" action="../management/add/?q=&type=User">
                         {{ notify_self_form.as_p }}
-                        <input name="action" type="submit" class="{{"Button"|button}}" value="{% trans "Notify me" %}" />
+                        <input name="action" type="submit" class="tb-btn" value="{% trans "Notify me" %}" />
                     </form>
                 {% endif %}
             {% endif %}
         {% endif %}
         {% if obj.is_official and in_group %}
-            <a class="{{"Button"|button}}" href="../management/add-reader/" ><span class="ui-button-text">{% trans "Give access to a restricted account" %}</span></a>
+            <a class="tb-btn" href="../management/add-reader/" ><span class="ui-button-text">{% trans "Give access to a restricted account" %}</span></a>
         {% endif %}
         {% with reader_list as links %}
             {% with in_group as can_delete %}

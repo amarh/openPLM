@@ -31,27 +31,27 @@ $(function() {
 {% block content %}
 
     {% if is_owner and obj.is_editable %}
-        <a class="{{"Button"|button}}" 
+        <a class="tb-btn" 
             {% if obj.type|can_add_type:request.session.type %}
                 href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
             {% else %}
                 href="./add/{% add_get type='Part' q='' %}"
             {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>
 
-        <a class="{{"Button"|button}}"
+        <a class="tb-btn"
             href="/object/create/?type=Part&amp;related_parent={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"BOM-child/add/"|urlencode|add:"%3Ftype%3D%23%23type%23%23%26reference%3D%23%23ref%23%23%26revision%3D%23%23rev%23%23"}}">
             <span class="ui-button-text">{% trans "Create a part and add it" %}</span>
         </a>
 
-        <a class="{{"Button"|button}}" href="./edit/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
+        <a class="tb-btn" href="./edit/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
     {% endif %}
     <form method="GET" action="">
         {% trans "Display :" %}
         <ul>
             {{display_form.as_ul}}
         </ul>
-        <input type="submit" class="{{"Button"|button}}" name="update" value="{% trans "Update view" %}"/>
-        <input type="submit" class="{{"Button"|button}}" name="diff" value="{% trans "Compare two BOMs" %}"/>
+        <input type="submit" class="tb-btn" name="update" value="{% trans "Update view" %}"/>
+        <input type="submit" class="tb-btn" name="diff" value="{% trans "Compare two BOMs" %}"/>
     </form>
     <div id="decompose">
         {{ decomposition_msg|safe }}
@@ -61,7 +61,7 @@ $(function() {
     </div>
     {% if can_generate_pdf %}
         <div class="center">
-            <a class="{{"Button"|button}}" href="/pdf{{obj.plmobject_url}}BOM-child/{% add_get %}">
+            <a class="tb-btn" href="/pdf{{obj.plmobject_url}}BOM-child/{% add_get %}">
                 <span class="ui-button-text">{% trans "Download as PDF" %}</span>
             </a>
         </div>
