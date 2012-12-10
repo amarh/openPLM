@@ -782,6 +782,7 @@ a.Button > span {
 }
 
 
+.tb-btn:hover,
 li.ui-button:hover,
 a.ui-button:hover,
 input.ui-button:hover,
@@ -856,13 +857,13 @@ h2 div.toolbar > ul > li > button {
 
 #help-dialog ul,
 #help-dialog ol,
-#main_content ul,
+#main_content ul:not(.tb),
 #main_content ol {
     display: block;
 }
 #help-dialog ul li,
 .ui-dialog-content ul li,
-#main_content ul li {
+#main_content ul:not(.tb) li {
     display: list-item;
     list-style-type: square;
     margin-left: 2em;
@@ -1318,4 +1319,26 @@ div#browser {
 
 #add-file-nojs {
     float: right;
+}
+
+/* bootstrap hacks */
+ul.tb a {
+    text-decoration: none;
+}
+ul.tb li {
+    display: list-item !important;
+}
+
+.tb-btn {
+    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #c6c7c5;
+    border: 1px solid #7F7C7C;
+    color: #343434;
+    font-weight: normal;
+    text-decoration: none;
+    padding: 0.4em 1em;
+    line-height: 1.4em;
+    font-size: 15.4px;
+}
+.tb-btn span {
+    color: #343434;
 }
