@@ -1,12 +1,13 @@
 import re
 
 from django import template
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.template import Node, resolve_variable
 
 from haystack.models import SearchResult
 
-from openPLM.plmapp.controllers.user import UserController
+from openPLM.plmapp.controllers import (DocumentController, PartController,
+        UserController, GroupController)
 from openPLM.plmapp import models
 from openPLM.plmapp.utils import get_pages_num
 
@@ -324,3 +325,22 @@ def is_readable(obj, user):
 
     # other objects: readable
     return True
+
+@register.filter
+def main_type(obj):
+    if isinstance(obj, (models.User, UserController)):
+        return "user"
+    if isinstance(obj, (models.Part, PartController)):
+        return "part"
+    if isinstance(obj, (models.Document, DocumentController)):
+        return "document"
+    if isinstance(obj,(models.Group, GroupController)):
+        return "group"
+    if hasattr(obj, "has_key") and "type" in obj:
+        if obj["type"] in models.get_all_parts():
+            return "part"
+        if obj["type"] in models.get_all_documents():
+            return "document"
+        return obj["type"]
+    return ""
+

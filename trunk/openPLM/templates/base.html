@@ -159,7 +159,7 @@
         <div id="center-col" class="heightfix">
 
             {% block main %}
-                <div id="ActiveBox">
+                <div id="ActiveBox" {% if object_reference != "-" %}class="{{ obj|main_type }}"{% endif %}>
                     {% block reference %}
                         {% include "blocks/reference.html" %}
                     {% endblock %}

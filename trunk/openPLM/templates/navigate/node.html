@@ -4,7 +4,7 @@
         title="{{title_}}">
 
         {% if card %}
-            <div class="bar"></div>
+            <div class="bar"><span class="menuitem">&nbsp;</span></div>
             {% with type|add:"s/identity_card.html" as tpl %}
                 {% with "true" as hide_link %}
                     {% include tpl %}
