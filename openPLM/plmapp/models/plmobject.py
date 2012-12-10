@@ -406,13 +406,6 @@ def get_all_users_and_plmobjects():
     res.update(get_all_plmobjects())
     return res
 
-@memoize_noarg
-def get_all_userprofiles_and_plmobjects():
-    res = {}
-    get_all_subclasses(UserProfile, res)
-    res.update(get_all_plmobjects())
-    return res
-
 
 def get_all_subclasses_with_level(base, lst, level):
     level = "=" + level
