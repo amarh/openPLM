@@ -68,38 +68,38 @@
     <form method="POST" action="">
         {% if is_owner and obj.is_editable %}
             {{ file_formset.management_form }}
-	    <noscript>
-            <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
-                <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
-                <span class="ui-button-text">{% trans "ADD" %}</span>
-            </a>
-	    </noscript>
+            <noscript>
+                <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
+                    <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
+                    <span class="ui-button-text">{% trans "ADD" %}</span>
+                </a>
+            </noscript>
             {% if file_formset.total_form_count %}
-        <div class="tb-btn-toolbar">
-                <input type="submit" class="tb-btn" value="{% trans "DELETE" %}"/>
-                <input type="button" class="tb-btn" value="{% trans "CHECK ALL" %}" id="s_all"/>
-                <input type="button" class="tb-btn hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
+                <div class="tb-btn-toolbar">
+                    <input type="submit" class="tb-btn" value="{% trans "DELETE" %}"/>
+                    <input type="button" class="tb-btn" value="{% trans "CHECK ALL" %}" id="s_all"/>
+                    <input type="button" class="tb-btn hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
 
-            <div class="tb-btn-group">
-                <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
-                    {% trans "Download..." %}
-                    <span class="tb-caret"></span>
-                </button>
-                <ul class="tb tb-dropdown-menu">
-                    {% for format in archive_formats %}
-                        <li>
-                        <a href="./archive/?format={{format}}&files=1">{% blocktrans %}Download all files ({{format}}){% endblocktrans %}</a>
-                        </li>
-                    {% endfor %}
-                    {% if can_generate_pdf %}
-                        <li class="tb-divider"></li>
-                        <li>
-                        <a href="../pdf/">{% trans "Download merged PDF files"%}</a>
-                        </li>
-                    </ul>
-                {% endif %}
-            </div>
-            </div>
+                    <div class="tb-btn-group">
+                        <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                            {% trans "Download..." %}
+                            <span class="tb-caret"></span>
+                        </button>
+                        <ul class="tb tb-dropdown-menu">
+                            {% for format in archive_formats %}
+                                <li>
+                                <a href="./archive/?format={{format}}&files=1">{% blocktrans %}Download all files ({{format}}){% endblocktrans %}</a>
+                                </li>
+                            {% endfor %}
+                            {% if can_generate_pdf %}
+                                <li class="tb-divider"></li>
+                                <li>
+                                <a href="../pdf/">{% trans "Download merged PDF files"%}</a>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
             {% endif %}
         {% else %}
             {# placeholder since archive_form: float is right #}
