@@ -4,43 +4,88 @@
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu -->
 
 {% block scripts %}
-<script type="text/javascript">
-    function update_add_param(suggested_type){
-        var add_link = $("#main_content").find("a[href^='./add']");
-        var Doc_group = $("#search_id_type").children("[label='Document']");
-        var doc_types=[];
-        $.each($(Doc_group).children(), function(i,v){
-            doc_types.push($(v).val());
-        });
-        if($.inArray(suggested_type,doc_types)!=-1){
-            $(add_link).attr("href","./add/?q=&type="+suggested_type);               
-        }else{
-            $(add_link).attr("href","./add/?q=&type=Document");
+    <script type="text/javascript">
+        function update_add_param(suggested_type){
+            var add_link = $("#main_content").find("a[href^='./add']");
+            var Doc_group = $("#search_id_type").children("[label='Document']");
+            var doc_types=[];
+            $.each($(Doc_group).children(), function(i,v){
+                    doc_types.push($(v).val());
+                    });
+            if($.inArray(suggested_type,doc_types)!=-1){
+                $(add_link).attr("href","./add/?q=&type="+suggested_type);               
+            }else{
+                $(add_link).attr("href","./add/?q=&type=Document");
+            }
         }
-    }
 </script>
 {% endblock %}
 
 {% block content %}
-    <div>
-        {% if documents %}
-            <form class="archive_form" method="GET" action="./archive/">
-                {{ archive_form.as_p }}
-                <input type="submit" name="files" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
-                <input type="submit" name="cad" class="{{"Button"|button}}" value="{% trans "Download all CAD files" %}"/>
-            </form>
-            
-        {% endif %}
-        {% if can_generate_pdf %}
-            <div>
-                <a href="../pdf/" class="{{"Button"|button}}">
-                    <span class="ui-button-text">{% trans "Download merged PDF files"%}</span>
-                </a>
-            </div>
-        {% endif %}
-    </div>
-    <form method="post" action="">	
 
+
+    <form method="post" action="">	
+        <div class="tb-btn-toolbar">
+            {% if user.get_profile.is_contributor %}
+                {{ docs_formset.management_form }}
+            <div class="tb-btn-group">
+                {% if not obj.is_cancelled %}
+                    <a class="tb-btn" 
+                        {% if obj.type|can_link:request.session.type %}
+                            href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
+                        {% else %}
+                            href="./add/{% add_get type='Document' q='' %}"
+                        {% endif %}>
+                        <span>{% trans "Attach another document" %}</span>
+                    </a>
+                {% endif %}
+
+                {% if obj.is_draft or obj.is_official %}
+                    {# action valid if the part is a draft or official, since the user will own the document #}
+                    <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                        <span class="tb-caret"></span>
+                    </button>
+                    <ul class="tb tb-dropdown-menu">
+                        <li>
+                        <a href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
+                            {% trans "Create a document and attach it to the part" %}
+                        </a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+
+                {% if forms %}
+                    <input type="submit" class="tb-btn" value="{% trans "Detach" %}"/>
+                {% endif %}
+            {% endif %}
+
+            <div class="tb-btn-group">
+                <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                    {% trans "Download..." %}
+                    <span class="tb-caret"></span>
+                </button>
+                <ul class="tb tb-dropdown-menu">
+                    {% for format in archive_formats %}
+                        <li>
+                        <a href="./archive/?format={{format}}&files=1">{% blocktrans %}Download all files ({{format}}){% endblocktrans %}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="tb-divider"></li>
+                    {% for format in archive_formats %}
+                        <li>
+                        <a href="./archive/?format={{format}}&cad=1">{% blocktrans %}Download all CAD files ({{format}}){% endblocktrans %}</a>
+                        </li>
+                    {% endfor %}
+                    {% if can_generate_pdf %}
+                        <li class="tb-divider"></li>
+                        <li>
+                        <a href="../pdf/">{% trans "Download merged PDF files"%}</a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
         <table class="Content">
             {% for link in documents %}
 
@@ -74,31 +119,6 @@
             {% endfor %}
         </table>
 
-        {% if user.get_profile.is_contributor  %}
-            {{ docs_formset.management_form }}
-            {% if not obj.is_cancelled %}
-            <a class="{{"Button"|button}}" 
-            {% if obj.type|can_link:request.session.type %}
-            href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
-            {% else %}
-            href="./add/{% add_get type='Document' q='' %}"
-            {% endif %}>
-                <span class="ui-button-text">{% trans "Attach another document" %}</span>
-            </a>
-            {% endif %}
-
-            {% if obj.is_draft or obj.is_official %}
-                {# action valid if the part is a draft or official, since the user will own the document #}
-                <a class="{{"Button"|button}}"
-                    href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
-                    <span class="ui-button-text">{% trans "Create a document and attach it to the part." %}</span>
-                </a>
-            {% endif %}
-
-            {% if forms %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
-            {% endif %}
-        {% endif %}
     </form>
 {% endblock %}
 

@@ -80,7 +80,7 @@ from haystack.views import SearchView
 import openPLM.plmapp.csvimport as csvimport
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.archive import generate_archive
+from openPLM.plmapp.archive import generate_archive, ARCHIVE_FORMATS
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view, secure_required
@@ -1244,6 +1244,7 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
                 'documents': obj.get_attached_documents(),
                 'forms' : dforms,
                 'archive_form' : archive_form,
+                'archive_formats' : ARCHIVE_FORMATS,
                 'docs_formset': formset})
     return r2r('parts/doccad.html', ctx, request)
 
