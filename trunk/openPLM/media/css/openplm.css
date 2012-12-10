@@ -1269,7 +1269,7 @@ div#type-panel {
 div#type-panel h3:first-child {
     margin-top: 0;
 }
-div#type-panel li {
+#main_content div#type-panel li {
     list-style: none;
     margin-left: 0;
     padding-left: 1em;
