@@ -71,29 +71,29 @@
 
 
                             <ul>
-                                <li class="{{"Button"|button}}">
-                                <a href="/home/">
+                                <li>
+                                <a class="tb-btn" href="/home/">
                                     <span class="ui-button-text">{% trans "HOME" %}</span>
                                 </a>
                                 </li>
 
                                 {% if not restricted %}
-                                    <li class="{{"Button"|button}}">
-                                    <a href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
+                                    <li>
+                                    <a class="tb-btn" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
                                         <span class="ui-button-text">{% trans "SEARCH" %}</span>
                                     </a>
                                     </li>
                                 {% endif %}
 
-                                <li class="{{"Button"|button}}">
-                                <a href="/browse/object/">
+                                <li>
+                                <a class="tb-btn" href="/browse/object/">
                                     <span class="ui-button-text">{% trans "BROWSE" %}</span>
                                 </a>
                                 </li>
 
                                 {% if user.get_profile.is_contributor %}
-                                    <li class="{{"Button"|button}}">
-                                <a href="/object/create/?type={% if request.session.type == "User"%}Part{%else %}{{ request.session.type }}{% endif %}">
+                                    <li>
+                                <a class="tb-btn"   href="/object/create/?type={% if request.session.type == "User"%}Part{%else %}{{ request.session.type }}{% endif %}">
                                     <span class="ui-button-text">{% trans "CREATE" %}</span>
                                 </a>
                                 </li>

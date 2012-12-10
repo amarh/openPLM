@@ -68,7 +68,7 @@
     {% if file_formset.total_form_count %}
         <form class="archive_form" method="GET" action="./archive/">
             {{ archive_form.as_p }}
-            <input type="submit" class="{{"Button"|button}}" value="{% trans "Download all files" %}"/>
+            <input type="submit" class="tb-btn" value="{% trans "Download all files" %}"/>
         </form>
     {% endif %}
     <form method="POST" action="">
@@ -81,9 +81,9 @@
             </a>
 	    </noscript>
             {% if file_formset.total_form_count %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "DELETE" %}"/>
-                <input type="button" class="{{"Button"|button}}" value="{% trans "CHECK ALL" %}" id="s_all"/>
-                <input type="button" class="{{"Button"|button}} hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
+                <input type="submit" class="tb-btn" value="{% trans "DELETE" %}"/>
+                <input type="button" class="tb-btn" value="{% trans "CHECK ALL" %}" id="s_all"/>
+                <input type="button" class="tb-btn hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
             {% endif %}
         {% else %}
             {# placeholder since archive_form: float is right #}
@@ -107,7 +107,7 @@
                             <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}">{{instance.filename}}</a></td>
                         <td class="Content">{{instance.size|filesizeformat}}</td>
                         <td class="Content">
-                            <a class="{{"Button"|button}}" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
+                            <a class="tb-btn" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
                                 <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
                             </a>
                         </td>
@@ -116,14 +116,14 @@
                             {% if is_owner and obj.is_editable %}
 
                                 {% if instance.locked %}
-                                    <a class="{{"Button"|button}}" href="./checkin/{{instance.id|urlencode }}/">
+                                    <a class="tb-btn" href="./checkin/{{instance.id|urlencode }}/">
                                         <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
                                     </a>
                                 {% else %}
 
                                     {% if instance.checkout_valid %}
 
-                                        <a class="{{"Button"|button}}
+                                        <a class="tb-btn
                                             {% if instance.native_related %}check-out {% endif %}"
                                             href="./checkout/{{instance.id|urlencode }}/">
                                             <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
@@ -159,7 +159,7 @@
     </form>
     {% if can_generate_pdf %}
         <div>
-            <a href="../pdf/" class="{{"Button"|button}}">
+            <a href="../pdf/" class="tb-btn">
                 <span class="ui-button-text">{% trans "Download merged PDF files"%}</span>
             </a>
         </div>

@@ -22,10 +22,10 @@
                             {{ cost_form.as_table}}
                         </table>
                         <div class="center">
-                            <input type="submit" name="update" class="{{"Button"|button}}"
+                            <input type="submit" name="update" class="tb-btn"
                             value="{% trans "Update" %}"/>
                             {% if published and not openerp_error %}
-                                <input type="submit" name="update_erp" class="{{"Button"|button}}"
+                                <input type="submit" name="update_erp" class="tb-btn"
                                 value="{% trans "Update cost from OpenERP" %}"/>
                             {% endif %}
                         </div>
@@ -108,7 +108,7 @@
                                 </div>
                             </div>
 
-                            <input name="publish" type="submit" class="{{"Button"|button}}" value="{% trans "Publish on OpenERP" %}" />
+                            <input name="publish" type="submit" class="tb-btn" value="{% trans "Publish on OpenERP" %}" />
                         </form>
                     {% else %}
                         <p>

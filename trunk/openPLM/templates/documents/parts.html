@@ -27,7 +27,7 @@
         {% if user.get_profile.is_contributor %}
             {{ parts_formset.management_form }}
             {% if not obj.is_cancelled %}
-            <a class="{{"Button"|button}}" 
+            <a class="tb-btn" 
             {% if obj.type|can_link:request.session.type %}
             href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
             {% else %}
@@ -37,7 +37,7 @@
             </a>
             {% if not obj.is_deprecated %}
                 {# action valid if the doc is not deprecated, since the user will own the part #}
-                 <a class="{{"Button"|button}}"
+                 <a class="tb-btn"
                     href="/object/create/?type=Part&amp;related_doc={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"parts/"|urlencode}}">
                     <span class="ui-button-text">{% trans "Create a part and attach it to the document." %}</span>
                 </a>
@@ -46,7 +46,7 @@
             {% endif %}
 
             {% if parts_formset.forms %}
-                <input type="submit" class="{{"Button"|button}}" value="{% trans "DISCONNECT" %}"/>
+                <input type="submit" class="tb-btn" value="{% trans "DISCONNECT" %}"/>
             {% endif %}
         {% endif %}
 

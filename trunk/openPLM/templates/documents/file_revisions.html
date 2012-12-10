@@ -14,7 +14,7 @@
                 {% if last_revision.deleted %}
                     <p>{% trans "Deleted." %}
                 {% else %}
-                    <a class="{{"Button"|button}}" href="/file/{{last_revision.id}}/{{last_revision.filename|urlencode}}">
+                    <a class="tb-btn" href="/file/{{last_revision.id}}/{{last_revision.filename|urlencode}}">
                         <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
                     </a>
                 {% endif %}
@@ -24,14 +24,14 @@
                     {% if is_owner and obj.is_editable %}
 
                         {% if last_revision.locked %}
-                            <a class="{{"Button"|button}}" href="./checkin/{{last_revision.id|urlencode }}/">
+                            <a class="tb-btn" href="./checkin/{{last_revision.id|urlencode }}/">
                                 <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
                             </a>
                         {% else %}
 
                             {% if last_revision.checkout_valid %}
 
-                                <a class="{{"Button"|button}}
+                                <a class="tb-btn
                                     {% if last_revision.native_related %}check-out {% endif %}"
                                     href="./checkout/{{last_revision.id|urlencode }}/">
                                     <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
@@ -102,7 +102,7 @@
                             {% if doc_file.deleted %}
                                 <span>{% trans  "File deleted"%} </span>
                             {% else %}
-                                <a class="{{"Button"|button}}" href="/file/{{doc_file.id}}/{{doc_file.filename|urlencode}}">
+                                <a class="tb-btn" href="/file/{{doc_file.id}}/{{doc_file.filename|urlencode}}">
                                     <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
                                 </a>
                             {% endif %}

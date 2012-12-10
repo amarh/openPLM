@@ -7,7 +7,7 @@
     {# toolbar #}
     {% if is_owner and obj.is_editable %}
         <div class="toolbar">
-            <a class="{{"Button"|button}}" 
+            <a class="tb-btn" 
                 {% if obj.type|can_add_type:request.session.type %}
                     href="./add/{% add_get type=request.session.type q='' %}"
                 {% else %}
@@ -17,7 +17,7 @@
             </a>
             {% if alternates %}
                 <form method="POST" action="{{obj.plmobject_url}}alternates/delete/" style="display:inline">
-                    <input type="submit" class="{{"Button"|button}}" name="delete_alternate"
+                    <input type="submit" class="tb-btn" name="delete_alternate"
                     value="{% trans "Delete alternate links related to this part" %}"/>
                 </form>
             {% endif %}

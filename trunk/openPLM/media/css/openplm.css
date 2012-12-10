@@ -759,7 +759,7 @@ input.Button {
     color: #343434;
 }
 
-.ui-button {
+.btn, .ui-button {
     border: 1px solid #7f7c7c !important;
     text-shadow: 1px 1px rgba(200, 200, 200, 0.7);
 }
