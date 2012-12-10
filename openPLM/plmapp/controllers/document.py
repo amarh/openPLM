@@ -596,7 +596,7 @@ class DocumentController(PLMObjectController):
         """
         Return true if the document is attached to at least one part.
         """
-        return not self.get_attached_parts().exists()
+        return self.get_attached_parts().exists()
 
     def publish(self):
         super(DocumentController, self).publish()
