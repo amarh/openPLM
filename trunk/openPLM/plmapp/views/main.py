@@ -1216,8 +1216,8 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     ``documents``
         a queryset of :class:`.DocumentPartLink` bound to the part
 
-    ``archive_form``
-        a form to download an archive containing all attached files
+    ``archive_formats``
+        list of available archive formats
 
     ``docs_formset``
         a formset to detach documents
@@ -1239,11 +1239,9 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     else:
         formset = forms.get_doc_cad_formset(obj)
     dforms = dict((form.instance.id, form) for form in formset.forms)
-    archive_form = forms.ArchiveForm()
     ctx.update({'current_page':'doc-cad',
                 'documents': obj.get_attached_documents(),
                 'forms' : dforms,
-                'archive_form' : archive_form,
                 'archive_formats' : ARCHIVE_FORMATS,
                 'docs_formset': formset})
     return r2r('parts/doccad.html', ctx, request)
