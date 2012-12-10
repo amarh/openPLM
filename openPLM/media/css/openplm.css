@@ -417,7 +417,19 @@ div#ActiveArea
     padding-left: 1em !important;
     min-height: 500px;
     background-color: #c8c6c5;
-    margin: 0em 0.5em 0.5em 0.5em;
+    margin: -1px 0.5em 0.5em 0.5em;
+    border: 1px solid #343434;
+}
+
+.part #main_content {
+    border-color: #009FE3;
+}
+.document #main_content {
+    border-color: #312783;
+}
+.group #main_content,
+.user #main_content {
+    border-color: #E6007E;
 }
 
 /* menu stuff*/
@@ -446,14 +458,18 @@ ul#MenuList li {
     text-align: center;
     padding: 5px;
     white-space:nowrap;
-    /*background: url("../img/dark/menu_bg.png") no-repeat center center;*/
-    background-size: 100% 100%;
     padding-top: 10px;
 }
 
-ul#MenuList li.CurrentPage {
-    background: url("../img/dark/menu_active_bg.png") no-repeat center center;
-    background-size: 100% 100%;
+.part ul#MenuList li.CurrentPage {
+    background-color: #009fe3;
+}
+.document ul#MenuList li.CurrentPage {
+    background-color: #312783;
+}
+.user ul#MenuList li.CurrentPage,
+.group ul#MenuList li.CurrentPage {
+    background-color: #e6007e;
 }
 ul#MenuList li:hover
 {
@@ -467,17 +483,19 @@ ul#MenuList li a
     padding: 4px 0px;
     display: inline-block;
     color: #eee;
-    text-shadow: 1px 1px rgba(50, 50, 50, 0.7) 
+    text-shadow: 1px 1px rgba(50, 50, 50, 0.7)
 }
 ul#MenuList li a img {
     margin: 0;
 }
 
-ul#MenuList li.CurrentPage a {
-    color: #343434;
-    text-shadow: 1px 1px rgba(250, 250, 250, 0.7) 
+.part ul#MenuList li.CurrentPage a {
+    /*color: #343434;*/
+    text-shadow: 1px 1px rgba(50, 50, 50, 0.7) 
 }
-ul#MenuList li:first-child {
+.part ul#MenuList li.CurrentPage:hover a {
+    color: #eee;
+    text-shadow: 1px 1px rgba(50, 50, 50, 0.7)
 }
 
 /* *************************************************************************************** */

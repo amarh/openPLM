@@ -77,6 +77,15 @@ div.card div.bar {
     position: relative;
     margin-bottom: -2px;
     z-index: 10;
+    text-align: left;
+}
+
+.node .bar .menuitem {
+    height: 8px;
+    left: 0.5em;
+    position: absolute;
+    display: inline-block;
+    width: 1em;
 }
 
 div.main_node.card div.identity_card {
@@ -89,12 +98,15 @@ div.main_node.card.n_document div.identity_card {
     border-color: #312783;
 }
 div.main_node.card div.bar {
+    background-color: #343434;
+}
+div.main_node.card div.bar .menuitem {
     background-color: #E6007E;
 }
-div.main_node.card.n_part div.bar {
+div.main_node.card.n_part div.bar .menuitem {
     background-color: #009FE3;
 }
-div.main_node.card.n_document div.bar {
+div.main_node.card.n_document div.bar .menuitem {
     background-color: #312783;
 }
 
