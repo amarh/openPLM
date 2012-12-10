@@ -1296,20 +1296,13 @@ div#type-panel li a {
     line-height: 2em;
     width: 100%;
 }
-div#type-panel li a span {
-    display: block;
-    width: 100%;
-}
 div#type-panel li a,
 div.id_details a {
     text-decoration: none;
 }
-div#type-panel li.selected {
-    border-right: 6px solid #343434;
-    border-left: 0.8em solid #343434;
-    margin-right: -3px;
-    margin-left: -0.4em;
-    padding-left: 0.6em;
+#main_content div#type-panel li.selected {
+    font-weight: bold;;
+
 }
 div#type-panel li:hover {
     color: white;
