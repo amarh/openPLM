@@ -1295,6 +1295,7 @@ div#type-panel h3:first-child {
 div#type-panel li a {
     line-height: 2em;
     width: 100%;
+    display:block;
 }
 div#type-panel li a,
 div.id_details a {
