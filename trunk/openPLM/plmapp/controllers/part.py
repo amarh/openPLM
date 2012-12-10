@@ -1037,10 +1037,9 @@ class PartController(PLMObjectController):
             * is attached to at least one document
         """
         q = Q(parent=self.object) | Q(child=self.object)
-        res = not models.ParentChildLink.current_objects.filter(q).exists()
-        res = res and not self.get_attached_documents().exists()
+        res = models.ParentChildLink.current_objects.filter(q).exists()
+        res = res or self.get_attached_documents().exists()
         return res
-
    
     def get_cad_files(self):
         """
