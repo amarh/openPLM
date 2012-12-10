@@ -331,7 +331,7 @@ div#FilterNav label {
     color:black;
 }
 
-div#FilterNav > form > ul
+#main_content div#FilterNav > form > ul
 {
     display: none;
     text-indent: 0px;
@@ -339,7 +339,7 @@ div#FilterNav > form > ul
     width: 100%;
 }
 
-div#FilterNav > form > ul > li
+#main_content div#FilterNav > form > ul > li
 {
     display: block;
     text-indent: 0px;
