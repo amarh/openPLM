@@ -421,13 +421,17 @@ div#ActiveArea
     border: 1px solid #343434;
 }
 
-.part #main_content {
+.part #main_content,
+.part .CurrentPage {
     border-color: #009FE3;
 }
-.document #main_content {
+.document #main_content,
+.document .CurrentPage {
     border-color: #312783;
 }
 .group #main_content,
+.group .CurrentPage,
+.user .CurrentPage,
 .user #main_content {
     border-color: #E6007E;
 }
@@ -451,6 +455,7 @@ ul#MenuList {
     padding-left: 1.5em;
     background-color: #4C4A4C;
     padding-right: 1.5em;
+    border-bottom: 1px solid #4c4a4c;
 }
 
 ul#MenuList li {
@@ -461,16 +466,30 @@ ul#MenuList li {
     padding-top: 10px;
 }
 
-.part ul#MenuList li.CurrentPage {
-    background-color: #009fe3;
+.part ul#MenuList {
+    border-bottom-color: #009fe3;
 }
-.document ul#MenuList li.CurrentPage {
-    background-color: #312783;
+.document ul#MenuList {
+    border-bottom-color: #312783;
 }
-.user ul#MenuList li.CurrentPage,
-.group ul#MenuList li.CurrentPage {
-    background-color: #e6007e;
+.user ul#MenuList,
+.group ul#MenuList {
+    border-bottom-color: #e6007e;
 }
+
+
+ul#MenuList li.CurrentPage {
+    background-color: #C8C6C5;
+    border-style: solid;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-bottom-color: #c8c6c5;
+    border-radius: 0.4em 0.4em 0 0;
+    margin: -1px;
+}
+
 ul#MenuList li:hover
 {
     background: url("../img/dark/menu_hover_bg.png") no-repeat center center;
@@ -489,11 +508,11 @@ ul#MenuList li a img {
     margin: 0;
 }
 
-.part ul#MenuList li.CurrentPage a {
-    /*color: #343434;*/
-    text-shadow: 1px 1px rgba(50, 50, 50, 0.7) 
+ul#MenuList li.CurrentPage a {
+    color: #242424;
+    text-shadow: none;
 }
-.part ul#MenuList li.CurrentPage:hover a {
+ul#MenuList li.CurrentPage:hover a {
     color: #eee;
     text-shadow: 1px 1px rgba(50, 50, 50, 0.7)
 }
