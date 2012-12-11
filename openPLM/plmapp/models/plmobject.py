@@ -13,7 +13,6 @@ from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 from .lifecycle import (State, Lifecycle, LifecycleStates,
         get_default_lifecycle, get_default_state, get_cancelled_lifecycle)
 from .group import GroupInfo
-from .user import UserProfile
 
 
 # PLMobjects
