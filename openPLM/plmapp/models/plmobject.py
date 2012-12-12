@@ -380,9 +380,7 @@ class PLMObject(models.Model):
 def get_all_subclasses(base, d):
     if base.__name__ not in d and not base._deferred:
         d[base.__name__] = base
-    subclasses = base.__subclasses__()
-    subclasses.sort(key=lambda c: c.__name__)
-    for cls in subclasses:
+    for cls in base.__subclasses__():
         get_all_subclasses(cls, d)
 
 
