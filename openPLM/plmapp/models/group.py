@@ -47,9 +47,6 @@ class GroupInfo(Group):
     def get_creation_fields(cls):
         """
         Returns fields which should be displayed in a creation form.
-
-        By default, it returns :attr:`attributes` less attributes returned by
-        :meth:`excluded_creation_fields`
         """
         return ["name", "description"]
 
@@ -57,18 +54,12 @@ class GroupInfo(Group):
     def get_modification_fields(cls):
         """
         Returns fields which should be displayed in a modification form
-              
-        By default, it returns :attr:`attributes` less attributes returned by
-        :meth:`excluded_modification_fields`
         """
         return ["description"]
 
     @property
     def is_editable(self):
         return True
-
-    def get_attributes_and_values(self):
-        return [(attr, getattr(self, attr)) for attr in self.attributes]
 
 
 class Invitation(models.Model):
