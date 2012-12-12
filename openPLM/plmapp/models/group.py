@@ -45,11 +45,6 @@ class GroupInfo(Group):
         return ["attributes", "history", "users", "objects"]
 
     @classmethod
-    def excluded_creation_fields(cls):
-        "Returns fields which should not be available in a creation form"
-        return ["owner", "creator", "ctime", "mtime"]
-
-    @classmethod
     def get_creation_fields(cls):
         """
         Returns fields which should be displayed in a creation form.
@@ -57,20 +52,7 @@ class GroupInfo(Group):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_creation_fields`
         """
-        fields = []
-        for field in cls(__fake__=True).attributes:
-            if field not in cls.excluded_creation_fields():
-                fields.append(field)
-        return fields
-
-    @classmethod
-    def excluded_modification_fields(cls):
-        """
-        Returns fields which should not be available in a modification form
-        """
-        return [ugettext_noop("name"), ugettext_noop("creator"),
-                ugettext_noop("owner"), ugettext_noop("ctime"),
-                ugettext_noop("mtime")]
+        return ["name", "description"]
 
     @classmethod
     def get_modification_fields(cls):
@@ -80,11 +62,7 @@ class GroupInfo(Group):
         By default, it returns :attr:`attributes` less attributes returned by
         :meth:`excluded_modification_fields`
         """
-        fields = []
-        for field in cls(__fake__=True).attributes:
-            if field not in cls.excluded_modification_fields():
-                fields.append(field)
-        return fields
+        return ["description"]
 
     @property
     def is_editable(self):
