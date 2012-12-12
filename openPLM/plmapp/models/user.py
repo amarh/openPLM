@@ -69,11 +69,6 @@ class UserProfile(models.Model):
             return ["attributes", "parts-doc-cad"]
         return ["attributes", "history", "parts-doc-cad", "delegation",
                 "groups"]
-    
-    @classmethod
-    def excluded_creation_fields(cls):
-        "Returns fields which should not be available in a creation form"
-        return ["date_joined", "last_login"]
    
 
 def add_profile(sender, instance, created, **kwargs):
