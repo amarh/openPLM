@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 
+
+from .iobject import IObject
 from .lifecycle import (State, Lifecycle, LifecycleStates,
         get_default_lifecycle, get_default_state, get_cancelled_lifecycle)
 from .group import GroupInfo
@@ -351,9 +353,6 @@ class PLMObject(models.Model):
             if field not in cls.excluded_modification_fields():
                 fields.append(field)
         return fields
-        
-    def get_attributes_and_values(self):
-        return [(attr, getattr(self, attr)) for attr in self.attributes]
 
     def get_leaf_object(self):
         return get_all_plmobjects()[self.type].objects.get(id=self.id)
@@ -412,28 +411,18 @@ def get_all_subclasses_with_level(base, lst, level):
     for cls in subclasses:
         get_all_subclasses_with_level(cls, lst, level)
 
-
-@memoize_noarg
-def get_all_plmobjects_with_level():
-    u"""
-    Returns a list<name, class> of all available :class:`.PLMObject` subclasses
-    with 1 or more "=>" depending on the level
-    """
-
-    lst = []
-    level=">"
-    get_all_subclasses_with_level(PLMObject, lst, level)
-    if lst: del lst[0]
-    lst.append(("Group", "Group"))
-    return lst
-
-
 @memoize_noarg
 def get_all_users_and_plmobjects_with_level():
-    list_of_choices = list(get_all_plmobjects_with_level())
-    level=">"
-    get_all_subclasses_with_level(User, list_of_choices, level)
-    return list_of_choices
+    choices = []
+    get_all_subclasses_with_level(PLMObject, choices, ">")
+    del choices[0]
+    ichoices = []
+    get_all_subclasses_with_level(IObject, ichoices, ">")
+    del ichoices[0]
+    choices.extend(ichoices)
+    choices.append(("Group", "Group"))
+    choices.append(("User", "User"))
+    return choices
 
 
 
