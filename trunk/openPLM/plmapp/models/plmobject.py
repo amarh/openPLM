@@ -135,10 +135,10 @@ class PLMObject(models.Model):
 
     # state and lifecycle
     lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"), 
-                                  related_name="%(class)s_lifecyle",
+                                  related_name="+",
                                   default=get_default_lifecycle)
     state = models.ForeignKey(State, verbose_name=_("state"),
-                              related_name="%(class)s_lifecyle",
+                              related_name="+",
                               default=get_default_state)
 
     published = models.BooleanField(verbose_name=_("published"), default=False)
