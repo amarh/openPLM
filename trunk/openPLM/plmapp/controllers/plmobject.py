@@ -30,6 +30,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
@@ -164,6 +165,13 @@ class PLMObjectController(Controller):
             return obj
         else:
             raise ValueError("form is invalid")
+
+    @classmethod
+    def load(cls, type, reference, revision, user):
+        model = models.get_all_plmobjects()[type]
+        obj = get_object_or_404(model, type=type, reference=reference,
+                revision=revision)
+        return cls(obj, user)
    
     def can_approve_promotion(self, user=None):
         return bool(self.get_represented_approvers(user))

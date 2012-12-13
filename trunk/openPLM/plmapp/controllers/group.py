@@ -32,6 +32,8 @@ from :class:`.PLMObjectController` are not defined.
 import re
 import datetime
 
+from django.shortcuts import get_object_or_404
+
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
 from openPLM.plmapp.tasks import update_index
@@ -116,6 +118,10 @@ class GroupController(Controller):
             return obj
         else:
             raise ValueError("form is invalid")
+
+    @classmethod
+    def load(cls, type, reference, revision, user):
+        return cls(get_object_or_404(models.Group, name=reference), user)
 
     def has_permission(self, role):
         if not self._user.is_active:

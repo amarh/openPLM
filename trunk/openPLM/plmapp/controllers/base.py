@@ -145,6 +145,10 @@ class Controller(object):
         if no_index:
             obj.no_index = True
 
+    @classmethod
+    def load(cls, type, reference, revision, user):
+        raise NotImplemented
+
     def __setattr__(self, attr, value):
         # we override this method to make it to modify *object* directly
         # if we modify *object*, we records the modification in **_histo*
