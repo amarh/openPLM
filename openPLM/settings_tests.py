@@ -114,6 +114,7 @@ INSTALLED_APPS = (
     'openPLM.apps.office',
     'openPLM.apps.gdoc',
     'openPLM.apps.subversion',
+    'openPLM.apps.ecr',
     'openPLM.plmapp.tests',
 )
 
