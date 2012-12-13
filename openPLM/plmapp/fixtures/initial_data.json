@@ -28,14 +28,16 @@
         "pk": "draft_official_deprecated", 
         "model": "plmapp.lifecycle", 
         "fields": {
-            "official_state":"official"
+            "official_state":"official",
+            "type" : 1
         }
     },
     {
         "pk": "draft_proposed_official_deprecated", 
         "model": "plmapp.lifecycle", 
         "fields": {
-            "official_state":"official"
+            "official_state":"official",
+            "type" : 1
         }
     },
 
@@ -43,7 +45,8 @@
         "pk": "cancelled", 
         "model": "plmapp.lifecycle", 
         "fields": {
-            "official_state":"cancelled"
+            "official_state":"cancelled",
+            "type" : 2
         }
     }, 
 

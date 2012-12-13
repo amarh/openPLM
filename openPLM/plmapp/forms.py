@@ -211,7 +211,8 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         field = form.fields["lifecycle"]
         field.cache_choices = inbulk_cache is not None
         if inbulk_cache is None or "lifecycles" not in inbulk_cache:
-            lifecycles = m.Lifecycle.objects.exclude(pk=m.get_cancelled_lifecycle().pk)
+            lifecycles = m.Lifecycle.objects.filter(type=m.Lifecycle.STANDARD).\
+                    exclude(pk=m.get_cancelled_lifecycle().pk)
             form.fields["lifecycle"].queryset = lifecycles
             if inbulk_cache is not None:
                 inbulk_cache["lifecycles"] = lifecycles

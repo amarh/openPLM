@@ -50,9 +50,16 @@ class Lifecycle(models.Model):
     class Meta:
         app_label = "plmapp"
 
+    STANDARD, CANCELLED, ECR = (1, 2, 3)
+    TYPES = (
+        (STANDARD, "standard"),
+        (CANCELLED, "cancelled"),
+        (ECR, "ECR"),
+    )
 
     name = models.CharField(max_length=50, primary_key=True)
     official_state = models.ForeignKey(State)
+    type = models.PositiveSmallIntegerField(default=STANDARD, choices=TYPES)
 
     def __init__(self, *args, **kwargs):
         super(Lifecycle, self).__init__(*args, **kwargs)
@@ -110,6 +117,8 @@ class Lifecycle(models.Model):
         
         lifecycle = cls(name=cycle.name,
             official_state=State.objects.get_or_create(name=cycle.official_state)[0])
+        if cycle.official_state == cycle[-1]:
+            lifecycle.type = cls.ECR
         lifecycle.save()
         for i, state_name in enumerate(cycle):
             state = State.objects.get_or_create(name=state_name)[0]
