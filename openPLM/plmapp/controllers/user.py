@@ -34,6 +34,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 from django.template import Context, Template
+from django.shortcuts import get_object_or_404
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
@@ -72,6 +73,10 @@ class UserController(Controller):
         super(UserController, self).__init__(obj, user, block_mails, no_index)
         self.creator = obj
         self.owner = obj
+    
+    @classmethod
+    def load(cls, type, reference, revision, user):
+        return cls(get_object_or_404(models.User, username=reference), user)
 
     def get_verbose_name(self, attr_name):
         """

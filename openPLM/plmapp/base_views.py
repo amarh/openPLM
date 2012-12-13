@@ -38,7 +38,6 @@ from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
@@ -48,8 +47,6 @@ from django.template import RequestContext
 from openPLM import get_version
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller
-from openPLM.plmapp.controllers.user import UserController
-from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.forms import get_navigate_form, SimpleSearchForm
@@ -67,19 +64,8 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
     :type obj_revi: str
     :return: a :class:`PLMObjectController` or a :class:`UserController`
     """
-    if obj_type == 'User':
-        obj = get_object_or_404(User, username=obj_ref)
-        controller_cls = UserController
-    elif obj_type == 'Group':
-        obj = get_object_or_404(Group, name=obj_ref)
-        controller_cls = GroupController
-    else:
-        model = models.get_all_plmobjects()[obj_type]
-        obj = get_object_or_404(model, type=obj_type,
-                                reference=obj_ref,
-                                revision=obj_revi)
-        controller_cls = get_controller(obj_type)
-    return controller_cls(obj, user)
+    controller_cls = get_controller(obj_type)
+    return controller_cls.load(obj_type, obj_ref, obj_revi, user)
 
 # from http://www.redrobotstudios.com/blog/2009/02/18/securing-django-with-ssl/
 def secure_required(view_func):
