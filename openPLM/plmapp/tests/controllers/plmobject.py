@@ -334,7 +334,7 @@ class ControllerTest(BaseTestCase):
         user2 = self.get_contributor("toto")
         self.assertRaises(exc.PermissionError, controller.add_signer,
                 user2, level_to_sign_str(0))
-        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
+        self.assertFalse(controller.users.filter(user=user2))
 
     def test_remove_signer_error_approved(self):
         controller = self.create("Part1")
@@ -344,13 +344,13 @@ class ControllerTest(BaseTestCase):
         controller.approve_promotion()
         self.assertRaises(exc.PermissionError, controller.remove_signer,
                 user, level_to_sign_str(0))
-        self.assertTrue(controller.plmobjectuserlink_plmobject.now().filter(user=user).exists())
+        self.assertTrue(controller.users.now().filter(user=user).exists())
 
     def test_remove_signer_error_one_signer(self):
         controller = self.create("Part1")
         self.assertRaises(exc.PermissionError, controller.remove_signer,
                 self.user, level_to_sign_str(0))
-        self.assertTrue(controller.plmobjectuserlink_plmobject.now().filter(user=self.user).exists())
+        self.assertTrue(controller.users.now().filter(user=self.user).exists())
 
     def test_remove_signer(self):
         controller = self.create("Part1")
@@ -371,8 +371,8 @@ class ControllerTest(BaseTestCase):
                 user, user2, level_to_sign_str(0))
         self.assertRaises(exc.PermissionError, controller.replace_signer,
                 self.user, user2, level_to_sign_str(0))
-        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
-        self.assertFalse(controller.plmobjectuserlink_plmobject.filter(user=user2))
+        self.assertFalse(controller.users.filter(user=user2))
+        self.assertFalse(controller.users.filter(user=user2))
 
     def test_replace_signer(self):
         controller = self.create("Part1")
@@ -424,7 +424,7 @@ class ControllerTest(BaseTestCase):
                 role="notified")
         self.assertNotEqual(ids[0], link.id)
         ids.append(link.id)
-        self.assertEqual(set(ids), set(controller.plmobjectuserlink_plmobject.filter(user=self.user, 
+        self.assertEqual(set(ids), set(controller.users.filter(user=self.user, 
              role="notified").values_list("id", flat=True)))
         # get the old link
         link = models.PLMObjectUserLink.objects.at(t).get(user=self.user, plmobject=controller.object,
@@ -580,7 +580,7 @@ class ControllerTest(BaseTestCase):
         self.assertFalse(ctrl.is_revisable())
         self.assertFalse(ctrl.is_promotable())
         self.assertFalse(ctrl.is_editable)
-        signers = ctrl.plmobjectuserlink_plmobject.now().filter(role__startswith=models.ROLE_SIGN)
+        signers = ctrl.users.now().filter(role__startswith=models.ROLE_SIGN)
         self.assertEqual(0, signers.count())
 
     def test_is_readable_owner(self):

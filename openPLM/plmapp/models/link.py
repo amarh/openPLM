@@ -548,7 +548,7 @@ class PLMObjectUserLink(Link):
 
     ACTION_NAME = "Link : PLMObject-user"
 
-    plmobject = models.ForeignKey(PLMObject, related_name="%(class)s_plmobject")    
+    plmobject = models.ForeignKey(PLMObject, related_name="users") 
     user = models.ForeignKey(User, related_name="%(class)s_user")    
     role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
             db_index=True)

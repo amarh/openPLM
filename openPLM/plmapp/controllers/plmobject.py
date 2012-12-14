@@ -356,12 +356,12 @@ class PLMObjectController(Controller):
             return False
         if role == models.ROLE_OWNER and self.owner == self._user:
             return True
-        if self.plmobjectuserlink_plmobject.now().filter(user=self._user, role=role).exists():
+        if self.users.now().filter(user=self._user, role=role).exists():
             return True
 
         users = models.DelegationLink.get_delegators(self._user, role)
         if users:
-            qset = self.plmobjectuserlink_plmobject.now().filter(user__in=users,
+            qset = self.users.now().filter(user__in=users,
                                                           role=role)
             return qset.exists()
         else:
@@ -677,7 +677,7 @@ class PLMObjectController(Controller):
         self.check_edit_signer()
         if not role.startswith(models.ROLE_SIGN):
             raise ValueError("Not a sign role")
-        if self.plmobjectuserlink_plmobject.now().filter(role=role).count() <= 1:
+        if self.users.now().filter(role=role).count() <= 1:
             raise PermissionError("Can not remove signer, there is only one signer.")
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=signer, role=role)
@@ -709,7 +709,7 @@ class PLMObjectController(Controller):
         
         # remove old signer
         try:
-            link = self.plmobjectuserlink_plmobject.now().get(user=old_signer,
+            link = self.users.now().get(user=old_signer,
                role=role)
         except models.PLMObjectUserLink.DoesNotExist:
             raise ValueError("Invalid old signer")
@@ -816,7 +816,7 @@ class PLMObjectController(Controller):
         self.lifecycle = models.get_cancelled_lifecycle()
         self.state = models.get_cancelled_state()
         self.set_owner(company, True)
-        self.plmobjectuserlink_plmobject.filter(role__startswith=models.ROLE_SIGN).end()
+        self.users.filter(role__startswith=models.ROLE_SIGN).end()
         self._clear_approvals()
         self.save(with_history=False)
         self._save_histo("Cancel", "Object cancelled") 
