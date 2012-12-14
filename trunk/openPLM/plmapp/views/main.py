@@ -1594,9 +1594,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         set to (*obj*, :samp`"add_{role}"`)
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    link = models.PLMObjectUserLink.current_objects.get(id=int(link_id))
-    if obj.object.id != link.plmobject.id:
-        raise ValueError("Bad link id")
+    link = obj.plmobjectuserlink_plmobject.now().get(id=int(link_id))
     
     if request.method == "POST":
         replace_manager_form = forms.SelectUserForm(request.POST)
@@ -1700,7 +1698,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         try:
             link_id = int(request.POST["link_id"])
-            link = models.PLMObjectUserLink.current_objects.get(id=link_id)
+            link = obj.plmobjectuserlink_plmobject.now().get(id=link_id)
             obj.remove_user(link)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
