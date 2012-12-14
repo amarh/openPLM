@@ -9,6 +9,7 @@ from django.forms.util import ErrorList
 
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as pmodels
+from openPLM.plmapp.utils import memoize_noarg
 
 
 class ECR(models.Model, pmodels.IObject):
@@ -62,6 +63,7 @@ class ECR(models.Model, pmodels.IObject):
     # other attributes
     name = models.CharField(_("name"), max_length=100, blank=True,
                             help_text=_(u"Name of the product"))
+    description = models.TextField(_("description"), blank=True)
 
     creator = models.ForeignKey(User, verbose_name=_("creator"), 
                                 related_name="%(class)s_creator")
@@ -275,7 +277,6 @@ class ECRUserLink(pmodels.Link):
             db_index=True)
 
     class Meta:
-        app_label = "plmapp"
         unique_together = ("ecr", "user", "role", "end_time")
         ordering = ["user", "role", "ecr__reference",]
 
@@ -307,7 +308,14 @@ class ECRPromotionApproval(pmodels.Link):
     next_state = models.ForeignKey(pmodels.State, related_name="+")
 
     class Meta:
-        app_label = "plmapp"
         unique_together = ("ecr", "user", "current_state", "next_state", "end_time")
+
+
+@memoize_noarg
+def get_default_lifecycle():
+    u"""
+    Returns the default :class:`.Lifecycle` used when instanciate a :class:`.ECR`
+    """
+    return pmodels.Lifecycle.objects.filter(type=pmodels.Lifecycle.ECR).order_by('name')[0]
 
 
