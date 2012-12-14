@@ -209,7 +209,7 @@ class Migration(SchemaMigration):
             'ctime': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'users'", 'to': "orm['plmapp.PLMObject']"}),
+            'plmobject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobjectuserlink_plmobject'", 'to': "orm['plmapp.PLMObject']"}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'plmobjectuserlink_user'", 'to': "orm['auth.User']"})
         },
