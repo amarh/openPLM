@@ -490,7 +490,7 @@ class ViewTest(CommonViewTest):
     def do_test_management_delete_post(self, url, role):
         self.brian.groups.add(self.group)
         self.controller.set_role(self.brian, role)
-        link_id = self.controller.plmobjectuserlink_plmobject.get(user=self.brian, role=role).id
+        link_id = self.controller.users.get(user=self.brian, role=role).id
         response = self.post(url, {"link_id" : link_id})
         self.assertFalse(m.PLMObjectUserLink.current_objects.filter(plmobject=self.controller.object,
             user=self.brian, role=role).exists())

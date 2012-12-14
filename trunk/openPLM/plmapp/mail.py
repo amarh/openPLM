@@ -45,8 +45,8 @@ from openPLM.plmapp.models import User, UserProfile, DelegationLink, ROLE_OWNER,
 
 def get_recipients(obj, roles, users):
     recipients = set(users)
-    if hasattr(obj, "plmobjectuserlink_plmobject"):
-        manager = obj.plmobjectuserlink_plmobject.now().order_by()
+    if hasattr(obj, "users"):
+        manager = obj.users.now().order_by()
         roles_filter = Q()
 
         for role in roles:

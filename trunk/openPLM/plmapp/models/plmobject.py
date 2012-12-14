@@ -363,7 +363,7 @@ class PLMObject(models.Model):
 
     def get_current_signers(self):
         role = self.get_current_signer_role()
-        return self.plmobjectuserlink_plmobject.now().filter(role=role).values_list("user", flat=True)
+        return self.users.now().filter(role=role).values_list("user", flat=True)
     
     def get_approvers(self):
         if self.is_deprecated or self.is_cancelled:

@@ -326,7 +326,7 @@ class NavigationGraph(object):
             else:
                 users = ((u, role) for u in obj.user_set.all())
         else:
-            users = obj.plmobjectuserlink_plmobject.at(self.time).filter(role__istartswith=role)
+            users = obj.users.at(self.time).filter(role__istartswith=role)
             users = ((u.user, u.role) for u in users.all())
         node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
         for user, role in users:

@@ -234,10 +234,6 @@ class ECR(models.Model, pmodels.IObject):
         return approvers
 
     @property
-    def plmobjectuserlink_plmobject(self):
-        return self.users
-
-    @property
     def is_part(self):
         return False
     @property

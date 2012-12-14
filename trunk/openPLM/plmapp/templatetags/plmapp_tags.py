@@ -55,7 +55,7 @@ def can_add(obj, arg):
                 if cur_obj.check_in_group(obj):
                     if action.startswith("add_"):
                         role = action[4:]
-                        return not cur_obj.plmobjectuserlink_plmobject.now().filter(user=obj,
+                        return not cur_obj.users.now().filter(user=obj,
                             role=role).exists()
                     return True
             return True
@@ -65,7 +65,7 @@ def can_add(obj, arg):
                 return False
             if obj.get_profile().restricted:
                 if action == "add_reader":
-                    return not cur_obj.plmobjectuserlink_plmobject.now().filter(user=obj,
+                    return not cur_obj.users.now().filter(user=obj,
                             role=models.ROLE_READER).exists()
                 return True
     return False

@@ -350,7 +350,7 @@ def get_lifecycle_data(obj):
     state = obj.state.name
     object_lifecycle = []
     roles = defaultdict(list)
-    for link in obj.plmobjectuserlink_plmobject.now().order_by("ctime").select_related("user"):
+    for link in obj.users.now().order_by("ctime").select_related("user"):
         roles[link.role].append(link)
     lcs = obj.lifecycle.to_states_list()
     for i, st in enumerate(lcs):
@@ -432,7 +432,7 @@ def get_management_data(obj, user):
     """
     ctx = {}
     # evaluates now PLMObjectLinks to make one sql query
-    links = list(obj.plmobjectuserlink_plmobject.now().select_related("user"))
+    links = list(obj.users.now().select_related("user"))
     if not obj.check_permission("owner", False):
         link = [l for l in links if l.role == models.ROLE_NOTIFIED and l.user == user]
         ctx["is_notified"] = bool(link)
@@ -1594,7 +1594,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         set to (*obj*, :samp`"add_{role}"`)
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    link = obj.plmobjectuserlink_plmobject.now().get(id=int(link_id))
+    link = obj.users.now().get(id=int(link_id))
     
     if request.method == "POST":
         replace_manager_form = forms.SelectUserForm(request.POST)
@@ -1698,7 +1698,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         try:
             link_id = int(request.POST["link_id"])
-            link = obj.plmobjectuserlink_plmobject.now().get(id=link_id)
+            link = obj.users.now().get(id=link_id)
             obj.remove_user(link)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
