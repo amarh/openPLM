@@ -1,3 +1,4 @@
-{% for attr, value in object.get_attributes_and_values %}
-{% if "time" not in attr %} - {{attr}}:{{ value }} {% endif %}
+{% load plmapp_tags %}
+{% for attribute in object.attributes %}
+{% if "time" not in attribute %} - {{attribute}}:{{ object|attr:attribute }} {% endif %}
 {% endfor %}
