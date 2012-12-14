@@ -224,7 +224,7 @@ class ECR(models.Model, pmodels.IObject):
         return self.users.now().filter(role=role).values_list("user", flat=True)
     
     def get_approvers(self):
-        if self.is_deprecated or self.is_cancelled:
+        if self.is_official or self.is_cancelled:
             return self.approvals.none()
         lcl = self.lifecycle.to_states_list()
         role = level_to_sign_str(lcl.index(self.state.name))
@@ -232,6 +232,20 @@ class ECR(models.Model, pmodels.IObject):
         approvers = self.approvals.now().filter(current_state=self.state,
                 next_state=next_state).values_list("user", flat=True)
         return approvers
+
+    @property
+    def plmobjectuserlink_plmobject(self):
+        return self.users
+
+    @property
+    def is_part(self):
+        return False
+    @property
+    def is_document(self):
+        return False
+    @property
+    def type(self):
+        return "ECR"
 
 
 class ECRHistory(pmodels.AbstractHistory):
@@ -271,7 +285,7 @@ class ECRUserLink(pmodels.Link):
 
     ACTION_NAME = "Link : ECR-user"
 
-    ecr = models.ForeignKey(ECR, related_name="user")    
+    ecr = models.ForeignKey(ECR, related_name="users")    
     user = models.ForeignKey(User, related_name="ecrs")    
     role = models.CharField(max_length=30, choices=zip(pmodels.ROLES, pmodels.ROLES),
             db_index=True)
