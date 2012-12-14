@@ -11,7 +11,7 @@
         {% endif %}
     {% endif %}
     <div class="reference">
-        {% if result|is_plmobject %}
+        {% if result|is_plmobject or result.state %}
             <div class="bullet" title="{{result.state}}"></div>
         {% endif %}
         {% with is_readable|yesno:",a" as removed_tag %}
