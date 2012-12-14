@@ -50,18 +50,18 @@
             {% if is_owner and obj.is_editable %}
                 <a class="tb-btn" 
                     href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
-                    <span class="ui-button-text">{% trans "Edit this information" %}</span>
+                    <span>{% trans "Edit this information" %}</span>
                 </a>
             {% endif %}
         {% endif %}
         {% if can_generate_pdf and not restricted %}
             <a href="/pdf{{obj.plmobject_url}}attributes/" class="tb-btn">
-                <span class="ui-button-text">{% trans "Download as PDF"%}</span>
+                <span>{% trans "Download as PDF"%}</span>
             </a>
         {% endif %}
         {% if obj.can_clone %}
             <a href="{{obj.plmobject_url}}clone/" class="tb-btn">
-                <span class="ui-button-text">{% trans "Clone" %}</span>
+                <span>{% trans "Clone" %}</span>
             </a>
         {% endif %}
     </div>
