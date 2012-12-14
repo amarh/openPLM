@@ -377,7 +377,7 @@ class PLMObject(models.Model):
 
 
 def get_all_subclasses(base, d):
-    if base.__name__ not in d and not base._deferred:
+    if base.__name__ not in d and not getattr(base, "_deferred", False):
         d[base.__name__] = base
     for cls in base.__subclasses__():
         get_all_subclasses(cls, d)
@@ -392,12 +392,16 @@ def get_all_plmobjects():
     get_all_subclasses(PLMObject, res)
     res["Group"] = GroupInfo
     del res["PLMObject"]
+    get_all_subclasses(IObject, res)
+    del res["IObject"]
     return res
 
 @memoize_noarg
 def get_all_users_and_plmobjects():
     res = {}
     get_all_subclasses(User, res)
+    get_all_subclasses(IObject, res)
+    del res["IObject"]
     res.update(get_all_plmobjects())
     return res
 
