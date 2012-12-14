@@ -24,7 +24,7 @@ class ECR(models.Model, pmodels.IObject):
     :other attributes:
         .. attribute:: name
 
-            Name of the product, for example ``Game of life``
+            Name of the ECR, for example ``Game of life``
 
         .. attribute:: description
 
@@ -62,7 +62,7 @@ class ECR(models.Model, pmodels.IObject):
 
     # other attributes
     name = models.CharField(_("name"), max_length=100, blank=True,
-                            help_text=_(u"Name of the product"))
+                            help_text=_(u"Name of the ECR"))
     description = models.TextField(_("description"), blank=True)
 
     creator = models.ForeignKey(User, verbose_name=_("creator"), 
