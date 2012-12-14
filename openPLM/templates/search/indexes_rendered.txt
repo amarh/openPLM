@@ -1,3 +1,4 @@
+{% load plmapp_tags %}
 {% if object.username %}
     <span class="user_bullet">&nbsp;</span>
     <span class="full_name"> {{ object.get_full_name}} </span> //
@@ -7,7 +8,7 @@
 {% else %}
 
     {% if object.type %}
-        <span class="{{object.is_part|yesno:"part,document"}}_bullet">&nbsp;</span>
+        <span class="{{object|main_type}}_bullet">&nbsp;</span>
         <span class="type"> {{object.type}} </span> //
         <a href="{{object.plmobject_url}}"/><span class="reference">{{object.reference}}</span></a> //
         <span class="revision">{{object.revision}}</span>
