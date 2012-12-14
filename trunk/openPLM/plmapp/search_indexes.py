@@ -107,10 +107,10 @@ class GroupIndex(ModelSearchIndex):
 set_template_name(GroupIndex)
 site.register(models.GroupInfo, GroupIndex)
 
-
+indexed = site.get_indexed_models()
 
 for key, model in models.get_all_plmobjects().iteritems():
-    if model == models.GroupInfo:
+    if model in indexed:
         continue
     class ModelIndex(QueuedModelSearchIndex):
         model = model
@@ -124,7 +124,8 @@ for key, model in models.get_all_plmobjects().iteritems():
         state = CharField(model_attr="state__name")
         lifecycle = CharField(model_attr="lifecycle__name")
         state_class = CharField()
-        group= CharField(model_attr="group__name")
+        if "group" in Meta.fields:
+            group= CharField(model_attr="group__name")
 
         ctime = DateTimeField(model_attr="ctime")
         mtime = DateTimeField(model_attr="mtime")
