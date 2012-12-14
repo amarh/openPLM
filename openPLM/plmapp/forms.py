@@ -162,14 +162,14 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
                 auto = cleaned_data.get("auto", False)
                 inbulk = getattr(self, "inbulk_cache")
                 if auto and not ref:
-                    cleaned_data["reference"] = ref = get_new_reference(cls, start, inbulk)
+                    cleaned_data["reference"] = ref = get_new_reference(cls, self.start, inbulk)
                 if not auto and not ref:
                     self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
                 if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
                     if not auto:
                         raise ValidationError(_("An object with the same type, reference and revision already exists"))
                     else:
-                        cleaned_data["reference"] = get_new_reference(cls, start, inbulk)
+                        cleaned_data["reference"] = get_new_reference(cls, self.start, inbulk)
                 elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
                     raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
                 return cleaned_data
@@ -181,6 +181,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         form = Form(initial=initial, **kwargs)
     else:
         form = Form(data=data, **kwargs)
+    form.start = start
     if issubclass(cls, m.PLMObject):
         # lifecycles and groups are cached if inbulk_cache is a dictionary
         # this is an optimization if several creation forms are displayed 
