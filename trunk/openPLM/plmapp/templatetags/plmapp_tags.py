@@ -342,5 +342,5 @@ def main_type(obj):
         if obj["type"] in models.get_all_documents():
             return "document"
         return obj["type"]
-    return ""
+    return getattr(obj, "type", "")
 
