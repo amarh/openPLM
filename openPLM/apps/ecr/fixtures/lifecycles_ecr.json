@@ -1,0 +1,265 @@
+[
+    {
+        "pk": "proposed", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "created", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "reviewed", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "approved", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "completed", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "change order", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "impact evaluation", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "change order", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "evaluated", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "analysed", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "plan modification", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "advice", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "ECR1: simple", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state": "completed", 
+            "type": 3
+        }
+    }, 
+    {
+        "pk": "ECR2: impact evaluation", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state": "completed", 
+            "type": 3
+        }
+    }, 
+    {
+        "pk": "ECR3: plan modification", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state": "completed", 
+            "type": 3
+        }
+    }, 
+    {
+        "pk": "ECR4: advice", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state": "completed", 
+            "type": 3
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "created", 
+            "lifecycle": "ECR1: simple", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "change order", 
+            "lifecycle": "ECR1: simple", 
+            "rank": 1
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "completed", 
+            "lifecycle": "ECR1: simple", 
+            "rank": 2
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "created", 
+            "lifecycle": "ECR2: impact evaluation", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "impact evaluation", 
+            "lifecycle": "ECR2: impact evaluation", 
+            "rank": 1
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "change order", 
+            "lifecycle": "ECR2: impact evaluation", 
+            "rank": 2
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "completed", 
+            "lifecycle": "ECR2: impact evaluation", 
+            "rank": 3
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "created", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "evaluated", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 1
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "analysed", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 2
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "reviewed", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 3
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "plan modification", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 4
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "completed", 
+            "lifecycle": "ECR3: plan modification", 
+            "rank": 5
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "created", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 0
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "proposed", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 1
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "analysed", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 2
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "advice", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 3
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "plan modification", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 4
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "completed", 
+            "lifecycle": "ECR4: advice", 
+            "rank": 5
+        }
+    }
+]
