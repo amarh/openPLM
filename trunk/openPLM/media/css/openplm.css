@@ -1376,3 +1376,17 @@ ul.tbi li {
 .tb-btn span {
     color: #343434;
 }
+
+.tb-btn-mini {
+    padding: 0.3em;
+    line-height: 1em;
+    font-size: 12px;
+}
+
+.detach-form {
+    z-index: 10;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
