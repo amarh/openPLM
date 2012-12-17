@@ -39,13 +39,22 @@
                         <span>{% trans "Attach another document" %}</span>
                     </a>
                 {% endif %}
-
                 {% if obj.is_draft or obj.is_official %}
                     {# action valid if the part is a draft or official, since the user will own the document #}
                     <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
                         <span class="tb-caret"></span>
                     </button>
                     <ul class="tb tb-dropdown-menu">
+                        <li>
+                        <a {% if obj.type|can_link:request.session.type %}
+                                href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
+                            {% else %}
+                                href="./add/{% add_get type='Document' q='' %}"
+                            {% endif %}>
+                            {% trans "Attach another document" %}
+                        </a>
+                        </li>
+
                         <li>
                         <a href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
                             {% trans "Create a document and attach it to the part" %}
