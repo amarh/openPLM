@@ -20,5 +20,8 @@ urlpatterns = patterns('',
     (ecr + 'management/add-signer(?P<level>\d+)/$', pviews.add_management, ecr_dict),
     (ecr + 'management/replace/(?P<link_id>\d+)/$', pviews.replace_management, ecr_dict),
     (ecr + 'management/delete/$', pviews.delete_management, ecr_dict),
+    (ecr + 'part-doc-cads/$', views.plmobjects),
+    (ecr + 'part-doc-cads/add/$', views.attach_plmobject),
+    (ecr + 'part-doc-cads/delete/$', views.detach_plmobject),
     ('browse/ecr/$', views.browse_ecr),
     )

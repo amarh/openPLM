@@ -1,7 +1,7 @@
 ###########################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ class ECRController(Controller):
         :param data: a dict<key, value> with informations to add to the ECR
         :rtype: :class:`ECRController`
         """
-        
+
 
         if not user.is_active:
             raise PermissionError(u"%s's account is inactive" % user)
@@ -69,7 +69,7 @@ class ECRController(Controller):
             raise ValueError("Reference contains a '/' or a '..'")
         # create an object
         try:
-            reference_number = int(re.search(r"^ECR_(\d+)$", reference).group(1)) 
+            reference_number = int(re.search(r"^ECR_(\d+)$", reference).group(1))
             if reference_number > 2**31 - 1:
                 reference_number = 0
         except:
@@ -110,13 +110,13 @@ class ECRController(Controller):
 
         #res._update_state_history()
         return res
-        
+
     @classmethod
     def create_from_form(cls, form, user, block_mails=False, no_index=False):
         u"""
         Creates a :class:`ECRController` from *form* and associates *user*
         as the creator/owner of the ECR.
-        
+
         This method raises :exc:`ValueError` if *form* is invalid.
 
         :param form: a django form associated to a model
@@ -134,7 +134,7 @@ class ECRController(Controller):
     def load(cls, type, reference, revision, user):
         obj = get_object_or_404(ECR, reference=reference)
         return cls(obj, user)
-  
+
     # FIXME: lot of copy/paste from PLMObjectController
     def can_approve_promotion(self, user=None):
         return bool(self.get_represented_approvers(user))
@@ -164,13 +164,13 @@ class ECRController(Controller):
     def _all_approved(self):
         not_approvers = self.get_current_signers().exclude(user__in=self.get_approvers())
         return not not_approvers.exists()
-   
+
     def approve_promotion(self):
         if self.object.is_promotable():
             lcl = self.lifecycle.to_states_list()
             role = level_to_sign_str(lcl.index(self.state.name))
             self.check_permission(role)
-            
+
             represented = self.get_represented_approvers()
             if not represented:
                 raise PromotionError()
@@ -184,16 +184,16 @@ class ECRController(Controller):
             else:
                 details = u"Current state: %s, next state:%s\n" % (self.state.name, next_state)
                 details += u"Represented users: %s" % u", ".join(u.username for u in users)
-                self._save_histo(u"Approved promotion", details, roles=(role,)) 
+                self._save_histo(u"Approved promotion", details, roles=(role,))
         else:
             raise PromotionError()
 
     def discard_approvals(self):
         role = self.get_current_signer_role()
         self.check_permission(role)
-        self._clear_approvals() 
+        self._clear_approvals()
         details = u"Current state:%s" % self.state.name
-        self._save_histo(u"Removed promotion approvals", details, roles=(role,)) 
+        self._save_histo(u"Removed promotion approvals", details, roles=(role,))
 
     def _clear_approvals(self):
         self.approvals.now().end()
@@ -202,7 +202,7 @@ class ECRController(Controller):
         u"""
         Promotes :attr:`object` in its lifecycle and writes its promotion in
         the history
-        
+
         :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
@@ -239,7 +239,7 @@ class ECRController(Controller):
         u"""
         Demotes :attr:`object` in irs lifecycle and writes irs demotion in the
         history
-        
+
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
         if not self.is_proposed:
@@ -302,7 +302,7 @@ class ECRController(Controller):
     def check_in_group(self, user, raise_=True):
         """
         Checks that *user* belongs to the object's group.
-        
+
         Returns True if the user belongs to the group.
         Otherwise, returns False if *raise_* is False or raises
         a :exc:`.PermissionError` if *raise_* is True.
@@ -317,19 +317,19 @@ class ECRController(Controller):
 
         .. note::
             This method does **NOT** check that the current user
-            is the owner of the object. :meth:`set_role` does that check. 
-        
+            is the owner of the object. :meth:`set_role` does that check.
+
         :param new_owner: the new owner
         :type new_owner: :class:`~django.contrib.auth.models.User`
         :param dirty: True if set_owner should skip sanity checks and
                       should not send a mail (usefull for tests, default is
                       False)
         :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
-        :raise: :exc:`ValueError` if *new_owner* is the company and the 
+        :raise: :exc:`ValueError` if *new_owner* is the company and the
                 object is editable
 
         """
-        
+
         if not dirty:
             self.check_contributor(new_owner)
             if new_owner.username == settings.COMPANY:
@@ -352,7 +352,7 @@ class ECRController(Controller):
         """
         Adds *new_notified* to the list of users notified when :attr:`object`
         changes.
-        
+
         :param new_notified: the new user who would be notified
         :type new_notified: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`IntegrityError` if *new_notified* is already notified
@@ -364,7 +364,7 @@ class ECRController(Controller):
             raise PermissionError(u"%s's account is inactive" % new_notified)
         ECRUserLink.objects.create(ecr=self.object, user=new_notified, role="notified")
         details = u"user: %s" % new_notified
-        self._save_histo("New notified", details) 
+        self._save_histo("New notified", details)
 
     def add_reader(self, new_reader):
         if not self.is_official:
@@ -374,7 +374,7 @@ class ECRController(Controller):
         ECRUserLink.objects.create(ecr=self.object,
             user=new_reader, role=models.ROLE_READER)
         details = "user: %s" % new_reader
-        self._save_histo("New reader", details) 
+        self._save_histo("New reader", details)
 
     def check_edit_signer(self, raise_=True):
         """
@@ -436,49 +436,49 @@ class ECRController(Controller):
         self.check_signer(new_signer, role)
         ECRUserLink.objects.create(ecr=self.object, user=new_signer, role=role)
         details = u"user: %s" % new_signer
-        self._save_histo("New %s" % role, details, roles=(role,)) 
+        self._save_histo("New %s" % role, details, roles=(role,))
 
     def remove_notified(self, notified):
         """
         Removes *notified* to the list of users notified when :attr:`object`
         changes.
-        
+
         :param notified: the user who would be no more notified
         :type notified: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`ObjectDoesNotExist` if *notified* is not notified
             when :attr:`object` changes
         """
-        
+
         if notified != self._user:
             self.check_permission("owner")
         link = ECRUserLink.current_objects.get(ecr=self.object,
                 user=notified, role="notified")
         link.end()
         details = u"user: %s" % notified
-        self._save_histo("Notified removed", details) 
+        self._save_histo("Notified removed", details)
 
     def remove_reader(self, reader):
         """
         Removes *reader* to the list of restricted readers when :attr:`object`
         changes.
-        
+
         :param reader: the user who would be no more reader
         :type reader: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`ObjectDoesNotExist` if *reader* is not reader
         """
-        
+
         link = ECRUserLink.current_objects.get(ecr=self.object,
                 user=reader, role=models.ROLE_READER)
         link.end()
         details = u"user: %s" % reader
-        self._save_histo("Reader removed", details) 
-        
+        self._save_histo("Reader removed", details)
+
     def remove_signer(self, signer, role):
         """
         .. versionadded:: 1.2
 
         Removes *signer* to the list of signers for role *role*.
-        
+
         :param signer: the user who would be no more signer
         :type signer: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`.PermissionError` if:
@@ -488,7 +488,7 @@ class ECRController(Controller):
             * there is only one signer
 
         :raise: :exc:`ObjectDoesNotExist` if *signer* is not a signer
-        """ 
+        """
         self.check_edit_signer()
         if not role.startswith(models.ROLE_SIGN):
             raise ValueError("Not a sign role")
@@ -498,7 +498,7 @@ class ECRController(Controller):
                 user=signer, role=role)
         link.end()
         details = u"user: %s" % signer
-        self._save_histo("%s removed" % role, details, roles=(role,)) 
+        self._save_histo("%s removed" % role, details, roles=(role,))
 
     def replace_signer(self, old_signer, new_signer, role):
         """
@@ -519,7 +519,7 @@ class ECRController(Controller):
 
         self.check_edit_signer()
         self.check_signer(new_signer, role)
-        
+
         # remove old signer
         try:
             link = self.users.now().get(user=old_signer,
@@ -531,7 +531,7 @@ class ECRController(Controller):
         ECRUserLink.objects.create(ecr=self.object, user=new_signer, role=role)
         details = u"new signer: %s" % new_signer
         details += u", old signer: %s" % old_signer
-        self._save_histo("New %s" % role, details, roles=(role,)) 
+        self._save_histo("New %s" % role, details, roles=(role,))
 
     def set_role(self, user, role):
         """
@@ -540,7 +540,7 @@ class ECRController(Controller):
         .. note::
             If *role* is :const:`.ROLE_OWNER`, the previous owner is
             replaced by *user*.
-            
+
         :raise: :exc:`ValueError` if *role* is invalid
         :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
@@ -621,9 +621,10 @@ class ECRController(Controller):
         self.state = models.get_cancelled_state()
         self.set_owner(company, True)
         self.users.filter(role__startswith=models.ROLE_SIGN).end()
+        self.plmobjects.end()
         self._clear_approvals()
         self.save(with_history=False)
-        self._save_histo("Cancel", "Object cancelled") 
+        self._save_histo("Cancel", "Object cancelled")
         #self._update_state_history()
 
     def can_publish(self):
@@ -641,7 +642,7 @@ class ECRController(Controller):
         Returns True if the user can unpublish this object.
         """
         return False
-    
+
     def check_cancel(self,raise_=True):
         """
         .. versionadded:: 1.1
@@ -668,7 +669,7 @@ class ECRController(Controller):
         if (not res) and raise_:
             raise PermissionError("You are not allowed to cancel this object")
         return res
-        
+
     def can_cancel(self):
         """
         .. versionadded:: 1.1
@@ -676,23 +677,23 @@ class ECRController(Controller):
         Returns True if the user can cancel this object.
         """
         return self.check_cancel(raise_=False)
-    
+
     def safe_cancel(self):
         self.check_cancel()
         self.cancel()
-        
+
     def check_clone(self, raise_=True):
         """
         .. versionadded:: 1.1
 
         Checks that an object can be cloned.
-        
+
         If *raise_* is True:
 
             :raise: :exc:`.PermissionError` if the object is not readable
             :raise: :exc:`.PermissionError` if the object can not be read
             :raise: :exc:`.PermissionError` if the object is not cloneable
-            
+
         If *raise_* is False:
 
             Returns True if all previous tests has been succesfully passed,
@@ -707,7 +708,7 @@ class ECRController(Controller):
         Returns True if the user can clone this object.
         """
         return False
-        
+
     def publish(self):
         raise ControllerError("An ECR can not be published")
 
@@ -720,3 +721,57 @@ class ECRController(Controller):
         return []
     def get_all_revisions(self):
         return [self.objects]
+
+    def attach_object(self, plmobject):
+        self.check_attach_object(plmobject)
+        self.plmobjects.create(plmobject=plmobject)
+        details = u"%s // %s // %s" % (plmobject.type, plmobject.reference, plmobject.revision)
+        self._save_histo("Object attached", details)
+
+    def detach_object(self, plmobject):
+        self.check_detach_object(plmobject)
+        self.plmobjects.now().filter(plmobject=plmobject.id).end()
+        details = u"%s // %s // %s" % (plmobject.type, plmobject.reference, plmobject.revision)
+        self._save_histo("Object detached", details)
+
+    def is_object_attached(self, plmobject):
+        return self.plmobjects.now().filter(plmobject=plmobject.id).exists()
+
+    def check_attach_object(self, plmobject, raise_=True):
+        self.check_permission(models.ROLE_OWNER, raise_)
+        if self.is_cancelled:
+            if raise_:
+                raise ValueError("ECR is cancelled")
+            return False
+        if raise_:
+            self.check_editable()
+        elif not self.is_editable:
+            return False
+        if self.is_object_attached(plmobject):
+            if raise_:
+                raise ValueError("Object is already attached")
+            return False
+        return True
+
+    def can_attach_plmobject(self, plmobject):
+        return self.check_attach_object(plmobject, False)
+
+    def check_detach_object(self, plmobject, raise_=True):
+        self.check_permission(models.ROLE_OWNER, raise_)
+        if self.is_cancelled:
+            if raise_:
+                raise ValueError("ECR is cancelled")
+            return False
+        if raise_:
+            self.check_editable()
+        elif not self.is_editable:
+            return False
+        if not self.is_object_attached(plmobject):
+            if raise_:
+                raise ValueError("Object is not attached")
+            return False
+        return True
+
+    def can_detach_plmobject(self, plmobject):
+        return self.check_detach_object(plmobject, False)
+

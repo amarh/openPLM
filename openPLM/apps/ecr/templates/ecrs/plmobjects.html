@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block content %}
+    {% if is_owner and obj.is_editable %}
+        <div>
+            <a href="./add/" class="tb-btn">{% trans "Attach" %}</a>
+        </div>
+    {% endif %}
+
+    {% if objects.paginator.count == 0 %}
+        <span>
+            {% trans "No objects are attached to this ECR" %}
+        </span>
+    {% else %}
+        <div>
+            <span id="numresults">
+                {% trans "Objects" %}
+                {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %} {{start}} - {{end}} on {{total}} {% endblocktrans %}
+            </span> 
+        </div>
+        <div>
+            {% for object in objects.object_list %}
+                {% if object.is_part %}
+                    {% include "parts/identity_card.html" %}
+                {% else %}
+                    {% include "documents/identity_card.html" %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% show_pages_bar objects request %}
+    {% endif %}
+{% endblock %}
+
