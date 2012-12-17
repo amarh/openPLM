@@ -5,6 +5,8 @@ from functools import wraps
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
+from django.utils.html import conditional_escape as esc
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
@@ -23,10 +25,10 @@ def cache_lifecycle_stuff(func):
     A decorator that caches the result of *func*.
 
     *func* must take one argument: a :class:`.PLMObject` and
-    its returned value should only depends on the state and the 
+    its returned value should only depends on the state and the
     lifecycle of the given PLMObject (and not its type).
 
-    The maximum cache size will be the number of 
+    The maximum cache size will be the number of
     :class:`.LifecycleStates`. Each key of the cache is
     a tuple (state's name, lifecycle's name).
     """
@@ -41,13 +43,13 @@ def cache_lifecycle_stuff(func):
             return value
     func.cache = {}
     wrapper.__doc__ += """
-    
+
         .. note::
-            
+
             The result of this function is cached with :func:`._cache_lifecycle_stuff`.
     """
     return wrapper
-    
+
 
 class PLMObject(models.Model):
     u"""
@@ -63,7 +65,7 @@ class PLMObject(models.Model):
 
             Type of the :class:`.PLMObject`, for example ``Game``
         .. attribute:: revision
-            
+
             Revision of the :class:`.PLMObject`, for example ``a``
 
     :other attributes:
@@ -83,16 +85,16 @@ class PLMObject(models.Model):
 
             date of last modification of the object (automatically field at each save)
         .. attribute:: lifecycle
-            
+
             :class:`.Lifecycle` of the object
         .. attribute:: state
-            
+
             Current :class:`.State` of the object
         .. attribute:: group
 
             :class:`.GroupInfo` that owns the object
         .. attribute:: published
-            
+
             .. versionadded:: 1.1
 
             True if the object is published (accessible to anonymous user)
@@ -100,7 +102,7 @@ class PLMObject(models.Model):
 
             .. versionadded:: 1.1
 
-            number found in the reference if it matches ``PART_|DOC_\d+``            
+            number found in the reference if it matches ``PART_|DOC_\d+``
 
     .. note::
 
@@ -116,7 +118,7 @@ class PLMObject(models.Model):
                                  help_text=_(u"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"))
     type = models.CharField(_("type"), max_length=50)
     revision = models.CharField(_("revision"), max_length=50)
-    
+
     # hidden field to get a valid new reference
     reference_number = models.IntegerField(default=0)
 
@@ -124,9 +126,9 @@ class PLMObject(models.Model):
     name = models.CharField(_("name"), max_length=100, blank=True,
                             help_text=_(u"Name of the product"))
 
-    creator = models.ForeignKey(User, verbose_name=_("creator"), 
+    creator = models.ForeignKey(User, verbose_name=_("creator"),
                                 related_name="%(class)s_creator")
-    owner = models.ForeignKey(User, verbose_name=_("owner"), 
+    owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
     ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
@@ -134,7 +136,7 @@ class PLMObject(models.Model):
     group = models.ForeignKey(GroupInfo, verbose_name=_("group"), related_name="%(class)s_group")
 
     # state and lifecycle
-    lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"), 
+    lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"),
                                   related_name="+",
                                   default=get_default_lifecycle)
     state = models.ForeignKey(State, verbose_name=_("state"),
@@ -142,8 +144,8 @@ class PLMObject(models.Model):
                               default=get_default_state)
 
     published = models.BooleanField(verbose_name=_("published"), default=False)
-    
-    
+
+
     class Meta:
         # keys in the database
         app_label = "plmapp"
@@ -161,6 +163,12 @@ class PLMObject(models.Model):
     def __unicode__(self):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
                                   self.revision)
+
+    @property
+    def title(self):
+        attrs = tuple(esc(x) for x in [self.type, self.reference, self.revision, self.name])
+        return mark_safe(u'''<span class="type">%s</span> // <span class="reference">%s</span>
+ // <span class="revision">%s</span> // <span class="name">%s</span>''' % attrs)
 
     def _is_promotable(self):
         """
@@ -195,13 +203,13 @@ class PLMObject(models.Model):
     def is_cloneable(self):
         """
         .. versionadded:: 1.1
-        
+
         Return true by default. This property may be overriden
         by custom Part or Document
         """
         return True
-        
-        
+
+
     @property
     def is_editable(self):
         """
@@ -222,7 +230,7 @@ class PLMObject(models.Model):
         current_rank = lcs.get(state=self.state).rank
         official_rank = lcs.get(state=self.lifecycle.official_state).rank
         return current_rank < official_rank
-    
+
     @property
     @cache_lifecycle_stuff
     def is_cancelled(self):
@@ -234,7 +242,7 @@ class PLMObject(models.Model):
     def is_deprecated(self):
         """ True if the object is deprecated. """
         return not self.is_cancelled and self.state == self.lifecycle.last_state
-    
+
     @property
     @cache_lifecycle_stuff
     def is_official(self):
@@ -255,8 +263,8 @@ class PLMObject(models.Model):
         """
         rank = LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
-        return level_to_sign_str(rank) 
-    
+        return level_to_sign_str(rank)
+
     @cache_lifecycle_stuff
     def get_previous_sign_level(self):
         """
@@ -265,8 +273,8 @@ class PLMObject(models.Model):
         """
         rank = LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
-        return level_to_sign_str(rank - 1) 
-   
+        return level_to_sign_str(rank - 1)
+
     @property
     def is_part(self):
         """ True if the plmobject is a part."""
@@ -282,7 +290,7 @@ class PLMObject(models.Model):
         if self.type in get_all_plmobjects():
             return issubclass(get_all_plmobjects()[self.type], Document)
         return False
-    
+
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
@@ -310,9 +318,9 @@ class PLMObject(models.Model):
 
     @property
     def plmobject_url(self):
-        url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision) 
+        url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision)
         return iri_to_uri(url)
-        
+
 
     @classmethod
     def get_creation_fields(cls):
@@ -344,7 +352,7 @@ class PLMObject(models.Model):
     def get_modification_fields(cls):
         """
         Returns fields which should be displayed in a modification form
-        
+
         By default, it returns :attr:`.attributes` less attributes returned by
         :meth:`.excluded_modification_fields`
         """
@@ -364,7 +372,7 @@ class PLMObject(models.Model):
     def get_current_signers(self):
         role = self.get_current_signer_role()
         return self.users.now().filter(role=role).values_list("user", flat=True)
-    
+
     def get_approvers(self):
         if self.is_deprecated or self.is_cancelled:
             return self.approvals.none()

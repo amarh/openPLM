@@ -4,6 +4,8 @@ import datetime
 from django.db import models
 
 from django.contrib.auth.models import User, Group
+from django.utils.html import conditional_escape as esc
+from django.utils.safestring import mark_safe
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 
@@ -11,14 +13,14 @@ class GroupInfo(Group):
     u"""
     Class that stores additional data on a :class:`Group`.
     """
-    
+
     class Meta:
         app_label = "plmapp"
 
     description = models.TextField(blank=True)
     creator = models.ForeignKey(User, related_name="%(class)s_creator")
-    
-    owner = models.ForeignKey(User, verbose_name=_("owner"), 
+
+    owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
     ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
@@ -27,6 +29,10 @@ class GroupInfo(Group):
     def __init__(self, *args, **kwargs):
         if "__fake__" not in kwargs:
             super(GroupInfo, self).__init__(*args, **kwargs)
+
+    @property
+    def title(self):
+        return mark_safe(u"""<span class="type">Group</span> // <span class="name">%s</span>""" % esc(self.name))
 
     @property
     def plmobject_url(self):
@@ -63,7 +69,7 @@ class GroupInfo(Group):
 
 
 class Invitation(models.Model):
-    
+
     class Meta:
         app_label = "plmapp"
 
