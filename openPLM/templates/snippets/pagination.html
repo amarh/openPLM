@@ -10,7 +10,7 @@
             </li>
         {% endif %}
 
-        {% if objects.has_previous %}
+        {% if objects.has_previous and pages|length > objects.paginator.num_pages %}
             <li>
             <a href="{% add_get page=objects.previous_page_number%}">« {% trans "Prev." %}</a>
             </li>
@@ -22,13 +22,10 @@
             </li>
         {% endfor %}
 
-        {% if objects.has_next %}
+        {% if objects.has_next and objects.paginator.num_pages not in pages %}
             <li>
             <a href="{% add_get page=objects.next_page_number%}">{% trans "Next." %} »</a>
             </li>
-        {% endif %}
-
-        {% if objects.has_next  and objects.paginator.num_pages not in pages %}
             <li>
             {% if objects.paginator.num_pages|add:'-1' not in pages %}
                 <a href="{% add_get page=objects.paginator.num_pages %}">{% trans "Last page" %}</a>
