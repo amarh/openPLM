@@ -74,7 +74,7 @@ def plmobjects(request, obj_ref):
 
 @bv.handle_errors
 def attach_plmobject(request, obj_ref):
-    obj, ctx = bv.get_generic_data(request, "ECR", obj_ref, "-")
+    obj, ctx = bv.get_generic_data(request, "ECR", obj_ref, "-", search=True)
     if request.method == "POST":
         form = PLMObjectForm(request.POST)
         if form.is_valid():
@@ -83,11 +83,16 @@ def attach_plmobject(request, obj_ref):
             return HttpResponseRedirect("..")
     else:
         form = PLMObjectForm()
+    if obj.is_editable and ctx["is_owner"]:
+        plmobjects = obj.plmobjects.now().values_list("plmobject", flat=True)
+        can_attach = lambda x: x.id not in plmobjects
+    else:
+        can_attach = lambda x: False
     ctx.update({
         "current_page": "part-doc-cads",
         "attach_form": form,
         "link_creation": True,
-        "attach": (obj, "attach_plmobject"),
+        "attach": (obj, can_attach),
     })
     return r2r("ecrs/plmobjects_add.html", ctx, request)
 

@@ -753,7 +753,7 @@ class ECRController(Controller):
             return False
         return True
 
-    def can_attach_plmobject(self, plmobject):
+    def can_attach_object(self, plmobject):
         return self.check_attach_object(plmobject, False)
 
     def check_detach_object(self, plmobject, raise_=True):

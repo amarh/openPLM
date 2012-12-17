@@ -32,6 +32,8 @@ def can_add(obj, arg):
 
     if isinstance(obj, models.DocumentFile):
         obj = obj.document
+    if callable(action):
+        return action(obj)
     if action == "attach_doc":
         return cur_obj.can_attach_document(obj)
     elif action == "attach_part":
@@ -257,7 +259,7 @@ class IsObjectReadableNode(template.Node):
         try:
             user = context["request"].user
             context["is_object_readable"] = is_readable(obj, user)
-        except KeyError, AttributeError:
+        except (KeyError, AttributeError):
             context["is_object_readable"] = True
         return ''
 
