@@ -18,15 +18,15 @@ register = template.Library()
 def can_add(obj, arg):
     """
     Test if an object can be linked to the current object.
-    
+
     :param obj: object to test
     :type obj: it can be an instance of :class:`.DocumentFile`, :class:`.Part` or :class:`.UserController`
-    
+
     :param arg: arguments here are the current object and the action for link creation
-    
+
     :return: True if the action can be processed on the current object
     """
-   
+
     # TODO: replace this with the callable (cur_obj.can_attach_document...)
     cur_obj, action = arg
 
@@ -74,33 +74,33 @@ def can_add(obj, arg):
 def can_add_type(parent_type, child_type):
     """
     Used in Bom View.
-    
+
     :param parent_type: Type of the parent, the current part
     :param child_type: type of the object that may be added as child
-    
+
     :return: True if child_type is a type of object that can be added to parent_type
     """
     part_types = models.get_all_parts()
     return parent_type in part_types and child_type in part_types
 
-@register.filter    
+@register.filter
 def can_link(current_type, suggested_type):
     """
     Used in Doc-Parts views.
-    
+
     :param current_type: type of the current object (part or document)
     :param suggested_type: type of the object that may be attached to the current one
-    
+
     :return: True if current_type is a type of object that can be attached to current_type object
     """
     doc_types = models.get_all_documents()
     part_types = models.get_all_parts()
     return ((current_type in doc_types and suggested_type in part_types) or
             (current_type in part_types and suggested_type in doc_types))
-    
+
 @register.filter
 def button(css_class, options=""):
-    classes = set([css_class, " ui-button", 
+    classes = set([css_class, " ui-button",
             "ui-button-text-only", "ui-widget", "ui-state-default",
             "ui-corner-all"])
     options = options.split(",")
@@ -223,7 +223,7 @@ Original version's URL: http://django.mar.lt/2010/07/add-get-parameter-tag.html
 class AddGetParameter(Node):
     def __init__(self, values):
         self.values = values
-        
+
     def render(self, context):
         req = resolve_variable('request', context)
         params = req.GET.copy()
@@ -266,7 +266,7 @@ def do_is_object_readable(parser, token):
         tag_name, = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError, "%r tag requires no arguments" % token.contents.split()[0]
-    return IsObjectReadableNode()    
+    return IsObjectReadableNode()
 register.tag('is_object_readable', do_is_object_readable)
 
 @register.filter
@@ -326,15 +326,17 @@ def is_readable(obj, user):
     # other objects: readable
     return True
 
+
 @register.filter
 def main_type(obj):
-    if isinstance(obj, (models.User, UserController)):
+    if isinstance(obj, (User, UserController)):
         return "user"
-    if isinstance(obj, (models.Part, PartController)):
+    if isinstance(obj, (models.Part, PartController)) or getattr(obj, "is_part", False):
         return "part"
-    if isinstance(obj, (models.Document, DocumentController)):
+    if (isinstance(obj, (models.Document, DocumentController)) or
+        getattr(obj, "is_document", False)):
         return "document"
-    if isinstance(obj,(models.Group, GroupController)):
+    if isinstance(obj, (Group, GroupController)):
         return "group"
     if hasattr(obj, "has_key") and "type" in obj:
         if obj["type"] in models.get_all_parts():
@@ -342,5 +344,5 @@ def main_type(obj):
         if obj["type"] in models.get_all_documents():
             return "document"
         return obj["type"]
-    return getattr(obj, "type", "")
+    return getattr(obj, "type", "").lower()
 
