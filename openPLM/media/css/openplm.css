@@ -1383,8 +1383,12 @@ ul.tbi li {
     font-size: 12px;
 }
 
-.detach-form {
+.identity_card .detach-form {
+    display: none;
+}
+.identity_card:hover .detach-form {
     z-index: 10;
+    display: block;
     position: absolute;
     top: 2px;
     right: 2px;
