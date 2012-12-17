@@ -2,6 +2,14 @@
 
 <div class="identity_card ic-{{type}}">
     {% is_object_readable %}
+    {% if detach_objects %}
+        <div class="detach-form">
+            <form method="POST" action="./delete/">
+                <input type="hidden" name="plmobject" value="{{object.id}}"/>
+                <button type="submit" class="tb-btn tb-btn-mini"><i class="tb-icon-remove icon-remove"></i> {%trans "Detach" %}</button>
+            </form>
+        </div>
+    {% endif %}
     {% if not hide_links %}
         {% if is_object_readable or suffix_url == "public/" %}
             <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
