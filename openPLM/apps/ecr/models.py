@@ -260,8 +260,8 @@ class ECRHistory(pmodels.AbstractHistory):
         return "/history_item/ecr/%d/" % self.id
 
 class ECRPLMObjectLink(pmodels.Link):
-    ecr = models.ForeignKey(ECR)
-    plmobject = models.ForeignKey(pmodels.PLMObject)
+    ecr = models.ForeignKey(ECR, related_name="plmobjects")
+    plmobject = models.ForeignKey(pmodels.PLMObject, related_name="ecrs")
 
     class Meta:
         unique_together = ("ecr", "plmobject", "end_time")
