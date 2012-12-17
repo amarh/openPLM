@@ -10,6 +10,7 @@ ecr_dict = {"obj_type": "ECR", "obj_revi": "-"}
 
 urlpatterns = patterns('',
     (ecr + "(?:attributes/)?$", pviews.display_object_attributes, ecr_dict),
+    ("pdf/" + ecr[1:] + "(?:attributes/)?$", "apps.pdfgen.views.attributes", ecr_dict),
     (ecr + "history/$", pviews.display_object_history, ecr_dict),
     (ecr + "lifecycle/$", pviews.display_object_lifecycle, ecr_dict),
     (ecr + "lifecycle/apply/$", pviews.display_object_lifecycle, ecr_dict),
