@@ -228,9 +228,10 @@
                     {% endif %}
                     {% if status == obj.lifecycle.official_state.name %}
                         official 
-                    {% endif %}
-                    {% if forloop.last %}
-                        deprecated
+                    {% else %}
+                        {% if forloop.last %}
+                            deprecated
+                        {% endif %}
                     {% endif %}
                     {% if is_current_state %}
                         active
