@@ -235,7 +235,6 @@ class ECR(models.Model, pmodels.IObject):
         if self.is_official or self.is_cancelled:
             return self.approvals.none()
         lcl = self.lifecycle.to_states_list()
-        role = level_to_sign_str(lcl.index(self.state.name))
         next_state = lcl.next_state(self.state.name)
         approvers = self.approvals.now().filter(current_state=self.state,
                 next_state=next_state).values_list("user", flat=True)
