@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -39,13 +39,13 @@ class SeekedFile(object):
     A file-like object that wraps an already opened
     and seeked file.
 
-    This file-like can be read by PIL and is used to 
+    This file-like can be read by PIL and is used to
     open an image contained in another file.
     """
     def __init__(self, file):
         self.shift = file.tell()
-        self.file = file  
-    
+        self.file = file
+
     def read(self, *args):
         return self.file.read(*args)
 
@@ -57,7 +57,7 @@ class SeekedFile(object):
 
     def tell(self):
         return self.file.tell() - self.shift
-    
+
     def seek(self, offset, whence=0):
         return self.file.seek(offset + self.shift, whence)
 
@@ -155,7 +155,7 @@ def convert(value, from_, to):
     Convert *value* from *from_* unit to *to* unit.
 
     Example::
-        
+
         >>> "%.3f" % convert(10, "cm", "mm")
         '100.000'
         >>> "%.3f" % convert(10, "mm", "cm")
@@ -222,7 +222,7 @@ def level_to_sign_str(level):
     Converts a level (int, starting from 0) to a sign role
 
     Example::
-        
+
         >>> level_to_sign_str(0)
         'sign_1st_level'
         >>> level_to_sign_str(1)
@@ -302,7 +302,7 @@ def get_pages_num(total_pages, current_page):
     page = int(current_page)
     total = int(total_pages)
     if total < 5:
-        pages = range(1,total)
+        pages = range(1, total + 1)
     else:
         if page < total-1:
             if page > 2:
