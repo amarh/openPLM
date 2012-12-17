@@ -37,19 +37,16 @@
             
             </div>
         <h2>
-            <span class="type">{{object_type}}
-            {% ifequal object_type "Timeline" %}
-            <a target="_blank" href="rss/">
-                <img style="float:none;" src="/media/img/feed_icon.png" alt="{% trans "click here to subscribe to the related feed" %}" title="{% trans "click here to subscribe to the related feed" %}">
-            </a>
-            {% endifequal %}
-            </span>
             {% if object_reference != '-' %}
-                // <span class="reference">{{object_reference}}</span> 
-                {% if obj.is_document or obj.is_part %}
-                    // <span class="revision">{{object_revision}}</span> 
-                {% endif %}    
-                // <span class="name">{% filter force_escape %}{% firstof obj.name obj.get_full_name%}{% endfilter %}</span>
+                {{ obj.title }}
+            {% else %}
+                <span class="type">{{object_type}}
+                    {% ifequal object_type "Timeline" %}
+                        <a target="_blank" href="rss/">
+                            <img style="float:none;" src="/media/img/feed_icon.png" alt="{% trans "click here to subscribe to the related feed" %}" title="{% trans "click here to subscribe to the related feed" %}">
+                        </a>
+                    {% endifequal %}
+                </span>
             {% endif%}
         </h2>
         {% if object_reference != '-' %}

@@ -3,6 +3,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.html import conditional_escape as esc
+from django.utils.safestring import mark_safe
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 
@@ -11,10 +13,10 @@ class UserProfile(models.Model):
     """
     Profile for a :class:`~django.contrib.auth.models.User`
     """
-   
+
     class Meta:
         app_label = "plmapp"
-    
+
     user = models.ForeignKey(User, unique=True)
     #: True if user is an administrator
     is_administrator = models.BooleanField(default=False, blank=True)
@@ -28,7 +30,13 @@ class UserProfile(models.Model):
     #: language
     language = models.CharField(max_length=5, default="en",
             choices=settings.LANGUAGES)
-    
+
+    @property
+    def title(self):
+        attrs = (esc(self.user.username), esc(self.user.get_full_name()))
+        return mark_safe(u"""<span class="type">User</span> // <span class="reference"> %s </span>
+ // <span class="name"> %s </span>""" % attrs)
+
     @property
     def is_viewer(self):
         u"""
@@ -59,7 +67,7 @@ class UserProfile(models.Model):
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
-        return ["first_name", "last_name", "email", 
+        return ["first_name", "last_name", "email",
                 "date_joined", "last_login", "rank"]
 
     @property
@@ -69,7 +77,7 @@ class UserProfile(models.Model):
             return ["attributes", "parts-doc-cad"]
         return ["attributes", "history", "parts-doc-cad", "delegation",
                 "groups"]
-   
+
 
 def add_profile(sender, instance, created, **kwargs):
     """ function called when a user is created to add his profile """

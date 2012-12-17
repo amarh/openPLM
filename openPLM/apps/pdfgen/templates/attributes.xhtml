@@ -3,25 +3,11 @@
 
 
 {% block title %}
-    {% if obj.is_document or obj.is_part %}
-        {{ obj.type }}-{{ obj.reference }}-{{ obj.revision }}
-    {% else %}
-        {{ obj.get_full_name }} {{ obj.username }}
-        {{ obj.name }}
-    {% endif %}
+    {{ obj.title|striptags }} 
 {% endblock %}
 
 {% block page_title %}
-    {% if obj.is_document or obj.is_part %}
-        {{ obj.type }} // {{ obj.reference }} // {{ obj.revision }} // {{obj.name}}
-    {% else %}
-        {% if obj.username %}
-            {% trans "User" %} // {{ obj.get_full_name}} // {{obj.username }}
-        {% else %}
-            {% trans "Group" %} // {{ obj.name }}
-        {% endif %}
-    {% endif %}
-
+    {{ obj.title }} 
 {% endblock %}
 
 {% block content %}

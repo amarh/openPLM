@@ -3,6 +3,8 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
+from django.utils.html import conditional_escape as esc
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django.forms.util import ErrorList
@@ -42,21 +44,21 @@ class ECR(models.Model, pmodels.IObject):
 
             date of last modification of the object (automatically field at each save)
         .. attribute:: lifecycle
-            
+
             :class:`.Lifecycle` of the object
         .. attribute:: state
-            
+
             Current :class:`.State` of the object
         .. attribute:: reference_number
 
-            number found in the reference if it matches ``ECR_\d+``            
+            number found in the reference if it matches ``ECR_\d+``
 
     """
 
     # key attributes
     reference = models.CharField(_("reference"), max_length=50, db_index=True, unique=True,
                                  help_text=_(u"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. characters"))
-    
+
     # hidden field to get a valid new reference
     reference_number = models.IntegerField(default=0)
 
@@ -65,16 +67,16 @@ class ECR(models.Model, pmodels.IObject):
                             help_text=_(u"Name of the ECR"))
     description = models.TextField(_("description"), blank=True)
 
-    creator = models.ForeignKey(User, verbose_name=_("creator"), 
+    creator = models.ForeignKey(User, verbose_name=_("creator"),
                                 related_name="%(class)s_creator")
-    owner = models.ForeignKey(User, verbose_name=_("owner"), 
+    owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
     ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 
     # state and lifecycle
-    lifecycle = models.ForeignKey(pmodels.Lifecycle, verbose_name=_("lifecycle"), 
+    lifecycle = models.ForeignKey(pmodels.Lifecycle, verbose_name=_("lifecycle"),
                                   related_name="+",)
     state = models.ForeignKey(pmodels.State, verbose_name=_("state"),
                               related_name="+",)
@@ -93,6 +95,12 @@ class ECR(models.Model, pmodels.IObject):
 
     def __unicode__(self):
         return u"ECR<%s>" % self.reference
+
+    @property
+    def title(self):
+        attrs = (esc(self.reference), esc(self.name))
+        return mark_safe(u'''<span class="type">ECR</span> // <span class="reference">%s</span>
+ // <span class="name">%s</span>''' % attrs)
 
     def is_promotable(self):
         """
@@ -118,7 +126,7 @@ class ECR(models.Model, pmodels.IObject):
         """
         """
         return False
-        
+
     @property
     def is_editable(self):
         """
@@ -139,7 +147,7 @@ class ECR(models.Model, pmodels.IObject):
         current_rank = lcs.get(state=self.state).rank
         official_rank = lcs.get(state=self.lifecycle.official_state).rank
         return current_rank < official_rank
-    
+
     @property
     @pmodels.cache_lifecycle_stuff
     def is_cancelled(self):
@@ -151,7 +159,7 @@ class ECR(models.Model, pmodels.IObject):
     def is_deprecated(self):
         """ Always returns False since an ECR can not be deprecated"""
         return False
-    
+
     @property
     @pmodels.cache_lifecycle_stuff
     def is_official(self):
@@ -172,8 +180,8 @@ class ECR(models.Model, pmodels.IObject):
         """
         rank = pmodels.LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
-        return level_to_sign_str(rank) 
-    
+        return level_to_sign_str(rank)
+
     @pmodels.cache_lifecycle_stuff
     def get_previous_sign_level(self):
         """
@@ -182,8 +190,8 @@ class ECR(models.Model, pmodels.IObject):
         """
         rank = pmodels.LifecycleStates.objects.get(state=self.state,
                             lifecycle=self.lifecycle).rank
-        return level_to_sign_str(rank - 1) 
-   
+        return level_to_sign_str(rank - 1)
+
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
@@ -200,7 +208,7 @@ class ECR(models.Model, pmodels.IObject):
     @property
     def plmobject_url(self):
         return iri_to_uri(u"/ecr/%s/" % self.reference)
-        
+
     @classmethod
     def get_creation_fields(cls):
         """
@@ -222,7 +230,7 @@ class ECR(models.Model, pmodels.IObject):
     def get_current_signers(self):
         role = self.get_current_signer_role()
         return self.users.now().filter(role=role).values_list("user", flat=True)
-    
+
     def get_approvers(self):
         if self.is_official or self.is_cancelled:
             return self.approvals.none()
@@ -247,14 +255,14 @@ class ECR(models.Model, pmodels.IObject):
 class ECRHistory(pmodels.AbstractHistory):
 
     plmobject = models.ForeignKey(ECR)
-    
+
     def get_redirect_url(self):
         return "/history_item/ecr/%d/" % self.id
 
 class ECRPLMObjectLink(pmodels.Link):
     ecr = models.ForeignKey(ECR)
     plmobject = models.ForeignKey(pmodels.PLMObject)
-    
+
     class Meta:
         unique_together = ("ecr", "plmobject", "end_time")
 
@@ -266,7 +274,7 @@ class ECRUserLink(pmodels.Link):
     """
     Link between a :class:`~.django.contrib.auth.models.User` and a
     :class:`.ECR`
-    
+
     :model attributes:
         .. attribute:: ecr
 
@@ -275,14 +283,14 @@ class ECRUserLink(pmodels.Link):
 
             a :class:`.User`
         .. attribute:: role
-            
+
             role of *user* for *ecr* (like `owner` or `notified`)
     """
 
     ACTION_NAME = "Link : ECR-user"
 
-    ecr = models.ForeignKey(ECR, related_name="users")    
-    user = models.ForeignKey(User, related_name="ecrs")    
+    ecr = models.ForeignKey(ECR, related_name="users")
+    user = models.ForeignKey(User, related_name="ecrs")
     role = models.CharField(max_length=30, choices=zip(pmodels.ROLES, pmodels.ROLES),
             db_index=True)
 
@@ -296,7 +304,7 @@ class ECRUserLink(pmodels.Link):
 class ECRPromotionApproval(pmodels.Link):
     """
     Model to track a promotion approval
-    
+
     :model attributes:
         .. attribute:: ecr
 
@@ -312,8 +320,8 @@ class ECRPromotionApproval(pmodels.Link):
             next :class:`.State` of :attr:`ecr` when if will be promoted
 
     """
-    ecr = models.ForeignKey(ECR, related_name="approvals") 
-    user = models.ForeignKey(User, related_name="ecr_approvals")  
+    ecr = models.ForeignKey(ECR, related_name="approvals")
+    user = models.ForeignKey(User, related_name="ecr_approvals")
     current_state = models.ForeignKey(pmodels.State, related_name="+")
     next_state = models.ForeignKey(pmodels.State, related_name="+")
 

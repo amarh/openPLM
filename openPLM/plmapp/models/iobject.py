@@ -1,9 +1,13 @@
 class IObject(object):
 
     @property
+    def title(self):
+        return ""
+
+    @property
     def plmobject_url(self):
         return u""
-    
+
     @property
     def menu_items(self):
         "menu items to choose a view"
