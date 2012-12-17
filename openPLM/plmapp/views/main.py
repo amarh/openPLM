@@ -2809,14 +2809,15 @@ def browse(request, type="object"):
         # only authenticated users can see all groups and users
         obj, ctx = get_generic_data(request, search=False)
         try:
-            cls = {
+            type2manager = {
                 "object" : models.PLMObject.objects, 
                 "part" : models.Part.objects,
                 "topassembly" : models.Part.top_assemblies,
                 "document" : models.Document.objects,
                 "group" : models.GroupInfo.objects,
                 "user" : User.objects,
-            }[type]
+            }
+            cls = type2manager[type]
         except KeyError:
             raise Http404
         object_list = cls.all()
@@ -2857,9 +2858,11 @@ def browse(request, type="object"):
         object_list = cls.filter(query)
 
     ctx.update(get_pagination(request.GET, object_list, type))
+    extra_types = [c.__name__ for c in models.IObject.__subclasses__()] 
     ctx.update({
         "object_type" : _("Browse"),
         "type" : type,
+        "extra_types" : extra_types,
     })
     return r2r("browse.html", ctx, request)
 
