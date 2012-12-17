@@ -1,9 +1,11 @@
+from django.http import HttpResponseRedirect
 from django.db.models import F, Q
 from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp import models
 import openPLM.plmapp.base_views as bv
 from openPLM.plmapp.views import create_object, r2r, get_pagination
+from openPLM.plmapp.forms import PLMObjectForm
 
 from openPLM.apps.ecr.forms import get_creation_form
 from openPLM.apps.ecr.models import ECR
@@ -48,7 +50,7 @@ def browse_ecr(request):
             query |= Q(id__in=readable.values_list("ecr_id", flat=True))
         object_list = ECR.objects.filter(query)
 
-    ctx.update(get_pagination(request.GET, object_list, type))
+    ctx.update(get_pagination(request.GET, object_list, "ECR"))
     extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
     ctx.update({
         "object_type": _("Browse"),
@@ -56,3 +58,47 @@ def browse_ecr(request):
         "extra_types": extra_types,
     })
     return r2r("browse_ecr.html", ctx, request)
+
+
+@bv.handle_errors
+def plmobjects(request, obj_ref):
+    obj, ctx = bv.get_generic_data(request, "ECR", obj_ref, "-")
+    objects = models.PLMObject.objects.filter(
+            id__in=obj.plmobjects.now().values_list("plmobject", flat=True))
+    objects = objects.select_related("state", "lifecycle")
+    ctx.update(get_pagination(request.GET, objects, "object"))
+    ctx["current_page"] = "part-doc-cads"
+    ctx["detach_objects"] = obj.is_editable and ctx["is_owner"]
+    return r2r("ecrs/plmobjects.html", ctx, request)
+
+
+@bv.handle_errors
+def attach_plmobject(request, obj_ref):
+    obj, ctx = bv.get_generic_data(request, "ECR", obj_ref, "-")
+    if request.method == "POST":
+        form = PLMObjectForm(request.POST)
+        if form.is_valid():
+            plmobject = bv.get_obj_from_form(form, request.user)
+            obj.attach_object(plmobject.object)
+            return HttpResponseRedirect("..")
+    else:
+        form = PLMObjectForm()
+    ctx.update({
+        "current_page": "part-doc-cads",
+        "attach_form": form,
+        "link_creation": True,
+        "attach": (obj, "attach_plmobject"),
+    })
+    return r2r("ecrs/plmobjects_add.html", ctx, request)
+
+
+@bv.handle_errors
+def detach_plmobject(request, obj_ref):
+    obj, ctx = bv.get_generic_data(request, "ECR", obj_ref, "-")
+    if request.method == "POST":
+        plmobject_id = int(request.POST["plmobject"])
+        plmobject = models.PLMObject.objects.get(id=plmobject_id)
+        obj.detach_object(plmobject)
+    return HttpResponseRedirect("..")
+
+

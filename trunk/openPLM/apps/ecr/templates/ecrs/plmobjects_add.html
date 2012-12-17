@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    {% with attach_form as form %}
+        {% include "snippets/undo_form.html" %}
+    {% endwith %}
+
+{% endblock %}
