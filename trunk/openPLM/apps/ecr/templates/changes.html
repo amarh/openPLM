@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+{% block content %}
+    {% if objects.paginator.count == 0 %}
+        <span>
+            {% trans "No ECR are attached to this object." %}
+        </span>
+    {% else %}
+        <div>
+            <span id="numresults">
+                {% trans "Engineering Change Requests" %}
+                {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %} {{start}} - {{end}} on {{total}} {% endblocktrans %}
+            </span> 
+        </div>
+        <div>
+            {% for object in objects.object_list %}
+                {% include "ecrs/identity_card.html" %}
+            {% endfor %}
+        </div>
+
+        {% show_pages_bar objects request %}
+    {% endif %}
+{% endblock %}
+
