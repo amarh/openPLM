@@ -265,6 +265,7 @@ class ECRHistory(pmodels.AbstractHistory):
     def get_redirect_url(self):
         return "/history_item/ecr/%d/" % self.id
 
+
 class ECRPLMObjectLink(pmodels.Link):
     ecr = models.ForeignKey(ECR, related_name="plmobjects")
     plmobject = models.ForeignKey(pmodels.PLMObject, related_name="ecrs")
