@@ -78,7 +78,9 @@ $(function (){
         hide_left_panel();
         return;
     }
-    var search = $.cookie("search_box") === "true";
+    var search_cookie = $.cookie("search_box");
+    var search = search_cookie === "true";
+    search = search || $("#SearchBox").hasClass("link_creation");
 
     $("#SearchButton").attr("checked", search);
     var tb = $("#SearchButton").button( {
@@ -107,6 +109,9 @@ $(function (){
     }
     else{
         hide_search_box();
+    }
+    if (search_cookie !== null){
+        $.cookie("search_box", search_cookie, { path: '/' });
     }
 
 
