@@ -9,9 +9,11 @@ ecr = r'^ecr/(?P<obj_ref>%(x)s)/' % {'x': r'[^/?#\t\r\v\f]+'}
 
 ecr_dict = {"obj_type": "ECR", "obj_revi": "-"}
 
+object_pattern = '(?P<obj_type>\w+)/(?P<obj_ref>%(x)s)/(?P<obj_revi>%(x)s)/' % {'x' : r'[^/?#\t\r\v\f]+'}
+
 urlpatterns = patterns('',
     (ecr + "(?:attributes/)?$", pviews.display_object_attributes, ecr_dict),
-    ("pdf/" + ecr[1:] + "(?:attributes/)?$", "apps.pdfgen.views.attributes", ecr_dict),
+    ("^pdf/" + ecr[1:] + "(?:attributes/)?$", "apps.pdfgen.views.attributes", ecr_dict),
     (ecr + r"history/$", pviews.display_object_history, ecr_dict),
     (ecr + r"history/$", pviews.display_object_history, ecr_dict),
     (ecr + r"lifecycle/$", pviews.display_object_lifecycle, ecr_dict),
@@ -27,6 +29,7 @@ urlpatterns = patterns('',
     (ecr + r'part-doc-cads/delete/$', views.detach_plmobject),
     (r'^browse/ecr/$', views.browse_ecr),
     (r'^history_item/ecr/(?P<hid>\d+)/$', views.redirect_history),
+    (r'^object/' + object_pattern + "changes/$", views.changes),
     )
 
 if "openPLM.apps.rss" in settings.INSTALLED_APPS:
