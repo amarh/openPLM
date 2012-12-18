@@ -81,9 +81,7 @@ class RssFeed(HTTPAuthFeed):
         return obj.histories[:10]
 
     def item_title(self, item):
-        i_date = item.date.strftime("%B %d, %Y")
-        i_action = item.action
-        return "%s - %s" % (i_date,i_action)
+        return u"%s - %s" % (item. action, strip_tags(item.title))
 
     def item_description(self, item):
         i_details = item.details.lower()

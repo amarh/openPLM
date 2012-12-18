@@ -8,7 +8,8 @@ from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
 from .lifecycle import State, Lifecycle, get_cancelled_state
-from .plmobject import PLMObject
+from .plmobject import PLMObject, get_all_subclasses
+from openPLM.plmapp.qssequence import QuerySetSequence
 
 # history stuff
 class AbstractHistory(models.Model):
@@ -24,13 +25,13 @@ class AbstractHistory(models.Model):
 
             type of action (see :attr:`.ACTIONS`)
         .. attribute:: details
-        
+
             type of action (see :attr:`.ACTIONS`)
         .. attribute:: date
-        
+
             date of the event
         .. attribute:: user
-        
+
             :class:`~django.contrib.auth.models.User` who maded the event
 
     :class attribute:
@@ -47,7 +48,7 @@ class AbstractHistory(models.Model):
         ("Publish", "Publish"),
         ("Unpublish", "Unpublish"),
     )
-    
+
     class Meta:
         abstract = True
 
@@ -60,7 +61,15 @@ class AbstractHistory(models.Model):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
 
     def get_day(self):
-        return datetime.date(self.date.year, self.date.month, self.date.day) 
+        return datetime.date(self.date.year, self.date.month, self.date.day)
+
+    @classmethod
+    def timeline_items(cls, user):
+        return cls.objects.all().order_by("-date").select_related("user", "plmobject")
+
+    @property
+    def title(self):
+        return self.plmobject.title
 
 
 class History(AbstractHistory):
@@ -71,6 +80,14 @@ class History(AbstractHistory):
     def get_redirect_url(self):
         return "/history_item/object/%d/" % self.id
 
+    @classmethod
+    def timeline_items(cls, user):
+        q = models.Q(plmobject__owner__username=settings.COMPANY)
+        q |= models.Q(plmobject__group__in=user.groups.all())
+        histories = History.objects.filter(q).order_by('-date')
+        return histories.select_related("user", "plmobject__type", "plmobject__reference",
+            "plmobject__revision")
+
 class UserHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
@@ -79,13 +96,32 @@ class UserHistory(AbstractHistory):
     def get_redirect_url(self):
         return "/history_item/user/%d/" % self.id
 
+    @property
+    def title(self):
+        return self.plmobject.username
+
+    @classmethod
+    def timeline_items(cls, user):
+        return cls.objects.all().order_by("-date").select_related("user", "plmobject")
+
+
 class GroupHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
     plmobject = models.ForeignKey(Group)
-    
+
     def get_redirect_url(self):
         return "/history_item/group/%d/" % self.id
+
+    @classmethod
+    def timeline_items(cls, user):
+        return cls.objects.all().order_by("-date").select_related("user",
+                "plmobject", "plmobject__groupinfo")
+
+    @property
+    def title(self):
+        return self.plmobject.groupinfo.title
+
 
 class StateHistoryQuerySet(QuerySet):
     """ QuerySet with utility methods to filter :class:`StateHistory` alive at a given time."""
@@ -132,7 +168,7 @@ class StateHistoryManager(models.Manager):
         Shorcut for ``self.get_query_set().at(time)``. See :meth:`StateHistoryQuerySet.at`.
         """
         return self.get_query_set().at(time)
-    
+
     def officials(self):
         """
         Shorcut for ``self.get_query_set().officials()``. See :meth:`StateHistoryQuerySet.officials()`.
@@ -146,7 +182,7 @@ class StateHistory(models.Model):
 
     :model attributes:
         .. attribute:: plmobject
-            
+
             :class:`.PLMObject` that has been promoted/demoted.
         .. attribute:: start_time
 
@@ -174,20 +210,20 @@ class StateHistory(models.Model):
 
                 set if :meth:`.PLMObject.is_draft` returns True
             .. attribute:: PROPOSED
-                
+
                 set if :meth:`.PLMObject.is_proposed` returns True
             .. attribute:: OFFICIAL
-            
+
                 set if :meth:`.PLMObject.is_official` returns True
             .. attribute:: DEPRECATED
 
                 set if :meth:`.PLMObject.is_deprecated` returns True
             .. attribute:: CANCELLED
-                
+
                 set if :meth:`.PLMObject.is_cancelled` returns True
 
     """
-    
+
     class Meta:
         app_label = "plmapp"
 
@@ -225,9 +261,8 @@ class StateHistory(models.Model):
         super(StateHistory, self).save(*args, **kwargs)
 
 def timeline_histories(user):
-    q = models.Q(plmobject__owner__username=settings.COMPANY)
-    q |= models.Q(plmobject__group__in=user.groups.all())
-    histories = History.objects.filter(q).order_by('-date')
-    return histories.select_related("user", "plmobject__type", "plmobject__reference",
-        "plmobject__revision")
+    d = {}
+    get_all_subclasses(AbstractHistory, d)
+    del d["AbstractHistory"]
+    return QuerySetSequence(*(c.timeline_items(user) for c in d.values()))
 

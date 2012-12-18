@@ -6,6 +6,7 @@ MINYEAR = 1900
 
 from django.utils.dates import WEEKDAYS
 from django.utils.html import conditional_escape as esc
+from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -125,7 +126,7 @@ class RevisionHistoryCalendar(HistoryCalendar):
                 esc(history.action))
 
 class TimelineCalendar(HistoryCalendar):
-   
+
     def group_by_day(self, histories):
         histories = super(TimelineCalendar, self).group_by_day(histories)
         # keep one history per day
@@ -140,27 +141,24 @@ class TimelineCalendar(HistoryCalendar):
         return histories
 
     def format_hline(self, history):
-        p = history.plmobject
-        return u'''<span class="type">%s</span>&nbsp;//
-<span class="reference">%s</span>&nbsp;//
-<span class="revision">%s</span>''' % (esc(p.type), esc(p.reference), esc(p.revision))
+        return history.title
 
 @handle_errors
 def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", obj_revi="-", timeline=False):
     """
     Calendar view.
-    
+
     This view displays a history of the selected object and its revisions.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/calendar/[{year}/][{month}/]`
     :url: :samp:`/user/{username}/history/calendar/[{year}/][{month}/]``
     :url: :samp:`/group/{group_name}/history/calendar/[{year}/][{month}/]``
     :url: :samp:`/timeline/calendar/[{year}/][{month}/]``
-    
-    .. include:: ../../modules/views/views_params.txt 
+
+    .. include:: ../../modules/views/views_params.txt
 
     **Template:**
-    
+
     :file:`calendar.html`
 
     **Context:**
@@ -193,7 +191,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
         prefix = "../"
     if month is not None:
         prefix += "../"
-  
+
     year, month = parse_date(year, month)
 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -230,7 +228,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
         next_month = date(year=year, month=month + 1, day=1)
 
     ctx.update({
-        'current_page' : 'history', 
+        'current_page' : 'history',
         'calendar' : mark_safe(cal),
         'year' : year,
         'month' : month,
@@ -252,12 +250,12 @@ def history(request, *args, **kwargs):
 
 if ICAL_INSTALLED:
     class CalendarFeed(RssFeed, ICalFeed):
-       
+
         def get_object(self, request, year=None, month=None, obj_type="-", obj_ref="-", obj_revi="-"):
             year, month = parse_date(year, month)
             obj = super(CalendarFeed, self).get_object(request, obj_type, obj_ref, obj_revi)
-            obj.object.h_month = month 
-            obj.object.h_year = year 
+            obj.object.h_month = month
+            obj.object.h_year = year
             return obj
 
         def items(self, obj):
@@ -286,8 +284,8 @@ if ICAL_INSTALLED:
         def get_object(self, request, year=None, month=None):
             year, month = parse_date(year, month)
             obj = request.user
-            obj.h_month = month 
-            obj.h_year = year 
+            obj.h_month = month
+            obj.h_year = year
             return obj
 
         def items(self, obj):
@@ -296,9 +294,8 @@ if ICAL_INSTALLED:
             return models.timeline_histories(obj).filter(date__year=year, date__month=month).order_by("date")
 
         def item_title(self, item):
-            return u"%s // %s // %s - %s" % (item.plmobject.type,
-                    item.plmobject.reference, item.plmobject.revision,
-                    item.action)
+            return strip_tags(item.title)
+
         def item_start_datetime(self, item):
             return item.date
 

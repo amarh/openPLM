@@ -35,11 +35,7 @@
                         {{histo.action}}
                     </span>
                     {% if show_identifiers %}
-                        <a href="{{ histo.plmobject.plmobject_url}}">
-                            <span class="type">{{ histo.plmobject.type }}</span>
-                            <span class="reference">{{ histo.plmobject.reference }}</span>
-                            <span class="revision">{{ histo.plmobject.revision }}</span>
-                        </a>
+                        <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a>
                         <span>:</span>
                     {% endif %}
                     {% if show_revisions %}
