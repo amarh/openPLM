@@ -2416,7 +2416,6 @@ def file_revisions(request, docfile_id):
     :return: a :class:`django.http.HttpResponse`
     """
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
-    ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
     obj, ctx = get_generic_data(request, doc_file.document.type, doc_file.document.reference,
             doc_file.document.revision)
     last_revision = doc_file.last_revision if doc_file.last_revision else doc_file
@@ -2511,8 +2510,6 @@ def group_ask_to_join(request, obj_ref):
     if request.method == "POST":
         obj.ask_to_join()
         return HttpResponseRedirect("..")
-    else:
-        form = forms.SelectUserForm()
     ctx["ask_form"] = ""
     ctx['current_page'] = 'users'
     ctx['in_group'] = request.user.groups.filter(id=obj.id).exists()
