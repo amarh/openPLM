@@ -17,6 +17,6 @@ urlpatterns = patterns('',
     (object_url+'atom/$', AtomFeed()),
     (user_url+'rss/$', AtomFeed(),user_dict),
     (group_url+'rss/$', AtomFeed(), group_dict),
-    ('rss/$', TimelineRssFeed()),
-    ('atom/$', TimelineAtomFeed()),
+    (r'^(?:timeline/)?rss/$', TimelineRssFeed()),
+    (r'^(?:timeline/)?atom/$', TimelineAtomFeed()),
 )

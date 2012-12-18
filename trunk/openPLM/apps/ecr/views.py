@@ -4,11 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp import models
 import openPLM.plmapp.base_views as bv
-from openPLM.plmapp.views import create_object, r2r, get_pagination
+from openPLM.plmapp.views import create_object, r2r, get_pagination, ITEMS_PER_HISTORY
 from openPLM.plmapp.forms import PLMObjectForm
 
 from openPLM.apps.ecr.forms import get_creation_form
-from openPLM.apps.ecr.models import ECR
+from openPLM.apps.ecr.models import ECR, ECRHistory
 
 
 @bv.handle_errors
@@ -106,4 +106,12 @@ def detach_plmobject(request, obj_ref):
         obj.detach_object(plmobject)
     return HttpResponseRedirect("..")
 
+
+@bv.handle_errors
+def redirect_history(request, hid):
+    h = ECRHistory.objects.get(id=int(hid))
+    items = ECRHistory.objects.filter(plmobject=h.plmobject, date__gte=h.date).count() - 1
+    page = items // ITEMS_PER_HISTORY + 1
+    url = u"%shistory/?page=%d#%s" % (h.plmobject.plmobject_url, page, hid)
+    return HttpResponseRedirect(url)
 

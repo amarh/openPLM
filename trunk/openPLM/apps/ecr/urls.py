@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.conf.urls.defaults import *
 import openPLM.apps.ecr.views as views
 import openPLM.apps.ecr.controllers
@@ -11,17 +12,27 @@ ecr_dict = {"obj_type": "ECR", "obj_revi": "-"}
 urlpatterns = patterns('',
     (ecr + "(?:attributes/)?$", pviews.display_object_attributes, ecr_dict),
     ("pdf/" + ecr[1:] + "(?:attributes/)?$", "apps.pdfgen.views.attributes", ecr_dict),
-    (ecr + "history/$", pviews.display_object_history, ecr_dict),
-    (ecr + "lifecycle/$", pviews.display_object_lifecycle, ecr_dict),
-    (ecr + "lifecycle/apply/$", pviews.display_object_lifecycle, ecr_dict),
-    (ecr + 'management/add/$', pviews.add_management, ecr_dict),
-    (ecr + 'management/add-reader/$', pviews.add_management, dict(obj_type="ECR",
+    (ecr + r"history/$", pviews.display_object_history, ecr_dict),
+    (ecr + r"history/$", pviews.display_object_history, ecr_dict),
+    (ecr + r"lifecycle/$", pviews.display_object_lifecycle, ecr_dict),
+    (ecr + r"lifecycle/apply/$", pviews.display_object_lifecycle, ecr_dict),
+    (ecr + r'management/add/$', pviews.add_management, ecr_dict),
+    (ecr + r'management/add-reader/$', pviews.add_management, dict(obj_type="ECR",
                                                                 obj_revi="-", reader=True)),
-    (ecr + 'management/add-signer(?P<level>\d+)/$', pviews.add_management, ecr_dict),
-    (ecr + 'management/replace/(?P<link_id>\d+)/$', pviews.replace_management, ecr_dict),
-    (ecr + 'management/delete/$', pviews.delete_management, ecr_dict),
-    (ecr + 'part-doc-cads/$', views.plmobjects),
-    (ecr + 'part-doc-cads/add/$', views.attach_plmobject),
-    (ecr + 'part-doc-cads/delete/$', views.detach_plmobject),
-    ('browse/ecr/$', views.browse_ecr),
+    (ecr + r'management/add-signer(?P<level>\d+)/$', pviews.add_management, ecr_dict),
+    (ecr + r'management/replace/(?P<link_id>\d+)/$', pviews.replace_management, ecr_dict),
+    (ecr + r'management/delete/$', pviews.delete_management, ecr_dict),
+    (ecr + r'part-doc-cads/$', views.plmobjects),
+    (ecr + r'part-doc-cads/add/$', views.attach_plmobject),
+    (ecr + r'part-doc-cads/delete/$', views.detach_plmobject),
+    (r'^browse/ecr/$', views.browse_ecr),
+    (r'^history_item/ecr/(?P<hid>\d+)/$', views.redirect_history),
     )
+
+if "openPLM.apps.rss" in settings.INSTALLED_APPS:
+    from openPLM.apps.rss.feeds import RssFeed, AtomFeed
+    urlpatterns += patterns("",
+        (ecr + "rss/$", RssFeed(), ecr_dict),
+        (ecr + "atom/$", AtomFeed(), ecr_dict),
+    )
+

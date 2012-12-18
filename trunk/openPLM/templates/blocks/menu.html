@@ -7,7 +7,7 @@
                 {% filter upper %}{% trans menu_item %}{% endfilter%}
             </a>
             {% ifequal menu_item "history" %}
-            <a target="_blank" href="../rss/">
+                <a target="_blank" href="{{obj.plmobject_url}}rss/">
                 <img src="/media/img/feed_icon.png" alt="{% trans "click here to subscribe to the related feed" %}" title="{% trans "click here to subscribe to the related feed" %}">
             </a>
             {% endifequal %}
