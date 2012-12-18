@@ -3,7 +3,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ from openPLM.plmapp.archive import generate_archive, ARCHIVE_FORMATS
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view, secure_required
-from openPLM.plmapp.controllers import get_controller 
+from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
@@ -94,9 +94,9 @@ from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHand
 def r2r(template, dictionary, request):
     """
     Shortcut for:
-    
+
     ::
-        
+
         render_to_response(template, dictionary,
                               context_instance=RequestContext(request))
     """
@@ -161,15 +161,15 @@ def display_home_page(request):
     Home page view.
 
     :url: :samp:`/home/`
-    
+
     **Template:**
-    
+
     :file:`home.html`
 
     **Context:**
 
     ``RequestContext``
- 
+
     ``pending_invitations_owner``
         QuerySet of pending invitations to groups owned by the user
 
@@ -203,22 +203,22 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/attributes/`
 
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`attribute.html`
 
     **Context:**
 
     ``RequestContext``
-    
+
     ``object_attributes``
         list of tuples(verbose attribute name, value)
-        
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     object_attributes_list = []
     attrs = obj.attributes
     if getattr(settings, "HIDE_EMAILS", False):
@@ -264,18 +264,18 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
     """
     Lifecycle data of the given object (a part or a document).
-  
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/lifecycle/[apply/]`
-    
-    .. include:: views_params.txt 
-  
+
+    .. include:: views_params.txt
+
     POST requests must have a "demote", "promote", "publish" or "unpublish"
     key and must validate the :class:`.ConfirmPasswordForm` form.
     If the form is valid, the object is promoted, demoted, published, unpublished
     according to the request.
 
     **Template:**
-    
+
     :file:`lifecycle.html`
 
     **Context:**
@@ -306,21 +306,21 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
             if action_name in request.POST:
                 ctx["action"] = action_name
                 break
-    else: 
+    else:
         password_form = forms.ConfirmPasswordForm(request.user)
     ctx['password_form'] = password_form
     ctx['in_group'] = obj.check_in_group(request.user, raise_=False)
     ctx.update(get_management_data(obj, request.user))
     ctx.update(get_lifecycle_data(obj))
     return r2r('lifecycle.html', ctx, request)
-    
-    
+
+
 def get_lifecycle_data(obj):
     """
     Returns a dictionary containing lifecycle data of *obj*.
 
     **Dictionary content**
-    
+
     ``object_lifecycle``
         List of tuples (state name, *boolean*, signer role). The boolean is
         True if the state name equals to the current state. The signer role
@@ -332,17 +332,17 @@ def get_lifecycle_data(obj):
 
     ``is_signer_dm``
         True if the current user has the permission to demote this object
-    
+
     ``signers_data``
         List of tuple (signer, nb_signer). The signer is a dict which contains
         management data for the signer and indicates wether a signer exists or not.
-        
+
     ``password_form``
         A form to ask the user password
 
     ``cancelled_revisions``
         List of plmobjects that will be cancelled if the object is promoted
-    
+
     ``deprecated_revisions``
         List of plmobjects that will be deprecated if the object is promoted
     """
@@ -387,22 +387,22 @@ def get_lifecycle_data(obj):
         'deprecated_revisions' : deprecated,
         'alternates' : alternates,
         'previous_alternates' : previous_alternates,
-        'current_page' : 'lifecycle', 
+        'current_page' : 'lifecycle',
         'object_lifecycle' : object_lifecycle,
-        'is_signer' : is_signer, 
+        'is_signer' : is_signer,
         'is_signer_dm' : is_signer_dm,
         'is_promotable' : obj.is_promotable(),
         'can_approve' : can_approve,
         'can_cancel' : obj.can_cancel(),
     })
     return ctx
-    
+
 def get_management_data(obj, user):
     """
     Returns a dictionary containing management data for *obj*.
 
     :param user: User who runs the request
-    
+
     **Dictionary content**
 
     ``notified_list``
@@ -418,7 +418,7 @@ def get_management_data(obj, user):
 
         ``is_notified``
             True if *user* receives notifications when *obj* changes
-        
+
         ``remove_notify_link``
             (set if *is_notified* is True)
             Notification :class:`.PLMObjectUserLink` between *obj* and *user*
@@ -443,7 +443,7 @@ def get_management_data(obj, user):
                 initial = dict(type="User", username=user.username)
                 form = forms.SelectUserForm(initial=initial)
                 for field in ("type", "username"):
-                    form.fields[field].widget = HiddenInput() 
+                    form.fields[field].widget = HiddenInput()
                 ctx["notify_self_form"] = form
                 ctx["can_notify"] = True
             else:
@@ -454,19 +454,19 @@ def get_management_data(obj, user):
         'reader_list' :[l for l in links if l.role == models.ROLE_READER],
     })
     return ctx
-    
+
 
 @handle_errors
 def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     """
     View that displays the revisions of the given object (a part or
     a document) and shows a form to make a new revision.
-    
-    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/revisions/`
-    
-    .. include:: views_params.txt 
 
-    This view returns the result of :func:`revise_document` 
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/revisions/`
+
+    .. include:: views_params.txt
+
+    This view returns the result of :func:`revise_document`
     if the object is a document and the result of :func:`revise_part`
     if the object is a part.
     """
@@ -480,14 +480,14 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
 def get_id_card_data(doc_ids):
     """
     Get informations to display in the id-cards of all Document which id is in doc_ids
-    
+
     :param doc_ids: list of Document ids to treat
-    
+
     :return: a Dictionnary which contains the following informations
-    
+
         * ``thumbnails``
             list of tuple (document,thumbnail)
-            
+
         * ``num_files``
             list of tuple (document, number of file)
     """
@@ -512,7 +512,7 @@ def revise_document(obj, ctx, request):
     :param ctx: initial context
     :type ctx: dict
     :param request: riven request
-  
+
     This view can create a new revision of the document, it required
     the following POST parameters:
 
@@ -529,7 +529,7 @@ def revise_document(obj, ctx, request):
     parts will be attached to the new document is required.
 
     **Template:**
-    
+
     :file:`documents/revisions.html`
 
     **Context:**
@@ -541,7 +541,7 @@ def revise_document(obj, ctx, request):
 
     ``revisions``
         list of revisions of the document
-    
+
     ``add_revision_form``
         form to revise the document. Only set if the document is revisable.
 
@@ -553,7 +553,7 @@ def revise_document(obj, ctx, request):
     if obj.is_revisable():
         parts = obj.get_suggested_parts()
         confirmation = bool(parts)
-       
+
         if request.method == "POST" and request.POST:
             add_form = forms.AddRevisionForm(request.POST)
             selected_parts = []
@@ -563,9 +563,9 @@ def revise_document(obj, ctx, request):
                 if part_formset.is_valid():
                     for form in part_formset.forms:
                         part = form.instance
-                        if part not in parts: 
+                        if part not in parts:
                             # invalid data
-                            # a user should not be able to go here if he 
+                            # a user should not be able to go here if he
                             # does not write by hand its post request
                             # so we do not need to generate an error message
                             valid_forms = False
@@ -584,7 +584,7 @@ def revise_document(obj, ctx, request):
         ctx["add_revision_form"] = add_form
     ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()
-    
+
     ctx.update(get_id_card_data([r.id for r in revisions]))
     ctx.update({'current_page' : 'revisions',
                 'revisions' : revisions,
@@ -593,13 +593,13 @@ def revise_document(obj, ctx, request):
 
 def revise_part(obj, ctx, request):
     """ View to revise a part.
-    
+
     :param obj: displayed part
     :type obj: :class:`.PartController`
     :param ctx: initial context
     :type ctx: dict
     :param request: riven request
-  
+
     This view can create a new revision of the part, it required
     the following POST parameters:
 
@@ -622,7 +622,7 @@ def revise_part(obj, ctx, request):
     If there is at least one suggested object, a confirmation is required.
 
     **Template:**
-    
+
     :file:`parts/revisions.html`
 
     **Context:**
@@ -634,7 +634,7 @@ def revise_part(obj, ctx, request):
 
     ``revisions``
         list of revisions of the part
-    
+
     ``add_revision_form``
         form to revise the part. Only set if the document is revisable.
 
@@ -645,7 +645,7 @@ def revise_part(obj, ctx, request):
     ``children_formset``
         a :class:`.SelectChildFormset` of parts that the new revision
         will be composed of. Only set if *confirmation* is True.
-    
+
     ``parents_formset``
         a :class:`.SelectParentFormset` of parts that the new revision
         will be added to, it will replace the previous revisions
@@ -672,7 +672,7 @@ def revise_part(obj, ctx, request):
                 if children_formset.is_valid():
                     for form in children_formset.forms:
                         link = form.cleaned_data["link"]
-                        if link not in children: 
+                        if link not in children:
                             valid_forms = False
                             break
                         if form.cleaned_data["selected"]:
@@ -686,7 +686,7 @@ def revise_part(obj, ctx, request):
                     if doc_formset.is_valid():
                         for form in doc_formset.forms:
                             doc = form.cleaned_data["document"]
-                            if doc not in documents: 
+                            if doc not in documents:
                                 valid_forms = False
                                 break
                             if form.cleaned_data["selected"]:
@@ -701,7 +701,7 @@ def revise_part(obj, ctx, request):
                         for form in parents_formset.forms:
                             parent = form.cleaned_data["new_parent"]
                             link = form.cleaned_data["link"]
-                            if (link, parent) not in parents: 
+                            if (link, parent) not in parents:
                                 valid_forms = False
                                 break
                             if form.cleaned_data["selected"]:
@@ -757,18 +757,18 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         template="history.html"):
     """
     History view.
-    
+
     This view displays a history of the selected object and its revisions.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/history/`
     :url: :samp:`/user/{username}/history/`
     :url: :samp:`/group/{group_name}/history/`
     :url: :samp:`/timeline/`
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`history.html`
 
     **Context:**
@@ -780,7 +780,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
 
     ``show_revisions``
         True if the template should show the revision of each history row
-    
+
     ``show_identifiers``
         True if the template should show the type, reference and revision
         of each history row
@@ -790,7 +790,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         # global timeline: shows objects owned by the company and readable objects
         history = models.timeline_histories(obj)
         ctx['object_type'] = _("Timeline")
-    elif hasattr(obj, "get_all_revisions"):
+    elif hasattr(obj, "revision"):
         # display history of all revisions
         history = obj.histories
         ctx["show_revisions"] = True
@@ -807,7 +807,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     except EmptyPage:
         history = paginator.page(paginator.num_pages)
     ctx.update({
-        'current_page' : 'history', 
+        'current_page' : 'history',
         'object_history' : history,
         'show_identifiers' : timeline,
         })
@@ -822,21 +822,21 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
 def display_children(request, obj_type, obj_ref, obj_revi):
     """
     BOM view.
-    
+
     That view displays the children of the selected object that must be a part.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/bom.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``children``
         a list of :class:`.Child`
 
@@ -845,7 +845,7 @@ def display_children(request, obj_type, obj_ref, obj_revi):
 
     ``extra_columns``
         a list of extra columns that are displayed
-    
+
     ``extension_data``
 
     ``decomposition_msg``
@@ -858,7 +858,7 @@ def display_children(request, obj_type, obj_ref, obj_revi):
         query = request.GET.urlencode() + "&compact=on"
         return HttpResponseRedirect("%sdiff/?%s" % (request.path, query))
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_children"):
         return HttpResponseBadRequest("object must be a part")
     date = None
@@ -897,19 +897,19 @@ def display_children(request, obj_type, obj_ref, obj_revi):
 def edit_children(request, obj_type, obj_ref, obj_revi):
     """
     View to edit a BOM.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/edit/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/bom_edit.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``children_formset``
         a formset to edit the BOM
 
@@ -921,7 +921,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_children"):
         return HttpResponseBadRequest("object must be a part")
     if request.method == "POST":
@@ -936,7 +936,7 @@ def edit_children(request, obj_type, obj_ref, obj_revi):
     for PCLE in models.get_PCLEs(obj.object):
         fields = PCLE.get_visible_fields()
         if fields:
-            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+            extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name)
                     for f in fields)
             prefix = PCLE._meta.module_name
             extra_fields.extend('%s_%s' % (prefix, f) for f in fields)
@@ -953,18 +953,18 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
     View to replace a child by another one.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/replace/{link_id}/`
-    
+
     .. include:: views_params.txt
     :param link_id: id of the :class:`.ParentChildLink` being replaced
 
     **Template:**
-    
+
     :file:`parts/bom_replace.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``replace_child_form``
         a form to select the replacement part
 
@@ -996,24 +996,24 @@ def replace_child(request, obj_type, obj_ref, obj_revi, link_id):
     ctx["link_creation"] = True
     return r2r("parts/bom_replace.html", ctx, request)
 
-##########################################################################################    
+##########################################################################################
 @handle_errors
 def add_child(request, obj_type, obj_ref, obj_revi):
     """
     View to add a child to a part.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/bom-child/add/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/bom_add.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``add_child_form``
         a form to add a child (:class:`.AddChildForm`)
 
@@ -1029,7 +1029,7 @@ def add_child(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi,
             load_all=True)
-    
+
     if request.method == "POST" and request.POST:
         add_child_form = forms.AddChildForm(obj.object, request.POST)
         if add_child_form.is_valid():
@@ -1039,7 +1039,7 @@ def add_child(request, obj_type, obj_ref, obj_revi):
                           add_child_form.cleaned_data["order"],
                           add_child_form.cleaned_data["unit"],
                           **add_child_form.extensions)
-            return HttpResponseRedirect(obj.plmobject_url + "BOM-child/") 
+            return HttpResponseRedirect(obj.plmobject_url + "BOM-child/")
     else:
         if "type" in request.GET and request.GET["type"] in models.get_all_parts():
             # use GET params only if they seems valid
@@ -1077,7 +1077,7 @@ def compare_bom(request, obj_type, obj_ref, obj_revi):
             compact = cmp_form.cleaned_data.get("compact", compact)
     else:
         initial = {"date" : now, "date2" : now, "level" : "first",
-            "state" : "all", "compact" : compact, } 
+            "state" : "all", "compact" : compact, }
         cmp_form = forms.CompareBOMForm(initial=initial)
     ctx.update(obj.cmp_bom(date, date2, level, state, show_documents, show_alternates))
     ctx.update({'current_page' : 'BOM-child',
@@ -1088,27 +1088,27 @@ def compare_bom(request, obj_type, obj_ref, obj_revi):
                 })
     return r2r('parts/bom_diff.html', ctx, request)
 
-    
-##########################################################################################    
+
+##########################################################################################
 @handle_errors
 def display_parents(request, obj_type, obj_ref, obj_revi):
     """
     Parents view.
-    
+
     That view displays the parents of the selected object that must be a part.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parents/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/parents.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``parents``
         a list of :class:`.Parents`
 
@@ -1117,7 +1117,7 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_parents"):
         return HttpResponseBadRequest("object must be a part")
     date = None
@@ -1154,7 +1154,7 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
     if only_official:
         states = states.officials()
     states = dict(states.values_list("plmobject", "state"))
-    
+
     ctx.update({'current_page':'parents',
                 'parents' :  parents,
                 'display_form' : display_form,
@@ -1198,21 +1198,21 @@ def delete_alternate(request, obj_type, obj_ref, obj_revi):
 def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     Attached documents view.
-    
+
     That view displays the documents attached to the selected object that must be a part.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/doc-cad/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/doccad.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``documents``
         a queryset of :class:`.DocumentPartLink` bound to the part
 
@@ -1228,7 +1228,7 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_attached_documents"):
         return HttpResponseBadRequest("object must be a part")
     if request.method == "POST":
@@ -1247,24 +1247,24 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     return r2r('parts/doccad.html', ctx, request)
 
 
-##########################################################################################    
+##########################################################################################
 @handle_errors
 def add_doc_cad(request, obj_type, obj_ref, obj_revi):
     """
     View to attach a document to a part.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/doc-cad/add/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`parts/doccad_add.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``add_doc_cad_form``
         a form to attach a document (:class:`.AddDocCadForm`)
 
@@ -1275,7 +1275,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
         set to (*obj*, "attach_doc")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if request.POST:
         add_doc_cad_form = forms.AddDocCadForm(request.POST)
         if add_doc_cad_form.is_valid():
@@ -1288,7 +1288,7 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
                 'add_doc_cad_form': add_doc_cad_form,
                 'attach' : (obj, "attach_doc")})
     return r2r('parts/doccad_add.html', ctx, request)
-    
+
 #############################################################################################
 ###      All functions which manage the different html pages specific to documents        ###
 #############################################################################################
@@ -1296,21 +1296,21 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
 def display_parts(request, obj_type, obj_ref, obj_revi):
     """
     Attached parts view.
-    
+
     That view displays the parts attached to the selected object that must be a document.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parts/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`documents/parts.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``parts``
         a queryset of :class:`.DocumentPartLink` bound to the document
 
@@ -1322,7 +1322,7 @@ def display_parts(request, obj_type, obj_ref, obj_revi):
         (a part may not be "detachable")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_attached_parts"):
         return HttpResponseBadRequest("object must be a document")
     if request.method == "POST":
@@ -1334,30 +1334,30 @@ def display_parts(request, obj_type, obj_ref, obj_revi):
         formset = forms.get_rel_part_formset(obj)
     rforms = dict((form.instance.id, form) for form in formset.forms)
 
-    ctx.update({'current_page':'parts', 
+    ctx.update({'current_page':'parts',
                 'parts': obj.get_attached_parts(),
                 'forms' : rforms,
                 'parts_formset': formset})
     return r2r('documents/parts.html', ctx, request)
 
-##########################################################################################    
+##########################################################################################
 @handle_errors
 def add_part(request, obj_type, obj_ref, obj_revi):
     """
     View to attach a part to a document.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parts/add/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`documents/parts_add.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``add_part_form``
         a form to attach a part (:class:`.AddPartForm`)
 
@@ -1368,7 +1368,7 @@ def add_part(request, obj_type, obj_ref, obj_revi):
         set to (*obj*, "attach_part")
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if request.POST:
         add_part_form = forms.AddPartForm(request.POST)
         if add_part_form.is_valid():
@@ -1387,27 +1387,27 @@ def add_part(request, obj_type, obj_ref, obj_revi):
 def display_files(request, obj_type, obj_ref, obj_revi):
     """
     Files view.
-    
-    That view displays files of the given document. 
-    
+
+    That view displays files of the given document.
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`documents/files.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``file_formset``
         a formset to remove files
 
     ``archive_formats``
         list of available archive formats
-    
+
     ``add_file_form``
         form to add a file
     """
@@ -1426,8 +1426,8 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     else:
         formset = forms.get_file_formset(obj)
     add_file_form = forms.AddFileForm()
-    
-    ctx.update({'current_page':'files', 
+
+    ctx.update({'current_page':'files',
                 'file_formset': formset,
                 'archive_formats' : ARCHIVE_FORMATS,
                 'deprecated_files' : obj.deprecated_files.filter(last_revision__isnull=True),
@@ -1440,18 +1440,18 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 @handle_errors(undo="..")
 def add_file(request, obj_type, obj_ref, obj_revi):
     """
-    That view displays the form to upload a file. 
+    That view displays the form to upload a file.
 
     .. note::
 
         This view show a simple form (no javascript) and is here
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/add/`
-    
+
     .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`documents/files_add_noscript.html`
 
     **Context:**
@@ -1476,7 +1476,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             else:
                 return HttpResponse("false:")
         add_file_form = forms.AddFileForm()
-    ctx['add_file_form'] = add_file_form 
+    ctx['add_file_form'] = add_file_form
     return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
@@ -1485,20 +1485,20 @@ def add_file(request, obj_type, obj_ref, obj_revi):
 def up_file(request, obj_type, obj_ref, obj_revi):
     """
     This view process the file(s) upload.
-    
+
     The upload is done asynchronously.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/up/`
-    
+
     .. include:: views_params.txt
-    
+
     :post params:
         files
             uploaded files
-    
+
     :get params:
         list of pair (filename, id)
-    
+
     The response contains "failed" if the submitted form is not valid.
     """
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
@@ -1522,24 +1522,24 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
 def up_progress(request, obj_type, obj_ref, obj_revi):
     """
     Show upload progress for a given progress_id
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/files/_up/`
-    
+
     .. include:: views_params.txt
-    
+
     :get params:
         X-Progress-ID
             progress id to search
-        
+
         f_size
             size of the original file
-            
+
     The response contains the uploaded size and a status :
 
         * waiting if the corresponding file has not been created yet
-        
+
         * writing if the file is being written
-        
+
         * linking if the size of the uploaded file equals the size of the original
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
@@ -1569,18 +1569,18 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     View to replace a manager (owner, signer, reader...) by another one.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/replace/{link_id}/`
-    
+
     .. include:: views_params.txt
     :param link_id: id of the :class:`.PLMObjectUserLink` being replaced
 
     **Template:**
-    
+
     :file:`management_replace.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``replace_manager_form``
         a form to select the new manager (a user)
 
@@ -1595,7 +1595,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = obj.users.now().get(id=int(link_id))
-    
+
     if request.method == "POST":
         replace_manager_form = forms.SelectUserForm(request.POST)
         if replace_manager_form.is_valid():
@@ -1612,15 +1612,15 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
             return HttpResponseRedirect("../../../lifecycle/")
     else:
         replace_manager_form = forms.SelectUserForm()
-    
-    ctx.update({'current_page':'lifecycle', 
+
+    ctx.update({'current_page':'lifecycle',
                 'replace_manager_form': replace_manager_form,
                 'link_creation': True,
                 'role' : link.role,
                 'attach' : (obj, "add_" + link.role)})
     return r2r('management_replace.html', ctx, request)
 
-##########################################################################################    
+##########################################################################################
 @handle_errors(undo="../../lifecycle/")
 def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=None):
     """
@@ -1628,7 +1628,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add/`
 
-    or 
+    or
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/management/add-reader/`
 
@@ -1636,13 +1636,13 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
     :param reader: True to add a restricted reader instead of a notified user
 
     **Template:**
-    
+
     :file:`management_replace.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``replace_manager_form``
         a form to select the new manager (a user)
 
@@ -1670,15 +1670,15 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
             return HttpResponseRedirect("../../lifecycle/")
     else:
         add_management_form = forms.SelectUserForm()
-    
-    ctx.update({'current_page':'lifecycle', 
+
+    ctx.update({'current_page':'lifecycle',
                 'replace_manager_form': add_management_form,
                 'link_creation': True,
                 'role' : role,
                 "attach" : (obj, "add_" + role)})
     return r2r('management_replace.html', ctx, request)
 
-##########################################################################################    
+##########################################################################################
 @handle_errors
 def delete_management(request, obj_type, obj_ref, obj_revi):
     """
@@ -1713,7 +1713,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     """
     View to create a :class:`.PLMObject` or a :class:`.GroupInfo`.
 
-    :url: ``/object/create/`` 
+    :url: ``/object/create/``
 
     Requests (POST and GET) must contain a ``type`` variable that validates a
     :class:`.TypeForm`.
@@ -1721,7 +1721,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
     POST requests must validate the creation form, fields depend on the
     given type. If the creation form is valid, an object is created and
     in case of success, this view redirects to the created object.
-    
+
     Requests may contain a ``__next__`` variable. A successful creation will
     redirect to this URL. Some special strings are replaced:
 
@@ -1759,17 +1759,17 @@ def create_object(request, from_registered_view=False, creation_form=None):
          creation view
     :param creation_form: a creation form that will be used instead of the
          default one
-    
+
     **Template:**
-    
+
     :file:`create.html`
 
     **Context:**
 
     ``RequestContext``
-   
+
     ``creation_form``
-    
+
     ``creation_type_form``
         :class:`.TypeForm` to select the type of the created object
 
@@ -1841,7 +1841,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
             if attach is not None:
                 try:
                     attach(ctrl)
-                except (ControllerError, ValueError) as e: 
+                except (ControllerError, ValueError) as e:
                     # crtl cannot be attached (maybe the state of the
                     # related object as changed)
                     # alerting the user using the messages framework since
@@ -1872,8 +1872,8 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
     """
     Manage html page for the modification of the selected object.
     It computes a context dictionary based on
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     cls = models.get_all_plmobjects()[obj_type]
@@ -1884,7 +1884,7 @@ def modify_object(request, obj_type, obj_ref, obj_revi):
             return HttpResponseRedirect(obj.plmobject_url + "attributes/")
     else:
         modification_form = forms.get_modification_form(cls, instance=obj.object)
-    
+
     ctx['modification_form'] = modification_form
     return r2r('edit.html', ctx, request)
 
@@ -1894,19 +1894,19 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     """
     Manage html page to display the cloning form of the selected object
     (part or document) or clone it.
-    
+
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/clone/`
-    
-    .. include:: views_params.txt 
-    
+
+    .. include:: views_params.txt
+
     **Template:**
-    
+
     :file:`clone.html`
-    
+
     :param creation_form: the creation form that will be used to clone the object
-    
+
     If the object is a part :
-    
+
     :post params:
         a valid :class:`.SelectDocumentFormset`
             Only required if *is_linked* is True, see below.
@@ -1919,11 +1919,11 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
 
 
     If the object is a document :
-    
+
     :post params:
         a valid :class:`.SelectPartFormset`
             Only required if *is_linked* is True, see below.
-            
+
     A cloned document may be attached to some parts, given by :meth:`.DocumentController.get_suggested_parts`.
 
 
@@ -1933,7 +1933,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
 
     ``is_linked``
         True if the object is linked (attached) to other object , at least one.
-    
+
     ``creation_form``
         form to clone the object. Fields in this form are set according to the current object.
 
@@ -1944,14 +1944,14 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     ``children_formset``
         a :class:`.SelectChildFormset` of parts that the new object, if it is a part,
         may be linked with. Only set if *is_linked* is True.
-    
+
     ``parts_formset``
         a :class:`.SelectPartFormset` of parts that the new object, if it is a document,
         may be attached to. Only set if *is_linked* is True.
-    
+
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     obj.check_clone()
     cls = models.get_all_users_and_plmobjects()[obj_type]
     is_linked = True
@@ -1962,9 +1962,9 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
     else:
         parts = obj.get_suggested_parts()
         is_linked = ctx['is_linked'] = bool(parts)
-        
+
     formsets ={}
-    
+
     if request.method == 'GET':
         # generate and fill the creation form
         not_auto_cloned_fields =['reference','revision','group','lifecycle','auto']
@@ -1976,7 +1976,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
         for f in creation_form.fields:
             if f not in not_auto_cloned_fields:
                 creation_form.fields[f].initial = getattr(obj, f)
-                
+
         # generate the links form
         if issubclass(cls, models.Part) and is_linked:
             initial = [dict(link=link) for link in children]
@@ -1988,7 +1988,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
         else:
             if issubclass(cls, models.Document) and is_linked :
                 formsets["part_formset"] = forms.SelectPartFormset(queryset=parts)
-                
+
     elif request.method == 'POST':
         if issubclass(cls, models.Part) and is_linked:
             formsets.update({
@@ -2020,7 +2020,7 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
                     valid_forms, selected_parts = clone_document(request.user, request.POST, parts)
                     if valid_forms:
                         new_ctrl = obj.clone(creation_form, request.user, selected_parts)
-                        return HttpResponseRedirect(new_ctrl.plmobject_url) 
+                        return HttpResponseRedirect(new_ctrl.plmobject_url)
                     else :
                         formsets["part_formset"]=forms.SelectPartFormset(request.POST)
             else:
@@ -2036,12 +2036,12 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
 def clone_part(user, data, children, documents):
     """
     Analyze the formsets in data to return list of selected children and documents.
-    
+
     :param user: user who is cloning the part
     :param data: posted data (see post params in :func:`.clone`)
     :param children: list of children linked to the originial part
     :param documents: list of documents attached to the original part
-    
+
     :return:
         valid_forms
             True if all formsets are valid
@@ -2060,7 +2060,7 @@ def clone_part(user, data, children, documents):
         if children_formset.is_valid():
             for form in children_formset.forms:
                 link = form.cleaned_data["link"]
-                if link not in children: 
+                if link not in children:
                     valid_forms = False
                     form.errors['link']=[_("It's not a valid child.")]
                     break
@@ -2075,7 +2075,7 @@ def clone_part(user, data, children, documents):
         if doc_formset.is_valid():
             for form in doc_formset.forms:
                 doc = form.cleaned_data["document"]
-                if doc not in documents: 
+                if doc not in documents:
                     valid_forms = False
                     form.errors['document']=[_("It's not a valid document.")]
                     break
@@ -2084,15 +2084,15 @@ def clone_part(user, data, children, documents):
         else:
             valid_forms = False
     return valid_forms, selected_children, selected_documents
-                        
+
 def clone_document(user, data, parts):
     """
     Analyze the formsets in data to return list of selected parts.
-    
+
     :param user: user who is cloning the document
     :param data: posted data (see post params in :func:`.clone`)
     :param parts: list of parts attached to the original document
-    
+
     :return:
         valid_forms
             True if all formsets are valid
@@ -2101,15 +2101,15 @@ def clone_document(user, data, parts):
     """
     valid_forms= True
     selected_parts = []
-    
+
     if parts:
         part_formset = forms.SelectPartFormset(data)
         if part_formset.is_valid():
             for form in part_formset.forms:
                 part = form.instance
-                if part not in parts: 
+                if part not in parts:
                     # invalid data
-                    # a user should not be able to go here if he 
+                    # a user should not be able to go here if he
                     # does not write by hand its post request
                     # so we do not need to generate an error message
                     valid_forms = False
@@ -2120,7 +2120,7 @@ def clone_document(user, data, parts):
         else:
             valid_forms = False
     return valid_forms, selected_parts
-    
+
 #############################################################################################
 ###         All functions which manage the different html pages specific to user          ###
 #############################################################################################
@@ -2130,7 +2130,7 @@ def modify_user(request, obj_ref):
     Manage html page for the modification of the selected
     :class:`~django.contrib.auth.models.User`.
     It computes a context dictionary based on
-    
+
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
     :return: a :class:`django.http.HttpResponse`
@@ -2144,10 +2144,10 @@ def modify_user(request, obj_ref):
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = forms.OpenPLMUserChangeForm(instance=obj.object)
-    
+
     ctx["modification_form"] = modification_form
     return r2r('edit.html', ctx, request)
-    
+
 ##########################################################################################
 @handle_errors(restricted_access=False)
 def change_user_password(request, obj_ref):
@@ -2155,7 +2155,7 @@ def change_user_password(request, obj_ref):
     Manage html page for the modification of the selected
     :class:`~django.contrib.auth.models.User` password.
     It computes a context dictionary based on
-    
+
     :param request: :class:`django.http.QueryDict`
     :param obj_ref: :attr:`~django.contrib.auth.models.User.username`
     :return: a :class:`django.http.HttpResponse`
@@ -2174,7 +2174,7 @@ def change_user_password(request, obj_ref):
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = PasswordChangeForm(obj)
-    
+
     ctx["modification_form"] = modification_form
     return r2r('users/password.html', ctx, request)
 
@@ -2184,11 +2184,11 @@ def display_related_plmobject(request, obj_type, obj_ref, obj_revi):
     """
     View listing the related parts and documents of
     the selected :class:`~django.contrib.auth.models.User`.
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "get_object_user_links"):
         return HttpResponseBadRequest("object must be a user")
     objs = obj.get_object_user_links().select_related("plmobject")
@@ -2220,19 +2220,19 @@ def display_delegation(request, obj_ref):
         obj.remove_delegation(models.DelegationLink.objects.get(pk=int(selected_link_id)))
         return HttpResponseRedirect("..")
     links = obj.get_user_delegation_links().select_related("delegatee")
-    ctx.update({'current_page':'delegation', 
+    ctx.update({'current_page':'delegation',
                 'user_delegation_link': links})
     return r2r('users/delegation.html', ctx, request)
 
 
-##########################################################################################    
+##########################################################################################
 @handle_errors(undo="../../..")
 def delegate(request, obj_ref, role, sign_level):
     """
     Manage html page for delegations modification of the selected
     :class:`~django.contrib.auth.models.User`.
     It computes a context dictionary based on
-    
+
     :param request: :class:`django.http.QueryDict`
     :param obj_type: :class:`~django.contrib.auth.models.User`
     :type obj_ref: str
@@ -2243,7 +2243,7 @@ def delegate(request, obj_ref, role, sign_level):
     :return: a :class:`django.http.HttpResponse`
     """
     obj, ctx = get_generic_data(request, "User", obj_ref)
-    
+
     if request.method == "POST":
         delegation_form = forms.SelectUserForm(request.POST)
         if delegation_form.is_valid():
@@ -2268,38 +2268,38 @@ def delegate(request, obj_ref, role, sign_level):
             role = _("signer all levels")
     elif role == "notified":
         role = _("notified")
-    
+
     ctx.update({'current_page':'delegation',
                 'replace_manager_form': delegation_form,
                 'link_creation': True,
                 'attach' : (obj, "delegate"),
                 'role': role})
     return r2r('management_replace.html', ctx, request)
-    
-    
+
+
 ##########################################################################################
 ###             Manage html pages for file check-in / check-out / download             ###
-########################################################################################## 
+##########################################################################################
 
 @csrf_exempt
 def get_checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
-    Process to the checkin asynchronously in order to show progress 
+    Process to the checkin asynchronously in order to show progress
     when the checked-in file is uploaded.
-    
+
     Calls :func:`.checkin_file` .
     """
     request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
     return checkin_file(request, obj_type, obj_ref, obj_revi,file_id_value)
-   
+
 @handle_errors(undo="../..")
 @csrf_protect
 def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     """
     Manage html page for the files (:class:`DocumentFile`) checkin in the selected object.
     It computes a context dictionary based on
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
     :param file_id_value: :attr:`.DocumentFile.id`
     :type file_id_value: str
     :return: a :class:`django.http.HttpResponse`
@@ -2317,11 +2317,11 @@ def checkin_file(request, obj_type, obj_ref, obj_revi, file_id_value):
     return r2r('documents/files_add_noscript.html', ctx, request)
 
 ##########################################################################################
-@handle_errors 
+@handle_errors
 def download(request, docfile_id, filename=""):
     """
     View to download a document file.
-    
+
     :param request: :class:`django.http.QueryDict`
     :param docfile_id: :attr:`.DocumentFile.id`
     :type docfile_id: str
@@ -2339,7 +2339,7 @@ def public_download(request, docfile_id, filename=""):
 
     It returns an :class: `HttpResponseForbidden` if the document is
     not published.
-    
+
     :param request: :class:`django.http.QueryDict`
     :param docfile_id: :attr:`.DocumentFile.id`
     :type docfile_id: str
@@ -2367,17 +2367,17 @@ def serve(ctrl, doc_file, filename):
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
 
-@handle_errors 
+@handle_errors
 def download_archive(request, obj_type, obj_ref, obj_revi):
     """
     View to download all files from a document/part.
 
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
     """
 
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     obj.check_readable()
-    
+
     d_o_u = "document__owner__username"
     if obj.is_document:
         files = obj.files.select_related(d_o_u)
@@ -2405,11 +2405,11 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
         return response
     return HttpResponseForbidden()
 
-@handle_errors 
+@handle_errors
 def file_revisions(request, docfile_id):
     """
     View to download a document file.
-    
+
     :param request: :class:`django.http.QueryDict`
     :param docfile_id: :attr:`.DocumentFile.id`
     :type docfile_id: str
@@ -2427,13 +2427,13 @@ def file_revisions(request, docfile_id):
 
 
 ##########################################################################################
-@handle_errors 
+@handle_errors
 def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
     """
     Manage html page for the files (:class:`DocumentFile`) checkout from the selected object.
     It locks the :class:`DocumentFile` and, after, calls :func:`.views.download`
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
     :param docfile_id: :attr:`.DocumentFile.id`
     :type docfile_id_value: str
     """
@@ -2444,7 +2444,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 
 ##########################################################################################
 ###                     Manage html pages for navigate function                        ###
-##########################################################################################    
+##########################################################################################
 @handle_errors
 def navigate(request, obj_type, obj_ref, obj_revi):
     """
@@ -2453,8 +2453,8 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     This function uses Graphviz (http://graphviz.org/).
     Some filters let user defines which type of links he/she wants to display.
     It computes a context dictionary based on
-    
-    .. include:: views_params.txt 
+
+    .. include:: views_params.txt
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
     ctx["edges"] = simplejson.dumps(ctx["edges"])
@@ -2464,7 +2464,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
 def display_users(request, obj_ref):
     """
     View of the *user* page of a group.
-     
+
     """
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
@@ -2477,7 +2477,7 @@ def display_users(request, obj_ref):
     ctx["user_formset"] = formset
     ctx["pending_invitations"] = obj.invitation_set.filter(
             state=models.Invitation.PENDING).select_related("guest", "owner")
-    ctx['current_page'] = 'users' 
+    ctx['current_page'] = 'users'
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
     return r2r("groups/users.html", ctx, request)
 
@@ -2497,7 +2497,7 @@ def group_add_user(request, obj_ref):
     else:
         form = forms.SelectUserForm()
     ctx["add_user_form"] = form
-    ctx['current_page'] = 'users' 
+    ctx['current_page'] = 'users'
     ctx['link_creation'] = True
     return r2r("groups/add_user.html", ctx, request)
 
@@ -2505,7 +2505,7 @@ def group_add_user(request, obj_ref):
 def group_ask_to_join(request, obj_ref):
     """
     View of the *user join* page of a group
-    
+
     """
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
@@ -2514,7 +2514,7 @@ def group_ask_to_join(request, obj_ref):
     else:
         form = forms.SelectUserForm()
     ctx["ask_form"] = ""
-    ctx['current_page'] = 'users' 
+    ctx['current_page'] = 'users'
     ctx['in_group'] = request.user.groups.filter(id=obj.id).exists()
     return r2r("groups/ask_to_join.html", ctx, request)
 
@@ -2527,7 +2527,7 @@ def display_groups(request, obj_ref):
     obj, ctx = get_generic_data(request, "User", obj_ref)
     ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all())\
             .order_by("name")
-    ctx['current_page'] = 'groups' 
+    ctx['current_page'] = 'groups'
     return r2r("users/groups.html", ctx, request)
 
 @handle_errors
@@ -2549,12 +2549,12 @@ def sponsor(request, obj_ref):
         form = forms.SponsorForm(initial=dict(sponsor=obj.id, language=obj.language),
                 sponsor=obj.id)
     ctx["sponsor_form"] = form
-    ctx['current_page'] = 'delegation' 
+    ctx['current_page'] = 'delegation'
     return r2r("users/sponsor.html", ctx, request)
 
 @handle_errors
 def create_user(request):
-    url = request.user.get_profile().plmobject_url + "delegation/sponsor/" 
+    url = request.user.get_profile().plmobject_url + "delegation/sponsor/"
     return HttpResponseRedirect(url)
 register_creation_view(User, create_user)
 
@@ -2575,7 +2575,7 @@ def display_plmobjects(request, obj_ref):
     """
     View of the *objects* page of a group.
     """
-    
+
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     objects = obj.plmobject_group.order_by("type", "reference", "revision")
     ctx.update(get_pagination(request.GET, objects, "object"))
@@ -2602,7 +2602,7 @@ def accept_invitation(request, obj_ref, token):
     ctx["invitation"] = inv
     return r2r("groups/accept_invitation.html", ctx, request)
 
- 
+
 @handle_errors(undo="../../../users/")
 def refuse_invitation(request, obj_ref, token):
     """
@@ -2768,17 +2768,17 @@ def get_pagination(r_GET, object_list, type):
     if sort == "name" :
         sort_critera = "username" if type == "user" else "name"
     elif type in ("part", "topassembly") and sort == "children":
-        object_list = object_list.with_children_counts() 
+        object_list = object_list.with_children_counts()
         sort_critera = "-num_children,reference,revision"
     elif type == "part" and sort == "most-used":
-        object_list = object_list.with_parents_counts() 
+        object_list = object_list.with_parents_counts()
         sort_critera = "-num_parents,reference,revision"
     else:
         sort_critera = "-date_joined" if type == "user" else "-ctime"
     object_list = object_list.order_by(*sort_critera.split(","))
- 
+
     paginator = Paginator(object_list, 24) # Show 24 objects per page
- 
+
     page = r_GET.get('page', 1)
     try:
         objects = paginator.page(page)
@@ -2810,7 +2810,7 @@ def browse(request, type="object"):
         obj, ctx = get_generic_data(request, search=False)
         try:
             type2manager = {
-                "object" : models.PLMObject.objects, 
+                "object" : models.PLMObject.objects,
                 "part" : models.Part.objects,
                 "topassembly" : models.Part.top_assemblies,
                 "document" : models.Document.objects,
@@ -2836,7 +2836,7 @@ def browse(request, type="object"):
     else:
         try:
             cls = {
-                "object" : models.PLMObject.objects, 
+                "object" : models.PLMObject.objects,
                 "part" : models.Part.objects,
                 "topassembly" : models.Part.top_assemblies,
                 "document" : models.Document.objects,
@@ -2858,7 +2858,7 @@ def browse(request, type="object"):
         object_list = cls.filter(query)
 
     ctx.update(get_pagination(request.GET, object_list, type))
-    extra_types = [c.__name__ for c in models.IObject.__subclasses__()] 
+    extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
     ctx.update({
         "object_type" : _("Browse"),
         "type" : type,
@@ -2879,10 +2879,10 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/public/`
 
-    .. include:: views_params.txt 
+    .. include:: views_params.txt
 
     **Template:**
-    
+
     :file:`public.html`
 
     **Context:**
@@ -2891,7 +2891,7 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
 
     ``obj``
         the controller
-    
+
     ``object_attributes``
         list of tuples(verbose attribute name, value)
 
