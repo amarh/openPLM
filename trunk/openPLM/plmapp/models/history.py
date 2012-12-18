@@ -261,8 +261,11 @@ class StateHistory(models.Model):
         super(StateHistory, self).save(*args, **kwargs)
 
 def timeline_histories(user):
-    d = {}
-    get_all_subclasses(AbstractHistory, d)
-    del d["AbstractHistory"]
-    return QuerySetSequence(*(c.timeline_items(user) for c in d.values()))
+    return History.timeline_items(user)
+    # this code would be nice (get all histories) but it retrieves all XXXhistory
+    # items
+    #d = {}
+    #get_all_subclasses(AbstractHistory, d)
+    #del d["AbstractHistory"]
+    #return QuerySetSequence(*[c.timeline_items(user) for c in d.values()])[:50].order_by("-date")
 
