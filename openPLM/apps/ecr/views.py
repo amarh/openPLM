@@ -115,3 +115,11 @@ def redirect_history(request, hid):
     url = u"%shistory/?page=%d#%s" % (h.plmobject.plmobject_url, page, hid)
     return HttpResponseRedirect(url)
 
+
+@bv.handle_errors
+def changes(request, obj_type, obj_ref, obj_revi):
+    obj, ctx = bv.get_generic_data(request, obj_type, obj_ref, obj_revi)
+    ecrs = ECR.objects.filter(id__in=obj.ecrs.now().values_list("ecr", flat=True))
+    ctx.update(get_pagination(request.GET, ecrs, "ECR"))
+    ctx["current_page"] = "changes"
+    return r2r("changes.html", ctx, request)

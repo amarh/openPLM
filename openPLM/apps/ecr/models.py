@@ -13,6 +13,13 @@ from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as pmodels
 from openPLM.plmapp.utils import memoize_noarg
 
+_menu_items = pmodels.PLMObject.menu_items
+
+def menu_items(self):
+    return _menu_items.fget(self) + [ugettext_noop("changes")]
+
+pmodels.PLMObject.menu_items = property(menu_items)
+
 
 class ECR(models.Model, pmodels.IObject):
     u"""
