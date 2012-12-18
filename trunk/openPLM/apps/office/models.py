@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -50,6 +50,10 @@ class OfficeDocument(Document):
         attrs = list(super(OfficeDocument, self).attributes)
         attrs.extend(["nb_pages", "format"])
         return attrs
+
+    @classmethod
+    def excluded_creation_fields(cls):
+        return Document.excluded_creation_fields() + ["nb_pages", "format"]
 
 class OfficeDocumentController(DocumentController):
 
