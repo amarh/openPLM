@@ -1848,7 +1848,7 @@ def create_object(request, from_registered_view=False, creation_form=None):
                     # the response is redirected
                     message = _(u"Error: %(details)s") % dict(details=unicode(e))
                     messages.error(request, message)
-                    # redirecting to the ctrl page that least its attached
+                    # redirecting to the ctrl page that lists its attached
                     # objects
                     if ctrl.is_document:
                         return HttpResponseRedirect(ctrl.plmobject_url + "parts/")
