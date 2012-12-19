@@ -1,6 +1,6 @@
 
 //update the results block
-function update_results(msg){
+function update_results(msg, data){
     var response = $(msg);
     
     // get the results block
@@ -19,38 +19,29 @@ function update_results(msg){
         init();
     }
     
+    data.q = encodeURIComponent(data.q);
     //update link to search and create pages
-    var req_type = $("#search_id_type").val();
-    var req_q = $("#search_id_q").val();
-    if (req_q==""){
-        req_q="*";
-    }
-    var search_link = $("#DisplayBox").find("a[href^='/search']")[0];
-    $(search_link).attr("href","/search/?type="+req_type+"&q="+req_q);
-    if( req_type!="User"){
-        var create_link = $("#DisplayBox").find("a[href^='/object/create']")[0];
-        $(create_link).attr("href","/object/create/?type="+req_type);
+    var search_link = $("#DisplayBox").find("a[href^='/search']");
+    $(search_link).attr("href","/search/?type="+data.type+"&q="+data.q);
+    if( data.type!="User"){
+        var create_link = $("#DisplayBox").find("a[href^='/object/create']");
+        $(create_link).attr("href","/object/create/?type="+data.type);
     }
     
     //update link on ADD button for bom and doccad pages
     if (typeof(window.update_add_param)=='function'){
-        update_add_param(req_type);
+        update_add_param(data);
     }
 }
 
 //launch the search request asynchronously
 function perform_search(){
-    var data ="navigate=" + $("div.Result").attr("navigate");
-    data = data + "&type=" + $("#search_id_type").val();
-    data = data +"&q=" + $("#search_id_q").val();
-    $.ajax({
-        type : "GET",
-        url : "/perform_search/",
-        data : data,
-        success : function(msg){
-            update_results(msg);
-        } 
-    });
+    var data = {
+        navigate : $("div.Result").attr("navigate"),
+        type :  $("#search_id_type").val(),
+        q : $("#search_id_q").val()
+    }
+    $.get("/perform_search/", data, function (r) {update_results(r, data);});
 }
 
 $(function(){

@@ -5,17 +5,17 @@
 
 {% block scripts %}
 <script type="text/javascript">
-    function update_add_param(suggested_type){
-        var add_link = $("#main_content").find("a[href^='./add']");
+    function update_add_param(query){
+        var add_link = $("a.add-link");
         var Part_group = $("#search_id_type").children("[label='Part']");
         var part_types=[];
         $.each($(Part_group).children(), function(i,v){
             part_types.push($(v).val());
         });
-        if($.inArray(suggested_type,part_types)!=-1){
-            $(add_link).attr("href","./add/?q=&type="+suggested_type);               
+        if($.inArray(query.type,part_types)!=-1){
+            add_link.attr("href","./add/?q="+ query.q + "&type="+ query.type);               
         }else{
-            $(add_link).attr("href","./add/?q=&type=Part");
+            add_link.attr("href","./add/?q=" + query.q + "&type=Part");
         }
     }
 </script>
@@ -27,11 +27,11 @@
         {% if user.get_profile.is_contributor %}
             {{ parts_formset.management_form }}
             {% if not obj.is_cancelled %}
-            <a class="tb-btn" 
+            <a class="tb-btn add-link" 
             {% if obj.type|can_link:request.session.type %}
             href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
             {% else %}
-            href="./add/{% add_get type='Part' q='' %}"
+            href="./add/{% add_get type='Part' q=request.session.search_query %}"
             {% endif %}>
                 <span class="ui-button-text">{% trans "ADD" %}</span>
             </a>
