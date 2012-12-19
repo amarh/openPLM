@@ -1,7 +1,7 @@
 {% load i18n plmapp_tags highlight %}
 
-<div class="identity_card ic-{{type}}">
-    {% is_object_readable %}
+{% is_object_readable %}
+<div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}">
     {% if detach_objects %}
         <div class="detach-form">
             <form method="POST" action="./delete/">
