@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -62,7 +62,7 @@ def login_json(func):
     This also checks if the user agent is ``"openplm"`` and, if not,
     returns a 403 HTTP RESPONSE.
     """
-   
+
     json_func = json_view(func, API_VERSION)
     @functools.wraps(func)
     @csrf_exempt
@@ -110,7 +110,7 @@ def search(request, editable_only="true", with_file_only="true"):
     Returns all objects matching a query.
 
     :param editable_only: if ``"true"`` (the default), returns only editable objects
-    :param with_file_only: if ``"true"`` (the default), returns only documents with 
+    :param with_file_only: if ``"true"`` (the default), returns only documents with
                            at least one file
 
     :implements: :func:`http_api.search`
@@ -137,7 +137,7 @@ def search(request, editable_only="true", with_file_only="true"):
                             continue
                     ids.add(res.id)
                     objects.append(object_to_dict(res))
-            return {"objects" : objects} 
+            return {"objects" : objects}
     return {"result": "error"}
 
 @login_json
@@ -168,11 +168,11 @@ def get_files(request, doc_id, all_files=False):
     If *all_files* is False (the default), only unlocked files are returned.
 
     :implements: :func:`http_api.files`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param all_files: boolean, False if only unlocked files should be returned
-    :returned fields: files, a list of files (see :ref:`http-api-file`) 
+    :returned fields: files, a list of files (see :ref:`http-api-file`)
     """
 
     document = models.Document.objects.get(id=doc_id)
@@ -190,11 +190,11 @@ def check_out(request, doc_id, df_id):
     the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.lock`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param df_id: id of a :class:`.DocumentFile`
-    :returned fields: None 
+    :returned fields: None
     """
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
@@ -209,7 +209,7 @@ def check_in(request, doc_id, df_id, thumbnail=False):
     the :class:`.Document` identified by *doc_id*
 
     :implements: :func:`http_api.check_in`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param df_id: id of a :class:`.DocumentFile`
@@ -229,7 +229,7 @@ def is_locked(request, doc_id, df_id):
     the :class:`.Document` identified by *doc_id* is locked.
 
     :implements: :func:`http_api.is_locked`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param df_id: id of a :class:`.DocumentFile`
@@ -247,11 +247,11 @@ def unlock(request, doc_id, df_id):
     the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.unlock`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param df_id: id of a :class:`.DocumentFile`
-    :returned fields: None 
+    :returned fields: None
     """
     doc = get_obj_by_id(doc_id, request.user)
     df = models.DocumentFile.objects.get(id=df_id)
@@ -364,9 +364,9 @@ def next_revision(request, doc_id):
     """
     Returns a possible new revision for the :class:`.Document` identified by
     *doc_id*.
-    
+
     :implements: :func:`http_api.next_revision`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :returned fields: revision, the new revision (may be an empty string)
@@ -383,18 +383,18 @@ def revise(request, doc_id):
     Makes a new revision of the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.revise`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :returned fields:
         * doc, the new document (see :ref:`http-api-object`)
-        * files, a list of files (see :ref:`http-api-file`) 
+        * files, a list of files (see :ref:`http-api-file`)
     """
-    
+
     doc = get_obj_by_id(doc_id, request.user)
-    form = forms.AddRevisionForm(request.POST)
+    form = forms.AddRevisionForm(doc, request.user, request.POST)
     if form.is_valid():
-        rev = doc.revise(form.cleaned_data["revision"])
+        rev = doc.revise(form.cleaned_data["revision"], group=form.cleaned_data["group"])
         ret = {"doc" : object_to_dict(rev)}
         files = []
         for df in rev.files:
@@ -410,7 +410,7 @@ def is_revisable(request, doc_id):
     Returns True if the :class:`.Document` identified by *doc_id* can be revised.
 
     :implements: :func:`http_api.is_revisable`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :returned fields: revisable, True if it can be revised
@@ -427,11 +427,11 @@ def attach_to_part(request, doc_id, part_id):
     identified by *part_id*.
 
     :implements: :func:`http_api.attach_to_part`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param part_id: id of a :class:`.Part`
-    :returned fields: None 
+    :returned fields: None
     """
     doc = get_obj_by_id(doc_id, request.user)
     part = get_obj_by_id(part_id, request.user)
@@ -445,7 +445,7 @@ def add_file(request, doc_id, thumbnail=False):
     Adds a file to the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.add_file`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :returned fields: doc_file, the file that has been had,
@@ -464,7 +464,7 @@ def add_thumbnail(request, doc_id, df_id):
     the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.add_thumbnail`
-    
+
     :param request: the request
     :param doc_id: id of a :class:`.Document`
     :param df_id: id of a :class:`.DocumentFile`

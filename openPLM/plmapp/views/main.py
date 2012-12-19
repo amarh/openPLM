@@ -471,7 +471,14 @@ def display_object_revisions(request, obj_type, obj_ref, obj_revi):
     if the object is a part.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    ctx["add_revision_form"] = None
+    add_form = None
+    if obj.is_revisable():
+        if request.method == "POST":
+            add_form = forms.AddRevisionForm(obj, request.user, request.POST)
+        else:
+            initial = { "revision": get_next_revision(obj.revision) }
+            add_form = forms.AddRevisionForm(obj, request.user, initial=initial)
+    ctx["add_revision_form"] = add_form
     if obj.is_document:
         return revise_document(obj, ctx, request)
     else:
@@ -550,16 +557,17 @@ def revise_document(obj, ctx, request):
         may be attached to. Only set if *confirmation* is True.
     """
     confirmation = False
-    if obj.is_revisable():
+    add_form = ctx["add_revision_form"]
+    if add_form is not None:
         parts = obj.get_suggested_parts()
         confirmation = bool(parts)
 
         if request.method == "POST" and request.POST:
-            add_form = forms.AddRevisionForm(request.POST)
             selected_parts = []
             valid_forms = True
             if confirmation:
                 part_formset = forms.SelectPartFormset(request.POST)
+                ctx["part_formset"] = part_formset
                 if part_formset.is_valid():
                     for form in part_formset.forms:
                         part = form.instance
@@ -575,13 +583,12 @@ def revise_document(obj, ctx, request):
                 else:
                     valid_forms = False
             if add_form.is_valid() and valid_forms:
-                obj.revise(add_form.cleaned_data["revision"], selected_parts)
+                obj.revise(add_form.cleaned_data["revision"], selected_parts,
+                        group=add_form.cleaned_data["group"])
                 return HttpResponseRedirect(".")
         else:
-            add_form = forms.AddRevisionForm({"revision" : get_next_revision(obj.revision)})
             if confirmation:
                 ctx["part_formset"] = forms.SelectPartFormset(queryset=parts)
-        ctx["add_revision_form"] = add_form
     ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()
 
@@ -653,14 +660,14 @@ def revise_part(obj, ctx, request):
         Only set if *confirmation* is True.
     """
     confirmation = False
-    if obj.is_revisable():
+    add_form = ctx["add_revision_form"]
+    if add_form is not None:
         children = [c.link for c in obj.get_children(1)]
         parents = obj.get_suggested_parents()
         documents = obj.get_suggested_documents()
         confirmation = bool(children or parents or documents)
 
         if request.method == "POST" and request.POST:
-            add_form = forms.AddRevisionForm(request.POST)
             valid_forms = True
             selected_children = []
             selected_parents = []
@@ -669,6 +676,7 @@ def revise_part(obj, ctx, request):
                 # children
                 children_formset = forms.SelectChildFormset(request.POST,
                         prefix="children")
+                ctx["children_formset"] = children_formset
                 if children_formset.is_valid():
                     for form in children_formset.forms:
                         link = form.cleaned_data["link"]
@@ -683,6 +691,7 @@ def revise_part(obj, ctx, request):
                     # documents
                     doc_formset = forms.SelectDocumentFormset(request.POST,
                             prefix="documents")
+                    ctx["doc_formset"] = doc_formset
                     if doc_formset.is_valid():
                         for form in doc_formset.forms:
                             doc = form.cleaned_data["document"]
@@ -697,6 +706,7 @@ def revise_part(obj, ctx, request):
                     # parents
                     parents_formset = forms.SelectParentFormset(request.POST,
                             prefix="parents")
+                    ctx["parents_formset"] = parents_formset
                     if parents_formset.is_valid():
                         for form in parents_formset.forms:
                             parent = form.cleaned_data["new_parent"]
@@ -710,10 +720,10 @@ def revise_part(obj, ctx, request):
                         valid_forms = False
             if add_form.is_valid() and valid_forms:
                 obj.revise(add_form.cleaned_data["revision"], selected_children,
-                        selected_documents, selected_parents)
+                        selected_documents, selected_parents,
+                        group=add_form.cleaned_data["group"])
                 return HttpResponseRedirect(".")
         else:
-            add_form = forms.AddRevisionForm({"revision" : get_next_revision(obj.revision)})
             if confirmation:
                 initial = [dict(link=link) for link in children]
                 ctx["children_formset"] = forms.SelectChildFormset(prefix="children",
@@ -724,8 +734,6 @@ def revise_part(obj, ctx, request):
                 initial = [dict(link=p[0], new_parent=p[1]) for p in parents]
                 ctx["parents_formset"] = forms.SelectParentFormset(prefix="parents",
                         initial=initial)
-
-        ctx["add_revision_form"] = add_form
 
     ctx["confirmation"] = confirmation
     revisions = obj.get_all_revisions()

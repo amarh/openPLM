@@ -952,6 +952,10 @@ ul.errorlist li {
     margin-left: 1em;
 }
 
+.inline-form > * {
+    vertical-align: middle;
+}
+
 /* type, reference, revision, name */
 span.name {
     font-style: italic;

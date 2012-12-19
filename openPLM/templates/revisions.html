@@ -12,7 +12,7 @@
 {% block content %}
     {% if add_revision_form and obj.is_revisable and user.get_profile.is_contributor %}
         <form id="form-revision" method="POST"
-            {% if confirmation %} class="confirmation" {% endif %} action="">
+            class= "inline-form {% if confirmation %}confirmation{% endif %}" action="">
             {{ add_revision_form }}
 
             {% if confirmation %}

@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -82,7 +82,7 @@ def get_new_reference(cls, start=0, inbulk_cache=None):
 
     The formatting is ``PART_000XX`` if *cls* is a subclass of :class:`.Part`
     and ``DOC_000XX`` otherwise.
-    
+
     The number is the count of Parts or Documents plus *start* plus 1.
     It is incremented while an object with the same reference already exists.
     *start* can be used to create several creation forms at once.
@@ -117,7 +117,7 @@ def get_initial_creation_data(cls, start=0, inbulk_cache=None):
     """
     if issubclass(cls, m.PLMObject):
         data = {
-                'reference' : get_new_reference(cls, start, inbulk_cache), 
+                'reference' : get_new_reference(cls, start, inbulk_cache),
                 'revision' : 'a',
                 'lifecycle' : str(m.get_default_lifecycle().pk),
         }
@@ -184,7 +184,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
     form.start = start
     if issubclass(cls, m.PLMObject):
         # lifecycles and groups are cached if inbulk_cache is a dictionary
-        # this is an optimization if several creation forms are displayed 
+        # this is an optimization if several creation forms are displayed
         # in one request
         # for example, the decomposition of a STEP file can display
         # a lot of creation forms
@@ -225,7 +225,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
             field.choice_cache = inbulk_cache["lc_cache"]
     return form
 get_creation_form.cache = {}
-        
+
 def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     Form = get_modification_form.cache.get(cls)
     if Form is None:
@@ -269,7 +269,7 @@ class DocumentTypeForm(forms.Form):
 
 from haystack.forms import SearchForm
 class SimpleSearchForm(SearchForm):
-   
+
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
     type.widget.attrs["autocomplete"] = "off"
@@ -279,11 +279,11 @@ class SimpleSearchForm(SearchForm):
     def __init__(self, *args, **kwargs):
         super(SimpleSearchForm, self).__init__(*args, **kwargs)
         self.fields.insert(0, 'type', self.fields.pop('type'))
-    
+
     def search(self):
         from haystack.query import EmptySearchQuerySet
         from openPLM.plmapp.search import SmartSearchQuerySet
-        
+
         if self.is_valid():
             cls = m.get_all_users_and_plmobjects()[self.cleaned_data["type"]]
             d = {}
@@ -302,7 +302,7 @@ class SimpleSearchForm(SearchForm):
             return results
         else:
             return EmptySearchQuerySet()
-        
+
 
 OBJECT_DOES_NOT_EXIST_MSG = _(
 """The object %(type)s // %(reference)s // %(revision)s does not exist.
@@ -329,7 +329,7 @@ class PLMObjectForm(forms.Form):
                 raise ValidationError(OBJECT_DOES_NOT_EXIST_MSG % d)
         return cleaned_data
 
-    
+
 
 class AddChildForm(PLMObjectForm, PartTypeForm):
     quantity = forms.FloatField()
@@ -346,7 +346,7 @@ class AddChildForm(PLMObjectForm, PartTypeForm):
                 field_name = "%s_%s" % (PCLE._meta.module_name, field)
                 self.fields[field_name] = form_field
                 self._PCLEs[PCLE].append(field)
-        
+
     def clean(self):
         super(AddChildForm, self).clean()
         self.extensions = {}
@@ -400,7 +400,7 @@ class ModifyChildForm(forms.ModelForm):
     class Meta:
         model = m.ParentChildLink
         fields = ["order", "quantity", "unit", "child", "parent",]
-    
+
     def clean(self):
         super(ModifyChildForm, self).clean()
         self.extensions = {}
@@ -454,7 +454,7 @@ ChildrenFormset = modelformset_factory(m.ParentChildLink,
 def get_children_formset(controller, data=None):
     if data is None:
         queryset = m.ParentChildLink.current_objects.filter(parent=controller)
-        queryset = queryset.select_related("child__state") 
+        queryset = queryset.select_related("child__state")
         formset = ChildrenFormset(queryset=queryset)
     else:
         formset = ChildrenFormset(data=data)
@@ -462,8 +462,21 @@ def get_children_formset(controller, data=None):
 
 class AddRevisionForm(forms.Form):
     revision = forms.CharField()
+    group = forms.ModelChoiceField(queryset=m.GroupInfo.objects.none())
     clean_revision = _clean_revision
-   
+
+    def __init__(self, ctrl, user, *args, **kwargs):
+        super(AddRevisionForm, self).__init__(*args, **kwargs)
+        groups = user.groups.all().values_list("id", flat=True)
+        groupinfos = m.GroupInfo.objects.filter(id__in=groups)
+        in_group = ctrl.check_in_group(user, raise_=False)
+        fgroup = self.fields["group"]
+        fgroup.queryset = groupinfos
+        fgroup.required = not in_group
+        if in_group:
+            self.initial["group"] = ctrl.group
+
+
 class RelPartForm(forms.ModelForm):
     document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
                                    widget=forms.HiddenInput())
@@ -478,7 +491,7 @@ class SelectPartForm(forms.ModelForm):
     class Meta:
         model = m.Part
         fields = ["selected"]
-        
+
 SelectPartFormset = modelformset_factory(m.Part, form=SelectPartForm, extra=0)
 
 
@@ -486,7 +499,7 @@ class SelectDocumentForm(forms.Form):
     selected = forms.BooleanField(required=False, initial=True)
     document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
                                    widget=forms.HiddenInput())
-        
+
 SelectDocumentFormset = formset_factory(form=SelectDocumentForm, extra=0)
 
 class SelectChildForm(forms.Form):
@@ -506,10 +519,10 @@ SelectParentFormset = formset_factory(form=SelectParentForm, extra=0)
 
 class AddPartForm(PLMObjectForm, PartTypeForm):
     pass
-    
+
 class ModifyRelPartForm(RelPartForm):
     delete = forms.BooleanField(required=False, initial=False)
-        
+
 RelPartFormset = modelformset_factory(m.DocumentPartLink,
                                       form=ModifyRelPartForm, extra=0)
 
@@ -520,7 +533,7 @@ def get_rel_part_formset(controller, data=None, **kwargs):
 
 class AddFileForm(forms.Form):
     filename = forms.FileField()
-    
+
 class ModifyFileForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
     document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
@@ -528,7 +541,7 @@ class ModifyFileForm(forms.ModelForm):
     class Meta:
         model = m.DocumentFile
         fields = ["document"]
-        
+
 FileFormset = modelformset_factory(m.DocumentFile, form=ModifyFileForm, extra=0)
 def get_file_formset(controller, data=None):
     if data is None:
@@ -540,7 +553,7 @@ def get_file_formset(controller, data=None):
 
 class AddDocCadForm(PLMObjectForm, DocumentTypeForm):
     pass
-    
+
 class ModifyDocCadForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
     part = forms.ModelChoiceField(queryset=m.Part.objects.all(),
@@ -550,7 +563,7 @@ class ModifyDocCadForm(forms.ModelForm):
     class Meta:
         model = m.DocumentPartLink
         fields = ["part", "document"]
-        
+
 DocCadFormset = modelformset_factory(m.DocumentPartLink,
                                      form=ModifyDocCadForm, extra=0)
 def get_doc_cad_formset(controller, data=None, **kwargs):
@@ -639,7 +652,7 @@ class SelectUserForm(forms.Form):
                 raise ValidationError(USER_DOES_NOT_EXIST_MSG %
                         {"username" : username})
         return cleaned_data
-    
+
 
 class ModifyUserForm(forms.Form):
     delete = forms.BooleanField(required=False, initial=False)
@@ -647,7 +660,7 @@ class ModifyUserForm(forms.Form):
                                    widget=forms.HiddenInput())
     group = forms.ModelChoiceField(queryset=Group.objects.all(),
                                    widget=forms.HiddenInput())
-    
+
     @property
     def user_data(self):
         return self.initial["user"]
@@ -704,7 +717,7 @@ class SponsorForm(forms.ModelForm):
                 # i don't know if a domain can contains a '@'
                 domain = email.rsplit("@", 1)[1]
                 if domain not in Site.objects.values_list("domain", flat=True):
-                    raise forms.ValidationError(_(u"Email's domain not valid")) 
+                    raise forms.ValidationError(_(u"Email's domain not valid"))
         except AttributeError:
             # restriction disabled if the setting is not set
             pass
@@ -713,7 +726,7 @@ class SponsorForm(forms.ModelForm):
     def clean_role(self):
         role = self.cleaned_data["role"] or "contributor"
         return role
-  
+
     def clean(self):
         super(SponsorForm, self).clean()
         try:
@@ -766,7 +779,7 @@ def get_headers_formset(Importer):
                     header = None
                 if header and header in headers:
                     raise forms.ValidationError(_("Columns must have distinct headers."))
-                headers.append(header) 
+                headers.append(header)
             for field in Importer.REQUIRED_HEADERS:
                 if field not in headers:
                     raise forms.ValidationError(Importer.get_missing_headers_msg())
@@ -784,7 +797,7 @@ class ConfirmPasswordForm(forms.Form):
     """
     A form that checks the user has entered his password.
     """
-    password = forms.CharField(label=_("Password"), 
+    password = forms.CharField(label=_("Password"),
             widget=forms.PasswordInput(attrs= { "autocomplete" : "off" }))
 
     def __init__(self, user, *args, **kwargs):
