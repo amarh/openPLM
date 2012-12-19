@@ -402,7 +402,6 @@ class PLMObjectController(Controller):
 
         Returns a controller of the new object.
         """
-        # TODO: changes the group
         self.check_readable()
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
