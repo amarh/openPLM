@@ -215,8 +215,8 @@ class Document3DController(DocumentController):
 
             handle_step_file.delay(doc_file.pk)
 
-    def revise(self, new_revision, selected_parts=()):
-        rev = super(Document3DController, self).revise(new_revision, selected_parts)
+    def revise(self, new_revision, selected_parts=(), **kwargs):
+        rev = super(Document3DController, self).revise(new_revision, selected_parts, **kwargs)
         STP_file = self.object.files.filter(is_stp)
         if STP_file.exists():
             new_STP_file = rev.object.files.get(is_stp)
@@ -349,7 +349,7 @@ class Document3DController(DocumentController):
                     docs.append(doc)
                 if not docs:
                     return product
-                
+
                 dfs = dict(DocumentFile.objects.filter(document__in=docs, deprecated=False)\
                         .filter(is_stp).values_list("document", "id"))
                 # cache this values as it may be useful for get_all_geometry_files

@@ -1,7 +1,7 @@
 ###########################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -42,9 +42,9 @@ from openPLM.plmapp.controllers.base import Controller
 rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class PLMObjectController(Controller):
     u"""
-    Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
+    Object used to manage a :class:`~plmapp.models.PLMObject` and store his
     modification in a history
-    
+
     :attributes:
         .. attribute:: object
 
@@ -79,7 +79,7 @@ class PLMObjectController(Controller):
         :param data: a dict<key, value> with informations to add to the plmobject
         :rtype: :class:`PLMObjectController`
         """
-        
+
         profile = user.get_profile()
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
@@ -98,7 +98,7 @@ class PLMObjectController(Controller):
         # create an object
         try:
             start = "PART_"  if issubclass(class_, models.Part) else "DOC_"
-            reference_number = int(re.search(r"^%s(\d+)$" % start, reference).group(1)) 
+            reference_number = int(re.search(r"^%s(\d+)$" % start, reference).group(1))
             if reference_number > 2**31 - 1:
                 reference_number = 0
         except:
@@ -143,13 +143,13 @@ class PLMObjectController(Controller):
 
         res._update_state_history()
         return res
-        
+
     @classmethod
     def create_from_form(cls, form, user, block_mails=False, no_index=False):
         u"""
         Creates a :class:`PLMObjectController` from *form* and associates *user*
         as the creator/owner of the PLMObject.
-        
+
         This method raises :exc:`ValueError` if *form* is invalid.
 
         :param form: a django form associated to a model
@@ -172,7 +172,7 @@ class PLMObjectController(Controller):
         obj = get_object_or_404(model, type=type, reference=reference,
                 revision=revision)
         return cls(obj, user)
-   
+
     def can_approve_promotion(self, user=None):
         return bool(self.get_represented_approvers(user))
 
@@ -201,13 +201,13 @@ class PLMObjectController(Controller):
     def _all_approved(self):
         not_approvers = self.get_current_signers().exclude(user__in=self.get_approvers())
         return not not_approvers.exists()
-   
+
     def approve_promotion(self):
         if self.object.is_promotable():
             lcl = self.lifecycle.to_states_list()
             role = level_to_sign_str(lcl.index(self.state.name))
             self.check_permission(role)
-            
+
             represented = self.get_represented_approvers()
             if not represented:
                 raise PromotionError()
@@ -221,16 +221,16 @@ class PLMObjectController(Controller):
             else:
                 details = u"Current state: %s, next state:%s\n" % (self.state.name, next_state)
                 details += u"Represented users: %s" % u", ".join(u.username for u in users)
-                self._save_histo(u"Approved promotion", details, roles=(role,)) 
+                self._save_histo(u"Approved promotion", details, roles=(role,))
         else:
             raise PromotionError()
 
     def discard_approvals(self):
         role = self.get_current_signer_role()
         self.check_permission(role)
-        self._clear_approvals() 
+        self._clear_approvals()
         details = u"Current state:%s" % self.state.name
-        self._save_histo(u"Removed promotion approvals", details, roles=(role,)) 
+        self._save_histo(u"Removed promotion approvals", details, roles=(role,))
 
     def _clear_approvals(self):
         self.approvals.now().end()
@@ -239,7 +239,7 @@ class PLMObjectController(Controller):
         u"""
         Promotes :attr:`object` in its lifecycle and writes its promotion in
         the history
-        
+
         :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
@@ -314,7 +314,7 @@ class PLMObjectController(Controller):
         u"""
         Demotes :attr:`object` in irs lifecycle and writes irs demotion in the
         history
-        
+
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
         """
         if not self.is_proposed:
@@ -379,7 +379,7 @@ class PLMObjectController(Controller):
         .. versionadded:: 1.0.1
 
         Checks that *user* belongs to the object's group.
-        
+
         Returns True if the user belongs to the group.
         Otherwise, returns False if *raise_* is False or raises
         a :exc:`.PermissionError` if *raise_* is True.
@@ -395,15 +395,15 @@ class PLMObjectController(Controller):
                 return False
         return True
 
-    def revise(self, new_revision):
+    def revise(self, new_revision, group=None):
         u"""
-        Makes a new revision: duplicates :attr:`object`. The duplicated 
+        Makes a new revision: duplicates :attr:`object`. The duplicated
         object's revision is *new_revision*.
 
         Returns a controller of the new object.
         """
         # TODO: changes the group
-        self.check_readable() 
+        self.check_readable()
         if not new_revision or new_revision == self.revision or \
            rx_bad_ref.search(new_revision):
             raise RevisionError("Bad value for new_revision")
@@ -411,16 +411,21 @@ class PLMObjectController(Controller):
             raise RevisionError("Object is deprecated or cancelled.")
         if models.RevisionLink.objects.now().filter(old=self.object.pk).exists():
             raise RevisionError("A revision already exists for %s" % self.object)
+        if group is None:
+            group = self.object.group
+        if not group.user_set.filter(id=self._user.id).exists():
+            raise ValueError("Invalid group")
         data = {}
         fields = self.get_modification_fields() + self.get_creation_fields()
         for attr in fields:
             if attr not in ("reference", "type", "revision"):
                 data[attr] = getattr(self.object, attr)
+        data["group"] = group
         data["state"] = models.get_default_state(self.lifecycle)
-        new_controller = self.create(self.reference, self.type, new_revision, 
+        new_controller = self.create(self.reference, self.type, new_revision,
                                      self._user, data)
         details = "old : %s, new : %s" % (self.object, new_controller.object)
-        self._save_histo(models.RevisionLink.ACTION_NAME, details) 
+        self._save_histo(models.RevisionLink.ACTION_NAME, details)
         models.RevisionLink.objects.create(old=self.object, new=new_controller.object)
         return new_controller
 
@@ -435,7 +440,7 @@ class PLMObjectController(Controller):
         # a cancelled or deprecated object cannot be revised.
         if self.is_cancelled or self.is_deprecated:
             return False
-        
+
         # objects.get fails if a link does not exist
         # we can revise if any links exist
         try:
@@ -446,7 +451,7 @@ class PLMObjectController(Controller):
                 return self.check_readable(False)
             else:
                 return True
-    
+
     def get_previous_revisions(self):
         all_revisions = self.get_all_revisions()
         return all_revisions[:all_revisions.index(self.object.plmobject_ptr)]
@@ -458,7 +463,7 @@ class PLMObjectController(Controller):
     def get_all_revisions(self):
         """
         Returns a list of all revisions, ordered from less recent to most recent
-        
+
         :rtype: list of :class:`.PLMObject`
         """
         objects = list(models.PLMObject.objects.filter(type=self.type,
@@ -481,15 +486,15 @@ class PLMObjectController(Controller):
 
         .. note::
             This method does **NOT** check that the current user
-            is the owner of the object. :meth:`set_role` does that check. 
-        
+            is the owner of the object. :meth:`set_role` does that check.
+
         :param new_owner: the new owner
         :type new_owner: :class:`~django.contrib.auth.models.User`
         :param dirty: True if set_owner should skip sanity checks and
                       should not send a mail (usefull for tests, default is
                       False)
         :raise: :exc:`.PermissionError` if *new_owner* is not a contributor
-        :raise: :exc:`ValueError` if *new_owner* is the company and the 
+        :raise: :exc:`ValueError` if *new_owner* is the company and the
                 object is editable
 
         .. versionchanged:: 1.0.1
@@ -497,7 +502,7 @@ class PLMObjectController(Controller):
         :raise: :exc:`.PermissionError` if *new_owner* does not belong to
                 the object's group.
         """
-        
+
         if not dirty:
             self.check_contributor(new_owner)
             self.check_in_group(new_owner)
@@ -523,7 +528,7 @@ class PLMObjectController(Controller):
         """
         Adds *new_notified* to the list of users notified when :attr:`object`
         changes.
-        
+
         :param new_notified: the new user who would be notified
         :type new_notified: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`IntegrityError` if *new_notified* is already notified
@@ -542,7 +547,7 @@ class PLMObjectController(Controller):
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
         details = u"user: %s" % new_notified
-        self._save_histo("New notified", details) 
+        self._save_histo("New notified", details)
 
     def add_reader(self, new_reader):
         if not self.is_official:
@@ -555,7 +560,7 @@ class PLMObjectController(Controller):
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_reader, role=models.ROLE_READER)
         details = "user: %s" % new_reader
-        self._save_histo("New reader", details) 
+        self._save_histo("New reader", details)
 
     def check_edit_signer(self, raise_=True):
         """
@@ -620,50 +625,50 @@ class PLMObjectController(Controller):
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_signer, role=role)
         details = u"user: %s" % new_signer
-        self._save_histo("New %s" % role, details, roles=(role,)) 
+        self._save_histo("New %s" % role, details, roles=(role,))
 
     def remove_notified(self, notified):
         """
         Removes *notified* to the list of users notified when :attr:`object`
         changes.
-        
+
         :param notified: the user who would be no more notified
         :type notified: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`ObjectDoesNotExist` if *notified* is not notified
             when :attr:`object` changes
         """
-        
+
         if notified != self._user:
             self.check_permission("owner")
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.end()
         details = u"user: %s" % notified
-        self._save_histo("Notified removed", details) 
+        self._save_histo("Notified removed", details)
 
     def remove_reader(self, reader):
         """
         Removes *reader* to the list of restricted readers when :attr:`object`
         changes.
-        
+
         :param reader: the user who would be no more reader
         :type reader: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`ObjectDoesNotExist` if *reader* is not reader
         """
-        
+
         self.check_in_group(self._user)
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=reader, role=models.ROLE_READER)
         link.end()
         details = u"user: %s" % reader
-        self._save_histo("Reader removed", details) 
-        
+        self._save_histo("Reader removed", details)
+
     def remove_signer(self, signer, role):
         """
         .. versionadded:: 1.2
 
         Removes *signer* to the list of signers for role *role*.
-        
+
         :param signer: the user who would be no more signer
         :type signer: :class:`~django.contrib.auth.models.User`
         :raise: :exc:`.PermissionError` if:
@@ -673,7 +678,7 @@ class PLMObjectController(Controller):
             * there is only one signer
 
         :raise: :exc:`ObjectDoesNotExist` if *signer* is not a signer
-        """ 
+        """
         self.check_edit_signer()
         if not role.startswith(models.ROLE_SIGN):
             raise ValueError("Not a sign role")
@@ -683,7 +688,7 @@ class PLMObjectController(Controller):
                 user=signer, role=role)
         link.end()
         details = u"user: %s" % signer
-        self._save_histo("%s removed" % role, details, roles=(role,)) 
+        self._save_histo("%s removed" % role, details, roles=(role,))
 
     def replace_signer(self, old_signer, new_signer, role):
         """
@@ -706,7 +711,7 @@ class PLMObjectController(Controller):
 
         self.check_edit_signer()
         self.check_signer(new_signer, role)
-        
+
         # remove old signer
         try:
             link = self.users.now().get(user=old_signer,
@@ -719,7 +724,7 @@ class PLMObjectController(Controller):
                                                 user=new_signer, role=role)
         details = u"new signer: %s" % new_signer
         details += u", old signer: %s" % old_signer
-        self._save_histo("New %s" % role, details, roles=(role,)) 
+        self._save_histo("New %s" % role, details, roles=(role,))
 
     def set_role(self, user, role):
         """
@@ -728,7 +733,7 @@ class PLMObjectController(Controller):
         .. note::
             If *role* is :const:`.ROLE_OWNER`, the previous owner is
             replaced by *user*.
-            
+
         :raise: :exc:`ValueError` if *role* is invalid
         :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
@@ -819,7 +824,7 @@ class PLMObjectController(Controller):
         self.users.filter(role__startswith=models.ROLE_SIGN).end()
         self._clear_approvals()
         self.save(with_history=False)
-        self._save_histo("Cancel", "Object cancelled") 
+        self._save_histo("Cancel", "Object cancelled")
         self._update_state_history()
 
     def check_publish(self, raise_=True):
@@ -867,7 +872,7 @@ class PLMObjectController(Controller):
         .. versionadded:: 1.1
 
         Publish the object.
-        
+
         A published object can be accessed by anonymous users.
 
         :raise: all exceptions raised by :meth:`check_publish`
@@ -920,7 +925,7 @@ class PLMObjectController(Controller):
         .. versionadded:: 1.1
 
         Unpublish the object.
-        
+
         :raise: all exceptions raised by :meth:`check_unpublish`
         """
         self.check_unpublish()
@@ -928,7 +933,7 @@ class PLMObjectController(Controller):
         self.object.save()
         details = u"Unpublished by %s (%s)" % (self._user.get_full_name(), self._user.username)
         self._save_histo("Unpublish", details)
-    
+
     def check_cancel(self,raise_=True):
         """
         .. versionadded:: 1.1
@@ -958,7 +963,7 @@ class PLMObjectController(Controller):
         if (not res) and raise_:
             raise PermissionError("This object has more than 1 revision")
         return res
-        
+
     def can_cancel(self):
         """
         .. versionadded:: 1.1
@@ -966,23 +971,23 @@ class PLMObjectController(Controller):
         Returns True if the user can cancel this object.
         """
         return self.check_cancel(raise_=False)
-    
+
     def safe_cancel(self):
         self.check_cancel()
         self.cancel()
-        
+
     def check_clone(self, raise_=True):
         """
         .. versionadded:: 1.1
 
         Checks that an object can be cloned.
-        
+
         If *raise_* is True:
 
             :raise: :exc:`.PermissionError` if the object is not readable
             :raise: :exc:`.PermissionError` if the object can not be read
             :raise: :exc:`.PermissionError` if the object is not cloneable
-            
+
         If *raise_* is False:
 
             Returns True if all previous tests has been succesfully passed,
@@ -998,21 +1003,21 @@ class PLMObjectController(Controller):
         if (not res) and raise_:
             raise PermissionError("This object can not be cloned")
         return res
-        
+
     def can_clone(self):
         """
         .. versionadded:: 1.1
-        
+
         Returns True if the user can clone this object.
         """
         return self.check_clone(raise_=False)
-        
+
     def clone(self,form, user, block_mails=False, no_index=False):
-        """ 
+        """
         .. versionadded:: 1.1
-        
+
         Clone this object and return the related controller.
-        
+
         :param form: the form sent from clone view
         :param user: the user who is cloning the object
         """
@@ -1032,7 +1037,7 @@ class PLMObjectController(Controller):
             return new_ctrl
         else:
             raise ValueError("form is invalid")
-    
+
     @property
     def histories(self):
         objects = [o.id for o in self.get_all_revisions()]
