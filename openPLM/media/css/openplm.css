@@ -1398,3 +1398,7 @@ ul.tbi li {
     right: 2px;
 }
 
+
+.unreadable {
+    cursor: no-drop;
+}
