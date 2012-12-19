@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -44,13 +44,13 @@ from openPLM.plmapp.files.deletable import (get_deletable_files, ON_CHECKIN_SELE
 
 class DocumentController(PLMObjectController):
     """
-    A :class:`.PLMObjectController` which manages 
+    A :class:`.PLMObjectController` which manages
     :class:`.Document`
-    
+
     It provides methods to add or delete files, (un)lock them and attach a
     :class:`.Document` to a :class:`.Part`.
     """
-   
+
     def has_standard_related_locked(self, new_filename):
         """
         Returns True if :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True
@@ -59,24 +59,24 @@ class DocumentController(PLMObjectController):
 
         We use it to avoid to add a native file while a related standard locked
         file is present in the document.
-         
+
         :param new_filename: name of the added file
-        """    
+        """
         if getattr(settings, 'ENABLE_NATIVE_FILE_MANAGEMENT', False):
             name, ext = os.path.splitext(new_filename)
             ext = ext.lower()
             doc_files = self.files.filter(locked=True)
             for doc in doc_files:
-                standard, standard_ext = os.path.splitext(doc.filename)           
+                standard, standard_ext = os.path.splitext(doc.filename)
                 if standard == name and standard_ext.lower() in native_to_standards[ext]:
                     return True
         return False
-            
+
     def lock(self, doc_file):
         """
         Lock *doc_file* so that it can not be modified or deleted
         if *doc_file* has a native related file this will be deprecated
-          
+
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`.PermissionError` if :attr:`_user` is not the owner of
@@ -95,27 +95,27 @@ class DocumentController(PLMObjectController):
         if not doc_file.checkout_valid:
             raise LockError("Check-out impossible, native related file is locked")
         if doc_file.deprecated:
-            raise LockError("Check-out impossible,  file is deprecated")  
+            raise LockError("Check-out impossible,  file is deprecated")
         if not doc_file.locked:
             doc_file.locked = True
             doc_file.locker = self._user
             doc_file.save()
             self._save_histo("Locked",
                              "%s locked by %s" % (doc_file.filename, self._user))
-                             
+
             doc_to_deprecated=doc_file.native_related
             if doc_to_deprecated:
                 doc_to_deprecated.deprecated = True
                 doc_to_deprecated.save()
                 self._save_histo("Deprecated",
-                                 "file : %s" % doc_to_deprecated.filename)                 
+                                 "file : %s" % doc_to_deprecated.filename)
         else:
             raise LockError("File already locked")
 
     def unlock(self, doc_file):
         """
         Unlock *doc_file* so that it can be modified or deleted
-        
+
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`plmapp.exceptions.UnlockError` if *doc_file* is already
@@ -137,7 +137,7 @@ class DocumentController(PLMObjectController):
         self._save_histo("Unlocked",
                          "%s unlocked by %s" % (doc_file.filename, self._user))
 
-       
+
     def add_file(self, f, update_attributes=True, thumbnail=True):
         """
         Adds file *f* to the document. *f* should be a :class:`~django.core.files.File`
@@ -153,7 +153,7 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`ValueError` if the file size is superior to
                  :attr:`settings.MAX_FILE_SIZE`
         :raises: :exc:`ValueError` if we try to add a native file while a relate standar file locked is present in the Document
-        """   
+        """
         self.check_permission("owner")
         self.check_editable()
 
@@ -168,7 +168,7 @@ class DocumentController(PLMObjectController):
         size = f.tell()
         f.seek(0)
         doc_file = models.DocumentFile.objects.create(filename=f.name, size=size,
-                        file=models.docfs.save(f.name,f), document=self.object) 
+                        file=models.docfs.save(f.name,f), document=self.object)
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
@@ -176,7 +176,7 @@ class DocumentController(PLMObjectController):
         if update_attributes:
             self.handle_added_file(doc_file)
         if thumbnail:
-           generate_thumbnail.delay(doc_file.id) 
+           generate_thumbnail.delay(doc_file.id)
         return doc_file
 
     def add_thumbnail(self, doc_file, thumbnail_file):
@@ -184,7 +184,7 @@ class DocumentController(PLMObjectController):
         Sets *thumnail_file* as the thumbnail of *doc_file*. *thumbnail_file*
         should be a :class:`~django.core.files.File` with an attribute *name*
         (like an :class:`UploadedFile`).
-        
+
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`ValueError` if the file size is superior to
@@ -200,7 +200,7 @@ class DocumentController(PLMObjectController):
         if settings.MAX_FILE_SIZE != -1 and thumbnail_file.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         if doc_file.deprecated:
-            raise ValueError("File is deprecated")  
+            raise ValueError("File is deprecated")
         basename = os.path.basename(thumbnail_file.name)
         name = "%d%s" % (doc_file.id, os.path.splitext(basename)[1])
         if doc_file.thumbnail:
@@ -235,7 +235,7 @@ class DocumentController(PLMObjectController):
         if doc_file.locked:
             raise DeleteFileError("File is locked")
         if doc_file.deprecated:
-            raise ValueError("File is deprecated")  
+            raise ValueError("File is deprecated")
         path = os.path.realpath(doc_file.file.path)
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
@@ -252,7 +252,7 @@ class DocumentController(PLMObjectController):
 
         This method may be overridden to updates attributes with data from
         *doc_file*. The default implementation does nothing.
-        
+
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
         """
@@ -264,7 +264,7 @@ class DocumentController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
 
-        self.check_attach_part(part)        
+        self.check_attach_part(part)
         if isinstance(part, PLMObjectController):
             part = part.object
         self.documentpartlink_document.create(part=part)
@@ -276,7 +276,7 @@ class DocumentController(PLMObjectController):
         Deletes link between *part* (a :class:`.Part`) and
         :attr:`~PLMObjectController.object`.
         """
-        
+
         self.check_attach_part(part, True)
         if isinstance(part, PLMObjectController):
             part = part.object
@@ -291,7 +291,7 @@ class DocumentController(PLMObjectController):
         :attr:`~PLMObjectController.object`.
         """
         return self.object.documentpartlink_document.at(time)
-    
+
     def get_detachable_parts(self):
         """
         Returns all attached parts the user can detach.
@@ -305,7 +305,7 @@ class DocumentController(PLMObjectController):
             return self.documentpartlink_document.filter(id__in=links).now()
         else:
             return models.DocumentPartLink.objects.none()
-    
+
     def is_part_attached(self, part):
         """
         Returns True if *part* is attached to the current document.
@@ -321,7 +321,7 @@ class DocumentController(PLMObjectController):
         if not isinstance(part, PLMObjectController):
             part = get_controller(part.type)(part, self._user)
         part.check_attach_document(self, detach)
-       
+
     def can_attach_part(self, part):
         """
         Returns True if *part* can be attached to the current document.
@@ -333,7 +333,7 @@ class DocumentController(PLMObjectController):
         except StandardError:
             pass
         return can_attach
-       
+
     def can_detach_part(self, part):
         """
         Returns True if *part* can be detached.
@@ -374,9 +374,9 @@ class DocumentController(PLMObjectController):
         else:
             return models.Part.objects.none()
 
-    def revise(self, new_revision, selected_parts=()):
+    def revise(self, new_revision, selected_parts=(), **kwargs):
         # same as PLMObjectController + duplicate files (and their thumbnails)
-        rev = super(DocumentController, self).revise(new_revision)
+        rev = super(DocumentController, self).revise(new_revision, **kwargs)
         for doc_file in self.object.files.all():
             filename = doc_file.filename
             path = models.docfs.get_available_name(filename.encode("utf-8"))
@@ -405,7 +405,7 @@ class DocumentController(PLMObjectController):
         """
         Updates *doc_file* with data from *new_file*. *doc_file*.thumbnail
         is deleted if it is present.
-        
+
         :exceptions raised:
             * :exc:`ValueError` if *doc_file*.document is not self.object
             * :exc:`ValueError` if the file size is superior to
@@ -432,10 +432,10 @@ class DocumentController(PLMObjectController):
         if settings.MAX_FILE_SIZE != -1 and new_file.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         if doc_file.deprecated:
-            raise ValueError("File is deprecated")  
-            
+            raise ValueError("File is deprecated")
+
         if doc_file.locked:
-            self.unlock(doc_file)   
+            self.unlock(doc_file)
         now = datetime.datetime.now()
         previous_revision = doc_file.previous_revision
         doc_file.previous_revision = None
@@ -489,9 +489,9 @@ class DocumentController(PLMObjectController):
     def update_rel_part(self, formset):
         u"""
         Updates related part informations with data from *formset*
-        
+
         :param formset:
-        :type formset: a modelfactory_formset of 
+        :type formset: a modelfactory_formset of
                         :class:`~plmapp.forms.ModifyRelPartForm`
         """
         parts = set()
@@ -513,15 +513,15 @@ class DocumentController(PLMObjectController):
     def update_file(self, formset):
         u"""
         Updates uploaded file informations with data from *formset*
-        
+
         :param formset:
-        :type formset: a modelfactory_formset of 
+        :type formset: a modelfactory_formset of
                         :class:`~plmapp.forms.ModifyFileForm`
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
               :attr:`object`
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
-        
+
         self.check_permission("owner")
         self.check_editable()
         if formset.is_valid():
@@ -553,18 +553,18 @@ class DocumentController(PLMObjectController):
             if (not res) and raise_ :
                 raise PermissionError("This document is related to a part.")
         return res
-        
+
     def clone(self,form, user, parts, block_mails=False, no_index=False):
         """
         Clones the object :
-        
+
             * calls :meth:`.PLMObjectController.clone`
             * duplicates all :class:`.DocumentFile` in self.object
-            
+
         :param parts: list of :class:`.Part` selected to be attached to the new document
-        """    
+        """
         new_ctrl = super(DocumentController, self).clone(form, user, block_mails, no_index)
-        
+
         for doc_file in self.object.files.all():
             filename = doc_file.filename
             path = models.docfs.get_available_name(filename.encode("utf-8"))
@@ -582,7 +582,7 @@ class DocumentController(PLMObjectController):
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
-            
+
         if parts :
             # attach the given parts
             for part in parts:
@@ -591,7 +591,7 @@ class DocumentController(PLMObjectController):
         details = "to %s//%s//%s//%s " %(new_ctrl.type, new_ctrl.reference, new_ctrl.revision, new_ctrl.name)
         self._save_histo("Clone", details)
         return new_ctrl
-        
+
     def has_links(self):
         """
         Return true if the document is attached to at least one part.
@@ -606,7 +606,7 @@ class DocumentController(PLMObjectController):
         for path in self.files.exclude(thumbnail="").values_list("thumbnail", flat=True):
             os.symlink(os.path.join(input_dir, path),
                        os.path.join(output_dir, path))
-    
+
     def unpublish(self):
         super(DocumentController, self).unpublish()
         # unpublish all thumbnails

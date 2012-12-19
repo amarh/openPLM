@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -79,13 +79,13 @@ class PartController(PLMObjectController):
         """
         Checks if *child* can be added to *self*.
         If *child* can not be added, an exception is raised.
-        
+
         :param child: child to be added
         :type child: :class:`.Part`
-        
+
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
-            :attr:`object`.    
+            :attr:`object`.
         """
         self.check_permission("owner")
         self.check_editable()
@@ -121,7 +121,7 @@ class PartController(PLMObjectController):
         children += models.AlternatePartSet.get_related_parts(children)
         if set(p.id for p in child_ctrl.get_alternates()) & set(children):
             raise ValueError("Can not add child, %s is an alternate part of one of the children" % child)
-        
+
 
     def precompute_can_add_child2(self):
         is_owner = self.check_permission("owner", raise_=False)
@@ -131,7 +131,7 @@ class PartController(PLMObjectController):
             parents.update(models.AlternatePartSet.get_related_parts(parents))
             invalid_ids = set(parents)
             while parents:
-                parents = set(links.filter(child__in=parents).values_list("parent", 
+                parents = set(links.filter(child__in=parents).values_list("parent",
                         flat=True))
                 parents.update(models.AlternatePartSet.get_related_parts(parents))
                 parents.difference_update(invalid_ids)
@@ -177,7 +177,7 @@ class PartController(PLMObjectController):
         :param unit: a valid unit
 
         Extra arguments are used to create relevant :class:`.ParentChildLinkExtension`.
-        
+
         :raises: :exc:`ValueError` if *child* is already a child or a parent.
         :raises: :exc:`ValueError` if *quantity* or *order* are negative.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
@@ -217,7 +217,7 @@ class PartController(PLMObjectController):
         .. note::
             The link is not destroyed: its :attr:`.ParentChildLink.end_time`
             is set to now.
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
@@ -242,14 +242,14 @@ class PartController(PLMObjectController):
         :type new_quantity: positive float
         :param new_order: order
         :type new_order: positive int
-        
+
         Extra arguments are used to modify relevant :class:`.ParentChildLinkExtension`.
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
-        
+
         self.check_permission("owner")
         self.check_editable()
         if isinstance(child, PLMObjectController):
@@ -325,14 +325,14 @@ class PartController(PLMObjectController):
         for ext in extensions:
             ext.link = link2
             ext.save(force_insert=True)
-        return link2       
+        return link2
 
     def get_children(self, max_level=1, date=None,
             related=("child", "child__state", "child__lifecycle"),
             only_official=False, only=None):
         """
         Returns a list of all children at time *date*.
-        
+
         :param max_level: maximum level of children, ``-1``
             returns all descendants, ``1`` returns direct children
         :param related: a list of related fields that are given
@@ -343,7 +343,7 @@ class PartController(PLMObjectController):
             retrieved field of the :class:`.ParentChildLink`
         :rtype: list of :class:`Child`
         """
-        
+
         links = models.ParentChildLink.objects.at(date).order_by("-order")\
                 .select_related(*related)
         if only is not None:
@@ -369,7 +369,7 @@ class PartController(PLMObjectController):
                         if c.link.child_id == link.parent_id:
                             res.insert(res.index(c) +1, child)
                             break
-            last_children = last 
+            last_children = last
             level += 1
         if only_official and res:
             # retrieves all official children at *date* and then prunes the
@@ -397,7 +397,7 @@ class PartController(PLMObjectController):
         links = models.ParentChildLink.current_objects
         parents = [part.id]
         while parents:
-            parents = links.filter(parent__in=parents).values_list("child", 
+            parents = links.filter(parent__in=parents).values_list("child",
                     flat=True)
             if self.id in parents:
                 return True
@@ -413,19 +413,19 @@ class PartController(PLMObjectController):
         parents += models.AlternatePartSet.get_related_parts(parents)
         while parents:
             parents += models.AlternatePartSet.get_related_parts(parents)
-            parents = list(links.filter(parent__in=parents).values_list("child", 
+            parents = list(links.filter(parent__in=parents).values_list("child",
                     flat=True))
             if not tested_parts.isdisjoint(parents):
                 return True
         return False
 
-    
+
     def get_parents(self, max_level=1, date=None,
             related=("parent", "parent__state", "parent__lifecycle"),
             only_official=False, only=None):
         """
         Returns a list of all parents at time *date*.
-        
+
         :param max_level: maximum level of parents, ``-1``
             returns all ancestors, ``1`` returns direct parents
         :param related: a list of related fields that are given
@@ -462,7 +462,7 @@ class PartController(PLMObjectController):
                         if c.link.parent_id == link.child_id:
                             res.insert(res.index(c) +1, parent)
                             break
-            last_parents = last 
+            last_parents = last
             level += 1
         if only_official and res:
             # retrieves all official children at *date* and then prunes the
@@ -486,11 +486,11 @@ class PartController(PLMObjectController):
     def update_children(self, formset):
         u"""
         Updates children informations with data from *formset*
-        
+
         :param formset:
-        :type formset: a modelfactory_formset of 
+        :type formset: a modelfactory_formset of
                         :class:`~plmapp.forms.ModifyChildForm`
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
@@ -526,12 +526,12 @@ class PartController(PLMObjectController):
                       ``"first"``, ``"all"`` and ``"last"``.
         :param state: set to ``"official"`` to hide unofficial parts and document
         :param show_documents: True if attached document are displayed
-        
+
         It returns a dictionary containing the following keys:
 
         ``children``
             list of :class:`Child`, see :meth:`.get_children`
-        
+
         ``extra_columens``
             list of extra column headers (field name, verbose name):
             its the list of BOMs extensions bound to the object
@@ -573,7 +573,7 @@ class PartController(PLMObjectController):
             for PCLE in models.get_PCLEs(self.object):
                 fields = PCLE.get_visible_fields()
                 if fields:
-                    extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name) 
+                    extra_columns.extend((f, PCLE._meta.get_field(f).verbose_name)
                             for f in fields)
                     pcles = PCLE.objects.filter(link__in=(c.link.id for c in children))
                     pcles = pcles.values("link_id", *fields)
@@ -590,7 +590,7 @@ class PartController(PLMObjectController):
             if only_official and alt:
                 sh = models.StateHistory.objects.at(date).officials().filter(plmobject__in=alt)
                 official_alt = set(sh.values_list("plmobject_id", flat=True))
-                alt = [p for p in alt if p.id in official_alt] 
+                alt = [p for p in alt if p.id in official_alt]
             id2ps = dict((p.id, p.psid) for p in alt)
             for part_id in ids:
                 try:
@@ -665,11 +665,11 @@ class PartController(PLMObjectController):
         return ctx
 
     def revise(self, new_revision, child_links=None, documents=(),
-            parents=()):
+            parents=(), **kwargs):
         """
         Revises the part. Does the same thing as :meth:`.PLMObjectController.revise`
         and:
-            
+
             * copies all :class:`.ParentChildLink` of *child_links*, with the
               new revision as the new parent. If *child_links* is None (the
               default), all current children are copied. If an empty sequence
@@ -689,7 +689,7 @@ class PartController(PLMObjectController):
               tuples that may interest the user who revises this part.
         """
         # same as PLMObjectController + add children
-        new_controller = super(PartController, self).revise(new_revision)
+        new_controller = super(PartController, self).revise(new_revision, **kwargs)
         # adds the children
         if child_links is None:
             child_links = (x.link for x in self.get_children(1))
@@ -714,11 +714,11 @@ class PartController(PLMObjectController):
         user revises the part.
 
         A document is suggested if:
-        
+
             a. it is attached to the current part and:
-             
+
                 1. it is a *draft* and its superior revisions, if they exist,
-                   are *not* attached to the part 
+                   are *not* attached to the part
 
                    or
 
@@ -738,7 +738,7 @@ class PartController(PLMObjectController):
                    or
 
                 2. it is official
-                
+
         """
         docs = []
         links = self.get_attached_documents()
@@ -780,9 +780,9 @@ class PartController(PLMObjectController):
 
                 1. no superior revisions are a parent and its state is draft
                    or official
-    
+
                    or
-                
+
                 2. no superior revisions exist and its state is proposed.
 
             b. it is not a parent, a previous revision is a parent, its state
@@ -828,11 +828,11 @@ class PartController(PLMObjectController):
         """
         Links *document* (a :class:`.Document`) with
         :attr:`~PLMObjectController.object`.
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         """
-        
+
         self.check_attach_document(document)
         if isinstance(document, PLMObjectController):
             document = document.object
@@ -844,11 +844,11 @@ class PartController(PLMObjectController):
         """
         Delete link between *document* (a :class:`.Document`)
         and :attr:`~PLMObjectController.object`.
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         """
-        
+
         self.check_attach_document(document, True)
         if isinstance(document, PLMObjectController):
             document = document.object
@@ -877,7 +877,7 @@ class PartController(PLMObjectController):
             return self.documentpartlink_part.filter(id__in=links)
         else:
             return models.DocumentPartLink.objects.none()
-     
+
     def is_document_attached(self, document):
         """
         Returns True if *document* is attached to the current part.
@@ -886,20 +886,20 @@ class PartController(PLMObjectController):
         if isinstance(document, PLMObjectController):
             document = document.object
         return self.documentpartlink_part.now().filter(document=document).exists()
-    
+
     def check_attach_document(self, document, detach=False):
         if not hasattr(document, "is_document") or not document.is_document:
             raise TypeError("%s is not a document" % document)
         self.check_contributor()
         if not (self.is_draft or document.is_draft):
-            raise ValueError("Can not attach: one of the part or document's state must be draft.") 
-        if self.is_cancelled: 
+            raise ValueError("Can not attach: one of the part or document's state must be draft.")
+        if self.is_cancelled:
             raise ValueError("Can not attach: part is cancelled.")
-        if self.is_deprecated: 
+        if self.is_deprecated:
             raise ValueError("Can not attach: part is deprecated.")
-        if document.is_cancelled: 
+        if document.is_cancelled:
             raise ValueError("Can not attach: document is cancelled.")
-        if document.is_deprecated: 
+        if document.is_deprecated:
             raise ValueError("Can not attach: document is deprecated.")
         if self.is_proposed:
             raise ValueError("Can not attach: part's state is %s" % self.state.name)
@@ -920,7 +920,7 @@ class PartController(PLMObjectController):
             owner_ok = False
         if not owner_ok:
             self.check_permission("owner")
-        
+
         if self.is_document_attached(document):
             if not detach:
                 raise ValueError("Document is already attached to the part.")
@@ -954,14 +954,14 @@ class PartController(PLMObjectController):
     def update_doc_cad(self, formset):
         u"""
         Updates doc_cad informations with data from *formset*
-        
+
         :param formset:
-        :type formset: a modelfactory_formset of 
+        :type formset: a modelfactory_formset of
                         :class:`~plmapp.forms.ModifyChildForm`
-        
+
         :raises: :exc:`ValueError` if one of the document is not detachable.
         """
-         
+
         docs = set()
         if formset.is_valid():
             for form in formset.forms:
@@ -1032,7 +1032,7 @@ class PartController(PLMObjectController):
     def has_links(self):
         """
         Return true if the part :
-        
+
             * is a parent or a child
             * is attached to at least one document
         """
@@ -1040,7 +1040,7 @@ class PartController(PLMObjectController):
         res = models.ParentChildLink.current_objects.filter(q).exists()
         res = res or self.get_attached_documents().exists()
         return res
-   
+
     def get_cad_files(self):
         """
         Returns an iterable of all :class:`.DocumentFile` related
@@ -1065,7 +1065,7 @@ class PartController(PLMObjectController):
             self.check_permission("owner")
             self.check_editable()
         # FIXME: untested !!!
-        
+
         # TODO: better error messages, permissions
 
         if part.is_cancelled:
@@ -1111,13 +1111,13 @@ class PartController(PLMObjectController):
                     for p in alternates if p.id != tested_part.id)
         if not revision_valid:
             raise ValueError("Invalid revision")
-        
+
         # ancestors
         links = models.ParentChildLink.current_objects
         parents = [part.id, self.id] + [p.id for p in alternates]
         built_set = set(parents[:])
         while parents:
-            parents = list(links.filter(child__in=parents).values_list("parent", 
+            parents = list(links.filter(child__in=parents).values_list("parent",
                     flat=True))
             parents += models.AlternatePartSet.get_related_parts(parents)
             if not built_set.isdisjoint(parents):
@@ -1167,7 +1167,7 @@ class PartController(PLMObjectController):
         partset = models.AlternatePartSet.get_partset(self.object)
         if partset:
             return partset.remove_part(self.object)
-        return None        
+        return None
 
     def get_alternates(self, date=None):
         try:
@@ -1190,7 +1190,7 @@ class PartController(PLMObjectController):
             # self should replace previous_revision
             try:
                 other_part = partset.parts.exclude(id=previous_revision.id)[0]
-                # do not check owner permission since the company owns the part 
+                # do not check owner permission since the company owns the part
                 self.add_alternate(other_part, check_perm=False)
             except (ValueError, PermissionError) as e:
                 # it should not failed, except if another alternate set was built
