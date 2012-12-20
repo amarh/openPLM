@@ -3,7 +3,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ from openPLM.plmapp.utils import can_generate_pdf
 def get_obj(obj_type, obj_ref, obj_revi, user):
     """
     Get type, reference and revision of an object and return the related controller
-    
+
     :param obj_type: :attr:`.PLMObject.type`
     :type obj_type: str
     :param obj_ref: :attr:`.PLMObject.reference`
@@ -82,9 +82,9 @@ def secure_required(view_func):
 def json_view(func, API_VERSION=""):
     """
     Decorator which converts the result from *func* into a json response.
-    
+
     The result from *func* must be serializable by :mod:`django.utils.simple_json`
-    
+
     This decorator automatically adds a ``result`` field to the response if it
     was not present. Its value is ``'ok'`` if no exception was raised, and else,
     it is ``'error'``. In that case, a field ``'error'`` is added with a short
@@ -176,7 +176,7 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
 
     If an exception of type :exc:`.django.http.Http404` is raised, the exception
     is re-raised.
-    
+
     If an exception of type :exc:`.ControllerError` is raised, a
     :class:`.django.http.HttpResponse` is returned with an explanation message.
 
@@ -220,15 +220,15 @@ def init_ctx(init_type_, init_reference, init_revision):
     Get type, reference and revision of an object and return a dictionnary with them
     plus current time, :attr:`settings.THUMBNAILS_URL` the begining of the URL to
     get thumbnail of a file and :attr:`settings.LANGUAGES`.
-    
+
     Example::
-    
+
         >>> init_ctx('BiosOs','BI-0044','1.4.3')
         {'THUMBNAILS_URL': '/media/thumbnails',
          'object_reference': 'BI-0044',
          'object_revision': '1.4.3',
          'object_type': 'BiosOs'}
-    
+
     :param init_type_: type of the object
     :type init_type_: str
     :param init_reference: reference of the object
@@ -273,7 +273,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     Get a request and return a controller, a context dictionnary with elements common to all pages
     (search form, search data, search results, ...) and another dictionnary to update the
     request.session dictionnary.
-    
+
     :param request: :class:`django.http.QueryDict`
     :param type_: :attr:`.PLMObject.type`
     :type type_: str
@@ -298,7 +298,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         if not restricted:
             save_session = update_navigation_history(request, obj,
                 type_, reference, revision)
-        
+
     if not restricted: # a restricted account can not perform a search
         # Builds, update and treat Search form
         search_needed = "results" not in request.session or load_all
@@ -331,13 +331,13 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
             search_count = request.session.get("search_count", 0)
 
         ctx.update({
-           'results' : qset, 
+           'results' : qset,
            'search_query' : search_query,
            'search_count' : search_count,
            'search_form' : search_form,
            'navigation_history' : request.session.get("navigation_history", []),
         })
-    
+
     ctx.update({
        'link_creation' : False,
        'attach' : (obj, False),
@@ -359,7 +359,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     from haystack import site
     for r in request.session.get("results", []):
         r.searchsite = site
-        
+
     if save_session:
         request.session.save()
     return obj, ctx
@@ -419,12 +419,12 @@ _creation_views = {}
 def register_creation_view(type_, view):
     """
     Register a creation view for *type_* (a subclass of :class:`.PLMObject`).
-    
-    Most of the applications does not need to call this function which is 
+
+    Most of the applications does not need to call this function which is
     available for special cases which cannot be handled by :func:`.create_object`.
 
     .. note::
-        
+
         You must ensure that the module that calls this function has been imported.
         For example, you can import it in your :file:`urls.py` file.
     """
