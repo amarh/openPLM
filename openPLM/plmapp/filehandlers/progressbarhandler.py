@@ -3,15 +3,16 @@
 # Contact : zahariri.ali@gmail.com
 ######################################
 
+from django.conf import settings
 from django.core.files import temp as tempfile
 from django.core.files.uploadhandler import FileUploadHandler
-from django.core.files.uploadedfile import *
+from django.core.files.uploadedfile import UploadedFile
 
 
 class ProgressBarUploadHandler(FileUploadHandler):
     """
     Handle and tracks progress for multiple file uploads.
-    The http post request must contain a query parameter for each file field, 
+    The http post request must contain a query parameter for each file field,
     which should contain a unique string to identify the temporary file uploaded to be tracked.
     """
 
@@ -19,21 +20,25 @@ class ProgressBarUploadHandler(FileUploadHandler):
         super(ProgressBarUploadHandler, self).__init__(*args, **kwargs)
         self.progress_id = {}
 
-    def new_file(self,file_name, *args, **kwargs):
+    def new_file(self, file_name, *args, **kwargs):
         """
-        Create the file object, identified by the corresponding query parameter, to append to as data is coming in.
+        Create the file object, identified by the corresponding query parameter,
+        to append to as data is coming in.
         """
-        self.progress_id["%s" % file_name]=self.request.GET["%s" % file_name]
+        self.progress_id[file_name]=self.request.GET[file_name]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
-        self.file = ProgressUploadedFile(self.progress_id["%s" % file_name],self.file_name, self.content_type, 0, self.charset)
+        self.file = ProgressUploadedFile(self.progress_id[file_name], self.file_name,
+                self.content_type, 0, self.charset)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
-    
+        import time
+        time.sleep(0.25)
+
     def file_complete(self, file_size):
-       	self.file.seek(0)
-       	self.file.size = file_size
-       	return self.file
+        self.file.seek(0)
+        self.file.size = file_size
+        return self.file
 
     def upload_complete(self):
         pass
@@ -42,18 +47,16 @@ class ProgressBarUploadHandler(FileUploadHandler):
         return self.file.temporary_file_path()
 
 
-from django.conf import settings
 class ProgressUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location with a specified suffix (i.e. stream-to-disk).
     """
-    def __init__(self, suf, name, content_type, size, charset):
-        suf_id = "%s" % (suf)
+    def __init__(self, suf_id, name, content_type, size, charset):
         if settings.FILE_UPLOAD_TEMP_DIR:
-            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % (suf_id),
+            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % suf_id,
                                                dir=settings.FILE_UPLOAD_TEMP_DIR)
         else:
-            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % (suf_id))
+            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % suf_id)
         super(ProgressUploadedFile, self).__init__(file, name, content_type, size, charset)
 
     def temporary_file_path(self):
