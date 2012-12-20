@@ -32,8 +32,6 @@ class ProgressBarUploadHandler(FileUploadHandler):
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
-        import time
-        time.sleep(0.25)
 
     def file_complete(self, file_size):
         self.file.seek(0)
