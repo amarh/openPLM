@@ -20,22 +20,22 @@ class PartQuerySet(QuerySet):
         """
         Annotates results with the number of children (field ``num_children``).
         """
-        return self.extra(select={"num_children" : 
+        return self.extra(select={"num_children" :
 """
 SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
     WHERE plmapp_parentchildlink.end_time IS NULL AND
-    plmapp_parentchildlink.parent_id = plmapp_part.plmobject_ptr_id 
+    plmapp_parentchildlink.parent_id = plmapp_part.plmobject_ptr_id
 """})
 
     def with_parents_counts(self):
         """
         Annotates results with the number of parents (field ``num_parents``).
         """
-        return self.extra(select={"num_parents" : 
+        return self.extra(select={"num_parents" :
 """
 SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
     WHERE plmapp_parentchildlink.end_time IS NULL AND
-    plmapp_parentchildlink.child_id = plmapp_part.plmobject_ptr_id 
+    plmapp_parentchildlink.child_id = plmapp_part.plmobject_ptr_id
 """})
 
 
@@ -54,14 +54,14 @@ class PartManager(models.Manager):
         Shorcut for ``self.get_query_set().with_children_counts()``.
         See :meth:`PartQuerySet.with_children_counts`.
         """
-        return self.get_query_set().with_children_counts() 
+        return self.get_query_set().with_children_counts()
 
     def with_parents_counts(self):
         """
         Shorcut for ``self.get_query_set().with_parents_counts()``.
         See :meth:`PartQuerySet.with_parents_counts`.
         """
-        return self.get_query_set().with_parents_counts() 
+        return self.get_query_set().with_parents_counts()
 
 
 class TopAssemblyManager(PartManager):
@@ -71,7 +71,7 @@ class TopAssemblyManager(PartManager):
     """
 
     def get_query_set(self):
-        from openPLM.plmapp.models.link import ParentChildLink 
+        from openPLM.plmapp.models.link import ParentChildLink
         current_pcl = ParentChildLink.current_objects
         return super(TopAssemblyManager, self).get_query_set().\
                 exclude(id__in=current_pcl.values_list("child")).\
@@ -109,25 +109,25 @@ class Part(AbstractPart, PLMObject):
     @property
     def menu_items(self):
         items = list(super(Part, self).menu_items)
-        items.extend([ugettext_noop("BOM-child"), ugettext_noop("parents"), 
+        items.extend([ugettext_noop("BOM-child"), ugettext_noop("parents"),
                       ugettext_noop("alternates"), ugettext_noop("doc-cad")])
         return items
 
     def is_promotable(self):
         """
-        Returns True if the part is promotable. 
-        
+        Returns True if the part is promotable.
+
         A part is promotable if:
-            
+
             #. its state is not the last state of its lifecycle
-            
+
             #. if the part is not editable (its state is official).
-            
+
             #. the part is editable and:
 
                 #. there is a next state in its lifecycle and if its children
                     which have the same lifecycle are in a state as mature as
-                    the object's state.  
+                    the object's state.
 
                 #. if the part has no children, there is at least one official
                    document attached to it.
@@ -179,7 +179,7 @@ class Part(AbstractPart, PLMObject):
         return True
 
     def is_set_promotable(self, partset):
-        # current implementation: at most 4 requests 
+        # current implementation: at most 4 requests
         # FIXME: handle alternate links
         from .link import ParentChildLink, DocumentPartLink
         part_ids = set(partset.parts.values_list("id", flat=True))
@@ -210,7 +210,7 @@ class Part(AbstractPart, PLMObject):
     @property
     def is_part(self):
         return True
-    
+
     @property
     def is_document(self):
         return False
@@ -228,8 +228,8 @@ def get_all_parts():
 @memoize_noarg
 def get_all_parts_with_level():
     lst = []
-    level=">"
+    level="=>"
     get_all_subclasses_with_level(Part, lst , level)
-    return lst   
+    return lst
 
 

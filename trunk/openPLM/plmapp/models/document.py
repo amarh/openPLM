@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
+from django.utils.functional import memoize
+
 from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.utils import memoize_noarg
 
@@ -237,6 +239,8 @@ class Document(PLMObject):
     class Meta:
         app_label = "plmapp"
 
+    ACCEPT_FILES = True
+
     @property
     def files(self):
         "Queryset of all non deprecated :class:`.DocumentFile` linked to self"
@@ -300,10 +304,14 @@ def get_all_subtype_documents(subtype):
     get_all_subclasses(subtype, res)
     return res
 
-@memoize_noarg
-def get_all_documents_with_level():
+
+def get_all_documents_with_level(only_accept_files=False):
     lst = []
-    level=">"
-    get_all_subclasses_with_level(Document, lst , level)
+    level="=>"
+    get_all_subclasses_with_level(Document, lst, level)
+    classes = get_all_documents()
+    if only_accept_files:
+        return [(n, l) for n, l in lst if classes[n].ACCEPT_FILES]
     return lst
 
+get_all_documents_with_level = memoize(get_all_documents_with_level, {}, 1)
