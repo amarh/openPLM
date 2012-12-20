@@ -195,7 +195,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         form.inbulk_cache = inbulk_cache
         if inbulk_cache is None or "group" not in inbulk_cache:
             groups = user.groups.all().values_list("id", flat=True)
-            field.queryset = m.GroupInfo.objects.filter(id__in=groups)
+            field.queryset = m.GroupInfo.objects.filter(id__in=groups).order_by("name")
             if inbulk_cache is not None:
                 # a bit ugly but ModelChoiceField reevalute the
                 # queryset if cache_choices is False and choice_cache
@@ -227,7 +227,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         field.cache_choices = inbulk_cache is not None
         if inbulk_cache is None or "lifecycles" not in inbulk_cache:
             lifecycles = m.Lifecycle.objects.filter(type=m.Lifecycle.STANDARD).\
-                    exclude(pk=m.get_cancelled_lifecycle().pk)
+                    exclude(pk=m.get_cancelled_lifecycle().pk).order_by("name")
             form.fields["lifecycle"].queryset = lifecycles
             if inbulk_cache is not None:
                 inbulk_cache["lifecycles"] = lifecycles
