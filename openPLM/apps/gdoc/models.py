@@ -19,7 +19,7 @@ from openPLM.apps.gdoc.gutils import get_gclient
 
 class FlowModel(models.Model):
     """
-    Short live model used by OAuth2 authentication process. 
+    Short live model used by OAuth2 authentication process.
     """
     id = models.ForeignKey(User, primary_key=True)
     flow = FlowField()
@@ -41,6 +41,8 @@ admin.site.register(FlowModel)
 
 class GoogleDocument(Document):
 
+    ACCEPT_FILES = False
+
     resource_id = models.CharField(max_length=200, blank=False, null=False)
 
     @property
@@ -56,7 +58,7 @@ class GoogleDocument(Document):
         # a GoogleDocument has no files, so we do not checks
         # if it has a locked file
         return self._is_promotable()
-        
+
 admin.site.register(GoogleDocument)
 
 class InvalidCredentialException(StandardError):
@@ -87,7 +89,7 @@ class GoogleDocumentController(DocumentController):
         copy = self.client.copy_resource(entry, self.name + " - " + new_revision)
         rev.object.resource_id = copy.resource_id.text
         rev.object.save()
-        
+
     def lock(self, doc_file):
         raise exc.LockError()
 

@@ -21,12 +21,14 @@ revision_validator = RegexValidator(revision_rx,
 
 class SubversionRepository(Document):
 
+    ACCEPT_FILES = False
+
     repository_uri = models.CharField(verbose_name=_("repository uri"),max_length=250, blank=False, null=False)
     svn_revision = models.CharField(verbose_name=_("svn revision"),max_length=50, blank=False, null=False,
             default="HEAD", validators=[revision_validator])
     issue_tracking_system = models.CharField(verbose_name=_("issue tracking system"),max_length=250, blank=True,
             null=False)
-    
+
     @property
     def attributes(self):
         attrs = ["repository_uri", "svn_revision", "issue_tracking_system"]
@@ -45,10 +47,10 @@ class SubversionRepository(Document):
     def checkout_cmd(self):
         return u"svn co -r '%s' '%s'"  % (self.svn_revision.strip(),
                 self.repository_uri.strip())
-        
+
     @property
     def export_cmd(self):
-        return u"svn export -r '%s' '%s'"  % (self.svn_revision.strip(), 
+        return u"svn export -r '%s' '%s'"  % (self.svn_revision.strip(),
                 self.repository_uri.strip())
 
 admin.site.register(SubversionRepository)
