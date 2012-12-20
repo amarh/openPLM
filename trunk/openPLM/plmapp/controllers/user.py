@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
+import os
 from django.conf import settings
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
@@ -40,16 +41,16 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
 from openPLM.plmapp.tasks import update_index
 from openPLM.plmapp.utils import generate_password
-from openPLM.plmapp.exceptions import PermissionError
+from openPLM.plmapp.exceptions import PermissionError, DeleteFileError
 from openPLM.plmapp.controllers.base import Controller, permission_required
 
 NEW_ACCOUNT_SUBJECT = u"New account on OpenPLM"
 
 class UserController(Controller):
     u"""
-    Object used to manage a :class:`~django.contrib.auth.models.User` and store his 
+    Object used to manage a :class:`~django.contrib.auth.models.User` and store his
     modification in a history
-    
+
     :attributes:
         .. attribute:: object
 
@@ -58,7 +59,7 @@ class UserController(Controller):
     :param obj: managed object
     :type obj: an instance of :class:`~django.contrib.auth.models.User`
     :param user: user who modify *obj*
-    :type user: :class:`~django.contrib.auth.models.User` 
+    :type user: :class:`~django.contrib.auth.models.User`
 
     .. note::
         This class does not inherit from :class:`.PLMObjectController`.
@@ -73,7 +74,7 @@ class UserController(Controller):
         super(UserController, self).__init__(obj, user, block_mails, no_index)
         self.creator = obj
         self.owner = obj
-    
+
     @classmethod
     def load(cls, type, reference, revision, user):
         return cls(get_object_or_404(models.User, username=reference), user)
@@ -101,7 +102,7 @@ class UserController(Controller):
     def update_from_form(self, form):
         u"""
         Updates :attr:`object` from data of *form*
-        
+
         This method raises :exc:`ValueError` if *form* is invalid.
         """
         self.check_update_data()
@@ -206,7 +207,7 @@ class UserController(Controller):
     def delegate(self, user, role):
         """
         Delegates role *role* to *user*.
-        
+
         Possible values for *role* are:
             ``'notified'``
                 valid for all users
@@ -217,7 +218,7 @@ class UserController(Controller):
             ``'sign*'``
                 valid only for contributors and administrators, means all sign
                 roles that :attr:`object` has.
-        
+
         :raise: :exc:`.PermissionError` if *user* can not have the role *role*
         :raise: :exc:`ValueError` if *user* is :attr:`object`
         """
@@ -250,7 +251,7 @@ class UserController(Controller):
     @permission_required(role=models.ROLE_OWNER)
     def remove_delegation(self, delegation_link):
         """
-        Removes a delegation (*delegation_link*). The delegator must be 
+        Removes a delegation (*delegation_link*). The delegator must be
         :attr:`object`, otherwise a :exc:`ValueError` is raised.
         """
         if delegation_link.delegator != self.object:
@@ -260,7 +261,7 @@ class UserController(Controller):
                                  delegatee=delegation_link.delegatee)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
         delegation_link.end()
-        
+
     def get_user_delegation_links(self):
         """
         Returns all delegatees of :attr:`object`.
@@ -283,7 +284,7 @@ class UserController(Controller):
                 # i don't know if a domain can contains a '@'
                 domain = email.rsplit("@", 1)[1]
                 if domain not in Site.objects.values_list("domain", flat=True):
-                    raise PermissionError("Email's domain not valid") 
+                    raise PermissionError("Email's domain not valid")
         except AttributeError:
             # restriction disabled if the setting is not set
             pass
@@ -303,12 +304,12 @@ class UserController(Controller):
                }
         update_index.delay("auth", "user", new_user.pk)
         self._send_mail(send_mail, self.get_sponsor_subject(new_user), [new_user],
-                ctx, "mails/new_account") 
+                ctx, "mails/new_account")
         models.UserHistory.objects.create(action="Create", user=self._user,
                 plmobject=self._user, details="New user: %s" % new_user.username)
         models.UserHistory.objects.create(action="Create", user=self._user,
                 plmobject=new_user, details="Account created")
-       
+
     @permission_required(role=models.ROLE_OWNER)
     def resend_sponsor_mail(self, new_user):
         try:
@@ -333,7 +334,7 @@ class UserController(Controller):
                 "password" : password,
                }
         self._send_mail(send_mail, self.get_sponsor_subject(new_user), [new_user],
-                ctx, "mails/new_account") 
+                ctx, "mails/new_account")
 
     def check_readable(self, raise_=True):
         if self._user.get_profile().restricted:
@@ -342,4 +343,58 @@ class UserController(Controller):
                     raise PermissionError("You can not see this user account")
                 return False
         return True
+
+    def add_file(self, f):
+        """
+        Adds private file *f*. *f* should be a :class:`~django.core.files.File`
+        with an attribute *name* (like an :class:`UploadedFile`).
+
+        :return: the :class:`.PrivateFile` created.
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
+        :raises: :exc:`ValueError` if the file size is superior to
+                 :attr:`settings.MAX_FILE_SIZE`
+        """
+        self.check_permission("owner")
+
+        if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
+            raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
+
+        f.name = f.name.encode("utf-8")
+        f.seek(0, os.SEEK_END)
+        size = f.tell()
+        f.seek(0)
+        doc_file = models.PrivateFile.objects.create(filename=f.name, size=size,
+                        file=models.docfs.save(f.name,f), creator=self.object)
+        self.save(False)
+        # set read only file
+        os.chmod(doc_file.file.path, 0400)
+        # no history!
+        return doc_file
+
+    def delete_file(self, doc_file):
+        """
+        Deletes *doc_file*, the file attached to *doc_file* is physically
+        removed.
+
+        :exceptions raised:
+            * :exc:`ValueError` if *doc_file*.creator is not self.object
+            * :exc:`plmapp.exceptions.DeleteFileError` if *doc_file* is
+              locked
+            * :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
+
+        :param doc_file: the file to be deleted
+        :type doc_file: :class:`.PrivateFile`
+        """
+
+        self.check_permission("owner")
+        if doc_file.creator != self.object:
+            raise PermissionError("Not your file")
+        path = os.path.realpath(doc_file.file.path)
+        if not path.startswith(settings.DOCUMENTS_DIR):
+            raise DeleteFileError("Bad path : %s" % path)
+        os.chmod(path, 0700)
+        os.remove(path)
+        doc_file.delete()
 
