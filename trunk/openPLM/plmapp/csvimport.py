@@ -36,7 +36,7 @@ class CSVImportError(StandardError):
 
     def __unicode__(self):
         details = self.errors.as_text()
-        return u"CSVImportError:\n\t" + details 
+        return u"CSVImportError:\n\t" + details
 
 class Preview(object):
     u"""
@@ -82,14 +82,14 @@ class CSVImporter(object):
     :param csv_file: file being imported
     :type csv_file: a file like object
     :param user: user who imports the file
-    :type user: :class:`~django.contrib.auth.models.User` 
+    :type user: :class:`~django.contrib.auth.models.User`
     :param encoding: encoding of the file (`utf-8`, `ascii`, etc.)
-    
+
     For "end users", this class has two useful methods:
-        
+
         * :meth:`get_preview` to generate a :class:`Preview` of the file
         * :meth:`import_csv` to import the csv file
-    
+
     An implementation must overwrite the methods :meth:`get_headers_set` and
     :meth:`parse_row` and redefine the attribute :attr:`REQUIRED_HEADERS`.
     """
@@ -103,12 +103,13 @@ class CSVImporter(object):
         self.csv_file = csv_file
         self.user = user
         self.encoding = encoding
+        self.inbulk_cache = {}
 
     @classmethod
     @abstractmethod
     def get_headers_set(cls):
         """
-        Returns a set of all possible headers. 
+        Returns a set of all possible headers.
 
         .. note::
 
@@ -174,7 +175,7 @@ class CSVImporter(object):
         :return: A list of :class:`.PLMObjectController` of all created objects.
         """
         # puts all stuff in a private method so we call tear_down only after
-        # after a database commit 
+        # after a database commit
         self.__do_import_csv(headers)
         self.tear_down()
         return self.objects
@@ -196,7 +197,7 @@ class CSVImporter(object):
             if isinstance(e, Exception):
                 e = unicode(e)
             self._errors[line].append(e)
-    
+
     def get_value(self, row, header):
         return row[self.headers_dict[header]]
 
@@ -235,7 +236,7 @@ class CSVImporter(object):
                 if ok:
                     self.objects.append(ctrl)
         """
-        pass 
+        pass
 
 class PLMObjectsImporter(CSVImporter):
     """
@@ -272,7 +273,7 @@ class PLMObjectsImporter(CSVImporter):
             instance = obj.object
             instances.append((instance._meta.app_label,
                     instance._meta.module_name, instance._get_pk_val()))
-        update_indexes.delay(instances) 
+        update_indexes.delay(instances)
 
     def parse_row(self, line, row):
         """
@@ -284,7 +285,7 @@ class PLMObjectsImporter(CSVImporter):
         cls = models.get_all_plmobjects()[type_]
         group = models.GroupInfo.objects.get(name=self.get_value(row, "group"))
         lifecycle = models.Lifecycle.objects.get(name=self.get_value(row, "lifecycle"))
-        form = get_creation_form(self.user, cls)
+        form = get_creation_form(self.user, cls, inbulk_cache=self.inbulk_cache)
         data = {
                 "type" : type_,
                 "group" : str(group.id),
@@ -295,9 +296,9 @@ class PLMObjectsImporter(CSVImporter):
         for field in form.fields:
             if field not in data and field in self.headers_dict:
                 data[field] = self.get_value(row, field)
-        form = get_creation_form(self.user, cls, data)
+        form = get_creation_form(self.user, cls, data, inbulk_cache=self.inbulk_cache)
         if not form.is_valid():
-            items = (mark_safe(u"%s: %s" % item) for item 
+            items = (mark_safe(u"%s: %s" % item) for item
                     in form.errors.iteritems())
             self.store_errors(line, *items)
         else:
@@ -323,15 +324,15 @@ class BOMImporter(CSVImporter):
 
     REQUIRED_HEADERS = ("parent-type", "parent-reference", "parent-revision",
                         "child-type", "child-reference", "child-revision",
-                        "quantity", "order") 
+                        "quantity", "order")
 
     HEADERS_SET = set(REQUIRED_HEADERS)
 
     @classmethod
     def get_headers_set(cls):
-        return cls.HEADERS_SET 
-    
-    def parse_row(self, line, row): 
+        return cls.HEADERS_SET
+
+    def parse_row(self, line, row):
         from openPLM.plmapp.base_views import get_obj
         ptype, preference, prevision = self.get_values(row,
                 *["parent-" + h for h in ("type", "reference", "revision")])
@@ -381,12 +382,12 @@ class UsersImporter(CSVImporter):
 
     @classmethod
     def get_headers_set(cls):
-        return cls.HEADERS_SET 
+        return cls.HEADERS_SET
 
     def tear_down(self):
         self.ctrl.unblock_mails()
-    
-    def parse_row(self, line, row): 
+
+    def parse_row(self, line, row):
         from openPLM.plmapp.forms import SponsorForm
         un, fn, ln, em, grps,la = self.get_values(row, *self.REQUIRED_HEADERS)
         groups = []
@@ -413,11 +414,11 @@ class UsersImporter(CSVImporter):
             self.ctrl.sponsor(new_user)
             self.objects.append(new_user)
         else:
-            items = (mark_safe(u"%s: %s" % item) for item 
+            items = (mark_safe(u"%s: %s" % item) for item
                     in form.errors.iteritems())
             self.store_errors(line, *items)
-    
-   
+
+
 #: Dictionary (name -> CSVImporter's subclass) of known :class:`CSVImporter`
 IMPORTERS = {"csv" : PLMObjectsImporter, "bom" : BOMImporter,
         "users" : UsersImporter}
