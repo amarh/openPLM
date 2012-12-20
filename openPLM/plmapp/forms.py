@@ -207,6 +207,20 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
             field.queryset = inbulk_cache["group"]
             field.choice_cache = inbulk_cache["gr_cache"]
         field.error_messages["invalid_choice"] = INVALID_GROUP
+        if data is None and "group" not in initial:
+            # set initial value of group to the last selected group
+            try:
+                field.initial = inbulk_cache["gr_initial"]
+            except (KeyError, TypeError):
+                try:
+                    last_created_object = m.PLMObject.objects.filter(creator=user).order_by("-ctime")[0]
+                    last_group = last_created_object.group
+                except IndexError:
+                    last_group = field.queryset[0] if field.queryset else None
+                if last_group in field.queryset:
+                    field.initial = last_group
+                if inbulk_cache:
+                    inbulk_cache["gr_initial"] = field.initial
 
         # do not accept the cancelled lifecycle
         field = form.fields["lifecycle"]
