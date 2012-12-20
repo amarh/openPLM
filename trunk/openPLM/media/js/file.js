@@ -436,8 +436,9 @@ function update_progress(key){
     	    
     	    var percent = progress_bar(uploaded, files_info[key].size);
     	    if(!isNaN(percent)){
-        		$("#"+key+" .progress .text").text(percent+"%");
-        		$("#"+key).find("progress").attr("value",percent);
+                var div = $(document.getElementById(key));
+        	    div.find(" .progress .text").text(percent+"%");
+        		div.find("progress").attr("value",percent);
     	    }
     	    
     	}
