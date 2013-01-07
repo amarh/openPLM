@@ -36,7 +36,7 @@
         </tr>
         {% for link in user_delegation_link %}
             <tr class="Content">
-                <td class="Content">{{link.delegatee.username}}</td>
+                <td class="Content"><a href="/user/{{link.delegatee.username|urlencode}}/">{{link.delegatee.username}}</a></td>
                 <td class="Content">{{link.delegatee.first_name}}</td>
                 <td class="Content">{{link.delegatee.last_name}}</td>
                 <td class="Content">{{link.role}}</td>
