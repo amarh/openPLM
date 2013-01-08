@@ -1168,7 +1168,7 @@ div#mi_homepage {
 }
 
 div.menuitem.disabled {
-    background-image: url("../img/menuitem_home_disable.png");
+    background-image: url("../img/menuitem_home_disabled.png");
 }
 div.menuitem.disabled * {
     color: #888;
