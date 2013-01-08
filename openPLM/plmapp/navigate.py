@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -57,14 +57,14 @@ TIME_FORMAT = "%Y-%m-%d:%H:%M:%S/"
 def get_id_card_data(doc_ids, date=None):
     """
     Get informations to display in the id-cards of all Document which id is in doc_ids
-    
+
     :param doc_ids: list of Document ids to treat
-    
+
     :return: a Dictionnary which contains the following informations
-    
+
         * ``thumbnails``
             list of tuple (document,thumbnail)
-            
+
         * ``num_files``
             list of tuple (document, number of file)
     """
@@ -106,7 +106,7 @@ def get_path(obj):
     else:
         return u"User/%s/-/" % obj.username
 
-_attrs = ("id", "type", "reference", "revision", "name")
+_attrs = ("id", "type", "reference", "revision", "name", "state", "lifecycle")
 _plmobjects_attrs = ["plmobject__" + x for x in _attrs]
 _parts_attrs = ["part__" + x for x in _attrs]
 _documents_attrs = ["document__" + x for x in _attrs]
@@ -170,7 +170,7 @@ class NavigationGraph(object):
         self.plmobjects_result = not (self.groups_result or self.users_result)
         options = ("child", "parents", "doc", "owner", "signer",
                    "notified", "part", "owned", "to_sign",
-                   "request_notification_from", OSR) 
+                   "request_notification_from", OSR)
         self.options = dict.fromkeys(options, False)
         self.options["prog"] = "dot"
         self.options["cards"] = True
@@ -244,8 +244,8 @@ class NavigationGraph(object):
                 self.time = datetime.datetime.combine(date or datetime.date.today(),
                     time or datetime.time())
         else:
-            self.time = None 
-       
+            self.time = None
+
     def _create_child_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
@@ -257,10 +257,10 @@ class NavigationGraph(object):
                 continue
             child = link.child
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
-                    link.get_shortened_unit(), link.order) 
+                    link.get_shortened_unit(), link.order)
             self.edges.add((link.parent_id, child.id, label))
             self._set_node_attributes(link.child)
-    
+
     def _create_parents_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
@@ -272,16 +272,16 @@ class NavigationGraph(object):
                 continue
             parent = link.parent
             label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
-                    link.get_shortened_unit(), link.order) 
+                    link.get_shortened_unit(), link.order)
             self.edges.add((parent.id, link.child_id, label))
             self._set_node_attributes(parent)
-   
+
     def _create_part_edges(self, obj, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
-            parts = obj.get_attached_parts().only("type", "reference", "revision", "name")
+            parts = obj.get_attached_parts().only(*_attrs)
             for part in parts[:OBJECTS_LIMIT]:
                 if self.options[OSR] and part.id not in self.results:
                     continue
@@ -296,13 +296,13 @@ class NavigationGraph(object):
                 # cf. tickets #82 and #83
                 self.edges.add((link.part_id, obj.id, " "))
                 self._set_node_attributes(link.part)
-    
+
     def _create_doc_edges(self, obj, obj_id=None, *args):
         if self.options[OSR] and not self.plmobjects_result:
             return
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
-            docs = obj.get_attached_documents().only("type", "reference", "revision", "name")
+            docs = obj.get_attached_documents().only(*_attrs)
             for doc in docs[:OBJECTS_LIMIT]:
                 if self.options[OSR] and doc.id not in self.results:
                     continue
@@ -389,8 +389,8 @@ class NavigationGraph(object):
         self._set_node_attributes(self.object, id_)
         self.main_node = node["id"]
         if not self.options["cards"]:
-            node["width"] = 110. / 96 
-            node["height"] = 80. / 96 
+            node["width"] = 110. / 96
+            node["height"] = 80. / 96
         opt_to_meth = {
             'child' : (self._create_child_edges, None),
             'parents' : (self._create_parents_edges, None),
@@ -418,18 +418,18 @@ class NavigationGraph(object):
                     for link in links.select_related("document"):
                         if self.options[OSR] and link.document_id not in self.results:
                             continue
-                        
+
                         self.edges.add((link.part_id, link.document_id, " "))
                         self._set_node_attributes(link.document)
 
         elif not isinstance(self.object, UserController):
             if not (self.options[OSR] and not self.plmobjects_result):
-                ids = self.options["doc_parts"].intersection(self._part_to_node.keys()) 
+                ids = self.options["doc_parts"].intersection(self._part_to_node.keys())
                 links = models.DocumentPartLink.objects.at(self.time).filter(part__in=ids)
                 for link in links.select_related("document"):
                     if self.options[OSR] and link.document_id not in self.results:
                         continue
-                    
+
                     self.edges.add((link.part_id, link.document_id, " "))
                     self._set_node_attributes(link.document)
 
@@ -454,14 +454,14 @@ class NavigationGraph(object):
         else:
             id_ = obj.id
         obj_id = obj_id or id_
-       
+
         if "id" in self.nodes[obj_id]:
             # already treated
             return
         # data and _title_to_node are used to retrieve usefull data (url, tooltip)
         # in _convert_map
         data = {}
-        url = None 
+        url = None
 
         # set node attributes according to its type
         if type_ == "plmobject":
@@ -496,9 +496,9 @@ class NavigationGraph(object):
                 type_ = "part"
                 # this will be used later to test if it has an attached document
                 self._part_to_node[id_] = data
-            
+
             data["object"] = {"id" : obj.id, "reference" : obj.reference,
-                    "revision": obj.revision, "type" : obj.type, 
+                    "revision": obj.revision, "type" : obj.type,
                     "name" : obj.name, "state_id" : obj.state_id }
         elif isinstance(obj, (User, UserController)):
             full_name = u'%s\n%s' % (obj.first_name, obj.last_name)
@@ -524,7 +524,7 @@ class NavigationGraph(object):
                 )
         if self.options["cards"]:
             self.nodes[obj_id]["width"] = ([200., 150.][type_ == "part"]) / 96
-            self.nodes[obj_id]["height"] = 107. / 96 
+            self.nodes[obj_id]["height"] = 107. / 96
         self._title_to_node[id_] = data
 
     def _convert_map(self, map_string):
@@ -554,7 +554,7 @@ class NavigationGraph(object):
                 continue
 
             data = self._title_to_node.get(area.get("id"), {})
-            
+
             # compute css position of the div
             left, top = map(int, area.get("coords").split(",")[:2])
             style = "top:%dpx;left:%dpx;" % (top, left)
@@ -590,13 +590,13 @@ class NavigationGraph(object):
         root = ET.fromstring(svg)
         graph = root.getchildren()[0]
         transform = graph.get("transform")
-        
+
         m = re.search(r"scale\((.*?)\)", transform)
         if m:
             scale = map(float, m.group(1).split(" ", 1))
         else:
             scale = (1, 1)
-        
+
         m = re.search(r"translate\((.*?)\)", transform)
         if m:
             translate = map(float, m.group(1).split(" ", 1))
@@ -605,18 +605,18 @@ class NavigationGraph(object):
 
         width = root.get("width").replace("pt", "")
         height = root.get("height").replace("pt", "")
-        
+
         for grp in graph:
             if grp.get("class") != "edge":
                 continue
             e = {"id" : grp.get("id")}
             for path in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}path"):
                 e["p"] = path.get("d")
-                
+
             for poly in grp.findall("./{http://www.w3.org/2000/svg}a/{http://www.w3.org/2000/svg}polygon"):
                 e["a"] = poly.get("points")
             edges.append(e)
-        return dict(width=width, height=height, scale=scale, translate=translate, 
+        return dict(width=width, height=height, scale=scale, translate=translate,
                 edges=edges)
 
     def render(self):
