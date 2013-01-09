@@ -104,7 +104,8 @@ def handle_step_file(doc_file_pk):
 
     :param doc_file_pk: primery key of a :class:`.DocumentFile` that will be treated
 
-    Method called when adding :class:`~django.core.files.File` **.stp** (:meth:`.add_file` with  *updates_attributes* true) into :class:`.Document3DController`.
+    Method called by :meth:`.DocumentController.handle_added_file` when a STEP
+    file is added to a Document3D.
 
     It calls a subprocess (:meth:`.generateGeometrys_Arborescense` ) that generates a file **.arb** and one or more files **.geo** (these files
     are necessary for the visualization 3D and the decomposition of the :class:`~django.core.files.File` **.stp** ),

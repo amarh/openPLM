@@ -126,6 +126,16 @@ def get_initial_creation_data(cls, start=0, inbulk_cache=None):
     return data
 
 class CreationForm(forms.ModelForm):
+    """
+    Base class of forms used to create an object (Part, Document, Group...)
+
+    :param user: User who creates the object
+    :param start: an offset useful when several forms are displayed at the
+                  same time so that all forms have a valid, unique reference
+    :param inbulk_cache: a dictionary to store cached data, like valid groups
+    :param args: extra arguments passed to :class:`~ModelFrom` constructor
+    :param kwargs: extra kwargs arguments passed to :class:`~ModelForm` constructor
+    """
     def __init__(self, user, start, inbulk_cache, *args, **kwargs):
         self.start = start
         self.inbulk_cache = inbulk_cache
