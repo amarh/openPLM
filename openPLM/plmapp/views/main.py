@@ -1635,7 +1635,7 @@ def replace_management(request, obj_type, obj_ref, obj_revi, link_id):
         role of the link being replace
 
     ``attach``
-        set to (*obj*, :samp`"add_{role}"`)
+        set to (*obj*, :samp:`"add_{role}"`)
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     link = obj.users.now().get(id=int(link_id))
