@@ -84,10 +84,11 @@ from openPLM.plmapp.archive import generate_archive, ARCHIVE_FORMATS
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view, secure_required
-from openPLM.plmapp.controllers import get_controller
+from openPLM.plmapp.controllers import get_controller, UserController
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
-from openPLM.plmapp.utils import level_to_sign_str, get_next_revision
+from openPLM.plmapp.utils import (level_to_sign_str, get_next_revision,
+        filename_to_name)
 from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
 
 
@@ -1443,6 +1444,25 @@ def display_files(request, obj_type, obj_ref, obj_revi):
                })
     return r2r('documents/files.html', ctx, request)
 
+
+@handle_errors
+def upload_and_create(request, obj_ref):
+    obj, ctx = get_generic_data(request)
+    if not obj.get_profile().is_contributor:
+        raise ValueError("You are not a contributor")
+    if request.method == "POST":
+        if request.FILES:
+            # from a browser where js is disabled
+            return add_file(request, "User", obj.username, "-")
+    add_file_form = forms.AddFileForm()
+    ctx.update({
+                'add_file_form': add_file_form,
+                'object_reference': "-",
+                'object_type': _("Upload"),
+               })
+    return r2r('users/files.html', ctx, request)
+
+
 ##########################################################################################
 @csrf_protect
 @handle_errors(undo="..")
@@ -1473,17 +1493,27 @@ def add_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
+            added_files = []
             for fkey, f in request.FILES.iteritems():
-                obj.add_file(request.FILES[fkey])
-            return HttpResponseRedirect(obj.plmobject_url + "files/")
+                added_files.append(obj.add_file(request.FILES[fkey]))
+            if isinstance(obj, UserController):
+                pfiles = "&".join("pfiles=%d" % f.id for f in added_files)
+                url = "/object/create/?type=Document&%s" % pfiles
+            else:
+                url = obj.plmobject_url + "files/"
+            return HttpResponseRedirect(url)
     else:
-        if 'file_name' in request.GET:
+        if obj_type != "User" and 'file_name' in request.GET:
             f_name = request.GET['file_name'].encode("utf-8")
             if obj.has_standard_related_locked(f_name):
                 return HttpResponse("true:Native file has a standard related locked file.")
             else:
                 return HttpResponse("false:")
         add_file_form = forms.AddFileForm()
+    if obj_type == "User":
+        ctx["object_reference"] = "-"
+        ctx["object_type"] = _("Upload")
+        del ctx["object_menu"]
     ctx['add_file_form'] = add_file_form
     return r2r('documents/files_add_noscript.html', ctx, request)
 
@@ -1519,9 +1549,15 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
     if request.method == "POST":
         add_file_form = forms.AddFileForm(request.POST, request.FILES)
         if add_file_form.is_valid():
-            for key, f_id in request.GET.iteritems():
-                obj.add_file(request.FILES[key])
-            return HttpResponse(".")
+            added_files = []
+            for fkey, f in request.FILES.iteritems():
+                added_files.append(obj.add_file(request.FILES[fkey]))
+            if isinstance(obj, UserController):
+                pfiles = "&".join("pfiles=%d" % f.id for f in added_files)
+                url = "/object/create/?type=Document&%s" % pfiles
+            else:
+                url = obj.plmobject_url + "files/"
+            return HttpResponse(url)
         else:
             return HttpResponse("failed")
 
@@ -1814,6 +1850,8 @@ def create_object(request, from_registered_view=False, creation_form=None):
         parent = get_obj_by_id(int(request.REQUEST["related_parent"]), request.user)
         ctx["related_parent"] = request.REQUEST["related_parent"]
         related = ctx["related"] = parent
+    if "pfiles" in request.REQUEST:
+        Form = forms.Document2TypeForm
 
     if "__next__" in request.REQUEST:
         redirect_to = request.REQUEST["__next__"]
@@ -1840,6 +1878,14 @@ def create_object(request, from_registered_view=False, creation_form=None):
         if related is not None:
             creation_form.fields["group"].initial = related.group
             creation_form.initial["lifecycle"] = related.lifecycle
+        if "pfiles" in request.GET:
+            pfiles = request.GET.getlist("pfiles")
+            creation_form.initial["pfiles"] = pfiles
+            try:
+                name = filename_to_name(obj.files.get(id=int(pfiles[0])).filename)
+                creation_form.initial["name"] = name
+            except Exception:
+                pass
     elif request.method == 'POST':
         if creation_form is None:
             creation_form = forms.get_creation_form(request.user, cls, request.POST)
@@ -2571,7 +2617,7 @@ def sponsor_resend_mail(request, obj_ref):
             link_id = request.POST["link_id"]
             link = models.DelegationLink.objects.get(id=int(link_id))
             obj.resend_sponsor_mail(link.delegatee)
-        except (KeyError, ValueError, ControllerError) as e:
+        except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
     return HttpResponseRedirect("../../")
 

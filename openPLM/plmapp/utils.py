@@ -314,6 +314,9 @@ def get_pages_num(total_pages, current_page):
     return pages
 
 
+def filename_to_name(filename):
+    return os.path.splitext(filename)[0].replace("_", " ")
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

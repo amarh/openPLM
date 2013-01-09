@@ -70,6 +70,22 @@
             {% endif %}
 
         </div>
+                <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-right:2em; margin-left:2em"> 
+            {% if user.get_profile.is_contributor %}
+                <a class="tooltip" href="/user/{{user|urlencode}}/files/">
+                    {% trans "Upload" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Upload one or more files and create a document" %}</span>
+                </a>
+            {% else %}
+                <div class="tooltip">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "You can not upload a file since you are not a contributor." %}</span>
+                </div>
+            {% endif %}
+
+        </div>
         
         <div class="menuitem" style="margin-left:2em"> 
             <a class="tooltip" href="/user/{{user|urlencode }}/parts-doc-cad/">

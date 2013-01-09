@@ -125,64 +125,30 @@ def get_initial_creation_data(cls, start=0, inbulk_cache=None):
         data = {}
     return data
 
-def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=None, **kwargs):
-    u"""
-    Returns a creation form suitable to create an object
-    of type *cls*.
+class CreationForm(forms.ModelForm):
+    def __init__(self, user, start, inbulk_cache, *args, **kwargs):
+        self.start = start
+        self.inbulk_cache = inbulk_cache
+        super(CreationForm, self).__init__(*args, **kwargs)
 
-    The returned form can be used, if it is valid, with the function
-    :meth:`~plmapp.controllers.PLMObjectController.create_from_form`
-    to create a :class:`~plmapp.models.PLMObject` and its associated
-    :class:`~plmapp.controllers.PLMObjectController`.
 
-    If *data* is provided, it will be used to fill the form.
+class PLMObjectCreationForm(forms.ModelForm):
 
-    *start* is used if *data* is ``None``, it's usefull if you need to show
-    several initial creation forms at once and you want different references.
+    auto = BooleanField(required=False, initial=True,
+            help_text=_("Checking this box, you allow OpenPLM to set the reference of the object."))
 
-    *inbulk_cache* may be a dictionary to cache lifecycles, groups and other
-    values. It is useful if a page renders several creation forms bound to the same
-    user
-    """
-    Form = get_creation_form.cache.get(cls)
-    if Form is None:
-        fields = cls.get_creation_fields()
-        Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'))
-        # replace textinputs with autocomplete inputs, see ticket #66
-        auto_complete_fields(Form, cls)
-        if issubclass(cls, m.PLMObject):
-            Form.base_fields.insert(1,'auto',BooleanField(required=False,initial=True, help_text=_("Checking this box, you allow OpenPLM to set the reference of the object.")))
-            Form.base_fields["reference"].required = False
-            Form.clean_reference = _clean_reference
-            Form.clean_revision = _clean_revision
-            def _clean(self):
-                cleaned_data = self.cleaned_data
-                ref = cleaned_data.get("reference", "")
-                rev = cleaned_data.get("revision", "")
-                auto = cleaned_data.get("auto", False)
-                inbulk = getattr(self, "inbulk_cache")
-                if auto and not ref:
-                    cleaned_data["reference"] = ref = get_new_reference(cls, self.start, inbulk)
-                if not auto and not ref:
-                    self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
-                if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
-                    if not auto:
-                        raise ValidationError(_("An object with the same type, reference and revision already exists"))
-                    else:
-                        cleaned_data["reference"] = get_new_reference(cls, self.start, inbulk)
-                elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
-                    raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
-                return cleaned_data
-            Form.clean = _clean
-        get_creation_form.cache[cls] = Form
-    if data is None:
-        initial = get_initial_creation_data(cls, start, inbulk_cache)
-        initial.update(kwargs.pop("initial", {}))
-        form = Form(initial=initial, **kwargs)
-    else:
-        form = Form(data=data, **kwargs)
-    form.start = start
-    if issubclass(cls, m.PLMObject):
+    clean_reference = _clean_reference
+    clean_revision = _clean_revision
+
+    def __init__(self, user, start, inbulk_cache, *args, **kwargs):
+        data = kwargs.get("data")
+        if data is None:
+            initial = get_initial_creation_data(self.Meta.model, start, inbulk_cache)
+            initial.update(kwargs.pop("initial", {}))
+            kwargs["initial"] = initial
+        self.start = start
+        self.inbulk_cache = inbulk_cache
+        super(PLMObjectCreationForm, self).__init__(*args, **kwargs)
         # lifecycles and groups are cached if inbulk_cache is a dictionary
         # this is an optimization if several creation forms are displayed
         # in one request
@@ -190,9 +156,9 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         # a lot of creation forms
 
         # display only valid groups
-        field = form.fields["group"]
+        field = self.fields["group"]
         field.cache_choices = inbulk_cache is not None
-        form.inbulk_cache = inbulk_cache
+
         if inbulk_cache is None or "group" not in inbulk_cache:
             groups = user.groups.all().values_list("id", flat=True)
             field.queryset = m.GroupInfo.objects.filter(id__in=groups).order_by("name")
@@ -223,21 +189,96 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
                     inbulk_cache["gr_initial"] = field.initial
 
         # do not accept the cancelled lifecycle
-        field = form.fields["lifecycle"]
+        field = self.fields["lifecycle"]
         field.cache_choices = inbulk_cache is not None
         if inbulk_cache is None or "lifecycles" not in inbulk_cache:
             lifecycles = m.Lifecycle.objects.filter(type=m.Lifecycle.STANDARD).\
                     exclude(pk=m.get_cancelled_lifecycle().pk).order_by("name")
-            form.fields["lifecycle"].queryset = lifecycles
+            self.fields["lifecycle"].queryset = lifecycles
             if inbulk_cache is not None:
                 inbulk_cache["lifecycles"] = lifecycles
                 list(field.choices)
                 inbulk_cache["lc_cache"] = field.choice_cache
         else:
             lifecycles = inbulk_cache["lifecycles"]
-            form.fields["lifecycle"].queryset = lifecycles
+            self.fields["lifecycle"].queryset = lifecycles
             field.choice_cache = inbulk_cache["lc_cache"]
-    return form
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        ref = cleaned_data.get("reference", "")
+        rev = cleaned_data.get("revision", "")
+        auto = cleaned_data.get("auto", False)
+        inbulk = getattr(self, "inbulk_cache")
+        cls = self.Meta.model
+        if auto and not ref:
+            cleaned_data["reference"] = ref = get_new_reference(cls, self.start, inbulk)
+        if not auto and not ref:
+            self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
+        if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
+            if not auto:
+                raise ValidationError(_("An object with the same type, reference and revision already exists"))
+            else:
+                cleaned_data["reference"] = get_new_reference(cls, self.start, inbulk)
+        elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
+            raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
+        return cleaned_data
+
+
+class PrivateFileChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.filename
+
+
+class Document2CreationForm(PLMObjectCreationForm):
+
+    pfiles = PrivateFileChoiceField(queryset=m.PrivateFile.objects.none(),
+            required=False, widget=forms.MultipleHiddenInput())
+
+    def __init__(self, user, start, inbulk_cache, *args, **kwargs):
+        super(Document2CreationForm, self).__init__(user, start, inbulk_cache,
+            *args, **kwargs)
+        self.fields["pfiles"].queryset = user.files.all().order_by("filename")
+
+
+def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=None, **kwargs):
+    u"""
+    Returns a creation form suitable to create an object
+    of type *cls*.
+
+    The returned form can be used, if it is valid, with the function
+    :meth:`~plmapp.controllers.PLMObjectController.create_from_form`
+    to create a :class:`~plmapp.models.PLMObject` and its associated
+    :class:`~plmapp.controllers.PLMObjectController`.
+
+    If *data* is provided, it will be used to fill the form.
+
+    *start* is used if *data* is ``None``, it's usefull if you need to show
+    several initial creation forms at once and you want different references.
+
+    *inbulk_cache* may be a dictionary to cache lifecycles, groups and other
+    values. It is useful if a page renders several creation forms bound to the same
+    user
+    """
+    Form = get_creation_form.cache.get(cls)
+    if Form is None:
+        fields = cls.get_creation_fields()
+        if issubclass(cls, m.PLMObject):
+            if issubclass(cls, m.Document) and cls.ACCEPT_FILES:
+                base_form = Document2CreationForm
+            else:
+                base_form = PLMObjectCreationForm
+            fields.insert(1, "auto")
+        else:
+            base_form = CreationForm
+        Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'), form=base_form)
+        # replace textinputs with autocomplete inputs, see ticket #66
+        auto_complete_fields(Form, cls)
+        if issubclass(cls, m.PLMObject):
+            Form.base_fields["reference"].required = False
+        get_creation_form.cache[cls] = Form
+    return Form(user, start, inbulk_cache, data=data, **kwargs)
+
 get_creation_form.cache = {}
 
 def get_modification_form(cls=m.PLMObject, data=None, instance=None):
@@ -277,6 +318,13 @@ class PartTypeForm(forms.Form):
 
 class DocumentTypeForm(forms.Form):
     LIST = m.get_all_documents_with_level()
+    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
+    type.widget.attrs["autocomplete"] = "off"
+
+
+class Document2TypeForm(forms.Form):
+    # only documents that accept files
+    LIST = m.get_all_documents_with_level(True)
     type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
     type.widget.attrs["autocomplete"] = "off"
 
@@ -548,7 +596,7 @@ def get_rel_part_formset(controller, data=None, **kwargs):
 class AddFileForm(forms.Form):
     filename = forms.FileField()
 
-class ModifyFileForm(forms.ModelForm):
+class DeleteFileForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
     document = forms.ModelChoiceField(queryset=m.Document.objects.all(),
                                    widget=forms.HiddenInput())
@@ -556,14 +604,34 @@ class ModifyFileForm(forms.ModelForm):
         model = m.DocumentFile
         fields = ["document"]
 
-FileFormset = modelformset_factory(m.DocumentFile, form=ModifyFileForm, extra=0)
+FileFormset = modelformset_factory(m.DocumentFile, form=DeleteFileForm, extra=0)
 def get_file_formset(controller, data=None):
     if data is None:
-        queryset = controller.files
+        queryset = controller.files.order_by("-ctime")
         formset = FileFormset(queryset=queryset)
     else:
         formset = FileFormset(data=data)
     return formset
+
+
+class DeletePrivateFileForm(forms.ModelForm):
+    delete = forms.BooleanField(required=False, initial=False)
+    creator = forms.ModelChoiceField(queryset=User.objects.all(),
+                                   widget=forms.HiddenInput())
+    class Meta:
+        model = m.PrivateFile
+        fields = ["creator"]
+
+PrivateFileFormset = modelformset_factory(m.PrivateFile, form=DeletePrivateFileForm, extra=0)
+def get_private_file_formset(controller, data=None):
+    if data is None:
+        queryset = controller.files.order_by("-ctime")
+        formset = PrivateFileFormset(queryset=queryset)
+    else:
+        formset = PrivateFileFormset(data=data)
+    return formset
+
+
 
 class AddDocCadForm(PLMObjectForm, DocumentTypeForm):
     pass

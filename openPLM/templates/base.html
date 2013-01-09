@@ -63,141 +63,127 @@
                 </div>
             {% endif %}
 
-
             <div id="content-box" class="clearfix">
                 {% block toolbar %}
                     {% if request.user.is_authenticated %}
                         <div id="DisplayBox">
+                            <div class="tb-btn-toolbar">
 
-
-                            <ul>
-                                <li>
                                 <a class="tb-btn" href="/home/">
                                     <span class="ui-button-text">{% trans "HOME" %}</span>
                                 </a>
-                                </li>
 
                                 {% if not restricted %}
-                                    <li>
                                     <a class="tb-btn" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
                                         <span class="ui-button-text">{% trans "SEARCH" %}</span>
                                     </a>
-                                    </li>
                                 {% endif %}
 
-                                <li>
                                 <a class="tb-btn" href="/browse/object/">
                                     <span class="ui-button-text">{% trans "BROWSE" %}</span>
                                 </a>
-                                </li>
 
                                 {% if user.get_profile.is_contributor %}
-                                    <li>
-                                <a class="tb-btn"   href="/object/create/?type={% if request.session.type == "User"%}Part{%else %}{{ request.session.type }}{% endif %}">
-                                    <span class="ui-button-text">{% trans "CREATE" %}</span>
-                                </a>
-                                </li>
-                            {% endif %}
-
-                            {% if not restricted %}
-                                {% if object_reference != "-" and  navigate_bool %}
-                                    <li class="{{"Button"|button:"corner-left,state-active,state-focus"}}" id="NavigateButton">
-                                {% else %}
-                                    <li class="{{"Button"|button:"corner-left"}}" id="NavigateButton">
-                                {% endif %}
-                            <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}}navigate/{% else %}/user/{{user|urlencode }}/navigate/{% endif %}">
-                                <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
-                            </a>
-                            </li>
-                            {% if object_reference != "-" and not navigate_bool %}
-                                <li class="{{"Button"|button:"corner-right,state-active,state-focus"}}" id="StudyButton">
-                            {% else %}
-                                <li class="{{"Button"|button:"corner-right"}}" id="StudyButton">
-                            {% endif %}
-                        <a href="{% if obj.plmobject_url %}{{obj.plmobject_url}} {% else %}/user/{{user|urlencode }}/{% endif %}">
-                            <span class="ui-button-text">{% trans "STUDY" %}</span>
-                        </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        {% endif %}
-    {% endblock %}
-
-    <div class="clearfix">
-        {% if not restricted %}
-            {% block leftcolumn %}
-                <div id="ToggleBoxButton">
-                    <input type="checkbox" id="SearchButton" />
-                    <label for="SearchButton">{% trans "Toggle the left panel" %}</label>
-                    </li>
-                </div>
-                <div id="left-col">
-
-                    {% block search %}
-                        <div id="SearchBox" class="Box {{link_creation|yesno:"link_creation,"}}">
-                            <h2>{% trans "Search" %}
-                                <div class="toolbar">
-                                    <ul>
-                                        <li>
-                                        <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
-                                            href="{{MEDIA_URL}}help/{{LANGUAGE_CODE}}/search.html" target="_blank">
-                                            <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
-                                            <span class="ui-button-text">?</span>
+                                    <div class="tb-btn-group">
+                                        <a class="tb-btn" href="{{user.get_profile.plmobject_url}}files/">
+                                            <span class="ui-button-text">{% trans "Upload" %}</span>
                                         </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </h2>
-                            {% include "blocks/search.html" %}
-                        </div>
-                    {% endblock %}
-                </div>
-            {% endblock %}
-        {% endif %}
 
-        <div id="center-col" class="heightfix">
+                                        <a class="tb-btn" href="/object/create/?type={{ctype}}">
+                                            <span class="ui-button-text">{% trans "CREATE" %}</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
 
-            {% block main %}
-                <div id="ActiveBox" {% if object_reference != "-" %}class="{{ obj|main_type }}"{% endif %}>
-                    {% block reference %}
-                        {% include "blocks/reference.html" %}
-                    {% endblock %}
-
-                    <div id="ActiveArea">
-                        {% if is_readable %}
-                            {% if object_menu and not navigate_bool %}
-                                {% include "blocks/menu.html" %}
-                            {% endif %}
-                            <div id="main_content">
-                                {% block content %}{% endblock %}	
+                                {% if not restricted and not navigate_bool %}
+                                    <a class="tb-btn" href="{{obj_url}}navigate/">
+                                        <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
+                                    </a>
+                                {% endif %}
+                                {% if restricted or navigate_bool %}
+                                    <a class="tb-btn" href="{{obj_url}}">
+                                        <span class="ui-button-text">{% trans "STUDY" %}</span>
+                                    </a>
+                                {% endif %}
                             </div>
-                        {% else %}
-                            <p>{% trans "You are not allowed to see this object" %}</p>
-                        {% endif %}
+                        </div>
+                    {% endif %}
+                {% endblock %}
 
-                        <div class="clearfix"></div>
+                <div class="clearfix">
+                    {% if not restricted %}
+                        {% block leftcolumn %}
+                            <div id="ToggleBoxButton">
+                                <input type="checkbox" id="SearchButton" />
+                                <label for="SearchButton">{% trans "Toggle the left panel" %}</label>
+                                </li>
+                            </div>
+                            <div id="left-col">
+
+                                {% block search %}
+                                    <div id="SearchBox" class="Box {{link_creation|yesno:"link_creation,"}}">
+                                        <h2>{% trans "Search" %}
+                                            <div class="toolbar">
+                                                <ul>
+                                                    <li>
+                                                    <a class="help ui-button ui-button-text-icon-primary ui-state-default ui-button-icon-only ui-corner-all ui-widget" 
+                                                        href="{{MEDIA_URL}}help/{{LANGUAGE_CODE}}/search.html" target="_blank">
+                                                        <span class="ui-button-icon-primary ui-icon ui-icon-help">&nbsp;</span>
+                                                        <span class="ui-button-text">?</span>
+                                                    </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </h2>
+                                        {% include "blocks/search.html" %}
+                                    </div>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+                    {% endif %}
+
+                    <div id="center-col" class="heightfix">
+
+                        {% block main %}
+                            <div id="ActiveBox" {% if object_reference != "-" %}class="{{ obj|main_type }}"{% endif %}>
+                                {% block reference %}
+                                    {% include "blocks/reference.html" %}
+                                {% endblock %}
+
+                                <div id="ActiveArea">
+                                    {% if is_readable %}
+                                        {% if object_menu and not navigate_bool %}
+                                            {% include "blocks/menu.html" %}
+                                        {% endif %}
+                                        <div id="main_content">
+                                            {% block content %}{% endblock %}	
+                                        </div>
+                                    {% else %}
+                                        <p>{% trans "You are not allowed to see this object" %}</p>
+                                    {% endif %}
+
+                                    <div class="clearfix"></div>
+
+                                </div>
+
+                            </div>
+                        {% endblock %}
 
                     </div>
 
                 </div>
-            {% endblock %}
+            </div>
 
-        </div>
-
-    </div>
-</div>
-
-<div id="bottom-box">
-    <div id="links">
-        <div class="legal">
-            2010-2012 openPLM &#0153; - openPLM {{ openPLM_version }}
-            - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
-            - <a href="http://wiki.openplm.org/trac/wiki/Credits" target="_blank">Credits</a>
-        </div>
-        <a id="linobject" href="http://www.linobject.com">Powered by LinObject</a>
-    </div>                    
-</div>
+            <div id="bottom-box">
+                <div id="links">
+                    <div class="legal">
+                        2010-2012 openPLM &#0153; - openPLM {{ openPLM_version }}
+                        - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
+                        - <a href="http://wiki.openplm.org/trac/wiki/Credits" target="_blank">Credits</a>
+                    </div>
+                    <a id="linobject" href="http://www.linobject.com">Powered by LinObject</a>
+                </div>                    
+            </div>
 
         </div>
     </body>
