@@ -551,9 +551,10 @@ function up_file(f_form){
             if(y.document){
                 y=y.document;
             }
-            if($(y).find("body").text()!=""){
-                if($(y).find("body").text()!="failed"){
-                    go_to=location.href;
+            var resp = $(y).find("body").text();
+            if (resp != ""){
+                if(resp != "failed"){
+                    go_to= resp;
                 }else{
                     upload_failed();
                 }
@@ -570,8 +571,8 @@ function up_file(f_form){
     if(($.browser.opera!=true)&&($.browser.msie!=true)){
         xhr.onreadystatechange = function() {
             if(xhr.readyState == 4){
-                if(xhr.status==200) {
-                    go_to = location.href;
+                if(xhr.status==200 && xhr.responseText != "failed") {
+                    go_to = xhr.responseText;
                 }else{
                     upload_failed();
                 }

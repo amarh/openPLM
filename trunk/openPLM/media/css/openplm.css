@@ -247,14 +247,13 @@ div#ActiveArea > *{
 
 /* BOX WHERE WE FIND DIFFERENT BUTTONS FOR PAGE DISPLAY (SHOW/HIDE BOXES & NAVIGATE/STUDY) */
 div#DisplayBox {
-    width: 100%;
-    margin-right: 0px;
-    margin-bottom: 0px;
     padding: 0.2em 0em;
-    vertical-align: middle;
-    font-size: 14px;
     text-align: center;
     background-color: #c8c7c5;
+}
+
+div#DisplayBox .tb-btn-toolbar {
+    margin: 3px;
 }
 
 /* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
@@ -329,10 +328,6 @@ div#LoggedPersonBox {
 
 
 /* BUTTON TO SWITCH TO NAVIGATE MODE DISPLAY */
-li#NavigateButton {
-    margin-right: -5px;
-}
-
 #SetLangForm {
     display: inline;
     padding-right: 1em;
@@ -1375,6 +1370,9 @@ ul.tbi li {
     text-decoration: none;
     padding: 0.4em 1em;
     line-height: 1.4em;
+}
+.tb-btn-group .tb-btn,
+.tb-btn{
     font-size: 15.4px;
 }
 .tb-btn span {

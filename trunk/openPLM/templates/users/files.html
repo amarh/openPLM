@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags %}
+
+<!-- Manage html display in the Content div which correspond to the "files" menu -->
+
+{% block css %}
+    <link type="text/css" href="/media/css/files.css" rel="Stylesheet" />
+    <style type="text/css">
+        .hidden{
+            display:none;
+        }
+    </style> 
+{% endblock %}
+{% block content %}
+    {% if user.get_profile.is_contributor %}
+        <h3>{% trans "Upload files and document creation" %} </h3>
+    <div>
+        <p>
+        {% trans "Select files to upload, then click on upload button to create your document" %}
+        </p>
+        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
+            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
+            {% include "documents/files_add.html" %}
+        </div>
+
+        <noscript>
+            <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
+                <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
+                <span class="ui-button-text">{% trans "ADD" %}</span>
+            </a>
+        </noscript>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+

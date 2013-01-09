@@ -3,7 +3,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
-        json_view, get_navigate_data, secure_required, get_creation_view 
+        json_view, get_navigate_data, secure_required, get_creation_view
 
 from openPLM.plmapp.navigate import TIME_FORMAT
 
@@ -54,7 +54,7 @@ def ajax_creation_form(request):
     """
     Simple view which returns the html of a creation form with the data
     of :attr:`request.GET` as initial values.
-    
+
     The request must contains a get parameter *type* with a valid type,
     otherwise, a :class:`.HttpResponseForbidden` is returned.
     """
@@ -68,6 +68,8 @@ def ajax_creation_form(request):
         if view is not None:
             return {"reload" : True}
         initial = dict(request.GET.iteritems())
+        if "pfiles" in request.GET:
+            initial["pfiles"] = request.GET.getlist("pfiles")
         if "reference" in initial:
             # gets a new reference if the type switches from a part to a document
             # and vice versa, see ticket #99
@@ -116,7 +118,7 @@ def ajax_autocomplete(request, obj_type, field):
         return HttpResponseForbidden()
     results = cls.objects.filter(**{"%s__icontains" % field : term})
     results = results.values_list(field, flat=True).order_by(field).distinct()
-    json = JSONEncoder().encode(list(str(r) for r in results[:limit]))  
+    json = JSONEncoder().encode(list(str(r) for r in results[:limit]))
     return HttpResponse(json, mimetype='application/json')
 
 @ajax_login_required
@@ -144,9 +146,9 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi, date=None):
     missing_url = urlparse.urljoin(settings.MEDIA_URL, "img/image-missing.png")
     for f in fileset:
         if f.thumbnail:
-            img = f.thumbnail.url 
+            img = f.thumbnail.url
         else:
-            img = missing_url 
+            img = missing_url
         files.append({
             "name": f.filename,
             "url": "/file/%d/" % f.id,
@@ -184,7 +186,7 @@ def ajax_add_child(request, part_id):
         form = forms.AddChildForm(part.object, request.POST)
         if form.is_valid():
             child = get_obj_from_form(form, request.user)
-            part.add_child(child, form.cleaned_data["quantity"], 
+            part.add_child(child, form.cleaned_data["quantity"],
                            form.cleaned_data["order"],
                            form.cleaned_data["unit"],
                            **form.extensions)
@@ -194,7 +196,7 @@ def ajax_add_child(request, part_id):
             data["error"] = "invalid form"
     form.fields["type"].widget = widgets.TextInput()
     for field in ("type", "reference", "revision"):
-        form.fields[field].widget.attrs['readonly'] = 'on' 
+        form.fields[field].widget.attrs['readonly'] = 'on'
     data.update({
             "parent" : {
                 "id" : part.id,
@@ -238,7 +240,7 @@ def ajax_attach(request, plmobject_id):
             data["result"] = "error"
             data["error"] = "invalid form"
     for field in ("type", "reference", "revision"):
-        form.fields[field].widget.attrs['readonly'] = 'on' 
+        form.fields[field].widget.attrs['readonly'] = 'on'
     data.update({
             "plmobject" : {
                 "id" : plmobject.id,
@@ -257,7 +259,7 @@ def ajax_can_attach(request, plmobject_id):
     data = {"can_attach" : False}
     if isinstance(plmobject, PLMObjectController) and request.GET:
         form = forms.PLMObjectForm(request.GET)
-        
+
         if form.is_valid():
             attached = get_obj_from_form(form, request.user)
             if attached.check_readable(False):

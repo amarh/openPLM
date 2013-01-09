@@ -109,7 +109,7 @@ class PLMObjectController(Controller):
             obj.no_index = True
         if data:
             for key, value in data.iteritems():
-                if key not in ["reference", "type", "revision"]:
+                if key not in ["reference", "type", "revision", "auto", "pfiles"]:
                     setattr(obj, key, value)
         obj.state = models.get_default_state(obj.lifecycle)
         obj.save()

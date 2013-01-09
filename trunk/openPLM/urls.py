@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#/
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -95,7 +95,7 @@ urlpatterns += patterns('',
     ('^history_item/(?P<type>object|group|user)/(?P<hid>\d+)/', redirect_history),
     )
 
-urlpatterns += patterns2('', 'ajax/', 
+urlpatterns += patterns2('', 'ajax/',
     (r'create/$', ajax_creation_form),
     (r'complete/(?P<obj_type>\w+)/(?P<field>\w+)/$', ajax_autocomplete),
     (r'thumbnails/(?P<date>\d{4}-[01]\d-[0-3]\d:[012]\d:\d\d:\d\d/)?%s?$' % object_pattern, ajax_thumbnails),
@@ -145,7 +145,7 @@ urlpatterns += patterns2('', object_url,
 )
 
 
-urlpatterns += patterns2('', user_url, 
+urlpatterns += patterns2('', user_url,
     (r'$', display_object, user_dict),
     (r'attributes/$', display_object_attributes, user_dict),
     (r'history/$', display_object_history, user_dict),
@@ -160,9 +160,14 @@ urlpatterns += patterns2('', user_url,
     (r'password/$', change_user_password),
     (r'navigate/$', navigate, user_dict),
     (r'groups/$', display_groups),
+    # same as document files urls
+    (r'files/$', upload_and_create),
+    (r'files/add/$', add_file, user_dict),
+    (r'files/up/$', up_file, user_dict),
+    (r'files/_up/$', up_progress, user_dict),
 )
 
-urlpatterns += patterns2('', group_url, 
+urlpatterns += patterns2('', group_url,
     (r'$', display_object, group_dict),
     (r'attributes/$', display_object_attributes, group_dict),
     (r'history/$', display_object_history, group_dict),
@@ -178,7 +183,7 @@ urlpatterns += patterns2('', group_url,
 urlpatterns += patterns('',
 	# In order to take into account the css file
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root' : 'media/'}),    
+        {'document_root' : 'media/'}),
     (r'^file/(?P<docfile_id>\d+)/$', download),
     (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
     (r'^file/public/(?P<docfile_id>\d+)/$', public_download),

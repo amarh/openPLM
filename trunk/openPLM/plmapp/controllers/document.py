@@ -51,6 +51,21 @@ class DocumentController(PLMObjectController):
     :class:`.Document` to a :class:`.Part`.
     """
 
+    @classmethod
+    def create_from_form(cls, form, user, *args, **kwargs):
+        obj = super(DocumentController, cls).create_from_form(form, user, *args, **kwargs)
+        if type(obj.object).ACCEPT_FILES:
+            private_files = form.cleaned_data.get("pfiles", [])
+            if any(pf.creator != user for pf in private_files):
+                raise PermissionError("Not your file")
+            for pf in private_files:
+                doc_file = models.DocumentFile.objects.create(filename=pf.filename, size=pf.size,
+                    file=pf.file.path, document=obj.object)
+                obj.handle_added_file(doc_file)
+                generate_thumbnail.delay(doc_file.id)
+                pf.delete()
+        return obj
+
     def has_standard_related_locked(self, new_filename):
         """
         Returns True if :const:`settings.ENABLE_NATIVE_FILE_MANAGEMENT` is True

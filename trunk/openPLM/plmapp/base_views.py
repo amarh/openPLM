@@ -293,8 +293,10 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     restricted = request.user.get_profile().restricted
     if type_ == reference == revision == '-':
         obj = request.user
+        obj_url = obj.get_profile().plmobject_url
     else:
         obj = get_obj(type_, reference, revision, request.user)
+        obj_url = obj.plmobject_url
         if not restricted:
             save_session = update_navigation_history(request, obj,
                 type_, reference, revision)
@@ -336,12 +338,14 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
            'search_count' : search_count,
            'search_form' : search_form,
            'navigation_history' : request.session.get("navigation_history", []),
+           'ctype': "Part" if request.session["type"] == "User" else request.session["type"],
         })
 
     ctx.update({
        'link_creation' : False,
        'attach' : (obj, False),
        'obj' : obj,
+       'obj_url': obj_url,
        'restricted' : restricted,
     })
     if hasattr(obj, "menu_items"):

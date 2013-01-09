@@ -356,6 +356,7 @@ class UserController(Controller):
                  :attr:`settings.MAX_FILE_SIZE`
         """
         self.check_permission("owner")
+        self.check_contributor()
 
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
@@ -397,4 +398,27 @@ class UserController(Controller):
         os.chmod(path, 0700)
         os.remove(path)
         doc_file.delete()
+
+    def update_file(self, formset):
+        u"""
+        Updates uploaded file informations with data from *formset*
+
+        :param formset:
+        :type formset: a modelfactory_formset of
+                        :class:`~plmapp.forms.ModifyFileForm`
+        :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
+              :attr:`object`
+        """
+
+        self.check_permission("owner")
+        if formset.is_valid():
+            for form in formset.forms:
+                creator = form.cleaned_data["creator"]
+                if creator.pk != self.object.pk:
+                    raise ValueError("Not your file")
+                delete = form.cleaned_data["delete"]
+                filename = form.cleaned_data["id"]
+                if delete:
+                    self.delete_file(filename)
+
 
