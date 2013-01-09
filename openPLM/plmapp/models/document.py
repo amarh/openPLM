@@ -201,6 +201,9 @@ class PrivateFile(models.Model):
     A private file is not shared, and it is temporary. It is created to
     store a file before a document creation.
 
+    Private files are created when a user uploads files and *then* creates
+    a document containing these files.
+
     :model attributes:
         .. attribute:: filename
 
