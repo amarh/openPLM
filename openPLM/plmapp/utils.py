@@ -275,7 +275,7 @@ def get_ext(filename):
 
     It stripped all ".{number}" extensions if they are present.
 
-    Example::
+    Example:
         >>> get_ext("filename.png")
         '.png'
         >>> get_ext("filename.prt.2")
@@ -315,7 +315,22 @@ def get_pages_num(total_pages, current_page):
 
 
 def filename_to_name(filename):
-    return os.path.splitext(filename)[0].replace("_", " ")
+    """
+    .. versionadded:: 1.2
+
+    Returns a clean version of a filename that should be
+    more suitable as a document name.
+
+    Example:
+        >>> filename_to_name("/tmp/hello.pdf")
+        'hello'
+        >>> filename_to_name(u"/tmp/Hello_world.pdf")
+        u'Hello world'
+        >>> filename_to_name(u"/tmp/heLLoWorlD.xyz")
+        u'heLLoWorlD'
+    """
+    basename = os.path.basename(filename)
+    return os.path.splitext(basename)[0].replace("_", " ")
 
 if __name__ == "__main__":
     import doctest
