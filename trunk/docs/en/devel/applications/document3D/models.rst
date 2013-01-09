@@ -2,11 +2,6 @@
 :mod:`document3D.models` --- models for openPLM
 =================================================
 
-
-Habla sobre los modelos
-
-
-
 .. automodule::  openPLM.apps.document3D.models
     :members:
     :show-inheritance:
