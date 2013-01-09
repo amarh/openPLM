@@ -3,7 +3,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ There are 5 kinds of models:
         - :class:`.UserProfile`
         - :class:`.GroupInfo`
         - :class:`.Invitation`
-    * Lifecycle related models :
+    * Lifecycle related models:
         - :class:`.Lifecycle`
         - :class:`.State`
         - :class:`.LifecycleStates`
@@ -45,16 +45,18 @@ There are 5 kinds of models:
             - :func:`.get_default_lifecycle`
             - :func:`.get_default_state`
     * History models:
-        - :class:`.AbstractHistory` model
-        - :class:`.History` model
-        - :class:`.UserHistory` model
-        - :class:`.GroupHistory` model
+        - :class:`.AbstractHistory`
+        - :class:`.History`
+        - :class:`.UserHistory`
+        - :class:`.GroupHistory`
+        - :class:`.history.StateHistory`
     * PLMObject models:
         - :class:`.PLMObject` is the base class
         - :class:`.Part`
         - :class:`.Document` and related classes:
             - :class:`.DocumentStorage` (see also :obj:`.docfs`)
             - :class:`.DocumentFile`
+            - :class:`.PrivateFile`
         - functions:
             - :func:`.get_all_plmobjects`
             - :func:`.part.get_all_parts`
@@ -66,6 +68,7 @@ There are 5 kinds of models:
         - :class:`.DocumentPartLink`
         - :class:`.DelegationLink`
         - :class:`.PLMObjectUserLink`
+        - :class:`.AlternatePartSet`
 
 
 Inheritance diagrams
@@ -76,7 +79,7 @@ Users and groups
 
 .. inheritance-diagram:: openPLM.plmapp.models.user  openPLM.plmapp.models.group
     :parts: 1
-    
+
 Lifecycles
 ----------
 
@@ -122,7 +125,7 @@ from openPLM.plmapp.models.history import *
 from openPLM.plmapp.models.link import *
 
 
-    
+
 # import_models should be the last function
 
 def import_models(force_reload=False):
