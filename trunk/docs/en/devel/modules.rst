@@ -1,7 +1,7 @@
 .. _modules:
 
-Modules
----------
+Modules (:mod:`openPLM.plmapp` package)
+------------------------------------------
 
 .. toctree::
     :maxdepth: 2
