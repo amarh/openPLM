@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ class MockExtension(models.ParentChildLinkExtension):
     @classmethod
     def apply_to(cls, parent):
         return parent.name == u"mockextension"
-   
+
     def clone(self, link, save=False, **data):
         ca = data.get("custom_attribute", self.custom_attribute)
         clone = MockExtension(link=link, custom_attribute=ca)
@@ -63,7 +63,7 @@ class InvisibleMockExtension(models.ParentChildLinkExtension):
     @classmethod
     def apply_to(cls, parent):
         return parent.name == u"imockextension"
-   
+
     def clone(self, link, save=False, **data):
         attr1 = data.get("attr1", self.attr1)
         attr2 = data.get("attr2", self.attr2)
@@ -78,7 +78,7 @@ imockext = InvisibleMockExtension._meta.module_name
 class ParentChildLinkExtensionTestCase(BaseTestCase):
     TYPE = "Part"
     CONTROLLER = PartController
-   
+
     def setUp(self):
         self.registered_PCLEs = list(models.registered_PCLEs)
         models.register_PCLE(MockExtension)
@@ -98,7 +98,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
     def tearDown(self):
         models.registered_PCLEs[:] = self.registered_PCLEs
         super(ParentChildLinkExtensionTestCase, self).tearDown()
-   
+
     def test_clone_PCLE(self):
         link = models.ParentChildLink.objects.create(parent=self.controller.object,
                 child=self.controller2.object, quantity=3, order=4, unit="m")
@@ -115,7 +115,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         clone = ext.clone(link, save=True, custom_attribute="'")
         self.assertEqual(clone.custom_attribute, "'")
         self.assertEqual(link.id, clone.link.id)
-        self.assertEqual(2, MockExtension.objects.count()) 
+        self.assertEqual(2, MockExtension.objects.count())
 
     def get_link_and_ext(self):
 
@@ -151,7 +151,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertNotEqual(e1.id, ext1.id)
         self.assertNotEqual(e2.id, ext2.id)
         self.assertEqual(4, InvisibleMockExtension.objects.count())
-    
+
     def test_clone_link_with_saving(self):
         # clone a link with saving
         link, ext = self.get_link_and_ext()
@@ -194,7 +194,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual(link.quantity, 10)
         self.assertEqual(link.order, 15)
         self.assertFalse(bool(link.extensions))
-        
+
     def test_modify_child(self):
         self.controller.add_child(self.controller2, 10, 15, "-")
         self.controller.modify_child(self.controller2, 3, 5, "kg",
@@ -229,7 +229,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual(InvisibleMockExtension, type(ext))
         self.assertEqual(6, ext.attr2)
         self.assertEqual(4, InvisibleMockExtension.objects.count())
-    
+
     def test_modify_only_extension(self):
         self.controller.add_child(self.controller2, 10, 15, "-",
                 **{mockext:{"custom_attribute":"val1"}})
@@ -266,8 +266,44 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         # the extension must not be deleted
         self.assertEqual(1, MockExtension.objects.count())
 
-    def test_revise(self):
+    def test_replace_child(self):
+        link = self.controller.add_child(self.controller2, 10, 15, "-",
+                **{mockext:{"custom_attribute":"val1"}})
+        l2 = self.controller.replace_child(link, self.controller3.object)
+        extensions = l2.extensions
+        self.assertEqual(1, len(extensions))
+        ext = extensions[0]
+        self.assertEqual(MockExtension, type(ext))
+        self.assertEqual("val1", ext.custom_attribute)
 
+    def test_replace_child_existing_link(self):
+        link = self.controller.add_child(self.controller2, 10, 15, "-",
+                **{mockext:{"custom_attribute":"val1"}})
+        self.controller.add_child(self.controller3, 11, 16, "-",
+                **{mockext:{"custom_attribute":"val2"}})
+        l2 = self.controller.replace_child(link, self.controller3.object)
+        extensions = l2.extensions
+        self.assertEqual(1, len(extensions))
+        ext = extensions[0]
+        self.assertEqual(MockExtension, type(ext))
+        self.assertEqual("val1", ext.custom_attribute)
+
+    def test_replace_child_existing_link_iext(self):
+        link = self.controller2.add_child(self.controller3, 10, 15, "-")
+        ext1 = InvisibleMockExtension.objects.create(link=link, attr1="a", attr2=1)
+        ext2 = InvisibleMockExtension.objects.create(link=link, attr1="b", attr2=2)
+        l2 = self.controller2.add_child(self.controller, 11, 16, "-")
+        ext3 = InvisibleMockExtension.objects.create(link=l2, attr1="c", attr2=3)
+
+        l3 = self.controller2.replace_child(link, self.controller.object)
+        self.assertEqual(3, len(l3.extensions))
+        self.assertEqual(21, l3.quantity)
+        self.assertEqual(1, len(self.controller2.get_children(1)))
+        data = [(e.attr1, e.attr2) for e in l3.extensions]
+        data.sort()
+        self.assertEqual([("a", 1), ("b", 2), ("c", 3)], data)
+
+    def test_revise(self):
         self.controller.add_child(self.controller2, 10, 15, "-",
                 **{mockext:{"custom_attribute":"val1"}})
         self.controller.add_child(self.controller3, 10, 35, "-")
@@ -279,7 +315,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual(1, len(exts))
         ext = exts[0]
         self.assertEqual("val1", ext.custom_attribute)
-                
+
     def test_add_child_form(self):
         fname = mockext + "_custom_attribute"
         # create a form and check that it has a custom_attribute field
@@ -287,7 +323,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         field = form[fname]
         self.assertRaises(KeyError, lambda: form[imockext + "_attr1"])
         self.assertRaises(KeyError, lambda: form[imockext + "_attr2"])
-        # create another form that must not have a custom_attribute field 
+        # create another form that must not have a custom_attribute field
         form = forms.AddChildForm(self.controller2.object)
         self.assertRaises(KeyError, lambda: form[fname])
         self.assertRaises(KeyError, lambda: form[imockext + "_attr1"])
@@ -305,7 +341,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual({mockext : {"custom_attribute" : u"plop"}},
                 form.extensions)
-        
+
     def test_children_formset(self):
         fname = mockext + "_custom_attribute"
         self.controller.add_child(self.controller2, 10, 15, "-",
@@ -319,7 +355,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         self.assertEqual(None, f2[fname].field.initial)
         self.assertRaises(KeyError, lambda: f1[imockext + "_attr1"])
         self.assertRaises(KeyError, lambda: f1[imockext + "_attr2"])
-        
+
         # create a valid formset
         data = {}
         for key, value in formset.management_form.initial.iteritems():
@@ -329,7 +365,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
                 value = field.field.initial or form.initial.get(field.name, "")
                 if callable(value):
                     value = value()
-                data["form-%d-%s" % (i, field.name)] = value 
+                data["form-%d-%s" % (i, field.name)] = value
             data['form-%d-ORDER' % i] = str(i)
         data["form-1-" + fname] = "beer"
         formset = forms.get_children_formset(self.controller, data)
@@ -360,7 +396,7 @@ class ParentChildLinkExtensionTestCase(BaseTestCase):
         link = self.controller.get_children()[0].link
         self.assertEqual({link.id : {u"custom_attribute" : "val1", "link_id" : 1}},
                 extension_data)
-        
+
     def test_bom_edit_post(self):
         fname = mockext + "_custom_attribute"
         self.controller.add_child(self.controller2, 10, 15, "-",

@@ -314,10 +314,21 @@ class PartController(PLMObjectController):
             new_child = new_child.object
         if link.child == new_child:
             return link
-        self.check_add_child(new_child)
+        try:
+            existing_link = self.parentchildlink_parent.now().get(child=new_child)
+            if link.unit != existing_link.unit:
+                raise ValueError("Different units")
+            extra_qty = existing_link.quantity
+        except models.ParentChildLink.DoesNotExist:
+            self.check_add_child(new_child)
+            existing_link = None
+            extra_qty = 0
         link.end()
+        if existing_link is not None:
+            existing_link.end()
         # make a new link
-        link2, extensions = link.clone(child=new_child, end_time=None)
+        link2, extensions = link.clone(child=new_child, end_time=None,
+            quantity=link.quantity + extra_qty)
         details = u"Child changes from %s to %s" % (link.child, new_child)
         self._save_histo("Modify - %s" % link.ACTION_NAME, details)
         link2.save(force_insert=True)
@@ -325,6 +336,14 @@ class PartController(PLMObjectController):
         for ext in extensions:
             ext.link = link2
             ext.save(force_insert=True)
+        # copy extensions of the existing link
+        if existing_link is not None:
+            existing_link.end()
+            l3, extensions = existing_link.clone(save=False, child=new_child)
+            for ext in extensions:
+                if not ext.one_per_link():
+                    ext.link = link2
+                    ext.save(force_insert=True)
         return link2
 
     def get_children(self, max_level=1, date=None,

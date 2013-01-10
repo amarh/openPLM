@@ -1,7 +1,7 @@
-#R###########################################################################
+#############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ from openPLM.plmapp.tests.controllers.plmobject import ControllerTest
 class PartControllerTest(ControllerTest):
     TYPE = "Part"
     CONTROLLER = PartController
-   
+
     def setUp(self):
         super(PartControllerTest, self).setUp()
         self.controller = self.create("aPart1")
@@ -57,7 +57,7 @@ class PartControllerTest(ControllerTest):
 
     def add_child(self, qty=10, order=15, unit="-"):
         """ Adds controller2 to controller."""
-        self.controller.add_child(self.controller2, qty, order, unit)
+        return self.controller.add_child(self.controller2, qty, order, unit)
 
     def test_add_child(self):
         """ Tests the addition of a child and checks that the BOM is
@@ -94,7 +94,7 @@ class PartControllerTest(ControllerTest):
             self.add_child(order=-15)
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
-    
+
     def test_add_child_error_child_is_parent(self):
         """
         Tests that add_child raises a ValueError if the given child
@@ -107,7 +107,7 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(ValueError, fail)
         self.assertFalse(self.controller.get_children())
-    
+
     def test_add_child_error_already_a_child(self):
         """
         Tests that add_child raises a ValueError if the given child
@@ -121,7 +121,7 @@ class PartControllerTest(ControllerTest):
         self.controller.precompute_can_add_child2()
         self.assertFalse(self.controller.can_add_child2(self.controller2.object))
         self.assertRaises(ValueError, fail)
-    
+
     def test_add_child_error_child_is_document(self):
         """
         Tests that add_child raises a ValueError if the given child
@@ -160,7 +160,7 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(ctrl.can_add_child2(self.controller2.object))
         self.assertRaises(exc.PermissionError, fail)
         self.assertFalse(self.controller.get_children())
-    
+
     def test_add_child_error_official_status(self):
         """
         Tests that it is not possible to add a child to an official
@@ -295,7 +295,7 @@ class PartControllerTest(ControllerTest):
         self.add_child()
         self.controller.delete_child(self.controller2)
         self.assertEqual(self.controller.get_children(), [])
-    
+
     def test_delete_child_error_not_owner(self):
         """
         Tests that only the owner can delete a child link.
@@ -331,6 +331,30 @@ class PartControllerTest(ControllerTest):
         self.assertRaises(exc.PermissionError, self.controller.delete_child,
                 self.controller2)
         self.assertEqual(1, len(self.controller.get_children()))
+
+    def test_replace_child(self):
+        link = self.add_child()
+        self.controller.replace_child(link, self.controller3.object)
+        children = self.controller.get_children(1)
+        self.assertEqual(1, len(children))
+        self.assertEqual(self.controller3.object, children[0].link.child)
+
+    def test_replace_child_existing_link(self):
+        l1 = self.controller.add_child(self.controller2.object, 10, 15)
+        l2 = self.controller.add_child(self.controller3.object, 13, 35)
+        self.controller.replace_child(l1, self.controller3.object)
+        children = self.controller.get_children(1)
+        self.assertEqual(1, len(children))
+        link = children[0].link
+        self.assertEqual(self.controller3.object, link.child)
+        self.assertEqual(15, link.order)
+        self.assertEqual(23, link.quantity)
+
+    def test_replace_child_existing_link_error_invalid_unit(self):
+        l1 = self.controller.add_child(self.controller2.object, 10, 15, "-")
+        l2 = self.controller.add_child(self.controller3.object, 13, 35, "m")
+        self.assertRaises(ValueError, self.controller.replace_child,
+                l1, self.controller3.object)
 
     def test_get_children(self):
         controller4 = self.create("aPart4")
@@ -432,13 +456,13 @@ class PartControllerTest(ControllerTest):
         """Tests promotion from official state."""
         self.controller.promote()
         self.failUnless(self.controller.is_promotable())
-    
+
     def test_is_promotable3(self):
         """Tests promotions with an official child."""
         self.controller2.promote()
         self.controller.add_child(self.controller2, 10, 15)
         self.failUnless(self.controller.is_promotable())
-        
+
     def test_is_promotable4(self):
         """Tests promotion from official state, with a deprecated child."""
         self.controller.add_child(self.controller2, 10, 15)
@@ -473,7 +497,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(controller.state.name, "official")
         self.failIf(controller.is_editable)
         self.assertRaises(exc.PromotionError, controller.demote)
-        lcl = LifecycleList("diop", "official", "draft", 
+        lcl = LifecycleList("diop", "official", "draft",
                 "issue1", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         controller.lifecycle = lc
@@ -488,7 +512,7 @@ class PartControllerTest(ControllerTest):
     def test_cancel(self):
         """
         Tests :meth:`.Part.cancel`.
-        """ 
+        """
         self.assertFalse(self.controller.is_cancelled)
         self.assertEqual(1, self.controller.get_attached_documents().count())
         # builds a small bom to checks that links are removed
@@ -501,7 +525,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(0, self.controller.get_attached_documents().count())
         self.assertEqual(0, len(self.controller.get_children()))
         self.assertEqual(0, len(self.controller3.get_children()))
-         
+
     def test_attach_to_document(self):
         """
         Tests :meth:`.PartController.attach_to_document`.
@@ -563,7 +587,7 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(suggested)
 
     def test_get_suggested_documents_proposed(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.document.object.lifecycle = lc
@@ -582,7 +606,7 @@ class PartControllerTest(ControllerTest):
             self.assertFalse(suggested)
 
     def test_get_suggested_documents_revision_attached(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.document.object.lifecycle = lc
@@ -604,7 +628,7 @@ class PartControllerTest(ControllerTest):
                 self.assertFalse(self.document.object in suggested)
 
     def test_get_suggested_documents_revision_not_attached(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.document.object.lifecycle = lc
@@ -627,9 +651,9 @@ class PartControllerTest(ControllerTest):
                     self.assertTrue(rev.object in suggested)
                 else:
                     self.assertFalse(rev.object in suggested)
-   
+
     def test_get_suggested_documents_two_revisions(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.document.object.lifecycle = lc
@@ -687,7 +711,7 @@ class PartControllerTest(ControllerTest):
         document.attach_to_part(self.controller)
 
         rev = self.controller.revise("b", documents=(self.document.object, ))
-            
+
         attached1 = self.controller.get_attached_documents()
         docs = attached1.values_list("document", flat=True)
 
@@ -710,7 +734,7 @@ class PartControllerTest(ControllerTest):
         document.attach_to_part(self.controller)
 
         rev = self.controller.revise("b", documents=())
-            
+
         attached1 = self.controller.get_attached_documents()
         docs = attached1.values_list("document", flat=True)
 
@@ -745,7 +769,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(links[0].unit, links2[0].unit)
 
     def test_get_suggested_parents_no_revision(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.add_child()
@@ -766,7 +790,7 @@ class PartControllerTest(ControllerTest):
         self.assertFalse(suggested)
 
     def test_get_suggested_parents_revision_attached(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.controller.object.lifecycle = lc
@@ -784,7 +808,7 @@ class PartControllerTest(ControllerTest):
             self.assertEqual(parent.id, rev.id)
 
     def test_get_suggested_parents_revision_not_attached(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.controller.object.lifecycle = lc
@@ -809,9 +833,9 @@ class PartControllerTest(ControllerTest):
                     self.assertTrue(rev.id in parents)
                 else:
                     self.assertFalse(rev.id in parents)
-   
+
     def test_get_suggested_parents_two_revisions(self):
-        lcl = LifecycleList("dpop","official", "draft", 
+        lcl = LifecycleList("dpop","official", "draft",
                "proposed", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.controller.object.lifecycle = lc
@@ -871,12 +895,12 @@ class PartControllerTest(ControllerTest):
         else:
             parent, other = self.controller2, self.controller
         rev = self.controller3.revise('b', parents=((links[0], parent.object),))
-    
+
         parents = [p.link for p in rev.get_parents(1)]
         self.assertEqual(1, len(parents))
         self.assertEqual(parents[0].child_id, rev.id)
         self.assertEqual(parents[0].parent_id, parent.id)
-        
+
         children = [c.link for c in parent.get_children(1)]
         self.assertEqual(1, len(children))
         self.assertEqual(children[0].child_id, rev.id)
@@ -884,7 +908,7 @@ class PartControllerTest(ControllerTest):
         children_o = [c.link for c in other.get_children(1)]
         self.assertEqual(1, len(children))
         self.assertEqual(children_o[0].child_id, self.controller3.id)
-        
+
 
     def assertCancelError(self, ctrl):
         res = super(PartControllerTest, self).assertCancelError(ctrl)
@@ -893,28 +917,28 @@ class PartControllerTest(ControllerTest):
         res = res or models.ParentChildLink.objects.filter(q).exists()
         res = res or bool(ctrl.get_attached_documents())
         self.assertTrue(res)
-        
+
     def test_cancel_has_parent(self) :
         """ Test that a part with at least one parent can *not* be cancelled. """
         self.controller.add_child(self.controller3, 10, 15, "m")
         children = self.controller.get_children()
         self.assertEqual(len(children), 1)
         self.assertCancelError(self.controller3)
-    
+
     def test_cancel_has_child(self) :
         """ Tests that a part with at least one child can *not* be cancelled. """
         self.controller3.add_child(self.controller2, 10, 15, "m")
         children = self.controller3.get_children()
         self.assertEqual(len(children), 1)
         self.assertCancelError(self.controller3)
-        
+
     def test_cancel_has_document_related(self):
         """ Tests that a part with a document related can *not* be cancelled. """
         self.assertEqual(len(self.controller.get_attached_documents()), 1)
         self.assertCancelError(self.controller)
-        
+
     #clone test
-    
+
     def assertClone(self, ctrl, data, child_links, documents):
         new_ctrl = super(PartControllerTest, self).assertClone(ctrl, data)
         for link in child_links:
@@ -922,9 +946,9 @@ class PartControllerTest(ControllerTest):
         for doc in documents:
             models.DocumentPartLink.objects.create(part=new_ctrl.object,
                 document=doc)
-        
+
         # check that all children are child of the original part
-        child_cloned = True    
+        child_cloned = True
         children = [c.link for c in ctrl.get_children(1)]
         new_children = [c.link for c in new_ctrl.get_children(1)]
         less_or_equal = len(new_children) <= len(children)
@@ -932,15 +956,15 @@ class PartControllerTest(ControllerTest):
         for link in new_children:
             child_cloned = child_cloned and ctrl.parentchildlink_parent.filter(child=link.child).exists()
         self.assertTrue(child_cloned)
-        
-        
+
+
         # check that all attached document are attached to the original part
         doc_cloned = True
         for doc in new_ctrl.get_suggested_documents():
-            doc_cloned = doc_cloned and doc in ctrl.get_suggested_documents()        
-        self.assertTrue(doc_cloned) 
-   
-            
+            doc_cloned = doc_cloned and doc in ctrl.get_suggested_documents()
+        self.assertTrue(doc_cloned)
+
+
     def test_clone_child_links(self):
         """
         Tests that a part with children can be cloned.
@@ -951,7 +975,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(len(children), 1)
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, children, [])
-        
+
     def test_clone_attached_documents(self):
         """
         Tests that a part attached to documents can be cloned.
@@ -962,14 +986,14 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(len(documents),1)
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, [], documents)
-        
+
     def test_clone_cancelled(self):
         """Tests that even a cancelled object is cloned """
         ctrl = self.get_created_ctrl()
         data = self.getDataCloning(ctrl)
         ctrl.cancel()
         self.assertClone(ctrl, data, [],[])
-        
+
     def test_clone_official(self):
         """Tests that an offical object can be cloned ."""
         ctrl = self.get_created_ctrl()
@@ -977,7 +1001,7 @@ class PartControllerTest(ControllerTest):
         self.promote_to_official(ctrl)
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, [], [])
-        
+
     def test_clone_deprecated(self):
         """Tests that a deprecated object can be cloned"""
         ctrl = self.get_created_ctrl()
@@ -1068,7 +1092,7 @@ class PartControllerTest(ControllerTest):
         +--> Part2 (child)
              +--> Part3 (child)
                   |--> Part4 (alternate)
-                  +--> Part5 (alternate)  
+                  +--> Part5 (alternate)
         """
         self.controller.add_child(self.controller2, 1, 3)
         self.controller2.add_child(self.controller3, 7, 54)
@@ -1126,7 +1150,7 @@ class PartControllerTest(ControllerTest):
 
     def test_add_alternate_error_ancestors2(self):
         """
-   
+
         Part6
         +--> Part2 (child)
              |--> Part1 (alternate)
@@ -1181,7 +1205,7 @@ class PartControllerTest(ControllerTest):
         ctrls = []
         for i in range(10):
             ctrls.append(self.create("x%d" % i))
-       
+
         for i in range(1, 8, 2):
             ctrls[i].add_alternate(ctrls[i+1])
         for i in range(0, 9, 2):
@@ -1250,7 +1274,7 @@ class PartControllerTest(ControllerTest):
         |--> Part2 (alternate)
         +--> Part4 (child)
              +--> Part1 (child)
-        
+
         asserts that Part1 --> Part2 (child) is forbidden
         """
 
@@ -1318,7 +1342,7 @@ class PartControllerTest(ControllerTest):
         c4 = self.create("p4")
         self.controller.add_child(c4, 18, 155)
         self.assertFalse(self.controller.is_promotable())
-    
+
     def test_is_promotable_with_alternate(self):
         """
         Test cases:
@@ -1369,5 +1393,5 @@ class PartControllerTest(ControllerTest):
         self.controller.promote()
         self.assertTrue(self.controller.is_deprecated)
         self.assertFalse(self.controller.is_alternate(self.controller2))
-    
+
 
