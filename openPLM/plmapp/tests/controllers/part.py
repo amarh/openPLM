@@ -337,7 +337,7 @@ class PartControllerTest(ControllerTest):
         self.controller.replace_child(link, self.controller3.object)
         children = self.controller.get_children(1)
         self.assertEqual(1, len(children))
-        self.assertEqual(self.controller3.object, children[0].link.child)
+        self.assertEqual(self.controller3.object.part, children[0].link.child)
 
     def test_replace_child_existing_link(self):
         l1 = self.controller.add_child(self.controller2.object, 10, 15)
@@ -346,7 +346,7 @@ class PartControllerTest(ControllerTest):
         children = self.controller.get_children(1)
         self.assertEqual(1, len(children))
         link = children[0].link
-        self.assertEqual(self.controller3.object, link.child)
+        self.assertEqual(self.controller3.object.part, link.child)
         self.assertEqual(15, link.order)
         self.assertEqual(23, link.quantity)
 
