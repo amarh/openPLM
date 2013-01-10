@@ -1,4 +1,5 @@
 import datetime
+import urlparse
 
 import pysvn
 
@@ -11,7 +12,7 @@ from openPLM.apps.subversion.models import parse_revision
 @handle_errors
 def display_files(request, obj_type, obj_ref, obj_revi):
     """
-    Files page of a SubversionRepository. 
+    Files page of a SubversionRepository.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = 'files'
@@ -19,12 +20,12 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 
 def get_day(log):
     date = log["date"]
-    return datetime.date(date.year, date.month, date.day) 
+    return datetime.date(date.year, date.month, date.day)
 
 @handle_errors
 def logs(request, obj_type, obj_ref, obj_revi):
     """
-    Logs page of a SubversionRepository. 
+    Logs page of a SubversionRepository.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = 'logs'
@@ -34,10 +35,10 @@ def logs(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def ajax_logs(request, obj_type, obj_ref, obj_revi):
     """
-    Ajax Logs page of a SubversionRepository. 
+    Ajax Logs page of a SubversionRepository.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     ctx["error"] = False
     try:
         revision = parse_revision(obj.svn_revision)
@@ -47,6 +48,11 @@ def ajax_logs(request, obj_type, obj_ref, obj_revi):
         client = pysvn.Client()
         if not client.is_url(uri):
             raise ValueError()
+        # parse uri and set credentials if given
+        parts = urlparse.urlparse(uri)
+        if parts.username and parts.password:
+            client.callback_get_login = lambda *args: (True, parts.username,
+                    parts.password, True)
         logs = client.log(uri, limit=20, revision_start=revision)
         for log in logs:
             log["date"] = datetime.datetime.fromtimestamp(log["date"])
@@ -54,7 +60,7 @@ def ajax_logs(request, obj_type, obj_ref, obj_revi):
         ctx["logs"] = logs
     except (ValueError, pysvn.ClientError):
         ctx["error"] = True
-    
+
     ctx['current_page'] = 'logs'
     return pviews.r2r('ajax_logs.html', ctx, request)
 
