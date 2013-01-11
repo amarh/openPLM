@@ -1398,5 +1398,5 @@ ul.tbi li {
 
 
 .unreadable {
-    cursor: no-drop;
+    cursor: not-allowed;
 }
