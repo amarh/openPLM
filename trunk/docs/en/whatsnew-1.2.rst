@@ -54,7 +54,7 @@ Small User Experience improvements
 Lifecycle
 ---------
 
-We can add or supress signers in lifecycles:
+We can add or remove signers in lifecycles:
 
 .. figure:: /whatsnew/1.2/lifecycle_1.png
 
@@ -76,7 +76,7 @@ We can visualize a complete multi-level BOM including its attached documents:
 Files
 -------
 
-We can acces to all uploaded versions of one file:
+We can access to all uploaded versions of one file:
 
 .. figure:: /whatsnew/1.2/files_1.png
 
