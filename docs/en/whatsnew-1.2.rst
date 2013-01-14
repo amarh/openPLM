@@ -51,6 +51,26 @@ Small User Experience improvements
     * We can drag graph clicking wherever we want in the graph.
 
 
+Upload and create
+------------------
+
+You can now upload a file (or more) and create a new document
+without in a few clicks.
+
+
+.. raw:: html
+
+    <div>
+        <br/>
+        <video width="700" height="375" controls="controls">
+          <source src="_downloads/upload.webm" type="video/webm" />
+          Upload of a file
+        </video>
+    </div>
+
+:download:`Download the video </whatsnew/1.2/upload.webm>`
+
+
 Lifecycle
 ---------
 
