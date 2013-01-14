@@ -20,23 +20,28 @@ Screenshots:
 .. list-table::
 
     * - .. figure:: /whatsnew/1.2/navigate_2.png
-           :width: 100%
+            :align: center
+            
+            Document
+
       - .. figure:: /whatsnew/1.2/navigate_3.png
-           :width: 100%
+            :align: center
+
+            Part
 
 Revisions management
 +++++++++++++++++++++
 
-Two links to the previous and next revisions are now displayed :
-    * - .. figure:: /whatsnew/1.2/navigate_1.png
-           :width: 50%
+Two links to the previous and next revisions are now displayed:
+    
+.. figure:: /whatsnew/1.2/navigate_1.png
 
 Switch to study mode
 +++++++++++++++++++++
 
-Now, we can inspect directly one of the elements displayed in navigate :
-    * - .. figure:: /whatsnew/1.2/navigate_4.png
-           :width: 50%
+Now, we can inspect directly one of the elements displayed in navigate:
+
+.. figure:: /whatsnew/1.2/navigate_4.png
 
 Small User Experience improvements
 +++++++++++++++++++++++++++++++++++
@@ -49,9 +54,9 @@ Small User Experience improvements
 Lifecycle
 ---------
 
-We can add or supress signers in lifecycles :
-    * - .. figure:: /whatsnew/1.2/lifecycle_1.png
-           :width: 100%
+We can add or supress signers in lifecycles:
+
+.. figure:: /whatsnew/1.2/lifecycle_1.png
 
 BOM
 ----
@@ -64,16 +69,16 @@ We can compare the same BOM at two different dates.
 Attached documents
 +++++++++++++++++++
 
-We can visualize a complete multi-level BOM including its attached documents :
-    * - .. figure:: /whatsnew/1.2/bom_1.png
-           :width: 100%
+We can visualize a complete multi-level BOM including its attached documents:
+
+.. figure:: /whatsnew/1.2/bom_1.png
 
 Files
 -------
 
-We can acces to all uploaded versions of one file :
-    * - .. figure:: /whatsnew/1.2/files_1.png
-           :width: 100%
+We can acces to all uploaded versions of one file:
+
+.. figure:: /whatsnew/1.2/files_1.png
 
 Badges
 ------
