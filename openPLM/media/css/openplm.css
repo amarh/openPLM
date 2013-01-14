@@ -91,7 +91,7 @@ h3 {
     margin: 0.5em 0 .5em;
     padding: 0.5em 1em;
     font-size: 100%;
-    font-weight: 600;
+    font-weight: bold;
     background-image: url("../img/dark/h2_bg_2.png");
 }
 h3.alternate {
@@ -270,7 +270,7 @@ div.Box h2 {
     color: #eee;
     font-size: 100%;
     padding-left: 1em;
-    font-weight: 600;
+    font-weight: bold;
     font-variant:small-caps;
 
     background-color:  #aaa;
@@ -543,7 +543,7 @@ table.Content th
 }
 
 table.Content th * {
-    font-weight: 600;
+    font-weight: bold;
     color: #eee;
 }
 
