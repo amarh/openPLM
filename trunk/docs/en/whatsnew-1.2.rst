@@ -88,7 +88,31 @@ Administrator changes
 New application: badges
 -----------------------
 
-New application: change management
+A new application, :ref:`badges <badges-admin>` can be installed.
+It adds badges ala StackOverflow.
+
+
+New application: calendrier
+-----------------------------
+
+A new application, :ref:`calendrier <calendrier-admin>` can be installed.
+It adds a calendar view of the timeline and histories pages and an ICal feed
+for each object.
+
+
+New application: ecr: change management
+---------------------------------------
+
+A new application, :ref:`ecr <calendrier-admin>` can be installed.
+It adds Engineering Change Request objects.
+
+
+Optional lifecycles
+--------------------
+
+New lifecycles are available, you can load them by running the command
+``./manage.py loaddata extra_lifecycles``
+
 
 Developer changes
 ==================
