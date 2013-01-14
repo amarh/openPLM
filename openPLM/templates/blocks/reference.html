@@ -49,7 +49,7 @@
                 </span>
             {% endif%}
         </h2>
-        {% if object_reference != '-' %}
+        {% if object_reference != '-' and object_type != "User" %}
             <div id="mtime-wrapper">
                 {% if request.user.is_authenticated and not restricted %}
                     <a href="{{ obj.plmobject_url }}history/">
