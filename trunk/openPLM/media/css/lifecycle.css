@@ -32,7 +32,7 @@ div.state_wrapper {
 
 div.lifecycle div.state {
     width: 118px;
-    line-height: 119px;
+    height: 119px;
     background: url("../img/lifecycle/proposition_off.png") no-repeat;
     text-align: center;
 }
@@ -41,6 +41,10 @@ div.lifecycle div.state span.state {
     text-transform: capitalize;
     font-size: 14px;
     font-weight: 500;
+    vertical-align: middle;
+    display: table-cell;
+    width: 118px;
+    height: 119px;
 }
 
 div.lifecycle div.state.active {
@@ -69,7 +73,6 @@ div.lifecycle div.deprecated {
 }
 
 div.lifecycle div.deprecated span.state {
-    display: block;
     -moz-transform: rotate(-45deg);
     -o-transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
