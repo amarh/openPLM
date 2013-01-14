@@ -201,6 +201,7 @@ div#content-box {
     margin: 1em;
     margin-top: 0;
     min-height: 500px;
+    -webkit-box-shadow: 0 0px 8px #333;
     box-shadow: 0 0px 8px #333;
     border-radius: 0 5px 0 0;
 }
@@ -299,6 +300,7 @@ div#ActiveBox
     min-height: 420px;
     margin-bottom: 2em;
     padding: 0px;
+    -webkit-box-shadow: 1px 1px 15px #333333;
     box-shadow: 1px 1px 15px #333333;
 }
 
@@ -1096,6 +1098,7 @@ a#linobject {
     z-index: 1000;
     background-color: #343434;
     width: 15em;
+    -webkit-box-shadow: 3px 3px 5px #888;
     box-shadow: 3px 3px 5px #888;
 }
 
@@ -1120,6 +1123,7 @@ a#linobject {
 
 /* supermenu -- homepage */
 #supermenuholder {
+    -webkit-box-shadow: 0 0 115px 80px #888 inset;
     box-shadow: 0 0 115px 80px #888 inset;
     padding: 3em;
 }
@@ -1142,6 +1146,7 @@ div.menuitem {
     text-shadow: 1px 1px #000;
     margin-top: 0.2em;
     vertical-align: middle;
+    -webkit-box-shadow: 2px 2px 5px #000;
     box-shadow: 2px 2px 5px #000;
     border-radius: 4px;
 }
@@ -1159,6 +1164,7 @@ div#mi_homepage {
     background-image: url("../img/dark/logo_openplm.png");
     width: 260px;
     height: 180px;
+    -webkit-box-shadow: none;
     box-shadow: none;
 }
 
@@ -1174,6 +1180,7 @@ div.menuitem.disabled * {
     width: 180px;
     background-color: #F9EF89;
     color: black;
+    -webkit-box-shadow: 3px 3px 5px #555;
     box-shadow: 3px 3px 5px #555;
     position: absolute;
     text-shadow: none;
@@ -1230,6 +1237,7 @@ div.identity_card {
     background-color: white;
     border: 1px solid #777;
     border-radius: 0.4em;
+    -webkit-box-shadow: 1px 1px 3px #888;
     box-shadow: 1px 1px 3px #888;
     width: 20em;
     height: 160px;
@@ -1239,6 +1247,7 @@ div.identity_card {
 
 div.identity_card:hover {
     background-color: #f3f3f1;
+    -webkit-box-shadow: 1px 1px 3px #555;
     box-shadow: 1px 1px 3px #555;
 }
 
