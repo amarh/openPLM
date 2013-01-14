@@ -5,22 +5,28 @@
 
 {% block content %}
     {% if is_owner %}
-        {% trans "START DELEGATE :" %}
-        <a class="tb-btn" href="./delegate/owner/?q=&type=User">
-            <span class="ui-button-text">{% trans "OWNERSHIP" %}</span>
-        </a>
-        <a class="tb-btn" href="./delegate/sign/1/?q=&type=User">
-            <span class="ui-button-text">{% trans "SIGNATURE 1st LEVEL" %}</span>
-        </a>
-        <a class="tb-btn" href="./delegate/sign/2/?q=&type=User">
-            <span class="ui-button-text">{% trans "SIGNATURE 2nd LEVEL" %}</span>
-        </a>
-        <a class="tb-btn" href="./delegate/sign/all/?q=&type=User">
-            <span class="ui-button-text">{% trans "ALL SIGNATURES" %}</span>
-        </a>
-        <a class="tb-btn" href="./delegate/notified/?q=&type=User">
-            <span class="ui-button-text">{% trans "NOTIFICATIONS" %}</span>
-        </a>
+        <div class="tb-btn-group">
+            <a class="tb-btn tb-dropdown-toggle" data-toggle="dropdown" href="#">
+                {% trans "Delegate:" %}
+            </a>
+            <ul class="tb tb-dropdown-menu">
+                <li>
+                <a href="./delegate/owner/?q=&type=User">{% trans "Ownership" %}</a>
+                </li>
+                <li>
+                <a href="./delegate/sign/1/?q=&type=User">{% trans "Signature 1st level" %}</a>
+                </li>
+                <li>
+                <a href="./delegate/sign/2/?q=&type=User">{% trans "Signature 2nd level" %}</a>
+                </li>
+                <li>
+                <a href="./delegate/sign/all/?q=&type=User">{% trans "All signatures" %}</a>
+                </li>
+                <li>
+                <a href="./delegate/notified/?q=&type=User">{% trans "Notifications" %}</a>
+                </li>
+            </ul>
+        </div>
         {% if obj.is_contributor or obj.is_administrator %}
             <a class="tb-btn" href="./sponsor/">
                 <span class="ui-button-text">{% trans "Sponsor" %}</span>
