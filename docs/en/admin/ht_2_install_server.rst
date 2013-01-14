@@ -136,6 +136,7 @@ Then execute the following commands:
     * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
+    * ``./manage.py loaddata extra_lifecycles`` to load optional lifecycles
     
     .. note::
         You have to create the superadmin user for Django and a special user named 'company'.
@@ -150,7 +151,7 @@ Compile message files
 Run the following commands:
     
     #. ``make``
-    #. ``./bin/translate_all.sh compile all``.
+    #. ``./bin/translate_all.sh compile all``
    
 Configure where the files are saved
 ===================================
