@@ -1,0 +1,122 @@
+[
+    {
+        "pk": "design in progress", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "ready for tooling", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "ready for production", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "ready for pre-production", 
+        "model": "plmapp.state", 
+        "fields": {}
+    }, 
+    {
+        "pk": "tool_production", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state":"official",
+            "type" : 1
+        }
+    },
+    {
+        "pk": "tool_pre_production", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state":"official",
+            "type" : 1
+        }
+    },
+
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "design in progress", 
+            "lifecycle": "tool_production", 
+            "rank": 0
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "ready for tooling", 
+            "lifecycle": "tool_production", 
+            "rank": 1
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "ready for production", 
+            "lifecycle": "tool_production", 
+            "rank": 2
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "deprecated",
+            "lifecycle": "tool_production", 
+            "rank": 3
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "design in progress", 
+            "lifecycle": "tool_pre_production", 
+            "rank": 0
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "ready for tooling", 
+            "lifecycle": "tool_pre_production", 
+            "rank": 1
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "ready for pre-production", 
+            "lifecycle": "tool_pre_production", 
+            "rank": 2
+        }
+    },
+
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "ready for production", 
+            "lifecycle": "tool_pre_production", 
+            "rank": 3
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "deprecated",
+            "lifecycle": "tool_pre_production", 
+            "rank": 4
+        }
+    }
+     
+]
