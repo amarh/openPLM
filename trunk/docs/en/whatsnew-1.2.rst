@@ -55,7 +55,7 @@ Upload and create
 ------------------
 
 You can now upload a file (or more) and create a new document
-without in a few clicks.
+in a few clicks.
 
 
 .. raw:: html
