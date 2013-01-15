@@ -119,7 +119,8 @@ class PLMObjectController(Controller):
         # record creation in history
         infos = {"type" : type, "reference" : reference, "revision" : revision}
         infos.update(data)
-        details = u",".join(u"%s : %s" % (k, v) for k, v in infos.items())
+        details = u",".join(u"%s : %s" % (k, v) for k, v in infos.items()
+                if k not in ("auto", "pfiles"))
         res._save_histo("Create", details)
         # add links
         models.PLMObjectUserLink.objects.create(plmobject=obj, user=user, role="owner")
