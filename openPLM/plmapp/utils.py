@@ -228,16 +228,16 @@ def level_to_sign_str(level):
         >>> level_to_sign_str(1)
         'sign_2nd_level'
         >>> level_to_sign_str(2)
-        'sign_3th_level'
-        >>> level_to_sign_str(3)
         'sign_3rd_level'
+        >>> level_to_sign_str(3)
+        'sign_4th_level'
         >>> level_to_sign_str(4)
         'sign_5th_level'
         >>> level_to_sign_str(10)
         'sign_11th_level'
     """
 
-    types = {0 : "1st", 1 : "2nd", 3 : "3rd"}
+    types = {0 : "1st", 1 : "2nd", 2 : "3rd"}
     return "sign_%s_level" % types.get(level, "%dth" % (level + 1))
 
 def memoize_noarg(func):
