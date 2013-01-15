@@ -735,10 +735,10 @@ span#numresults {
 
 /* related content */
 #related_content {
-    float: right;
+    /*float: right;*/
+    display: inline-block;
     width: 25%;
     padding-bottom: 1em;
-    margin: 1em;
     background-color: #e4e3e1;
     border: 1px solid #afacab;
 }
@@ -1227,10 +1227,21 @@ a.decomposable {
     width: 39em;
 }
 
-div#attributes {
+#attributes-outer {
     margin: 1em;
+}
+
+div#attributes {
     width: 70%;
- }
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 2em;
+}
+
+#attributes table.Content {
+    margin-bottom: 1em;
+    margin-top: 0em;
+}
 
 div.identity_card {
     display: inline-block;

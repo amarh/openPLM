@@ -5,65 +5,69 @@
 <!-- Manage html display in the Content div which correspond to the "attributes" menu -->
 
 {% block content %}
+    <div id="attributes-outer">
+        <div id="attributes">
+            <table class="Content">
+                {% for description,attribute in object_attributes %}
+                    <tr class="Content">
+                        <td class="Content description">{{description|capfirst}}</td>
+                        <td class="Content">
+                            {% if attribute.year %}
+                                {{ attribute|date:"DATETIME_FORMAT" }} — 
+                                {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                            {% else %}
+                                {{attribute|linebreaks}}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
 
-    {% if obj.is_part or obj.is_document %}
-        <div id="related_content">
-            <h3>{% trans "Similar contents" %} </h3>
-            <ul class="Result">
-                {% more_like_this obj.object as related_content limit 5 %}
-                {% with 1 as link_creation %}
-                    {% for result in related_content %}
-                        {% include "search/result.html" %}
-                    {% endfor %}
-                {% endwith %}
-            </ul>
+            <div class="center">
+                {% if object_type == 'User' %}
+                    {% if obj.can_update_data %}
+                        <a class="tb-btn" href="/user/{{object_reference|urlencode }}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
+                    {% endif %}
+                    {% if is_owner %}
+                        <a class="tb-btn" href="/user/{{object_reference|urlencode }}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
+                    {% endif %}
+                {% else %}
+                    {% if is_owner and obj.is_editable %}
+                        <a class="tb-btn" 
+                            href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
+                            <span>{% trans "Edit this information" %}</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+                {% if can_generate_pdf and not restricted %}
+                    <a href="/pdf{{obj.plmobject_url}}attributes/" class="tb-btn">
+                        <span>{% trans "Download as PDF"%}</span>
+                    </a>
+                {% endif %}
+                {% if obj.can_clone %}
+                    <a href="{{obj.plmobject_url}}clone/" class="tb-btn">
+                        <span>{% trans "Clone" %}</span>
+                    </a>
+                {% endif %}
+            </div>
+
         </div>
-    {% endif %}
 
-    <div id="attributes">
-        <table class="Content">
-            {% for description,attribute in object_attributes %}
-                <tr class="Content">
-                    <td class="Content description">{{description|capfirst}}</td>
-                    <td class="Content">
-                        {% if attribute.year %}
-                            {{ attribute|date:"DATETIME_FORMAT" }} — 
-                            {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
-                        {% else %}
-                            {{attribute|linebreaks}}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
 
-    <div class="center">
-        {% if object_type == 'User' %}
-            {% if obj.can_update_data %}
-                <a class="tb-btn" href="/user/{{object_reference|urlencode }}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
-            {% endif %}
-            {% if is_owner %}
-                <a class="tb-btn" href="/user/{{object_reference|urlencode }}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
-            {% endif %}
-        {% else %}
-            {% if is_owner and obj.is_editable %}
-                <a class="tb-btn" 
-                    href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
-                    <span>{% trans "Edit this information" %}</span>
-                </a>
-            {% endif %}
+        {% if obj.is_part or obj.is_document %}
+            <div id="related_content">
+                <h3>{% trans "Similar contents" %} </h3>
+                <ul class="Result">
+                    {% more_like_this obj.object as related_content limit 5 %}
+                    {% with 1 as link_creation %}
+                        {% for result in related_content %}
+                            {% include "search/result.html" %}
+                        {% endfor %}
+                    {% endwith %}
+                </ul>
+            </div>
         {% endif %}
-        {% if can_generate_pdf and not restricted %}
-            <a href="/pdf{{obj.plmobject_url}}attributes/" class="tb-btn">
-                <span>{% trans "Download as PDF"%}</span>
-            </a>
-        {% endif %}
-        {% if obj.can_clone %}
-            <a href="{{obj.plmobject_url}}clone/" class="tb-btn">
-                <span>{% trans "Clone" %}</span>
-            </a>
-        {% endif %}
+
     </div>
 
     {% if not restricted %}
