@@ -562,6 +562,9 @@ function up_file(f_form){
         }
         
         if(go_to!=""){
+            if (go_to.substring(0, 8) != "/object/") {
+                go_to = ".";
+            }
             location.href=go_to;
         }
     }
