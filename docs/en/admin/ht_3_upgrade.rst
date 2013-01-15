@@ -49,14 +49,33 @@ but it can take a few minutes.
 Updating the code
 ==================
 
+Development version (svn)
+---------------------------
 
 svn up
 
 /!\ settings.py, your own modifications
 
-or 
 
-copy
+Stable version (tarball)
+--------------------------
+
+    #. Backup your files, code, settings.py, thumbnails...
+    #. Extract the tarball in a temporary directory, for example `/tmp/newopenplm`.
+    #. Copy the files:
+
+..
+        test it and then, uncomment it
+        #. ``cp -r /tmp/newopenplm/openPLM /path/to/openPLM``
+        #. restore the settings.py file: ``cp backups/settings.py /path/to/openPLM``
+        #. thumbnails ??
+        #. python path: ``sed -in 's#\(/var/django/\)openPLM/trunk/#\1#' settings.py apache/*.wsgi etc/default/celeryd``
+      
+    #. Check apache configuration files
+
+
+New settings
+=============
 
 
 Migrating the database
@@ -93,6 +112,13 @@ File permissions
     * ``chown www-data:www-data -R /var/django/openPLM/trunk/openPLM/media/public/thumbnails``
     * ``chown www-data:www-data -R /var/django/openPLM/trunk/openPLM/media/3D`` if ``document3D`` is installed
 
+Enabling new applications
+==========================
+
+A new version of OpenPLM often comes with new optional applications.
+You can enable them according to your needs.
+
+
 Starting the server
 ===================
 
@@ -101,6 +127,5 @@ Starting the server
 ``service apache2 start``
 
 Now you can test and complain if something does not work ;-)
-
 
 
