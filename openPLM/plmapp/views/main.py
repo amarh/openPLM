@@ -124,7 +124,7 @@ def comment_post_wrapper(request):
     # Clean the request to prevent form spoofing
     user = request.user
     if user.is_authenticated() and not user.get_profile().restricted:
-        if not (user.get_full_name() == request.POST['name'] or \
+        if not (user.get_full_name() == request.POST['name'] and \
                 user.email == request.POST['email']):
             return HttpResponse("You registered user...trying to spoof a form...eh?")
         return post_comment(request)
