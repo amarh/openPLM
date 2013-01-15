@@ -14,14 +14,36 @@ Backups
 ============
 
 Database
+--------
+ 
+http://www.postgresql.org/docs/9.2/static/backup.html
 
 Code
+----
+
+Backups are mostly useless if you do not have the code that was running.
+
+Copy the content of :samp:`{/path/to/openPLM/}` (directory containing the :file:`settings.py` file).
 
 Files
+-----
 
-Thumbnails
+Copy ``/var/openPLM/docs``.
+
+
+Thumbnails and 3D files
+--------------------------
+
+Copy :samp:`{/path/to/openPLM}/media/thumbnails` and :samp:`{/path/to/openPLM}/media/public`.
+
+If `document3D` application is installed, copy :samp:`{/path/to/openPLM}/media/3D`.
+
 
 Search indexes
+----------------
+
+You can also copy ``/var/openPLM/xapian_index``, it is easy to rebuild the index
+but it can take a few minutes.
 
 
 Updating the code
