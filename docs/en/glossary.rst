@@ -20,7 +20,7 @@ Glossary
     clone
         duplicate a :term:`plmobject` (copy all its content) without creating a link between the original and the new :term:`plmobject` s 
         
-    company (term:`user`)
+    company (:term:`user`)
         company (can be changed to another name during initialisation phase) is a special and unique :term:`user`. He is the creator of the first :term:`group` and he sponsors the first :term:`user` s. He also owns all official :term:`plmobject` s.
         
     decompose
