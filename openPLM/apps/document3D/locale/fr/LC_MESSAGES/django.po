@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-12 12:02+0200\n"
+"POT-Creation-Date: 2013-01-15 18:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Zahariri ALI <zahariri.ali@gmail.com>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: templates/Display3D.htm:14
+#: templates/Display3D.htm:16
 msgid ""
 "This document has no 3D data. Maybe it does not have a STEP/STL file or "
 "openPLM has not yet converted its STEP file."
@@ -25,59 +25,59 @@ msgstr ""
 "Ce document n'a pas de données 3D associées. Peut-être qu'il n'a pas de "
 "fichier STEP/STL ou openPLM n'a pas encore converti son fichier STEP."
 
-#: templates/Display3D.htm:26
+#: templates/Display3D.htm:28
 msgid "Set to axometric view"
 msgstr "Régler en vue axométrique"
 
-#: templates/Display3D.htm:27
+#: templates/Display3D.htm:29
 msgid "Set to front view"
 msgstr "Régler en vue de face"
 
-#: templates/Display3D.htm:28
+#: templates/Display3D.htm:30
 msgid "Set to right view"
 msgstr "Régler en vue de droite"
 
-#: templates/Display3D.htm:29
+#: templates/Display3D.htm:31
 msgid "Set to top view"
 msgstr "Régler en vue du dessous"
 
-#: templates/Display3D.htm:30
+#: templates/Display3D.htm:32
 msgid "Set to rear view"
 msgstr "Régler en vue arrière"
 
-#: templates/Display3D.htm:31
+#: templates/Display3D.htm:33
 msgid "Set to left view"
 msgstr "Régler en vue de gauche"
 
-#: templates/Display3D.htm:32
+#: templates/Display3D.htm:34
 msgid "Set to bottom view"
 msgstr "Régler en vue du dessous"
 
-#: templates/Display3D.htm:36
+#: templates/Display3D.htm:38
 msgid "Random colors"
 msgstr "Couleurs aléatoires"
 
-#: templates/Display3D.htm:37
+#: templates/Display3D.htm:39
 msgid "Initial colors"
 msgstr "Couleurs initiales"
 
-#: templates/Display3D.htm:40
+#: templates/Display3D.htm:42
 msgid "Toggle transparency"
 msgstr "Alterner la transparence"
 
-#: templates/Display3D.htm:41
+#: templates/Display3D.htm:43
 msgid "Toggle axis visibility"
 msgstr "Changer la visibilité des axes"
 
-#: templates/Display3D.htm:62
+#: templates/Display3D.htm:64
 msgid "Zoom out"
 msgstr "Dézoomer"
 
-#: templates/Display3D.htm:66
+#: templates/Display3D.htm:68
 msgid "Zoom in"
 msgstr "Zoomer"
 
-#: templates/Display3D.htm:70
+#: templates/Display3D.htm:72
 msgid "Fit all"
 msgstr "Ajuster à la fenêtre"
 
@@ -125,11 +125,11 @@ msgstr "Afficher ou cacher tous les assemblages de ce niveau"
 msgid "Level"
 msgstr "Niveau"
 
-#: templates/DisplayDecompose.htm:212
+#: templates/DisplayDecompose.htm:208
 msgid "already indexed"
 msgstr "déjà référencé"
 
-#: templates/DisplayDecompose.htm:289
+#: templates/DisplayDecompose.htm:278
 msgid "Create"
 msgstr "Créer"
 
@@ -148,8 +148,18 @@ msgstr ""
 "\n"
 "       Un document (<a href=\"/object/%(type)s/%(ref)s/%(rev)s/\">%(ref)s</"
 "a> )\n"
-"        contenant un fichier STEP (<a href=\"/file/%(f_id)s/\">%(f_name)s</a>)\n"
-"        est attaché à cette part. Souhaitez vous l'analyser pour générer la nomenclature?\n"
+"        contenant un fichier STEP (<a href=\"/file/%(f_id)s/\">%(f_name)s</"
+"a>)\n"
+"        est attaché à cette part. Souhaitez vous l'analyser pour générer la "
+"nomenclature?\n"
 "        <a style=\"color:#FFFF00\" href=\"%(plmobject_url)sdecompose/"
 "%(f_id)s/\">Oui</a>\n"
 "        "
+
+#: templates/public_3d.html:10
+msgid "3D"
+msgstr ""
+
+#: templates/public_3d.html:12
+msgid "View in 3D"
+msgstr "Visualiser en 3D"
