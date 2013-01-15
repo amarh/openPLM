@@ -93,7 +93,7 @@
                     <div class="comment">
                         <span class="comment posted-by">
                             {% trans "Posted by:" %}
-                            <a href="/user/{{comment.user|urlencode }}/">{{ comment.user_name }}</a>
+                            <a href="/user/{{comment.user|urlencode }}/">{{ comment.user.get_full_name }}</a>
                         </span>
                         <span class="comment date">
                             {% trans "Date:" %}
