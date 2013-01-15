@@ -2021,7 +2021,8 @@ def clone(request, obj_type, obj_ref, obj_revi,creation_form=None):
 
     if request.method == 'GET':
         # generate and fill the creation form
-        not_auto_cloned_fields =['reference','revision','group','lifecycle','auto']
+        not_auto_cloned_fields = ['reference','revision', 'group','lifecycle',
+                'auto', 'pfiles']
         creation_form = forms.get_creation_form(request.user, cls)
         if bool(request.user.groups.filter(id=obj.group.id)):
             creation_form.fields["group"].initial = obj.group.id
