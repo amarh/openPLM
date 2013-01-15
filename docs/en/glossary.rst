@@ -42,7 +42,7 @@ Glossary
         promote a :term:`plmobject` to its official :term:`state` 
         
     owner
-        an :term:`user` who have all rights on a :term:`plmobject`
+        a :term:`user` who have all rights on a :term:`plmobject`
         
     part
         a real life product or service or a subset of them in OpenPLM. Creating links between parts helps us defining :term:`assembly` s sub- :term:`assembly` s and, hence, a full product structure (and :term:`BOM`). 
@@ -60,10 +60,10 @@ Glossary
         make a :term:`plmobject` accessible to anonymous :term:`user` s 
         
     publisher
-        an :term:`user` who has the right to publish a :term:`plmobject` 
+        a :term:`user` who has the right to publish a :term:`plmobject` 
         
     signer
-        an :term:`user` who can promote or demote a :term:`plmobject`
+        a :term:`user` who can promote or demote a :term:`plmobject`
         
     state
         state of a :term:`plmobject` (can be draft, official, cancel, ...)
