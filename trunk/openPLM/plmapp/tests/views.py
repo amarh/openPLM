@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ from openPLM.plmapp.controllers import DocumentController, PartController, \
 from openPLM.plmapp.lifecycle import LifecycleList
 
 from openPLM.plmapp.tests.base import BaseTestCase
-        
+
 class CommonViewTest(BaseTestCase):
     TYPE = "Part"
     CONTROLLER = PartController
@@ -62,7 +62,7 @@ class CommonViewTest(BaseTestCase):
         self.client.post("/i18n/setlang/", {"language" : self.LANGUAGE})
         self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
                                                  self.user, self.DATA)
-        self.base_url = self.controller.plmobject_url 
+        self.base_url = self.controller.plmobject_url
         brian = User.objects.create_user(username="Brian", password="life",
                 email="brian@example.net")
         brian.get_profile().is_contributor = True
@@ -78,7 +78,7 @@ class CommonViewTest(BaseTestCase):
             link=False, page=""):
         return self.get_or_post(self.client.get, url, data, follow, status_code,
                 link, page)
-    
+
     def get_or_post(self, func, url, data=None, follow=True, status_code=200,
             link=False, page=""):
         response = func(url, data or {}, follow=follow)
@@ -110,12 +110,12 @@ class ViewTest(CommonViewTest):
 
     def test_home(self):
         response = self.get("/home/")
-        
+
     def test_create_get(self):
         response = self.get("/object/create/", {"type" : self.TYPE})
         self.assertEqual(response.context["object_type"], self.TYPE)
         self.failUnless(response.context["creation_form"])
-   
+
     def test_create_post(self):
         data = self.DATA.copy()
         data.update({
@@ -141,7 +141,7 @@ class ViewTest(CommonViewTest):
         response = self.get("/object/create/", {"type" : self.TYPE,
             "__next__" : "/home/"})
         self.assertEqual("/home/", response.context["next"])
-       
+
     def test_create_redirect_post(self):
         data = self.DATA.copy()
         data.update({
@@ -172,11 +172,11 @@ class ViewTest(CommonViewTest):
         """
         data = self.DATA.copy()
         ref = self.controller.reference
-        rev = "a new revision" 
+        rev = "a new revision"
         data.update({
                 "type" : self.TYPE,
                 "reference" : ref,
-                "auto" : False, 
+                "auto" : False,
                 "revision" : rev,
                 "name" : "An invalid object",
                 "group" : str(self.group.id),
@@ -189,10 +189,10 @@ class ViewTest(CommonViewTest):
                 reference=ref, revision=rev)
         self.assertFalse(response.context["creation_form"].is_valid())
         self.assertFalse(qset.exists())
-        
+
     def test_create_post_error_same_reference_and_revision(self):
         """
-        Tests that the creation of an object with the same type , 
+        Tests that the creation of an object with the same type ,
         reference and revision is forbidden when auto is not True.
         """
         data = self.DATA.copy()
@@ -201,7 +201,7 @@ class ViewTest(CommonViewTest):
         data.update({
                 "type" : self.TYPE,
                 "reference" : ref,
-                "auto" : False, 
+                "auto" : False,
                 "revision" : rev,
                 "name" : "An invalid object",
                 "group" : str(self.group.id),
@@ -213,10 +213,10 @@ class ViewTest(CommonViewTest):
         qset = m.PLMObject.objects.filter(type=self.TYPE,
                 reference=ref, revision=rev)
         self.assertFalse(response.context["creation_form"].is_valid())
-        
+
     def test_create_post_same_reference_and_revision(self):
         """
-        Tests that when auto is True and we intent to create an object with 
+        Tests that when auto is True and we intent to create an object with
         the same type, reference and revision:
             * a new and available reference is given to the new object
             * the object is created.
@@ -227,7 +227,7 @@ class ViewTest(CommonViewTest):
         data.update({
                 "type" : self.TYPE,
                 "reference" : ref,
-                "auto" : True, 
+                "auto" : True,
                 "revision" : rev,
                 "name" : "A valid object",
                 "group" : str(self.group.id),
@@ -243,12 +243,12 @@ class ViewTest(CommonViewTest):
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
 
-        
+
 
     def test_display_attributes(self):
         response = self.get(self.base_url + "attributes/", page="attributes")
         self.failUnless(response.context["object_attributes"])
-        attributes = dict((x.capitalize(), y) for (x,y) in 
+        attributes = dict((x.capitalize(), y) for (x,y) in
                           response.context["object_attributes"])
         # name : empty value
         self.assertEqual(attributes["Name"], "")
@@ -294,7 +294,7 @@ class ViewTest(CommonViewTest):
         self.assertEqual(lifecycles, wanted)
         # promote
         self.assertTrue(self.controller.is_promotable())
-        response = self.post(self.base_url + "lifecycle/apply/", 
+        response = self.post(self.base_url + "lifecycle/apply/",
                 {"promote" : "on", "password" : "password"})
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", False, [self.user.username]),
@@ -302,7 +302,7 @@ class ViewTest(CommonViewTest):
                   ("deprecated", False, []))
         self.assertEqual(lifecycles, wanted)
         # demote
-        lcl = LifecycleList("diop", "official", "draft", 
+        lcl = LifecycleList("diop", "official", "draft",
                 "issue1", "official", "deprecated")
         lc = m.Lifecycle.from_lifecyclelist(lcl)
         self.controller.lifecycle = lc
@@ -310,7 +310,7 @@ class ViewTest(CommonViewTest):
         self.controller.save()
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "issue1")
-        response = self.post(self.base_url + "lifecycle/apply/", 
+        response = self.post(self.base_url + "lifecycle/apply/",
                 {"demote" : "on", "password":"password"})
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         wanted = (("draft", True, [self.user.username]),
@@ -337,7 +337,7 @@ class ViewTest(CommonViewTest):
         self.assertFalse(response.context["cancelled_revisions"])
         self.assertFalse(response.context["deprecated_revisions"])
 
-        # rev b -> a is deprecated 
+        # rev b -> a is deprecated
         response = self.get(revb.plmobject_url + "lifecycle/")
         self.assertFalse(response.context["cancelled_revisions"])
         self.assertEqual([self.controller.object.plmobject_ptr],
@@ -366,7 +366,7 @@ class ViewTest(CommonViewTest):
                   ("deprecated", False, []))
         self.assertEqual(lifecycles, wanted)
         # try to promote
-        response = self.post(self.base_url + "lifecycle/apply/", 
+        response = self.post(self.base_url + "lifecycle/apply/",
                 {"promote" : "on", "password":"wrong_password"})
         lifecycles = self._remove_link_id(response.context["object_lifecycle"])
         self.assertEqual(lifecycles, wanted)
@@ -393,10 +393,10 @@ class ViewTest(CommonViewTest):
         revisions = response.context["revisions"]
         self.assertEqual(revisions, [self.controller.plmobject_ptr, rev.plmobject_ptr])
         self.assertTrue(response.context["add_revision_form"] is None)
-    
+
     def test_history(self):
         response = self.get(self.base_url + "history/")
-        history = response.context["object_history"].object_list 
+        history = response.context["object_history"].object_list
         # it should contains at least one item
         self.assertTrue(history)
         # edit the controller and checks that the history grows
@@ -405,7 +405,7 @@ class ViewTest(CommonViewTest):
         response = self.get(self.base_url + "history/")
         history2 = response.context["object_history"].object_list
         self.failUnless(len(history2) > len(history))
-        # create a new revision: both should appear in the history 
+        # create a new revision: both should appear in the history
         revb = self.controller.revise("new_revision")
         response = self.get(self.base_url + "history/")
         history3 = response.context["object_history"].object_list
@@ -421,7 +421,7 @@ class ViewTest(CommonViewTest):
         response = self.get(self.base_url + "navigate/")
         self.assertTrue(response.context["filter_object_form"])
         self.assertTrue(response.context["navigate_bool"])
-        
+
     def test_navigate_post(self):
         data = dict.fromkeys(("child", "parents",
             "doc", "parents", "owner", "signer", "notified", "part",
@@ -429,7 +429,7 @@ class ViewTest(CommonViewTest):
         data["prog"] = "neato"
         response = self.post(self.base_url + "navigate/", data)
         self.assertTrue(response.context["filter_object_form"])
-       
+
     def test_management(self):
         response = self.get(self.base_url + "lifecycle/", page="lifecycle")
         self.brian.groups.add(self.group)
@@ -445,7 +445,7 @@ class ViewTest(CommonViewTest):
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("add_" + role, attach[1])
-    
+
     def do_test_management_add_post(self, url, role):
         data = dict(type="User", username=self.brian.username)
         self.brian.groups.add(self.group)
@@ -461,7 +461,7 @@ class ViewTest(CommonViewTest):
         self.brian.get_profile().save()
         self.controller.promote(checked=True)
         self.do_test_management_add_get(self.base_url + "management/add-reader/", m.ROLE_READER)
-    
+
     def test_management_add_signer0_get(self):
         self.do_test_management_add_get(self.base_url + "management/add-signer0/",
                 level_to_sign_str(0))
@@ -475,7 +475,7 @@ class ViewTest(CommonViewTest):
         self.brian.get_profile().save()
         self.controller.promote(checked=True)
         self.do_test_management_add_post(self.base_url + "management/add-reader/", m.ROLE_READER)
-    
+
     def test_management_add_signer0_post(self):
         self.do_test_management_add_post(self.base_url + "management/add-signer0/",
                 level_to_sign_str(0))
@@ -486,7 +486,7 @@ class ViewTest(CommonViewTest):
 
     def test_management_add_notified_post(self):
         self.do_test_management_add_post(self.base_url + "management/add/", m.ROLE_NOTIFIED)
- 
+
     def do_test_management_delete_post(self, url, role):
         self.brian.groups.add(self.group)
         self.controller.set_role(self.brian, role)
@@ -500,7 +500,7 @@ class ViewTest(CommonViewTest):
         self.brian.get_profile().save()
         self.controller.promote(checked=True)
         self.do_test_management_delete_post(self.base_url + "management/delete/", m.ROLE_READER)
-    
+
     def test_management_delete_signer0_post(self):
         self.do_test_management_delete_post(self.base_url + "management/delete/",
                 level_to_sign_str(0))
@@ -508,10 +508,10 @@ class ViewTest(CommonViewTest):
     def test_management_delete_signer1_post(self):
         self.do_test_management_delete_post(self.base_url + "management/delete/",
                 level_to_sign_str(1))
-   
+
     def test_management_delete_notified_post(self):
         self.do_test_management_delete_post(self.base_url + "management/delete/", m.ROLE_NOTIFIED)
-    
+
     def test_management_replace_signer_get(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
@@ -523,7 +523,7 @@ class ViewTest(CommonViewTest):
         attach = response.context["attach"]
         self.assertEqual(self.controller.id, attach[0].id)
         self.assertEqual("add_" + role, attach[1])
-    
+
     def test_management_replace_signer_post(self):
         role = level_to_sign_str(0)
         self.brian.groups.add(self.group)
@@ -544,7 +544,7 @@ class ViewTest(CommonViewTest):
         self.controller.object.save()
         self.user.get_profile().can_publish = True
         self.user.get_profile().save()
-        response = self.post(self.base_url + "lifecycle/apply/", 
+        response = self.post(self.base_url + "lifecycle/apply/",
                 {"publish" : "on", "password" : "password"})
         self.assertTrue(response.context["obj"].published)
         # check that the public link is displayed
@@ -552,12 +552,12 @@ class ViewTest(CommonViewTest):
         self.assertTrue(root.xpath('//input[@name="unpublish"]'))
         self.assertFalse(root.xpath('//input[@name="publish"]'))
         self.assertTrue(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
-    
+
     def test_publish_post_error_not_official(self):
         """ Tests a publication: error: object not official. """
         self.user.get_profile().can_publish = True
         self.user.get_profile().save()
-        response = self.client.post(self.base_url + "lifecycle/apply/", 
+        response = self.client.post(self.base_url + "lifecycle/apply/",
                 data={"publish" : "on", "password" : "password"})
         self.assertTemplateUsed(response, "error.html")
         response2 = self.get(self.base_url + "lifecycle/apply/")
@@ -567,7 +567,7 @@ class ViewTest(CommonViewTest):
         self.assertFalse(root.xpath('//input[@name="unpublish"]'))
         self.assertFalse(root.xpath('//input[@name="publish"]'))
         self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
-   
+
     def test_publish_post_error_published(self):
         """ Tests a publication: error: object is already published. """
         self.user.get_profile().can_publish = True
@@ -575,7 +575,7 @@ class ViewTest(CommonViewTest):
         self.controller.object.state = m.State.objects.get(name="official")
         self.controller.object.published = True
         self.controller.object.save()
-        response = self.client.post(self.base_url + "lifecycle/apply/", 
+        response = self.client.post(self.base_url + "lifecycle/apply/",
                 data={"publish" : "on", "password" : "password"})
         self.assertTemplateUsed(response, "error.html")
         response2 = self.get(self.base_url + "lifecycle/apply/")
@@ -585,7 +585,7 @@ class ViewTest(CommonViewTest):
         self.assertTrue(root.xpath('//input[@name="unpublish"]'))
         self.assertFalse(root.xpath('//input[@name="publish"]'))
         self.assertTrue(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
-    
+
     def test_unpublish_post(self):
         """ Tests an unpublication. """
         self.controller.object.published = True
@@ -593,7 +593,7 @@ class ViewTest(CommonViewTest):
         self.controller.object.save()
         self.user.get_profile().can_publish = True
         self.user.get_profile().save()
-        response = self.post(self.base_url + "lifecycle/apply/", 
+        response = self.post(self.base_url + "lifecycle/apply/",
                 {"unpublish" : "on", "password" : "password"})
         self.assertFalse(response.context["obj"].published)
         # check that the public link is not displayed
@@ -601,13 +601,13 @@ class ViewTest(CommonViewTest):
         self.assertFalse(root.xpath('//input[@name="unpublish"]'))
         self.assertTrue(root.xpath('//input[@name="publish"]'))
         self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
-    
+
     def test_unpublish_post_error_unpublished(self):
         """ Tests an unpublication: errror: object is unpublished. """
         self.controller.object.save()
         self.user.get_profile().can_publish = True
         self.user.get_profile().save()
-        response = self.client.post(self.base_url + "lifecycle/apply/", 
+        response = self.client.post(self.base_url + "lifecycle/apply/",
                 {"unpublish" : "on", "password" : "password"})
         self.assertTemplateUsed(response, "error.html")
         response2 = self.get(self.base_url + "lifecycle/apply/")
@@ -617,7 +617,7 @@ class ViewTest(CommonViewTest):
         self.assertFalse(root.xpath('//input[@name="unpublish"]'))
         self.assertFalse(root.xpath('//input[@name="publish"]'))
         self.assertFalse(root.xpath(u'//a[@href=$url]', url=self.base_url+"public/"))
-   
+
     def test_public_get(self):
         """ Tests anonymous access to a published object. """
         self.controller.object.published = True
@@ -652,7 +652,7 @@ class DocumentViewTestCase(ViewTest):
     def test_related_parts_get(self):
         part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
         self.controller.attach_to_part(part)
-        
+
         response = self.get(self.base_url + "parts/", page="parts")
         self.assertEqual([part.id],
                          [p.part.id for p in response.context["parts"]])
@@ -668,7 +668,7 @@ class DocumentViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : part1.get_attached_documents()[0].id,
                 'form-0-part' : part1.id,
                 'form-0-document' : self.controller.id,
@@ -681,11 +681,11 @@ class DocumentViewTestCase(ViewTest):
             }
         response = self.post(self.base_url + "parts/", data, page="parts")
         self.assertEqual(1, response.context["parts"].count())
-        self.assertEqual(list(part2.get_attached_documents()), 
+        self.assertEqual(list(part2.get_attached_documents()),
                          list(response.context["parts"]))
         forms_ = response.context["forms"]
         self.assertEqual([part2.id],
-                [f.instance.part.id for f in forms_.values()]) 
+                [f.instance.part.id for f in forms_.values()])
 
     def test_parts_update_post_empty_selection(self):
         part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
@@ -696,7 +696,7 @@ class DocumentViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : part1.get_attached_documents()[0].id,
                 'form-0-part' : part1.id,
                 'form-0-document' : self.controller.id,
@@ -710,8 +710,8 @@ class DocumentViewTestCase(ViewTest):
         response = self.post(self.base_url + "parts/", data, page="parts")
         self.assertEqual(2, response.context["parts"].count())
         forms_ = response.context["forms"]
-        self.assertEqual(set((part1.id, part2.id)), 
-                set(f.instance.part.id for f in forms_.values())) 
+        self.assertEqual(set((part1.id, part2.id)),
+                set(f.instance.part.id for f in forms_.values()))
 
     def test_doc_cad_update_post_all_selected(self):
         part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
@@ -722,7 +722,7 @@ class DocumentViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : part1.get_attached_documents()[0].id,
                 'form-0-part' : part1.id,
                 'form-0-document' : self.controller.id,
@@ -736,7 +736,7 @@ class DocumentViewTestCase(ViewTest):
         response = self.post(self.base_url + "parts/", data, page="parts")
         self.assertEqual(0, response.context["parts"].count())
         self.assertFalse(response.context["forms"])
-        
+
     def test_add_related_part_get(self):
         response = self.get(self.base_url + "parts/add/", link=True)
         self.assertTrue(isinstance(response.context["add_part_form"],
@@ -766,7 +766,7 @@ class DocumentViewTestCase(ViewTest):
         response = self.get(self.base_url + "files/", page="files")
         formset = response.context["file_formset"]
         self.assertEqual(1, formset.total_form_count())
-       
+
     def test_files_post(self):
         df1 = self.controller.add_file(self.get_file())
         df2 = self.controller.add_file(self.get_file())
@@ -779,7 +779,7 @@ class DocumentViewTestCase(ViewTest):
                 'form-1-id': df2.id,
                 'form-1-ORDER': '1',
                 'form-MAX_NUM_FORMS': '',
-                'form-TOTAL_FORMS': 2, 
+                'form-TOTAL_FORMS': 2,
                 'form-INITIAL_FORMS': 2,
                 }
         response = self.post(self.base_url + "files/", data)
@@ -844,7 +844,7 @@ class DocumentViewTestCase(ViewTest):
         attached parts, it is not necessary to confirm the form.
         """
         response = self.get(self.base_url + "revisions/")
-        # checks that is not necessary to confirm the revision 
+        # checks that is not necessary to confirm the revision
         self.assertFalse(response.context["confirmation"])
 
     def test_revise_no_attached_part_post(self):
@@ -866,7 +866,7 @@ class DocumentViewTestCase(ViewTest):
         part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
         self.controller.attach_to_part(part)
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["part_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -925,7 +925,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual([part.id], list(parts))
         # ensure part is not attached to the new revision
         self.assertFalse(rev.documentpartlink_document.now().exists())
-        # ensure only the old revision is attached to part 
+        # ensure only the old revision is attached to part
         self.assertEqual([self.controller.id],
             list(part.get_attached_documents().values_list("document", flat=True)))
 
@@ -941,7 +941,7 @@ class DocumentViewTestCase(ViewTest):
         p2.object.is_promotable = lambda: True
         p2.promote()
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["part_formset"]
         self.assertEqual(2, formset.total_form_count())
@@ -987,7 +987,7 @@ class DocumentViewTestCase(ViewTest):
 
     def test_revise_one_deprecated_part_attached_get(self):
         """
-        Tests a get request to revise a document which has one deprecated 
+        Tests a get request to revise a document which has one deprecated
         attached part.
         This part must not be suggested when the user revises the document.
         """
@@ -996,12 +996,12 @@ class DocumentViewTestCase(ViewTest):
         part.object.state = part.lifecycle.last_state
         part.object.save()
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertFalse(response.context["confirmation"])
 
     def test_revise_one_deprecated_part_attached_post(self):
         """
-        Tests a post request to revise a document which has one deprecated 
+        Tests a post request to revise a document which has one deprecated
         attached part.
         This part must not be suggested when the user revises the document.
         """
@@ -1025,7 +1025,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual([part.id], list(parts))
         # ensure part is not attached to the new revision
         self.assertFalse(rev.documentpartlink_document.now().exists())
-        # ensure only the old revision is attached to part 
+        # ensure only the old revision is attached to part
         self.assertEqual([self.controller.id],
             list(part.get_attached_documents().values_list("document", flat=True)))
 
@@ -1039,7 +1039,7 @@ class DocumentViewTestCase(ViewTest):
         self.controller.attach_to_part(part)
         p2 = part.revise("b")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["part_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -1076,7 +1076,7 @@ class DocumentViewTestCase(ViewTest):
     def test_revise_one_attached_revised_part_post_error(self):
         """
         Tests a post request to revise a document which has one attached part.
-        The part has been revised and has been selected instead of its revision. 
+        The part has been revised and has been selected instead of its revision.
         """
         part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
         self.controller.attach_to_part(part)
@@ -1313,7 +1313,7 @@ class PartViewTestCase(ViewTest):
     def test_parents_empty(self):
         response = self.get(self.base_url + "parents/", page="parents")
         self.assertEqual(0, len(list(response.context["parents"])))
-        
+
     def test_parents(self):
         p1 = PartController.create("c1", "Part", "a", self.user, self.DATA)
         p1.add_child(self.controller, 10, 20)
@@ -1325,7 +1325,7 @@ class PartViewTestCase(ViewTest):
     def test_doc_cad_empty(self):
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
         self.assertEqual(0, len(list(response.context["documents"])))
-    
+
     def test_doc_cad(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
                 self.DATA)
@@ -1338,7 +1338,7 @@ class PartViewTestCase(ViewTest):
         response = self.get(self.base_url + "doc-cad/", page="doc-cad")
         self.assertEqual(2, response.context["documents"].count())
         forms_ = response.context["forms"]
-        self.assertEqual([doc1.id], [f.instance.document.id for f in forms_.values()]) 
+        self.assertEqual([doc1.id], [f.instance.document.id for f in forms_.values()])
 
     def test_doc_add_add_get(self):
         response = self.get(self.base_url + "doc-cad/add/", link=True)
@@ -1348,7 +1348,7 @@ class PartViewTestCase(ViewTest):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
                 self.DATA)
         data = {"type" : doc1.type, "reference" : doc1.reference,
-                "revision" : doc1.revision } 
+                "revision" : doc1.revision }
         response = self.post(self.base_url + "doc-cad/add/", data)
         document = self.controller.get_attached_documents()[0].document
         self.assertEqual(doc1.object, document)
@@ -1364,7 +1364,7 @@ class PartViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : doc1.get_attached_parts()[0].id,
                 'form-0-part' : self.controller.id,
                 'form-0-document' : doc1.id,
@@ -1377,11 +1377,11 @@ class PartViewTestCase(ViewTest):
             }
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
         self.assertEqual(1, response.context["documents"].count())
-        self.assertEqual(list(doc2.get_attached_parts()), 
+        self.assertEqual(list(doc2.get_attached_parts()),
                          list(response.context["documents"]))
         forms_ = response.context["forms"]
-        self.assertEqual([doc2.id], [f.instance.document.id for f in forms_.values()]) 
-        
+        self.assertEqual([doc2.id], [f.instance.document.id for f in forms_.values()])
+
     def test_doc_cad_update_post_empty_selection(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
                 self.DATA)
@@ -1393,7 +1393,7 @@ class PartViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : doc1.get_attached_parts()[0].id,
                 'form-0-part' : self.controller.id,
                 'form-0-document' : doc1.id,
@@ -1407,8 +1407,8 @@ class PartViewTestCase(ViewTest):
         response = self.post(self.base_url + "doc-cad/", data, page="doc-cad")
         self.assertEqual(2, response.context["documents"].count())
         forms_ = response.context["forms"]
-        self.assertEqual(set((doc1.id, doc2.id)), 
-                set(f.instance.document.id for f in forms_.values())) 
+        self.assertEqual(set((doc1.id, doc2.id)),
+                set(f.instance.document.id for f in forms_.values()))
 
     def test_doc_cad_update_post_all_selected(self):
         doc1 = DocumentController.create("doc1", "Document", "a", self.user,
@@ -1421,7 +1421,7 @@ class PartViewTestCase(ViewTest):
                 'form-TOTAL_FORMS' : '2',
                 'form-INITIAL_FORMS' : '2',
                 'form-MAX_NUM_FORMS' : '',
-                
+
                 'form-0-id' : doc1.get_attached_parts()[0].id,
                 'form-0-part' : self.controller.id,
                 'form-0-document' : doc1.id,
@@ -1442,7 +1442,7 @@ class PartViewTestCase(ViewTest):
         attached documents, it is not necessary to confirm the form.
         """
         response = self.get(self.base_url + "revisions/")
-        # checks that is not necessary to confirm the revision 
+        # checks that is not necessary to confirm the revision
         self.assertFalse(response.context["confirmation"])
 
     def test_revise_no_attached_document_post(self):
@@ -1464,7 +1464,7 @@ class PartViewTestCase(ViewTest):
         document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
         self.controller.attach_to_document(document)
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["doc_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -1531,7 +1531,7 @@ class PartViewTestCase(ViewTest):
         self.assertEqual([document.id], list(documents))
         # ensure document is not attached to the new revision
         self.assertFalse(rev.documentpartlink_part.now().exists())
-        # ensure only the old revision is attached to document 
+        # ensure only the old revision is attached to document
         self.assertEqual([self.controller.id],
             list(document.get_attached_parts().values_list("part", flat=True)))
 
@@ -1547,7 +1547,7 @@ class PartViewTestCase(ViewTest):
         d2.object.is_promotable = lambda: True
         d2.promote()
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["doc_formset"]
         self.assertEqual(2, formset.total_form_count())
@@ -1598,7 +1598,7 @@ class PartViewTestCase(ViewTest):
 
     def test_revise_one_deprecated_document_attached_get(self):
         """
-        Tests a get request to revise a part which has one deprecated 
+        Tests a get request to revise a part which has one deprecated
         attached document.
         This document must not be suggested when the user revises the part.
         """
@@ -1607,12 +1607,12 @@ class PartViewTestCase(ViewTest):
         document.object.state = document.lifecycle.last_state
         document.object.save()
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertFalse(response.context["confirmation"])
 
     def test_revise_one_deprecated_document_attached_post(self):
         """
-        Tests a post request to revise a part which has one deprecated 
+        Tests a post request to revise a part which has one deprecated
         attached document.
         This document must not be suggested when the user revises the part.
         """
@@ -1640,7 +1640,7 @@ class PartViewTestCase(ViewTest):
         self.assertEqual([document.id], list(documents))
         # ensure document is not attached to the new revision
         self.assertFalse(rev.documentpartlink_part.now().exists())
-        # ensure only the old revision is attached to document 
+        # ensure only the old revision is attached to document
         self.assertEqual([self.controller.id],
             list(document.get_attached_parts().values_list("part", flat=True)))
 
@@ -1654,7 +1654,7 @@ class PartViewTestCase(ViewTest):
         self.controller.attach_to_document(document)
         d2 = document.revise("b")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["doc_formset"]
         self.assertEqual(2, formset.total_form_count())
@@ -1692,7 +1692,7 @@ class PartViewTestCase(ViewTest):
     def test_revise_one_attached_revised_document_post_error(self):
         """
         Tests a post request to revise a part which has one attached document.
-        The document has been revised and has been selected instead of its revision. 
+        The document has been revised and has been selected instead of its revision.
         """
         document = DocumentController.create("RefDocument", "Document", "a", self.user, self.DATA)
         self.controller.attach_to_document(document)
@@ -1724,7 +1724,7 @@ class PartViewTestCase(ViewTest):
         child = PartController.create("RefChild", "Part", "a", self.user, self.DATA)
         self.controller.add_child(child, 10, 25, "-")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["children_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -1805,7 +1805,7 @@ class PartViewTestCase(ViewTest):
         self.controller.add_child(child2, 10, 55, "-")
 
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["children_formset"]
 
@@ -1866,7 +1866,7 @@ class PartViewTestCase(ViewTest):
         parent = PartController.create("RefParent", "Part", "a", self.user, self.DATA)
         parent.add_child(self.controller, 10, 25, "-")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["parents_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -1874,7 +1874,7 @@ class PartViewTestCase(ViewTest):
         self.assertFalse(form.fields["selected"].initial)
         self.assertEqual(parent.id, form.initial["link"].parent_id)
         self.assertEqual(parent.id, form.initial["new_parent"].id)
-   
+
     def test_revise_one_parent_post_unselected(self):
         """
         Tests a post request to revise a part which has one parent.
@@ -1949,7 +1949,7 @@ class PartViewTestCase(ViewTest):
         parent.add_child(self.controller, 10, 25, "-")
         parent2 = parent.revise("the game")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["parents_formset"]
         self.assertEqual(1, formset.total_form_count())
@@ -1967,7 +1967,7 @@ class PartViewTestCase(ViewTest):
         parent2 = parent.revise("the game")
         parent.add_child(self.controller, 10, 25, "-")
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["parents_formset"]
         self.assertEqual(2, formset.total_form_count())
@@ -1989,7 +1989,7 @@ class PartViewTestCase(ViewTest):
         parent.add_child(self.controller, 10, 25, "-")
         link = parent.get_children(1)[0].link
         response = self.get(self.base_url + "revisions/")
-        # checks that it is necessary to confirm the revision 
+        # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
         formset = response.context["parents_formset"]
         self.assertEqual(2, formset.total_form_count())
@@ -2031,17 +2031,17 @@ class PartViewTestCase(ViewTest):
         self.assertEqual(link.unit, link2.unit)
         self.assertEqual(rev.id, link2.child_id)
 
-    
+
 class UserViewTestCase(CommonViewTest):
 
     def setUp(self):
         super(UserViewTestCase, self).setUp()
         self.user_url = "/user/%s/" % self.user.username
         self.controller = UserController(self.user, self.user)
-        
+
     def test_user_attribute(self):
         response = self.get(self.user_url + "attributes/", page="attributes")
-        attributes = dict((x.capitalize(), y) for (x,y) in 
+        attributes = dict((x.capitalize(), y) for (x,y) in
                           response.context["object_attributes"])
 
         old_lang = translation.get_language()
@@ -2060,10 +2060,10 @@ class UserViewTestCase(CommonViewTest):
     def test_part_doc_cads(self):
         response = self.get(self.user_url + "parts-doc-cad/")
         # TODO
-        
+
     def test_history(self):
         response = self.get(self.user_url + "history/")
-        
+
     def test_navigate(self):
         response = self.get(self.user_url + "navigate/")
 
@@ -2074,7 +2074,7 @@ class UserViewTestCase(CommonViewTest):
                 set(g.id for g in form.fields["groups"].queryset.all()))
 
     def test_sponsor_post(self):
-        data = dict(sponsor=self.user.id, 
+        data = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
                     language=self.user.get_profile().language)
@@ -2099,7 +2099,7 @@ class UserViewTestCase(CommonViewTest):
         self.assertEqual("Snow", user.last_name)
 
     def test_modify_sponsored_user(self):
-        data0 = dict(sponsor=self.user.id, 
+        data0 = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
                     language=self.user.get_profile().language)
@@ -2112,7 +2112,7 @@ class UserViewTestCase(CommonViewTest):
         self.assertEqual(user.email, data0["email"])
         self.assertEqual(user.first_name, data0["first_name"])
         self.assertEqual(user.last_name, data0["last_name"])
-        
+
         # self.user can edit these data
         self.client.login(username=self.user.username, password="password")
         response = self.client.post("/user/loser/modify/", data)
@@ -2155,20 +2155,20 @@ class UserViewTestCase(CommonViewTest):
 
     def test_delegation_get(self):
         response = self.get(self.user_url + "delegation/")
-        
+
     def test_delegation_remove(self):
         self.controller.delegate(self.brian, m.ROLE_OWNER)
         link = self.controller.get_user_delegation_links()[0]
         data = {"link_id" : link.id }
         response = self.post(self.user_url + "delegation/delete/", data)
         self.assertFalse(self.controller.get_user_delegation_links())
-       
+
     def test_delegate_get(self):
         for role in ("owner", "notified"):
             url = self.user_url + "delegation/delegate/%s/" % role
             response = self.get(url, link=True, page="delegation")
             self.assertEqual(role, unicode(response.context["role"]))
-    
+
     def test_delegate_sign_get(self):
         for level in ("all", "1", "2"):
             url = self.user_url + "delegation/delegate/sign/%s/" % str(level)
@@ -2244,6 +2244,33 @@ class UserViewTestCase(CommonViewTest):
         user = User.objects.get(username="dede")
         self.assertEqual(user.password, pwd)
 
+    def test_upload_file_get(self):
+        response = self.get(self.user_url + "files/add/")
+        self.assertTrue(isinstance(response.context["add_file_form"],
+                                   forms.AddFileForm))
+
+    def test_upload_file_post(self):
+        fname = u"toti\xe8o_t.txt"
+        name = u"toti\xe8o t"
+        f = self.get_file(name=fname, data="crumble")
+        data = { "filename" : f }
+        response = self.post(self.user_url + "files/add/", data)
+        df = list(self.controller.files.all())[0]
+        self.assertEquals(df.filename, f.name)
+        self.assertEquals("crumble", df.file.read())
+        url = "/object/create/?type=Document&pfiles=%d" % df.id
+        self.assertRedirects(response, url)
+        # post the form as previously returned by "files/add/"
+        cform = response.context["creation_form"]
+        self.assertEquals(name, cform.initial["name"])
+        form = lxml.html.fromstring(response.content).xpath("//form[@id='creation_form']")[0]
+        data = dict(form.fields)
+        r2 = self.post(url, data)
+        obj = r2.context["obj"]
+        self.assertEquals(name, obj.name)
+        self.assertEquals(list(obj.files.values_list("filename", flat=True)), [fname])
+        self.assertFalse(self.controller.files.all())
+
 
 class GroupViewTestCase(CommonViewTest):
 
@@ -2252,10 +2279,10 @@ class GroupViewTestCase(CommonViewTest):
         self.part_controller = self.controller
         self.group_url = "/group/%s/" % self.group.name
         self.controller = GroupController(self.group, self.user)
-        
+
     def test_group_attributes(self):
         response = self.get(self.group_url + "attributes/", page="attributes")
-        attributes = dict((x.capitalize(), y) for (x,y) in 
+        attributes = dict((x.capitalize(), y) for (x,y) in
                           response.context["object_attributes"])
         self.assertEqual(attributes["Description"], self.group.description)
         self.assertTrue(response.context["is_owner"])
@@ -2288,7 +2315,7 @@ class GroupViewTestCase(CommonViewTest):
             }
         response = self.post(self.group_url + "users/", data)
         self.assertEqual([], list(self.brian.groups.all()))
-    
+
     def test_users_post_nodeletetion(self):
         self.brian.groups.add(self.group)
         data = {
@@ -2323,10 +2350,10 @@ class GroupViewTestCase(CommonViewTest):
         response = self.get(self.group_url + "objects/", page="objects")
         objects = response.context["objects"]
         self.assertEqual([self.part_controller.plmobject_ptr], list(objects.object_list))
-        
+
     def test_history(self):
         response = self.get(self.group_url + "history/", page="history")
-        
+
     def test_navigate(self):
         response = self.get(self.group_url + "navigate/")
 
@@ -2357,7 +2384,7 @@ class GroupViewTestCase(CommonViewTest):
         # check a mail has been sent to brian
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual(mail.outbox[0].bcc, [self.brian.email])
-    
+
     def test_user_join_get(self):
         """
         Tests the page to ask to join the group, get version.
@@ -2400,7 +2427,7 @@ class GroupViewTestCase(CommonViewTest):
         # check that brian does not belong to the group
         self.assertFalse(self.brian.groups.count())
         self.assertFalse(mail.outbox)
-    
+
     def test_accept_invitation_from_guest_get(self):
         """
         Tests the page to accept an invitation, get version.
@@ -2455,7 +2482,7 @@ class GroupViewTestCase(CommonViewTest):
         if self.LANGUAGE == "en":
             self.assertEqual(1, len(mail.outbox))
         else:
-            # two languages -> two messages 
+            # two languages -> two messages
             self.assertEqual(2, len(mail.outbox))
         # a notification is sent to the owner and to the guest
         recipients = set()
@@ -2472,7 +2499,7 @@ class GroupViewTestCase(CommonViewTest):
         """
         GroupController(self.group, self.brian).ask_to_join()
         self._do_test_accept_invitation_post()
-    
+
     def test_accept_invitation_from_owner_get(self):
         """
         Tests the page to accept an invitation, get version.
@@ -2501,7 +2528,7 @@ class GroupViewTestCase(CommonViewTest):
         # check that brian does not belong to the group
         self.assertFalse(self.brian.groups.count())
         self.assertFalse(mail.outbox)
-    
+
     def test_refuse_invitation_from_guest_get(self):
         """
         Tests the page to refuse an invitation, get version.
@@ -2530,7 +2557,7 @@ class GroupViewTestCase(CommonViewTest):
         """
         GroupController(self.group, self.brian).ask_to_join()
         self._do_test_refuse_invitation_post()
-    
+
     def test_refuse_invitation_from_owner_get(self):
         """
         Tests the page to refuse an invitation, get version.
@@ -2620,7 +2647,7 @@ class GroupViewTestCase(CommonViewTest):
         # check that brian does not belong to the group
         self.assertFalse(self.brian.groups.count())
         self.assertFalse(mail.outbox)
-    
+
     def test_send_invitation_from_guest_get(self):
         """
         Tests the page to send an invitation, get version.
@@ -2655,7 +2682,7 @@ class GroupViewTestCase(CommonViewTest):
         GroupController(self.group, self.brian).ask_to_join()
         self.client.login(username="Brian", password="life")
         self._do_test_send_invitation_post(False)
-    
+
     def test_send_invitation_from_owner_get(self):
         """
         Tests the page to send an invitation, get version.
@@ -2670,7 +2697,7 @@ class GroupViewTestCase(CommonViewTest):
         self.controller.add_user(self.brian)
         self._do_test_send_invitation_post(True)
 
- 
+
 def sorted_objects(l):
     return sorted(l, key=lambda x: x.id)
 
@@ -2684,11 +2711,11 @@ class SearchViewTestCase(CommonViewTest):
         return query
 
     def search(self, request, type=None):
-        
+
         query = self.get_query(request)
         t = type or request["type"]
         response = self.get("/user/%s/attributes/" % self.user.username,
-                {"type" : t, "q" : query}) 
+                {"type" : t, "q" : query})
         results = list(response.context["results"])
         results.sort(key=lambda r:r.object.pk)
         return [r.object for r in results]
@@ -2697,7 +2724,7 @@ class SearchViewTestCase(CommonViewTest):
         response = self.get("/user/%s/attributes/" % self.user.username)
         # check that searchform is present
         af = response.context["search_form"]
-    
+
     def test_session_forms(self):
         "Tests if form field are kept between two search"
         data =  {"type" : "Part", "revision" : "c", "name" : "a name"}
@@ -2712,28 +2739,28 @@ class SearchViewTestCase(CommonViewTest):
         "Test a search with an empty database"
         # clear all plmobject so results is empty
         m.PLMObject.objects.all().delete()
-        results = self.search({"type" : self.TYPE}) 
+        results = self.search({"type" : self.TYPE})
         self.assertEqual(results, [])
 
     def test_one_result(self):
         "Test a search with one object in the database"
-        results = self.search({"type" : self.TYPE}) 
+        results = self.search({"type" : self.TYPE})
         self.assertEqual(results, [self.controller.object])
 
     def test_plmobject(self):
         # add a plmobject : the search should return the same results
-        m.PLMObject.objects.create(reference="aa", type="PLMObject", 
+        m.PLMObject.objects.create(reference="aa", type="PLMObject",
                                      revision="c", owner=self.user,
                                      creator=self.user, group=self.group)
-        results = self.search({"type" : self.TYPE}) 
+        results = self.search({"type" : self.TYPE})
         self.assertEqual(results, [self.controller.object])
-    
+
     def test_option_revision(self):
         # search with more options : revision
         results = self.search({"type" : self.TYPE,
-                               "revision" : self.controller.revision}) 
+                               "revision" : self.controller.revision})
         self.assertEqual(results, [self.controller.object])
-        results = self.search({"type" : self.TYPE, "revision" : "____"}) 
+        results = self.search({"type" : self.TYPE, "revision" : "____"})
         self.assertEqual(results, [])
 
     def test_option_name(self):
@@ -2741,9 +2768,9 @@ class SearchViewTestCase(CommonViewTest):
         self.controller.name = "blabla"
         self.controller.save()
         results = self.search({"type" : self.TYPE,
-                               "name" : self.controller.name}) 
+                               "name" : self.controller.name})
         self.assertEqual(results, [self.controller.object])
-        results = self.search({"type" : self.TYPE, "name" : "____"}) 
+        results = self.search({"type" : self.TYPE, "name" : "____"})
         self.assertEqual(results, [])
 
     def test_two_results(self):
@@ -2759,14 +2786,14 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("%s OR %s" % (self.controller.reference, c2.reference),
                 self.TYPE)
         self.assertEqual(sorted_objects([self.controller.object, c2.object]),
-                         sorted_objects(results)) 
+                         sorted_objects(results))
 
     def test_search_and(self):
         c2 = self.CONTROLLER.create("value2", self.TYPE, "c", self.user, self.DATA)
         c3 = self.CONTROLLER.create("value3", self.TYPE, "c", self.user, self.DATA)
         results = self.search("%s AND %s" % (self.controller.reference, c2.reference),
                 self.TYPE)
-        self.assertEqual([], results) 
+        self.assertEqual([], results)
         results = self.search("value2 AND revision:c", self.TYPE)
         self.assertEqual([c2.object], results)
 
@@ -2781,32 +2808,32 @@ class SearchViewTestCase(CommonViewTest):
         for i in xrange(6):
             self.CONTROLLER.create("val-0%d" % i, self.TYPE, "c",
                     self.user, self.DATA)
-        
+
         self.CONTROLLER.create("val-0i-5", self.TYPE, "c", self.user, self.DATA)
         c = self.CONTROLLER.create("0i-5", self.TYPE, "c", self.user, self.DATA)
         results = self.search("val-0*", self.TYPE)
         self.assertEqual(7, len(results))
-        self.assertTrue(c.object not in results) 
+        self.assertTrue(c.object not in results)
 
     def test_search_numbers(self):
         """ Tests that 1759 matches 001759. (see ticket #69). """
 
         c2 = self.CONTROLLER.create("part-001759", self.TYPE, "c", self.user, self.DATA)
         results = self.search("1759", self.TYPE)
-        self.assertEqual([c2.object], results) 
+        self.assertEqual([c2.object], results)
         c3 = self.CONTROLLER.create("part-0001759", self.TYPE, "c", self.user, self.DATA)
         results = self.search("1759", self.TYPE)
-        self.assertEqual([c2.object, c3.object], results) 
+        self.assertEqual([c2.object, c3.object], results)
 
     def test_search_numbers_separated_by_underscores(self):
         """ Tests that 1759 matches 001759. (see ticket #69)."""
 
         c2 = self.CONTROLLER.create("part_001759", self.TYPE, "c", self.user, self.DATA)
         results = self.search("1759", self.TYPE)
-        self.assertEqual([c2.object], results) 
+        self.assertEqual([c2.object], results)
         c3 = self.CONTROLLER.create("part_0001759", self.TYPE, "c", self.user, self.DATA)
         results = self.search("1759", self.TYPE)
-        self.assertEqual([c2.object, c3.object], results) 
+        self.assertEqual([c2.object, c3.object], results)
 
     def test_search_all(self):
         for i in xrange(6):
@@ -2873,7 +2900,7 @@ class MechantUserViewTest(TestCase):
     TYPE = "Part"
     CONTROLLER = PartController
     DATA = {}
-    
+
     def setUp(self):
         owner = User(username="owner")
         owner.set_password("password")
@@ -2895,7 +2922,7 @@ class MechantUserViewTest(TestCase):
         self.base_url = "/object/%s/%s/%s/" % (self.controller.type,
                                               self.controller.reference,
                                               self.controller.revision)
-    
+
     def test_edit_attributes(self):
         data = self.DATA.copy()
         data.update(type=self.TYPE, name="new_name")
