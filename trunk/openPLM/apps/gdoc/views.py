@@ -21,7 +21,7 @@ STEP2_URI = '%s/oauth2callback'
 
 def oauth2_required(func):
     """
-    Decorator that ensures that a view is called with a valid 
+    Decorator that ensures that a view is called with a valid
     google client.
 
     The function *func* must have the following definition::
@@ -72,7 +72,7 @@ def create_gdoc(request, client):
     """
     Creation view of a :class:`.GoogleDocument`.
     """
-    
+
     if request.method == 'GET':
         creation_form = get_gdoc_creation_form(request.user, client)
     elif request.method == 'POST':
@@ -85,29 +85,32 @@ register_creation_view(GoogleDocument, create_gdoc)
 @handle_errors
 def display_files(request, client, obj_type, obj_ref, obj_revi):
     """
-    Files page of a GoogleDocument. 
+    Files page of a GoogleDocument.
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     if not hasattr(obj, "files"):
         raise TypeError()
     try:
         entry = client.get_resource_by_id(obj.resource_id)
         edit_uri = ""
-        for link in entry.link:
-            if link.rel == 'alternate':
-                edit_uri = link.href
-                break
-        uri = client._get_download_uri(entry.content.src)
-        ctx.update({
-            'resource' : obj.resource_id.split(":", 1)[-1],
-            'download_uri' : uri,
-            'edit_uri' : edit_uri,
-            'error' : False,
-            })
+        if entry is not None:
+            for link in entry.link:
+                if link.rel == 'alternate':
+                    edit_uri = link.href
+                    break
+            uri = client._get_download_uri(entry.content.src)
+            ctx.update({
+                'resource' : obj.resource_id.split(":", 1)[-1],
+                'download_uri' : uri,
+                'edit_uri' : edit_uri,
+                'error' : False,
+                })
+        else:
+            ctx["error"] = True
     except gdata.client.RequestError:
         ctx['error'] = True
-    
+
     ctx['current_page'] = 'files'
     return pviews.r2r('gdoc_files.html', ctx, request)
 
