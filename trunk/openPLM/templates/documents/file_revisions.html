@@ -24,7 +24,7 @@
                     {% if is_owner and obj.is_editable %}
 
                         {% if last_revision.locked %}
-                            <a class="tb-btn" href="./checkin/{{last_revision.id|urlencode }}/">
+                            <a class="tb-btn" href="{{obj.plmobject_url}}files/checkin/{{last_revision.id|urlencode }}/">
                                 <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
                             </a>
                         {% else %}
@@ -33,7 +33,7 @@
 
                                 <a class="tb-btn
                                     {% if last_revision.native_related %}check-out {% endif %}"
-                                    href="./checkout/{{last_revision.id|urlencode }}/">
+                                    href="{{obj.plmobject_url}}files/checkout/{{last_revision.id|urlencode }}/">
                                     <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
                                 </a>                                    
 
