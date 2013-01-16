@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -84,10 +84,10 @@ class CT(object):
         self.pk = pk
 
     def __getstate__(self):
-        return dict(app_label=self.app_label, 
+        return dict(app_label=self.app_label,
                     module_name=self.module_name,
                     pk=self.pk)
-    
+
     def __setstate__(self, state):
         self.app_label = state["app_label"]
         self.module_name = state["module_name"]
@@ -142,18 +142,18 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
     :param str last_action: type of modification
     :param str histories: list of :class:`.AbstractHistory`
     :param user: user who made the modification
-    :type user: :class:`~django.contrib.auth.models.User` 
+    :type user: :class:`~django.contrib.auth.models.User`
     :param blacklist: list of emails whose no mail should be sent (empty by default).
 
     """
     plmobject = unserialize(plmobject)
-    recipients = get_recipients(plmobject, roles, users) 
+    recipients = get_recipients(plmobject, roles, users)
     if recipients:
         user = unserialize(user)
         subject = "[PLM] " + unicode(plmobject)
         ctx = {
                 "last_action" : last_action,
-                "histories" : histories, 
+                "histories" : histories,
                 "plmobject" : plmobject,
                 "user" : user,
             }
@@ -177,8 +177,8 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
                 if email not in blacklist:
                     lang_to_email[lang].add(email)
             if not lang_to_email:
-                return    
-            
+                return
+
         ctx = unserialize(ctx)
         ctx["site"] = Site.objects.get_current()
         for lang, emails in lang_to_email.iteritems():
@@ -186,18 +186,18 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
             html_content = render_to_string(template + ".html", ctx)
             message = _(render_to_string(template + ".txt", ctx))
             subj_translation = _(subject)
-            msg = EmailMultiAlternatives(subj_translation, message, settings.EMAIL_OPENPLM,
-                bcc=emails)
+            msg = EmailMultiAlternatives(subj_translation, message.strip(),
+                settings.EMAIL_OPENPLM, bcc=emails)
             msg.attach_alternative(html_content, "text/html")
             msg.send(fail_silently=getattr(settings, "EMAIL_FAIL_SILENTLY", True))
-        
+
         if lang_to_email:
             translation.deactivate()
 
 def send_mail(subject, recipients, ctx, template, blacklist=()):
     ctx = serialize(ctx)
     do_send_mail.delay(subject, convert_users(recipients),
-            ctx, template, blacklist) 
+            ctx, template, blacklist)
 
 def send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
               users=(), template="mails/history"):
