@@ -25,24 +25,12 @@
 ################################################################################
 
 """
-Introduction
-=============
+This module contains all "html" views, i.e. views that renders an HTML page
+from a standard (not ajax) HTTP request.
+Ajax views are in :mod:`.ajax` and API views are in :mod:`.api`
 
-This module contains all views to display html pages.
-
-All URLs are linked with django's standard views or with plmapp view functions hereafter.
-Each of them receives an httprequest object.
-Then treat data with the help of different controllers and different models.
-Then adress a html template with a context dictionary via an httpresponse.
-
-We have a view for each :class:`PLMObject` or :class:`UserProfile` :func:`menu_items`.
-We have some views which allow link creation between 2 instances of :class:`PLMObject` or between
-an instance of :class:`PLMObject` and an instance of :class:`UserProfile`.
-We have some views for link deletion.
-We have some views for link edition.
-We have views for :class:`PLMObject` creation and edition.
-Finaly we have :func:`navigate` which draw a picture with a central object and its related objects.
-
+Most of the views are decorated with :func:`.handle_errors` and
+render HTML with the django template engine.
 """
 
 import os
