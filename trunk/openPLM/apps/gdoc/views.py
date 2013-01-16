@@ -12,7 +12,7 @@ import openPLM.plmapp.views.main as pviews
 from openPLM.plmapp.base_views import handle_errors, get_generic_data, register_creation_view
 
 from openPLM.apps.gdoc.models import CredentialsModel, FlowModel
-from openPLM.apps.gdoc.models import GoogleDocument, GoogleDocumentController
+from openPLM.apps.gdoc.models import GoogleDocument
 from openPLM.apps.gdoc.forms import get_gdoc_creation_form
 from openPLM.apps.gdoc.gutils import get_gclient, SCOPES, USER_AGENT
 
