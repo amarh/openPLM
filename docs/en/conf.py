@@ -65,7 +65,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'openPLM'
-copyright = u'2010-2012, LinObject'
+copyright = u'2010-2013, LinObject'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
