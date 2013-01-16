@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 13:42+0200\n"
+"POT-Creation-Date: 2013-01-16 09:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -18,34 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: templates/attributes.xhtml:19
-msgid "User"
-msgstr "Utilisateur"
-
-#: templates/attributes.xhtml:21
-msgid "Group"
-msgstr "Groupe"
-
 #: templates/base.xhtml:71
 msgid "Genererated by openPLM"
 msgstr "Généré par openPLM"
-
-#: templates/bom.xhtml:27
-#, fuzzy
-msgid "Level"
-msgstr "Niveau"
-
-#: templates/bom.xhtml:28
-msgid "Ord."
-msgstr "Ord."
-
-#: templates/bom.xhtml:29
-msgid "Qty"
-msgstr "Qté"
-
-#: templates/bom.xhtml:30
-msgid "Unit"
-msgstr "Unité"
 
 #: templates/select_pdf.html:8
 msgid ""
@@ -69,7 +44,6 @@ msgid "There are no PDF files."
 msgstr "Il n'y a aucun fichier PDF."
 
 #: templates/select_pdf_part.html:19
-#, fuzzy
 msgid "Level:"
 msgstr "Niveau:"
 
@@ -88,3 +62,22 @@ msgstr "Utilisateur qui a validé/refusé l'objet"
 #: templates/summary.xhtml:36
 msgid "Date"
 msgstr "Date"
+
+#~ msgid "User"
+#~ msgstr "Utilisateur"
+
+#~ msgid "Group"
+#~ msgstr "Groupe"
+
+#, fuzzy
+#~ msgid "Level"
+#~ msgstr "Niveau"
+
+#~ msgid "Ord."
+#~ msgstr "Ord."
+
+#~ msgid "Qty"
+#~ msgstr "Qté"
+
+#~ msgid "Unit"
+#~ msgstr "Unité"
