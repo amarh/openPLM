@@ -55,7 +55,7 @@
                         </li>
                         {% if type == "part" or type == "topassembly" %}
                             <li {% if sort == "children"%}class="selected"{% endif %} >
-                            <a href="{% add_get sort='children' %}"><span>{% trans "Number of children" %}</span></a>
+                            <a href="{% add_get sort='children' %}"><span>{% trans "Largest assemblies" %}</span></a>
                             </li>
                         {% endif %}
                         {% if type == "part" %}
@@ -97,7 +97,7 @@
                                 {% trans "Sorted by name" %}.
                             {% else %}
                                 {% if type in "part topassembly" and sort == "children" %}
-                                    {% trans "Number of children" %}.
+                                    {% trans "Largest assemblies" %}.
                                 {% else %}
                                     {% if type == "part" and sort == "most-used" %}
                                         {% trans "Most used" %}.
