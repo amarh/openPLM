@@ -73,10 +73,10 @@ class UserIndex(ModelSearchIndex):
         fields = ("username", "last_name", "first_name", "email")
 
     ctime = DateTimeField(model_attr="date_joined")
-    
+
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
-    
+
     def prepare_ctime(self, obj):
         return prepare_date(obj.date_joined)
 
@@ -132,7 +132,7 @@ for key, model in models.get_all_plmobjects().iteritems():
 
         rendered = CharField(use_template=True, indexed=False)
         rendered_add = CharField(use_template=True, indexed=False)
-       
+
         def prepare_ctime(self, obj):
             return prepare_date(obj.ctime)
 
@@ -153,7 +153,10 @@ for key, model in models.get_all_plmobjects().iteritems():
             return "state-" + cls
 
         def index_queryset(self):
-            return self.model.objects.filter(type=self.key)
+            if "type" in self.model._meta.get_all_field_names():
+                return self.model.objects.filter(type=self.key)
+            else:
+                return self.model.objects.all()
 
     set_template_name(ModelIndex)
     site.register(model, ModelIndex)
@@ -169,13 +172,13 @@ class DocumentFileIndex(QueuedModelSearchIndex):
     file = CharField(model_attr='file', stored=False)
     group = CharField(model_attr="document__group__name")
     document_id = IntegerField(model_attr="document__id", indexed=False)
-    
+
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
 
     def prepare_file(self, obj):
         # if it is a text file, we can dump it
-        # it's faster than launching a new process 
+        # it's faster than launching a new process
         path = obj.file.path
         name, ext = os.path.splitext(path)
         size = 1024*1024 # 1Mo
@@ -188,13 +191,13 @@ class DocumentFileIndex(QueuedModelSearchIndex):
 
     def index_queryset(self):
         return models.DocumentFile.objects.filter(deprecated=False)
-    
+
     def should_update(self, instance, **kwargs):
         if instance.deprecated:
             # this method is called by a task, so we should not acquire a lock
             # or delay this deletion
             self.remove_object(instance)
         return not instance.deprecated
-    
+
 site.register(models.DocumentFile, DocumentFileIndex)
 
