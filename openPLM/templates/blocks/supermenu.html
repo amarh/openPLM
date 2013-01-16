@@ -54,23 +54,8 @@
     
     {# Create, Study #}
     <div class="menurow">
-        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-right:3em"> 
-            {% if user.get_profile.is_contributor %}
-                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
-                    {% trans "Create" %}
-                    <span class="triangle">&nbsp;</span>
-                    <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
-                </a>
-            {% else %}
-                <div class="tooltip">
-                    {% trans "Create" %}
-                    <span class="triangle">&nbsp;</span>
-                    <span class="info">{% trans "You can not create a part or document since you are not a contributor." %}</span>
-                </div>
-            {% endif %}
 
-        </div>
-                <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-right:3em; margin-left:3em"> 
+        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-right:2em;i"> 
             {% if user.get_profile.is_contributor %}
                 <a class="tooltip" href="/user/{{user|urlencode}}/files/">
                     {% trans "Upload" %}
@@ -86,13 +71,20 @@
             {% endif %}
 
         </div>
-        
-        <div class="menuitem" style="margin-left:3em"> 
-            <a class="tooltip" href="/user/{{user|urlencode }}/parts-doc-cad/">
-                {% trans "Study" %}
-                <span class="triangle">&nbsp;</span>
-                <span class="info">{% trans "See/edit your personal data and explore your parts and document." %}</span>
-            </a>
+        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-left:2em"> 
+            {% if user.get_profile.is_contributor %}
+                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
+                </a>
+            {% else %}
+                <div class="tooltip">
+                    {% trans "Create" %}
+                    <span class="triangle">&nbsp;</span>
+                    <span class="info">{% trans "You can not create a part or document since you are not a contributor." %}</span>
+                </div>
+            {% endif %}
 
         </div>
     </div>
