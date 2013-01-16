@@ -1111,8 +1111,8 @@ msgid "Sorted by name"
 msgstr "Triés selon le nom"
 
 #: templates/browse.html:58 templates/browse.html.py:100
-msgid "Number of children"
-msgstr "Nombre d'enfants"
+msgid "Largest assemblies"
+msgstr "Plus grands assemblages"
 
 #: templates/browse.html:63 templates/browse.html.py:103
 msgid "Most used"
