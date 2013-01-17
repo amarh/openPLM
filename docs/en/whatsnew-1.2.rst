@@ -15,7 +15,10 @@ Navigate
 New style
 ++++++++++
 
-Screenshots:
+Nodes have been redesigned. You can now see more information about
+a part or a document. It should also be easier to determinate if
+a node represents a part or a document.
+
 
 .. list-table::
 
@@ -39,9 +42,10 @@ Two links to the previous and next revisions are now displayed:
 Switch to study mode
 +++++++++++++++++++++
 
-Now, you can inspect directly one of the elements displayed in navigate:
+Now, you can directly inspect one of the elements displayed in navigate:
 
 .. figure:: /whatsnew/1.2/navigate_4.png
+
 
 Small User Experience improvements
 +++++++++++++++++++++++++++++++++++
@@ -49,6 +53,8 @@ Small User Experience improvements
     * Zoom factor stays when switching from one object to another.
 
     * You can drag graph by clicking wherever you want in the graph.
+
+    * You can navigate at a previous date
 
 
 Upload and create
@@ -87,7 +93,8 @@ BOM
 Comparison
 ++++++++++++
 
-You can compare the same BOM at two different dates.
+You can compare a BOM at two different dates.
+
 
 Attached documents
 +++++++++++++++++++
@@ -114,11 +121,18 @@ You can access to all uploaded versions of one file:
 
 .. figure:: /whatsnew/1.2/files_1.png
 
+Change management
+------------------
+
+If your administrator enables them, you will be able to create
+ECR (Engineering Change Requests) to request a change bound to 
+several parts and documents.
+
 Badges
 ------
 
-Change management
-------------------
+If your administrator enables them, you will win badges by using OpenPLM ☺.
+
 
 Miscellaneous enhancements
 ----------------------------
