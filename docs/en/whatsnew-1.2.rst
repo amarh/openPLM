@@ -1,13 +1,13 @@
 .. _whatsnew-1.2:
 
-.. Images come later, once we are sure we would not have to update them ;)
+.. Images come later, once you are sure you would not have to update them ;)
 
 =========================
 What's new in OpenPLM 1.2
 =========================
 
-User changes
-===============
+What's new for users
+=====================
 
 Navigate
 --------
@@ -39,7 +39,7 @@ Two links to the previous and next revisions are now displayed:
 Switch to study mode
 +++++++++++++++++++++
 
-Now, we can inspect directly one of the elements displayed in navigate:
+Now, you can inspect directly one of the elements displayed in navigate:
 
 .. figure:: /whatsnew/1.2/navigate_4.png
 
@@ -48,7 +48,7 @@ Small User Experience improvements
 
     * Zoom factor stays when switching from one object to another.
 
-    * We can drag graph by clicking wherever we want in the graph.
+    * You can drag graph by clicking wherever you want in the graph.
 
 
 Upload and create
@@ -87,12 +87,12 @@ BOM
 Comparison
 ++++++++++++
 
-We can compare the same BOM at two different dates.
+You can compare the same BOM at two different dates.
 
 Attached documents
 +++++++++++++++++++
 
-We can visualize a complete multi-level BOM including its attached documents:
+You can visualize a complete multi-level BOM including all attached documents:
 
 .. figure:: /whatsnew/1.2/bom_1.png
 
@@ -110,7 +110,7 @@ of one of its alternate) when BOM are built.
 Files
 -------
 
-We can access to all uploaded versions of one file:
+You can access to all uploaded versions of one file:
 
 .. figure:: /whatsnew/1.2/files_1.png
 
@@ -130,11 +130,10 @@ Miscellaneous enhancements
 
     * For each part and document, similar contents are displayed on
       the attributes page
-    
   
 
-Administrator changes
-=======================
+What's new for administrators
+===============================
 
 Documentation
 -------------
