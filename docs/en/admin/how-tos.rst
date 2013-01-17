@@ -5,7 +5,7 @@ How to install OpenPLM
 ================================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :glob:
 
     ht_*
