@@ -16,7 +16,10 @@ Backups
 Database
 --------
  
-http://www.postgresql.org/docs/9.2/static/backup.html
+See your database documentation:
+
+ * PostgreSQL: http://www.postgresql.org/docs/9.2/static/backup.html
+ 
 
 Code
 ----
@@ -24,6 +27,8 @@ Code
 Backups are mostly useless if you do not have the code that was running.
 
 Copy the content of :samp:`{/path/to/openPLM/}` (directory containing the :file:`settings.py` file).
+You should also copy your apache configuration and your celery files
+(``/etc/init.d/celetyd`` and ``/etc/default/celeryd``).
 
 Files
 -----
@@ -45,6 +50,14 @@ Search indexes
 You can also copy ``/var/openPLM/xapian_index``, it is easy to rebuild the index
 but it can take a few minutes.
 
+Restoring a backup
+-------------------
+
+ * Stop apache and celery
+ * Restore all files
+ * Restore the database
+ * Restore the code
+ * Restore search indexes or rebuild them
 
 Updating the code
 ==================
@@ -52,9 +65,11 @@ Updating the code
 Development version (svn)
 ---------------------------
 
-svn up
-
-/!\ settings.py, your own modifications
+    #. Backup your files, code, **settings.py**, thumbnails...
+    #. Check your own modification: ``svn up`` and ``svn diff``
+    #. Run ``svn up``
+    #. Restore your own settings (svn should have gracefully updated the
+       settings.py file)
 
 
 Stable version (tarball)
@@ -98,14 +113,15 @@ You can easily determinate new settings:
 Migrating the database
 =========================
 
-
-``./manage.py migrate``
+One simple command:
+    
+    * ``./manage.py migrate``
 
 
 Translations
 ==================
 
-Not required if tarball
+Not required if you update using the tarball:
 
     #. ``make``
     #. ``./bin/translate_all.sh compile all``
@@ -114,7 +130,9 @@ Not required if tarball
 Search indexes
 =================
 
-Not really required but it improves performance.
+Not really required but some functionalities may run faster.
+For example, OpenPLM 1.2 indexes more attributes which avoid
+some database hits when testing if an object is readable by the user.
 
     #. ``./manage.py rebuild_index``
     #. ``chown www-data:www-data -R /var/openPLM``
