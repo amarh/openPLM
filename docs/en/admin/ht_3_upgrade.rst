@@ -81,9 +81,9 @@ Here, openPLM is installed in ``/var/django``.
     #. Extract the tarball in a temporary directory.
        For example: ``tar xzf openplm-XYZ.tgz -C . /tmp``
     #. Copy the files:
-       ``cp -rp /tmp/openPLM /var/django``, ``/var/django`` is the directory containing the ``openPLM``
-       directory
-    #. Restore the settings.py file:
+       ``cp -rp /tmp/openplm/openPLM /var/django``,
+       ``/var/django`` is the directory containing your ``openPLM`` directory
+    #. Restore your :file:`settings.py` file:
        
         * ``cp /var/django/openPLM/settings.py /var/django/openPLM/settings.py.orig``
         * ``cp backups/settings.py /var/django/openPLM``
@@ -131,15 +131,33 @@ Search indexes
 =================
 
 Not really required but some functionalities may run faster.
-For example, OpenPLM 1.2 indexes more attributes which avoid
-some database hits when testing if an object is readable by the user.
 
     #. ``./manage.py rebuild_index``
     #. ``chown www-data:www-data -R /var/openPLM``
 
+
+Determining if you should rebuild the index
+-----------------------------------------------
+
+Rebuilding search indexes can take several minutes depending
+on the number of indexed parts, documents and files.
+You can try to rebuild indexes and if it takes too much time
+you can safely restore your backed up indexes.
+
+Version 1.2:
+
+    * group attribute is indexed and it is now possible to query
+      documents by their group (``group=a_group_name``).
+      Previously, a query like ``a_group_name`` matched the
+      right documents but ``group=a_group_name`` would returned an
+      empty result set.
+
+    * OpenPLM 1.2 tests if a search result is readable by the
+      current user. If search indexes are not rebuilt, each search
+      will hit the database and take a little more time.
+
 File permissions
 ================
-
 
     * ``chown www-data:www-data -R /var/openPLM``
     * ``chown www-data:www-data -R /var/django/openPLM/trunk/openPLM/media/thumbnails``
@@ -151,6 +169,19 @@ Enabling new applications
 
 A new version of OpenPLM often comes with new optional applications.
 You can enable them according to your needs.
+
+Other actions
+==============
+
+..
+    Put stuff specific to a version here
+
+OpenPLM 1.2
+-----------
+
+You can load more optional lifecycles:
+
+    * ``./manage.py loaddata extra_lifecycles``
 
 
 Starting the server
