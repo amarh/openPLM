@@ -46,9 +46,9 @@ Now, we can inspect directly one of the elements displayed in navigate:
 Small User Experience improvements
 +++++++++++++++++++++++++++++++++++
 
-    * Zoom factor stays when we switch from one object to another.
+    * Zoom factor stays when switching from one object to another.
 
-    * We can drag graph clicking wherever we want in the graph.
+    * We can drag graph by clicking wherever we want in the graph.
 
 
 Upload and create
@@ -74,7 +74,10 @@ in a few clicks.
 Lifecycle
 ---------
 
-We can add or remove signers in lifecycles:
+It is now possible to asked several signers to promote or demote
+a part or document.
+The owner can be one of the first signers and he can easily warn other
+users when he think its work is ready.
 
 .. figure:: /whatsnew/1.2/lifecycle_1.png
 
@@ -92,6 +95,17 @@ Attached documents
 We can visualize a complete multi-level BOM including its attached documents:
 
 .. figure:: /whatsnew/1.2/bom_1.png
+
+
+Alternate links
++++++++++++++++++
+
+It is possible to create a set of alternate parts.
+Each usage of a part can be replaced by one of its alternate.
+It is possible to include alternate parts in all BOM.
+
+OpenPLM prevents incoherent situations (like a part parent
+of one of its alternate) when BOM are built.
 
 Files
 -------
@@ -156,10 +170,6 @@ Optional lifecycles
 
 New lifecycles are available, you can load them by running the command
 ``./manage.py loaddata extra_lifecycles``
-
-
-Developer changes
-==================
 
 
 Previous versions
