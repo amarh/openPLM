@@ -110,6 +110,11 @@ Change management
 Administrator changes
 =======================
 
+Documentation
+-------------
+
+    * A new how-to, :ref:`admin-upgrade`, is available. 
+
 New settings
 ------------
 
