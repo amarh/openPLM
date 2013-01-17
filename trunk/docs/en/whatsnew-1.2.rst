@@ -120,6 +120,18 @@ Badges
 Change management
 ------------------
 
+Miscellaneous enhancements
+----------------------------
+
+    * When creating a part or a document, the group is set to the
+      last selected group
+
+    * It is possible to choose the group of a new revision
+
+    * For each part and document, similar contents are displayed on
+      the attributes page
+    
+  
 
 Administrator changes
 =======================
