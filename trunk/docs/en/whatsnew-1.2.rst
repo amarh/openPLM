@@ -116,6 +116,13 @@ New settings
     * :const:`~settings.EMAIL_FAIL_SILENTLY`
     * :const:`~settings.KEEP_ALL_FILES`
 
+Minor file revisions
+--------------------
+
+A notable change of this version is the ability of openPLM to keep
+old minor revision of all files (all check-ins).
+You can configure which files are kept, see :mod:`plmapp.files.deletable`.
+
 
 New application: badges
 -----------------------
