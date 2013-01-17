@@ -1,6 +1,14 @@
+.. _admin-upgrade:
+
 =============================================
 How to upgrade an installation of OpenPLM
 =============================================
+
+
+.. warning::
+
+    Before upgrading your installation, read the whole document and
+    be sure to have reliable backups.
 
 Stopping the server
 ===================
