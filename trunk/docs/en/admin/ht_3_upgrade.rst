@@ -60,22 +60,39 @@ svn up
 Stable version (tarball)
 --------------------------
 
-    #. Backup your files, code, settings.py, thumbnails...
-    #. Extract the tarball in a temporary directory, for example `/tmp/newopenplm`.
+Here, openPLM is installed in ``/var/django``.
+
+    #. Backup your files, code, **settings.py**, thumbnails...
+    #. Extract the tarball in a temporary directory.
+       For example: ``tar xzf openplm-XYZ.tgz -C . /tmp``
     #. Copy the files:
+       ``cp -rp /tmp/openPLM /var/django``, ``/var/django`` is the directory containing the ``openPLM``
+       directory
+    #. Restore the settings.py file:
+       
+        * ``cp /var/django/openPLM/settings.py /var/django/openPLM/settings.py.orig``
+        * ``cp backups/settings.py /var/django/openPLM``
 
-..
-        test it and then, uncomment it
-        #. ``cp -r /tmp/newopenplm/openPLM /path/to/openPLM``
-        #. restore the settings.py file: ``cp backups/settings.py /path/to/openPLM``
-        #. thumbnails ??
-        #. python path: ``sed -in 's#\(/var/django/\)openPLM/trunk/#\1#' settings.py apache/*.wsgi etc/default/celeryd``
-      
-    #. Check apache configuration files
-
+    #. Fix the python path in apache ``*.wsgi`` files:
+       ``sed -in 's#\(/var/django/\)openPLM/trunk/#\1#' apache/*.wsgi``
 
 New settings
 =============
+
+It is possible that a new version comes with new settings. 
+Generally, new settings are optional and their default values
+do not changes the behavior of a previous installation.
+New settings may better fit your needs.
+You can easily determinate new settings:
+
+ * development version:
+
+    ``diff /path/to/backup/settings.py /path/to/settings.py``
+    (svn should have merged your settings and the original settings)
+
+ * tarball:
+
+     ``diff -u /var/django/openPLM/settings.py /var/django/openPLM/settings.py.orig``
 
 
 Migrating the database
@@ -96,7 +113,6 @@ Not required if tarball
 
 Search indexes
 =================
-
 
 Not really required but it improves performance.
 
