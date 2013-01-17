@@ -284,6 +284,8 @@ def get_fields_from_form(form):
     """
     fields = []
     for field_name, field in form.fields.items():
+        if field_name == "pfiles":
+            continue
         initial = form.initial.get(field_name, field.initial)
         if callable(initial):
             initial = initial()
