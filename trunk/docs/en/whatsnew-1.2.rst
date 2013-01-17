@@ -110,6 +110,13 @@ Change management
 Administrator changes
 =======================
 
+New settings
+------------
+
+    * :const:`~settings.EMAIL_FAIL_SILENTLY`
+    * :const:`~settings.KEEP_ALL_FILES`
+
+
 New application: badges
 -----------------------
 
