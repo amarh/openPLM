@@ -251,6 +251,7 @@ div#DisplayBox {
     padding: 0.2em 0em;
     text-align: center;
     background-color: #c8c7c5;
+    text-transform: uppercase;
 }
 
 div#DisplayBox .tb-btn-toolbar {
