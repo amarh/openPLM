@@ -2270,6 +2270,7 @@ class UserViewTestCase(CommonViewTest):
         self.assertEquals(name, obj.name)
         self.assertEquals(list(obj.files.values_list("filename", flat=True)), [fname])
         self.assertFalse(self.controller.files.all())
+        self.assertEquals(obj.files.all()[0].file.read(), "crumble")
 
 
 class GroupViewTestCase(CommonViewTest):
