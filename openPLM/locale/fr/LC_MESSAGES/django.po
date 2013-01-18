@@ -1056,7 +1056,7 @@ msgstr "PARCOURIR"
 
 #: templates/base.html:93 templates/create.html:70
 msgid "CREATE"
-msgstr "CREER"
+msgstr "CRÉER"
 
 #: templates/base.html:100
 msgid "NAVIGATE"
@@ -1656,7 +1656,7 @@ msgstr "Fichiers"
 #: templates/documents/file_revisions.html:106
 #: templates/documents/files.html:127
 msgid "DOWNLOAD"
-msgstr "TELECHARGER"
+msgstr "TÉLÉCHARGER"
 
 #: templates/public.html:35 templates/documents/file_revisions.html:115
 #: templates/documents/files.html:167
@@ -1908,7 +1908,7 @@ msgstr "AJOUTER"
 
 #: templates/documents/files.html:79
 msgid "DELETE"
-msgstr "DETRUIRE"
+msgstr "DÉTRUIRE"
 
 #: templates/documents/files.html:80
 msgid "CHECK ALL"
@@ -2478,7 +2478,7 @@ msgstr "Créer une part et l'ajouter"
 
 #: templates/parts/bom.html:46
 msgid "EDIT"
-msgstr "EDITER"
+msgstr "ÉDITER"
 
 #: templates/parts/bom.html:53
 msgid "Update view"
@@ -2756,7 +2756,7 @@ msgstr "Rôle"
 
 #: templates/users/delegation.html:54
 msgid "STOP DELEGATION"
-msgstr "ARRETER DELEGATION"
+msgstr "ARRETER DÉLÉGATION"
 
 #: templates/users/delegation.html:62
 msgid "Resend mail"
