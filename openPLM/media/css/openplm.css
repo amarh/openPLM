@@ -727,6 +727,10 @@ li.Result div.summary em {
     color: black;
     font-style: normal;
 }
+li.Result form {
+    float: right;
+    margin: 1px;
+}
 
 span#numresults {
     color: #343434;
@@ -736,7 +740,6 @@ span#numresults {
 
 /* related content */
 #related_content {
-    /*float: right;*/
     display: inline-block;
     width: 25%;
     padding-bottom: 1em;
@@ -756,15 +759,9 @@ span#numresults {
     padding: 0em;
     position: relative;
 }
-#related_content ul li form {
-    position: absolute;
-    top: 0;
-    right: 3px;
-}
 #related_content ul li:hover {
     background: none;
 }
-    
 
 
 /** input **/

@@ -10,6 +10,15 @@
             </div>
         {% endif %}
     {% endif %}
+    {% if link_creation or navigate_bool and is_readable %}
+        <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">
+            {{result.rendered_add|safe}}
+            {% if link_creation and result.object|can_add:attach %}
+                <input type="submit" class="tb-btn" value="{% trans "ADD" %}"/>
+            {% endif %}
+        </form>
+
+    {% endif %}
     <div class="reference">
         {% if result|is_plmobject or result.state %}
             <div class="bullet" title="{{result.state}}"></div>
@@ -21,14 +30,5 @@
     <div class="summary">
         {{ result.highlighted.text|hide_emails|safe }}
     </div>
-    {% if link_creation or navigate_bool and is_readable %}
-        <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">
-            {{result.rendered_add|safe}}
-            {% if link_creation and result.object|can_add:attach %}
-                <input type="submit" class="tb-btn" value="{% trans "ADD" %}"/>
-            {% endif %}
-        </form>
-
-    {% endif %}
     </li>
 {% endwith %}
