@@ -63,6 +63,8 @@ class DocumentController(PLMObjectController):
                     file=pf.file.path, document=obj.object)
                 obj.handle_added_file(doc_file)
                 generate_thumbnail.delay(doc_file.id)
+                # django < 1.2.5 deletes the file when pf is deleted
+                pf.file = ""
                 pf.delete()
         return obj
 
