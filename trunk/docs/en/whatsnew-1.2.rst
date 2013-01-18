@@ -6,6 +6,32 @@
 What's new in OpenPLM 1.2
 =========================
 
+
+Introduction
+===============
+
+
+OpenPLM is a product oriented PLM solution.
+A product oriented PLM (Product Lifecycle Management) solution unifies
+all activities of the company in an ECM which structures data around the product.
+OpenPLM features a full web and user-friendly interface. 
+OpenPLM is Free and Open Source Software.
+This means that all our work is free to use, modify and redistribute. 
+
+Since the last version, released 5 month ago, lots of changes have been made
+in OpenPLM 1.2. 
+Some noteworthy highlights:
+
+    * It is now easier to upload files and create documents
+    * Several enhancements to the navigate feature
+    * Engineering Change Requests
+    * Alternate part links
+
+
+.. image:: /whatsnew/1.2/intro.png
+    :align: center
+    :width: 64%
+
 What's new for users
 =====================
 
