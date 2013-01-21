@@ -1,7 +1,11 @@
+# OpenPLM module
+# (c) 2013 LinObject SAS
+#
 
 #***************************************************************************
+#*   (c) LinObject SAS (contact@linobject.com) 2013                        *
 #*                                                                         *
-#*   Copyright (c) 2009 Yorik van Havre <yorik@gmx.fr>                     * 
+#*   This file is part of the OpenPLM plugin for FreeCAD.                  *
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU General Public License (GPL)            *
@@ -9,21 +13,26 @@
 #*   the License, or (at your option) any later version.                   *
 #*   for detail see the LICENCE text file.                                 *
 #*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
+#*   FreeCAD is distributed in the hope that it will be useful,            *
 #*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
 #*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
 #*   GNU Library General Public License for more details.                  *
 #*                                                                         *
 #*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
+#*   License along with this plugin; if not, write to the Free Software    *
 #*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
 #*   USA                                                                   *
 #*                                                                         *
-#***************************************************************************
+#*   LinObject SAS 2013                                                    *
+#***************************************************************************/
+
+# Authors
+# Pierre Cosquer <pcosquer@linobject.com>
+# Alejandro Galech <agalech@linobject.com>
 
 __title__="FreeCAD OpenPLM Workbench - Init file"
-__author__ = "Yorik van Havre <yorik@gmx.fr>"
-__url__ = ["http://yorik.orgfree.com","http://free-cad.sourceforge.net"]
+__author__ = "Pierre Cosquer <pcosquer@linobject.com>"
+__url__ = ["http://openplm.org", "http://free-cad.sourceforge.net"]
 
 # adding the OpenPLM module scripts to FreeCAD
 import os
@@ -54,14 +63,14 @@ class OpenPLMWorkbench (Workbench):
         self.cmdList3 = ["Separator", "OpenPLM_Configure"]
         self.appendMenu("OpenPLM", self.cmdList3)
         self.initialized = True
- 
+
     def Activated(self):
         pass
 
     def Deactivated(self):
         pass
 
-    def GetClassName(self): 
+    def GetClassName(self):
         return "Gui::PythonWorkbench"
 
 
