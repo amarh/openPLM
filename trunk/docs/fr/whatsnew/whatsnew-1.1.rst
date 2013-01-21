@@ -26,7 +26,7 @@ Captures d'écran :
 
 .. list-table::
 
-    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_add.png
+    * - .. figure:: /whatsnew/1.1/Capture_openPLM_file_add.png
            :width: 100%
 
            Nouvelle page "Fichiers"
@@ -34,7 +34,7 @@ Captures d'écran :
            Comme vous pouvez le voir , le formulaire d'*upload* et la liste des fichiers sont tous deux disponibles sur cette page.
 
 
-    * - .. figure:: whatsnew/1.1/Capture_openPLM_file_progress.png
+    * - .. figure:: /whatsnew/1.1/Capture_openPLM_file_progress.png
            :width: 100%
                
            Barre de progression
@@ -58,7 +58,7 @@ Les pages cycle de vie et gestion ont été fusionnées dans la page cycle de vi
 
 Remplacer un signataire est maintenant beaucoup plus intuitif, voir la capture d'écran ci-dessous :
 
-.. image:: whatsnew/1.1/Capture_openPLM_lifecycle_management.png
+.. image:: /whatsnew/1.1/Capture_openPLM_lifecycle_management.png
 
 
 Pages publiques
@@ -85,7 +85,7 @@ l'option "compte restreint".
 
 Capture d'écran :
 
-.. image:: whatsnew/1.1/Capture_openPLM_sponsor.png
+.. image:: /whatsnew/1.1/Capture_openPLM_sponsor.png
     :width: 100%
 
 
@@ -147,7 +147,7 @@ Vous pouvez mettre une pièce en évidence en plaçant votre souris
 sur le nom correspondant à cette pièce, tel que vous pouvez le voir sur 
 la capture d'écran ci-dessous :
 
-.. figure:: whatsnew/1.1/3D3.png
+.. figure:: /whatsnew/1.1/3D3.png
     :width: 90%
     
     Mise en évidence
@@ -165,13 +165,13 @@ Captures d'écran :
 
 .. list-table::
 
-   * - .. figure:: whatsnew/1.1/3D_old.png
+   * - .. figure:: /whatsnew/1.1/3D_old.png
             :width: 60%
             
             Avant (sans ombres)  
             
             
-     - .. figure:: whatsnew/1.1/3D1.png
+     - .. figure:: /whatsnew/1.1/3D1.png
             :width: 70%
             
             Maintenant (avec les ombres)
@@ -190,7 +190,7 @@ ou revenir aux couleurs initiales.
 Vous pouvez aussi activer/désactiver la transparence et afficher/cacher les axes.
 
 
-.. figure:: whatsnew/1.1/3D2.png
+.. figure:: /whatsnew/1.1/3D2.png
     :target: http://www.openplm.org/example3D/mendelmax2.html
     :width: 90%
     
@@ -218,7 +218,7 @@ Accès WebDAV
 
 OpenPLM propose aussi la gestion de fichier via un accés WebDAV :
 
-.. figure:: whatsnew/1.1/webdav_nautilus.png
+.. figure:: /whatsnew/1.1/webdav_nautilus.png
 
     Une liste de répertoire utilisant nautilus
 

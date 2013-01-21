@@ -5,7 +5,7 @@ Liste des tutoriaux
 ===================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :glob:
 
     ht_*
