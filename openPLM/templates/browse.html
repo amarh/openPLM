@@ -35,11 +35,13 @@
                             <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
                             </li>
                         {% endif %}
-                        {% for etype in extra_types %}
-                            <li {% if type == etype%}class="selected"{% endif %} >
-                            <a href="/browse/{{etype.lower}}/{% add_get page='1'%}"><span>{{ etype }}</span></a>
-                            </li>
-                        {% endfor %}
+                        {% if request.user.is_authenticated %}
+                            {% for etype in extra_types %}
+                                <li {% if type == etype%}class="selected"{% endif %} >
+                                <a href="/browse/{{etype.lower}}/{% add_get page='1'%}"><span>{{ etype }}</span></a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
                     </ul>
                 {% endblock %}
                 {% block browse-sort %}
