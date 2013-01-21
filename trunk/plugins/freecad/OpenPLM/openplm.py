@@ -1,3 +1,37 @@
+# OpenPLM module
+# (c) 2013 LinObject SAS
+#
+
+#***************************************************************************
+#*   (c) LinObject SAS (contact@linobject.com) 2013                        *
+#*                                                                         *
+#*   This file is part of the OpenPLM plugin for FreeCAD.                  *
+#*                                                                         *
+#*   This program is free software; you can redistribute it and/or modify  *
+#*   it under the terms of the GNU General Public License (GPL)            *
+#*   as published by the Free Software Foundation; either version 2 of     *
+#*   the License, or (at your option) any later version.                   *
+#*   for detail see the LICENCE text file.                                 *
+#*                                                                         *
+#*   FreeCAD is distributed in the hope that it will be useful,            *
+#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#*   GNU Library General Public License for more details.                  *
+#*                                                                         *
+#*   You should have received a copy of the GNU Library General Public     *
+#*   License along with this plugin; if not, write to the Free Software    *
+#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+#*   USA                                                                   *
+#*                                                                         *
+#*   LinObject SAS 2013                                                    *
+#***************************************************************************/
+
+# Authors
+# Pierre Cosquer <pcosquer@linobject.com>
+# Alejandro Galech <agalech@linobject.com>
+
+
+
 import os
 import shutil
 import json
@@ -31,7 +65,7 @@ def main_window():
 def save(gdoc):
     FreeCADGui.runCommand("Std_Save")
     gdoc.Label = os.path.splitext(os.path.basename(gdoc.FileName))[0] or gdoc.Label
-    
+
 def close(gdoc):
     FreeCADGui.runCommand("Std_CloseActiveWindow")
     gdoc2 = FreeCAD.ActiveDocument
@@ -39,7 +73,7 @@ def close(gdoc):
         FreeCAD.closeDocument(gdoc.Name)
 
 class OpenPLMPluginInstance(object):
-    
+
     #: location of openPLM server
     SERVER = "http://localhost:8000/"
     #: OpenPLM main directory
@@ -83,7 +117,7 @@ class OpenPLMPluginInstance(object):
         """
         Open a login dialog and connect the user
         """
-        
+
         self.username = username
         self.password = password
 
@@ -118,18 +152,18 @@ class OpenPLMPluginInstance(object):
             path = os.path.join(rep, filename)
             fileName, fileExtension = os.path.splitext(filename)
             path_stp=os.path.join(rep, (fileName+".stp")).encode("utf-8")
-            #create temporal file stp  
+            #create temporal file stp
             Part.export(gdoc.Objects, path_stp)
             gdoc.FileName = path
             save(gdoc)
-            
+
             #upload stp and freecad object
             doc_step_file=self.upload_file(doc, path_stp)
             doc_file = self.upload_file(doc, path.encode("utf-8"))
-            
-            #remove temporal file stp  
+
+            #remove temporal file stp
             os.remove(path_stp)
-            
+
             self.add_managed_file(doc, doc_file, path)
             self.load_file(doc, doc_file["id"], path, gdoc)
             if not unlock:
@@ -143,7 +177,7 @@ class OpenPLMPluginInstance(object):
     def get_data(self, url, data=None, show_errors=True, reraise=False):
         data_enc = urllib.urlencode(data) if data else None
         try:
-            return json.load(self.opener.open(self.SERVER + url, data_enc)) 
+            return json.load(self.opener.open(self.SERVER + url, data_enc))
         except urllib2.URLError as e:
             if show_errors:
                 message = e.reason if hasattr(e, "reason") else ""
@@ -173,9 +207,9 @@ class OpenPLMPluginInstance(object):
             request = urllib2.Request(url, datagen, headers)
             res = json.load(self.opener.open(request))
         return res
-        
+
     def download(self, doc, doc_file):
-    
+
         f = self.opener.open(self.SERVER + "file/%s/" % doc_file["id"])
         rep = os.path.join(self.PLUGIN_DIR, doc["type"], doc["reference"],
                            doc["revision"])
@@ -204,16 +238,16 @@ class OpenPLMPluginInstance(object):
     def check_out(self, doc, doc_file):
         self.get_data("api/object/%s/checkout/%s/" % (doc["id"], doc_file["id"]))
         self.download(doc, doc_file)
-        
+
 
         #on va locker fichier step associe
-        url= "api/object/%s/files/all/" % doc["id"] 
+        url= "api/object/%s/files/all/" % doc["id"]
         res = PLUGIN.get_data(url)
         fileName, fileExtension = os.path.splitext(doc_file["filename"])
         doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
-        if not len(doc_step)==0:    
+        if not len(doc_step)==0:
             self.get_data("api/object/%s/lock/%s/" % (doc["id"], doc_step[0]["id"]))
-        #end locker    
+        #end locker
 
     def add_managed_file(self, document, doc_file, path):
         data = self.get_conf_data()
@@ -230,7 +264,7 @@ class OpenPLMPluginInstance(object):
         f = open(self.CONF_FILE, "w")
         json.dump(data, f)
         f.close()
-    
+
     def get_conf_data(self):
         try:
             with open(self.CONF_FILE, "r") as f:
@@ -242,7 +276,7 @@ class OpenPLMPluginInstance(object):
         except IOError:
             # file does not exist
             return {}
-    
+
     def set_server(self, url):
         if not url.endswith("/"):
             url += "/"
@@ -262,7 +296,7 @@ class OpenPLMPluginInstance(object):
         for doc in data.get("documents", {}).itervalues():
             files.extend((d, doc) for d in doc.get("files", {}).items())
         return files
-   
+
     def forget(self, gdoc=None, delete=True, close_doc=False):
         gdoc = gdoc or FreeCAD.ActiveDocument
         if gdoc and gdoc in self.documents:
@@ -276,18 +310,18 @@ class OpenPLMPluginInstance(object):
                 del data["documents"][str(doc["id"])]
             self.save_conf(data)
             #on va unlocker
-            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id)) 
-            url= "api/object/%s/files/all/" % doc["id"] 
+            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
+            url= "api/object/%s/files/all/" % doc["id"]
             res = PLUGIN.get_data(url)
             root, f_name = os.path.split(path)
             fileName, fileExtension = os.path.splitext(f_name)
             doc_step = [obj for obj in res["files"] if obj["filename"] == fileName+".stp"]
             if doc_step:
                 self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_step[0]["id"]))
-  
+
             #end unlocker
             path = path.encode("utf-8")
-                          
+
             if delete and os.path.exists(path):
                 os.remove(path)
             if close_doc:
@@ -305,7 +339,7 @@ class OpenPLMPluginInstance(object):
             return
         self.documents[document] = dict(openplm_doc=doc,
             openplm_file_id=doc_file_id, openplm_path=path)
-        if " rev. " not in document.Label: 
+        if " rev. " not in document.Label:
             document.Label = document.Label + " / %(name)s rev. %(revision)s" % doc
         return document
 
@@ -316,10 +350,10 @@ class OpenPLMPluginInstance(object):
             #doc_file_name = self.documents[gdoc]["openplm_file_name"]
             path = self.documents[gdoc]["openplm_path"]
             def func():
-                
+
                 #check-in fichier step asscocies if exists
                 #api/doc_id/files/[all/]
-                url= "api/object/%s/files/all/" % doc["id"] 
+                url= "api/object/%s/files/all/" % doc["id"]
                 res = PLUGIN.get_data(url)
                 root, f_name = os.path.split(path)
                 fileName, fileExtension = os.path.splitext(f_name)
@@ -328,15 +362,15 @@ class OpenPLMPluginInstance(object):
                 fileName, fileExtension = os.path.splitext(path)
                 path_stp= (fileName + ".stp").encode("utf-8")
                 Part.export(gdoc.Objects, path_stp)
-                
+
                 if not doc_step:    #il faut generer un nouvelle fichier step
                     doc_step_file=self.upload_file(doc,path_stp) # XXX
                     doc_step.append(doc_step_file)
                 else:                   #il faut un check-in
                     url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_step[0]["id"]) # XXX
                     self.upload(url, path_stp)
-                    os.remove(path_stp)           
-                
+                    os.remove(path_stp)
+
                 url = self.SERVER + "api/object/%s/checkin/%s/" % (doc["id"], doc_file_id) # XXX
                 self.upload(url, path)
 
@@ -390,7 +424,7 @@ class OpenPLMPluginInstance(object):
             except os.error:
                 # directory already exists, just ignores the exception
                 pass
-    
+
             self.forget(gdoc, close_doc=False)
             path = os.path.join(rep, name)
             gdoc.FileName = path
@@ -398,7 +432,7 @@ class OpenPLMPluginInstance(object):
             self.load_file(new_doc, doc_file["id"], path, gdoc)
             self.add_managed_file(new_doc, doc_file, path)
             self.check_in(gdoc, unlock, False)
-            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))        
+            self.get_data("api/object/%s/unlock/%s/" % (doc["id"], doc_file_id))
         else:
             show_error("Can not revise : file not in openPLM", self.window)
 
@@ -406,7 +440,7 @@ class OpenPLMPluginInstance(object):
         """
         Return True if file which is is *file_id* is locked.
 
-        If it is unlocked and *error_dialog* is True, an ErrorDialog is 
+        If it is unlocked and *error_dialog* is True, an ErrorDialog is
         displayed
         """
         locked = self.get_data("api/object/%s/islocked/%s/" % (doc_id, file_id))["locked"]
@@ -421,7 +455,7 @@ def show_error(message, parent):
     dialog = qt.QMessageBox()
     dialog.setText(message)
     dialog.setWindowTitle("Error")
-    dialog.setIcon(qt.QMessageBox.Warning)    
+    dialog.setIcon(qt.QMessageBox.Warning)
     dialog.exec_()
 
 BANNER_PATH = os.path.join(os.path.dirname(__file__), "banner_openplm.png")
@@ -471,7 +505,7 @@ class Dialog(qt.QDialog):
             entry.setCurrentIndex(choices.index(value or ''))
         elif isinstance(entry, qt.QCheckBox):
             entry.setChecked(value)
-    
+
     def field_to_widget(self, field):
         widget = None
         attributes = {}
@@ -488,7 +522,7 @@ class Dialog(qt.QDialog):
             values = []
             for _, c in choices:
                 values.append(c)
-            widget.addItems(values) 
+            widget.addItems(values)
         if type == "":
             raise ValueError()
         self.set_value(widget, field["initial"], field)
@@ -499,7 +533,7 @@ class Dialog(qt.QDialog):
 
 class LoginDialog(Dialog):
     TITLE = 'Login'
-      
+
     def update_ui(self):
         table = qt.QGridLayout()
         label = qt.QLabel(self)
@@ -519,7 +553,7 @@ class LoginDialog(Dialog):
         buttons_box = qt.QDialogButtonBox(buttons, parent=self)
         connect(buttons_box, QtCore.SIGNAL("accepted()"), self.login)
         connect(buttons_box, QtCore.SIGNAL("rejected()"), self.reject)
-        
+
         self.vbox.addWidget(buttons_box)
 
     def login(self):
@@ -545,7 +579,7 @@ class ConfigureDialog(Dialog):
         self.url_entry.setText(PLUGIN.SERVER)
         table.addWidget(label, 0, 0)
         table.addWidget(self.url_entry, 0, 1)
-        
+
         self.vbox.addLayout(table)
         buttons = qt.QDialogButtonBox.Ok | qt.QDialogButtonBox.Cancel
         buttons_box = qt.QDialogButtonBox(buttons, parent=self)
@@ -569,7 +603,7 @@ class SearchDialog(Dialog):
     EXPAND_FILES = True
 
     def update_ui(self):
-        
+
         docs = PLUGIN.get_data(self.TYPES_URL)
         self.types = docs["types"]
 
@@ -589,19 +623,19 @@ class SearchDialog(Dialog):
             label.setText(text.capitalize()+":")
             table.addWidget(label, i, 0)
             table.addWidget(entry, i, 1)
-        
+
         self.advanced_table = qt.QGridLayout()
         self.advanced_fields = []
         self.vbox.addLayout(self.advanced_table)
         self.display_fields(self.TYPE)
-        
+
         search_button = qt.QPushButton("Search")
         connect(search_button, QtCore.SIGNAL("clicked()"), self.search)
         self.vbox.addWidget(search_button)
 
         self.results_box = qt.QVBoxLayout()
         self.vbox.addLayout(self.results_box)
-        
+
         self.tree = qt.QTreeWidget()
         self.tree.setColumnCount(1)
         self.tree.setHeaderLabel("Results")
@@ -615,7 +649,7 @@ class SearchDialog(Dialog):
 
     def type_entry_activate_cb(self, typename):
         self.display_fields(typename)
-    
+
     def display_fields(self, typename):
         fields = self.instance.get_data("api/search_fields/%s/" % typename)["fields"]
         temp = {}
@@ -734,7 +768,7 @@ class CheckInDialog(Dialog):
         button = qt.QPushButton(self.ACTION_NAME)
         connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
         self.vbox.addWidget(button)
-        
+
     def action_cb(self):
         doc = FreeCAD.ActiveDocument
         unlock = self.get_value(self.unlock_button, None)
@@ -774,14 +808,14 @@ class ReviseDialog(Dialog):
         button = qt.QPushButton(self.ACTION_NAME)
         connect(button, QtCore.SIGNAL("clicked()"), self.action_cb)
         self.vbox.addWidget(button)
-        
+
     def action_cb(self):
         doc = FreeCAD.ActiveDocument
         self.gdoc = PLUGIN.revise(doc,
                           self.get_value(self.revision_entry, None),
                           self.get_value(self.unlock_button, None))
         self.accept()
-    
+
 class AttachToPartDialog(SearchDialog):
     TITLE = "Attach to part"
     ACTION_NAME = "Attach"
@@ -793,11 +827,11 @@ class AttachToPartDialog(SearchDialog):
     def __init__(self, doc):
         SearchDialog.__init__(self)
         self.doc = doc
-    
+
     def do_action(self, part):
         PLUGIN.attach_to_part(self.doc, part["id"])
         self.accept()
-   
+
     def action_cb(self):
         node =  self.tree.currentItem()
         if not node:
@@ -813,7 +847,7 @@ class CreateDialog(SearchDialog):
     TYPES_URL = "api/docs/"
 
     def update_ui(self):
-        self.doc_created = None        
+        self.doc_created = None
         docs = PLUGIN.get_data(self.TYPES_URL)
         self.types = docs["types"]
 
@@ -831,12 +865,12 @@ class CreateDialog(SearchDialog):
             label.setText(text.capitalize()+":")
             table.addWidget(label, i, 0)
             table.addWidget(entry, i, 1)
-       
+
         self.advanced_table = qt.QGridLayout()
         self.advanced_fields = []
         self.vbox.addLayout(self.advanced_table)
         self.display_fields(self.TYPE)
-        
+
         hbox = qt.QHBoxLayout()
         label = qt.QLabel()
         label.setText("Filename:")
@@ -848,14 +882,14 @@ class CreateDialog(SearchDialog):
         self.vbox.addLayout(hbox)
         self.unlock_button = qt.QCheckBox('Unlock ?')
         self.vbox.addWidget(self.unlock_button)
-                
+
         self.action_button = qt.QPushButton(self.ACTION_NAME)
         connect(self.action_button, QtCore.SIGNAL("clicked()"), self.action_cb)
         self.vbox.addWidget(self.action_button)
 
     def type_entry_activate_cb(self, typename):
         self.display_fields(typename)
-    
+
     def display_fields(self, typename):
         fields = self.instance.get_data("api/creation_fields/%s/" % typename)["fields"]
         temp = {}
@@ -905,8 +939,8 @@ class OpenPLMLogin:
         dialog = LoginDialog()
         dialog.exec_()
 
-    def GetResources(self): 
-        return {'MenuText': 'Login', 'ToolTip': 'Login'} 
+    def GetResources(self):
+        return {'MenuText': 'Login', 'ToolTip': 'Login'}
 
 FreeCADGui.addCommand('OpenPLM_Login', OpenPLMLogin())
 
@@ -916,8 +950,8 @@ class OpenPLMConfigure:
         dialog = ConfigureDialog()
         dialog.exec_()
 
-    def GetResources(self): 
-        return {'Pixmap' : 'preferences-system', 'MenuText': 'Configure', 'ToolTip': 'Configure'} 
+    def GetResources(self):
+        return {'Pixmap' : 'preferences-system', 'MenuText': 'Configure', 'ToolTip': 'Configure'}
 
 FreeCADGui.addCommand('OpenPLM_Configure', OpenPLMConfigure())
 
@@ -926,10 +960,10 @@ class OpenPLMCheckOut:
     def Activated(self):
         dialog = CheckOutDialog()
         dialog.exec_()
-    
-    def GetResources(self): 
-        return {'MenuText': 'Check-out', 'ToolTip': 'Check-out'} 
-    
+
+    def GetResources(self):
+        return {'MenuText': 'Check-out', 'ToolTip': 'Check-out'}
+
     def IsActive(self):
         return PLUGIN.connected
 
@@ -937,14 +971,14 @@ FreeCADGui.addCommand('OpenPLM_CheckOut', OpenPLMCheckOut())
 
 
 class OpenPLMDownload:
-    
+
     def Activated(self):
         dialog = DownloadDialog()
         dialog.exec_()
 
-    def GetResources(self): 
-        return {'MenuText': 'Download', 'ToolTip': 'Download'} 
-    
+    def GetResources(self):
+        return {'MenuText': 'Download', 'ToolTip': 'Download'}
+
     def IsActive(self):
         return PLUGIN.connected
 
@@ -955,9 +989,9 @@ class OpenPLMForget:
     def Activated(self):
         PLUGIN.forget(close_doc=True)
 
-    def GetResources(self): 
+    def GetResources(self):
         return {'MenuText': 'Forget current file',
-                'ToolTip': 'Forget and delete current file'} 
+                'ToolTip': 'Forget and delete current file'}
 
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
@@ -965,7 +999,7 @@ class OpenPLMForget:
 FreeCADGui.addCommand('OpenPLM_Forget', OpenPLMForget())
 
 class OpenPLMCheckIn:
-    
+
     def Activated(self):
         gdoc = FreeCAD.ActiveDocument
         if gdoc and gdoc in PLUGIN.documents:
@@ -976,15 +1010,15 @@ class OpenPLMCheckIn:
                 return
             name = os.path.basename(path)
             dialog = CheckInDialog(doc, name)
-            dialog.exec_() 
+            dialog.exec_()
             if gdoc not in PLUGIN.documents:
                 close(gdoc)
         else:
             win = main_window()
             show_error("Document not stored in OpenPLM", win)
 
-    def GetResources(self): 
-        return {'MenuText': 'Check-in', 'ToolTip': 'Check-in'} 
+    def GetResources(self):
+        return {'MenuText': 'Check-in', 'ToolTip': 'Check-in'}
 
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
@@ -1017,9 +1051,9 @@ class OpenPLMRevise:
             win = main_window()
             show_error("Document not stored in OpenPLM", win)
 
-    def GetResources(self): 
-        return {'MenuText': 'Revise', 'ToolTip': 'Revise'} 
-    
+    def GetResources(self):
+        return {'MenuText': 'Revise', 'ToolTip': 'Revise'}
+
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
@@ -1037,17 +1071,17 @@ class OpenPLMAttach:
             win = main_window()
             show_error("Document not stored in OpenPLM", win)
 
-    def GetResources(self): 
+    def GetResources(self):
         return {'MenuText': 'Attach to a part',
-                'ToolTip': 'Attach to a part'} 
-    
+                'ToolTip': 'Attach to a part'}
+
     def IsActive(self):
         return PLUGIN.connected and FreeCAD.ActiveDocument in PLUGIN.documents
 
 FreeCADGui.addCommand('OpenPLM_AttachToPart', OpenPLMAttach())
 
 class OpenPLMCreate:
-    
+
     def Activated(self):
         gdoc = FreeCAD.ActiveDocument
         win = main_window()
@@ -1062,10 +1096,10 @@ class OpenPLMCreate:
         if dialog.doc_created and gdoc not in PLUGIN.documents:
             close(gdoc)
 
-    def GetResources(self): 
+    def GetResources(self):
         return {'Pixmap' : 'document-new', 'MenuText': 'Create a Document',
                 'ToolTip': 'Create a document'}
-    
+
     def IsActive(self):
         doc = FreeCAD.ActiveDocument
         return PLUGIN.connected and doc and doc not in PLUGIN.documents
