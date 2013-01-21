@@ -212,7 +212,7 @@ for each object.
 New application: ecr: change management
 ---------------------------------------
 
-A new application, :ref:`ecr <calendrier-admin>` can be installed.
+A new application, :ref:`ecr <ecr-admin>` can be installed.
 It adds Engineering Change Request objects.
 
 
