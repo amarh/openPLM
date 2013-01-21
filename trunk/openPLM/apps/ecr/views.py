@@ -21,10 +21,10 @@ def create_ecr(request, *args):
 bv.register_creation_view(ECR, create_ecr)
 
 
-@bv.secure_required
+@bv.handle_errors(restricted_access=False)
 def browse_ecr(request):
     user = request.user
-    if user.is_authenticated() and not user.get_profile().restricted:
+    if not user.get_profile().restricted:
         # only authenticated users can see all groups and users
         obj, ctx = bv.get_generic_data(request, search=False)
         object_list = ECR.objects.all()
@@ -43,12 +43,9 @@ def browse_ecr(request):
             'object_menu': [],
             'navigation_history': [],
         })
-        query = Q(published=True)
-        if user.is_authenticated():
-            readable = user.ecruserlink_user.now().filter(role=models.ROLE_READER)
-            readable |= user.ecruserlink_user.now().filter(role=models.ROLE_OWNER)
-            query |= Q(id__in=readable.values_list("ecr_id", flat=True))
-        object_list = ECR.objects.filter(query)
+        readable = user.ecrs.now().filter(role=models.ROLE_READER)
+        readable |= user.ecrs.now().filter(role=models.ROLE_OWNER)
+        object_list = ECR.objects.filter(id__in=readable)
 
     ctx.update(get_pagination(request.GET, object_list, "ECR"))
     extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
