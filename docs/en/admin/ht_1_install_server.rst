@@ -1,9 +1,13 @@
 ===================================================
-How to install openPLM server 1.1
+How to install openPLM server 1.2
 ===================================================
 
-This document describes how to install an openPLM server using the 1.1 version
+This document describes how to install an openPLM server using the 1.2 version
 tarball.
+
+Previous versions:
+
+    - `1.1 <http://wiki.openplm.org/docs/1.1/en/admin/ht_1_install_server.html>`_
 
 
 Requirements
@@ -53,11 +57,11 @@ dependencies:
 Get the tarball containing the code
 ===================================
 
-    * ``wget -O openplm-1.1.tar.gz http://wiki.openplm.org/trac/downloads/5``
+    * ``wget -O openplm-1.2.tar.gz http://wiki.openplm.org/trac/downloads/7``
 
 Extract the code in /var and rename the directory to django
 
-    * ``tar xzf openplm-1.1.tar.gz -C /var/``
+    * ``tar xzf openplm-1.2.tar.gz -C /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -175,6 +179,7 @@ Then execute the following commands:
 
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
+    * ``./manage.py loaddada extra_lifecycles``  
     
     .. note::
         You have to create the superadmin user for Django and a special user named 'company'.
