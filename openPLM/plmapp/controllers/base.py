@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -67,10 +67,10 @@ class MetaController(type):
     @classmethod
     def get_controller(cls, type_name):
         """
-        Returns the controller (subclass of :class:`.PLMObjectController`) 
+        Returns the controller (subclass of :class:`.PLMObjectController`)
         associated to *type_name* (a string).
 
-        For example, ``get_controller("Part")`` will return the class 
+        For example, ``get_controller("Part")`` will return the class
         :class:`.PartController`.
         """
         if type_name in cls.controllers_dict:
@@ -83,7 +83,7 @@ class MetaController(type):
                 return PLMObjectController
             else:
                 model = models.get_all_plmobjects()[type_name]
-                parents = [p for p in model.__bases__ 
+                parents = [p for p in model.__bases__
                                 if issubclass(p, models.PLMObject)]
                 return cls.get_controller(parents[0].__name__)
 
@@ -110,9 +110,9 @@ def permission_required(func=None, role="owner"):
 
 class Controller(object):
     u"""
-    Object used to manage a :class:`~plmapp.models.PLMObject` and store his 
+    Object used to manage a :class:`~plmapp.models.PLMObject` and store his
     modification in a history
-    
+
     :attributes:
         .. attribute:: object
 
@@ -139,7 +139,7 @@ class Controller(object):
         self._user = user
         # variable to store attribute changes
         self._histo = ""
-        # cache for permissions (dict(role->bool)) 
+        # cache for permissions (dict(role->bool))
         self.__permissions = {}
         self.object = obj
         if no_index:
@@ -180,7 +180,7 @@ class Controller(object):
         """
         self.object.save()
         if self._histo and with_history:
-            self._save_histo("Modify", self._histo) 
+            self._save_histo("Modify", self._histo)
             self._histo = ""
 
     def _save_histo(self, action, details, blacklist=(), roles=(), users=()):
@@ -190,6 +190,8 @@ class Controller(object):
         """
         h = self.HISTORY.objects.create(plmobject=self.object, action=action,
                                      details=details, user=self._user)
+        if self._user not in users:
+            blacklist += (self._user.email,)
         roles = [models.ROLE_OWNER] + list(roles)
         self._send_mail(send_histories_mail, self, roles, action, [h],
                 self._user, blacklist, users)
@@ -207,18 +209,18 @@ class Controller(object):
             item = self.object._meta.get_field(attr_name).verbose_name
         except FieldDoesNotExist:
             item = attr_name
-        return item   
+        return item
 
     def update_from_form(self, form):
         u"""
         Updates :attr:`object` from data of *form*
-        
+
         :raises: :exc:`ValueError` if *form* is invalid.
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
-        
+
         self.check_permission("owner")
         self.check_editable()
         if form.is_valid():
@@ -231,7 +233,7 @@ class Controller(object):
                 self.save()
         else:
             raise ValueError("form is invalid")
-    
+
     def check_permission(self, role, raise_=True):
         """
         This method checks if :attr:`_user` has permissions implied by *role*.
@@ -246,7 +248,7 @@ class Controller(object):
             This method keeps a cache, so that you dont have to worry about
             multiple calls to this method.
         """
-        
+
         if role in self.__permissions:
             ok = self.__permissions[role]
         else:
@@ -255,7 +257,7 @@ class Controller(object):
         if not ok and raise_:
             raise PermissionError("action not allowed for %s" % self._user)
         return ok
-    
+
     def clear_permissions_cache(self):
         self.__permissions.clear()
 
@@ -269,7 +271,7 @@ class Controller(object):
 
         If *user* is None (the default), :attr:`_user` is used.
         """
-        
+
         if not user:
             user = self._user
         if not user.is_active:
@@ -278,7 +280,7 @@ class Controller(object):
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError(u"%s is not a contributor" % user)
         if profile.restricted:
-            # should not be possible, but an admin may have done a mistake 
+            # should not be possible, but an admin may have done a mistake
             raise PermissionError(u"%s is not a contributor" % user)
 
     def check_editable(self):
