@@ -3,6 +3,8 @@ import datetime
 from functools import wraps
 
 from django.db import models
+from django.db.models import F
+from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape as esc
@@ -51,7 +53,53 @@ def cache_lifecycle_stuff(func):
     return wrapper
 
 
-class PLMObject(models.Model):
+class PLMObjectQuerySet(QuerySet):
+    """
+    A :class:`QuerySet` with extra methods to filter results by their state.
+    """
+
+    def officials(self):
+        """ Retrieves only official :class:`PLMObject`. """
+        return self.filter(state=F("lifecycle__official_state"))
+
+    def exclude_cancelled(self):
+        """ Excludes cancelled :class:`PLMObject`. """
+        return self.exclude(lifecycle=get_cancelled_lifecycle())
+
+
+class PLMObjectManager(models.Manager):
+    """ Manager for :class:`PLMObject`.
+    Uses a :class:`PLMObjectQuerySet`."""
+
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return PLMObjectQuerySet(self.model)
+
+    def officials(self):
+        """ Retrieves only official :class:`PLMObject`. """
+        return self.get_query_set().officials()
+
+    def exclude_cancelled(self):
+        """ Excludes cancelled :class:`PLMObject`. """
+        return self.get_query_set().exclude_cancelled()
+
+
+class AbstractPLMObject(models.Model):
+    """
+    Abstract model that redefines the :attr:`.objects` manager.
+
+    This model is abstract so that child classes inherits
+    the manager.
+    """
+
+    class Meta:
+        abstract = True
+
+    objects = PLMObjectManager()
+
+
+class PLMObject(AbstractPLMObject):
     u"""
     Base class for :class:`.Part` and :class:`.Document`.
 
