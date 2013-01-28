@@ -2843,6 +2843,16 @@ class SearchViewTestCase(CommonViewTest):
         results = self.search("*", self.TYPE)
         self.assertEqual(set(m.Part.objects.all()), set(results))
 
+    def test_search_cancelled(self):
+        c2 = self.CONTROLLER.create("part_001759", self.TYPE, "c", self.user, self.DATA)
+        c2.safe_cancel()
+        results = self.search("1759", self.TYPE)
+        self.assertFalse(results)
+        results = self.search("cancelled", self.TYPE)
+        self.assertEquals([c2.object], results)
+        results = self.search("", self.TYPE)
+        self.assertEquals([self.controller.object], results)
+
     def test_search_not(self):
         self.controller.name = "abcdef"
         self.controller.save()
