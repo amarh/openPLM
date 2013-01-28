@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -43,9 +43,9 @@ from openPLM.plmapp.controllers.base import Controller, permission_required
 rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class GroupController(Controller):
     u"""
-    Object used to manage a :class:`~django.contrib.auth.models.Group` and store his 
+    Object used to manage a :class:`~django.contrib.auth.models.Group` and store his
     modification in a history
-    
+
     :attributes:
         .. attribute:: object
 
@@ -54,7 +54,7 @@ class GroupController(Controller):
     :param obj: managed object
     :type obj: an instance of :class:`~django.contrib.auth.models.Group`
     :param user: user who modify *obj*
-    :type user: :class:`~django.contrib.auth.models.Group` 
+    :type user: :class:`~django.contrib.auth.models.Group`
 
     .. note::
         This class does not inherit from :class:`.PLMObjectController`.
@@ -67,7 +67,7 @@ class GroupController(Controller):
         if hasattr(obj, "groupinfo"):
             obj = obj.groupinfo
         super(GroupController, self).__init__(obj, user, block_mails, no_index)
-   
+
     @classmethod
     def create(cls, name, description, user, data={}):
         profile = user.get_profile()
@@ -104,7 +104,7 @@ class GroupController(Controller):
         u"""
         Creates a :class:`PLMObjectController` from *form* and associates *user*
         as the creator/owner of the PLMObject.
-        
+
         This method raises :exc:`ValueError` if *form* is invalid.
 
         :param form: a django form associated to a model
@@ -133,15 +133,15 @@ class GroupController(Controller):
     def update_users(self, formset):
         u"""
         Updates users with data from *formset*
-        
+
         :param formset:
-        :type formset: a formset_factory of 
+        :type formset: a formset_factory of
                         :class:`~plmapp.forms.ModifyUserForm`
-        
+
         :raises: :exc:`.PermissionError` if :attr:`_user` is not the owner of
             :attr:`object`.
         """
-        
+
         self.check_permission("owner")
         users = []
         if formset.is_valid():
@@ -160,7 +160,7 @@ class GroupController(Controller):
             for user in users:
                 user.groups.remove(group)
             self._save_histo("User removed", ", ".join((u.username for u in users)))
-        
+
     @permission_required(role=models.ROLE_OWNER)
     def add_user(self, user):
         """
@@ -183,10 +183,10 @@ class GroupController(Controller):
     def ask_to_join(self):
         """
         Asks to join the group.
-        
+
         An email is sent to the group's owner so that he can validate the
         inscription.
-        
+
         :raises: :exc:`ValueError` if the owner's email is empty.
         """
         if not self.owner.email:
@@ -219,7 +219,7 @@ class GroupController(Controller):
                 raise PermissionError("You can not accept this invitation.")
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
-            
+
         invitation.state = models.Invitation.ACCEPTED
         invitation.validation_time = datetime.datetime.now()
 
@@ -236,7 +236,7 @@ class GroupController(Controller):
 
         This method can be called to resend an invitation.
 
-        :raises: :exc:`ValueError` if the invitation's state is not 
+        :raises: :exc:`ValueError` if the invitation's state is not
             :attr:`.Invitation.PENDING`
         """
         if invitation.state != models.Invitation.PENDING:
@@ -249,7 +249,7 @@ class GroupController(Controller):
                 "invitation" : invitation,
                 "guest" : self._user,
                 }
-        subject = "[PLM] %s asks you to join the group %s" % (self._user, self.name) 
+        subject = "[PLM] %s asks you to join the group %s" % (self._user, self.name)
         self._send_mail(send_mail, subject, [self.owner], ctx, "mails/invitation2")
 
     def send_invitation_to_guest(self, invitation):
@@ -258,8 +258,8 @@ class GroupController(Controller):
         to join the group.
 
         This method can be called to resend an invitation.
-        
-        :raises: :exc:`ValueError` if the invitation's state is not 
+
+        :raises: :exc:`ValueError` if the invitation's state is not
             :attr:`.Invitation.PENDING`
         """
         if invitation.state != models.Invitation.PENDING:
@@ -271,7 +271,7 @@ class GroupController(Controller):
         ctx = { "group" : self.object,
                 "invitation" : invitation,
                 }
-        subject = "[PLM] Invitation to join the group %s" % self.name 
+        subject = "[PLM] Invitation to join the group %s" % self.name
         self._send_mail(send_mail, subject, [invitation.guest], ctx,
                 "mails/invitation1")
 
@@ -300,7 +300,7 @@ class GroupController(Controller):
         invitation.validation_time = datetime.datetime.now()
         invitation.save()
         # TODO mail
-    
+
     def save(self, with_history=True):
         u"""
         Saves :attr:`object` and records its history in the database.
@@ -311,11 +311,11 @@ class GroupController(Controller):
 
     def get_attached_parts(self):
         types = models.get_all_parts().keys()
-        return self.plmobject_group.filter(type__in=types)
+        return self.plmobject_group.exclude_cancelled().filter(type__in=types)
 
     def get_attached_documents(self):
         types = models.get_all_documents().keys()
-        return self.plmobject_group.filter(type__in=types)
+        return self.plmobject_group.exclude_cancelled().filter(type__in=types)
 
     def check_readable(self, raise_=True):
         if self._user.get_profile().restricted or not self._user.is_active:
