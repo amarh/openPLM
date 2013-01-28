@@ -367,10 +367,10 @@ class SimpleSearchForm(SearchForm):
             # if the query does not retrieve all documents
                 mods.append(m.DocumentFile)
 
-            sqs = SmartSearchQuerySet().highlight().models(*mods)
+            sqs = SmartSearchQuerySet().models(*mods)
             if not query or query == "*":
-                return sqs
-            results = sqs.auto_query(query)
+                return sqs.exclude(state_class="cancelled")
+            results = sqs.highlight().auto_query(query)
             return results
         else:
             return EmptySearchQuerySet()

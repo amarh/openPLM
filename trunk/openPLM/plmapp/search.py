@@ -1,7 +1,9 @@
-
+import re
 from haystack.query import SearchQuerySet
 
 from openPLM.plmapp.query_parser import get_query_parser
+
+_lifecycle_queries = re.compile(r'lifecycle|state|cancel')
 
 class SmartSearchQuerySet(SearchQuerySet):
     """
@@ -9,7 +11,7 @@ class SmartSearchQuerySet(SearchQuerySet):
     queries.
 
     Supported queries:
-        
+
         * wildcards (ex: ``*``, ``quer*``)
         * boolean operators (AND, OR, NOT)
         * phrases (ex: ``"a phrase"``)
@@ -25,5 +27,7 @@ class SmartSearchQuerySet(SearchQuerySet):
         query_string = query_string.strip()
         query = self._PARSER(query_string)[0].to_SQ()
         clone = clone.filter(query)
+        if _lifecycle_queries.search(query_string) is None:
+            clone = clone.exclude(state_class="cancelled")
         return clone
 
