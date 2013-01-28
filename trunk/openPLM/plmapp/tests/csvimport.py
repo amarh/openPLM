@@ -51,7 +51,7 @@ class CSVImportTestCase(TransactionTestCase):
         task_prerun.disconnect(self.task_sent_handler)
         from haystack import backend
         backend.SearchBackend.inmemory_db = None
-    
+
     def get_valid_rows(self):
         return [[u'Type',
               u'reference',
@@ -113,7 +113,7 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertEquals(len(csv_rows) - 1, len(objects))
         sp1 = get_obj("SinglePart", "sp1", "s", self.user)
         self.assertEquals("SP1", sp1.name)
-        self.assertEqual(len(mail.outbox), len(objects))
+        self.assertEqual(0, len(mail.outbox))
         self.assertEqual(1, len(self.sent_tasks["openPLM.plmapp.tasks.update_indexes"]))
 
     def test_import_csv_invalid_last_row(self):
@@ -177,7 +177,7 @@ class CSVImportTestCase(TransactionTestCase):
         self.assertRaises(CSVImportError, self.import_csv,
                           BOMImporter, csv_rows)
         self.assertEquals(0, len(ParentChildLink.objects.all()))
-    
+
     def test_import_bom_invalid_parent(self):
         """
         Tests an import of an invalid bom: invalid parent.
