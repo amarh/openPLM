@@ -1,18 +1,17 @@
 from django.db import models
 from django.db.models import F
-from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from openPLM.plmapp.utils import memoize_noarg
 
 from .plmobject import (PLMObject, get_all_subclasses,
-        get_all_subclasses_with_level)
+        get_all_subclasses_with_level, PLMObjectQuerySet, PLMObjectManager)
 
 # parts stuff
 
-class PartQuerySet(QuerySet):
+class PartQuerySet(PLMObjectQuerySet):
     """
-    A QuerySet with extra methods to annotate results
+    A :class:`.PLMObjectQuerySet` with extra methods to annotate results
     with the number of children or parents.
     """
 
@@ -39,7 +38,7 @@ SELECT COUNT(plmapp_parentchildlink.id) from plmapp_parentchildlink
 """})
 
 
-class PartManager(models.Manager):
+class PartManager(PLMObjectManager):
     """
     Manager for :class:`Part`. Uses a :class:`PartQuerySet`.
     """
