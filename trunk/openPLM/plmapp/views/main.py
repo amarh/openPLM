@@ -2617,7 +2617,7 @@ def display_plmobjects(request, obj_ref):
     """
 
     obj, ctx = get_generic_data(request, "Group", obj_ref)
-    objects = obj.plmobject_group.order_by("type", "reference", "revision")
+    objects = obj.plmobject_group.exclude_cancelled()
     ctx.update(get_pagination(request.GET, objects, "object"))
     ctx['current_page'] = 'objects'
     return r2r("groups/objects.html", ctx, request)
