@@ -1,6 +1,7 @@
 # from: http://djangosnippets.org/snippets/2211/ by cronosa
 import os
 import logging
+import doctest
 from django.conf import settings
 EXCLUDED_APPS = getattr(settings, 'TEST_EXCLUDE', [])
 from django.test.simple import DjangoTestSuiteRunner
@@ -30,7 +31,7 @@ else:
                 COLORS = True
             except ImportError:
                 pass
-    
+
     if COLORS:
 
         class HighlightedTextTestResult(TextTestResult):
@@ -51,7 +52,7 @@ class OpenPLMTestSuiteRunner(TestSuiteRunner):
         south_log = logging.getLogger("south")
         south_log.setLevel(logging.WARNING)
         super(OpenPLMTestSuiteRunner, self).__init__(*args, **kwargs)
-    
+
     def build_suite(self, *args, **kwargs):
         suite = super(OpenPLMTestSuiteRunner, self).build_suite(*args, **kwargs)
         if not args[0] and not getattr(settings, 'RUN_ALL_TESTS', False):
@@ -60,7 +61,10 @@ class OpenPLMTestSuiteRunner(TestSuiteRunner):
                 pkg = case.__class__.__module__.split('.')[0]
                 if pkg == "openPLM":
                     tests.append(case)
-            suite._tests = tests 
+            suite._tests = tests
+        from openPLM.plmapp import utils, lifecycle
+        suite.addTest(doctest.DocTestSuite(utils))
+        suite.addTest(doctest.DocTestSuite(lifecycle))
         return suite
 
     if COLORS:
