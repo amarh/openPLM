@@ -411,6 +411,12 @@ class AddChildForm(PLMObjectForm, PartTypeForm):
     def __init__(self, parent, *args, **kwargs):
         super(AddChildForm, self).__init__(*args, **kwargs)
         self._PCLEs = defaultdict(list)
+        initial = kwargs.get("initial")
+        if not self.is_bound and (initial is None or "order" not in initial):
+            orders = list(parent.parentchildlink_parent.values_list('order', flat=True))
+            initial_order = max(orders) + 10 if orders else 10
+            self.fields["order"].initial = initial_order
+
         for PCLE in m.get_PCLEs(parent):
             for field in PCLE.get_editable_fields():
                 model_field = PCLE._meta.get_field(field)

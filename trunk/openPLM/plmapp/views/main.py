@@ -1047,6 +1047,9 @@ def add_child(request, obj_type, obj_ref, obj_revi):
         ctx['current_page'] = 'BOM-child'
     if ctx["results"]:
         obj.precompute_can_add_child2()
+        orders = list(obj.parentchildlink_parent.values_list('order', flat=True))
+        initial_order = max(orders) + 10 if orders else 10
+        ctx['order'] = initial_order
     ctx.update({'link_creation': True,
                 'add_child_form': add_child_form,
                 'attach' : (obj, "add_child")})

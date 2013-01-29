@@ -14,6 +14,7 @@
         <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">
             {{result.rendered_add|safe}}
             {% if link_creation and result.object|can_add:attach %}
+                {% if order %}<input type="hidden" name="order" value="{{order}}"/>{% endif %}
                 <input type="submit" class="tb-btn" value="{% trans "ADD" %}"/>
             {% endif %}
         </form>
