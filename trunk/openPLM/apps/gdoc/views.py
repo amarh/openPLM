@@ -9,6 +9,7 @@ from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
 
 import openPLM.plmapp.views.main as pviews
+from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.base_views import handle_errors, get_generic_data, register_creation_view
 
 from openPLM.apps.gdoc.models import CredentialsModel, FlowModel
@@ -112,7 +113,7 @@ def display_files(request, client, obj_type, obj_ref, obj_revi):
         ctx['error'] = True
 
     ctx['current_page'] = 'files'
-    return pviews.r2r('gdoc_files.html', ctx, request)
+    return r2r('gdoc_files.html', ctx, request)
 
 
 @oauth2_required

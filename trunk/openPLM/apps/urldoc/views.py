@@ -1,6 +1,6 @@
 
 from openPLM.plmapp.base_views import get_generic_data, handle_errors
-from openPLM.plmapp.views.main import r2r
+from openPLM.plmapp.utils import r2r
 
 @handle_errors
 def display_URLDoc(request, obj_type, obj_ref, obj_revi):

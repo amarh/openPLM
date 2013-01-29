@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from openPLM.plmapp.base_views import get_generic_data, handle_errors
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.forms import ConfirmPasswordForm
-from openPLM.plmapp.views.main import r2r
+from openPLM.plmapp.utils import r2r
 
 from openPLM.apps.oerp import erp
 from openPLM.apps.oerp import forms

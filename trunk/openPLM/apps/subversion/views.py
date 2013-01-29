@@ -3,7 +3,7 @@ import urlparse
 
 import pysvn
 
-import openPLM.plmapp.views.main as pviews
+from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.base_views import handle_errors, get_generic_data
 
 from openPLM.apps.subversion.models import parse_revision
@@ -16,7 +16,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = 'files'
-    return pviews.r2r('subversion_files.html', ctx, request)
+    return r2r('subversion_files.html', ctx, request)
 
 def get_day(log):
     date = log["date"]
@@ -29,7 +29,7 @@ def logs(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = 'logs'
-    return pviews.r2r('logs.html', ctx, request)
+    return r2r('logs.html', ctx, request)
 
 
 @handle_errors
@@ -62,6 +62,6 @@ def ajax_logs(request, obj_type, obj_ref, obj_revi):
         ctx["error"] = True
 
     ctx['current_page'] = 'logs'
-    return pviews.r2r('ajax_logs.html', ctx, request)
+    return r2r('ajax_logs.html', ctx, request)
 
 
