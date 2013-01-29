@@ -54,8 +54,6 @@ from django.forms import HiddenInput
 from django.http import (HttpResponseRedirect, HttpResponse, Http404,
                         HttpResponsePermanentRedirect, HttpResponseForbidden,
                         HttpResponseBadRequest)
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -76,21 +74,8 @@ from openPLM.plmapp.controllers import get_controller, UserController
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import (level_to_sign_str, get_next_revision,
-        filename_to_name)
+        filename_to_name, r2r)
 from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
-
-
-def r2r(template, dictionary, request):
-    """
-    Shortcut for:
-
-    ::
-
-        render_to_response(template, dictionary,
-                              context_instance=RequestContext(request))
-    """
-    return render_to_response(template, dictionary,
-                              context_instance=RequestContext(request))
 
 
 def set_language(request):

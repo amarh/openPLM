@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.base_views import get_generic_data, handle_errors
-from openPLM.plmapp.views.main import r2r
+from openPLM.plmapp.utils import r2r
 
 from openPLM.apps.badges.models import Badge
 

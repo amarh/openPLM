@@ -18,7 +18,8 @@ except ImportError:
     ICAL_INSTALLED = False
 
 from openPLM.plmapp.base_views import handle_errors, get_generic_data
-from openPLM.plmapp.views.main import r2r, display_object_history
+from openPLM.plmapp.utils import r2r
+from openPLM.plmapp.views import display_object_history
 from openPLM.plmapp import models
 
 def parse_date(year, month):

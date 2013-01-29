@@ -31,6 +31,8 @@ import string
 import random
 import os.path
 from functools import wraps
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 class SeekedFile(object):
     """
@@ -331,6 +333,20 @@ def filename_to_name(filename):
     """
     basename = os.path.basename(filename)
     return os.path.splitext(basename)[0].replace("_", " ")
+
+
+def r2r(template, dictionary, request):
+    """
+    Shortcut for:
+
+    ::
+
+        render_to_response(template, dictionary,
+                              context_instance=RequestContext(request))
+    """
+    return render_to_response(template, dictionary,
+                              context_instance=RequestContext(request))
+
 
 if __name__ == "__main__":
     import doctest

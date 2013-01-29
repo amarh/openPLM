@@ -21,7 +21,7 @@ from openPLM.plmapp.models import get_all_plmobjects
 from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
-from openPLM.plmapp.views.main import r2r
+from openPLM.plmapp.utils import r2r
 
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
