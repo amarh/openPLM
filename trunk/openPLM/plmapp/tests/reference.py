@@ -1,6 +1,7 @@
 # tests to checks that #108 (step management - Suggested part references
 # are all the same) is fixed
 
+import re
 import datetime
 from django.conf import settings
 
@@ -109,4 +110,19 @@ class SuggestedReferenceTestCase(BaseTestCase):
         self.create("PART_00004-545-55")
         self.assertNewReference("PART_00005-gege-HW", Part)
         self.assertNewReference("DOC_00001-Hello-HW", Document)
+
+    def test_compiled_patterns(self):
+        settings.REFERENCE_PATTERNS = {
+            "shared": True,
+            "part": (u"OBJECT_{number:05d}", re.compile(r"^OBJECT_(\d+)$")),
+            "doc": (u"OBJECT_{number:05d}", re.compile(r"^OBJECT_(\d+)$")),
+        }
+        self.assertNewReference("OBJECT_00001", Part)
+        self.create("OBJECT_00002", "Document")
+        self.create("OBJECT_00003")
+        self.assertNewReference("OBJECT_00004", Part)
+        self.assertNewReference("OBJECT_00004", Document)
+        self.create("OBJECT_00010")
+        self.assertNewReference("OBJECT_00011", Document)
+        self.assertNewReference("OBJECT_00011", Part)
 
