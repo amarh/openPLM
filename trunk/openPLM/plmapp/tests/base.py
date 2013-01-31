@@ -40,7 +40,7 @@ class BaseTestCase(TestCase):
         user.get_profile().save()
         user.groups.add(self.group)
         return user
-    
+
     def get_publisher(self, username="publisher"):
         """ Returns a new contributor"""
         user = User(username=username)
@@ -50,8 +50,8 @@ class BaseTestCase(TestCase):
         user.groups.add(self.group)
         return user
 
-    def create(self, ref="Part1"):
-        return self.CONTROLLER.create(ref, self.TYPE, "a", self.user, self.DATA)
+    def create(self, ref="Part1", type=None):
+        return self.CONTROLLER.create(ref, type or self.TYPE, "a", self.user, self.DATA)
 
     def get_file(self, name="temp.test", data="data"):
         f = ContentFile(data)

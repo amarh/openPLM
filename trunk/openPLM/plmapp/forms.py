@@ -27,36 +27,40 @@ from collections import defaultdict
 
 from django import forms
 from django.conf import settings
+from django.forms import ValidationError
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import modelform_factory, modelformset_factory, \
         BaseModelFormSet
 from django.forms.fields import BooleanField
 from django.contrib.auth.models import User, Group
-from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 from django.utils.functional import memoize
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
-from openPLM.plmapp.controllers import rx_bad_ref, DocumentController
+from openPLM.plmapp.controllers.document import DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
+from openPLM.plmapp.references import get_new_reference, validate_reference, validate_revision
 from openPLM.plmapp.widgets import JQueryAutoComplete
 from openPLM.plmapp.encoding import ENCODINGS
 
 
-
 def _clean_reference(self):
     data = self.cleaned_data["reference"]
-    if rx_bad_ref.search(data):
-        raise ValidationError(_("Bad reference: '#', '?', '/' and '..' are not allowed"))
+    try:
+        validate_reference(data)
+    except ValueError as e:
+        raise ValidationError(unicode(e))
     return re.sub("\s+", " ", data.strip(" "))
 
 def _clean_revision(self):
     data = self.cleaned_data["revision"]
-    if rx_bad_ref.search(data):
-        raise ValidationError(_("Bad revision: '#', '?', '/' and '..' are not allowed"))
+    try:
+        validate_revision(data)
+    except ValueError as e:
+        raise ValidationError(unicode(e))
     return re.sub("\s+", " ", data.strip(" "))
 
 INVALID_GROUP = _("Bad group, check that the group exists and that you belong"
@@ -75,40 +79,8 @@ def auto_complete_fields(form, cls):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
             form_field.widget = JQueryAutoComplete(source)
 
-def get_new_reference(cls, start=0, inbulk_cache=None):
-    u"""
-    Returns a new reference for creating a :class:`.PLMObject` of type
-    *cls*.
 
-    The formatting is ``PART_000XX`` if *cls* is a subclass of :class:`.Part`
-    and ``DOC_000XX`` otherwise.
-
-    The number is the count of Parts or Documents plus *start* plus 1.
-    It is incremented while an object with the same reference already exists.
-    *start* can be used to create several creation forms at once.
-
-    .. note::
-        The returned referenced may not be valid if a new object has been
-        created after the call to this function.
-    """
-    if issubclass(cls, m.Part):
-        base_cls, name = m.Part, "PART"
-    else:
-        base_cls, name = m.Document, "DOC"
-    if inbulk_cache is not None and "max_" + name in inbulk_cache:
-        max_ref = inbulk_cache["max_" + name]
-    else:
-        try:
-            max_ref = base_cls.objects.order_by("-reference_number")\
-                .values_list("reference_number", flat=True)[0]
-        except IndexError:
-            max_ref = 0
-        if inbulk_cache is not None:
-            inbulk_cache["max_" + name] = max_ref
-    nb = max_ref + start + 1
-    return "%s_%05d" % (name, nb)
-
-def get_initial_creation_data(cls, start=0, inbulk_cache=None):
+def get_initial_creation_data(user, cls, start=0, inbulk_cache=None):
     u"""
     Returns initial data to create a new object (from :func:`get_creation_form`).
 
@@ -117,13 +89,14 @@ def get_initial_creation_data(cls, start=0, inbulk_cache=None):
     """
     if issubclass(cls, m.PLMObject):
         data = {
-                'reference' : get_new_reference(cls, start, inbulk_cache),
+                'reference' : get_new_reference(user, cls, start, inbulk_cache),
                 'revision' : 'a',
                 'lifecycle' : str(m.get_default_lifecycle().pk),
         }
     else:
         data = {}
     return data
+
 
 class CreationForm(forms.ModelForm):
     """
@@ -153,11 +126,12 @@ class PLMObjectCreationForm(forms.ModelForm):
     def __init__(self, user, start, inbulk_cache, *args, **kwargs):
         data = kwargs.get("data")
         if data is None:
-            initial = get_initial_creation_data(self.Meta.model, start, inbulk_cache)
+            initial = get_initial_creation_data(user, self.Meta.model, start, inbulk_cache)
             initial.update(kwargs.pop("initial", {}))
             kwargs["initial"] = initial
         self.start = start
         self.inbulk_cache = inbulk_cache
+        self.user = user
         super(PLMObjectCreationForm, self).__init__(*args, **kwargs)
         # lifecycles and groups are cached if inbulk_cache is a dictionary
         # this is an optimization if several creation forms are displayed
@@ -221,15 +195,16 @@ class PLMObjectCreationForm(forms.ModelForm):
         auto = cleaned_data.get("auto", False)
         inbulk = getattr(self, "inbulk_cache")
         cls = self.Meta.model
+        user = self.user
         if auto and not ref:
-            cleaned_data["reference"] = ref = get_new_reference(cls, self.start, inbulk)
+            cleaned_data["reference"] = ref = get_new_reference(user, cls, self.start, inbulk)
         if not auto and not ref:
             self.errors['reference']=[_("You did not check the Auto box: the reference is required.")]
         if cls.objects.filter(type=cls.__name__, revision=rev, reference=ref).exists():
             if not auto:
                 raise ValidationError(_("An object with the same type, reference and revision already exists"))
             else:
-                cleaned_data["reference"] = get_new_reference(cls, self.start, inbulk)
+                cleaned_data["reference"] = get_new_reference(user, cls, self.start, inbulk)
         elif cls.objects.filter(type=cls.__name__, reference=ref).exists():
             raise ValidationError(_("An object with the same type and reference exists, you may consider to revise it."))
         return cleaned_data
