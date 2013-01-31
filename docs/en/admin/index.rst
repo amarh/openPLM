@@ -16,4 +16,5 @@ This documentation explains how to administrate openPLM.
     files
     lifecycle
     publication
+    references
 
