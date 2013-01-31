@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ The controller for a ``PLMObject`` is :class:`PLMObjectController`.
 All subclasses of ``PLMObject`` may have their own controller to add
 functionalities or redefined default behaviors.
 
-To get a suitable controller for a ``PLMObject`` instances use 
+To get a suitable controller for a ``PLMObject`` instances use
 :func:`~plmapp.controllers.base.get_controller`.
 For example, `get_controller('Part')` returns :class:`.PartController`.
 
@@ -80,9 +80,9 @@ This two methods return an instance of :class:`PLMObjectController` (or one of
 its subclasses).
 
 Moreover, the method :meth:`~PLMObjectController.create_from_form` can be used
-to update informations from a form created with 
+to update informations from a form created with
 :func:`plmapp.forms.get_modification_form`.
-    
+
 
 .. _how-to-add-a-controller:
 
@@ -92,7 +92,7 @@ How to add a controller
 If you add a new model which inherits from :class:`.PLMObject`
 or one of its subclasses, you may want to add your own controller.
 
-You just have to declare a class which inherits (directly or not) from 
+You just have to declare a class which inherits (directly or not) from
 :class:`.PLMObjectController`. To associate this class with your models, there
 are two possibilities:
 
@@ -103,9 +103,9 @@ are two possibilities:
           class MyController(PLMObjectController):
               MANAGED_TYPE = MyPart
               ...
-              
-      *MyController* will be associated to *MyPart* and 
-      ``get_controller("MyPart")`` will return *MyController*. 
+
+      *MyController* will be associated to *MyPart* and
+      ``get_controller("MyPart")`` will return *MyController*.
 
     * if *MANAGED_TYPE* is not defined, the name class will be used: for
       example, *MyPartController* will be associated to *MyPart*. The rule
@@ -118,7 +118,7 @@ views.
 
 .. note::
 
-    This association is possible without any registration because 
+    This association is possible without any registration because
     :class:`.PLMObjectController` metaclass is :class:`.MetaController`.
 
 If your controller has its own attributes, you must redefine the variable
@@ -157,14 +157,13 @@ This module defines several classes, here is a summary:
         :class:`User`       :class:`.UserController`
         :class:`.GroupInfo` :class:`.GroupController`
         =================== ===============================
-    
+
     * functions:
         :func:`~plmapp.controllers.base.get_controller`
 
 """
 from openPLM.plmapp.controllers.base import MetaController, get_controller
-from openPLM.plmapp.controllers.plmobject import PLMObjectController, \
-    rx_bad_ref
+from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.part import PartController
 from openPLM.plmapp.controllers.document import DocumentController
 

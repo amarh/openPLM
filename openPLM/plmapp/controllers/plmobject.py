@@ -35,11 +35,12 @@ from django.shortcuts import get_object_or_404
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
     PromotionError
+from openPLM.plmapp.references import parse_reference_number, validate_reference, validate_revision
 from openPLM.plmapp.utils import level_to_sign_str
 from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.controllers.base import Controller
 
-rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
+
 class PLMObjectController(Controller):
     u"""
     Object used to manage a :class:`~plmapp.models.PLMObject` and store his
@@ -89,20 +90,14 @@ class PLMObjectController(Controller):
             raise PermissionError("Restricted account can not create a part or document.")
         if not reference or not type or not revision:
             raise ValueError("Empty value not permitted for reference/type/revision")
-        if rx_bad_ref.search(reference) or rx_bad_ref.search(revision):
-            raise ValueError("Reference or revision contains a '/' or a '..'")
+        validate_reference(reference)
+        validate_revision(revision)
         try:
             class_ = models.get_all_plmobjects()[type]
         except KeyError:
             raise ValueError("Incorrect type")
         # create an object
-        try:
-            start = "PART_"  if issubclass(class_, models.Part) else "DOC_"
-            reference_number = int(re.search(r"^%s(\d+)$" % start, reference).group(1))
-            if reference_number > 2**31 - 1:
-                reference_number = 0
-        except:
-            reference_number = 0
+        reference_number = parse_reference_number(reference, class_)
         obj = class_(reference=reference, type=type, revision=revision,
                      owner=user, creator=user, reference_number=reference_number)
         if no_index:
@@ -404,9 +399,12 @@ class PLMObjectController(Controller):
         Returns a controller of the new object.
         """
         self.check_readable()
-        if not new_revision or new_revision == self.revision or \
-           rx_bad_ref.search(new_revision):
+        if not new_revision or new_revision == self.revision:
             raise RevisionError("Bad value for new_revision")
+        try:
+            validate_revision(new_revision)
+        except ValueError as e:
+            raise RevisionError(unicode(e))
         if self.is_cancelled or self.is_deprecated:
             raise RevisionError("Object is deprecated or cancelled.")
         if models.RevisionLink.objects.now().filter(old=self.object.pk).exists():

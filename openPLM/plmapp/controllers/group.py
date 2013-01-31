@@ -29,7 +29,6 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
-import re
 import datetime
 
 from django.shortcuts import get_object_or_404
@@ -39,8 +38,8 @@ from openPLM.plmapp.mail import send_mail
 from openPLM.plmapp.tasks import update_index
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.controllers.base import Controller, permission_required
+from openPLM.plmapp.references import validate_reference
 
-rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class GroupController(Controller):
     u"""
     Object used to manage a :class:`~django.contrib.auth.models.Group` and store his
@@ -79,7 +78,9 @@ class GroupController(Controller):
             raise PermissionError(u"%s's account is inactive" % user)
         if not name:
             raise ValueError("name must not be empty")
-        if rx_bad_ref.search(name):
+        try:
+            validate_reference(name)
+        except:
             raise ValueError("Name contains a '/' or a '..'")
 
         obj = models.GroupInfo(name=name, description=description)

@@ -6,14 +6,14 @@ from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as m
+from openPLM.plmapp.references import validate_reference
 
-from openPLM.plmapp.controllers import rx_bad_ref
 from openPLM.apps.ecr.models import ECR, get_default_lifecycle
 
 def get_new_reference(start=0, inbulk_cache=None):
     u"""
     Returns a new reference for creating a new :class:`.ECR`.
-    
+
     .. note::
         The returned referenced may not be valid if a new object has been
         created after the call to this function.
@@ -40,7 +40,7 @@ def get_initial_creation_data(start=0, inbulk_cache=None):
     :param start: used to generate the reference,  see :func:`get_new_reference`
     """
     return {
-            'reference' : get_new_reference(start, inbulk_cache), 
+            'reference' : get_new_reference(start, inbulk_cache),
             'lifecycle' : str(get_default_lifecycle().pk),
     }
 
@@ -51,13 +51,15 @@ class ECRForm(forms.ModelForm):
         fields = ECR.get_creation_fields()
         fields.insert(1, "auto")
 
-    auto = BooleanField(required=False, initial=True, 
+    auto = BooleanField(required=False, initial=True,
             help_text=_("Checking this box, you allow OpenPLM to set the reference of the ECR."))
 
     def clean_reference(self):
         data = self.cleaned_data["reference"]
-        if rx_bad_ref.search(data):
-            raise ValidationError(_("Bad reference: '#', '?', '/' and '..' are not allowed"))
+        try:
+            validate_reference(data)
+        except ValueError as e:
+            raise ValidationError(unicode(e))
         return re.sub("\s+", " ", data.strip(" "))
 
     def clean(self):

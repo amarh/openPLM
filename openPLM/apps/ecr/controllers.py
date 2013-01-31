@@ -33,12 +33,12 @@ from django.shortcuts import get_object_or_404
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError,\
     PromotionError, ControllerError
+from openPLM.plmapp.references import validate_reference
 from openPLM.plmapp.utils import level_to_sign_str
 from openPLM.plmapp.controllers.base import Controller
 
 from .models import ECR, ECRHistory, ECRUserLink
 
-rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 class ECRController(Controller):
     u"""
     """
@@ -65,8 +65,7 @@ class ECRController(Controller):
         # even a restricted account can create an ECR
         if not reference:
             raise ValueError("Empty value not permitted for reference")
-        if rx_bad_ref.search(reference):
-            raise ValueError("Reference contains a '/' or a '..'")
+        validate_reference(reference)
         # create an object
         try:
             reference_number = int(re.search(r"^ECR_(\d+)$", reference).group(1))
