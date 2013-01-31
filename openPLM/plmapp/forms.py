@@ -84,14 +84,15 @@ def get_initial_creation_data(user, cls, start=0, inbulk_cache=None):
     u"""
     Returns initial data to create a new object (from :func:`get_creation_form`).
 
+    :param user: user who will create the object
     :param cls: class of the created object
-    :param start: used to generate the reference,  see :func:`get_new_reference`
+    :param start: used to generate the reference,  see :func:`.get_new_reference`
     """
     if issubclass(cls, m.PLMObject):
         data = {
-                'reference' : get_new_reference(user, cls, start, inbulk_cache),
-                'revision' : 'a',
-                'lifecycle' : str(m.get_default_lifecycle().pk),
+            'reference' : get_new_reference(user, cls, start, inbulk_cache),
+            'revision' : 'a',
+            'lifecycle' : str(m.get_default_lifecycle().pk),
         }
     else:
         data = {}
