@@ -87,7 +87,7 @@ class PLMObjectManager(models.Manager):
 
 class AbstractPLMObject(models.Model):
     """
-    Abstract model that redefines the :attr:`.objects` manager.
+    Abstract model that redefines the :attr:`PLMObject.objects` manager.
 
     This model is abstract so that child classes inherits
     the manager.
