@@ -6,8 +6,10 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from openPLM.plmapp.models import PLMObject, Part, Document
 
+#: Regular expression to test if a reference is invalid (forbidden characters)
 rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 
+#: default reference patterns, generates references like ``PART_00001`` and ``DOC_00001``
 REFERENCE_PATTERNS = {
     "global": False,
     "part": (u"PART_{number:05d}", r"^PART_(\d+)$"),
@@ -16,10 +18,12 @@ REFERENCE_PATTERNS = {
 
 
 def validate_reference(reference):
+    """ Raises a :exc:`ValueError` if *reference* is not valid."""
     if rx_bad_ref.search(reference):
         raise ValueError(_(u"Bad reference: '#', '?', '/' and '..' are not allowed"))
 
 def validate_revision(revision):
+    """ Raises a :exc:`ValueError` if *revision* is not valid."""
     if not revision:
         raise ValueError("Empty value not permitted for revision")
     if rx_bad_ref.search(revision):
@@ -31,12 +35,18 @@ def get_new_reference(user, cls, start=0, inbulk_cache=None):
     Returns a new reference for creating a :class:`.PLMObject` of type
     *cls*.
 
-    The formatting is ``PART_000XX`` if *cls* is a subclass of :class:`.Part`
-    and ``DOC_000XX`` otherwise.
+    *user* is the user who will create the object.
+
+    By default, the formatting is ``PART_000XX``
+    if *cls* is a subclass of :class:`.Part` and ``DOC_000XX`` otherwise.
 
     The number is the count of Parts or Documents plus *start* plus 1.
     It is incremented while an object with the same reference already exists.
     *start* can be used to create several creation forms at once.
+
+    Parts and documents have an independent reference number. For example,
+    the first suggested part reference is ``PART_00001`` and the first
+    suggested document is ``DOC_00001`` even if parts have been created.
 
     .. note::
         The returned referenced may not be valid if a new object has been
@@ -67,6 +77,16 @@ def get_new_reference(user, cls, start=0, inbulk_cache=None):
             number=nb, initials=initials)
 
 def parse_reference_number(reference, class_):
+    """
+    Parses *reference* and returns the reference number.
+    The reference number is the text that increases after each
+    creation of a new document or part.
+
+    :param reference: reference of the created object
+    :param class_: class of the created object
+    :return: the reference number, 0 if there is no reference
+    :rtype: int
+    """
     try:
         patterns = getattr(settings, "REFERENCE_PATTERNS", REFERENCE_PATTERNS)
         name = "part" if issubclass(class_, Part) else "doc"
