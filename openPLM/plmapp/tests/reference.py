@@ -57,7 +57,7 @@ class SuggestedReferenceTestCase(BaseTestCase):
 
     def test_date_patterns(self):
         settings.REFERENCE_PATTERNS = {
-                "global": False,
+                "shared": False,
                 "part": ("{now:%y}-{number}-part", r'^\d\d-(\d+)-part$'),
                 "doc": ("{now:%y}-{number}-doc", r'^\d\d-(\d+)-doc$'),
         }
@@ -67,9 +67,9 @@ class SuggestedReferenceTestCase(BaseTestCase):
         self.assertNewReference("%s-6-part" % year, Part)
         self.assertNewReference("%s-1516-doc" % year, Document, 1515)
 
-    def test_global_patterns(self):
+    def test_shared_patterns(self):
         settings.REFERENCE_PATTERNS = {
-            "global": True,
+            "shared": True,
             "part": (u"OBJECT_{number:05d}", r"^OBJECT_(\d+)$"),
             "doc": (u"OBJECT_{number:05d}", r"^OBJECT_(\d+)$"),
         }
@@ -82,9 +82,9 @@ class SuggestedReferenceTestCase(BaseTestCase):
         self.assertNewReference("OBJECT_00011", Document)
         self.assertNewReference("OBJECT_00011", Part)
 
-    def test_global_distinct_patterns(self):
+    def test_shared_distinct_patterns(self):
         settings.REFERENCE_PATTERNS = {
-            "global": True,
+            "shared": True,
             "part": (u"PART_{number:05d}", r"^(?:PART|DOC)_(\d+)$"),
             "doc": (u"DOC_{number:05d}", r"^(?:PART|DOC)_(\d+)$"),
         }
@@ -99,7 +99,7 @@ class SuggestedReferenceTestCase(BaseTestCase):
 
     def test_user_patterns(self):
         settings.REFERENCE_PATTERNS = {
-            "global": False,
+            "shared": False,
             "part": (u"PART_{number:05d}-{user.username}-{initials}",
                 r"^PART_(\d+)-.*$"),
             "doc": (u"DOC_{number:05d}-{user.first_name}-{initials}",

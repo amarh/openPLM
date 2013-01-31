@@ -11,7 +11,7 @@ rx_bad_ref = re.compile(r"[?/#\n\t\r\f]|\.\.")
 
 #: default reference patterns, generates references like ``PART_00001`` and ``DOC_00001``
 REFERENCE_PATTERNS = {
-    "global": False,
+    "shared": False,
     "part": (u"PART_{number:05d}", r"^PART_(\d+)$"),
     "doc": (u"DOC_{number:05d}", r"^DOC_(\d+)$"),
 }
@@ -53,7 +53,7 @@ def get_new_reference(user, cls, start=0, inbulk_cache=None):
         created after the call to this function.
     """
     patterns = getattr(settings, "REFERENCE_PATTERNS", REFERENCE_PATTERNS)
-    if patterns["global"]:
+    if patterns["shared"]:
         base_cls = PLMObject
         name = "part" if issubclass(cls, Part) else "doc"
     elif issubclass(cls, Part):
