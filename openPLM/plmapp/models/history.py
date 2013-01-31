@@ -8,8 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
 from .lifecycle import State, Lifecycle, get_cancelled_state
-from .plmobject import PLMObject, get_all_subclasses
-from openPLM.plmapp.qssequence import QuerySetSequence
+from .plmobject import PLMObject
 
 # history stuff
 class AbstractHistory(models.Model):
@@ -262,10 +261,4 @@ class StateHistory(models.Model):
 
 def timeline_histories(user):
     return History.timeline_items(user)
-    # this code would be nice (get all histories) but it retrieves all XXXhistory
-    # items
-    #d = {}
-    #get_all_subclasses(AbstractHistory, d)
-    #del d["AbstractHistory"]
-    #return QuerySetSequence(*[c.timeline_items(user) for c in d.values()])[:50].order_by("-date")
 
