@@ -1,3 +1,5 @@
+.. _admin-references:
+
 ====================================================
 References -- how to customize generated references
 ====================================================
@@ -20,6 +22,7 @@ with the maximum stored reference number.
 The maximum reference number is not equal to the count of objects
 since two revisions shared the same number.
 
+
 Default behavior
 ================
 
@@ -32,6 +35,7 @@ For documents, it generates the following references: ``DOC_00001``, ``DOC_00002
 ..., ``DOC_00050``, ``DOC_155555``.
 
 Parts and documents have two distinct counters.
+
 
 How to customize it
 ===================
@@ -86,10 +90,11 @@ the following parameters:
 
     user
         a :class:`.User` who will creates the object.
+        You should not write directly ``{user}``, you should append one of its attributes:
 
-            * ``{user.username}``: user's username.
-            * ``{user.first_name}``: user's first name 
-            * ``{user.last_name}``: user's last name 
+            * ``{user.username}``: username (login).
+            * ``{user.first_name}``: first name 
+            * ``{user.last_name}``: last name 
 
     initials
         initials of the user
@@ -101,6 +106,7 @@ Be careful when you add a username, first name or last name since
 the generated reference may contains forbidden characters
 and be too long.
 
+
 Regular expression pattern
 ---------------------------
 
@@ -110,6 +116,7 @@ It must contain one pair of parenthesis that will matches a number (``(\d+)``).
 
 OpenPLM accepts a compiled pattern if you need to set a special flag to
 the regular expression.
+
 
 Examples
 ========
@@ -132,7 +139,6 @@ settings.py::
     }
 
 will generate sequences like ``DOC_00001``, ``PART_00002``, ``PART_00003``, ``DOC_00004``, etc.
-
 
 
 OBJ_XX
@@ -178,7 +184,4 @@ settings.py::
 If the user is *Robert Baratheon <rbaratheon>*,
 it will generate sequences like ``RB-1-doc``, ``rbaratheon-1-part``, 
 ``rbaratheon-2-part``, and ``RB-2-doc``, etc.
-
-
-
 
