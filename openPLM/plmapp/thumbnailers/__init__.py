@@ -23,11 +23,12 @@ import swthumbnailer
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from celery.task import task
 
-@task(ignore_result=True, soft_time_limit=60, time_limit=65)
+@task(name="openPLM.plmapp.thumbnailers.generate_thumbnail",
+      ignore_result=True, soft_time_limit=60, time_limit=65)
 def generate_thumbnail(doc_file_id):
     """
     Celery task that tries to generate a thumbnail for a :class:`.DocumentFile`.
-    
+
     If it succeed, this function modifies the :attr:`.DocumentFile.thumbnail`
     attribute.  The stored value follow the following pattern
     :samp:`{doc_file_id}.png`.
