@@ -176,7 +176,15 @@ Change rights for the directory where thumbnails will be stored:
     
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
     * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/public/thumbnails``
- 
+
+
+Collect staticfiles
+=======================
+
+Run ``./manage.py collectstatic``.
+This will collect static files (javascript, images, css) in
+the :file:`static/` repertory.
+
 .. _search-engine-svn:
 
 Configure the search engine
@@ -250,7 +258,7 @@ Configure Apache server
 Edit you Apache configuration file (:file:`/etc/apache2/httpd.conf`) and
 add the following lines:
     
-.. literalinclude:: apache/simple.conf
+.. literalinclude:: apache/simple_1.3.conf
     :language: apache
 
 Restart Apache server
@@ -345,7 +353,7 @@ Each HTTP connection will be redirected to an HTTPS connection.
 A possible apache configuration would be (the rewrite and ssl modules must
 be enabled)
 
-.. literalinclude:: apache/ssl.conf
+.. literalinclude:: apache/ssl_1.3.conf
     :language: apache
 
 Configuring E-mails
@@ -362,17 +370,6 @@ Troubleshootings
 
 .. contents::
     :local:
-
-Admin pages are ugly
----------------------
-
-openPLM ships with a simlink (:file:`/path/to/openPLM/media/admin`) that may
-be broken on your system.
-
-To fix this link, run the following command:
-``ln -s `python -c 'import django; print django.__path__[0]'`/contrib/admin/media
-/var/django/openPLM/trunk/openPLM/media/admin``
-
 
 Connection refused
 ------------------
