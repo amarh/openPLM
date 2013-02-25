@@ -98,7 +98,8 @@ def composer_step(doc_file):
     return False
 
 
-@task(soft_time_limit=60*25,time_limit=60*25)
+@task(name="openPLM.apps.document3D.handle_step_file",
+      soft_time_limit=60*25,time_limit=60*25)
 def handle_step_file(doc_file_pk):
     """
 
@@ -591,10 +592,8 @@ def get_all_plmDocument3Dtypes_with_level():
     get_all_subclasses_with_level(Document3D, lst , level)
     return lst
 
-
-
-from celery.task import task
-@task(soft_time_limit=60*25,time_limit=60*25)
+@task(name="openPLM.apps.document3D.decomposer_all",
+      soft_time_limit=60*25,time_limit=60*25)
 def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre):
     """
 

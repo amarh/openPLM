@@ -130,7 +130,7 @@ def unserialize(obj):
         return [unserialize(o) for o in obj]
     return obj
 
-@task(ignore_result=True)
+@task(name="openPLM.plmapp.mail.do_send_histories_mail",ignore_result=True)
 def do_send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
               users=(), template="mails/history"):
     """
@@ -159,7 +159,7 @@ def do_send_histories_mail(plmobject, roles, last_action, histories, user, black
             }
         do_send_mail(subject, recipients, ctx, template, blacklist)
 
-@task(ignore_result=True)
+@task(name="openPLM.plmapp.mail.do_send_mail", ignore_result=True)
 def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
         lang_to_email = defaultdict(set)

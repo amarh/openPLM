@@ -6,6 +6,9 @@ from functools import wraps
 
 from django.db.models.loading import get_model
 
+import openPLM.plmapp.mail
+import openPLM.plmapp.thumbnailers
+
 from celery.task import task
 
 def synchronized(cls=None, lock=None):
@@ -42,7 +45,8 @@ def synchronized(cls=None, lock=None):
     return cls
 
 @synchronized
-@task(default_retry_delay = 60, max_retries = 10)
+@task(name="openPLM.plmapp.tasks.update_index",
+      default_retry_delay=60, max_retries=10)
 def update_index(app_name, model_name, pk, **kwargs):
     from haystack import site
     import openPLM.plmapp.search_indexes
@@ -52,7 +56,8 @@ def update_index(app_name, model_name, pk, **kwargs):
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
 
-@task(default_retry_delay = 60, max_retries = 10)
+@task(name="openPLM.plmapp.tasks.update_indexes",
+      default_retry_delay=60, max_retries=10)
 def update_indexes(instances):
     from haystack import site
     import openPLM.plmapp.search_indexes
@@ -65,7 +70,8 @@ def update_indexes(instances):
 update_indexes = synchronized(update_indexes, update_index.lock)
 
 
-@task(default_retry_delay = 60, max_retries = 10)
+@task(name="openPLM.plmapp.tasks.remove_index",
+      default_retry_delay=60, max_retries=10)
 def remove_index(app_name, model_name, identifier):
     from haystack import site
     import openPLM.plmapp.search_indexes
