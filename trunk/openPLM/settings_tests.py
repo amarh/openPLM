@@ -5,6 +5,8 @@
 import sys
 import os.path
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -48,19 +50,21 @@ MEDIA_ROOT = 'media/'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/media/'
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+STATIC_URL = "/static/"
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '0ham7d#fh669-xi@wxf1wcpbhn6tbbegtv_cml()_wcboyw&u&'
 
+# Set faster password hashers for tests
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
+    "django.template.loaders.filesystem.Loader",
+    "django.template.loaders.app_directories.Loader",
     )),
 #     'django.template.loaders.eggs.load_template_source',
 )
@@ -71,6 +75,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
+)
+LOCALE_PATHS = (
+    os.path.join(PROJECT_ROOT, "locale"),
 )
 
 ugettext = lambda s: s
@@ -101,6 +108,7 @@ INSTALLED_APPS = (
     'django.contrib.comments',
     'django.contrib.humanize',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
     'djcelery',
     'haystack',
     'openPLM.plmapp',
@@ -160,7 +168,7 @@ if "rebuild_index" not in sys.argv:
 HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'xapian'
 # use a memory backend
-HAYSTACK_XAPIAN_PATH = ":memory:" 
+HAYSTACK_XAPIAN_PATH = ":memory:"
 # the memory backend does not support spelling
 HAYSTACK_INCLUDE_SPELLING = False
 EXTRACTOR = os.path.abspath("bin/extractor.sh")

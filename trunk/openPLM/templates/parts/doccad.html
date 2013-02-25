@@ -24,7 +24,7 @@
 {% block content %}
 
 
-    <form method="post" action="">	
+    <form method="post" action="">{% csrf_token %}	
         <div class="tb-btn-toolbar">
             {% if user.get_profile.is_contributor %}
                 {{ docs_formset.management_form }}

@@ -85,7 +85,7 @@
         {# promotion form #}
         {% if is_signer and can_approve and is_promotable %}
             <form id ="form-promote" class="confirmation" style="display: inline;"
-                action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">
+                action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">{% csrf_token %}
                 <div id="form-promote-dialog"
                     title="{% trans "Are you sure?" %}"
                     {% if password_form.is_bound and not password_form.is_valid %} 
@@ -246,14 +246,14 @@
                     <div class="arrow {% if is_current_state %} active {% endif %}" style="">&gt;</div>
                     {% for link in links %}
                         <span class="signer">
-                            <a href="{{link.user.plmobject_url}}">{{link.user.username}}</a>
+                            <a href="/user/{{link.user.username|urlencode}}">{{link.user.username}}</a>
                             {% if can_edit_signer %}
                                 <a title="{% trans "Replace" %}" class="{{"Button"|button:"button-icon-only"}}" href="../management/replace/{{link.id}}/?q=&type=User">
                                     <span class="ui-button-text">{% trans "REPLACE" %}</span>
                                     <span class="ui-button-icon-primary ui-icon ui-icon-refresh">&nbsp;</span>
                                 </a>
                                 {% if links|length > 1 %}
-                                    <form style="display:inline" method="POST" action="../management/delete/">
+                                    <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
                                         <input type="hidden" name="link_id" value="{{ link.id }}"/>
                                         <input name="action" type="submit"
                                         class="tb-btn" value="—" 
@@ -284,13 +284,13 @@
             <a class="tb-btn" href="../management/add/?q=&type=User" ><span class="ui-button-text">{% trans "Notify" %}</span></a>
         {% else %}
             {% if is_notified %}
-                <form  method="POST" action="../management/delete/">
+                <form  method="POST" action="../management/delete/">{% csrf_token %}
                     <input type="hidden" name="link_id" value="{{ remove_notify_link.id }}"/>
                     <input name="action" type="submit" class="tb-btn" value="{% trans "Unnotify me" %}" />
                 </form>
             {% else %}
                 {% if can_notify %}
-                    <form  method="POST" action="../management/add/?q=&type=User">
+                    <form  method="POST" action="../management/add/?q=&type=User">{% csrf_token %}
                         {{ notify_self_form.as_p }}
                         <input name="action" type="submit" class="tb-btn" value="{% trans "Notify me" %}" />
                     </form>

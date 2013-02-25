@@ -17,7 +17,7 @@
             <div>
                 <h4>{% trans "Individual cost" %}</h4>
                 {% if can_update %}
-                    <form method="POST" action="{{obj.plmobject_url}}ERP/update_cost/">
+                    <form method="POST" action="{{obj.plmobject_url}}ERP/update_cost/">{% csrf_token %}
                         <table class="Content">
                             {{ cost_form.as_table}}
                         </table>
@@ -92,7 +92,7 @@
             {% else %}
                 {% if obj.is_official %}
                     {% if can_publish %}
-                        <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}ERP/publish/" method="POST">
+                        <form id ="form-promote" class="confirmation"  action="{{obj.plmobject_url}}ERP/publish/" method="POST">{% csrf_token %}
                             <div id="form-promote-dialog"
                                 title="{% trans "Are you sure?" %}"
                                 {% if password_form.is_bound and not password_form.is_valid %} 

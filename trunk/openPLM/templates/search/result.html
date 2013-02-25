@@ -11,7 +11,7 @@
         {% endif %}
     {% endif %}
     {% if link_creation or navigate_bool and is_readable %}
-        <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">
+        <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">{% csrf_token %}
             {{result.rendered_add|safe}}
             {% if link_creation and result.object|can_add:attach %}
                 {% if order %}<input type="hidden" name="order" value="{{order}}"/>{% endif %}

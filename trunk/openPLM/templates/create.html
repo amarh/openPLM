@@ -15,7 +15,7 @@
     {% if user.get_profile.is_contributor %}
         <div>
         <h3>{% trans "OBJECT CREATION:" %}</h3>
-            <form id="creation_form" method="post" action="." >	
+            <form id="creation_form" method="post" action="." >{% csrf_token %}	
                 {# hidden fields from a "create an attach" button #}
                 {% if next %}
                     <input type="hidden" name="__next__" value="{{next}}"/>

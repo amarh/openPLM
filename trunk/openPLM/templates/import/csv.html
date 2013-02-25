@@ -54,7 +54,7 @@ $(function(){
             {% with headers_formset.non_form_errors as errors%}
                 {{errors.as_ul }}
             {% endwith%}
-            <form method="post" action=".">
+            <form method="post" action=".">{% csrf_token %}
                 {{ headers_formset.management_form }}
 
                 <table class="Content">

@@ -25,7 +25,7 @@
 {% block content %}
     <div id="Navigate">
         <div id="navAddForm">
-            <form method="POST" action="">
+            <form method="POST" action="">{% csrf_token %}
                 <table>
                     <tbody>
                         <td></td>
@@ -39,7 +39,7 @@
             <p>
             {% trans "Attach the selected document?" %}
             </p>
-            <form method="POST" action="">
+            <form method="POST" action="">{% csrf_token %}
                 <table>
                     <tbody>
                         <td></td>
@@ -124,7 +124,7 @@
         <div id="FilterNav">
             
             {% trans "Display :" %}
-            <form method="post" action="." >
+            <form method="post" action="." >{% csrf_token %}
                 <ul id="FilterNavUl">
                     {{filter_object_form.as_ul}}
                     <li><input id="FilterButton" type="submit" class="tb-btn" value="{% trans "FILTER" %}"/></li>

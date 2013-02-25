@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 from django.core.management import execute_manager
 
 try:
@@ -10,15 +12,5 @@ except ImportError as er:
     sys.stderr.write(str(er))
     sys.stderr.write("\nError: Can't find the file 'settings.py' in the directory\n")
     sys.exit(1)
-
-import SocketServer
-import django.core.servers.basehttp
-django.core.servers.basehttp.WSGIServer = \
-    type('WSGIServer',
-         (SocketServer.ThreadingMixIn,
-          django.core.servers.basehttp.WSGIServer,
-          object),
-         {})
-
 if __name__ == "__main__":
     execute_manager(settings)

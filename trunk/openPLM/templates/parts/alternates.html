@@ -14,7 +14,7 @@
                 <span class="ui-button-text">{% trans "Add an alternate part" %}</span>
             </a>
             {% if alternates %}
-                <form method="POST" action="{{obj.plmobject_url}}alternates/delete/" style="display:inline">
+                <form method="POST" action="{{obj.plmobject_url}}alternates/delete/" style="display:inline">{% csrf_token %}
                     <input type="submit" class="tb-btn" name="delete_alternate"
                     value="{% trans "Delete alternate links related to this part" %}"/>
                 </form>

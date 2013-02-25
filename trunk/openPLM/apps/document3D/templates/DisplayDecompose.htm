@@ -66,9 +66,7 @@
 
 {% block content %}
 
-    <form method="post" action="" id="decompose_form">
-
-        {% csrf_token %} 
+    <form method="post" action="" id="decompose_form"> {% csrf_token %} 
 
         <div style="display:none;">
             {{last_mtime}}

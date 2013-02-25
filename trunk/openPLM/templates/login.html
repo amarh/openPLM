@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 {% load i18n plmapp_tags %}
+{% load url from future %}
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -29,7 +30,7 @@
                 <div class="top-box-content">
                     <h1>{% trans "Welcome to openPLM" %}   </h1>
                     {% get_current_language as LANGUAGE_CODE %}
-                    <form id="SetLangForm" action="/i18n/setlang/" method="post">
+                    <form id="SetLangForm" action="/i18n/setlang/" method="post">{% csrf_token %}
                         <ul>
                             <li>
                             <select name="language">
@@ -66,7 +67,7 @@
                             {{ error }}
                         {% endfor %}
                     </div>
-                    <form action="{% url django.contrib.auth.views.login %}" method="post">
+                    <form action="{% url 'django.contrib.auth.views.login' %}" method="post">{% csrf_token %}
                         <table style="display:inline-block">
                             <tr>
                                 <td>{% trans "Login :" %}</td>

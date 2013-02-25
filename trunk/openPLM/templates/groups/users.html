@@ -6,7 +6,7 @@
 {% block content %}
     <div id="group_users"/>
         <h3>{% trans "Users" %}</h3>
-        <form method="post" action="">	
+        <form method="post" action="">{% csrf_token %}	
 
             {{ user_formset.management_form }}
             {% if is_owner %}

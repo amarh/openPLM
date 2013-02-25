@@ -4,7 +4,7 @@
 <div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}">
     {% if detach_objects %}
         <div class="detach-form">
-            <form method="POST" action="./delete/">
+            <form method="POST" action="./delete/">{% csrf_token %}
                 <input type="hidden" name="plmobject" value="{{object.id}}"/>
                 <button type="submit" class="tb-btn tb-btn-mini"><i class="tb-icon-remove icon-remove"></i> {%trans "Detach" %}</button>
             </form>

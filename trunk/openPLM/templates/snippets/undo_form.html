@@ -1,9 +1,9 @@
 {% load i18n plmapp_tags %}
 {% if form.is_multipart %}
 
-<form id="fileupload" enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>
+<form id="fileupload" enctype="multipart/form-data" method="post" action="{{action|default:"."}}" {{ form_attributes }}>{% csrf_token %}
 {% else %}
-    <form method="post" action="{{action|default:"."}}"  {{ form_attributes }}>
+    <form method="post" action="{{action|default:"."}}"  {{ form_attributes }}>{% csrf_token %}
 {% endif %}
     <table class="Content">
         {{ form }}
