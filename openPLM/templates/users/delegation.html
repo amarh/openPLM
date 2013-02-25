@@ -50,7 +50,7 @@
                 {% if is_owner %}
                     {% if link.role != "sponsor" %}
                         <td class="Content">
-                            <form method="post" action="./delete/">
+                            <form method="post" action="./delete/">{% csrf_token %}
                                 <input type="hidden" name="link_id" value="{{link.id}}" />
                                 <input type="submit" class="tb-btn" value="{% trans "STOP DELEGATION" %}"/>
                             </form>
@@ -58,7 +58,7 @@
                     {% else %}
                         {% if link.delegatee.last_login <= link.ctime and link.delegatee.is_active %}
                             <td class="Content">
-                                <form method="post" action="sponsor/mail/">
+                                <form method="post" action="sponsor/mail/">{% csrf_token %}
                                     <input type="hidden" name="link_id" value="{{link.id}}" />
                                     <input type="submit" class="tb-btn" value="{% trans "Resend mail" %}"/>
                                 </form>

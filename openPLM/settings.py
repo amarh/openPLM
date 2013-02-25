@@ -6,6 +6,8 @@
 import sys
 import os.path
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 #XYZ: once your installation is ok, you should change this to False
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -22,7 +24,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
         'NAME': 'openplm',               # Or path to database file if using sqlite3.
         'USER': 'django',                # Not used with sqlite3.
-        #XYZ: should be the password set by the postgresql command 
+        #XYZ: should be the password set by the postgresql command
         # "create role django with password 'MyPassword' login;"
         'PASSWORD': 'MyPassword',        # Not used with sqlite3.
         'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
@@ -57,10 +59,8 @@ MEDIA_ROOT = '/var/django/openPLM/trunk/openPLM/media/'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/media/'
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+STATIC_URL = "/static/"
 
 # Make this unique, and don't share it with anybody.
 # XYZ: the script change_secret_key.py can do this for you
@@ -68,18 +68,20 @@ SECRET_KEY = '0ham7d#fh669-xi@wxf1wcpbhn6tbbegtv_cml()_wcboyw&u&'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    "django.template.loaders.filesystem.Loader",
+    "django.template.loaders.app_directories.Loader",
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.csrf.middleware.CsrfMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
+)
+LOCALE_PATHS = (
+    os.path.join(PROJECT_ROOT, "locale"),
 )
 
 ugettext = lambda s: s
@@ -110,6 +112,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.comments',
     'django.contrib.humanize',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
     'djcelery',
     'haystack',
     'south',
@@ -213,7 +217,7 @@ BROKER_VHOST = "openplm"
 ENABLE_NATIVE_FILE_MANAGEMENT=True
 
 
-# change these settings to True to force https connection 
+# change these settings to True to force https connection
 #: set to True so that browsers ensure the cookie is only sent under an HTTPS connection
 SESSION_COOKIE_SECURE = False
 #: Force HTTPS connections

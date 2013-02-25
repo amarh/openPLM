@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post" action="">	
+    <form method="post" action="">{% csrf_token %}	
 
         {% if user.get_profile.is_contributor and not obj.is_cancelled %}
             {{ parts_formset.management_form }}

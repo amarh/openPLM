@@ -13,6 +13,7 @@
     {% if add_revision_form and obj.is_revisable and user.get_profile.is_contributor %}
         <form id="form-revision" method="POST"
             class= "inline-form {% if confirmation %}confirmation{% endif %}" action="">
+            {% csrf_token %}
             {{ add_revision_form }}
 
             {% if confirmation %}

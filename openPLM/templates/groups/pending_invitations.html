@@ -37,11 +37,11 @@
                         <td class="Content">
                             <form method="POST" action=
                             {% if prefix %}
-                            "..{{inv.group.plmobject_url}}invitation/send/{{inv.pk}}/"
+                            "{{inv.group.plmobject_url}}invitation/send/{{inv.pk}}/"
                             {% else %}
                             "../invitation/send/{{inv.pk}}/"
                             {% endif %}
-                            >
+                            >{% csrf_token %}
                                 <input type="submit" name="Send"
                                 class="tb-btn"
                                 value="{% trans "Resend" %}"/>
@@ -53,7 +53,7 @@
                         <td class="Content">
                             <a href=
                             {% if prefix %}
-                            "..{{inv.group.plmobject_url}}invitation/accept/{{inv.pk}}/" 
+                            "{{inv.group.plmobject_url}}invitation/accept/{{inv.pk}}/" 
                             {% else %}
                             "../invitation/accept/{{inv.pk}}/" 
                             {% endif %}
@@ -64,7 +64,7 @@
                         <td class="Content">
                             <a href=
                             {% if prefix %}
-                            "..{{inv.group.plmobject_url}}invitation/refuse/{{inv.pk}}/" 
+                            "{{inv.group.plmobject_url}}invitation/refuse/{{inv.pk}}/" 
                             {% else %}
                             "../invitation/refuse/{{inv.pk}}/"
                             {% endif %}

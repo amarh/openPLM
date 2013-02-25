@@ -99,7 +99,7 @@ class AjaxTestCase(CommonViewTest):
         self.assertEqual(self.controller.reference, parent["reference"])
         self.assertEqual(self.controller.revision, parent["revision"])
         self.assertTrue("form" in data)
-        
+
     def test_add_child_post(self):
         p2 = self.create("part2")
         data = self.post("/ajax/add_child/%d/" % self.controller.id,
@@ -112,7 +112,7 @@ class AjaxTestCase(CommonViewTest):
         self.assertEqual(link.child.id, p2.id)
         self.assertEqual(link.quantity, 10)
         self.assertEqual(link.order, 10)
-        
+
     def test_add_child_post_error(self):
         p2 = self.create("part2")
         data = self.post("/ajax/add_child/%d/" % self.controller.id,
@@ -141,7 +141,7 @@ class AjaxTestCase(CommonViewTest):
         data = self.post("/ajax/can_attach/%d/" % self.controller.id,
                 type=p2.type, reference=p2.reference, revision=p2.revision)
         self.assertFalse(data["can_attach"])
-    
+
     def test_can_attach_doc_doc(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -168,7 +168,7 @@ class AjaxTestCase(CommonViewTest):
         self.assertEqual(self.controller.reference, plmobject["reference"])
         self.assertEqual(self.controller.revision, plmobject["revision"])
         self.assertTrue("form" in data)
-        
+
     def test_attach_part_doc_post(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -206,7 +206,7 @@ class AjaxTestCase(CommonViewTest):
         doc.add_file(self.get_file())
         f2 = doc.files.all()[0]
         doc.add_thumbnail(f2, thumbnail)
-        
+
         data = self.get("/ajax/thumbnails/%s/%s/%s/" % (doc.type, doc.reference,
             doc.revision))
         files = data["files"]

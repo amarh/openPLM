@@ -65,7 +65,7 @@
         {% trans "You don't have the necessary rights to add/delete files."%}
     {% endif %}
 {% endif %}
-    <form method="POST" action="">
+    <form method="POST" action="">{% csrf_token %}
         {% if is_owner and obj.is_editable %}
             {{ file_formset.management_form }}
             <noscript>

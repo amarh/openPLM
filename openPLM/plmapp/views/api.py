@@ -34,7 +34,7 @@ import django.forms
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseForbidden
-from django.contrib.csrf.middleware import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller, DocumentController

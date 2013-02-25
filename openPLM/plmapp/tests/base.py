@@ -1,5 +1,5 @@
 import os
-
+from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -59,6 +59,7 @@ class BaseTestCase(TestCase):
         return f
 
     def tearDown(self):
+        cache.clear()
         from haystack import backend
         backend.SearchBackend.inmemory_db = None
         super(BaseTestCase, self).tearDown()

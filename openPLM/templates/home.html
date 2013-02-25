@@ -27,7 +27,9 @@
             <div>
                 <h3>{% trans "Groups that you own: pending invitations" %}</h3>
                 <div class="invitations">
+                {% with "yes" as prefix %}
                     {% include "groups/pending_invitations.html" %}
+                {% endwith %}
                 </div>
             </div>
         {% endif %}

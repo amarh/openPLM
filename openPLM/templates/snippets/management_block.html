@@ -25,7 +25,7 @@
                         {% if link.role == 'notified' or link.role == 'reader' %}
                             <li>
 
-                            <form action="../management/delete/" method="POST">
+                            <form action="../management/delete/" method="POST">{% csrf_token %}
                                 <input name="link_id" type="hidden" value="{{link.id}}"/>
                                 <input name="action" type="submit" class="tb-btn" value="{% trans "Delete" %}" />
                             </form>

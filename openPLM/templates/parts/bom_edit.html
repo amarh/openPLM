@@ -4,7 +4,7 @@
 <!-- Manage html display in the Content div which correspond to the "children" menu -->
 
 {% block content %}
-<form method="POST" action="">
+<form method="POST" action="">{% csrf_token %}
     {{ children_formset.management_form }}
     <table class="Content">
         <tr>
