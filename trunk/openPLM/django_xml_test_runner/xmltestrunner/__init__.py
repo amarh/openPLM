@@ -1,13 +1,12 @@
 import signal
-import unittest
 import xmlrunner
-from distutils import dir_util
 
+from unittest import TextTestRunner
 from django.conf import settings
-from django.test.simple import DjangoTestSuiteRunner, DjangoTestRunner
+from django.test.simple import DjangoTestSuiteRunner
 
-class XMLTestRunner(DjangoTestRunner):
-    
+class XMLTestRunner(TextTestRunner):
+
     def __init__(self, name=None, verbosity=0, failfast=False, **kwargs):
         super(XMLTestRunner, self).__init__(verbosity=verbosity, failfast=failfast, **kwargs)
         self.name = name
@@ -17,8 +16,6 @@ class XMLTestRunner(DjangoTestRunner):
         Runs the test suite after registering a custom signal handler
         that triggers a graceful exit when Ctrl-C is pressed.
         """
-        self._default_keyboard_interrupt_handler = signal.signal(signal.SIGINT,
-            self._keyboard_interrupt_handler)
         try:
             result = self._makeResult()
             output_dir = '.'
