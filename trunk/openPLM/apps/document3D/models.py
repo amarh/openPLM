@@ -123,7 +123,8 @@ def handle_step_file(doc_file_pk):
     thumbnail_path = thumbnailfs.path(name)
 
     try:
-        status=subprocess.call(["python", "apps/document3D/generate3D.py", doc_file.file.path,
+        dirname = os.path.dirname(__file__)
+        status=subprocess.call(["python", os.path.join(dirname, "generate3D.py"), doc_file.file.path,
             str(doc_file.id), settings.MEDIA_ROOT+"3D/", thumbnail_path],
             stdout=stdout, stderr=error_file.fileno())
         if status == 0:
@@ -672,7 +673,9 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         temp_file = tempfile.NamedTemporaryFile(delete=True)
         temp_file.write(json.dumps(data_for_product(product)))
         temp_file.seek(0)
-        if subprocess.call(["python", "apps/document3D/generateDecomposition.py",stp_file.file.path,temp_file.name]) == 0:
+        dirname = os.path.dirname(__file__)
+        if subprocess.call(["python", os.path.join(dirname, "generateDecomposition.py"),
+            stp_file.file.path,temp_file.name]) == 0:
 
             update_child_files_BD(product,user,old_product)
             update_root_BD(new_stp_file,stp_file,ctrl,product,f,name,part)
