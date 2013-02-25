@@ -8,7 +8,7 @@ from django.test.simple import DjangoTestSuiteRunner
 class XMLTestRunner(TextTestRunner):
 
     def __init__(self, name=None, verbosity=0, failfast=False, **kwargs):
-        super(XMLTestRunner, self).__init__(verbosity=verbosity, failfast=failfast, **kwargs)
+        super(XMLTestRunner, self).__init__(verbosity=verbosity, **kwargs)
         self.name = name
 
     def run(self, *args, **kwargs):
@@ -24,20 +24,16 @@ class XMLTestRunner(TextTestRunner):
             xmlrunner.XMLTestRunner(result, output_name=self.name,
                                     output_dir=output_dir).run(*args, **kwargs)
         finally:
-            signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
+            pass
         return result
 
     def _makeResult(self):
         result = xmlrunner._XMLTestResult()
-        failfast = self.failfast
 
         def stoptest_override(func):
             def stoptest(test):
                 # If we were set to failfast and the unit test failed,
                 # or if the user has typed Ctrl-C, report and quit
-                if (failfast and not result.wasSuccessful()) or \
-                    self._keyboard_interrupt_intercepted:
-                    result.stop()
                 func(test)
             return stoptest
 
@@ -46,4 +42,4 @@ class XMLTestRunner(TextTestRunner):
 
 class XMLTestSuiteRunner(DjangoTestSuiteRunner):
     def run_suite(self, suite, **kwargs):
-        return XMLTestRunner(name="From_Test_Command", verbosity=self.verbosity, failfast=self.failfast).run(suite)
+        return XMLTestRunner(name="From_Test_Command", verbosity=self.verbosity).run(suite)
