@@ -4,7 +4,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 #    Vous devriez avoir reçu une copie de la Licence Générale Publique GNU avec
 #    ce programme ; si ce n’est pas le cas, consultez :
 #    <http://www.gnu.org/licenses/>.
-#    
+#
 # Contact :
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
@@ -55,10 +55,10 @@ if sys.version_info < (2, 6):
 
 try:
     import django
-    if django.VERSION >= (1, 2):
+    if django.VERSION >= (1, 4):
         installed.append("django")
     else:
-        print "the version of django is too old (1.2 required, found %s)" % django.get_version()
+        print "the version of django is too old (1.4 required, found %s)" % django.get_version()
         not_installed.append("django")
 except ImportError:
     print "django is not installed, see http://djangoproject.com"
