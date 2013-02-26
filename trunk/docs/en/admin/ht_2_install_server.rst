@@ -1,4 +1,4 @@
-===================================================
+z==================================================
 How to install openPLM server (development version)
 ===================================================
 
@@ -22,7 +22,7 @@ This HowTo is based on:
     * PostgreSQL 8.4.4
     * Python 2.6.X
     * Django 1.5.X
-    * Celery 3.X
+    * Celery 3.0.X
     * Haystack 1.2.X
     * Xapian 1.2.X
     * Lepl 5.0
@@ -46,10 +46,11 @@ First, you must install some dependencies:
     #. ``pip install odfpy``
     #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
     #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django python-django-south``
+    #. ``apt-get install python-django python-django-south python-tz``
     #. ``pip install docutils``
     #. ``pip install django-celery``
     #. ``pip install 'django-haystack<2'``
+    #. ``pip install librabbitmq``
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install lepl``
     #. ``apt-get install python-pisa libgsf-bin``
