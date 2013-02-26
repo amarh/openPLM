@@ -27,6 +27,7 @@ This module contains some tests for openPLM.
 """
 
 import datetime
+from django.utils import timezone
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
@@ -413,7 +414,7 @@ class ControllerTest(BaseTestCase):
         link = models.PLMObjectUserLink.current_objects.get(user=self.user, plmobject=controller.object,
                                       role="notified")
         ids = [link.id]
-        t = datetime.datetime.now()
+        t = timezone.now()
         controller.remove_notified(self.user)
         self.assertEqual(0, len(models.PLMObjectUserLink.current_objects.filter(
             plmobject=controller.object, role="notified")))

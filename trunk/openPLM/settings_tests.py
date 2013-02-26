@@ -1,4 +1,10 @@
 #-!- coding:utf-8 -!-
+
+import warnings
+warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+
 # Django settings for openPLM project.
 # tests version
 
@@ -98,6 +104,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     "templates",
 )
+USE_TZ = True
 
 INSTALLED_APPS = (
     'django.contrib.auth',

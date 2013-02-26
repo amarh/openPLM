@@ -1,5 +1,6 @@
 import re
 import datetime
+from django.utils import timezone
 
 from django.conf import settings
 
@@ -73,7 +74,7 @@ def get_new_reference(user, cls, start=0, inbulk_cache=None):
             inbulk_cache["max_" + name] = max_ref
     nb = max_ref + start + 1
     initials = user.first_name[:1] + user.last_name[:1]
-    return format.format(user=user, now=datetime.datetime.now(),
+    return format.format(user=user, now=timezone.now(),
             number=nb, initials=initials)
 
 def parse_reference_number(reference, class_):

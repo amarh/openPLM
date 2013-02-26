@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+from django.utils import timezone
 import os
 from south.db import db
 from south.v2 import DataMigration
@@ -10,7 +11,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Set the ctime field of all document files"
         from django.conf import settings
-        now = datetime.datetime.now()
+        now = timezone.now()
         for df in orm.DocumentFile.objects.all():
             try:
                 path = os.path.join(settings.DOCUMENTS_DIR, df.file.name)

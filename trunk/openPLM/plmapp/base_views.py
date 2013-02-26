@@ -28,6 +28,7 @@
 import re
 import json
 import datetime
+from django.utils import timezone
 from functools import wraps
 import functools
 import traceback
@@ -407,7 +408,7 @@ def get_navigate_data(request, obj_type, obj_ref, obj_revi):
     graph.create_edges()
     map_string, edges = graph.render()
     width, height = edges["width"], edges["height"]
-    past = graph.time and datetime.datetime.now() - graph.time > datetime.timedelta(minutes=5)
+    past = graph.time and timezone.now() - graph.time > datetime.timedelta(minutes=5)
     ctx.update({
         'filter_object_form': form,
         'map_areas': map_string,

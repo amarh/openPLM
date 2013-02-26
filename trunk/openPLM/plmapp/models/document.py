@@ -4,6 +4,7 @@ import string
 import random
 import hashlib
 import datetime
+from django.utils import timezone
 
 from django.db import models
 from django.conf import settings
@@ -139,7 +140,7 @@ class DocumentFile(models.Model):
     document = models.ForeignKey('Document')
     deprecated = models.BooleanField(default=lambda: False)
 
-    ctime = models.DateTimeField(auto_now_add=False, default=datetime.datetime.now)
+    ctime = models.DateTimeField(auto_now_add=False, default=timezone.now)
     end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
     deleted = models.BooleanField(default=False)
     revision = models.IntegerField(default=1)
@@ -228,7 +229,7 @@ class PrivateFile(models.Model):
     file = models.FileField(upload_to=".", storage=docfs)
     size = models.PositiveIntegerField()
     creator = models.ForeignKey(User, related_name="files")
-    ctime = models.DateTimeField(auto_now_add=False, default=datetime.datetime.now)
+    ctime = models.DateTimeField(auto_now_add=False, default=timezone.now)
 
     def __unicode__(self):
         return u"PrivateFile<%s, %s>" % (self.filename, self.creator)

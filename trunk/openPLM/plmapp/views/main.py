@@ -38,6 +38,7 @@ import csv
 import glob
 import json
 import datetime
+from django.utils import timezone
 import tempfile
 import itertools
 from collections import defaultdict
@@ -856,7 +857,7 @@ def display_children(request, obj_type, obj_ref, obj_revi):
             show_documents = display_form.cleaned_data["show_documents"]
             show_alternates = display_form.cleaned_data["show_alternates"]
     else:
-        display_form = forms.DisplayChildrenForm(initial={"date" : datetime.datetime.now(),
+        display_form = forms.DisplayChildrenForm(initial={"date" : timezone.now(),
             "level" : "first", "state":"all"})
     ctx.update(obj.get_bom(date, level, state, show_documents, show_alternates))
     # decomposition
@@ -1049,7 +1050,7 @@ def compare_bom(request, obj_type, obj_ref, obj_revi):
     state = "all"
     show_documents = show_alternates = False
     compact = True
-    now = datetime.datetime.now()
+    now = timezone.now()
     if request.GET:
         cmp_form = forms.CompareBOMForm(request.GET)
         if cmp_form.is_valid():
@@ -1115,7 +1116,7 @@ def display_parents(request, obj_type, obj_ref, obj_revi):
             level = display_form.cleaned_data["level"]
             state = display_form.cleaned_data["state"]
     else:
-        display_form = forms.DisplayChildrenForm(initial=dict(date=datetime.datetime.now(),
+        display_form = forms.DisplayChildrenForm(initial=dict(date=timezone.now(),
             level="first", state="all"))
     # FIXME: show attached documents if asked
     del display_form.fields["show_documents"]

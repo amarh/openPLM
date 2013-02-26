@@ -27,6 +27,7 @@ This module contains some tests for openPLM.
 """
 
 import datetime
+from django.utils import timezone
 import itertools
 
 from openPLM.plmapp.controllers import PLMObjectController, PartController, \
@@ -359,11 +360,11 @@ class PartControllerTest(ControllerTest):
     def test_get_children(self):
         controller4 = self.create("aPart4")
         self.controller.add_child(self.controller2, 10, 15)
-        date = datetime.datetime.now()
+        date = timezone.now()
         self.controller2.add_child(self.controller3, 10, 25)
         self.controller.add_child(controller4, 10, 35)
         self.controller2.object.is_promotable = lambda *args: True
-        date2 = datetime.datetime.now()
+        date2 = timezone.now()
         self.controller2.promote()
         controller4.add_child(self.controller2, 28, 51)
         wanted = [(1, self.controller2.object.pk),
@@ -410,10 +411,10 @@ class PartControllerTest(ControllerTest):
     def test_get_parents(self):
         controller4 = self.create("aPart4")
         self.controller.add_child(self.controller2, 10, 15)
-        date = datetime.datetime.now()
+        date = timezone.now()
         self.controller2.add_child(self.controller3, 10, 15)
         self.controller2.object.is_promotable = lambda *args: True
-        date2 = datetime.datetime.now()
+        date2 = timezone.now()
         self.controller2.promote()
         self.controller.add_child(controller4, 10, 15)
         wanted = [(1, self.controller2.object.pk),

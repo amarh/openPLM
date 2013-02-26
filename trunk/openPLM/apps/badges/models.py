@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils import timezone
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -35,24 +35,24 @@ class Badge(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
     user = models.ManyToManyField(User, related_name="badges", through='BadgeToUser')
     level = models.CharField(max_length=1, choices=LEVEL_CHOICES)
-    
+
     icon = models.ImageField(upload_to='badge_images')
-    
+
     objects = BadgeManager()
-    
+
     @property
     def meta_badge(self):
         from utils import registered_badges
         return registered_badges[self.id]
-    
+
     @property
     def title(self):
         return self.meta_badge.title
-    
+
     @property
     def description(self):
         return self.meta_badge.description
-        
+
     @property
     def link(self):
         """
@@ -62,28 +62,29 @@ class Badge(models.Model):
             return "%s%s" %(settings.DOCUMENTATION_URL, self.meta_badge.link_to_doc)
         else:
             return None
-    
+
     def __unicode__(self):
         return u"%s" % self.title
-    
+
     def get_absolute_url(self):
         return reverse('badge_detail', kwargs={'slug': self.id})
-    
+
     def award_to(self, user, ignore_message=False):
         has_badge = self in user.badges.all()
         if self.meta_badge.one_time_only and has_badge:
             return False
         if self.meta_badge.get_progress_percentage(user=user) < 100 :
             return False
-        
+
         BadgeToUser.objects.create(badge=self, user=user)
-                
+
         badge_awarded.send(sender=self.meta_badge, user=user, badge=self)
-        
+
         if not ignore_message:
             message_template = _(u"You just got the %s Badge!")
-            user.message_set.create(message = message_template % self.title)
-        
+            # FIXME: switch to messages framework
+            #user.message_set.create(message = message_template % self.title)
+
         return BadgeToUser.objects.filter(badge=self, user=user).count()
 
     def number_awarded(self, user_or_qs=None):
@@ -104,5 +105,5 @@ class Badge(models.Model):
 class BadgeToUser(models.Model):
     badge = models.ForeignKey(Badge)
     user = models.ForeignKey(User)
-    
-    created = models.DateTimeField(default=datetime.now)
+
+    created = models.DateTimeField(default=timezone.now)

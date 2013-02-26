@@ -9,6 +9,7 @@ import sys
 import os
 import logging
 import datetime
+from django.utils import timezone
 from django.http import HttpResponse
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ElementTree, Element

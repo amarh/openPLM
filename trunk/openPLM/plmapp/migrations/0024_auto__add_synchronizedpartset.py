@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from django.utils import timezone
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -85,7 +86,7 @@ class Migration(SchemaMigration):
         },
         'plmapp.documentfile': {
             'Meta': {'object_name': 'DocumentFile'},
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'timezone.now'}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'deprecated': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'document': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.Document']"}),

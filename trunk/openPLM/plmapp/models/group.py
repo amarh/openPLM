@@ -1,5 +1,6 @@
 import random
 import datetime
+from django.utils import timezone
 
 from django.db import models
 
@@ -22,7 +23,7 @@ class GroupInfo(Group):
 
     owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
-    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+    ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 
@@ -83,7 +84,7 @@ class Invitation(models.Model):
     owner = models.ForeignKey(User, related_name="%(class)s_inv_owner")
     guest = models.ForeignKey(User, related_name="%(class)s_inv_guest")
     state = models.CharField(max_length=1, choices=STATES, default=PENDING)
-    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+    ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     validation_time = models.DateTimeField(_("date of validation"), null=True)
     guest_asked = models.BooleanField(_("True if guest created the invitation"))

@@ -30,6 +30,7 @@ from :class:`.PLMObjectController` are not defined.
 """
 
 import datetime
+from django.utils import timezone
 
 from django.shortcuts import get_object_or_404
 
@@ -222,7 +223,7 @@ class GroupController(Controller):
             raise PermissionError(u"%s's account is inactive" % self._user)
 
         invitation.state = models.Invitation.ACCEPTED
-        invitation.validation_time = datetime.datetime.now()
+        invitation.validation_time = timezone.now()
 
         user = invitation.guest
         user.groups.add(self.object)
@@ -298,7 +299,7 @@ class GroupController(Controller):
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
         invitation.state = models.Invitation.REFUSED
-        invitation.validation_time = datetime.datetime.now()
+        invitation.validation_time = timezone.now()
         invitation.save()
         # TODO mail
 
