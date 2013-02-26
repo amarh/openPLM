@@ -8,7 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
 from django.http import (HttpResponse, HttpResponseRedirect,
         HttpResponseForbidden, Http404)
-import django.utils.simplejson as json
+import json
 
 from openPLM.plmapp.base_views import (handle_errors, secure_required,
         get_generic_data, get_obj, get_obj_by_id, init_ctx)

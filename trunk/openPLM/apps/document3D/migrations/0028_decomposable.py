@@ -3,7 +3,7 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-import django.utils.simplejson as json
+import json
 
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings

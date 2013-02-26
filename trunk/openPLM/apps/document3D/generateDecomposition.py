@@ -6,7 +6,7 @@ from OCC.STEPCAFControl import *
 from OCC.STEPControl import *
 from OCC.Utils.DataExchange.STEP import StepOCAF_Export
 from STP_converter_WebGL import NEW_STEP_Import
-import django.utils.simplejson as json
+import json
 from classes import Product_from_Arb
 from OCC.GarbageCollector import garbage
 

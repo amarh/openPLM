@@ -2,7 +2,7 @@ from django import forms
 from django.forms.widgets import flatatt
 from django.utils.encoding import smart_unicode
 from django.utils.html import escape
-from django.utils.simplejson import JSONEncoder
+from json import JSONEncoder
 from django.utils.safestring import mark_safe
 
 class JQueryAutoComplete(forms.TextInput):

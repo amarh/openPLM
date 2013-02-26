@@ -32,7 +32,7 @@ import urlparse
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.forms import widgets
-from django.utils.simplejson import JSONEncoder
+from json import JSONEncoder
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponse, HttpResponseForbidden
 from django.template.loader import render_to_string

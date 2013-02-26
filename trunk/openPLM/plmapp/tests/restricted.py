@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.utils.simplejson import JSONDecoder
+from json import JSONDecoder
 from django.core.files.base import ContentFile
 
 import openPLM.plmapp.exceptions as exc

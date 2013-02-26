@@ -10,7 +10,7 @@ from django.db import models
 from django.contrib import admin
 from django.db.models import Q
 from django.core.files import File
-import django.utils.simplejson as json
+import json
 
 from celery.task import task
 

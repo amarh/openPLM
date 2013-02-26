@@ -1,6 +1,6 @@
 import gc
 import sys
-import django.utils.simplejson as json
+import json
 
 import os
 os.environ["MMGT_OPT"] = "0"

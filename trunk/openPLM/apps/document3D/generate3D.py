@@ -4,7 +4,7 @@ import tempfile
 from classes import data_for_product , get_available_name
 from STP_converter_WebGL import NEW_STEP_Import , MultiRoot_Error , OCC_ReadingStep_Error 
 import logging
-import django.utils.simplejson as json
+import json
     
 from pov import create_thumbnail
 

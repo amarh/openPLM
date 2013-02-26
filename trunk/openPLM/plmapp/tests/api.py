@@ -1,4 +1,4 @@
-from django.utils.simplejson import JSONDecoder
+from json import JSONDecoder
 from django.core.files.base import ContentFile
 
 from openPLM.plmapp.tests.views import CommonViewTest

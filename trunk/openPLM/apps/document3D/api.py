@@ -3,7 +3,7 @@ import zipfile
 
 from django.core.files import File
 from django.db import transaction
-import django.utils.simplejson as json
+import json
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
