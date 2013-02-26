@@ -53,12 +53,13 @@
             </div>
 
             {% if messages %}
-                <div id="messages">
-                    <ul class="messages">
-                        {% for message in messages %}
-                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
+                <div id="messages" class="center">
+                    {% for message in messages %}
+                        <div class="tb-alert {% if message.tags %}tb-alert-{{ message.tags }}{% endif %}">
+                            <button type="button" class="tb-close" data-dismiss="alert">&times;</button>
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
 
