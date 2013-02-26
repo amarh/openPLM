@@ -81,6 +81,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
+    'openPLM.apps.badges.middleware.GlobalRequest',
+
 )
 LOCALE_PATHS = (
     os.path.join(PROJECT_ROOT, "locale"),
@@ -130,6 +132,7 @@ INSTALLED_APPS = (
     'openPLM.apps.gdoc',
     'openPLM.apps.subversion',
     'openPLM.apps.ecr',
+    'openPLM.apps.badges',
     'openPLM.plmapp.tests',
 )
 
