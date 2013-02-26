@@ -1,6 +1,6 @@
 
 from django.conf import settings
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 import openPLM.apps.ecr.views as views
 import openPLM.apps.ecr.controllers
 import openPLM.plmapp.views as pviews

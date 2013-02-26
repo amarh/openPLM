@@ -22,7 +22,7 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 import openPLM.apps.cad.views as views
 
 urlpatterns = patterns('',

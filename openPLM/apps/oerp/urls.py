@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('openPLM.apps.oerp.views',
     (r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/$', 'erp_summary'),

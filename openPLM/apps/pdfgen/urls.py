@@ -23,7 +23,7 @@
 ################################################################################
 
 
-from django.conf.urls.defaults import include, patterns, url
+from django.conf.urls import include, patterns, url
 
 def patterns2(view_prefix, url_prefix, *urls):
     urls2 = []
