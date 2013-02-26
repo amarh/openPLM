@@ -97,16 +97,12 @@
                         <span id="sort_method">
                             {% if sort == "name" %}
                                 {% trans "Sorted by name" %}.
+                            {% elif type in "part topassembly" and sort == "children" %}
+                                {% trans "Largest assemblies" %}.
+                            {% elif type == "part" and sort == "most-used" %}
+                                {% trans "Most used" %}.
                             {% else %}
-                                {% if type in "part topassembly" and sort == "children" %}
-                                    {% trans "Largest assemblies" %}.
-                                {% else %}
-                                    {% if type == "part" and sort == "most-used" %}
-                                        {% trans "Most used" %}.
-                                    {% else %}
-                                        {% trans "Recently added" %}.
-                                    {% endif %}
-                                {% endif %}
+                                {% trans "Recently added" %}.
                             {% endif %}
                         </span>
                     {% endblock %}
@@ -115,12 +111,10 @@
                             <span id="state_filter">
                                 {% if state == "official" %}
                                     {% trans "Only official objects" %}.
+                                {% elif state == "published" %}
+                                    {% trans "Only published objects" %}.
                                 {% else %}
-                                    {% if state == "published" %}
-                                        {% trans "Only published objects" %}.
-                                    {% else %}
-                                        {% trans "All objects"%}.
-                                    {% endif %}
+                                    {% trans "All objects"%}.
                                 {% endif %}
                             </span>
                         {% endif %}

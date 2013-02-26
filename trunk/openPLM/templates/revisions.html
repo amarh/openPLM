@@ -25,29 +25,23 @@
     {% else %}
         {% if not user.get_profile.is_contributor %}
             {% trans "You can not revise this object since you are not a contributor." %}
-        {% else %}
-            {% if is_readable %}
+        {% elif is_readable %}
 
-                {% if obj.is_cancelled %}
-                    {% trans "You can not revise this object since it is cancelled." %}
-                {% else %}
-                    {% if obj.is_deprecated %}
-                        {% trans "You can not revise this object since it is deprecated." %}
-                    {% else %}
-                        {% trans "You can not revise this object since a revision already exist." %}
-                    {% endif %}
-                {% endif %}
-
+            {% if obj.is_cancelled %}
+                {% trans "You can not revise this object since it is cancelled." %}
+            {% elif obj.is_deprecated %}
+                {% trans "You can not revise this object since it is deprecated." %}
+            {% else %}
+                {% trans "You can not revise this object since a revision already exist." %}
             {% endif %}
+
         {% endif %}
     {% endif %}
     <div id="rev_list" class="Content">
         {% with obj.is_part|yesno:"parts,documents"|add:"/identity_card.html" as path %}
             {% for object in revisions %}
                 {% if obj.revision == object.revision %}
-                    {% with "current" as type %}
-                        {% include path %}
-                    {% endwith %}
+                    {% include path with type="current"%}
                 {% else %}
                     {% include path %}
                 {% endif %}
