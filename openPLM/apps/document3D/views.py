@@ -97,7 +97,7 @@ def display_public_3d(request, obj_ref, obj_revi):
         'object_menu' : [],
         'navigation_history' : [],
         'obj' : obj,
-        'javascript_arborescense' : javascript_arborescense, 
+        'javascript_arborescense' : javascript_arborescense,
     })
 
     return r2r("public_3d_view.html", ctx, request)
@@ -120,7 +120,7 @@ def public_3d_js(request, obj_id):
     if not js_files:
         return HttpResponse("")
     f = fileinput.FileInput(os.path.join(settings.MEDIA_ROOT, "3D", p) for p in js_files)
-    response = HttpResponse(f, mimetype="text/script")
+    response = HttpResponse(f, content_type="text/script")
     return response
 
 

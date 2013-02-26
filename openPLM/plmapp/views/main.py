@@ -2388,11 +2388,11 @@ def public_download(request, docfile_id, filename=""):
 
 def serve(ctrl, doc_file, filename):
     name = doc_file.filename.encode("utf-8", "ignore")
-    mimetype = guess_type(name, False)[0]
-    if not mimetype:
-        mimetype = 'application/octet-stream'
+    content_type = guess_type(name, False)[0]
+    if not content_type:
+        content_type = 'application/octet-stream'
     f, size = ctrl.get_content_and_size(doc_file)
-    response = HttpResponse(f, mimetype=mimetype)
+    response = HttpResponse(f, content_type=content_type)
     response["Content-Length"] = size
     if not filename:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
@@ -2426,11 +2426,11 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
     if form.is_valid():
         format = form.cleaned_data["format"]
         name = "%s_%s.%s" % (obj_ref, obj_revi, format)
-        mimetype = guess_type(name, False)[0]
-        if not mimetype:
-            mimetype = 'application/octet-stream'
+        content_type = guess_type(name, False)[0]
+        if not content_type:
+            content_type = 'application/octet-stream'
         content = generate_archive(files, format)
-        response = HttpResponse(content, mimetype=mimetype)
+        response = HttpResponse(content, content_type=content_type)
         #response["Content-Length"] = size
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
         return response
