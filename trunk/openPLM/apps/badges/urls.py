@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 import meta_badges
 from openPLM.apps.badges import views
