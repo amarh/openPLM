@@ -17,6 +17,9 @@ settings.py
 To enable the *badges* application, it must be enabled in the settings file: add
 ``'openPLM.apps.badges'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
+You must also add a middleware: add ``'openPLM.apps.badges.middleware.GlobalRequest'``
+to the :const:`MIDDLEWARE_CLASSES` setting (after the ProfileLocaleMiddleware).
+
 
 
 Synchronizing the database

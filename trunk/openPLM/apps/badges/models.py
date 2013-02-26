@@ -1,14 +1,15 @@
 from django.utils import timezone
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.contrib import messages
 from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from signals import badge_awarded
 from managers import BadgeManager
-
-from django.utils.translation import ugettext_lazy as _
+from middleware import get_request
 
 from openPLM.plmapp.models import UserProfile
 
@@ -82,8 +83,9 @@ class Badge(models.Model):
 
         if not ignore_message:
             message_template = _(u"You just got the %s Badge!")
-            # FIXME: switch to messages framework
-            #user.message_set.create(message = message_template % self.title)
+            request = get_request()
+            if request is not None:
+                messages.info(request, message_template % self.title)
 
         return BadgeToUser.objects.filter(badge=self, user=user).count()
 
