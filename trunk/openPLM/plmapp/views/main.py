@@ -37,7 +37,6 @@ import os
 import csv
 import glob
 import json
-import datetime
 from django.utils import timezone
 import tempfile
 import itertools
