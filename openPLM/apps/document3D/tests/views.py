@@ -5,7 +5,7 @@ from openPLM.plmapp.tests.views import CommonViewTest
 from openPLM.apps.document3D.models import Document3DController
 from openPLM.plmapp.decomposers import DecomposersManager
 from django.core.files import File
-from django.utils.simplejson import loads
+from json import loads
 
 
 

@@ -36,6 +36,7 @@ render HTML with the django template engine.
 import os
 import csv
 import glob
+import json
 import datetime
 import tempfile
 import itertools
@@ -57,7 +58,6 @@ from django.http import (HttpResponseRedirect, HttpResponse, Http404,
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
-from django.utils import simplejson
 from django.views.i18n import set_language as dj_set_language
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
@@ -2487,7 +2487,7 @@ def navigate(request, obj_type, obj_ref, obj_revi):
     .. include:: views_params.txt
     """
     ctx = get_navigate_data(request, obj_type, obj_ref, obj_revi)
-    ctx["edges"] = simplejson.dumps(ctx["edges"])
+    ctx["edges"] = json.dumps(ctx["edges"])
     return r2r('navigate.html', ctx, request)
 
 @handle_errors

@@ -26,6 +26,7 @@
 
 
 import re
+import json
 import datetime
 from functools import wraps
 import functools
@@ -34,7 +35,6 @@ import sys
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.utils import simplejson
 from django.core.mail import mail_admins
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseForbidden, Http404
@@ -83,7 +83,7 @@ def json_view(func, API_VERSION=""):
     """
     Decorator which converts the result from *func* into a json response.
 
-    The result from *func* must be serializable by :mod:`django.utils.simple_json`
+    The result from *func* must be serializable by :mod:`json`
 
     This decorator automatically adds a ``result`` field to the response if it
     was not present. Its value is ``'ok'`` if no exception was raised, and else,
@@ -116,8 +116,8 @@ def json_view(func, API_VERSION=""):
             msg = _('Internal error') + ': ' + str(e)
             response = {'result' : 'error', 'error' : msg}
         response["api_version"] = API_VERSION
-        json = simplejson.dumps(response)
-        return HttpResponse(json, mimetype='application/json')
+        json_data = json.dumps(response)
+        return HttpResponse(json_data, mimetype='application/json')
 
     return secure_required(wrapper)
 

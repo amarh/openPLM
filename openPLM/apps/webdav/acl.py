@@ -15,8 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import simplejson as json
 
 
 class WebDavPrivilegeException(Exception):
@@ -24,17 +24,17 @@ class WebDavPrivilegeException(Exception):
 
 
 class WebDavAcl(object):
-    PRIVILEGES = ["write", 
-                  "write-property", 
+    PRIVILEGES = ["write",
+                  "write-property",
                   "write-content",
-                  "unlock", 
-                  "read-acl", 
+                  "unlock",
+                  "read-acl",
                   "write-acl",
                   "read-current-user-privilege-set",
-                  "bind", 
+                  "bind",
                   "unbind",
                   "all"]
-    
+
     def __init__(self, user_dict = {}, group_dict = {}):
         self.user_dict = user_dict
         self.group_dict = group_dict
@@ -93,7 +93,7 @@ class WebDavAcl(object):
         Set a list of privileges for the group.
         """
         self.group_dict[group.name] = privs
-                
+
     def has_privileges(self, djangouser, *privs):
         """
         Tests whether or not the user has the specified privs.
