@@ -20,31 +20,26 @@
                 {% endif %}
                 {% if last_revision.deprecated %}
                     {% trans "Deprecated." %}
-                {% else %}
-                    {% if is_owner and obj.is_editable %}
+                {% elif is_owner and obj.is_editable %}
 
-                        {% if last_revision.locked %}
-                            <a class="tb-btn" href="{{obj.plmobject_url}}files/checkin/{{last_revision.id|urlencode }}/">
-                                <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
-                            </a>
-                        {% else %}
+                    {% if last_revision.locked %}
+                        <a class="tb-btn" href="{{obj.plmobject_url}}files/checkin/{{last_revision.id|urlencode }}/">
+                            <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                        </a>
+                    {% elif last_revision.checkout_valid %}
 
-                            {% if last_revision.checkout_valid %}
-
-                                <a class="tb-btn
-                                    {% if last_revision.native_related %}check-out {% endif %}"
-                                    href="{{obj.plmobject_url}}files/checkout/{{last_revision.id|urlencode }}/">
-                                    <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                </a>                                    
-
-                            {% else %}
-                                {% trans "Native related file is locked" %}
-                            {% endif %}
-                        {% endif %} 
+                        <a class="tb-btn
+                            {% if last_revision.native_related %}check-out {% endif %}"
+                            href="{{obj.plmobject_url}}files/checkout/{{last_revision.id|urlencode }}/">
+                            <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                        </a>                                    
 
                     {% else %}
-                        {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
-                    {% endif %}
+                        {% trans "Native related file is locked" %}
+                    {% endif %} 
+
+                {% else %}
+                    {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
                 {% endif %}
                 </p>
             </div>
