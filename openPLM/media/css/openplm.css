@@ -1216,6 +1216,8 @@ a.decomposable {
     margin: 0.5em auto;
     width: 40em;
     border: 1px solid #c6c5c5;
+    padding: 1em;
+    background-color: #eee;
 }
 
 #messages li.error {
