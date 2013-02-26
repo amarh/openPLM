@@ -27,9 +27,7 @@
             <div>
                 <h3>{% trans "Groups that you own: pending invitations" %}</h3>
                 <div class="invitations">
-                {% with "yes" as prefix %}
-                    {% include "groups/pending_invitations.html" %}
-                {% endwith %}
+                {% include "groups/pending_invitations.html" with prefix="yes" %}
                 </div>
             </div>
         {% endif %}
@@ -37,14 +35,10 @@
     {% with pending_invitations_guest as pending_invitations %}
         {% if pending_invitations %}
             <div>
-
                 <h3>{% trans "Groups that you may join: pending invitations" %}</h3>
                 <div class="invitations">
-                {% with "yes" as prefix %}
-                    {% include "groups/pending_invitations.html" %}
-                {% endwith %}
+                {% include "groups/pending_invitations.html" with prefix="yes" %}
                 </div>
-
             </div>
         {% endif %}
     {% endwith %}
