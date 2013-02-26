@@ -53,18 +53,16 @@
 {% endblock scripts %}
 
 {% block content %}
-{% if is_owner and obj.is_editable %}
-<div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
-    <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
-{% include "documents/files_add.html" %}
-</div>
-{% else %}
-    {% if is_owner %}
+    {% if is_owner and obj.is_editable %}
+    <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
+        <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
+        {% include "documents/files_add.html" %}
+    </div>
+    {% elif is_owner %}
         {% trans "The status of this document does not allow adding/deleting files." %}
     {% else %}
         {% trans "You don't have the necessary rights to add/delete files."%}
     {% endif %}
-{% endif %}
     <form method="POST" action="">{% csrf_token %}
         {% if is_owner and obj.is_editable %}
             {{ file_formset.management_form }}
@@ -135,20 +133,14 @@
                                     <a class="tb-btn" href="./checkin/{{instance.id|urlencode }}/">
                                         <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
                                     </a>
+                                {% elif instance.checkout_valid %}
+                                    <a class="tb-btn
+                                        {% if instance.native_related %}check-out {% endif %}"
+                                        href="./checkout/{{instance.id|urlencode }}/">
+                                        <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                    </a>                                    
                                 {% else %}
-
-                                    {% if instance.checkout_valid %}
-
-                                        <a class="tb-btn
-                                            {% if instance.native_related %}check-out {% endif %}"
-                                            href="./checkout/{{instance.id|urlencode }}/">
-                                            <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                        </a>                                    
-
-
-                                    {% else %}
-                                        {% trans "Native related file is locked" %}
-                                    {% endif %}
+                                    {% trans "Native related file is locked" %}
                                 {% endif %} 
 
                             {% else %}
