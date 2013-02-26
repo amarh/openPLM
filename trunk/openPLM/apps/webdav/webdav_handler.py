@@ -157,8 +157,7 @@ class WebDavHandler(object):
 
     def handle_propfind(self, request):
         path = self.get_final_path_part(request.path)
-        props = get_propfind_properties_from_xml(getattr(request, 'body',
-            getattr(request, 'raw_post_data')))
+        props = get_propfind_properties_from_xml(request.body)
         items = self.backend.dav_propfind(path, props)
         # NOT sure whether or not this is a good idea:
         #sub_setups = request.setup.get_sub_setups()
@@ -166,7 +165,7 @@ class WebDavHandler(object):
         #    subname = sub.name[len(request.setup.name) + 1:]
         #    subname = subname.split("/", 1)[0]
         #    propset = PropertySet({"getcontentlength":0})
-        #    items.append(BackendItem(subname, True, 
+        #    items.append(BackendItem(subname, True,
         #                             [propset]))
         s = get_multistatus_response_xml(request.build_absolute_uri(), items)
         response = HttpResponse(s, None, 207, "text/xml; charset=utf-8")
@@ -242,11 +241,11 @@ class WebDavHandler(object):
                 parsed = urlparse(items[0][0])
                 path = self.get_final_path_part(parsed.path)
                 token = items[0][1]
-        lock = self.backend.dav_lock(path, 
+        lock = self.backend.dav_lock(path,
                                      token,
                                      owner=request.user.username,
-                                     exclusive=True, 
-                                     infinite=True, 
+                                     exclusive=True,
+                                     infinite=True,
                                      timeout=0,
                                      )
         if lock:
@@ -254,7 +253,7 @@ class WebDavHandler(object):
             response = HttpResponse(s, None, 200, "text/xml; charset=utf-8")
             response["Lock-Token"] = lock.token
         else:
-            response = HttpResponse("412 Precondition Failed", None, 412, 
+            response = HttpResponse("412 Precondition Failed", None, 412,
                                     "text/plain")
         return response
 
@@ -269,4 +268,4 @@ class WebDavHandler(object):
         response = HttpResponse("204 No Content", None, 204, "text/plain")
         return response
 
-    
+

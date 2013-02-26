@@ -77,7 +77,7 @@ class OpenPLMBackend(Backend):
     def dav_propfind(self, path, property_list):
         ret = []
         ctrl, p = self.get_doc(path)
-        now = datetime.utcnow() 
+        now = datetime.utcnow()
 
         files = [ {"size": 4096, "locked" : False, "locker" : None,
                   "filename" : "", "is_dir" : True, "ctime" : now,  "mtime" : now,} ]
@@ -119,10 +119,10 @@ class OpenPLMBackend(Backend):
                         st = os.stat(docfs.path(f["file"]))
                         f["ctime"] = datetime.fromtimestamp(st.st_ctime)
                         f["mtime"] = datetime.fromtimestamp(st.st_mtime)
-                    except OSError:                    
+                    except OSError:
                         f["ctime"] = f["mtime"] = now
                     files.append(f)
-        
+
         for f in files:
             props_ok = {}
             props_not_found = {}
@@ -166,7 +166,7 @@ class OpenPLMBackend(Backend):
             f = BackendItem(
                 f["filename"],
                 f["is_dir"],
-                [PropertySet(props_ok), 
+                [PropertySet(props_ok),
                  PropertySet(props_not_found, "404 Not Found")]
                 )
             ret.append(f)
@@ -218,30 +218,10 @@ class OpenPLMBackend(Backend):
             tmpdir = settings.FILE_UPLOAD_TEMP_DIR
             with tempfile.NamedTemporaryFile(mode="r+w", dir=tmpdir) as f:
                 logger.debug("opened file '%s' for writing"%p)
-                if hasattr(readable, 'read'):
+                data = readable.read()
+                while data:
+                    f.write(data)
                     data = readable.read()
-                    while data:
-                        f.write(data)
-                        data = readable.read()
-                elif hasattr(readable, 'environ'):
-                    # this is how WSGIRequest builds raw_post_data in django 1.2
-                    # it should not consume too much memory
-                    try:
-                        fobj = readable.environ['wsgi.input']
-                        try:
-                            # CONTENT_LENGTH might be absent if POST doesn't have content at all (lighttpd)
-                            content_length = int(readable.environ.get('CONTENT_LENGTH', 0))
-                        except (ValueError, TypeError):
-                            # If CONTENT_LENGTH was empty string or not an integer, don't
-                            # error out. We've also seen None passed in here (against all
-                            # specs, but see ticket #8259), so we handle TypeError as well.
-                            content_length = 0
-                        if content_length > 0:
-                            safe_copyfileobj(fobj, f, size=content_length)
-                    except KeyError:
-                        f.write(readable.raw_post_data)
-                else:
-                    f.write(readable.raw_post_data)
                 f.flush()
                 f.seek(0)
                 f2 = File(open(f.name, "rb"), p[0])
@@ -250,22 +230,22 @@ class OpenPLMBackend(Backend):
                 else:
                     d.add_file(f2)
                 return
-            
+
         raise BackendIOException("Can not add a file")
 
     def dav_copy(self, path1, path2, token = None):
         raise NotImplementedError()
-        
+
     def dav_move(self, path1, path2, token1 = None, token2 = None):
         raise NotImplementedError()
-      
+
     def dav_lock(self, path, token = None, **kwargs):
         raise NotImplementedError()
 
     def dav_unlock(self, path, token, owner = None):
         raise NotImplementedError()
-      
+
     def dav_get_lock(self, path):
         raise NotImplementedError()
-        
+
 
