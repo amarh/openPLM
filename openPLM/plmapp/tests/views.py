@@ -28,6 +28,7 @@ This module contains some tests for openPLM.
 
 import os
 import datetime
+from django.utils import timezone
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -2221,7 +2222,7 @@ class UserViewTestCase(CommonViewTest):
     def test_resend_sponsor_error_user_connected(self):
         user = User(username="dede", email="dede@example.net")
         self.controller.sponsor(user)
-        user.last_login = datetime.datetime.now()
+        user.last_login = timezone.now()
         user.save()
         link = m.DelegationLink.objects.get(role="sponsor", delegatee=user)
         pwd = user.password

@@ -102,6 +102,8 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     "/var/django/openPLM/trunk/openPLM/templates",
 )
+USE_TZ = True
+
 
 #: list of installed apps
 INSTALLED_APPS = (

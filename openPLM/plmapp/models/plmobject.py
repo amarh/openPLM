@@ -1,5 +1,6 @@
 
 import datetime
+from django.utils import timezone
 from functools import wraps
 
 from django.db import models
@@ -178,7 +179,7 @@ class PLMObject(AbstractPLMObject):
                                 related_name="%(class)s_creator")
     owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
-    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+    ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
     group = models.ForeignKey(GroupInfo, verbose_name=_("group"), related_name="%(class)s_group")

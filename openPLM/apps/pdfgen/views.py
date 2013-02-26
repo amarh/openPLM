@@ -25,6 +25,7 @@
 ################################################################################
 
 import datetime
+from django.utils import timezone
 import warnings
 from collections import namedtuple
 

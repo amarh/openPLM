@@ -26,6 +26,7 @@
 """
 
 import datetime
+from django.utils import timezone
 import re
 
 from django.conf import settings
@@ -281,7 +282,7 @@ class PLMObjectController(Controller):
 
     def _update_state_history(self):
         """ Updates the :class:`.StateHistory` table of the object."""
-        now = datetime.datetime.now()
+        now = timezone.now()
         try:
             # ends previous StateHistory if it exists
             # here we do not try to see if the state has not changed since

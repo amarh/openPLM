@@ -28,6 +28,7 @@
 import os
 import shutil
 import datetime
+from django.utils import timezone
 
 import Image
 from django.conf import settings
@@ -453,7 +454,7 @@ class DocumentController(PLMObjectController):
 
         if doc_file.locked:
             self.unlock(doc_file)
-        now = datetime.datetime.now()
+        now = timezone.now()
         previous_revision = doc_file.previous_revision
         doc_file.previous_revision = None
         doc_file.save()
@@ -498,7 +499,7 @@ class DocumentController(PLMObjectController):
                 df.thumbnail.delete(save=False)
                 df.thumbnail = None
             if df.end_time is None:
-                df.end_time = datetime.datetime.now()
+                df.end_time = timezone.now()
             df.deleted = True
             df.deprecated = True
             df.save()

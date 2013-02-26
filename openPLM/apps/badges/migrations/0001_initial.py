@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+from django.utils import timezone
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -21,7 +22,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('badge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['badges.Badge'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=timezone.now)),
         ))
         db.send_create_signal('badges', ['BadgeToUser'])
 
@@ -75,7 +76,7 @@ class Migration(SchemaMigration):
         'badges.badgetouser': {
             'Meta': {'object_name': 'BadgeToUser'},
             'badge': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['badges.Badge']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'timezone.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },

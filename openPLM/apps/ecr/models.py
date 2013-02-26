@@ -1,4 +1,5 @@
 import datetime
+from django.utils import timezone
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -78,7 +79,7 @@ class ECR(models.Model, pmodels.IObject):
                                 related_name="%(class)s_creator")
     owner = models.ForeignKey(User, verbose_name=_("owner"),
                               related_name="%(class)s_owner")
-    ctime = models.DateTimeField(_("date of creation"), default=datetime.datetime.today,
+    ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 

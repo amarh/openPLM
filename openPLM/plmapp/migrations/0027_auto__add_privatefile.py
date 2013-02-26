@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from django.utils import timezone
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -15,7 +16,7 @@ class Migration(SchemaMigration):
             ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
             ('size', self.gf('django.db.models.fields.PositiveIntegerField')()),
             ('creator', self.gf('django.db.models.fields.related.ForeignKey')(related_name='files', to=orm['auth.User'])),
-            ('ctime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('ctime', self.gf('django.db.models.fields.DateTimeField')(default=timezone.now)),
         ))
         db.send_create_signal('plmapp', ['PrivateFile'])
 
@@ -84,7 +85,7 @@ class Migration(SchemaMigration):
         },
         'plmapp.documentfile': {
             'Meta': {'object_name': 'DocumentFile'},
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'timezone.now'}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'deprecated': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'document': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['plmapp.Document']"}),
@@ -209,7 +210,7 @@ class Migration(SchemaMigration):
         'plmapp.privatefile': {
             'Meta': {'object_name': 'PrivateFile'},
             'creator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': "orm['auth.User']"}),
-            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'timezone.now'}),
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'filename': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

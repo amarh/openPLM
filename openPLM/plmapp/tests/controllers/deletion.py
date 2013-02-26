@@ -1,5 +1,6 @@
 import os
 import datetime
+from django.utils import timezone
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import DocumentController

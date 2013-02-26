@@ -26,6 +26,7 @@
 """
 import difflib
 import datetime
+from django.utils import timezone
 from itertools import izip_longest
 from collections import namedtuple, defaultdict
 
@@ -264,7 +265,7 @@ class PartController(PLMObjectController):
             link.unit == new_unit and original_extension_data == extension_data):
             # do not make an update if it is useless
             return
-        link.end_time = datetime.datetime.today()
+        link.end_time = timezone.now()
         link.save()
         # make a new link
         link2, extensions = link.clone(quantity=new_quantity, order=new_order,
@@ -719,7 +720,7 @@ class PartController(PLMObjectController):
             models.DocumentPartLink.objects.create(part=new_controller.object,
                     document=doc)
         # for each parent, replace its child with the new revision
-        now = datetime.datetime.today()
+        now = timezone.now()
         for link, parent in parents:
             link.clone(save=True, parent=parent, child=new_controller.object)
             if link.parent_id == parent.id:

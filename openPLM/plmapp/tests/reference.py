@@ -3,6 +3,7 @@
 
 import re
 import datetime
+from django.utils import timezone
 from django.conf import settings
 
 from openPLM.plmapp.references import get_new_reference, REFERENCE_PATTERNS
@@ -62,7 +63,7 @@ class SuggestedReferenceTestCase(BaseTestCase):
                 "part": ("{now:%y}-{number}-part", r'^\d\d-(\d+)-part$'),
                 "doc": ("{now:%y}-{number}-doc", r'^\d\d-(\d+)-doc$'),
         }
-        now = datetime.datetime.now()
+        now = timezone.now()
         year = now.strftime("%y")
         self.create("%s-5-part" % year)
         self.assertNewReference("%s-6-part" % year, Part)

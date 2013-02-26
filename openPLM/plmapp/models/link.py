@@ -1,4 +1,5 @@
 import datetime
+from django.utils import timezone
 import kjbuckets
 
 
@@ -40,7 +41,7 @@ class LinkQuerySet(QuerySet):
         Ends all alive links: sets theur :attr:`end_time` to the current time and saves them
         if there :attr:`end_time` are not already set.
         """
-        return self.now().update(end_time=datetime.datetime.now())
+        return self.now().update(end_time=timezone.now())
 
 
 class LinkManager(models.Manager):
@@ -157,7 +158,7 @@ class Link(models.Model):
         if its :attr:`end_time` is not already set.
         """
         if self.end_time is None:
-            self.end_time = datetime.datetime.now()
+            self.end_time = timezone.now()
             self.save()
 
 class ParentChildLink(Link):

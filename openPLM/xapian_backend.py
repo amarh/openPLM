@@ -7,6 +7,7 @@ __version__ = (1, 1, 6, 'beta')
 
 import time
 import datetime
+from django.utils import timezone
 import cPickle as pickle
 import os
 import re

@@ -1,5 +1,6 @@
 
 import datetime
+from django.utils import timezone
 
 from django.conf import settings
 from django.db import models
@@ -239,7 +240,7 @@ class StateHistory(models.Model):
     state = models.ForeignKey(State)
     lifecycle = models.ForeignKey(Lifecycle)
     start_time = models.DateTimeField(_("date of promotion"),
-            default=datetime.datetime.today, auto_now_add=False)
+            default=timezone.now, auto_now_add=False)
     end_time = models.DateTimeField(null=True)
     state_category = models.PositiveSmallIntegerField(choices=STATE_CATEGORIES)
 

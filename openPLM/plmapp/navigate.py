@@ -29,6 +29,8 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 
 import re
 import datetime
+from django.utils import timezone
+from django.forms.util import from_current_timezone
 import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
@@ -241,8 +243,10 @@ class NavigationGraph(object):
             if date == datetime.date.today() and time is None:
                 self.time = None
             else:
-                self.time = datetime.datetime.combine(date or datetime.date.today(),
-                    time or datetime.time())
+                time = time or datetime.time()
+                date = date or datetime.date.today()
+                self.time = datetime.datetime.combine(date or datetime.date.today(), time)
+                self.time = from_current_timezone(self.time)
         else:
             self.time = None
 
