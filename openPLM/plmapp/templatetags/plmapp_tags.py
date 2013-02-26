@@ -348,3 +348,14 @@ def main_type(obj):
         return obj["type"]
     return getattr(obj, "type", "").lower()
 
+
+
+@register.inclusion_tag('snippets/confirmation_form.html', takes_context=True)
+def confirm(context, action, action_label, msg):
+    return {
+        "action": action,
+        "action_label": action_label,
+        "msg": msg,
+        "action_url": context["action_url"],
+        "password_form": context["password_form"],
+    }

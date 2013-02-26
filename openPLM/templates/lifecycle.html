@@ -69,7 +69,7 @@
 
         {# demote #}
         {% if is_signer_dm and obj.is_proposed %}
-            {% include "snippets/confirmation_form.html" with action="demote" action_label=_("DEMOTE") msg=_("Are you sure you want to demote this object.") %}
+            {% confirm "demote" _("DEMOTE") _("Are you sure you want to demote this object.") %}
         {% endif %}
 
         {# promotion form #}
@@ -154,24 +154,24 @@
 
         {# discard approvals #}
         {% if is_signer and approvers %}
-            {% include "snippets/confirmation_form.html" with action="discard" action_label=_("Discard approvals") msg=_("Warning, all signers will have to approve again the promotion.") %}
+            {% confirm "discard" _("Discard approvals") _("Warning, all signers will have to approve again the promotion.") %}
         {% endif %}
 
         {# cancel #}
         {% if can_cancel %}
-            {% include "snippets/confirmation_form.html" with action="cancel" action_label=_("CANCEL") msg=_("Warning, if you cancel this object, it won't be anymore accessible to everyone.") %}
+            {% confirm "cancel" _("CANCEL") _("Warning, if you cancel this object, it won't be anymore accessible to everyone.") %}
         {% endif %}
 
 
         {# publish #}
         {% if obj.can_publish %}
-            {% include "snippets/confirmation_form.html" with action="publish" action_label=_("PUBLISH") msg=_("Warning, if you publish this object, it will be accessible to everyone, including anonymous users.") %}
+            {% confirm "publish" _("PUBLISH") _("Warning, if you publish this object, it will be accessible to everyone, including anonymous users.") %}
         {% endif %}
 
         {% if obj.published %}
             {# unpublish #}
             {% if obj.can_unpublish %}
-                {% include "snippets/confirmation_form.html" with action="unpublish" action_label=_("UNPUBLISH") msg=_("Warning, if you unpublish this object, it won't be anymore accessible to everyone.") %}
+                {% confirm "unpublish" _("UNPUBLISH") _("Warning, if you unpublish this object, it won't be anymore accessible to everyone.") %}
             {% endif %}
 
             <div id="published-info">
