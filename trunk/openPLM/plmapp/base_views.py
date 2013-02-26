@@ -117,7 +117,7 @@ def json_view(func, API_VERSION=""):
             response = {'result' : 'error', 'error' : msg}
         response["api_version"] = API_VERSION
         json_data = json.dumps(response)
-        return HttpResponse(json_data, mimetype='application/json')
+        return HttpResponse(json_data, content_type='application/json')
 
     return secure_required(wrapper)
 

@@ -99,7 +99,7 @@ def ajax_autocomplete(request, obj_type, field):
     :param str field: a valid field (like ``"name"``)
     """
     if not request.GET.get('term'):
-       return HttpResponse(mimetype='text/plain')
+       return HttpResponse(content_type='text/plain')
     term = request.GET.get('term')
     limit = 50
     try:
@@ -119,7 +119,7 @@ def ajax_autocomplete(request, obj_type, field):
     results = cls.objects.filter(**{"%s__icontains" % field : term})
     results = results.values_list(field, flat=True).order_by(field).distinct()
     json = JSONEncoder().encode(list(str(r) for r in results[:limit]))
-    return HttpResponse(json, mimetype='application/json')
+    return HttpResponse(json, content_type='application/json')
 
 @ajax_login_required
 @json_view

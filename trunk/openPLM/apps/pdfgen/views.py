@@ -3,7 +3,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -121,7 +121,7 @@ class StreamedPdfFileWriter(PdfFileWriter):
         s = self._header + "\n"
         yield s
         length += len(s)
-        
+
         externalReferenceMap = {}
         self.set = set()
         self._sweepIndirectReferences(externalReferenceMap, self._root)
@@ -162,7 +162,7 @@ class StreamedPdfFileWriter(PdfFileWriter):
             trailer[NameObject("/Encrypt")] = self._encrypt
         trailer.writeToStream(stream, None)
         yield stream.getvalue()
-        
+
         # eof
         yield("\nstartxref\n%s\n%%%%EOF\n" % (xref_location))
         warnings.simplefilter('default', DeprecationWarning)
@@ -175,7 +175,7 @@ def render_to_pdf(template_src, context_dict, filename):
     result = StringIO.StringIO()
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-16")), result)
     if not pdf.err:
-        response = http.HttpResponse(result.getvalue(), mimetype='application/pdf')
+        response = http.HttpResponse(result.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         warnings.simplefilter('default', DeprecationWarning)
         return response
@@ -239,13 +239,13 @@ def download_merged_pdf(obj, files):
     inp = PdfFileReader(result)
     for page in inp.pages:
         output.addPage(page)
-    
+
     # append all pdfs
     for pdf_file in files:
         inp = PdfFileReader(file(pdf_file.file.path, "rb"))
         for page in inp.pages:
             output.addPage(page)
-    response = http.HttpResponse(output, mimetype='application/pdf')
+    response = http.HttpResponse(output, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     warnings.simplefilter('default', DeprecationWarning)
     return response
@@ -266,7 +266,7 @@ def select_pdf_document(request, ctx, obj):
                 if selected:
                     df = form.cleaned_data["id"]
                     files.append(df)
-            return download_merged_pdf(obj, files) 
+            return download_merged_pdf(obj, files)
     else:
         formset = get_pdf_formset(obj)
     ctx["pdf_formset"] = formset
@@ -296,10 +296,10 @@ def select_pdf_part(request, ctx, obj):
             ctrl = get_controller(doc.type)(doc, request.user)
             if ctrl.check_readable(raise_=False):
                 formset = get_pdf_formset(doc, data,
-                        prefix="pdf_%s_%d" % (link.id, doc.id))   
+                        prefix="pdf_%s_%d" % (link.id, doc.id))
                 link.formsets.append(formset)
         formsets.append((level, link))
-        
+
     if data:
         # returns a pdf file if all formsets are valid
         valid = True
@@ -315,7 +315,7 @@ def select_pdf_part(request, ctx, obj):
                 else:
                     valid = False
         if valid:
-            return download_merged_pdf(obj, files) 
+            return download_merged_pdf(obj, files)
     ctx["children"] = formsets
     return r2r("select_pdf_part.html", ctx, request)
 
@@ -323,7 +323,7 @@ def select_pdf_part(request, ctx, obj):
 def select_pdf(request, obj_type, obj_ref, obj_revi):
     """
     View to download a merged pdf file that contains all pdf files.
-    
+
     Redirects to :func:`select_pdf_part` or :func:`select_pdf_document`
     according to the type of the object.
 
@@ -342,7 +342,7 @@ def select_pdf(request, obj_type, obj_ref, obj_revi):
 def bom_pdf(request, obj_type, obj_ref, obj_revi):
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     obj.check_readable(raise_=True)
-    
+
     if not hasattr(obj, "get_children"):
         # TODO
         raise TypeError()
