@@ -55,10 +55,10 @@ if sys.version_info < (2, 6):
 
 try:
     import django
-    if django.VERSION >= (1, 4):
+    if django.VERSION >= (1, 5):
         installed.append("django")
     else:
-        print "the version of django is too old (1.4 required, found %s)" % django.get_version()
+        print "the version of django is too old (1.5 required, found %s)" % django.get_version()
         not_installed.append("django")
 except ImportError:
     print "django is not installed, see http://djangoproject.com"
