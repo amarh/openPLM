@@ -244,6 +244,13 @@ For example:
 To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 
 
+Configure allowed hosts
+==========================
+
+Django 1.5 checks the host before serving a request.
+You must edit the :django:setting:`ALLOWED_HOSTS` setting so that
+django accepts to serve your requests.
+
 Check required modules
 ======================
     
