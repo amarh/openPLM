@@ -54,7 +54,7 @@ from django.db.models import Q
 from django.forms import HiddenInput
 from django.http import (HttpResponseRedirect, HttpResponse, Http404,
                         HttpResponsePermanentRedirect, HttpResponseForbidden,
-                        HttpResponseBadRequest)
+                        HttpResponseBadRequest, StreamingHttpResponse)
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -2392,7 +2392,7 @@ def serve(ctrl, doc_file, filename):
     if not content_type:
         content_type = 'application/octet-stream'
     f, size = ctrl.get_content_and_size(doc_file)
-    response = HttpResponse(f, content_type=content_type)
+    response = StreamingHttpResponse(f, content_type=content_type)
     response["Content-Length"] = size
     if not filename:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
@@ -2430,8 +2430,7 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
         if not content_type:
             content_type = 'application/octet-stream'
         content = generate_archive(files, format)
-        response = HttpResponse(content, content_type=content_type)
-        #response["Content-Length"] = size
+        response = StreamingHttpResponse(content, content_type=content_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
         return response
     return HttpResponseForbidden()

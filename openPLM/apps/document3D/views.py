@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
 from django.http import (HttpResponse, HttpResponseRedirect,
-        HttpResponseForbidden, Http404)
+        HttpResponseForbidden, Http404, StreamingHttpResponse)
 import json
 
 from openPLM.plmapp.base_views import (handle_errors, secure_required,
@@ -120,7 +120,7 @@ def public_3d_js(request, obj_id):
     if not js_files:
         return HttpResponse("")
     f = fileinput.FileInput(os.path.join(settings.MEDIA_ROOT, "3D", p) for p in js_files)
-    response = HttpResponse(f, content_type="text/script")
+    response = StreamingHttpResponse(f, content_type="text/script")
     return response
 
 

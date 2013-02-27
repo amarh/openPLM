@@ -814,7 +814,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual(1, files.count())
         df = files[0]
         self.assertTrue(df.locked)
-        self.assertEqual("oh oh oh", response.content)
+        self.assertEqual("oh oh oh", "".join(response.streaming_content))
 
     def test_add_file_get(self):
         response = self.get(self.base_url + "files/add/")
@@ -2047,7 +2047,7 @@ class UserViewTestCase(CommonViewTest):
 
         old_lang = translation.get_language()
         translation.activate(self.LANGUAGE)
-        key = _("e-mail address")
+        key = _("email address")
         translation.activate(old_lang)
         del old_lang
 
