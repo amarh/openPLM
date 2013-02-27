@@ -147,6 +147,11 @@ if "openPLM.apps.document3D" in INSTALLED_APPS:
         "openPLM.apps.document3d.models.decomposer_all": {"queue": "step"},
     })
 
+
+#XYZ: allowed hosts
+#: see :django:setting:`ALLOWED_HOSTS`
+ALLOWED_HOSTS = ["www.example.com",]
+
 #XYZ: EMAIL settings
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST
 EMAIL_HOST = 'localhost'

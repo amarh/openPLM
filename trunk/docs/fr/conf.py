@@ -20,6 +20,8 @@ import sys, os
 sys.path.append(os.path.abspath('../../'))
 sys.path.append(os.path.abspath('../../openPLM'))
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "_ext")))
+
 from django.conf import global_settings, settings
 global_settings.HAYSTACK_SITECONF = "openPLM.plmapp.search_sites"
 global_settings.HAYSTACK_SEARCH_ENGINE = "dummy"
@@ -65,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'openPLM'
-copyright = u'2010-2014, LinObject'
+copyright = u'2010-2013, LinObject'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -226,8 +228,10 @@ latex_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None,
-                       'http://docs.djangoproject.com/en/dev': 'http://docs.djangoproject.com/en/dev/_objects',}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/2.6/', None),
+    'django': ('http://docs.djangoproject.com/en/dev', 'http://docs.djangoproject.com/en/dev/_objects'),
+}
 
 autodoc_member_order = 'bysource'
 
