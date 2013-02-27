@@ -19,12 +19,12 @@ class ArchiveViewTestCase(CommonViewTest):
             self.filenames.append(name)
             self.contents[name] = content
             self.document.add_file(self.get_file(name, content))
-       
+
         # add another file named "file_4.test"
         self.filenames.append("file_4_1.test")
         self.contents["file_4_1.test"] = content
         self.document.add_file(self.get_file(name, content))
-        
+
         # create another document
         self.document_bis = DocumentController.create('doc2', 'Document',
                 'a', self.user, self.DATA)
@@ -35,11 +35,13 @@ class ArchiveViewTestCase(CommonViewTest):
         self.controller.attach_to_document(self.document)
         self.controller.attach_to_document(self.document_bis)
 
+    def get_archive(self, obj, format):
+        response = self.client.get(obj.plmobject_url + "archive/",
+             {"format": format})
+        return StringIO("".join(response.streaming_content))
 
     def test_download_document_zip(self):
-        response = self.client.get(self.document.plmobject_url + "archive/",
-                { "format" : "zip"})
-        f = StringIO(response.content)
+        f = self.get_archive(self.document, "zip")
         zf = zipfile.ZipFile(f)
         self.assertFalse(zf.testzip())
         names = sorted(zf.namelist())
@@ -49,9 +51,7 @@ class ArchiveViewTestCase(CommonViewTest):
         zf.close()
 
     def test_download_document_tar(self):
-        response = self.client.get(self.document.plmobject_url + "archive/",
-                { "format" : "tar"})
-        f = StringIO(response.content)
+        f = self.get_archive(self.document, "tar")
         tf = tarfile.open(fileobj=f)
         names = sorted(tf.getnames())
         self.assertEqual(self.filenames, names)
@@ -60,9 +60,7 @@ class ArchiveViewTestCase(CommonViewTest):
         tf.close()
 
     def test_download_part_zip(self):
-        response = self.client.get(self.controller.plmobject_url + "archive/",
-                { "format" : "zip"})
-        f = StringIO(response.content)
+        f = self.get_archive(self.controller, "zip")
         zf = zipfile.ZipFile(f)
         self.assertFalse(zf.testzip())
         names = sorted(zf.namelist())
@@ -72,9 +70,7 @@ class ArchiveViewTestCase(CommonViewTest):
         zf.close()
 
     def test_download_part_tar(self):
-        response = self.client.get(self.controller.plmobject_url + "archive/",
-                { "format" : "tar"})
-        f = StringIO(response.content)
+        f = self.get_archive(self.controller, "tar")
         tf = tarfile.open(fileobj=f)
         names = sorted(tf.getnames())
         self.assertEqual(self.filenames + [self.file_bis], names)

@@ -25,7 +25,6 @@
 ################################################################################
 
 import datetime
-from django.utils import timezone
 import warnings
 from collections import namedtuple
 
@@ -246,7 +245,7 @@ def download_merged_pdf(obj, files):
         inp = PdfFileReader(file(pdf_file.file.path, "rb"))
         for page in inp.pages:
             output.addPage(page)
-    response = http.HttpResponse(output, content_type='application/pdf')
+    response = http.StreamingHttpResponse(output, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     warnings.simplefilter('default', DeprecationWarning)
     return response

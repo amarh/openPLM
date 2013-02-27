@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 
 import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp import models
-from openPLM.plmapp.controllers import (PartController, DocumentController, 
+from openPLM.plmapp.controllers import (PartController, DocumentController,
         GroupController, UserController)
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -18,7 +18,7 @@ class RestrictedTestCase(BaseTestCase):
         self.restricted_user.save()
         self.restricted_user.get_profile().restricted = True
         self.restricted_user.get_profile().save()
-        
+
 
 class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
 
@@ -78,8 +78,8 @@ class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
         self.ctrl.object.state = self.ctrl.lifecycle.official_state
         self.ctrl.object.save()
         self.assertRaises(exc.PermissionError, self.rctrl.add_reader, self.restricted_user)
-       
-        # a reader who tries to add another reader 
+
+        # a reader who tries to add another reader
         self.ctrl.add_reader(self.restricted_user)
         ruser = User(username="ru2", email="ru2@example.net")
         ruser.set_password("ru")
@@ -195,7 +195,7 @@ class RestrictedApiTestCase(RestrictedTestCase):
 
     def test_next_revision(self):
         self.assertApiErrorGet("/api/object/%d/next_revision/" % self.ctrl.id)
-    
+
     def test_get_files(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -249,7 +249,7 @@ class RestrictedApiTestCase(RestrictedTestCase):
                 self.DATA)
         df = doc.add_file(self.get_file(data="t"))
         mock_file = self.get_file(data="robert")
-        self.assertApiErrorPost("/api/object/%d/checkin/%d/" % (doc.id, df.id), 
+        self.assertApiErrorPost("/api/object/%d/checkin/%d/" % (doc.id, df.id),
                 filename=mock_file)
         self.assertEqual("t", doc.files[0].file.read())
 
@@ -259,7 +259,7 @@ class RestrictedApiTestCase(RestrictedTestCase):
         df = doc.add_file(self.get_file(), thumbnail=False)
         thumbnail = ContentFile(file("datatests/thumbnail.png").read())
         thumbnail.name = "Thumbnail.png"
-        self.assertApiErrorPost("/api/object/%d/add_thumbnail/%d/" % (doc.id, df.id), 
+        self.assertApiErrorPost("/api/object/%d/add_thumbnail/%d/" % (doc.id, df.id),
                 filename=thumbnail)
         self.assertFalse(doc.files[0].thumbnail.name)
 
@@ -296,12 +296,12 @@ class RestrictedAjaxTestCase(RestrictedTestCase):
         p2 = self.create("part2")
         self.assertAjaxErrorGet("/ajax/can_add_child/%d/" % self.ctrl.id,
                 type=p2.type, reference=p2.reference, revision=p2.revision)
-   
+
     def test_add_child_get(self):
         p2 = self.create("part2")
         self.assertAjaxErrorGet("/ajax/add_child/%d/" % self.ctrl.id,
                 type=p2.type, reference=p2.reference, revision=p2.revision)
-        
+
     def test_add_child_post(self):
         p2 = self.create("part2")
         self.assertAjaxErrorPost("/ajax/add_child/%d/" % self.ctrl.id,
@@ -326,7 +326,7 @@ class RestrictedAjaxTestCase(RestrictedTestCase):
         p2 = self.create("part2")
         self.assertAjaxErrorPost("/ajax/can_attach/%d/" % self.ctrl.id,
                 type=p2.type, reference=p2.reference, revision=p2.revision)
-    
+
     def test_can_attach_doc_doc(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -338,7 +338,7 @@ class RestrictedAjaxTestCase(RestrictedTestCase):
                 self.DATA)
         self.assertAjaxErrorGet("/ajax/attach/%d/" % self.ctrl.id,
                 type=doc.type, reference=doc.reference, revision=doc.revision)
-        
+
     def test_attach_part_doc_post(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -363,7 +363,7 @@ class RestrictedAjaxTestCase(RestrictedTestCase):
         doc.add_file(self.get_file())
         f2 = doc.files.all()[0]
         doc.add_thumbnail(f2, thumbnail)
-        
+
         self.assertAjaxErrorGet("/ajax/thumbnails/%s/%s/%s/" % (doc.type, doc.reference,
             doc.revision))
 
@@ -401,7 +401,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
     def test_create_post(self):
         self.assertEqual(1, models.Part.objects.count())
         self.assertViewErrorPost("/object/create/", type="Part",
-                reference="reff", revision="rev", name="e", 
+                reference="reff", revision="rev", name="e",
                 lifecycle=models.get_default_lifecycle().pk, group=self.group.id)
         self.assertEqual(1, models.Part.objects.count())
 
@@ -410,11 +410,11 @@ class RestrictedViewTestCase(RestrictedTestCase):
 
     def test_part_attributes_get(self):
         self.assert404(self.ctrl.plmobject_url + "attributes/")
-    
+
     def test_part_attributes_not_reader_get(self):
         self.ctrl.remove_reader(self.restricted_user)
         self.assert404(self.ctrl.plmobject_url + "attributes/")
-    
+
     def test_other_user_attributes_get(self):
         self.assert404("/user/%s/attributes/" % self.user.username)
 
@@ -519,7 +519,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         response = self.client.get("/user/%s/password/" % self.restricted_user.username)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, "users/password.html")
-    
+
     def test_user_password_post(self):
         response = self.client.post("/user/%s/password/" % self.restricted_user.username,
                 {"old_password": "ru", "new_password1":"ru2", "new_password2": "ru2"}, follow=True)
@@ -534,7 +534,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         doc.object.save()
         doc.add_reader(self.restricted_user)
         response = self.client.get("/file/public/%d/" % df.id)
-        self.assertEqual(content, response.content)
+        self.assertEqual(content, "".join(response.streaming_content))
 
     def test_valid_public(self):
         response = self.client.get(self.ctrl.plmobject_url + "public/")
@@ -569,7 +569,7 @@ class RestrictedViewTestCase(RestrictedTestCase):
         ctx = response.context
         self.assertEquals(1, len(ctx["revisions"]))
         self.assertEqual(doc.id, ctx["attached"][0].id)
-   
+
     def test_valid_public_attached_doc3(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user, self.DATA)
         doc.attach_to_part(self.ctrl.object)
@@ -591,14 +591,14 @@ class RestrictedViewTestCase(RestrictedTestCase):
         objects = response.context["objects"]
         self.assertEquals(1, objects.paginator.count)
         self.assertEquals(self.ctrl.object, objects.object_list[0].part)
-        
+
         p3.object.published = True
         p3.object.save()
         response = self.client.get("/browse/object/")
         objects = response.context["objects"]
         self.assertTrue(response.context["restricted"])
         self.assertEquals(2, objects.paginator.count)
-        self.assertEquals([p3.object, self.ctrl.object], 
+        self.assertEquals([p3.object, self.ctrl.object],
                 [p.part for p in objects.object_list])
 
     def test_browse_error_user(self):
