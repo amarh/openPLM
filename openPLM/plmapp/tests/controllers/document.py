@@ -69,7 +69,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(self.controller.state.name, "draft")
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "official")
-        self.failIf(self.controller.is_editable)
+        self.assertFalse(self.controller.is_editable)
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
@@ -80,7 +80,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(self.controller.state.name, "issue1")
         self.controller.demote()
         self.assertEqual(self.controller.state.name, "draft")
-        self.failUnless(self.controller.is_editable)
+        self.assertTrue(self.controller.is_editable)
 
     def test_is_promotable_no_file(self):
         """ Tests that a document without a file is not promotable."""
@@ -163,12 +163,12 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(f2.file.read(), "data")
         self.assertEqual(file(f2.file.path).read(), "data")
         self.assertEqual(os.path.splitext(f2.file.name)[1], ".test")
-        self.failIf("temp" in f2.file.path)
-        self.failUnless(f2.file.path.startswith(settings.DOCUMENTS_DIR))
-        self.failUnless(os.access(f2.file.path, os.F_OK))
-        self.failUnless(os.access(f2.file.path, os.R_OK))
-        self.failUnless(not os.access(f2.file.path, os.W_OK))
-        self.failUnless(not os.access(f2.file.path, os.X_OK))
+        self.assertFalse("temp" in f2.file.path)
+        self.assertTrue(f2.file.path.startswith(settings.DOCUMENTS_DIR))
+        self.assertTrue(os.access(f2.file.path, os.F_OK))
+        self.assertTrue(os.access(f2.file.path, os.R_OK))
+        self.assertTrue(not os.access(f2.file.path, os.W_OK))
+        self.assertTrue(not os.access(f2.file.path, os.X_OK))
 
     def test_add_several_files(self):
         nb = 5
@@ -196,7 +196,7 @@ class DocumentControllerTest(ControllerTest):
         path = f2.file.path
         self.controller.delete_file(f2)
         self.assertEqual([], list(self.controller.files.all()))
-        self.failIf(os.path.exists(path))
+        self.assertFalse(os.path.exists(path))
  
     def test_delete_file_error(self):
         self.controller.add_file(self.get_file())
@@ -268,7 +268,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(f1.filename, f2.filename)
         self.assertEqual(f1.size, f2.size)
         self.assertEqual(f1.file.read(), f2.file.read())
-        self.failIf(f1.file.path == f2.file.path)
+        self.assertFalse(f1.file.path == f2.file.path)
         self.old_files.append(f2)
 
     def test_checkin(self):

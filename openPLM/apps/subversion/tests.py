@@ -53,7 +53,7 @@ class SubversionRepositoryTestCase(ControllerTest):
         self.assertEqual(self.controller.state.name, "official")
         # check that the revision has been updated
         self.assertTrue(int(self.controller.svn_revision) > 600)
-        self.failIf(self.controller.is_editable)
+        self.assertFalse(self.controller.is_editable)
 
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
@@ -67,7 +67,7 @@ class SubversionRepositoryTestCase(ControllerTest):
         self.assertEqual("HEAD", self.controller.svn_revision)
         self.controller.demote()
         self.assertEqual(self.controller.state.name, "draft")
-        self.failUnless(self.controller.is_editable)
+        self.assertTrue(self.controller.is_editable)
       
     def test_promote_with_unknown_repository(self):
         self.controller.repository_uri = "http://example.org/plop"
@@ -81,7 +81,7 @@ class SubversionRepositoryTestCase(ControllerTest):
         # the svn_revision should just not change
         self.assertEqual("HEAD", self.controller.svn_revision)
         
-        self.failIf(self.controller.is_editable)
+        self.assertFalse(self.controller.is_editable)
 
         lcl = LifecycleList("diop", "official", "draft", 
                 "issue1", "official", "deprecated")
@@ -94,7 +94,7 @@ class SubversionRepositoryTestCase(ControllerTest):
         self.assertEqual("HEAD", self.controller.svn_revision)
         self.controller.demote()
         self.assertEqual(self.controller.state.name, "draft")
-        self.failUnless(self.controller.is_editable)
+        self.assertTrue(self.controller.is_editable)
 
     def test_add_file(self):
         # must fail

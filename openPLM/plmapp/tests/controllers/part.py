@@ -451,36 +451,36 @@ class PartControllerTest(ControllerTest):
 
     def test_is_promotable1(self):
         """Tests promotion from draft state, an official document is attached."""
-        self.failUnless(self.controller.is_promotable())
+        self.assertTrue(self.controller.is_promotable())
 
     def test_is_promotable2(self):
         """Tests promotion from official state."""
         self.controller.promote()
-        self.failUnless(self.controller.is_promotable())
+        self.assertTrue(self.controller.is_promotable())
 
     def test_is_promotable3(self):
         """Tests promotions with an official child."""
         self.controller2.promote()
         self.controller.add_child(self.controller2, 10, 15)
-        self.failUnless(self.controller.is_promotable())
+        self.assertTrue(self.controller.is_promotable())
 
     def test_is_promotable4(self):
         """Tests promotion from official state, with a deprecated child."""
         self.controller.add_child(self.controller2, 10, 15)
         self.controller2.promote()
         self.controller2.promote()
-        self.failUnless(self.controller.is_promotable())
+        self.assertTrue(self.controller.is_promotable())
 
     def test_is_promotable_no_document(self):
         "Tests that a part with no document attached is not promotable."""
-        self.failIf(self.controller3.is_promotable())
+        self.assertFalse(self.controller3.is_promotable())
 
     def test_is_promotable_no_official_document(self):
         "Tests that a part with no official document attached is not promotable."
         doc = DocumentController.create("doc_2", "Document", "a", self.user,
                 self.DATA)
         self.controller3.attach_to_document(doc)
-        self.failIf(self.controller3.is_promotable())
+        self.assertFalse(self.controller3.is_promotable())
 
     def test_is_promotable_one_official_document(self):
         """Tests that a part with one official document attached and another
@@ -489,14 +489,14 @@ class PartControllerTest(ControllerTest):
                 self.DATA)
         self.controller3.attach_to_document(self.document)
         self.controller3.attach_to_document(doc)
-        self.failUnless(self.controller3.is_promotable())
+        self.assertTrue(self.controller3.is_promotable())
 
     def test_promote(self):
         controller = self.controller
         self.assertEqual(controller.state.name, "draft")
         controller.promote()
         self.assertEqual(controller.state.name, "official")
-        self.failIf(controller.is_editable)
+        self.assertFalse(controller.is_editable)
         self.assertRaises(exc.PromotionError, controller.demote)
         lcl = LifecycleList("diop", "official", "draft",
                 "issue1", "official", "deprecated")
@@ -508,7 +508,7 @@ class PartControllerTest(ControllerTest):
         self.assertEqual(controller.state.name, "issue1")
         controller.demote()
         self.assertEqual(controller.state.name, "draft")
-        self.failUnless(controller.is_editable)
+        self.assertTrue(controller.is_editable)
 
     def test_cancel(self):
         """

@@ -49,7 +49,7 @@ class FileHandlerTest(TestCase):
     def test_parse(self):
         handler = HandlersManager.get_best_handler(".odt")
         myfile = handler(self.FILE, os.path.basename(self.FILE))
-        self.failUnless(myfile.is_valid())
+        self.assertTrue(myfile.is_valid())
         self.assertEquals(tuple(myfile.attributes), ("nb_pages", "format"))
         self.assertEqual("A4", myfile.format)
         self.assertEqual(3, myfile.nb_pages)

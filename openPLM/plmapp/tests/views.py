@@ -114,7 +114,7 @@ class ViewTest(CommonViewTest):
     def test_create_get(self):
         response = self.get("/object/create/", {"type" : self.TYPE})
         self.assertEqual(response.context["object_type"], self.TYPE)
-        self.failUnless(response.context["creation_form"])
+        self.assertTrue(response.context["creation_form"])
 
     def test_create_post(self):
         data = self.DATA.copy()
@@ -247,7 +247,7 @@ class ViewTest(CommonViewTest):
 
     def test_display_attributes(self):
         response = self.get(self.base_url + "attributes/", page="attributes")
-        self.failUnless(response.context["object_attributes"])
+        self.assertTrue(response.context["object_attributes"])
         attributes = dict((x.capitalize(), y) for (x,y) in
                           response.context["object_attributes"])
         # name : empty value
@@ -404,7 +404,7 @@ class ViewTest(CommonViewTest):
         self.controller.save()
         response = self.get(self.base_url + "history/")
         history2 = response.context["object_history"].object_list
-        self.failUnless(len(history2) > len(history))
+        self.assertTrue(len(history2) > len(history))
         # create a new revision: both should appear in the history
         revb = self.controller.revise("new_revision")
         response = self.get(self.base_url + "history/")
