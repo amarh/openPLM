@@ -326,7 +326,11 @@ class SimpleSearchForm(SearchForm):
 
     def __init__(self, *args, **kwargs):
         super(SimpleSearchForm, self).__init__(*args, **kwargs)
-        self.fields.insert(0, 'type', self.fields.pop('type'))
+        # swap type and q fields
+        t = self.fields.pop("type")
+        q = self.fields.pop("q")
+        self.fields["type"] = t
+        self.fields["q"] = q
 
     def search(self):
         from haystack.query import EmptySearchQuerySet
