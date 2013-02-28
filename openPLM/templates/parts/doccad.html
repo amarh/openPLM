@@ -26,7 +26,7 @@
 
     <form method="post" action="">{% csrf_token %}	
         <div class="tb-btn-toolbar">
-            {% if user.get_profile.is_contributor %}
+            {% if is_contributor %}
                 {{ docs_formset.management_form }}
             <div class="tb-btn-group">
                 {% if not obj.is_cancelled %}
@@ -100,7 +100,7 @@
 
                 <tr class="Content">
                     {% with link.document as document %}
-                        {% if user.get_profile.is_contributor and link.id in forms %}
+                        {% if is_contributor and link.id in forms %}
                             {% with forms|key:link.id as form %} 
                                 {{ form.id }}
                                 {{ form.document }}

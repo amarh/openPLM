@@ -29,10 +29,9 @@ This class is similar to :class:`.PLMObjectController` but some methods
 from :class:`.PLMObjectController` are not defined.
 """
 
-import datetime
-from django.utils import timezone
 
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.mail import send_mail
@@ -70,7 +69,7 @@ class GroupController(Controller):
 
     @classmethod
     def create(cls, name, description, user, data={}):
-        profile = user.get_profile()
+        profile = models.get_profile(user)
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
         if profile.restricted:
@@ -155,7 +154,7 @@ class GroupController(Controller):
                 user = form.cleaned_data["user"]
                 if user == self.owner:
                     raise ValueError("Bad user %s" % user)
-                if user.get_profile().restricted:
+                if models.get_profile(user).restricted:
                     raise ValueError("Restricted account can not join a group")
                 if delete:
                     users.append(user)
@@ -174,7 +173,7 @@ class GroupController(Controller):
         """
         if not user.email:
             raise ValueError("user's email is empty")
-        if user.get_profile().restricted:
+        if models.get_profile(user).restricted:
             raise ValueError("Restricted account can not join a group")
         if not user.is_active:
             raise ValueError(u"%s's account is inactive" % user)
@@ -193,7 +192,7 @@ class GroupController(Controller):
         """
         if not self.owner.email:
             raise ValueError("user's email is empty")
-        if self._user.get_profile().restricted:
+        if models.get_profile(self._user).restricted:
             raise ValueError("Restricted account can not join a group")
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
@@ -320,7 +319,7 @@ class GroupController(Controller):
         return self.plmobject_group.exclude_cancelled().filter(type__in=types)
 
     def check_readable(self, raise_=True):
-        if self._user.get_profile().restricted or not self._user.is_active:
+        if models.get_profile(self._user).restricted or not self._user.is_active:
             if raise_:
                 raise PermissionError("You can not see this group")
             return False

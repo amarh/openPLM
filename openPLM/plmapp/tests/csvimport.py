@@ -23,7 +23,7 @@ class CSVImportTestCase(TransactionTestCase):
         super(CSVImportTestCase, self).setUp()
         self.sent_tasks = defaultdict(list)
         self.cie = User.objects.create(username="company")
-        p = self.cie.get_profile()
+        p = models.get_profile(self.cie)
         p.is_contributor = True
         p.save()
         self.leading_group = GroupInfo.objects.create(name="leading_group",
@@ -33,8 +33,8 @@ class CSVImportTestCase(TransactionTestCase):
         self.user.email = "test@example.net"
         self.user.set_password("password")
         self.user.save()
-        self.user.get_profile().is_contributor = True
-        self.user.get_profile().save()
+        models.get_profile(self.user).is_contributor = True
+        models.get_profile(self.user).save()
         self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
                 description="grp")
         self.group.save()

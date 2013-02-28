@@ -152,7 +152,7 @@ class UserController(Controller):
         # if we modify *object*, we records the modification in **_histo*
         if hasattr(self, "object"):
             obj = object.__getattribute__(self, "object")
-            profile = obj.get_profile()
+            profile = models.get_profile(obj)
         else:
             obj = None
         if obj and (hasattr(obj, attr) or hasattr(profile, attr)) and \
@@ -174,7 +174,7 @@ class UserController(Controller):
         # we override this method to get attributes from *object* directly
         # (or its profile)
         obj = object.__getattribute__(self, "object")
-        profile = obj.get_profile()
+        profile = models.get_profile(obj)
         if hasattr(self, "object") and hasattr(obj, attr) and \
            not attr in self.__slots__:
             return getattr(obj, attr)
@@ -188,7 +188,7 @@ class UserController(Controller):
         Saves :attr:`object` and records its history in the database.
         If *with_history* is False, the history is not recorded.
         """
-        self.object.get_profile().save()
+        models.get_profile(self.object).save()
         super(UserController, self).save(with_history)
         update_index.delay("auth", "user", self.object.pk)
 
@@ -226,13 +226,13 @@ class UserController(Controller):
             raise ValueError("Bad delegatee (self)")
         if not user.is_active:
             raise ValueError("User account is inactive")
-        if self._user.get_profile().restricted:
+        if models.get_profile(self._user).restricted:
             raise PermissionError("A restricted account can not delegate a right")
-        if user.get_profile().restricted:
+        if models.get_profile(user).restricted:
             raise PermissionError("%s can not have role %s" % (user, role))
-        if user.get_profile().is_viewer and role != 'notified':
+        if models.get_profile(user).is_viewer and role != 'notified':
             raise PermissionError("%s can not have role %s" % (user, role))
-        if self.object.get_profile().is_viewer and role != 'notified':
+        if models.get_profile(self.object).is_viewer and role != 'notified':
             raise PermissionError("%s can not have role %s" % (self.object, role))
         if role == "sign*":
             qset = models.PLMObjectUserLink.current_objects.filter(user=self.object,
@@ -291,9 +291,9 @@ class UserController(Controller):
         password = generate_password()
         new_user.set_password(password)
         new_user.save()
-        new_user.get_profile().is_contributor = is_contributor
-        new_user.get_profile().restricted = restricted
-        new_user.get_profile().save()
+        models.get_profile(new_user).is_contributor = is_contributor
+        models.get_profile(new_user).restricted = restricted
+        models.get_profile(new_user).save()
         link = models.DelegationLink(delegator=self._user, delegatee=new_user,
                 role=models.ROLE_SPONSOR)
         link.save()
@@ -337,7 +337,7 @@ class UserController(Controller):
                 ctx, "mails/new_account")
 
     def check_readable(self, raise_=True):
-        if self._user.get_profile().restricted:
+        if models.get_profile(self._user).restricted:
             if self._user.id != self.object.id:
                 if raise_:
                     raise PermissionError("You can not see this user account")

@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 from django.utils import importlib
 
-from openPLM.plmapp.models import GroupInfo
+from openPLM.plmapp.models import GroupInfo, get_profile
 
 RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         from django.conf import settings
         username = options.get('company', None)
         interactive = options.get('interactive')
-        
+
         # Do quick and dirty validation if --noinput
         if not interactive:
             if not username:
@@ -74,7 +74,7 @@ class Command(BaseCommand):
         # try/except to trap for a keyboard interrupt and exit gracefully.
         if interactive:
             try:
-            
+
                 # Get a username
                 while 1:
                     if not username:
@@ -95,7 +95,7 @@ class Command(BaseCommand):
                     else:
                         sys.stderr.write("Error: That username is already taken.\n")
                         username = None
-            
+
                 # Get a password
                 while 1:
                     if not password:
@@ -110,11 +110,11 @@ class Command(BaseCommand):
                         password = None
                         continue
                     break
-            
+
             except KeyboardInterrupt:
                 sys.stderr.write("\nOperation cancelled.\n")
                 sys.exit(1)
-                
+
         cie = User.objects.create(username=username)
         cie.set_password(password)
         try:
@@ -128,12 +128,12 @@ class Command(BaseCommand):
 
         cie.groups.add(gr)
         cie.save()
-        p = cie.get_profile()
+        p = get_profile(cie)
         p.is_contributor = True
         p.save()
 
         print "Company created successfully."
-        
+
         if not found or default_username != username:
             try:
                 add = raw_input("Add company to settings file [yes|no] ? ")

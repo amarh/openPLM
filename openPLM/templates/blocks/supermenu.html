@@ -55,8 +55,8 @@
     {# Create, Study #}
     <div class="menurow">
 
-        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-right:2em;i"> 
-            {% if user.get_profile.is_contributor %}
+        <div class="menuitem {% if not is_contributor %} disabled {% endif %}" style="margin-right:2em;i"> 
+            {% if is_contributor %}
                 <a class="tooltip" href="/user/{{user|urlencode}}/files/">
                     {% trans "Upload" %}
                     <span class="triangle">&nbsp;</span>
@@ -71,8 +71,8 @@
             {% endif %}
 
         </div>
-        <div class="menuitem {% if not user.get_profile.is_contributor %} disabled {% endif %}" style="margin-left:2em"> 
-            {% if user.get_profile.is_contributor %}
+        <div class="menuitem {% if not is_contributor %} disabled {% endif %}" style="margin-left:2em"> 
+            {% if is_contributor %}
                 <a class="tooltip" href="/object/create/?type={{request.session.type}}">
                     {% trans "Create" %}
                     <span class="triangle">&nbsp;</span>

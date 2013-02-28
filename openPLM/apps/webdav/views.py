@@ -26,6 +26,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 
+from openPLM.plmapp.models import get_profile
 from openPLM.apps.webdav.webdav_handler import WebDavHandler
 from openPLM.apps.webdav.webdav_handler import WebDavHandlerException
 from openPLM.apps.webdav.backends.openplm import OpenPLMBackend
@@ -67,7 +68,7 @@ def openplm_webdav(request, local_path):
     else:
         user = request.user
     if user:
-        if user.get_profile().restricted:
+        if get_profile(user).restricted:
             return HttpResponseForbidden("403 Forbidden", None, 403, "text/plain")
         backend = OpenPLMBackend(user)
         handler = WebDavHandler(local_path, backend)

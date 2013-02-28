@@ -362,7 +362,7 @@ class Journalist(MetaBadge):
         only user who can publish can win this badge
         """
         user = instance.user
-        return user.get_profile().can_publish
+        return get_profile(user).can_publish
 
 
 #: badges won by user who created links or objects

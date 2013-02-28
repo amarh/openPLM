@@ -191,7 +191,7 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
         def wrapper(request, *args, **kwargs):
             if request.method == "POST" and request.POST.get("_undo"):
                 return HttpResponseRedirect(undo)
-            if restricted_access and request.user.get_profile().restricted:
+            if restricted_access and models.get_profile(request.user).restricted:
                 return HttpResponseForbidden()
             try:
                 response = f(request, *args, **kwargs)
@@ -291,10 +291,11 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
     save_session = False
-    restricted = request.user.get_profile().restricted
+    profile = models.get_profile(request.user)
+    restricted = profile.restricted
     if type_ == reference == revision == '-':
         obj = request.user
-        obj_url = obj.get_profile().plmobject_url
+        obj_url = profile.plmobject_url
     else:
         obj = get_obj(type_, reference, revision, request.user)
         obj_url = obj.plmobject_url
@@ -348,6 +349,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
        'obj' : obj,
        'obj_url': obj_url,
        'restricted' : restricted,
+       'is_contributor': profile.is_contributor,
     })
     if hasattr(obj, "menu_items"):
         ctx['object_menu'] = obj.menu_items
