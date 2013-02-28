@@ -44,6 +44,16 @@ def synchronized(cls=None, lock=None):
     cls.__class__.__call__ = call
     return cls
 
+def _get_related_fields(model_class):
+    from openPLM.plmapp import models
+    if issubclass(model_class, models.PLMObject):
+        return ("owner", "creator", "group")
+    elif issubclass(model_class, models.GroupInfo):
+        return ("owner", "creator")
+    elif issubclass(model_class, models.DocumentFile):
+        return ("document",)
+    return ()
+
 @synchronized
 @task(name="openPLM.plmapp.tasks.update_index",
       default_retry_delay=60, max_retries=10)
@@ -52,7 +62,11 @@ def update_index(app_name, model_name, pk, **kwargs):
     import openPLM.plmapp.search_indexes
 
     model_class = get_model(app_name, model_name)
-    instance = model_class.objects.select_related(depth=1).get(pk=pk)
+    fields = _get_related_fields(model_class)
+    if fields:
+        instance = model_class.objects.select_related(*fields).get(pk=pk)
+    else:
+        instance = model_class.objects.get(pk=pk)
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
 
@@ -64,7 +78,11 @@ def update_indexes(instances):
 
     for app_name, model_name, pk in instances:
         model_class = get_model(app_name, model_name)
-        instance = model_class.objects.select_related(depth=1).get(pk=pk)
+        fields = _get_related_fields(model_class)
+        if fields:
+            instance = model_class.objects.select_related(*fields).get(pk=pk)
+        else:
+            instance = model_class.objects.get(pk=pk)
         search_index = site.get_index(model_class)
         search_index.update_object(instance)
 update_indexes = synchronized(update_indexes, update_index.lock)
