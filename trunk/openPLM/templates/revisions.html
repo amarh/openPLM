@@ -10,7 +10,7 @@
     </style>
 {% endblock %}
 {% block content %}
-    {% if add_revision_form and obj.is_revisable and user.get_profile.is_contributor %}
+    {% if add_revision_form and obj.is_revisable and is_contributor %}
         <form id="form-revision" method="POST"
             class= "inline-form {% if confirmation %}confirmation{% endif %}" action="">
             {% csrf_token %}
@@ -23,7 +23,7 @@
             <input type="submit" class="tb-btn" value="{% trans "NEW" %}"/>
         </form>
     {% else %}
-        {% if not user.get_profile.is_contributor %}
+        {% if not is_contributor %}
             {% trans "You can not revise this object since you are not a contributor." %}
         {% elif is_readable %}
 

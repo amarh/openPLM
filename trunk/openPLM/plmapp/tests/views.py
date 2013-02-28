@@ -27,7 +27,6 @@ This module contains some tests for openPLM.
 """
 
 import os
-import datetime
 from django.utils import timezone
 
 from django.conf import settings
@@ -66,8 +65,8 @@ class CommonViewTest(BaseTestCase):
         self.base_url = self.controller.plmobject_url
         brian = User.objects.create_user(username="Brian", password="life",
                 email="brian@example.net")
-        brian.get_profile().is_contributor = True
-        brian.get_profile().save()
+        m.get_profile(brian).is_contributor = True
+        m.get_profile(brian).save()
         self.brian = brian
 
     def post(self, url, data=None, follow=True, status_code=200,
@@ -458,8 +457,8 @@ class ViewTest(CommonViewTest):
         self.do_test_management_add_get(self.base_url + "management/add/", m.ROLE_NOTIFIED)
 
     def test_management_add_reader_get(self):
-        self.brian.get_profile().restricted = True
-        self.brian.get_profile().save()
+        m.get_profile(self.brian).restricted = True
+        m.get_profile(self.brian).save()
         self.controller.promote(checked=True)
         self.do_test_management_add_get(self.base_url + "management/add-reader/", m.ROLE_READER)
 
@@ -472,8 +471,8 @@ class ViewTest(CommonViewTest):
                 level_to_sign_str(1))
 
     def test_management_add_reader_post(self):
-        self.brian.get_profile().restricted = True
-        self.brian.get_profile().save()
+        m.get_profile(self.brian).restricted = True
+        m.get_profile(self.brian).save()
         self.controller.promote(checked=True)
         self.do_test_management_add_post(self.base_url + "management/add-reader/", m.ROLE_READER)
 
@@ -497,8 +496,8 @@ class ViewTest(CommonViewTest):
             user=self.brian, role=role).exists())
 
     def test_management_delete_reader_post(self):
-        self.brian.get_profile().restricted = True
-        self.brian.get_profile().save()
+        m.get_profile(self.brian).restricted = True
+        m.get_profile(self.brian).save()
         self.controller.promote(checked=True)
         self.do_test_management_delete_post(self.base_url + "management/delete/", m.ROLE_READER)
 
@@ -543,8 +542,8 @@ class ViewTest(CommonViewTest):
         """ Tests a publication. """
         self.controller.object.state = m.State.objects.get(name="official")
         self.controller.object.save()
-        self.user.get_profile().can_publish = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).can_publish = True
+        m.get_profile(self.user).save()
         response = self.post(self.base_url + "lifecycle/apply/",
                 {"publish" : "on", "password" : "password"})
         self.assertTrue(response.context["obj"].published)
@@ -556,8 +555,8 @@ class ViewTest(CommonViewTest):
 
     def test_publish_post_error_not_official(self):
         """ Tests a publication: error: object not official. """
-        self.user.get_profile().can_publish = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).can_publish = True
+        m.get_profile(self.user).save()
         response = self.client.post(self.base_url + "lifecycle/apply/",
                 data={"publish" : "on", "password" : "password"})
         self.assertTemplateUsed(response, "error.html")
@@ -571,8 +570,8 @@ class ViewTest(CommonViewTest):
 
     def test_publish_post_error_published(self):
         """ Tests a publication: error: object is already published. """
-        self.user.get_profile().can_publish = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).can_publish = True
+        m.get_profile(self.user).save()
         self.controller.object.state = m.State.objects.get(name="official")
         self.controller.object.published = True
         self.controller.object.save()
@@ -592,8 +591,8 @@ class ViewTest(CommonViewTest):
         self.controller.object.published = True
         self.controller.object.state = m.State.objects.get(name="official")
         self.controller.object.save()
-        self.user.get_profile().can_publish = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).can_publish = True
+        m.get_profile(self.user).save()
         response = self.post(self.base_url + "lifecycle/apply/",
                 {"unpublish" : "on", "password" : "password"})
         self.assertFalse(response.context["obj"].published)
@@ -606,8 +605,8 @@ class ViewTest(CommonViewTest):
     def test_unpublish_post_error_unpublished(self):
         """ Tests an unpublication: errror: object is unpublished. """
         self.controller.object.save()
-        self.user.get_profile().can_publish = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).can_publish = True
+        m.get_profile(self.user).save()
         response = self.client.post(self.base_url + "lifecycle/apply/",
                 {"unpublish" : "on", "password" : "password"})
         self.assertTemplateUsed(response, "error.html")
@@ -2078,13 +2077,13 @@ class UserViewTestCase(CommonViewTest):
         data = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
-                    language=self.user.get_profile().language)
+                    language=m.get_profile(self.user).language)
         response = self.post(self.user_url + "delegation/sponsor/", data)
         user = User.objects.get(username=data["username"])
         for attr in ("first_name", "last_name", "email"):
             self.assertEquals(data[attr], getattr(user, attr))
-        self.assertTrue(user.get_profile().is_contributor)
-        self.assertFalse(user.get_profile().is_administrator)
+        self.assertTrue(m.get_profile(user).is_contributor)
+        self.assertFalse(m.get_profile(user).is_administrator)
         self.assertTrue(user.groups.filter(id=self.group.id))
 
     def test_modify_get(self):
@@ -2103,7 +2102,7 @@ class UserViewTestCase(CommonViewTest):
         data0 = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
-                    language=self.user.get_profile().language)
+                    language=m.get_profile(self.user).language)
         response = self.post(self.user_url + "delegation/sponsor/", data0)
         data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
          # brian can not edit these data
@@ -2921,13 +2920,13 @@ class MechantUserViewTest(TestCase):
         owner = User(username="owner")
         owner.set_password("password")
         owner.save()
-        owner.get_profile().is_contributor = True
-        owner.get_profile().save()
+        m.get_profile(owner).is_contributor = True
+        m.get_profile(owner).save()
         self.user = User(username="user")
         self.user.set_password("password")
         self.user.save()
-        self.user.get_profile().is_contributor = True
-        self.user.get_profile().save()
+        m.get_profile(self.user).is_contributor = True
+        m.get_profile(self.user).save()
         self.group = m.GroupInfo(name="grp", owner=self.user, creator=self.user,
                 description="grp")
         self.group.save()

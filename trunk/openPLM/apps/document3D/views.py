@@ -93,6 +93,7 @@ def display_public_3d(request, obj_ref, obj_revi):
 
     ctx.update({
         'is_readable' : True,
+        'is_contributor': False,
         # disable the menu and the navigation_history
         'object_menu' : [],
         'navigation_history' : [],

@@ -48,7 +48,7 @@ def can_add(obj, arg):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:
                 return False
-            if obj.get_profile().restricted:
+            if models.get_profile(obj).restricted:
                 return False
             if hasattr(cur_obj, "check_in_group"):
                 from django.conf import settings
@@ -65,7 +65,7 @@ def can_add(obj, arg):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:
                 return False
-            if obj.get_profile().restricted:
+            if models.get_profile(obj).restricted:
                 if action == "add_reader":
                     return not cur_obj.users.now().filter(user=obj,
                             role=models.ROLE_READER).exists()
@@ -359,3 +359,9 @@ def confirm(context, action, action_label, msg):
         "action_url": context["action_url"],
         "password_form": context["password_form"],
     }
+
+
+@register.filter
+def get_profile(user):
+    return models.get_profile(user)
+

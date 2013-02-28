@@ -12,7 +12,7 @@
     </style> 
 {% endblock %}
 {% block content %}
-    {% if user.get_profile.is_contributor %}
+    {% if is_contributor %}
         <h3>{% trans "Upload files and document creation" %} </h3>
     <div>
         <p>

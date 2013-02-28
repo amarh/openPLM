@@ -26,7 +26,6 @@
 
 import time
 import datetime
-from django.utils import timezone
 import urlparse
 
 
@@ -47,7 +46,7 @@ from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form,
 from openPLM.plmapp.navigate import TIME_FORMAT
 
 ajax_login_required = user_passes_test(lambda u: (u.is_authenticated()
-    and not u.get_profile().restricted))
+    and not models.get_profile(u).restricted))
 
 @ajax_login_required
 @json_view

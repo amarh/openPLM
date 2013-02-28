@@ -2,6 +2,7 @@ import lxml.html
 
 from django.contrib.auth.models import User
 
+from openPLM.plmapp import models
 from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.controllers import PartController, DocumentController,\
         UserController, GroupController
@@ -78,7 +79,7 @@ class PLMObjectNavigateTestCase(NavigateTestCase):
         for result in (self.cie, self.group, self.controller.object):
             self.get_graph_data({"owner" : True, OSR : True }, (result,))
             self.assertCount(1, 0)
-       
+
     def test_navigate_signer(self):
         """
         Tests a navigate with the "signer" option set.
@@ -113,7 +114,7 @@ class PLMObjectNavigateTestCase(NavigateTestCase):
         for result in (self.user, self.group, self.controller.object):
             self.get_graph_data({"notified" : True, OSR : True }, (result,))
             self.assertCount(1, 0)
-    
+
 
 class PartNavigateTestCase(NavigateTestCase):
 
@@ -148,7 +149,7 @@ class PartNavigateTestCase(NavigateTestCase):
         self.assertCount(1, 0)
         # add child2 to the controller
         # we should have 3 nodes (controller, child1, child2)
-        # and 3 edges (controller -> child1, controller -> child2 and 
+        # and 3 edges (controller -> child1, controller -> child2 and
         # child1 -> child2)
         self.controller.add_child(child2, 15, 789, "kg")
         for osr, results in ((False, ()), (True, (child1.object, child2.object))):
@@ -252,7 +253,7 @@ class PartNavigateTestCase(NavigateTestCase):
 class DocumentNavigateTestCase(NavigateTestCase):
     TYPE = "Document"
     CONTROLLER = DocumentController
-    
+
     def test_navigate_part(self):
         """
         Tests a navigate with the "doc" option set.
@@ -273,7 +274,7 @@ class DocumentNavigateTestCase(NavigateTestCase):
             self.assertCount(1, 0)
 
 class GroupNavigateTestCase(NavigateTestCase):
-    
+
     def setUp(self):
         super(GroupNavigateTestCase, self).setUp()
         self.part = self.controller.object
@@ -318,8 +319,8 @@ class GroupNavigateTestCase(NavigateTestCase):
         """
         # add another user
         brian = User.objects.create(username="Brian", password="life")
-        brian.get_profile().is_contributor = True
-        brian.get_profile().save()
+        models.get_profile(brian).is_contributor = True
+        models.get_profile(brian).save()
         brian.groups.add(self.group)
         brian.save()
         for osr, results in ((False, ()), (True, (self.user, brian))):
@@ -372,7 +373,7 @@ class GroupNavigateTestCase(NavigateTestCase):
             self.assertCount(1, 0)
 
 class UserNavigateTestCase(NavigateTestCase):
-    
+
     def setUp(self):
         super(UserNavigateTestCase, self).setUp()
         self.part = self.controller
@@ -414,7 +415,7 @@ class UserNavigateTestCase(NavigateTestCase):
             self.get_graph_data({"owned" : True, OSR : True,
                 "doc_parts" : [self.part.id]  }, (result,))
             self.assertCount(1, 0)
-        
+
     def test_navigate_notified(self):
         """
         Tests a navigate with the "request_notification_from" option set.

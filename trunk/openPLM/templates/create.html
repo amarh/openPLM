@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if user.get_profile.is_contributor %}
+    {% if is_contributor %}
         <div>
         <h3>{% trans "OBJECT CREATION:" %}</h3>
             <form id="creation_form" method="post" action="." >{% csrf_token %}	

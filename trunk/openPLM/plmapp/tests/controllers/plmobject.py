@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -26,11 +26,10 @@
 This module contains some tests for openPLM.
 """
 
-import datetime
-from django.utils import timezone
 
 from django.db import IntegrityError
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.exceptions as exc
@@ -59,7 +58,7 @@ class ControllerTest(BaseTestCase):
         self.assertEqual(controller.name, "")
         self.assertEqual(controller.type, self.TYPE)
         type_ = models.get_all_plmobjects()[self.TYPE]
-        self.assertEqual(type(controller.object), type_) 
+        self.assertEqual(type(controller.object), type_)
         obj = type_.objects.get(reference=controller.reference,
                 revision=controller.revision, type=controller.type)
         self.assertEqual(obj.owner, self.user)
@@ -92,18 +91,18 @@ class ControllerTest(BaseTestCase):
             controller = self.CONTROLLER.create("zee", "__", "a",
                                             self.user, self.DATA)
         self.assertRaises(ValueError, fail)
-    
+
     def test_create_error5(self):
         # bad type : PLMObject
         def fail():
             controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
                                             self.user, self.DATA)
         self.assertRaises(ValueError, fail)
-    
+
     def test_create_error6(self):
         """Create error test : user is not a contributor"""
-        self.user.get_profile().is_contributor = False
-        self.user.get_profile().save()
+        models.get_profile(self.user).is_contributor = False
+        models.get_profile(self.user).save()
         def fail():
             controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
                                             self.user, self.DATA)
@@ -190,7 +189,7 @@ class ControllerTest(BaseTestCase):
         controller = self.create("Part1")
         self.assertRaises(exc.RevisionError, controller.revise, "")
         self.assertOneRevision(controller)
-    
+
     def test_revise_error_same_revision(self):
         "Revision : error : same revision name"
         controller = self.create("Part1")
@@ -318,7 +317,7 @@ class ControllerTest(BaseTestCase):
                 self.user, user, level_to_sign_str(1789))
 
     def test_set_sign_error2(self):
-        """Test sign error : user is not a contributor"""    
+        """Test sign error : user is not a contributor"""
         controller = self.create("Part1")
         user = User(username="user2")
         user.save()
@@ -360,7 +359,7 @@ class ControllerTest(BaseTestCase):
         controller.remove_signer(self.user, level_to_sign_str(0))
         controller.object.is_promotable = lambda: True
         self.assertRaises(exc.PermissionError, controller.approve_promotion)
-                
+
     def test_replace_signer_error_approved(self):
         controller = self.create("Part1")
         user = self.get_contributor()
@@ -425,7 +424,7 @@ class ControllerTest(BaseTestCase):
                 role="notified")
         self.assertNotEqual(ids[0], link.id)
         ids.append(link.id)
-        self.assertEqual(set(ids), set(controller.users.filter(user=self.user, 
+        self.assertEqual(set(ids), set(controller.users.filter(user=self.user,
              role="notified").values_list("id", flat=True)))
         # get the old link
         link = models.PLMObjectUserLink.objects.at(t).get(user=self.user, plmobject=controller.object,
@@ -448,7 +447,7 @@ class ControllerTest(BaseTestCase):
 
     def test_promote_error(self):
         """
-        Tests that a :exc:`.PromotionError` is raised when 
+        Tests that a :exc:`.PromotionError` is raised when
         :meth:`.PLMObject.is_promotable` returns False.
         """
         controller = self.create("Part1")
@@ -645,7 +644,7 @@ class ControllerTest(BaseTestCase):
             # i = 0 -> official, i = 1 -> deprecated
             for user in (self.user, self.cie, robert, ned):
                 ctrl = self.CONTROLLER(controller.object, user)
-                ctrl.check_readable()        
+                ctrl.check_readable()
             if i == 0:
                 controller.promote()
 
@@ -701,7 +700,7 @@ class ControllerTest(BaseTestCase):
         """ Tests that only a publisher can publish."""
         controller = self.create("P1")
         self.promote_to_official(controller)
-        self.assertFalse(controller._user.get_profile().can_publish)
+        self.assertFalse(models.get_profile(controller._user).can_publish)
         self.assertPublishError(controller)
 
     def test_publish_not_in_group(self):
@@ -768,7 +767,7 @@ class ControllerTest(BaseTestCase):
     def test_unpublish_not_publisher(self):
         """ Tests that only a publisher can unpublish."""
         controller = self.get_published_ctrl()
-        self.assertFalse(controller._user.get_profile().can_publish)
+        self.assertFalse(models.get_profile(controller._user).can_publish)
         self.assertUnpublishError(controller)
 
     def test_unpublish_not_in_group(self):
@@ -779,20 +778,20 @@ class ControllerTest(BaseTestCase):
         publisher.groups.remove(self.group)
         ctrl = self.CONTROLLER(controller.object, publisher)
         self.assertUnpublishError(ctrl)
-    
+
     # cancel test
-    
+
     def get_created_ctrl(self):
         controller = self.create("P1")
         controller.object.save()
         return controller
-        
+
     def assertCancel(self,ctrl):
         self.assertTrue(ctrl.check_cancel())
         self.assertTrue(ctrl.can_cancel())
         ctrl.cancel()
         self.check_cancelled_object(ctrl)
-        
+
     def assertCancelError(self, ctrl):
         self.assertRaises(exc.PermissionError, ctrl.check_cancel)
         self.assertRaises(exc.PermissionError, ctrl.check_cancel)
@@ -803,12 +802,12 @@ class ControllerTest(BaseTestCase):
         res = res or len(ctrl.get_all_revisions()) > 1
         res = res or not ctrl.check_permission("owner",raise_=False)
         return res
-    
+
     def test_cancel_draft(self):
         """ Tests that a draft object with only one revision can be cancelled"""
         controller = self.get_created_ctrl()
         self.assertCancel(controller)
-        
+
     def test_cancel_not_draft(self):
         """ Tests that a non-draft object can *not* be cancelled"""
         controller = self.get_created_ctrl()
@@ -820,7 +819,7 @@ class ControllerTest(BaseTestCase):
         controller.object.save()
         self.assertFalse(controller.is_draft)
         self.assertCancelError(controller)
-        
+
     def test_cancel_official(self):
         """ Tests that an official object can *not* be cancelled (even by its creator/owner)"""
         controller = self.get_created_ctrl()
@@ -832,7 +831,7 @@ class ControllerTest(BaseTestCase):
         controller = self.get_created_ctrl()
         self.promote_to_deprecated(controller)
         self.assertCancelError(controller)
-        
+
     def test_cancel_cancelled(self):
         """ Tests that a cancelled object can *not* be cancelled"""
         controller = self.get_created_ctrl()
@@ -846,7 +845,7 @@ class ControllerTest(BaseTestCase):
         user = self.get_contributor()
         ctrl = self.CONTROLLER(controller.object, user)
         self.assertCancelError(ctrl)
-        
+
     def test_cancel_owner(self):
         """ Tests that any user with owner rights on the object
         can cancel it."""
@@ -855,13 +854,13 @@ class ControllerTest(BaseTestCase):
         controller.set_owner(user)
         ctrl = self.CONTROLLER(controller.object, user)
         self.assertCancel(ctrl)
-        
+
     def test_cancel_revised(self):
         """Tests that an object (here a draft) with more than one revision can *not* be cancelled"""
         controller = self.get_created_ctrl()
         ctrl = controller.revise("b")
         self.assertCancelError(ctrl)
-    
+
     # clone test
     def getDataCloning(self,ctrl, ref=None, rev=None):
         if ref is None:
@@ -876,7 +875,7 @@ class ControllerTest(BaseTestCase):
             "revision" : rev,
         })
         return data
-        
+
     def assertClone(self, ctrl, data):
         self.assertTrue(ctrl.can_clone())
         new_ctrl = ctrl.create(data["reference"], ctrl.object.type , data["revision"], ctrl._user,
@@ -887,7 +886,7 @@ class ControllerTest(BaseTestCase):
             res = res or getattr(ctrl, attr) == getattr(new_ctrl, attr)
         self.assertTrue(res)
         return new_ctrl
-        
+
     def test_clone_non_readable(self):
         """Tests that a user can *not* clone an object
         that he should not be able to read"""
@@ -898,11 +897,11 @@ class ControllerTest(BaseTestCase):
         ctrl.set_owner(self.cie, True)
         self.assertRaises(exc.PermissionError, ctrl.check_readable)
         self.assertRaises(exc.PermissionError, ctrl.clone, None, ctrl._user, [],[])
-        
+
     def test_clone_by_non_contributor(self):
         """ Tests that a non contributor can not clone
         an object."""
         ctrl= self.get_created_ctrl()
-        ctrl._user.get_profile().is_contributor = False
+        models.get_profile(ctrl._user).is_contributor = False
         self.assertRaises(exc.PermissionError, ctrl.check_contributor)
         self.assertRaises(exc.PermissionError, ctrl.clone, None, ctrl._user, [],[])

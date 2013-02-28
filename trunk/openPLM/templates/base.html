@@ -83,9 +83,9 @@
                                     <span class="ui-button-text">{% trans "BROWSE" %}</span>
                                 </a>
 
-                                {% if user.get_profile.is_contributor %}
+                                {% if is_contributor %}
                                     <div class="tb-btn-group">
-                                        <a class="tb-btn" href="{{user.get_profile.plmobject_url}}files/">
+                                        <a class="tb-btn" href="{{user|get_profile|attr:"plmobject_url"}}files/">
                                             <span class="ui-button-text">{% trans "Upload" %}</span>
                                         </a>
 

@@ -24,7 +24,7 @@
 {% block content %}
     <form method="post" action="">{% csrf_token %}	
 
-        {% if user.get_profile.is_contributor and not obj.is_cancelled %}
+        {% if is_contributor and not obj.is_cancelled %}
             {{ parts_formset.management_form }}
             <div class="tb-btn-toolbar">
                 <div class="tb-btn-group">
@@ -72,7 +72,7 @@
 
                 <tr class="Content">
                     {% with link.part as part %}
-                        {% if user.get_profile.is_contributor and link.id in forms %}
+                        {% if is_contributor and link.id in forms %}
                             {% with forms|key:link.id as form %} 
                                 {{ form.id }}
                                 {{ form.document }}

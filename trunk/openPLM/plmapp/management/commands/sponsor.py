@@ -2,19 +2,12 @@
 Management utility to sponsor a new user.
 """
 
-import getpass
-import os
-import re
-import sys
 from optparse import make_option
 from django.contrib.auth.models import User
-from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext as _
-from django.utils import importlib
 
 from openPLM.plmapp.forms import SponsorForm
-from openPLM.plmapp.models import GroupInfo
+from openPLM.plmapp.models import GroupInfo, get_profile
 from openPLM.plmapp.controllers import UserController
 
 class Command(BaseCommand):
@@ -43,7 +36,6 @@ class Command(BaseCommand):
     help = 'Used to sponsor a new user'
 
     def handle(self, *args, **options):
-        from django.conf import settings
         sponsor = User.objects.get(username=options.get('sponsor', None))
         obj = UserController(sponsor, sponsor)
         data = dict(options)
@@ -53,7 +45,7 @@ class Command(BaseCommand):
         form = SponsorForm(data)
         if form.is_valid():
             new_user = form.save()
-            new_user.get_profile().language = form.cleaned_data["language"]
+            get_profile(new_user).language = form.cleaned_data["language"]
             role = form.cleaned_data["role"]
             obj.sponsor(new_user, role=="contributor", role=="restricted")
         else:

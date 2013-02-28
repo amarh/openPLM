@@ -87,8 +87,8 @@ def set_language(request):
     if request.method == "POST" and request.user.is_authenticated():
         language = request.session.get('django_language')
         if language:
-            request.user.get_profile().language = language
-            request.user.get_profile().save()
+            models.get_profile(request.user).language = language
+            models.get_profile(request.user).save()
     return response
 
 @handle_errors
@@ -96,7 +96,7 @@ def comment_post_wrapper(request):
     # from http://thejaswi.info/tech/blog/2008/11/20/part-2-django-comments-authenticated-users/
     # Clean the request to prevent form spoofing
     user = request.user
-    if user.is_authenticated() and not user.get_profile().restricted:
+    if user.is_authenticated() and not models.get_profile(user).restricted:
         if not (user.get_full_name() == request.POST['name'] and \
                 user.email == request.POST['email']):
             return HttpResponse("You registered user...trying to spoof a form...eh?")
@@ -201,7 +201,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     for attr in attrs:
         item = obj.get_verbose_name(attr)
         object_attributes_list.append((item, getattr(obj, attr)))
-    ctx["is_contributor"] = obj._user.get_profile().is_contributor
+    ctx["is_contributor"] = models.get_profile(obj._user).is_contributor
     ctx.update({'current_page' : 'attributes',
                 'object_attributes' : object_attributes_list})
     if isinstance(obj.object, models.PLMObject):
@@ -1424,7 +1424,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def upload_and_create(request, obj_ref):
     obj, ctx = get_generic_data(request)
-    if not obj.get_profile().is_contributor:
+    if not models.get_profile(obj).is_contributor:
         raise ValueError("You are not a contributor")
     if request.method == "POST":
         if request.FILES:
@@ -2568,7 +2568,7 @@ def sponsor(request, obj_ref):
         form = forms.SponsorForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            new_user.get_profile().language = form.cleaned_data["language"]
+            models.get_profile(new_user).language = form.cleaned_data["language"]
             role = form.cleaned_data["role"]
             obj.sponsor(new_user, role=="contributor", role=="restricted")
             return HttpResponseRedirect("..")
@@ -2581,7 +2581,7 @@ def sponsor(request, obj_ref):
 
 @handle_errors
 def create_user(request):
-    url = request.user.get_profile().plmobject_url + "delegation/sponsor/"
+    url = models.get_profile(request.user).plmobject_url + "delegation/sponsor/"
     return HttpResponseRedirect(url)
 register_creation_view(User, create_user)
 
@@ -2673,7 +2673,7 @@ def import_csv_init(request, target="csv"):
     """
     Manage page to import a csv file.
     """
-    if not request.user.get_profile().is_contributor:
+    if not models.get_profile(request.user).is_contributor:
         raise PermissionError("You are not a contributor.")
     obj, ctx = get_generic_data(request)
     if request.method == "POST":
@@ -2702,7 +2702,7 @@ def import_csv_apply(request, target, filename, encoding):
     View that display a preview of an uploaded csv file.
     """
     obj, ctx = get_generic_data(request)
-    if not request.user.get_profile().is_contributor:
+    if not models.get_profile(request.user).is_contributor:
         raise PermissionError("You are not a contributor.")
     ctx["encoding_error"] = False
     ctx["io_error"] = False
@@ -2832,7 +2832,7 @@ def get_pagination(r_GET, object_list, type):
 @secure_required
 def browse(request, type="object"):
     user = request.user
-    if user.is_authenticated() and not user.get_profile().restricted:
+    if user.is_authenticated() and not models.get_profile(user).restricted:
         # only authenticated users can see all groups and users
         obj, ctx = get_generic_data(request, search=False)
         try:
@@ -2872,6 +2872,7 @@ def browse(request, type="object"):
         ctx = init_ctx("-", "-", "-")
         ctx.update({
             'is_readable' : True,
+            'is_contributor': False,
             'plmobjects' : True,
             'restricted' : True,
             'object_menu' : [],
@@ -2946,7 +2947,9 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
     object_attributes.insert(4, (obj.get_verbose_name("state"), obj.state.name))
     if request.user.is_anonymous():
         test = lambda x: x.published
+        is_contributor = False
     else:
+        is_contributor = models.get_profile(request.user).is_contributor
         readable = request.user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)\
                 .values_list("plmobject_id", flat=True)
         test = lambda x: x.published or x.id in readable
@@ -2958,6 +2961,7 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
         attached = [d.part for d in obj.get_attached_parts() if test(d.part)]
     ctx.update({
         'is_readable' : True,
+        'is_contributor': is_contributor,
         # disable the menu and the navigation_history
         'object_menu' : [],
         'navigation_history' : [],
