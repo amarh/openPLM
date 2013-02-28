@@ -66,7 +66,7 @@ class GroupControllerTestCase(BaseTestCase):
     def test_getattr(self):
         controller = self.CONTROLLER.create("Grp1", "a", self.user, self.DATA)
         self.assertEqual(controller.name, "Grp1")
-        self.failUnless("name" in controller.attributes)
+        self.assertTrue("name" in controller.attributes)
         self.assertRaises(AttributeError, lambda: controller.unknown_attr)
 
     def test_setattr(self):
@@ -91,7 +91,7 @@ class GroupControllerTestCase(BaseTestCase):
         self.assertFalse(inv.guest_asked)
         c2 = GroupController(controller.object, user)
         c2.accept_invitation(inv)
-        self.failUnless(user.groups.filter(id=controller.id))
+        self.assertTrue(user.groups.filter(id=controller.id))
         self.assertEqual(inv.state, Invitation.ACCEPTED)
 
     def test_add_user_refused(self):
@@ -104,7 +104,7 @@ class GroupControllerTestCase(BaseTestCase):
         self.assertFalse(inv.guest_asked)
         c2 = GroupController(controller.object, user)
         c2.refuse_invitation(inv)
-        self.failIf(user.groups.filter(id=c2.id))
+        self.assertFalse(user.groups.filter(id=c2.id))
         self.assertEqual(inv.state, Invitation.REFUSED)
 
     def test_create_from_form(self):

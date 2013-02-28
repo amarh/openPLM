@@ -37,7 +37,7 @@ class DeletionTestCase(BaseTestCase):
     def assertDeleted(self, doc_file):
         self.assertTrue(doc_file.deleted)
         self.assertTrue(doc_file.deprecated)
-        self.failIf(os.path.exists(doc_file.file.path))
+        self.assertFalse(os.path.exists(doc_file.file.path))
 
     def assertNotDeleted(self, doc_file):
         self.assertFalse(doc_file.deleted)
@@ -50,7 +50,7 @@ class DeletionTestCase(BaseTestCase):
         path = f2.file.path
         self.controller.delete_file(f2)
         self.assertEqual([], list(self.controller.files.all()))
-        self.failIf(os.path.exists(path))
+        self.assertFalse(os.path.exists(path))
  
     def test_checkin_keep_all(self):
         dlt.ON_CHECKIN_SELECTORS[:] = [(dlt.yes, dlt.KeepAllFiles())]

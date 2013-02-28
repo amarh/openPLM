@@ -65,7 +65,7 @@ class ControllerTest(BaseTestCase):
         self.assertEqual(obj.creator, self.user)
         models.PLMObjectUserLink.current_objects.get(plmobject=obj, user=self.user,
                 role=models.ROLE_OWNER)
-        self.failUnless(obj.is_editable)
+        self.assertTrue(obj.is_editable)
 
     def test_create_error1(self):
         # empty reference
@@ -116,7 +116,7 @@ class ControllerTest(BaseTestCase):
     def test_getattr(self):
         controller = self.create("Part1")
         self.assertEqual(controller.name, "")
-        self.failUnless("name" in controller.attributes)
+        self.assertTrue("name" in controller.attributes)
         self.assertEqual(controller.state.name, "draft")
         self.assertRaises(AttributeError, lambda: controller.unknown_attr)
 
@@ -150,7 +150,7 @@ class ControllerTest(BaseTestCase):
     def test_revise_official(self):
         ctrl = self.create("Part1")
         self.promote_to_official(ctrl)
-        self.failUnless(ctrl.is_revisable())
+        self.assertTrue(ctrl.is_revisable())
         rev = ctrl.revise("b")
         self.assertEqual(self.user, rev.owner)
 
@@ -163,7 +163,7 @@ class ControllerTest(BaseTestCase):
         self.group.user_set.add(user)
         self.group.save()
         ctrl = self.CONTROLLER(controller.object, user)
-        self.failUnless(ctrl.is_revisable())
+        self.assertTrue(ctrl.is_revisable())
         rev = ctrl.revise("b")
         self.assertEqual(user, rev.owner)
 
@@ -180,7 +180,7 @@ class ControllerTest(BaseTestCase):
         user = self.get_contributor()
         user.groups.remove(self.group)
         ctrl = self.CONTROLLER(controller.object, user)
-        self.failIf(ctrl.is_revisable())
+        self.assertFalse(ctrl.is_revisable())
         self.assertRaises(exc.PermissionError, ctrl.revise, "b")
         self.assertOneRevision(controller)
 

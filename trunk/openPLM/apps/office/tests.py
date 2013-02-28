@@ -47,7 +47,7 @@ class OfficeTest(DocumentControllerTest):
         self.assertEquals(self.controller.nb_pages, 3)
         self.assertEquals(self.controller.format, "A4")
         f2 = self.controller.files.all()[0]
-        self.failUnless(f2.file.path.endswith(".odt"))
+        self.assertTrue(f2.file.path.endswith(".odt"))
         self.controller.delete_file(f2)
 
     def test_add_odt2(self):

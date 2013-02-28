@@ -42,7 +42,7 @@ class HardDiskViewTest(ViewTest):
     
     def test_display_attributes2(self):
         response = self.get(self.base_url + "attributes/")
-        self.failUnless(response.context["object_attributes"])
+        self.assertTrue(response.context["object_attributes"])
         attributes = dict((x.lower(), y) for (x,y) in 
                           response.context["object_attributes"])               
         self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
