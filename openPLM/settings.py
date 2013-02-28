@@ -131,8 +131,6 @@ INSTALLED_APPS = (
     # 'openPLM.apps.document3D',
 )
 
-AUTH_PROFILE_MODULE = 'plmapp.UserProfile'
-
 CELERY_CREATE_MISSING_QUEUES = True
 CELERY_ROUTES = {
     "openPLM.plmapp.tasks.update_index": {"queue": "index"},
