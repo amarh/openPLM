@@ -7,8 +7,9 @@ from openPLM.plmapp.decomposers import DecomposersManager
 from django.core.files import File
 from json import loads
 
+from django.test.utils import override_settings
 
-
+@override_settings(TIME_ZONE="UTC")
 class view_3dTest(CommonViewTest):
 
     def setUp(self):
