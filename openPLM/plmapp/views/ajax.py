@@ -143,7 +143,7 @@ def ajax_thumbnails(request, obj_type, obj_ref, obj_revi, date=None):
         fileset = obj.documentfile_set.filter(ctime__lte=d).exclude(end_time__gt=d)
     else:
         fileset = obj.files
-    missing_url = urlparse.urljoin(settings.MEDIA_URL, "img/image-missing.png")
+    missing_url = urlparse.urljoin(settings.STATIC_URL, "img/image-missing.png")
     for f in fileset:
         if f.thumbnail:
             img = f.thumbnail.url

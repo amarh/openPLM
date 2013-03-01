@@ -287,7 +287,7 @@ div#slider-scale {
 }
 
 span.imgManagement {
-    background: url("/media/img/navigate_arrows.png") no-repeat;
+    background: url("../img/navigate_arrows.png") no-repeat;
 }
 
 #topControl
@@ -370,28 +370,28 @@ div#FilterNav label {
 }
 
 div.n_part.nocard {
-    background-image: url("/media/img/navigate/part.png");
+    background-image: url("../img/navigate/part.png");
 }
 div.n_document.nocard  {
-    background-image: url("/media/img/navigate/document.png");
+    background-image: url("../img/navigate/document.png");
 }
 div.n_group.nocard  {
-    background-image: url("/media/img/navigate/user.png");
+    background-image: url("../img/navigate/user.png");
 }
 div.n_user.nocard  {
-    background-image: url("/media/img/navigate/user.png");
+    background-image: url("../img/navigate/user.png");
 }
 div.n_part.main_node.nocard  {
-    background-image: url("/media/img/navigate/part_main.png");
+    background-image: url("../img/navigate/part_main.png");
 }
 div.n_document.main_node.nocard  {
-    background-image: url("/media/img/navigate/document_main.png");
+    background-image: url("../img/navigate/document_main.png");
 }
 div.n_group.main_node.nocard  {
-    background-image: url("/media/img/navigate/user_main.png");
+    background-image: url("../img/navigate/user_main.png");
 }
 div.n_user.main_node.nocard {
-    background-image: url("/media/img/navigate/user_main.png");
+    background-image: url("../img/navigate/user_main.png");
 }
 
 .edge {

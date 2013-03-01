@@ -29,17 +29,17 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 
 import re
 import datetime
-from django.utils import timezone
-from django.forms.util import from_current_timezone
 import warnings
 import cStringIO as StringIO
 import xml.etree.cElementTree as ET
 from collections import defaultdict
 
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.template.loader import render_to_string
 from django.utils.html import linebreaks
 from django.utils.encoding import iri_to_uri
+from django.forms.util import from_current_timezone
 
 import pygraphviz as pgv
 
@@ -578,7 +578,8 @@ class NavigationGraph(object):
             ctx["href"] = area.get("href")
             ctx["documents_url"] = ajax_navigate
             ctx["time"] = time_str
-            ctx["MEDIA_URL"] = "/media/"
+            ctx["MEDIA_URL"] = settings.MEDIA_URL
+            ctx["STATIC_URL"] = settings.STATIC_URL
             div = render_to_string("navigate/node.html", ctx)
             if main:
                 # the main node must be the first item, since it is

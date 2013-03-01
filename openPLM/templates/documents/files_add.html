@@ -21,7 +21,7 @@
     </div>
     <div id="div_files"></div>
 </div>
-<script type="text/javascript" src="/media/js/file.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/file.js"></script>
 <script type="text/javascript">
     {% with file_formset.forms as forms %}
         {% for form in forms %}
@@ -48,6 +48,6 @@
     trans["waiting"]="{% trans 'waiting' %}";
     trans["Total"]="{% trans 'Total' %}"
 </script>
-<script type="text/javascript" src="/media/js/opera_upload.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/opera_upload.js"></script>
 
 

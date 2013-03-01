@@ -3,14 +3,14 @@
 
 {% block css %}
 
-    <link rel="stylesheet" href="{{MEDIA_URL}}css/navigate.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="{{MEDIA_URL}}css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{STATIC_URL}}css/navigate.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{STATIC_URL}}css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
 {% endblock css %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.showLoading.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/raphael-min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/navigate.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/jquery.showLoading.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/raphael-min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/navigate.js"></script>
 
     <script>
         $(function () {
@@ -70,19 +70,19 @@
             {% endif %}
         </div>
         <div id="zoom-toolbar">
-            <img src="{{MEDIA_URL}}img/navigate/zoom-out.png"
+            <img src="{{STATIC_URL}}img/navigate/zoom-out.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-out"
                 title="{% trans "Zoom out" %}"/>
-            <img src="{{MEDIA_URL}}img/navigate/zoom-in.png"
+            <img src="{{STATIC_URL}}img/navigate/zoom-in.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-in"
                 title="{% trans "Zoom in" %}"/>
-            <img src="{{MEDIA_URL}}img/navigate/zoom-fit-best.png"
+            <img src="{{STATIC_URL}}img/navigate/zoom-fit-best.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-fit-all"
                 title="{% trans "Fit all" %}"/>
-            <img src="{{MEDIA_URL}}img/navigate/zoom-original.png"
+            <img src="{{STATIC_URL}}img/navigate/zoom-original.png"
                 class="ui-button ui-widget ui-state-default ui-corner-all"
                 id="zoom-original"
                 title="{% trans "Original" %}"/>
@@ -102,20 +102,20 @@
             {% with obj.get_previous_revisions as previous_revisions %}
                 {% if previous_revisions %}
                     <a href="{% with previous_revisions|last as prev %}{{prev.plmobject_url}}navigate/{%endwith%}">
-                        <img src="{{MEDIA_URL}}img/navigate/prev.png" alt="{% trans "previous" %}" title="{% trans "displays previous revision as current object" %}">
+                        <img src="{{STATIC_URL}}img/navigate/prev.png" alt="{% trans "previous" %}" title="{% trans "displays previous revision as current object" %}">
                     </a>
                 {% else %}
-                    <img src="{{MEDIA_URL}}img/navigate/no_prev.png" alt="{% trans "previous" %}" title="{% trans "you are on the first revision of this object" %}">
+                    <img src="{{STATIC_URL}}img/navigate/no_prev.png" alt="{% trans "previous" %}" title="{% trans "you are on the first revision of this object" %}">
                 {% endif %}
             {% endwith %}
 
             {% with obj.get_next_revisions as next_revisions %}
                 {% if next_revisions %}
                     <a href="{% with next_revisions|first as next %}{{next.plmobject_url}}navigate/{%endwith%}">
-                        <img src="{{MEDIA_URL}}img/navigate/next.png" alt="{% trans "next" %}" title="{% trans "displays next revision as current object" %}">
+                        <img src="{{STATIC_URL}}img/navigate/next.png" alt="{% trans "next" %}" title="{% trans "displays next revision as current object" %}">
                     </a>
                 {% else %}
-                    <img src="{{MEDIA_URL}}img/navigate/no_next.png" alt="{% trans "next" %}" title="{% trans "you are on the last revision of this object" %}">
+                    <img src="{{STATIC_URL}}img/navigate/no_next.png" alt="{% trans "next" %}" title="{% trans "you are on the last revision of this object" %}">
                 {% endif %}
             {% endwith %}
 

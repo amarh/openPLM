@@ -6,7 +6,7 @@
         {% if path %}
             {{MEDIA_URL}}{{suffix_url}}thumbnails/{{path}}
         {% else %}
-            {{MEDIA_URL}}img/icon_doc.png
+            {{STATIC_URL}}img/icon_doc.png
         {% endif %}
     {% endwith %}
 {% endspaceless %}{% endblock %}

@@ -1,7 +1,7 @@
 #help_csv{
     display: inline-block;
     position: absolute;
-    background: url("/media/img/focus.png") no-repeat scroll center center transparent;
+    background: url("../img/focus.png") no-repeat scroll center center transparent;
     background-position: 75% 50%;
     background-size: 50%;
     height: 32px;
