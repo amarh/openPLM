@@ -25,7 +25,7 @@ class StepImporter(object):
         self.app.NewDocument(TCollection_ExtendedString("MDTV-XCAF"),self.h_doc)
 
         self.STEPReader = STEPCAFControl_Reader()
-        if not self.STEPReader.ReadFile(file_path):
+        if not self.STEPReader.ReadFile(file_path.encode("utf-8")):
             raise Exception()
         self.STEPReader.Transfer(self.h_doc)
         self.doc = self.h_doc.GetObject()
