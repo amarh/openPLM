@@ -1,9 +1,9 @@
 RST=rst2html.py
-OUTPUT=media/
+OUTPUT=static/
 VPATH=$(OUTPUT)
 DIRS=$(wildcard help/*/)
 
-MDIRS=$(patsubst %,media/%,$(DIRS))
+MDIRS=$(patsubst %,static/%,$(DIRS))
 
 RSTS=$(wildcard help/*/*.rst)
 
@@ -16,7 +16,7 @@ clean:
 
 $(MDIRS):
 	@echo $@
-	@mkdir $@
+	@mkdir -p $@
 
 $(HTMLS): %.html : %.rst $(MDIRS) 
 	$(RST) --no-doc-title --link-stylesheet --initial-header-level=3 $< $(OUTPUT)$@
