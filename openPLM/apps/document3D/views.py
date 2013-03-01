@@ -693,6 +693,6 @@ def ajax_part_creation_form(request, prefix):
 
 
 def same_time(old_modification_data,old_modification_data_microsecond,mtime):
-    d = old_modification_data.replace(microsecond=old_modification_data_microsecond)
+    d = old_modification_data.replace(microsecond=int(old_modification_data_microsecond))
     return d == mtime
 
