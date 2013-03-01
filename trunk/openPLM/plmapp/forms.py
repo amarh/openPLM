@@ -385,7 +385,7 @@ class PLMObjectForm(forms.Form):
 
 class AddChildForm(PLMObjectForm, PartTypeForm):
     quantity = forms.FloatField()
-    order = forms.IntegerField()
+    order = forms.IntegerField(widget=forms.HiddenInput())
     unit = forms.ChoiceField(choices=UNITS, initial=DEFAULT_UNIT)
 
     def __init__(self, parent, *args, **kwargs):
