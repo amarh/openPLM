@@ -28,6 +28,11 @@ To enable the *calendrier* application, it must be enabled in the settings file:
 ``'openPLM.apps.calendrier'`` to the list of installed applications
 (:const:`~settings.INSTALLED_APPS`).
 
+Collecting static files
+==========================
+
+Run ``./manage.py collectstatic``.
+
 Testing
 =========
 

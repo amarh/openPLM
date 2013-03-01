@@ -43,6 +43,11 @@ and edit your apache configuration file to add the following lines:
     # alias media/ ...
 
 
+Collecting static files
+==========================
+
+Run ``./manage.py collectstatic``.
+
 Synchronize the database
 ========================
 
