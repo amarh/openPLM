@@ -28,6 +28,11 @@ Synchronizing the database
 Run ``./manage.py migrate badges``.
 
 
+Collecting static files
+==========================
+
+Run ``./manage.py collectstatic``.
+
 Award badges
 =============
 
