@@ -1,7 +1,7 @@
 {% extends "identity_card.html" %}
 {% load i18n plmapp_tags highlight %}
 
-{% block thumbnail_url%}{{MEDIA_URL}}img/icon_part.png{% endblock %}
+{% block thumbnail_url%}{{STATIC_URL}}img/icon_part.png{% endblock %}
 {% block id_details%}
     {{ block.super }}
     

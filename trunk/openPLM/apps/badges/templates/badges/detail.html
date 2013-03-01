@@ -12,7 +12,7 @@
     <p class="info_blurb">{{ badge.description }}
     {% if badge.link %}
         {% blocktrans with badge.link as link %}
-        <a href={{link}} target="_blank"><img src="/media/img/focus.png" title="Related documentation"/></a>
+        <a href={{link}} target="_blank"><img src="{{STATIC_URL}}img/focus.png" title="Related documentation"/></a>
         {% endblocktrans %}
     {% endif %}
     </p><br/>

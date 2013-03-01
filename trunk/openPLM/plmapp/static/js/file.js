@@ -181,7 +181,7 @@ function add_f_file(input,f){
         link.click(function(){
     	    del_file(file_line,input);
         });
-        var del_img = "<img src='/media/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
+        var del_img = "<img src='/static/img/trash_can1.png' alt='delete' title='"+trans["remove the file from the queue"]+"'>";
         link.append(del_img);
         file_line.append(link);
 

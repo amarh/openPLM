@@ -2,8 +2,8 @@
 {% load i18n plmapp_tags %}
 
 {% block scripts %}
-    <script type="text/javascript" src="/media/js/jquery.showLoading.min.js"></script>
-    <script type="text/javascript" src="/media/js/3D/ajax3D.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/jquery.showLoading.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/3D/ajax3D.js"></script>
     <script>
         $(
         function(){
@@ -60,8 +60,8 @@
 {% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href="/media/css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="/media/css/displayDecompose.css" type="text/css"/>
+    <link rel="stylesheet" href="{{STATIC_URL}}css/showLoading.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="{{STATIC_URL}}css/displayDecompose.css" type="text/css"/>
 {% endblock %}
 
 {% block content %}
@@ -130,13 +130,13 @@
                                         <td class="|->">
                                             <!--esthetique -->
                                             {%if not prefix and forloop.last %}
-                                                <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%" />
+                                                <img src="{{STATIC_URL}}img/arrows.png" alt="->" hight="50%" width="50%" />
                                             {% else %}
 
                                                 {% if not forloop.last or forloop.first %} 
-                                                    <img src="/media/img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
+                                                    <img src="{{STATIC_URL}}img/arrow_middle.png" alt="|->" hight="50%" width="50%"/>
                                                 {% else %}
-                                                    <img src="/media/img/arrows.png" alt="->" hight="50%" width="50%"/>
+                                                    <img src="{{STATIC_URL}}img/arrows.png" alt="->" hight="50%" width="50%"/>
                                                 {% endif %}
                                             {% endif %}
                                             <!--/esthetique -->
@@ -189,7 +189,7 @@
                                             >
                                             <td class="|">
                                                 {% if not forloop.last %}
-                                                    <img src="/media/img/line_part.png" alt="|" hight="50%" width="50%" />
+                                                    <img src="{{STATIC_URL}}img/line_part.png" alt="|" hight="50%" width="50%" />
                                                 {% endif %}
                                             </td>
                                             <td class="vide" colspan="4">
@@ -214,7 +214,7 @@
                                         <tr class="document{% if level > 0 %} hidden {% endif %} "  name="doc{{level}}{{assembly_num}}{{forloop.counter0}}">
                                             <td class="|">
                                                 {% if not forloop.last %}
-                                                    <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+                                                    <img src="{{STATIC_URL}}img/line.png" alt="|" hight="50%" width="50%"/>
                                                 {% endif %}
                                             </td>
                                             <td class="vide" colspan="4">
@@ -250,7 +250,7 @@
                                             <td class="|">
                                                 <!--esthetique -->
                                                 {% if not forloop.last %}
-                                                    <img src="/media/img/line.png" alt="|" hight="50%" width="50%"/>
+                                                    <img src="{{STATIC_URL}}img/line.png" alt="|" hight="50%" width="50%"/>
                                                 {% endif %}
                                                 <!--/esthetique -->
                                             </td>
