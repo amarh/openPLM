@@ -66,7 +66,7 @@ from haystack.views import SearchView
 import openPLM.plmapp.csvimport as csvimport
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.archive import generate_archive, ARCHIVE_FORMATS
+from openPLM.plmapp.utils.archive import generate_archive, ARCHIVE_FORMATS
 from openPLM.plmapp.base_views import init_ctx, get_obj, get_obj_from_form, \
     get_obj_by_id, handle_errors, get_generic_data, get_navigate_data, \
     get_creation_view, register_creation_view, secure_required

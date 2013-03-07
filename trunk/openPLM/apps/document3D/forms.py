@@ -1,7 +1,7 @@
 from django import forms
 from openPLM.apps.document3D.models import *
 from openPLM.plmapp.models import get_all_parts_with_level
-from openPLM.plmapp.units import UNITS
+from openPLM.plmapp.utils.units import UNITS
             
 class Doc_Part_type_Form(forms.Form):
     LIST_parts = get_all_parts_with_level()

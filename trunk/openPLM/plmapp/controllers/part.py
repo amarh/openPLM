@@ -33,7 +33,7 @@ from collections import namedtuple, defaultdict
 from django.db.models.query import Q
 
 import openPLM.plmapp.models as models
-from openPLM.plmapp.units import DEFAULT_UNIT
+from openPLM.plmapp.utils.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.files.formats import is_cad_file

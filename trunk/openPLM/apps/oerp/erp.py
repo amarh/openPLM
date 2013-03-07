@@ -10,7 +10,7 @@ except ImportError:
     CAN_EXPORT_TO_OERP = False
     ERPError = Exception # fake exception for try...except block
 
-from openPLM.plmapp.units import convert_unit, UnitConversionError
+from openPLM.plmapp.utils.units import convert_unit, UnitConversionError
 from openPLM.apps.oerp import models
 
 DEFAULT_PORT = 8070

@@ -8,7 +8,7 @@ from django.db import models, IntegrityError
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 
-from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
+from openPLM.plmapp.utils.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.utils import level_to_sign_str
 
 from .lifecycle import State

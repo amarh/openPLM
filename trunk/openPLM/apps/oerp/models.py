@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.core.validators import MinValueValidator
 
 from openPLM.plmapp.models import Part, ParentChildLink
-from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
+from openPLM.plmapp.utils.units import UNITS, DEFAULT_UNIT
 
 _menu_items = Part.menu_items
 
