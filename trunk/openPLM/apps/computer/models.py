@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -38,9 +38,10 @@ def register(cls):
 
 # single part
 class SinglePart(Part):
-    
+
     supplier = models.CharField(verbose_name=_("supplier"),max_length=200)
     tech_details = models.TextField(verbose_name=_("tech details"),blank=True)
+    tech_details.richtext = True
 
     @property
     def attributes(self):
@@ -80,7 +81,7 @@ class ReferenceDesignator(ParentChildLinkExtension):
     @classmethod
     def apply_to(cls, parent):
         return isinstance(parent, MotherBoard)
-   
+
     def clone(self, link, save, **data):
         ref = data.get("reference_designator", self.reference_designator)
         clone = ReferenceDesignator(link=link, reference_designator=ref)
@@ -94,7 +95,7 @@ register_PCLE(ReferenceDesignator)
 
 class RAM(SinglePart):
     size_in_mo = models.PositiveIntegerField(verbose_name=_("size in mo"))
-    
+
     @property
     def attributes(self):
         attrs = list(super(RAM, self).attributes)
@@ -106,7 +107,7 @@ register(RAM)
 
 class HardDisk(SinglePart):
     capacity_in_go = models.PositiveIntegerField(verbose_name=_("capacity in go"))
-    
+
     @property
     def attributes(self):
         attrs = list(super(HardDisk, self).attributes)
@@ -117,13 +118,13 @@ register(HardDisk)
 
 
 class ElectronicPart(SinglePart):
-    
-    pass 
+
+    pass
 register(ElectronicPart)
 
 
 class MechanicalPart(SinglePart):
-    
+
     pass
 
 register(MechanicalPart)
@@ -131,7 +132,7 @@ register(MechanicalPart)
 
 class Mouse(SinglePart):
     number_of_buttons = models.PositiveSmallIntegerField(verbose_name=_("number of buttons"), default=lambda: 3)
-    
+
     @property
     def attributes(self):
         attrs = list(super(Mouse, self).attributes)
@@ -146,7 +147,7 @@ class KeyBoard(SinglePart):
                ("az", "Azerty"),
               )
     keymap = models.CharField(verbose_name=_("keymap"), max_length=20, choices=KEYMAPS)
-    
+
     @property
     def attributes(self):
         attrs = list(super(KeyBoard, self).attributes)
@@ -159,7 +160,7 @@ register(KeyBoard)
 class Screen(SinglePart):
     horizontal_resolution = models.IntegerField(verbose_name=_("horizontal resolution"))
     vertical_resolution = models.IntegerField(verbose_name=_("vertical resolution"))
-    
+
     @property
     def attributes(self):
         attrs = list(super(Screen, self).attributes)
@@ -173,7 +174,7 @@ register(Screen)
 
 class Assembly(Part):
     manufacturer = models.CharField(verbose_name=_("manufacturer"), max_length=200)
-    
+
     @property
     def attributes(self):
         attrs = list(super(Assembly, self).attributes)
@@ -185,7 +186,7 @@ register(Assembly)
 
 class ComputerSet(Assembly):
     customer = models.CharField(verbose_name=_("customer"), max_length=200)
-    
+
     @property
     def attributes(self):
         attrs = list(super(ComputerSet, self).attributes)
@@ -197,7 +198,8 @@ register(ComputerSet)
 
 class CentralUnit(Assembly):
     tech_characteristics = models.TextField(verbose_name=_("tech characteristics"), blank=True)
-    
+    tech_characteristics.richtext = True
+
     @property
     def attributes(self):
         attrs = list(super(CentralUnit, self).attributes)
@@ -209,6 +211,7 @@ register(CentralUnit)
 
 class OtherAssembly(Assembly):
     tech_details = models.TextField(verbose_name=_("tech details"), blank=True)
+    tech_details.richtext = True
 
     @property
     def attributes(self):

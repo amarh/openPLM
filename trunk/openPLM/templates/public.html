@@ -48,13 +48,15 @@
             <h3>{% trans "Attributes" %}</h3>
             <div>
                 <table class="Content">
-                    {% for description, attribute in object_attributes %}
+                    {% for description, attribute, richtext in object_attributes %}
                         <tr class="Content">
                             <td class="Content description">{{description|capfirst}}</td>
                             <td class="Content">
                                 {% if attribute.year %}
                                     {{ attribute|date:"DATETIME_FORMAT" }} — 
                                     {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                                {% elif richtext %}
+                                    {{ attribute|richtext_filter }}
                                 {% else %}
                                     {{attribute|linebreaks}}
                                 {% endif %}

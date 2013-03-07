@@ -51,6 +51,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.comments.views.comments import post_comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.db.models.fields import FieldDoesNotExist
 from django.forms import HiddenInput
 from django.http import (HttpResponseRedirect, HttpResponse, Http404,
                         HttpResponsePermanentRedirect, HttpResponseForbidden,
@@ -170,6 +171,24 @@ def display_home_page(request):
 #############################################################################################
 ###All functions which manage the different html pages related to a part, a doc and a user###
 #############################################################################################
+
+def render_attributes(obj, attrs):
+    if getattr(settings, "HIDE_EMAILS", False):
+        if obj.has_permission(models.ROLE_OWNER):
+            attrs = (attr for attr in attrs if attr != "email")
+    object_attributes = []
+    meta = obj.object._meta
+    for attr in attrs:
+        item = obj.get_verbose_name(attr)
+        richtext = False
+        try:
+            field = meta.get_field(attr)
+            richtext = getattr(field, "richtext", False)
+        except FieldDoesNotExist:
+            richtext = False
+        object_attributes.append((item, getattr(obj, attr), richtext))
+    return object_attributes
+
 @handle_errors(restricted_access=False)
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
@@ -192,15 +211,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
 
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-
-    object_attributes = []
-    attrs = obj.attributes
-    if getattr(settings, "HIDE_EMAILS", False):
-        if not ctx["is_owner"]:
-            attrs = (attr for attr in attrs if attr != "email")
-    for attr in attrs:
-        item = obj.get_verbose_name(attr)
-        object_attributes.append((item, getattr(obj, attr)))
+    object_attributes = render_attributes(obj, obj.attributes)
     ctx["is_contributor"] = models.get_profile(obj._user).is_contributor
     ctx.update({'current_page' : 'attributes',
                 'object_attributes' : object_attributes})
@@ -2938,12 +2949,8 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
         raise Http404
 
     ctx = init_ctx(obj_type, obj_ref, obj_revi)
-    attrs = obj.published_attributes
-    object_attributes = []
-    for attr in attrs:
-        item = obj.get_verbose_name(attr)
-        object_attributes.append((item, getattr(obj, attr)))
-    object_attributes.insert(4, (obj.get_verbose_name("state"), obj.state.name))
+    object_attributes = render_attributes(obj, obj.published_attributes)
+    object_attributes.insert(4, (obj.get_verbose_name("state"), obj.state.name, False))
     if request.user.is_anonymous():
         test = lambda x: x.published
         is_contributor = False

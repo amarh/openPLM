@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with openPLM.  If not, see <http://www.gnu.org/licenses/>.
-#    
+#
 # Contact :
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
@@ -29,7 +29,6 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 
 """
-from django.utils.translation import ugettext_lazy as _
 
 from openPLM.apps.computer.models import SinglePartController
 from openPLM.plmapp.tests.views import ViewTest
@@ -39,12 +38,12 @@ class HardDiskViewTest(ViewTest):
     TYPE = "HardDisk"
     DATA = {"capacity_in_go" : 500,
             "supplier" : "ASupplier"}
-    
+
     def test_display_attributes2(self):
         response = self.get(self.base_url + "attributes/")
         self.assertTrue(response.context["object_attributes"])
-        attributes = dict((x.lower(), y) for (x,y) in 
-                          response.context["object_attributes"])               
+        attributes = dict((x.lower(), y) for (x,y, _) in
+                          response.context["object_attributes"])
         self.assertEqual(attributes["capacity in go"], self.DATA["capacity_in_go"])
         self.assertEqual(attributes["supplier"], self.DATA["supplier"])
         self.assertEqual(attributes["tech details"], "")
