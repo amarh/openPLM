@@ -1,5 +1,4 @@
 import random
-import datetime
 from django.utils import timezone
 
 from django.db import models
@@ -19,6 +18,7 @@ class GroupInfo(Group):
         app_label = "plmapp"
 
     description = models.TextField(blank=True)
+    description.richtext = True
     creator = models.ForeignKey(User, related_name="%(class)s_creator")
 
     owner = models.ForeignKey(User, verbose_name=_("owner"),

@@ -1,5 +1,4 @@
 import datetime
-from django.utils import timezone
 
 from django.conf import settings
 from django.db.models import signals
@@ -12,6 +11,7 @@ from haystack.utils import get_identifier
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.tasks import update_index, remove_index
+from openPLM.plmapp.filters import plaintext
 
 # just a hack to prevent a KeyError
 def get_state(self):
@@ -101,6 +101,8 @@ class GroupIndex(ModelSearchIndex):
     def prepare_mtime(self, obj):
         return prepare_date(obj.mtime)
 
+    def prepare_description(self, obj):
+        return plaintext(obj.description)
 
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
@@ -133,6 +135,15 @@ for key, model in models.get_all_plmobjects().iteritems():
 
         rendered = CharField(use_template=True, indexed=False)
         rendered_add = CharField(use_template=True, indexed=False)
+
+        def prepare(self, object):
+            self.prepared_data = QueuedSearchIndex.prepare(self, object)
+            meta_fields = object._meta.get_all_field_names()
+            for f in self.Meta.fields:
+                if f in meta_fields and f in self.prepared_data:
+                    if getattr(object._meta.get_field(f), "richtext", False):
+                        self.prepared_data[f] = plaintext(self.prepared_data[f])
+            return self.prepared_data
 
         def prepare_ctime(self, obj):
             return prepare_date(obj.ctime)

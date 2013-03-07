@@ -243,12 +243,10 @@ class ViewTest(CommonViewTest):
         self.assertEqual(self.user, obj.owner)
         self.assertEqual(self.user, obj.creator)
 
-
-
     def test_display_attributes(self):
         response = self.get(self.base_url + "attributes/", page="attributes")
         self.assertTrue(response.context["object_attributes"])
-        attributes = dict((x.capitalize(), y) for (x,y) in
+        attributes = dict((x.capitalize(), y) for (x, y, z) in
                           response.context["object_attributes"])
         # name : empty value
         self.assertEqual(attributes["Name"], "")
@@ -2041,7 +2039,7 @@ class UserViewTestCase(CommonViewTest):
 
     def test_user_attribute(self):
         response = self.get(self.user_url + "attributes/", page="attributes")
-        attributes = dict((x.capitalize(), y) for (x,y) in
+        attributes = dict((x.capitalize(), y) for (x, y, z) in
                           response.context["object_attributes"])
 
         old_lang = translation.get_language()
@@ -2283,7 +2281,7 @@ class GroupViewTestCase(CommonViewTest):
 
     def test_group_attributes(self):
         response = self.get(self.group_url + "attributes/", page="attributes")
-        attributes = dict((x.capitalize(), y) for (x,y) in
+        attributes = dict((x.capitalize(), y) for (x, y, z) in
                           response.context["object_attributes"])
         self.assertEqual(attributes["Description"], self.group.description)
         self.assertTrue(response.context["is_owner"])

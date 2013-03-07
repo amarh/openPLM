@@ -1,6 +1,8 @@
 import re
 
 from django import template
+from django.db.models.fields import FieldDoesNotExist
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.template import Node, resolve_variable
 
@@ -9,6 +11,7 @@ from haystack.models import SearchResult
 from openPLM.plmapp.controllers import (DocumentController, PartController,
         UserController, GroupController)
 from openPLM.plmapp import models
+from openPLM.plmapp.filters import richtext, plaintext
 from openPLM.plmapp.utils import get_pages_num
 
 
@@ -51,7 +54,6 @@ def can_add(obj, arg):
             if models.get_profile(obj).restricted:
                 return False
             if hasattr(cur_obj, "check_in_group"):
-                from django.conf import settings
                 if obj.username == settings.COMPANY:
                     return False
                 if cur_obj.check_in_group(obj):
@@ -120,7 +122,6 @@ def key(d, key_name):
     try:
         value = d[key_name]
     except KeyError:
-        from django.conf import settings
         value = settings.TEMPLATE_STRING_IF_INVALID
     return value
 key = register.filter('key', key)
@@ -131,9 +132,21 @@ def indice(l, index):
 indice = register.filter('indice', indice)
 
 def attr(o, attr_name):
-    from django.conf import settings
     return getattr(o, attr_name, settings.TEMPLATE_STRING_IF_INVALID)
 attr = register.filter('attr', attr)
+
+
+@register.filter
+def plainattr(obj, attr_name):
+    v = getattr(obj, attr_name)
+    try:
+        field = obj._meta.get_field(attr_name)
+        if getattr(field, "richtext", False):
+            v = plaintext(v)
+    except FieldDoesNotExist:
+        pass
+    return v
+
 
 @register.filter
 def is_plmobject(result):
@@ -364,4 +377,22 @@ def confirm(context, action, action_label, msg):
 @register.filter
 def get_profile(user):
     return models.get_profile(user)
+
+
+@register.filter
+def richtext_filter(content):
+    """
+    This template filter takes a string value and passes it through the
+    function specified by the RICHTEXT_FILTER setting.
+    """
+    return richtext(content)
+
+
+@register.filter
+def plaintext_filter(content):
+    """
+    This template filter takes a string value and passes it through the
+    function specified by the RICHTEXT_PLAIN_FILTER setting.
+    """
+    return plaintext(content)
 
