@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -24,20 +24,4 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-
-import openPLM.plmapp.views as pviews
-
-
-def freecad(request, obj_ref, obj_revi):
-    """ Manage html page for attributes """
-    obj_type = "FreeCAD"
-    obj, ctx = pviews.get_generic_data(request, obj_type, obj_ref, obj_revi)
-    object_attributes_list = []
-    for attr in obj.attributes:
-        item = obj.get_verbose_name(attr) + ":"
-        object_attributes_list.append((item, getattr(obj, attr)))
-    ctx.update({'current_page':'attributes', 
-        'object_attributes': object_attributes_list})
-    return render_to_response('attributes.html', ctx,
-                              context_instance=RequestContext(request))
 
