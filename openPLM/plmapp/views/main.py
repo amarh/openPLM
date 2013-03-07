@@ -2422,10 +2422,9 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
     else:
         return HttpResponseForbidden()
 
-    form = forms.ArchiveForm(request.GET)
-    if form.is_valid():
-        format = form.cleaned_data["format"]
-        name = "%s_%s.%s" % (obj_ref, obj_revi, format)
+    archive_format = request.GET.get("format")
+    if archive_format in ARCHIVE_FORMATS:
+        name = "%s_%s.%s" % (obj_ref, obj_revi, archive_format)
         content_type = guess_type(name, False)[0]
         if not content_type:
             content_type = 'application/octet-stream'
