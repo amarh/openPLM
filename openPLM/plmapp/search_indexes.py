@@ -102,7 +102,7 @@ class GroupIndex(ModelSearchIndex):
         return prepare_date(obj.mtime)
 
     def prepare_description(self, obj):
-        return plaintext(obj.description)
+        return plaintext(obj.description, obj)
 
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
@@ -142,7 +142,7 @@ for key, model in models.get_all_plmobjects().iteritems():
             for f in self.Meta.fields:
                 if f in meta_fields and f in self.prepared_data:
                     if getattr(object._meta.get_field(f), "richtext", False):
-                        self.prepared_data[f] = plaintext(self.prepared_data[f])
+                        self.prepared_data[f] = plaintext(self.prepared_data[f], object)
             return self.prepared_data
 
         def prepare_ctime(self, obj):
