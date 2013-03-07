@@ -13,7 +13,7 @@ from openPLM.plmapp.models import GroupInfo, PLMObject, ParentChildLink
 from openPLM.plmapp.csvimport import PLMObjectsImporter, BOMImporter,\
         CSVImportError, UsersImporter
 from openPLM.plmapp.base_views import get_obj
-from openPLM.plmapp.unicodecsv import UnicodeWriter
+from openPLM.plmapp.utils.unicodecsv import UnicodeWriter
 from openPLM.plmapp.forms import CSVForm
 
 

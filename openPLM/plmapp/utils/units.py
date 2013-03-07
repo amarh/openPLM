@@ -50,7 +50,7 @@ class UnitConversionError(Exception):
     """
     .. versionadded:: 1.1
 
-    Exception raised if an error occurs while converting 
+    Exception raised if an error occurs while converting
     a value from one unit to another one.
     """
     pass
@@ -68,7 +68,7 @@ FACTORS = {
     'dg' : (0.1, 'g'),
     'g' : (1., 'g'),
     'kg' : (1000, 'g'),
-    
+
     'mol' : (6.0221404e23, '-'),
     '-' : (1., '-'),
 
@@ -89,7 +89,7 @@ def convert_unit(value, original_unit, new_unit):
     :raises: :exc:`UnitConversionError` if the conversion is not possible.
 
     Here is an example :
-        
+
         >>> convert_unit(1, 'm', 'mm')
         1000.0
         >>> convert_unit(5, 'dm', 'mm')
@@ -100,7 +100,7 @@ def convert_unit(value, original_unit, new_unit):
         ------------------------------------------------------------
         Traceback (most recent call last):
           File "<ipython console>", line 1, in <module>
-          File "/home/pcosquer/openPLM/trunk/openPLM/../openPLM/plmapp/units.py", line 80, in convert_unit
+          File plmpapp/utils/units.py", line 80, in convert_unit
             def convert_unit(value, original_unit, new_unit):
         UnitConversionError: Inconsistent units (dL, kg)
     """

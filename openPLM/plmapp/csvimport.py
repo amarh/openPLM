@@ -13,7 +13,7 @@ from django.forms.util import ErrorList
 from django.utils.safestring import mark_safe
 
 from openPLM.plmapp import models
-from openPLM.plmapp.unicodecsv import UnicodeReader
+from openPLM.plmapp.utils.unicodecsv import UnicodeReader
 from openPLM.plmapp.controllers import PLMObjectController, UserController
 from openPLM.plmapp.tasks import update_indexes
 

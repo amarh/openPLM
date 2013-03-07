@@ -38,13 +38,13 @@ from django.contrib.sites.models import Site
 from django.utils.functional import memoize
 
 import openPLM.plmapp.models as m
-from openPLM.plmapp.units import UNITS, DEFAULT_UNIT
 from openPLM.plmapp.controllers.document import DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.references import get_new_reference, validate_reference, validate_revision
 from openPLM.plmapp.widgets import JQueryAutoComplete
-from openPLM.plmapp.encoding import ENCODINGS
+from openPLM.plmapp.utils.encoding import ENCODINGS
+from openPLM.plmapp.utils.units import UNITS, DEFAULT_UNIT
 
 
 def _clean_reference(self):
@@ -867,7 +867,7 @@ def get_headers_formset(Importer):
 
 get_headers_formset = memoize(get_headers_formset, {}, 1)
 
-from openPLM.plmapp.archive import ARCHIVE_FORMATS
+from openPLM.plmapp.utils.archive import ARCHIVE_FORMATS
 class ArchiveForm(forms.Form):
     format = forms.TypedChoiceField(choices=zip(ARCHIVE_FORMATS, ARCHIVE_FORMATS))
 

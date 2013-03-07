@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         from openPLM.apps.oerp.erp import get_oerp
-        from openPLM.plmapp.units import UNITS
+        from openPLM.plmapp.utils.units import UNITS
 
         uom_srv = get_oerp().get("product.uom")
         names = {"-" : "PCE", "L" : "Litre" }
