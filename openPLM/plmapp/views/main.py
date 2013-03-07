@@ -193,17 +193,17 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
 
-    object_attributes_list = []
+    object_attributes = []
     attrs = obj.attributes
     if getattr(settings, "HIDE_EMAILS", False):
         if not ctx["is_owner"]:
             attrs = (attr for attr in attrs if attr != "email")
     for attr in attrs:
         item = obj.get_verbose_name(attr)
-        object_attributes_list.append((item, getattr(obj, attr)))
+        object_attributes.append((item, getattr(obj, attr)))
     ctx["is_contributor"] = models.get_profile(obj._user).is_contributor
     ctx.update({'current_page' : 'attributes',
-                'object_attributes' : object_attributes_list})
+                'object_attributes' : object_attributes})
     if isinstance(obj.object, models.PLMObject):
         if obj.is_part:
             ctx["attach"] = (obj, "attach_doc")
@@ -2428,7 +2428,7 @@ def download_archive(request, obj_type, obj_ref, obj_revi):
         content_type = guess_type(name, False)[0]
         if not content_type:
             content_type = 'application/octet-stream'
-        content = generate_archive(files, format)
+        content = generate_archive(files, archive_format)
         response = StreamingHttpResponse(content, content_type=content_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
         return response
