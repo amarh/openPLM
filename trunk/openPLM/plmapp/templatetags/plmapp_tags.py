@@ -142,7 +142,7 @@ def plainattr(obj, attr_name):
     try:
         field = obj._meta.get_field(attr_name)
         if getattr(field, "richtext", False):
-            v = plaintext(v)
+            v = plaintext(v, obj)
     except FieldDoesNotExist:
         pass
     return v
@@ -380,19 +380,19 @@ def get_profile(user):
 
 
 @register.filter
-def richtext_filter(content):
+def richtext_filter(content, obj=None):
     """
     This template filter takes a string value and passes it through the
     function specified by the RICHTEXT_FILTER setting.
     """
-    return richtext(content)
+    return richtext(content, obj)
 
 
 @register.filter
-def plaintext_filter(content):
+def plaintext_filter(content, obj=None):
     """
     This template filter takes a string value and passes it through the
     function specified by the RICHTEXT_PLAIN_FILTER setting.
     """
-    return plaintext(content)
+    return plaintext(content, obj)
 

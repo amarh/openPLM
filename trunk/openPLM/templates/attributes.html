@@ -16,7 +16,7 @@
                                 {{ attribute|date:"DATETIME_FORMAT" }} — 
                                 {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
                             {% elif richtext %}
-                                {{ attribute|richtext_filter }}
+                                {{ attribute|richtext_filter:obj }}
                             {% else %}
                                 {{attribute|linebreaks}}
                             {% endif %}
@@ -100,7 +100,7 @@
                             {{ comment.submit_date|date:"r" }}
                         </span>
                         <div class="comment_text">
-                            {{ comment.comment|richtext_filter }}
+                            {{ comment.comment|richtext_filter:obj }}
                         </div>
                     </div>
                 {% endfor %}
