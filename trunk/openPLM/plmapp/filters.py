@@ -39,7 +39,11 @@ except ImportError:
     pass
 else:
     def markdown_filter(text):
-        md = markdown.markdown(text, safe_mode='escape', output_format='html5')
+        md = markdown.markdown(text,
+            safe_mode='escape',
+            output_format='html5',
+            extensions=["abbr", "tables", "def_list", "smart_strong", "toc",]
+        )
         return mark_safe(md)
 
 
