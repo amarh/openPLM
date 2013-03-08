@@ -63,7 +63,7 @@ else:
                 return ""
         def next_revision(label, base, end):
             try:
-                return object.get_next_revisions()[1].plmobject_url
+                return object.get_next_revisions()[0].plmobject_url
             except Exception:
                 return ""
 
