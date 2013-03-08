@@ -34,14 +34,22 @@ def plaintext(content, object):
 
 try:
     import markdown
-    from markdown.extensions.wikilinks import WikiLinkExtension, WikiLinks
+    from markdown.inlinepatterns import LinkPattern
+    from markdown.util import etree
+    from markdown.extensions.wikilinks import WikiLinkExtension
+    from django.utils.encoding import iri_to_uri
 except ImportError:
     pass
 else:
     ref = r'(?:\\ |[^/?#\t\r\v\f\s])+'
     object_pattern = r'(\w+/{ref}/{ref})'.format(ref=ref)
+    def build_url2(label, base, end):
+        return iri_to_uri('%s%s%s' % (base, label, end))
+
     class PLMLinkExtension(WikiLinkExtension):
         def __init__(self, pattern, configs):
+            if "build_url" not in [c[0] for c in configs]:
+                configs.append(("build_url", build_url2))
             WikiLinkExtension.__init__(self, configs)
             self.pattern = pattern
 
@@ -49,10 +57,32 @@ else:
             self.md = md
 
             # append to end of inline patterns
-            wikilinkPattern = WikiLinks(self.pattern, self.getConfigs())
-            wikilinkPattern.md = md
+            wikilinkPattern = PLMPattern(self.pattern, self.getConfigs())
+            wikilinkPattern.markdown = md
             md.inlinePatterns.add('plmlink%d' % hash(self.pattern),
                 wikilinkPattern, "<not_strong")
+
+    class PLMPattern(LinkPattern):
+        def __init__(self, pattern, config):
+            LinkPattern.__init__(self, pattern)
+            self.config = config
+
+        def handleMatch(self, m):
+            if m.group(2).strip():
+                base_url = self.config['base_url']
+                end_url = self.config['end_url']
+                html_class = self.config['html_class']
+                label = self.unescape(m.group(2).strip())
+                label = label.replace("\ ", " ")
+                url = self.config['build_url'](label, base_url, end_url)
+                a = etree.Element('a')
+                a.text = label.replace("\\ ", " ")
+                a.set('href', self.unescape(url))
+                if html_class:
+                    a.set('class', html_class)
+            else:
+                a = ''
+            return a
 
     def markdown_filter(text, object):
         # TODO: optimize this code
@@ -75,7 +105,6 @@ else:
                 PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/'),]),
                 # users
                 PLMLinkExtension(r"(?<!\w)@(%s)" % ref, [('base_url', '/user/'),]),
-                PLMLinkExtension(r"^@(%s)" % ref, [('base_url', '/user/'),]),
                 # groups
                 PLMLinkExtension(r"\bgroup:(%s)\b" % ref, [('base_url', '/group/'),]),
                 # previous/next revisions

@@ -1,4 +1,5 @@
 from django.test.utils import override_settings
+from django.utils.encoding import iri_to_uri
 from django.utils.safestring import SafeData
 
 from openPLM.plmapp.filters import plaintext, richtext, markdown_filter
@@ -50,9 +51,19 @@ class MarkDownFilterTestCase(BaseTestCase):
     def test_emph(self):
         self.markdown(SIMPLE_TEXT,  u"<p><em>a</em> simple text</p>")
 
-    def test_object_link(self):
+    def test_object_url(self):
         wanted = u"<p><a class='wikilink' href='%s'>Part/P1/a</a></p>" % self.ctrl.plmobject_url
         self.markdown(u"[Part/P1/a]", wanted)
+
+    def test_object_url_with_space(self):
+        url = "/object/Part/P1%20a/a/"
+        wanted = u"<p><a class='wikilink' href='%s'>Part/P1 a/a</a></p>" % url
+        self.markdown(u"[Part/P1\\ a/a]", wanted)
+
+    def test_object_url_special_character(self):
+        url = iri_to_uri(u"/object/Part/P1/\xe0\u0153/")
+        wanted = u"<p><a class='wikilink' href='%s'>Part/P1/\xe0\u0153</a></p>" % url
+        self.markdown(u"[Part/P1/\xe0\u0153]", wanted)
 
     def test_next_revision(self):
         revb = self.ctrl.revise("b")
@@ -62,3 +73,12 @@ class MarkDownFilterTestCase(BaseTestCase):
     def test_user_url(self):
         wanted = u"<p><a class='wikilink' href='/user/robert/'>robert</a></p>"
         self.markdown("@robert", wanted)
+
+    def test_user_url_with_space(self):
+        wanted = u"<p><a class='wikilink' href='/user/robert%20baratheon/'>robert baratheon</a></p>"
+        self.markdown("@robert\\ baratheon", wanted)
+
+    def test_group_url(self):
+        wanted = u"<p><a class='wikilink' href='/group/tortuesninja/'>tortuesninja</a></p>"
+        self.markdown("group:tortuesninja", wanted)
+
