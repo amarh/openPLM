@@ -139,6 +139,9 @@ INSTALLED_APPS = (
 if os.environ.get("openPLM3D", "") == "enabled":
     INSTALLED_APPS += ("openPLM.apps.document3D", )
 
+COMMENTS_APP = "openPLM.plmapp"
+RICHTEXT_FILTER = 'openPLM.plmapp.filters.markdown_filter'
+RICHTEXT_WIDGET_CLASS = 'openPLM.plmapp.widgets.MarkdownWidget'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 ######################
