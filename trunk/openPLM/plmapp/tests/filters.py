@@ -70,6 +70,20 @@ class MarkDownFilterTestCase(BaseTestCase):
         wanted = u"<p>next<a class='wikilink' href='%s'>&gt;&gt;</a>rev</p>" % revb.plmobject_url
         self.markdown(u"next >> rev", wanted)
 
+    def test_previous_revision(self):
+        revb = self.ctrl.revise("b")
+        wanted = u"<p>prev<a class='wikilink' href='%s'>&lt;&lt;</a>rev</p>" % self.ctrl.plmobject_url
+        html = markdown_filter(u"prev << rev", revb)
+        self.assertHTMLEqual(html, wanted)
+
+    def test_inexisting_previous_revision(self):
+        wanted = u"<p>prev<a class='wikilink' href=''>&lt;&lt;</a>rev</p>"
+        self.markdown(u"prev << rev", wanted)
+
+    def test_inexisting_next_revision(self):
+        wanted = u"<p>next<a class='wikilink' href=''>&gt;&gt;</a>rev</p>"
+        self.markdown(u"next >> rev", wanted)
+
     def test_user_url(self):
         wanted = u"<p><a class='wikilink' href='/user/robert/'>robert</a></p>"
         self.markdown("@robert", wanted)
