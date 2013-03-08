@@ -6,6 +6,14 @@ from openPLM.plmapp.filters import plaintext, richtext, markdown_filter
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
+def richtext_filter(text, object):
+    """ simple filter to test settings"""
+    return text.upper()
+
+def plaintext_filter(text, object):
+    """ simple filter to test settings"""
+    return text.lower()
+
 SIMPLE_TEXT =  u"_a_ simple text"
 class RichTextTestCase(BaseTestCase):
 
@@ -34,6 +42,18 @@ class RichTextTestCase(BaseTestCase):
         html = plaintext(SIMPLE_TEXT, self.ctrl)
         self.assertEqual(html, SIMPLE_TEXT)
         self.assertFalse(isinstance(html, SafeData))
+
+    @override_settings(RICHTEXT_FILTER='openPLM.plmapp.tests.filters.richtext_filter')
+    def test_richtext_test(self):
+        html = richtext("test", self.ctrl)
+        self.assertHTMLEqual(html, "TEST")
+
+    @override_settings(RICHTEXT_FILTER='openPLM.plmapp.tests.filters.richtext_filter',
+        RICHTEXT_PLAIN_FILTER='openPLM.plmapp.tests.filters.plaintext_filter')
+    def test_plaintext_test(self):
+        html = plaintext("TEST", self.ctrl)
+        self.assertEqual(html, "test")
+
 
 
 class MarkDownFilterTestCase(BaseTestCase):
