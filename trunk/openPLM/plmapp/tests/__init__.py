@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -44,6 +44,7 @@ from openPLM.plmapp.tests.navigate import *
 from openPLM.plmapp.tests.reference import *
 from openPLM.plmapp.tests.restricted import *
 from openPLM.plmapp.tests.synchronized import *
+from openPLM.plmapp.tests.filters import *
 
 import openPLM.plmapp.models
 from openPLM.plmapp.lifecycle import LifecycleList
