@@ -48,8 +48,7 @@ class MarkDownFilterTestCase(BaseTestCase):
         self.assertHTMLEqual(html, wanted)
         return html
 
-    def test_emph(self):
-        self.markdown(SIMPLE_TEXT,  u"<p><em>a</em> simple text</p>")
+    # openplm extensions
 
     def test_object_url(self):
         wanted = u"<p><a class='wikilink' href='%s'>Part/P1/a</a></p>" % self.ctrl.plmobject_url
@@ -95,4 +94,25 @@ class MarkDownFilterTestCase(BaseTestCase):
     def test_group_url(self):
         wanted = u"<p><a class='wikilink' href='/group/tortuesninja/'>tortuesninja</a></p>"
         self.markdown("group:tortuesninja", wanted)
+
+    # builtin syntax
+
+    def test_emph(self):
+        self.markdown(SIMPLE_TEXT,  u"<p><em>a</em> simple text</p>")
+
+    def test_title(self):
+        wanted = u"<h1 id='hello'>Hello</h1><p>world</p>"
+        self.markdown(u"# Hello #\n\nworld", wanted)
+
+    def test_link(self):
+        wanted = u"<p><a href='http://example.com'>http://example.com</a></p>"
+        self.markdown(u"<http://example.com>", wanted)
+
+    def test_link2(self):
+        wanted = u"<p><a href='http://example.com'>hello</a></p>"
+        self.markdown(u"[hello](http://example.com)", wanted)
+
+    def test_safe_link(self):
+        wanted = u"<p><a href=''>c</a></p>"
+        self.markdown(u"[c](javascript:plop)", wanted)
 
