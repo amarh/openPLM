@@ -44,6 +44,7 @@ from openPLM.plmapp.controllers.group import GroupController
 from openPLM.plmapp.references import get_new_reference, validate_reference, validate_revision
 from openPLM.plmapp.widgets import JQueryAutoComplete
 from openPLM.plmapp.utils.encoding import ENCODINGS
+from openPLM.plmapp.utils.importing import import_dotted_path
 from openPLM.plmapp.utils.units import UNITS, DEFAULT_UNIT
 
 
@@ -66,18 +67,30 @@ def _clean_revision(self):
 INVALID_GROUP = _("Bad group, check that the group exists and that you belong"
         " to this group.")
 
-def auto_complete_fields(form, cls):
+def enhance_fields(form, cls):
     """
     Replaces textinputs field of *form* with auto complete fields.
+
+    Replaces textareas' widgets with widgets user defined widgets
+    (:setting:`RICHTEXT_WIDGET_CLASS` setting).
 
     :param form: a :class:`Form` instance or class
     :param cls: class of the source that provides suggested values
     """
+    richtext_class = getattr(settings, "RICHTEXT_WIDGET_CLASS", None)
+    if richtext_class is not None:
+        richtext_class = import_dotted_path(richtext_class)
+
     for field, form_field in form.base_fields.iteritems():
         if field not in ("reference", "revision") and \
                 isinstance(form_field.widget, forms.TextInput):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
             form_field.widget = JQueryAutoComplete(source)
+        elif (richtext_class is not None and
+              isinstance(form_field.widget, forms.Textarea)):
+            f = cls._meta.get_field(field)
+            if getattr(f, "richtext", False):
+                form_field.widget = richtext_class()
 
 
 def get_initial_creation_data(user, cls, start=0, inbulk_cache=None):
@@ -259,7 +272,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
             base_form = CreationForm
         Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'), form=base_form)
         # replace textinputs with autocomplete inputs, see ticket #66
-        auto_complete_fields(Form, cls)
+        enhance_fields(Form, cls)
         if issubclass(cls, m.PLMObject):
             Form.base_fields["reference"].required = False
         get_creation_form.cache[cls] = Form
@@ -272,7 +285,7 @@ def get_modification_form(cls=m.PLMObject, data=None, instance=None):
     if Form is None:
         fields = cls.get_modification_fields()
         Form = modelform_factory(cls, fields=fields)
-        auto_complete_fields(Form, cls)
+        enhance_fields(Form, cls)
         get_modification_form.cache[cls] = Form
     if data:
         return Form(data)
