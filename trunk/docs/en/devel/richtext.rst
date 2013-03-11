@@ -1,8 +1,8 @@
-.. versionadded:: 1.3
-
 ==========================================================
 Rich text | Wiki syntax
 ==========================================================
+
+.. versionadded:: 1.3
 
 
 Introduction
@@ -159,7 +159,79 @@ with :func:`.ajax_richtext_preview`.
 How to add a new syntax
 =========================
 
-
 .. warning::
 
-    Safe mode
+    Be careful, markup libraries may have features that allow raw HTML to be
+    included, and that allow arbitrary files to be included. These can lead to
+    XSS vulnerabilities and leaking of private information. It is your
+    responsibility to check the features of the library you are using and
+    configure it appropriately to avoid this.
+
+
+To add a new syntax, you only have to write one function that
+will convert the content.
+This function is registered by the :setting:`RICHTEXT_FILTER` setting
+which must be the complete python path to the function
+(``application.module.function_name``).
+OpenPLM will automatically import the module and call the function instead
+of the default implementation.
+
+
+The function must take two arguments:
+
+    * the content to convert
+    * the current object
+
+It must return a unicode string which should mark as safe if it
+is a safe html content.
+
+Example::
+
+    # apps/my_filter/filters.py
+    from django.utils.safestring import mark_safe
+
+    def my_filter(content, obj):
+        # do something with content
+        html = f(content)
+        return mark_safe(html)
+
+::
+
+    # settings.py
+    RICHTEXT_FILTER = 'openPLM.apps.my_filter.filters.my_filter'
+
+
+Then you can define two additional settings:
+
+   * :setting:`RICHTEXT_PLAIN_FILTER` which should be a
+     path to function.
+     This function is similar to the previous filter except it
+     must return a plain text without any HTML tags (content
+     is escaped by openPLM).
+     The default implementation cleans up the HTML code.
+
+   * :setting:`RICHTEXT_WIDGET_CLASS` which should be a
+     path to a widget class.
+
+
+For example, the markdown widget is defined like this::
+
+    from django import forms
+
+    class MarkdownWidget(forms.Textarea):
+        class Media:
+            css = {
+                'all': ('css/jquery.markedit.css',)
+            }
+            js = ('js/showdown.js', 'js/jquery.markedit.js', )
+
+        def __init__(self):
+            super(MarkdownWidget, self).__init__()
+            self.attrs["class"] = "markedit"
+
+As you can see, it defines extra css and js files.
+It also sets the class attribute of the textarea so that
+the javascript can easily treat the textarea
+(here, ``$(".markedit").markedit()``).
+
+
