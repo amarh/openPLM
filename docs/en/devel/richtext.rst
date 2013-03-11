@@ -200,6 +200,13 @@ Example::
     # settings.py
     RICHTEXT_FILTER = 'openPLM.apps.my_filter.filters.my_filter'
 
+.. note::
+
+    Be careful with all security issues. Moreover, this function
+    should never fail and be tolerant to syntax errors.
+    Be also careful with extra features which may leak
+    confidential data.
+
 
 Then you can define two additional settings:
 
