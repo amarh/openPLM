@@ -27,4 +27,5 @@ If you are a core developper, you may want to read:
     documentation
     bom
     publication
+    richtext
     testing
