@@ -24,6 +24,7 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
+import os.path
 import datetime
 import warnings
 from collections import namedtuple
@@ -33,6 +34,7 @@ from pyPdf.generic import NameObject, DictionaryObject, NumberObject,\
     StreamObject, ArrayObject, IndirectObject
 
 from django import http
+from django.conf import settings
 from django.template.loader import get_template
 from django.template import Context
 from django.db.models.query import Q
@@ -45,7 +47,7 @@ import cStringIO as StringIO
 
 from openPLM.plmapp.base_views import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
-from openPLM.plmapp.views import r2r
+from openPLM.plmapp.views import r2r, render_attributes
 from openPLM.plmapp.forms import DisplayChildrenForm
 from openPLM.apps.pdfgen.forms import get_pdf_formset
 
@@ -167,18 +169,36 @@ class StreamedPdfFileWriter(PdfFileWriter):
         yield("\nstartxref\n%s\n%%%%EOF\n" % (xref_location))
         warnings.simplefilter('default', DeprecationWarning)
 
+def fetch_resources(uri, rel):
+    # only load static/media files (security)
+    sroot = os.path.normpath(settings.STATIC_ROOT)
+    mroot = os.path.normpath(settings.MEDIA_ROOT)
+    if uri.startswith(settings.STATIC_URL):
+        path = os.path.join(sroot, uri[len(settings.STATIC_URL):])
+    elif uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(mroot, uri[len(settings.MEDIA_URL):])
+    else:
+        return ""
+    path = os.path.normpath(path)
+    if path.startswith((sroot, mroot)) and os.path.exists(path):
+        return path
+    return ""
+
+
 def render_to_pdf(template_src, context_dict, filename):
     warnings.simplefilter('ignore', DeprecationWarning)
     template = get_template(template_src)
     context = Context(context_dict)
     html = template.render(context)
     result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-16")), result)
+    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-16")), result,
+        link_callback=fetch_resources)
     if not pdf.err:
         response = http.HttpResponse(result.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         warnings.simplefilter('default', DeprecationWarning)
         return response
+    warnings.simplefilter('default', DeprecationWarning)
     raise ValueError()
 
 @handle_errors
@@ -190,12 +210,9 @@ def attributes(request, obj_type, obj_ref, obj_revi):
     if hasattr(obj, "check_readable"):
         obj.check_readable(raise_=True)
     ctx = {"obj" : obj,}
-    attributes = []
-    for attr in obj.attributes:
-        item = obj.get_verbose_name(attr)
-        attributes.append((item, getattr(obj, attr)))
+    attributes = render_attributes(obj, obj.attributes)
     if hasattr(obj, "state"):
-        attributes.append((obj.get_verbose_name("state"), obj.state.name))
+        attributes.append((obj.get_verbose_name("state"), obj.state.name, False))
     ctx['attributes'] = attributes
     filename = u"%s_%s_%s.pdf" % (obj_type, obj_ref, obj_revi)
     return render_to_pdf('attributes.xhtml', ctx, filename)
