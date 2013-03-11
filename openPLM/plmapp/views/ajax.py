@@ -42,6 +42,7 @@ from openPLM.plmapp.controllers import PLMObjectController
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
         json_view, get_navigate_data, secure_required, get_creation_view
+from openPLM.plmapp.filters import richtext
 
 from openPLM.plmapp.navigate import TIME_FORMAT
 
@@ -268,4 +269,13 @@ def ajax_can_attach(request, plmobject_id):
                 elif hasattr(plmobject, "can_attach_part"):
                     data["can_attach"] = plmobject.can_attach_part(attached)
     return data
+
+
+@ajax_login_required
+@json_view
+def ajax_richtext_preview(request, obj_type, obj_ref, obj_revi):
+    obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
+    obj.check_readable()
+    content = request.GET["content"]
+    return {"html": richtext(content, obj)}
 

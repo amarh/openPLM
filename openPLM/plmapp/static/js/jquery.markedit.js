@@ -869,7 +869,8 @@
             $(previewPane).show();
             toolbar.markeditDisableToolbar('.preview button');
 
-            $(previewPane).html($(textarea).markeditGetHtml());
+            //$(previewPane).html($(textarea).markeditGetHtml());
+            $(textarea).onlinePreview($(previewPane));
         }
         return this;
 
@@ -936,6 +937,40 @@
     };
 
 
+    $.fn.onlinePreview = function(previewPane) {
+        var uri = new String(document.location);
+        var uri_rx = /\/object\/((?:[^\/]*\/){3}).*?/;
+        var result = uri_rx.exec(uri);
+        if (result === null){
+            uri_rx = /\/user\/([^\/]*)\//;
+            result = uri_rx.exec(uri);
+            if (result === null) {
+                uri_rx = /\/group\/([^\/]*)\//;;
+                result = uri_rx.exec(uri);
+                uri = "/ajax/richtext_preview/Group/" + (result[1]) + "/-/";
+            }
+            else {
+                uri = "/ajax/richtext_preview/User/" + (result[1]) + "/-/";
+            }
+        }
+        else {
+            uri = "/ajax/richtext_preview/" + (result[1]);
+        }
+
+
+        // Render the preview
+        var textarea = MarkEdit.getTextArea(this);
+        var text = $(textarea).val();
+        
+        previewPane.html("");
+        var jqxhr =$.getJSON(uri, {"content":text},
+            function(json) {
+                previewPane.html(json.html);
+            }
+        );
+        // fallback: showdown
+        jqxhr.error(function(){ previewPane.html($(textarea).markeditGetHtml());});
+    };
 
     // -----------------------------------------------------------------------
     //  MarkEdit Namespace
@@ -1617,10 +1652,16 @@ String.prototype.rightNewlineTrim = function() {
     return this.replace(/(\r|\n)+$/g, '');
 }
 
+
+
 $(function() {
+
+
+
     $(".markedit").markedit({
         'toolbar' : {
             'backgroundMode' : 'dark'
         }
     });
+
 });
