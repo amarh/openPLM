@@ -71,6 +71,7 @@ def get_obj(obj_type, obj_ref, obj_revi, user):
 # from http://www.redrobotstudios.com/blog/2009/02/18/securing-django-with-ssl/
 def secure_required(view_func):
     """Decorator which makes sure URL is accessed over https."""
+    @functools.wraps(view_func)
     def _wrapped_view_func(request, *args, **kwargs):
         if not request.is_secure():
             if getattr(settings, 'FORCE_HTTPS', False):

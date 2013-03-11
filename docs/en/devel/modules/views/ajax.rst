@@ -4,6 +4,6 @@
 
 .. automodule:: plmapp.views.ajax
     :members:
-    :undoc-members:
     :show-inheritance:
+    :undoc-members:
   

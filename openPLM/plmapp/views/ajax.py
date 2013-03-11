@@ -24,6 +24,10 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
+"""
+Ajax views.
+"""
+
 import time
 import datetime
 import urlparse
@@ -274,6 +278,18 @@ def ajax_can_attach(request, plmobject_id):
 @ajax_login_required
 @json_view
 def ajax_richtext_preview(request, obj_type, obj_ref, obj_revi):
+    """
+    Ajax view to get an HTML preview of a raw content (in richtext
+    syntax).
+
+    GET paramerer:
+
+        ``content``
+            raw content to be rendered
+
+    This view returns a JSON response with one key, ``html``, the rendered
+    content that can be included in a div element.
+    """
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     obj.check_readable()
     content = request.GET["content"]
