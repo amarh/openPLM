@@ -942,15 +942,20 @@
         var uri_rx = /\/object\/((?:[^\/]*\/){3}).*?/;
         var result = uri_rx.exec(uri);
         if (result === null){
-            uri_rx = /\/user\/([^\/]*)\//;
+            uri_rx = /\/(\w+)\/([^\/]*)\//;
             result = uri_rx.exec(uri);
             if (result === null) {
-                uri_rx = /\/group\/([^\/]*)\//;;
-                result = uri_rx.exec(uri);
-                uri = "/ajax/richtext_preview/Group/" + (result[1]) + "/-/";
+                uri = "/404/";
             }
             else {
-                uri = "/ajax/richtext_preview/User/" + (result[1]) + "/-/";
+                var type = result[1];
+                if (type == "user"){
+                    type = "User";
+                }
+                else if (type == "group"){
+                    type = "Group";
+                }
+                uri = "/ajax/richtext_preview/" + type + "/" + (result[2]) + "/-/";
             }
         }
         else {
