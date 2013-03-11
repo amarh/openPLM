@@ -1,7 +1,37 @@
+import re, htmlentitydefs
+
 from django.conf import settings
 from django.utils.html import strip_tags, linebreaks
 from django.utils.safestring import mark_safe
 from openPLM.plmapp.utils.importing import import_dotted_path
+
+## http://effbot.org/zone/re-sub.htm#unescape-html
+# Removes HTML or XML character references and entities from a text string.
+#
+# @param text The HTML (or XML) source text.
+# @return The plain text, as a Unicode string, if necessary.
+
+def unescape(text):
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
+
 
 def richtext(content, object):
     """
@@ -27,7 +57,7 @@ def plaintext(content, object):
         func = import_dotted_path(richtext_plain_filter)
     elif richtext_filter:
         f = import_dotted_path(richtext_filter)
-        func = lambda s, o: strip_tags(f(s, o))
+        func = lambda s, o: unescape(strip_tags(f(s, o)))
     else:
         func = lambda s, o: s
     return func(content, object)
