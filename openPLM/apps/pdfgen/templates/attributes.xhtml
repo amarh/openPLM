@@ -14,11 +14,20 @@
 
     <div>
         <table class="Content">
-            {% for description, attribute in attributes %}
-                <tr class="Content">
-                    <td class="Content description">{{description|capfirst}}</td>
-                    <td class="Content">{{attribute|linebreaks}}</td>
-                </tr>
+            {% for description, attribute, richtext in attributes %}
+                    <tr class="Content">
+                        <td class="Content description">{{description|capfirst}}</td>
+                        <td class="Content">
+                            {% if attribute.year %}
+                                {{ attribute|date:"DATETIME_FORMAT" }} — 
+                                {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
+                            {% elif richtext %}
+                                {{ attribute|richtext_filter:obj }}
+                            {% else %}
+                                {{attribute|linebreaks}}
+                            {% endif %}
+                        </td>
+                    </tr>
             {% endfor %}
         </table>
     </div>
