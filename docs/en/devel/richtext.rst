@@ -114,10 +114,46 @@ Alternatively, you can enhance any form like this::
 Markdown syntax
 ==================
 
-Python Markdown
+OpenPLM ships with a `Markdown`_ syntax.
 
-Extensions
+It can be enabled with the following settings::
 
+    RICHTEXT_FILTER = 'openPLM.plmapp.filters.markdown_filter'
+    RICHTEXT_WIDGET_CLASS = 'openPLM.plmapp.widgets.MarkdownWidget'
+
+The filter is built with `Python Markdown`_ with the ``safe_mode`` option activated
+and the following extensions:
+
+    * ``abbr``,
+    * ``tables``,
+    * ``def_list``,
+    * ``smart_strong``, 
+    * ``toc``.
+
+More custom extensions are enabled, they added the following syntaxes:
+
+.. list-table::
+
+    * - :samp:`[{type}/{reference}/{revision}]`
+      - link to a PLMObject
+    * - :samp:`<<`
+      - link to the previous revision of the current object
+    * - :samp:`>>`
+      - link to the next revision of the current object
+    * - :samp:`@{username}`
+      - link to a user page
+    * - :samp:`group:{name}`
+      - link to a group
+
+
+The javascript editor is based on `MarkEdit`_, it renders the preview
+with :func:`.ajax_richtext_preview`.
+
+.. _Python Markdown: http://pythonhosted.org/Markdown/index.html
+
+.. _Markdown: http://daringfireball.net/projects/markdown/
+
+.. _MarkEdit: http://tstone.github.com/jquery-markedit/
 
 
 How to add a new syntax
