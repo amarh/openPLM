@@ -20,13 +20,14 @@ This HowTo is based on:
     * Debian Squeeze
     * Apache Server version: Apache/2.2.16 (from Debian)
     * PostgreSQL 8.4.4
-    * Python 2.6.X
+    * Python 2.6.X or 2.7.X
     * Django 1.5.X
     * Celery 3.0.X
     * Haystack 1.2.X
     * Xapian 1.2.X
     * Lepl 5.0
-    * South 0.7.3
+    * South 0.7.6
+    * Markdown 2.2
  
  
 .. note::
@@ -51,6 +52,7 @@ First, you must install some dependencies:
     #. ``pip install django-celery``
     #. ``pip install 'django-haystack<2'``
     #. ``pip install librabbitmq``
+    #. ``pip install markdown```
     #. ``apt-get install postgresql python-psycopg2``
     #. ``pip install lepl``
     #. ``apt-get install python-pisa libgsf-bin``

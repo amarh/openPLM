@@ -70,6 +70,13 @@ The required version of Haystack is still 1.2.7:
 
     * ``pip install -U 'django-haystack==1.2.7'``
 
+Python Markdown
+++++++++++++++++++
+    
+You must install Python Markdown (version 2.2.1 or later)
+if you want to use Markdown as the syntax of comments and description fields:
+
+    * ``pip install -U Markdown``
 
 Settings
 ==============
