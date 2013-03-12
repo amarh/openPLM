@@ -26,7 +26,10 @@
             <div class="center">
                 {% if object_type == 'User' %}
                     {% if obj.can_update_data %}
-                        <a class="tb-btn" href="/user/{{object_reference|urlencode }}/modify/"><span class="ui-button-text">{% trans "Edit this information" %}</span></a>
+                        <a class="tb-btn" href="/user/{{object_reference|urlencode }}/modify/">
+                            <i class="tb-icon-pencil"></i>
+                            <span class="ui-button-text">{% trans "Edit this information" %}</span>
+                        </a>
                     {% endif %}
                     {% if is_owner %}
                         <a class="tb-btn" href="/user/{{object_reference|urlencode }}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
@@ -34,11 +37,13 @@
                 {% elif is_owner and obj.is_editable %}
                     <a class="tb-btn" 
                         href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
+                        <i class="tb-icon-pencil"></i>
                         <span>{% trans "Edit this information" %}</span>
                     </a>
                 {% endif %}
                 {% if can_generate_pdf and not restricted %}
                     <a href="/pdf{{obj.plmobject_url}}attributes/" class="tb-btn">
+                        <i class="tb-icon-download-alt"></i>
                         <span>{% trans "Download as PDF"%}</span>
                     </a>
                 {% endif %}
