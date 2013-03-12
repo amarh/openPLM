@@ -2,26 +2,47 @@
 Upgrading from OpenPLM 1.2 to OpenPLM 1.3
 ===========================================
 
+:Date: 2013-03-12
 
 New/updated dependencies
 ==============================
 
+.. note::
+
+    Before upgrading dependencies, you should save a list of
+    installed versions. You can get one with the command
+    ``pip freeze``.
+
 Django 1.5
 +++++++++++++++++
 
-``pip install -U 'django==1.5'``
+OpenPLM 1.2 depends on Django 1.2 or Django 1.3,
+OpenPLM 1.3 requires Django 1.5.
+
+    * ``pip install -U 'django==1.5'``
 
 Celery 3.0 and Django-Celery 3.0
 ++++++++++++++++++++++++++++++++++
 
-``pip install -U celery django-celery kombu``
 
-``librabbitmq``
+OpenPLM 1.2 depends on Celery 2.3 or Celery 2.5,
+OpenPLM 1.3 is now compatible with Celery 3.0 which is the only version
+supported by OpenPLM.
+
+    * ``pip install -U celery django-celery kombu``
+
+You should also install librabbitmq which is recommended by Celery to
+connect to RabbitMQ:
+
+    * ``pip install librabbitmq``
 
 South 0.7.6
 ++++++++++++
 
-``pip install -U south``
+South is used to migrate the database. You should always upgrade south
+before migrating a database:
+
+    * ``pip install -U south``
 
 psycopg2
 ++++++++++++++
@@ -45,7 +66,9 @@ To install a newer version:
 Haystack
 ++++++++++++
 
-``pip install -U 'django-haystack==1.2.7'``
+The required version of Haystack is still 1.2.7:
+
+    * ``pip install -U 'django-haystack==1.2.7'``
 
 
 Settings
