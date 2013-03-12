@@ -31,7 +31,7 @@ if the following command fails:
 
     * ``python -c 'from psycopg2.extensions import ISQLQuote'``
 
-When it fails, it outputs something like:
+When it fails, it outputs something like::
 
     Traceback (most recent call last):
       File "<string>", line 1, in <module>
