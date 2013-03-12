@@ -30,7 +30,7 @@ urlpatterns = patterns('',
     (r'^browse/ecr/$', views.browse_ecr),
     (r'^history_item/ecr/(?P<hid>\d+)/$', views.redirect_history),
     (r'^object/' + object_pattern + "changes/$", views.changes),
-    (r'^ajax/richtext_preview/' + object_pattern, "plmapp.views.ajax_richtext_preview", ecr_dict),
+    (r'^ajax/richtext_preview/' + ecr[1:] +"-/$", "plmapp.views.ajax_richtext_preview", ecr_dict),
     )
 
 if "openPLM.apps.rss" in settings.INSTALLED_APPS:
