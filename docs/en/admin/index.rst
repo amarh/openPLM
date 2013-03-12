@@ -8,6 +8,7 @@ This documentation explains how to administrate openPLM.
 .. toctree::
     :maxdepth: 2
     :numbered:   
+    :glob:
 
     how-tos
     settings
@@ -17,5 +18,5 @@ This documentation explains how to administrate openPLM.
     lifecycle
     publication
     references
-    upgrade_1.3
+    upgrade/*
 
