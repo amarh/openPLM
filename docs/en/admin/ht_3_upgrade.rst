@@ -78,6 +78,10 @@ Restoring a backup
 Updating the code
 ==================
 
+You should remove old ``.pyc`` files:
+
+    * ``find path/to/openPLM -name '*.pyc' -delete``
+
 Development version (svn)
 ---------------------------
 
