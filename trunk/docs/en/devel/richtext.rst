@@ -8,9 +8,23 @@ Rich text | Wiki syntax
 Introduction
 ================
 
+OpenPLM 1.3 introduces a wiki syntax to comments and some text fields.
+
+The code and this documentation speak about rich text instead of a
+wiki content as it is not really a wiki engine (no WikiLink automatically
+created).
+
+This document describes how to mark a text field as a rich text field
+and how to render its content.
+
+
 
 Model: how to enhance a textfield 
 ===================================
+
+OpenPLM does not store the rendered HTML. So it is possible to set
+a text field as a "rich" text field at any time. To do that,
+simply add a ``richtext`` attribute (set tot True) to the text field.
 
 Example:
 
@@ -21,6 +35,11 @@ Example:
 
         my_text_field = models.TextField()
         my_text_field.richtext = True
+
+Note that a plain text rendering is stored by the search engine.
+This plain text rendering is syntax dependant and you may have 
+to reindex a model if the raw text (user input stored in the database)
+and the plain text may be too different.
 
 How to render a content
 ===========================
