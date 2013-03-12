@@ -230,4 +230,4 @@ Previous versions
     :maxdepth: 1
     :glob:
 
-    whatsnew/*
+    /whatsnew/whatsnew-1.1
