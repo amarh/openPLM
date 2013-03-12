@@ -23,8 +23,21 @@ South 0.7.6
 
 ``pip install -U south``
 
-Psycopg
+psycopg2
 ++++++++++++++
+
+You may need to upgrade to a newer version of psycopg2 (binding to postgres)
+if the following command fails:
+
+    * ``python -c 'from psycopg2.extensions import ISQLQuote'``
+
+When it fails, it outputs something like:
+
+    Traceback (most recent call last):
+      File "<string>", line 1, in <module>
+    ImportError: No module named psycopg2.extensions
+
+To install a newer version:
 
     * ``apt-get install libpq-dev``
     * ``pip install -U psycopg2``
