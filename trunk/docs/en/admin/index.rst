@@ -17,4 +17,5 @@ This documentation explains how to administrate openPLM.
     lifecycle
     publication
     references
+    upgrade_1.3
 
