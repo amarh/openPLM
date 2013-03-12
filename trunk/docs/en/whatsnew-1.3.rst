@@ -29,6 +29,7 @@ What's new for users
 What's new for administrators
 ===============================
 
+:doc:`/admin/upgrade/upgrade-1.3`
 
 Previous versions
 =================

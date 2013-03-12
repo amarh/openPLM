@@ -10,6 +10,14 @@ How to upgrade an installation of OpenPLM
     Before upgrading your installation, read the whole document and
     be sure to have reliable backups.
 
+You should also read the following instructions:
+
+.. toctree::
+    :glob:
+    :titlesonly:
+
+    upgrade/*
+
 Stopping the server
 ===================
 
@@ -163,6 +171,15 @@ Version 1.2:
     * OpenPLM 1.2 tests if a search result is readable by the
       current user. If search indexes are not rebuilt, each search
       will hit the database and take a little more time.
+
+Collecting static files
+=========================
+
+.. versionadded:: 1.3
+
+Not required if you update using the tarball:
+
+    * ``./manage.py collectstatic``
 
 File permissions
 ================
