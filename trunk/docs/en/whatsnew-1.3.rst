@@ -53,6 +53,8 @@ Django 1.5
     * StreamingHttpResponse
     * static files
 
+Call :func:`.get_profile` instead of ``user.get_profile()``.
+
 Rich text | Wiki syntax
 ++++++++++++++++++++++++++
 
