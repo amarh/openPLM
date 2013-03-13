@@ -102,21 +102,6 @@ def can_link(current_type, suggested_type):
     return ((current_type in doc_types and suggested_type in part_types) or
             (current_type in part_types and suggested_type in doc_types))
 
-@register.filter
-def button(css_class, options=""):
-    classes = set([css_class, " ui-button",
-            "ui-button-text-only", "ui-widget", "ui-state-default",
-            "ui-corner-all"])
-    options = options.split(",")
-    for opt in options:
-        opt = opt.strip()
-        if opt:
-            if opt.startswith("icon"):
-                classes.discard("ui-button-text-only")
-            if opt.startswith("corner"):
-                classes.discard("ui-corner-all")
-            classes.add("ui-" + opt)
-    return " ".join(classes)
 
 def key(d, key_name):
     try:
