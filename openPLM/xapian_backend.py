@@ -7,22 +7,19 @@ __version__ = (1, 1, 6, 'beta')
 
 import time
 import datetime
-from django.utils import timezone
 import cPickle as pickle
 import os
 import re
 import shutil
 import sys
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import force_unicode
 
 from haystack.backends import BaseSearchBackend, BaseSearchQuery, SearchNode, log_query
-from haystack.constants import ID, DJANGO_CT, DJANGO_ID
-from haystack.exceptions import HaystackError, MissingDependency, MoreLikeThisError
-from haystack.fields import DateField, DateTimeField, IntegerField, FloatField, BooleanField, MultiValueField
+from haystack.constants import ID
+from haystack.exceptions import HaystackError, MissingDependency
 from haystack.models import SearchResult
 from haystack.utils import get_identifier
 
@@ -708,7 +705,8 @@ class SearchBackend(BaseSearchBackend):
                 match_re = re.compile(match, re.I)
                 content = match_re.sub('<%s>%s</%s>' % (tag, match, tag), content)
         # remove non highlighted line
-        content = "...".join(line for line in content.splitlines() if "<em>" in line)
+        matched_lines = [line for line in content.splitlines() if "<em>" in line][:3]
+        content = "...".join(matched_lines)
         return content
 
     def _do_field_facets(self, results, field_facets):
