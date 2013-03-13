@@ -56,7 +56,9 @@
                                     {{ attribute|date:"DATETIME_FORMAT" }} — 
                                     {% blocktrans with attribute|timesince as time_since %}{{time_since}} ago{% endblocktrans %}
                                 {% elif richtext %}
-                                    {{ attribute|richtext_filter:obj }}
+                                    <div class="richtext">
+                                        {{ attribute|richtext_filter:obj }}
+                                    </div>
                                 {% else %}
                                     {{attribute|linebreaks}}
                                 {% endif %}
