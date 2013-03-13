@@ -295,6 +295,7 @@ class SearchBackend(BaseSearchBackend):
             pass
 
         finally:
+            database.close()
             database = None
 
     def remove(self, obj):
