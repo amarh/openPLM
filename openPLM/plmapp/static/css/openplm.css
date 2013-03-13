@@ -1381,8 +1381,9 @@ ul.tbi li {
     padding: 0.4em 1em;
     line-height: 1.4em;
 }
-.tb-btn-group .tb-btn,
-.tb-btn{
+
+.tb-btn-group .tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]),
+.tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]) {
     font-size: 15.4px;
 }
 .tb-btn span {
