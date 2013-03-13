@@ -211,9 +211,8 @@
                         <span class="signer">
                             <a href="/user/{{link.user.username|urlencode}}">{{link.user.username}}</a>
                             {% if can_edit_signer %}
-                                <a title="{% trans "Replace" %}" class="{{"Button"|button:"button-icon-only"}}" href="../management/replace/{{link.id}}/?q=&type=User">
-                                    <span class="ui-button-text">{% trans "REPLACE" %}</span>
-                                    <span class="ui-button-icon-primary ui-icon ui-icon-refresh">&nbsp;</span>
+                                <a title="{% trans "Replace" %}" class="tb-btn tb-btn-small" href="../management/replace/{{link.id}}/?q=&type=User">
+                                    <i class="tb-icon-refresh"></i>
                                 </a>
                                 {% if links|length > 1 %}
                                     <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
