@@ -24,23 +24,23 @@
 
         <span id="toolbar" class="ui-widget-header ui-corner-all" style="display:none">
 
-            <div id="views-toolbar">
-                <button id="view-axo" class="Button small view">{% trans "Set to axometric view" %}</button>
-                <button id="view-front" class="Button small view">{% trans "Set to front view" %}</button>
-                <button id="view-right" class="Button small view">{% trans "Set to right view" %}</button>
-                <button id="view-top" class="Button small view">{% trans "Set to top view" %}</button>
-                <button id="view-rear" class="Button small view">{% trans "Set to rear view" %}</button>
-                <button id="view-left" class="Button small view">{% trans "Set to left view" %}</button>
-                <button id="view-bottom" class="Button small view">{% trans "Set to bottom view" %}</button>
+            <div id="views-toolbar" class="tb-btn-group">
+                <button id="view-axo" class="tb-btn view">{% trans "Set to axometric view" %}</button>
+                <button id="view-front" class="tb-btn view">{% trans "Set to front view" %}</button>
+                <button id="view-right" class="tb-btn view">{% trans "Set to right view" %}</button>
+                <button id="view-top" class="tb-btn view">{% trans "Set to top view" %}</button>
+                <button id="view-rear" class="tb-btn view">{% trans "Set to rear view" %}</button>
+                <button id="view-left" class="tb-btn view">{% trans "Set to left view" %}</button>
+                <button id="view-bottom" class="tb-btn view">{% trans "Set to bottom view" %}</button>
             </div>
 
-            <div id="colors-toolbar">
-                <button id="random-color" class="Button small view">{% trans "Random colors" %}</button>
-                <button id="initial-color" class="Button small view">{% trans "Initial colors" %}</button>
+            <div id="colors-toolbar" class="tb-btn-group">
+                <button id="random-color" class="tb-btn view">{% trans "Random colors" %}</button>
+                <button id="initial-color" class="tb-btn view">{% trans "Initial colors" %}</button>
             </div>
 
-            <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="Button small view">{% trans "Toggle transparency" %}</label></input>
-            <input type="checkbox" id="axis"><label for="axis" class="Button small view">{% trans "Toggle axis visibility" %}</label></input>
+            <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="tb-btn view">{% trans "Toggle transparency" %}</label></input>
+            <input type="checkbox" id="axis"><label for="axis" class="tb-btn view">{% trans "Toggle axis visibility" %}</label></input>
         </span>
 
         <div id="webgl_warning" class="main" style="display:none;">

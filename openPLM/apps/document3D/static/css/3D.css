@@ -159,8 +159,15 @@ div#main_content p {
 #views-toolbar, #colors-toolbar {
     display: inline;
 }
-.Button.view {
-    margin-right: -0.4em;
+.tb-btn.view {
+    margin-right: -0.1em;
+    height: 36px;
+    width: 40px;
+    padding: 3px;
+}
+label.tb-btn.view {
+    width: 34px;
+    height: 30px;
 }
 .view span.ui-icon {
     background: url('../img/views.png') no-repeat;

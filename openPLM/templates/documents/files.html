@@ -67,8 +67,7 @@
         {% if is_owner and obj.is_editable %}
             {{ file_formset.management_form }}
             <noscript>
-                <a class="{{"Button"|button:"button-text-icon-primary"}}" href="./add/">
-                    <span class="ui-button-icon-primary ui-icon ui-icon-document">&nbsp;</span>
+                <a class="tb-btn" href="./add/">
                     <span class="ui-button-text">{% trans "ADD" %}</span>
                 </a>
             </noscript>
