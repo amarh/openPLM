@@ -309,7 +309,7 @@
 
             // Create preview pane
             if (options.preview !== false) {
-                var previewPane = $('<div class="markedit-preview ui-widget-content"></div>');
+                var previewPane = $('<div class="richtext markedit-preview ui-widget-content"></div>');
 
                 // Set initial state for preview if enabled (now that it's created)
                 if (options.preview === 'toolbar') {
