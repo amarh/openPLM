@@ -242,6 +242,36 @@ def add_get(parser, token):
     return AddGetParameter(values)
 
 
+class AddSearchParameter(Node):
+    def __init__(self, values):
+        self.values = values
+
+    def render(self, context):
+        req = resolve_variable('request', context)
+        params = req.GET.copy()
+        if "type" not in self.values:
+            params["type"] = req.session.get("type", "Part")
+        if "q" not in self.values:
+            params["q"] = req.session.get("search_query", "*")
+        if "search_official" not in self.values:
+            params["search_official"] = req.session.get("search_official", "")
+        for key, value in self.values.items():
+            params[key] = value.resolve(context)
+        return '?%s' %  params.urlencode()
+
+
+@register.tag
+def add_search(parser, token):
+    pairs = token.split_contents()[1:]
+    values = {}
+    for pair in pairs:
+        s = pair.split('=', 1)
+        values[s[0]] = parser.compile_filter(s[1])
+    return AddSearchParameter(values)
+
+
+
+
 @register.inclusion_tag('snippets/pagination.html')
 def show_pages_bar(page, request):
     return {

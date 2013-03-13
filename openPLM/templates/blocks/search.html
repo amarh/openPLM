@@ -24,7 +24,7 @@
                 {% blocktrans with results|length as count and search_count as total %}
                     (1 - {{count}} on {{total}})
                 {% endblocktrans %}
-                <a href="/search/?q={{request.session.search_query}}&amp;type={{request.session.type}}">{% trans "All results" %}</a>
+                <a href="/search/{% add_search %}">{% trans "All results" %}</a>
             </span> 
             </p>
             <ul class="Result">

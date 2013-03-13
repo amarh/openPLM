@@ -2782,12 +2782,14 @@ class OpenPLMSearchView(SearchView):
         results = super(OpenPLMSearchView, self).get_results()
         # update request.session so that the left panel displays
         # the same results
-        self.request.session["results"] = results[:30]
-        self.request.session["search_count"] = results.count()
+        session = self.request.session
+        session["results"] = results[:30]
+        session["search_count"] = results.count()
+        session["search_official"] = self.request.GET.get("search_official", "")
         from haystack import site
-        for r in self.request.session.get("results"):
+        for r in session.get("results"):
             r.searchsite = site
-        self.request.session.save()
+        session.save()
         return results
 
     @method_decorator(handle_errors)

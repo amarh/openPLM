@@ -311,6 +311,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
             search_form = SimpleSearchForm(request.GET, auto_id=_SEARCH_ID)
             request.session["type"] = request.GET["type"]
             request.session["q"] = request.GET.get("q", "")
+            request.session["search_official"] = request.GET.get("search_official", "")
             search_needed = True
             save_session = True
         elif "type" in request.session:
@@ -326,6 +327,8 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
             if load_all:
                 qset = qset.load_all()
             request.session["search_query"] = search_query
+            search_official = ["", "1"][search_form.cleaned_data["search_official"]]
+            request.session["search_official"] = search_official
             search_count = request.session["search_count"] = qset.count()
             qset = qset[:30]
             request.session["results"] = qset
@@ -334,6 +337,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
             qset = request.session.get("results", [])
             search_query = request.session.get("search_query", "")
             search_count = request.session.get("search_count", 0)
+            search_official = request.session.get("search_official", "")
 
         ctx.update({
            'results' : qset,
