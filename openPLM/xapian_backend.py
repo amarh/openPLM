@@ -271,10 +271,7 @@ class SearchBackend(BaseSearchBackend):
                                         document.add_term(prefix + term[:6], weight)
                                         document.add_term(prefix + term[:8], weight)
                                     document.add_value(field['column'], _marshal_value(value))
-                                    document.add_value(field['column'], _marshal_value(value))
-                                    document.add_value(field['column'], _marshal_value(value))
                                     document.add_term(prefix + term, weight)
-                                    document.add_value(field['column'], _marshal_value(value))
                             else:
                                 for term in value:
                                     term = _marshal_term(term)
