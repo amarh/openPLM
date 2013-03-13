@@ -507,6 +507,7 @@ ul#MenuList li.CurrentPage:hover a {
 /* *************************************************************************************** */
 /*                   STYLE FOR THE TABLES USED IN THE SEARCHBOX & ACTIVEBOX                */
 /* *************************************************************************************** */
+.richtext table,
 table.Content
 {
     width: 100%;
@@ -517,12 +518,15 @@ table.Content
     background-color: #adacab;
 }
 
+.richtext table th,
+.richtext table td,
 table.Content th,
 table.Content td
 {
     padding: 3px;
 }
 
+.richtext table th,
 table.Content th
 {
     text-align: right;
@@ -532,11 +536,13 @@ table.Content th
     background-color: #585455;
 }
 
+.richtext table th *,
 table.Content th * {
     font-weight: bold;
     color: #eee;
 }
 
+.richtext table td,
 table.Content td
 {
     text-align: left;
