@@ -12,10 +12,10 @@
 
 
     <div>
-        <h3>{% trans "Cost" %}</h3>
+        <h3 class="hplm">{% trans "Cost" %}</h3>
         <div>
             <div>
-                <h4>{% trans "Individual cost" %}</h4>
+                <h4 class="hplm">{% trans "Individual cost" %}</h4>
                 {% if can_update %}
                     <form method="POST" action="{{obj.plmobject_url}}ERP/update_cost/">{% csrf_token %}
                         <table class="Content">
@@ -50,7 +50,7 @@
             </div>
             <hr/>
             <div>
-                <h4>{% trans "Total cost" %}</h4>
+                <h4 class="hplm">{% trans "Total cost" %}</h4>
                 <div>
                     <table class="Content">
                         <colgroup>
@@ -72,7 +72,7 @@
     </div>
 
     <div>
-        <h3>{% trans "OpenERP" %}</h3>
+        <h3 class="hplm">{% trans "OpenERP" %}</h3>
         <div>
             {% if published %}
                 <p>{% trans "This part has been published on OpenERP." %}</p>

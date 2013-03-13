@@ -16,7 +16,7 @@
     {% if not restricted %}
         <div>
             <div class="timeline open" >
-                <h3><span class="expand">{% trans "Last edited objects" %}</span></h3>
+                <h3 class="hplm"><span class="expand">{% trans "Last edited objects" %}</span></h3>
 
                 <div class="objects">
 
@@ -52,7 +52,7 @@
 
     {% for group in links %}
         <div class="timeline">
-            <h3><span class="expand">{% trans group.grouper|capfirst %}</span></h3>
+            <h3 class="hplm"><span class="expand">{% trans group.grouper|capfirst %}</span></h3>
 
             {% regroup group.list by plmobject__type as groups %}
 
@@ -60,7 +60,7 @@
 
                 <div class="objects hidden">
 
-                    <h4>{{ gp.grouper }} </h4>
+                    <h4 class="hplm">{{ gp.grouper }} </h4>
                     <div class="objects_inner">
                         <ul>
                             {% for link in gp.list %}

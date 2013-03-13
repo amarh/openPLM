@@ -25,7 +25,7 @@
     {% with pending_invitations_owner as pending_invitations %}
         {% if pending_invitations %}
             <div>
-                <h3>{% trans "Groups that you own: pending invitations" %}</h3>
+                <h3 class="hplm">{% trans "Groups that you own: pending invitations" %}</h3>
                 <div class="invitations">
                 {% include "groups/pending_invitations.html" with prefix="yes" %}
                 </div>
@@ -35,7 +35,7 @@
     {% with pending_invitations_guest as pending_invitations %}
         {% if pending_invitations %}
             <div>
-                <h3>{% trans "Groups that you may join: pending invitations" %}</h3>
+                <h3 class="hplm">{% trans "Groups that you may join: pending invitations" %}</h3>
                 <div class="invitations">
                 {% include "groups/pending_invitations.html" with prefix="yes" %}
                 </div>

@@ -79,7 +79,7 @@ h2 {
     line-height: 1.3;
 }
 
-h3, h4 {
+.hplm {
     color: #eee;
     text-shadow: 1px 1px #000;
     background: #afacab;
@@ -87,24 +87,24 @@ h3, h4 {
     background-size: cover;
 }
 
-h3 {
+h3.hplm {
     margin: 0.5em 0 .5em;
     padding: 0.5em 1em;
     font-size: 100%;
     font-weight: bold;
     background-image: url("../img/dark/h2_bg_2.png");
 }
-h3.alternate {
+h3.hplm.alternate {
     background-image: url("../img/dark/h2_bg_1.png");
 }
 
 
-h3 + p,
-h3 ~ * {
+h3.hplm + p,
+h3.hplm ~ * {
     margin-left: 1em;
 }
 
-h4 {
+h4.hplm {
     border-radius: 1em 0 1em 0;
     padding: 0.2em 1em;
     font-size: 105%;
@@ -112,8 +112,8 @@ h4 {
     background-image: url("../img/dark/h2_bg_1.png");
 }
 
-h4 + *,
-h4 ~ * {
+h4.hplm + *,
+h4.hplm ~ * {
     margin-right: 1.2em;
 }
 
@@ -1376,3 +1376,12 @@ ul.tbi li {
 .unreadable {
     cursor: not-allowed;
 }
+
+/* richtext -- wiki syntax */
+.richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6 {
+    background: none;
+    text-shadow: none;
+    color: black;
+    margin: 1em;
+}
+

@@ -16,7 +16,7 @@ $(function(){
 {% endblock %}
 
 {% block content %}
-    <h3>{% trans "Import of a csv file" %}</h3>
+    <h3 class="hplm">{% trans "Import of a csv file" %}</h3>
     {% with "/import/"|add:target|add:"/" as action %}
         {% with csv_form as form %}
             {% include "snippets/undo_form.html" %}
@@ -26,7 +26,7 @@ $(function(){
     {% ifequal step 2 %}
         {% if has_critical_error %}
             <div class="errors">
-                <h4>{% trans "Error" %}</h4>
+                <h4 class="hplm">{% trans "Error" %}</h4>
                 {% if errors %}
                     <dl class="errors">
                         {% for line, error in errors %}
