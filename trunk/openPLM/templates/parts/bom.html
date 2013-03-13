@@ -15,11 +15,10 @@
             $.each($(Part_group).children(), function(i,v){
                     part_types.push($(v).val());
                     });
-            if($.inArray(query.type,part_types)!=-1){
-                add_link.attr("href","./add/?q="+ query.q + "&type="+ query.type);               
-            }else{
-                add_link.attr("href","./add/?q=" + query.q + "&type=Part");
+            if($.inArray(query.type,part_types)==-1){
+                query.type = "Part";
             }
+            add_link.attr("href","./add/" + get_search_query(query));               
         }
 $(function() {
         $( "#id_date_0" ).datepicker();
@@ -34,9 +33,9 @@ $(function() {
         <div class="tb-btn-toolbar">
             <a class="tb-btn add-link" 
                 {% if obj.type|can_add_type:request.session.type %}
-                    href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
+                    href="./add/{% add_search %}"
                 {% else %}
-                    href="./add/{% add_get type='Part' q=request.session.search_query %}"
+                    href="./add/{% add_search type='Part' %}"
                 {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>
 
             <a class="tb-btn"

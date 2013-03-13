@@ -5,7 +5,7 @@
     <div class="menurow">
         <div class="menuitem {% if restricted %} disabled {% endif %}"> 
             {% if not restricted %}
-                <a class="tooltip" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
+                <a class="tooltip" href="/search/{% add_search %}">
                     {% trans "Search" %}
                     <span class="triangle">&nbsp;</span>
                     <span class="info">{% trans "Search for a part, a document, a file and more." %}</span>

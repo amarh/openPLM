@@ -75,7 +75,7 @@
                                 </a>
 
                                 {% if not restricted %}
-                                    <a class="tb-btn" href="/search/?type={{request.session.type}}&amp;q={{search_query}}">
+                                    <a class="tb-btn" href="/search/{% add_search %}">
                                         <i class="tb-icon-search"></i>
                                         <span class="ui-button-text">{% trans "SEARCH" %}</span>
                                     </a>

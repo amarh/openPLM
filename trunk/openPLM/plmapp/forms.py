@@ -37,6 +37,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 from django.utils.functional import memoize
 
+from haystack.forms import SearchForm
+
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers.document import DocumentController
 from openPLM.plmapp.controllers.user import UserController
@@ -328,22 +330,23 @@ class Document2TypeForm(forms.Form):
     type.widget.attrs["autocomplete"] = "off"
 
 
-from haystack.forms import SearchForm
 class SimpleSearchForm(SearchForm):
 
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
     type = forms.TypedChoiceField(choices=LIST)
     type.widget.attrs["autocomplete"] = "off"
-    q = forms.CharField(label=_("Query"), required=False,
-            initial="*")
+    q = forms.CharField(label=_("Query"), required=False, initial="*")
+    search_official = forms.BooleanField(label=_("Official objects"), required=False)
 
     def __init__(self, *args, **kwargs):
         super(SimpleSearchForm, self).__init__(*args, **kwargs)
         # swap type and q fields
         t = self.fields.pop("type")
         q = self.fields.pop("q")
+        o = self.fields.pop("search_official")
         self.fields["type"] = t
         self.fields["q"] = q
+        self.fields["search_official"] = o
 
     def search(self):
         from haystack.query import EmptySearchQuerySet
@@ -361,6 +364,8 @@ class SimpleSearchForm(SearchForm):
                 mods.append(m.DocumentFile)
 
             sqs = SmartSearchQuerySet().models(*mods)
+            if self.cleaned_data["search_official"] and issubclass(cls, m.PLMObject):
+                sqs = sqs.filter(state_class="official")
             if not query or query == "*":
                 return sqs.exclude(state_class="cancelled")
             results = sqs.highlight().auto_query(query)

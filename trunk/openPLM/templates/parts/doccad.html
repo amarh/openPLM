@@ -12,11 +12,10 @@
             $.each($(Doc_group).children(), function(i,v){
                     doc_types.push($(v).val());
                     });
-            if($.inArray(query.type, doc_types)!=-1){
-                add_link.attr("href","./add/?q="+query.q + "&type="+query.type);               
-            }else{
-                add_link.attr("href","./add/?q=" + query.q + "&type=Document");
+            if($.inArray(query.type, doc_types) == -1){
+                query.type = "Document";
             }
+            add_link.attr("href","./add/" + get_search_query(query));
         }
 </script>
 {% endblock %}
@@ -32,9 +31,9 @@
                 {% if not obj.is_cancelled %}
                     <a class="tb-btn add-link" 
                         {% if obj.type|can_link:request.session.type %}
-                            href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
+                            href="./add/{% add_search %}"
                         {% else %}
-                            href="./add/{% add_get type='Document' q=request.session.search_query %}"
+                            href="./add/{% add_search type='Document' %}"
                         {% endif %}>
                         <span>{% trans "Attach another document" %}</span>
                     </a>
@@ -47,9 +46,9 @@
                     <ul class="tb tb-dropdown-menu">
                         <li>
                         <a class="add-link" {% if obj.type|can_link:request.session.type %}
-                                href="./add/{% add_get type=request.session.type q=request.session.search_query %}"
+                                href="./add/{% add_search %}"
                             {% else %}
-                                href="./add/{% add_get type='Document' q=request.session.search_query %}"
+                                href="./add/{% add_search type='Document' %}"
                             {% endif %}>
                             {% trans "Attach another document" %}
                         </a>

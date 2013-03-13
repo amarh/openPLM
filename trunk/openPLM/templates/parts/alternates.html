@@ -7,9 +7,9 @@
         <div class="toolbar">
             <a class="tb-btn" 
                 {% if obj.type|can_add_type:request.session.type %}
-                    href="./add/{% add_get type=request.session.type q='' %}"
+                    href="./add/{% add_search q='' %}"
                 {% else %}
-                    href="./add/{% add_get type='Part' q='' %}"
+                    href="./add/{% add_search type='Part' q='' %}"
                 {% endif %}>
                 <span class="ui-button-text">{% trans "Add an alternate part" %}</span>
             </a>
