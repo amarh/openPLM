@@ -15,7 +15,7 @@
 {% block pdf_formset %}
     {% for level, link in children %}
         <div class="timeline" >
-            <h3>
+            <h3 class="hplm">
                 <span class="level">{% trans "Level:" %} {{level}}</span>
                 &nbsp;-&nbsp;
                 {% with link.child as child %}

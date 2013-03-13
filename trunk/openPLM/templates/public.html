@@ -13,7 +13,7 @@
     {% if obj.published or is_readable %}
         {% if obj.files %}
             <div id="files">
-                <h3>{% trans "Files" %}</h3>
+                <h3 class="hplm">{% trans "Files" %}</h3>
                 <div>
                     <table class="Content">
                         {% for df in obj.files %}
@@ -45,7 +45,7 @@
         {% endif %}
 
         <div id="attributes-outer">
-            <h3>{% trans "Attributes" %}</h3>
+            <h3 class="hplm">{% trans "Attributes" %}</h3>
             <div>
                 <table class="Content">
                     {% for description, attribute, richtext in object_attributes %}
@@ -71,7 +71,7 @@
 
         {% if revisions|length > 1 %}
             <div id="revisions">
-                <h3>{% trans "Revisions" %}</h3>
+                <h3 class="hplm">{% trans "Revisions" %}</h3>
                 <div>
                     <table class="Content">
                         {% for object in revisions %}
@@ -91,7 +91,7 @@
 
         {% if attached %}
             <div id="attached">
-                <h3>
+                <h3 class="hplm">
                     {% if obj.is_part %}
                         {% trans "Attached documents" %}
                     {% else %}

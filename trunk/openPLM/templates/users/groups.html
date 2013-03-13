@@ -17,7 +17,7 @@
         </div>
     {% endif %}
     <div>
-        <h3>{% trans "You are in the following groups:" %}</h3>
+        <h3 class="hplm">{% trans "You are in the following groups:" %}</h3>
             {% for object in groups %}
                 {% include "groups/identity_card.html" %}
             {% endfor %}

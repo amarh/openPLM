@@ -4,7 +4,7 @@
 {% block content %}
 
     <div>
-        <h3> {{ last_revision.filename }} </h3>
+        <h3 class="hplm"> {{ last_revision.filename }} </h3>
         <div>
             <div style="display:inline-block">
                 <p>
@@ -72,7 +72,7 @@
     </div>
 
     <div>
-        <h3> {% blocktrans with last_revision.filename as filename %}Previous revisions of {{ filename}}{%endblocktrans %} </h3>
+        <h3 class="hplm"> {% blocktrans with last_revision.filename as filename %}Previous revisions of {{ filename}}{%endblocktrans %} </h3>
 
         <div>
             {% if doc_files %}

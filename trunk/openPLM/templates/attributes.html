@@ -61,7 +61,7 @@
 
         {% if obj.is_part or obj.is_document %}
             <div id="related_content">
-                <h3>{% trans "Similar contents" %} </h3>
+                <h3 class="hplm">{% trans "Similar contents" %} </h3>
                 <ul class="Result">
                     {% more_like_this obj.object as related_content limit 5 %}
                     {% with 1 as link_creation %}
@@ -77,7 +77,7 @@
 
     {% if not restricted %}
     <div id="comments">
-        <h3>{% trans "Comments" %}</h3>
+        <h3 class="hplm">{% trans "Comments" %}</h3>
         <div class="comment_list">
             {% get_comment_count for obj.object as comment_count %}
             {% if comment_count %}
@@ -117,7 +117,7 @@
         </div>
         <div id="comment_form">
 
-            <h4>{% trans "Post a comment" %}</h4>
+            <h4 class="hplm">{% trans "Post a comment" %}</h4>
 
             {% get_comment_form for obj.object as form %}
             <div>

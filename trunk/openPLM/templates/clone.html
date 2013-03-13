@@ -14,7 +14,7 @@
 {% block content %}
     {% if obj.is_cloneable %}
         <div>
-        <h3>{% trans "OBJECT CLONING:" %}</h3>
+        <h3 class="hplm">{% trans "OBJECT CLONING:" %}</h3>
             <form id="creation_form" method="post" action="." >{% csrf_token %}	
                 <table class="Content">
                     <col width="20%" />
@@ -25,7 +25,7 @@
                 </table>
                 {% if is_linked %}
                 <div style="padding:0.5em">
-                <h3>{% trans "Links" %}</h3>
+                <h3 class="hplm">{% trans "Links" %}</h3>
                 {% if obj.is_part %}
                     {% include 'parts/clone.html' %}
                 {% else %}

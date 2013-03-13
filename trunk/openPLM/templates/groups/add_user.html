@@ -3,7 +3,7 @@
 
 {% block content %} 
     {% if is_owner %}
-        <h3>{% trans "Invite a new user to the group:" %} </h3>
+        <h3 class="hplm">{% trans "Invite a new user to the group:" %} </h3>
         <p>{% trans "The user will receive an e-mail and could accept your invitation." %}</p>
         {% with add_user_form as form %}
             {% include "snippets/undo_form.html" %}

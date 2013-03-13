@@ -14,7 +14,7 @@
 {% block content %}
     {% if is_contributor %}
         <div>
-        <h3>{% trans "OBJECT CREATION:" %}</h3>
+        <h3 class="hplm">{% trans "OBJECT CREATION:" %}</h3>
             <form id="creation_form" method="post" action="." >{% csrf_token %}	
                 {# hidden fields from a "create an attach" button #}
                 {% if next %}
@@ -72,7 +72,7 @@ This part will be added to the part {{related_type}} // {{ related_reference }} 
             </form>
         </div>
         <div>
-        <h3>{% trans "Other creation tools:" %}</h3>
+        <h3 class="hplm">{% trans "Other creation tools:" %}</h3>
             <ul>
                 <li>
                 <a href="/import/csv/" >

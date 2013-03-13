@@ -13,7 +13,7 @@
             <div id="type-panel">
                 {% block browse-type %}
                     <div>
-                        <h3 class="alternate">{% trans "Type" %} </h3>
+                        <h3 class="hplm alternate">{% trans "Type" %} </h3>
                     </div>
                     <ul>
                         <li {% if type == "object"%}class="selected"{% endif %} >
@@ -46,7 +46,7 @@
                 {% endblock %}
                 {% block browse-sort %}
                     <div>
-                        <h3 class="alternate">{% trans "Sort" %} </h3>
+                        <h3 class="hplm alternate">{% trans "Sort" %} </h3>
                     </div>
                     <ul>
                         <li {% if sort == "recently-added"%}class="selected"{% endif %} > 
@@ -70,7 +70,7 @@
                 {% block browse-state %}
                     {% if plmobjects and not restricted %}
                         <div>
-                            <h3 class="alternate">{% trans "State" %} </h3>
+                            <h3 class="hplm alternate">{% trans "State" %} </h3>
                         </div>
                         <ul>
                             <li {% if state == "all"%}class="selected"{% endif %} >
@@ -90,7 +90,7 @@
         {% endblock %}
         {% block browse-results %}
             <div id="browse-results">
-                <h3>{% trans "Results" %}</h3>
+                <h3 class="hplm">{% trans "Results" %}</h3>
                 <div id="object_list">
                     <p id="results">
                     {% block sort-method %}
