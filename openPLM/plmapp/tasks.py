@@ -57,7 +57,7 @@ def _get_related_fields(model_class):
 @synchronized
 @task(name="openPLM.plmapp.tasks.update_index",
       default_retry_delay=60, max_retries=10)
-def update_index(app_name, model_name, pk, **kwargs):
+def update_index(app_name, model_name, pk, fast_reindex=False, **kwargs):
     from haystack import site
     import openPLM.plmapp.search_indexes
 
@@ -67,12 +67,14 @@ def update_index(app_name, model_name, pk, **kwargs):
         instance = model_class.objects.select_related(*fields).get(pk=pk)
     else:
         instance = model_class.objects.get(pk=pk)
+    if fast_reindex:
+        instance.fast_reindex = True
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
 
 @task(name="openPLM.plmapp.tasks.update_indexes",
       default_retry_delay=60, max_retries=10)
-def update_indexes(instances):
+def update_indexes(instances, fast_reindex=False):
     from haystack import site
     import openPLM.plmapp.search_indexes
 
@@ -83,6 +85,8 @@ def update_indexes(instances):
             instance = model_class.objects.select_related(*fields).get(pk=pk)
         else:
             instance = model_class.objects.get(pk=pk)
+        if fast_reindex:
+            instance.fast_reindex = True
         search_index = site.get_index(model_class)
         search_index.update_object(instance)
 update_indexes = synchronized(update_indexes, update_index.lock)

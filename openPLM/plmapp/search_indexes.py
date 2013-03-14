@@ -1,4 +1,7 @@
 import datetime
+import codecs
+import os.path
+from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.db.models import signals
@@ -7,6 +10,7 @@ from haystack import site
 from haystack import indexes
 from haystack.indexes import *
 from haystack.models import SearchResult
+from haystack.query import SearchQuerySet
 from haystack.utils import get_identifier
 
 import openPLM.plmapp.models as models
@@ -112,6 +116,19 @@ site.register(models.GroupInfo, GroupIndex)
 
 indexed = site.get_indexed_models()
 
+def get_state_class(obj):
+    if obj.is_cancelled:
+        cls = "cancelled"
+    elif obj.is_official:
+        cls = "official"
+    elif obj.is_draft:
+        cls = "draft"
+    elif obj.is_deprecated:
+        cls = "deprecated"
+    else:
+        cls = "proposed"
+    return "state-" + cls
+
 for key, model in models.get_all_plmobjects().iteritems():
     if model in indexed:
         continue
@@ -152,17 +169,7 @@ for key, model in models.get_all_plmobjects().iteritems():
             return prepare_date(obj.mtime)
 
         def prepare_state_class(self, obj):
-            if obj.is_cancelled:
-                cls = "cancelled"
-            elif obj.is_official:
-                cls = "official"
-            elif obj.is_draft:
-                cls = "draft"
-            elif obj.is_deprecated:
-                cls = "deprecated"
-            else:
-                cls = "proposed"
-            return "state-" + cls
+            return get_state_class(obj)
 
         def index_queryset(self):
             if "type" in self.model._meta.get_all_field_names():
@@ -173,9 +180,6 @@ for key, model in models.get_all_plmobjects().iteritems():
     set_template_name(ModelIndex)
     site.register(model, ModelIndex)
 
-from subprocess import Popen, PIPE
-import codecs
-import os.path
 text_files = set((".txt", ".test", ))
 
 class DocumentFileIndex(QueuedModelSearchIndex):
@@ -184,11 +188,22 @@ class DocumentFileIndex(QueuedModelSearchIndex):
     file = CharField(model_attr='file', stored=False)
     group = CharField(model_attr="document__group__name")
     document_id = IntegerField(model_attr="document__id", indexed=False)
+    state = CharField(model_attr="document__state__name")
+    lifecycle = CharField(model_attr="document__lifecycle__name")
+    state_class = CharField()
 
     rendered = CharField(use_template=True, indexed=False)
     rendered_add = CharField(use_template=True, indexed=False)
 
+    def prepare_state_class(self, obj):
+        return get_state_class(obj.document)
+
     def prepare_file(self, obj):
+        if getattr(obj, "fast_reindex", False):
+            rset = SearchQuerySet().filter(id=get_identifier(obj))
+            if rset:
+                return rset[0].file
+
         # if it is a text file, we can dump it
         # it's faster than launching a new process
         path = obj.file.path
