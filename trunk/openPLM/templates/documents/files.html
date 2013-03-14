@@ -46,6 +46,14 @@
                 $("#s_all").removeClass("hidden");
                 $("#des_all").addClass("hidden");
             });
+            $("a.check-out-link").click(function(){
+                var a=$(this);
+                setTimeout(function(){
+                    a.parents(".file").find(".status").toggle();
+                    a.parents(".file").find(".checkin").toggle();
+                    a.hide();
+                }, 500);
+            });
 
         });
     </script>
@@ -104,17 +112,14 @@
         {% endif %}
         <table class="Content">
             {% for form in file_formset.forms %}
-                <tr class="Content">
+                <tr class="Content file">
                     {{ form.id }}
                     {{ form.document }}
                     {% with form.instance as instance %}
                         <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
                         <td class="Content ui-state-default ui-state-corner-all">
-                            {% if instance.locked %}
-                                <span class="ui-icon ui-icon-locked">{% trans "Locked" %}</span>
-                            {% else %}
-                                <span class="ui-icon ui-icon-unlocked">{% trans "Unlocked" %}</span>
-                            {% endif %}
+                            <span class="status ui-icon ui-icon-locked" {% if not instance.locked %}style="display:none"{% endif %}>{% trans "Locked" %}</span>
+                            <span class="status ui-icon ui-icon-unlocked" {% if instance.locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
                         </td>
                         <td class="Content">
                             <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}">{{instance.filename}}</a></td>
@@ -128,19 +133,20 @@
 
                             {% if is_owner and obj.is_editable %}
 
-                                {% if instance.locked %}
-                                    <a class="tb-btn" href="./checkin/{{instance.id|urlencode }}/">
-                                        <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
-                                    </a>
-                                {% elif instance.checkout_valid %}
-                                    <a class="tb-btn
-                                        {% if instance.native_related %}check-out {% endif %}"
+                                <a class="tb-btn checkin" href="./checkin/{{instance.id|urlencode }}/" {% if not instance.locked %}style="display:none"{% endif %}>
+                                    <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                                </a>
+                                {% if not instance.locked %}
+                                    {% if instance.checkout_valid %}
+                                        <a class="tb-btn 
+                                        {% if instance.native_related %}check-out {%else %}check-out-link {% endif %} "
                                         href="./checkout/{{instance.id|urlencode }}/">
                                         <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
                                     </a>                                    
                                 {% else %}
                                     {% trans "Native related file is locked" %}
                                 {% endif %} 
+                            {% endif %} 
 
                             {% else %}
                                 {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
