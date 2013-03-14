@@ -27,7 +27,6 @@
 
 import os
 import shutil
-import datetime
 from django.utils import timezone
 
 import Image
@@ -41,6 +40,7 @@ from openPLM.plmapp.thumbnailers import generate_thumbnail
 from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.files.deletable import (get_deletable_files, ON_CHECKIN_SELECTORS,
         ON_DEPRECATE_SELECTORS, ON_DELETE_SELECTORS, ON_CANCEL_SELECTORS)
+from openPLM.plmapp.tasks import update_indexes
 
 
 class DocumentController(PLMObjectController):
@@ -640,4 +640,24 @@ class DocumentController(PLMObjectController):
         super(DocumentController, self)._deprecate()
         for doc_file in self.files:
             self._delete_old_files(doc_file, ON_DEPRECATE_SELECTORS)
+
+    def _fast_reindex_files(self):
+        """
+        Reindexes associated document files. Called after a promote
+        or a demote to update the state_class field of each file.
+        """
+        files = list(self.files.values_list("pk", flat=True))
+        if files:
+            app_label = models.DocumentFile._meta.app_label
+            module_name = models.DocumentFile._meta.module_name
+            update_indexes.delay([(app_label, module_name, pk) for pk in files],
+                fast_reindex=True)
+
+    def promote(self, *args, **kwargs):
+        super(DocumentController, self).promote(*args, **kwargs)
+        self._fast_reindex_files()
+
+    def demote(self, *args, **kwargs):
+        super(DocumentController, self).demote(*args, **kwargs)
+        self._fast_reindex_files()
 
