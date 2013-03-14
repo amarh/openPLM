@@ -1391,3 +1391,6 @@ ul.tbi li {
     margin: 1em;
 }
 
+tr.locked td {
+    background-color:#FCF8E3;
+}

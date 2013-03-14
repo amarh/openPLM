@@ -49,8 +49,9 @@
             $("a.check-out-link").click(function(){
                 var a=$(this);
                 setTimeout(function(){
-                    a.parents(".file").find(".status").toggle();
-                    a.parents(".file").find(".checkin").toggle();
+                    var tr = a.parents(".file");
+                    tr.find(".status, .checkin").toggle();
+                    tr.toggleClass("locked unlocked");
                     a.hide();
                 }, 500);
             });
@@ -112,60 +113,60 @@
         {% endif %}
         <table class="Content">
             {% for form in file_formset.forms %}
-                <tr class="Content file">
-                    {{ form.id }}
-                    {{ form.document }}
-                    {% with form.instance as instance %}
-                        <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-                        <td class="Content ui-state-default ui-state-corner-all">
-                            <span class="status ui-icon ui-icon-locked" {% if not instance.locked %}style="display:none"{% endif %}>{% trans "Locked" %}</span>
-                            <span class="status ui-icon ui-icon-unlocked" {% if instance.locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
-                        </td>
-                        <td class="Content">
-                            <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}">{{instance.filename}}</a></td>
-                        <td class="Content">{{instance.size|filesizeformat}}</td>
-                        <td class="Content">
-                            <a class="tb-btn" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
-                                <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
-                            </a>
-                        </td>
-                        <td class="Content">
-
-                            {% if is_owner and obj.is_editable %}
-
-                                <a class="tb-btn checkin" href="./checkin/{{instance.id|urlencode }}/" {% if not instance.locked %}style="display:none"{% endif %}>
-                                    <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                {% with instance=form.instance locked=form.instance.locked%}
+                    <tr class="Content file {{ locked|yesno:"locked,unlocked" }}">
+                        {{ form.id }}
+                        {{ form.document }}
+                            <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                            <td class="Content ui-state-default ui-state-corner-all">
+                                <span class="status ui-icon ui-icon-locked" {% if not locked %}style="display:none"{% endif %}>{% trans "Locked" %}</span>
+                                <span class="status ui-icon ui-icon-unlocked" {% if locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
+                            </td>
+                            <td class="Content">
+                                <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}">{{instance.filename}}</a></td>
+                            <td class="Content">{{instance.size|filesizeformat}}</td>
+                            <td class="Content">
+                                <a class="tb-btn" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
+                                    <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
                                 </a>
-                                {% if not instance.locked %}
-                                    {% if instance.checkout_valid %}
-                                        <a class="tb-btn 
-                                        {% if instance.native_related %}check-out {%else %}check-out-link {% endif %} "
-                                        href="./checkout/{{instance.id|urlencode }}/">
-                                        <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                    </a>                                    
-                                {% else %}
-                                    {% trans "Native related file is locked" %}
+                            </td>
+                            <td class="Content">
+
+                                {% if is_owner and obj.is_editable %}
+
+                                    <a class="tb-btn checkin" href="./checkin/{{instance.id|urlencode }}/" {% if not locked %}style="display:none"{% endif %}>
+                                        <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
+                                    </a>
+                                    {% if not locked %}
+                                        {% if instance.checkout_valid %}
+                                            <a class="tb-btn 
+                                            {% if instance.native_related %}check-out {%else %}check-out-link {% endif %} "
+                                            href="./checkout/{{instance.id|urlencode }}/">
+                                            <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                                        </a>                                    
+                                    {% else %}
+                                        {% trans "Native related file is locked" %}
+                                    {% endif %} 
                                 {% endif %} 
-                            {% endif %} 
 
-                            {% else %}
-                                {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
-                            {% endif %}
+                                {% else %}
+                                    {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
+                                {% endif %}
 
-                        </td>
-                        <td class="Content">
-                            <a href="/file/revisions/{{instance.id}}/">{{ instance.revision }}</a>
-                        </td>
-                        <td class="Content">
-                            {% if instance.thumbnail %}
-                                <img class="thumbnail" src="{{instance.thumbnail.url}}"
-                                alt="Thumbnail"/>
-                            {% else %}
-                                {% trans "No thumbnail available" %}
-                            {% endif %}
-                        </td>
-                    {% endwith %}
-                </tr>
+                            </td>
+                            <td class="Content">
+                                <a href="/file/revisions/{{instance.id}}/">{{ instance.revision }}</a>
+                            </td>
+                            <td class="Content">
+                                {% if instance.thumbnail %}
+                                    <img class="thumbnail" src="{{instance.thumbnail.url}}"
+                                    alt="Thumbnail"/>
+                                {% else %}
+                                    {% trans "No thumbnail available" %}
+                                {% endif %}
+                            </td>
+                    </tr>
+                {% endwith %}
             {% endfor %}	    
         </table>
 
