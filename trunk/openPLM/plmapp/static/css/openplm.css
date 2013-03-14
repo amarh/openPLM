@@ -1276,14 +1276,12 @@ div.id_details p:not(:last-child) {
     border-bottom: 1px dotted #ccc;
 }
 
+
+#browser { margin-left: -1em; }
 div#type-panel {
-    float: left;
-    width: 15em;
     background-color: #fcfcfc;
-    height: 100%;
-    position: absolute;
 }
-div#type-panel h3:first-child {
+div#type-panel h3:first-child, #browse-results h3 {
     margin-top: 0;
 }
 #main_content div#type-panel li {
@@ -1316,16 +1314,6 @@ div#type-panel li:hover * {
     overflow: hidden;
     max-height: 5em;
     display: block;
-}
-
-div#browse-results {
-    margin-left: 15em;
-    padding-left: 1em;
-}
-
-div#browser {
-    position: relative;
-    min-height: 500px;
 }
 
 #add-file-nojs {

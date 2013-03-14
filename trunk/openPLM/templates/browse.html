@@ -8,9 +8,10 @@
 {% block leftcolumn %} {% endblock %}
 
 {% block content %}
-    <div id="browser">
+    <div id="browser" class="tb-container-fluid">
+        <div class="tb-row-fluid">
         {% block browse-left-panel %}
-            <div id="type-panel">
+            <div id="type-panel" class="tb-span2">
                 {% block browse-type %}
                     <div>
                         <h3 class="hplm alternate">{% trans "Type" %} </h3>
@@ -89,7 +90,7 @@
             </div>
         {% endblock %}
         {% block browse-results %}
-            <div id="browse-results">
+            <div id="browse-results" class="tb-span10">
                 <h3 class="hplm">{% trans "Results" %}</h3>
                 <div id="object_list">
                     <p id="results">
@@ -142,5 +143,6 @@
                 {% show_pages_bar objects request %}
             </div>
         {% endblock %}
+    </div>
     </div>
 {% endblock %}
