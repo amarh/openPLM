@@ -215,7 +215,7 @@ class SearchBackend(BaseSearchBackend):
                 term_generator = xapian.TermGenerator()
                 term_generator.set_database(database)
                 term_generator.set_stemmer(xapian.Stem(self.language))
-                if getattr(settings, 'HAYSTACK_INCLUDE_SPELLING', False) is True:
+                if getattr(settings, 'HAYSTACK_INCLUDE_SPELLING', False):
                     term_generator.set_flags(xapian.TermGenerator.FLAG_SPELLING)
                 term_generator.set_document(document)
 
@@ -405,7 +405,7 @@ class SearchBackend(BaseSearchBackend):
         if result_class is None:
             result_class = SearchResult
 
-        if getattr(settings, 'HAYSTACK_INCLUDE_SPELLING', False) is True:
+        if getattr(settings, 'HAYSTACK_INCLUDE_SPELLING', False):
             spelling_suggestion = self._do_spelling_suggestion(database, query, spelling_query)
         else:
             spelling_suggestion = ''
@@ -661,10 +661,10 @@ class SearchBackend(BaseSearchBackend):
         column = len(schema_fields)
 
         for field_name, field_class in sorted(fields.items(), key=lambda n: n[0]):
-            if field_class.document is True:
+            if field_class.document:
                 content_field_name = field_class.index_fieldname
 
-            if field_class.indexed is True:
+            if field_class.indexed:
                 field_data = {
                     'field_name': field_class.index_fieldname,
                     'type': 'text',
