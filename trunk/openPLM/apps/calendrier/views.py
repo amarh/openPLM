@@ -156,7 +156,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
     :url: :samp:`/group/{group_name}/history/calendar/[{year}/][{month}/]``
     :url: :samp:`/timeline/calendar/[{year}/][{month}/]``
 
-    .. include:: ../../modules/views/views_params.txt
+    .. include:: ../../modules/views_params.txt
 
     **Template:**
 

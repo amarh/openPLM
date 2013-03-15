@@ -37,13 +37,14 @@ import sys
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_admins
-from django.utils.translation import ugettext as _
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.template import RequestContext
+from django.utils.translation import ugettext as _
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -448,4 +449,76 @@ def get_creation_view(type_):
     or None if no views are registered.
     """
     return _creation_views.get(type_)
+
+
+def get_id_card_data(doc_ids):
+    """
+    Get informations to display in the id-cards of all Document which id is in doc_ids
+
+    :param doc_ids: list of Document ids to treat
+
+    :return: a Dictionnary which contains the following informations
+
+        * ``thumbnails``
+            list of tuple (document,thumbnail)
+
+        * ``num_files``
+            list of tuple (document, number of file)
+    """
+    ctx = { "thumbnails" : {}, "num_files" : {} }
+    if doc_ids:
+        thumbnails = models.DocumentFile.objects.filter(deprecated=False,
+                    document__in=doc_ids, thumbnail__isnull=False)
+        ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
+        num_files = dict.fromkeys(doc_ids, 0)
+        for doc_id in models.DocumentFile.objects.filter(deprecated=False,
+            document__in=doc_ids).values_list("document", flat=True):
+            num_files[doc_id] += 1
+        ctx["num_files"] = num_files
+    return ctx
+
+def get_pagination(r_GET, object_list, type):
+    """
+    Returns a dictionary with pagination data.
+
+    Called in view which returns a template where object id cards are displayed.
+    """
+    ctx = {}
+    sort = r_GET.get("sort", "children" if type == "topassembly" else "recently-added")
+    if sort == "name" :
+        sort_critera = "username" if type == "user" else "name"
+    elif type in ("part", "topassembly") and sort == "children":
+        object_list = object_list.with_children_counts()
+        sort_critera = "-num_children,reference,revision"
+    elif type == "part" and sort == "most-used":
+        object_list = object_list.with_parents_counts()
+        sort_critera = "-num_parents,reference,revision"
+    else:
+        sort_critera = "-date_joined" if type == "user" else "-ctime"
+    object_list = object_list.order_by(*sort_critera.split(","))
+
+    paginator = Paginator(object_list, 24) # Show 24 objects per page
+
+    page = r_GET.get('page', 1)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        objects = paginator.page(1)
+        page = 1
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        objects = paginator.page(paginator.num_pages)
+    ctx["thumbnails"] = {}
+    ctx["num_files"] = {}
+
+    if type in ("object", "document"):
+         ids = objects.object_list.values_list("id", flat=True)
+         ctx.update(get_id_card_data(ids))
+    ctx.update({
+         "objects" : objects,
+         "sort" : sort,
+    })
+    return ctx
+
 
