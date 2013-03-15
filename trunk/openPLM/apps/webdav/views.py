@@ -32,7 +32,7 @@ from openPLM.apps.webdav.webdav_handler import WebDavHandlerException
 from openPLM.apps.webdav.backends.openplm import OpenPLMBackend
 from openPLM.apps.webdav.acl import WebDavPrivilegeException
 
-from openPLM.plmapp.base_views import secure_required
+from openPLM.plmapp.views.base import secure_required
 from openPLM.plmapp.exceptions import ControllerError
 
 logger = logging.getLogger("webdav")

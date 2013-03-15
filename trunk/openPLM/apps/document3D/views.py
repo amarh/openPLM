@@ -10,7 +10,7 @@ from django.http import (HttpResponse, HttpResponseRedirect,
         HttpResponseForbidden, Http404, StreamingHttpResponse)
 import json
 
-from openPLM.plmapp.base_views import (handle_errors, secure_required,
+from openPLM.plmapp.views.base import (handle_errors, secure_required,
         get_generic_data, get_obj, get_obj_by_id, init_ctx)
 from openPLM.apps.document3D.forms import *
 from openPLM.apps.document3D.models import *

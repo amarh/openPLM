@@ -3,7 +3,7 @@ from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp import models
-import openPLM.plmapp.base_views as bv
+import openPLM.plmapp.views.base as bv
 from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.views import create_object, get_pagination, ITEMS_PER_HISTORY
 from openPLM.plmapp.forms import PLMObjectForm

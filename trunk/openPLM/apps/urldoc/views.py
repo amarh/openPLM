@@ -1,5 +1,5 @@
 
-from openPLM.plmapp.base_views import get_generic_data, handle_errors
+from openPLM.plmapp.views.base import get_generic_data, handle_errors
 from openPLM.plmapp.utils import r2r
 
 @handle_errors

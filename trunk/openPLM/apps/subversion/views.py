@@ -5,7 +5,7 @@ import urlparse
 import pysvn
 
 from openPLM.plmapp.utils import r2r
-from openPLM.plmapp.base_views import handle_errors, get_generic_data
+from openPLM.plmapp.views.base import handle_errors, get_generic_data
 
 from openPLM.apps.subversion.models import parse_revision
 

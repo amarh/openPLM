@@ -45,7 +45,7 @@ except ImportError:
     import ho.pisa as pisa
 import cStringIO as StringIO
 
-from openPLM.plmapp.base_views import get_obj, handle_errors, get_generic_data
+from openPLM.plmapp.views.base import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.views import r2r, render_attributes
 from openPLM.plmapp.forms import DisplayChildrenForm

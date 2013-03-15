@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
-from openPLM.plmapp.base_views import get_generic_data, handle_errors
+from openPLM.plmapp.views.base import get_generic_data, handle_errors
 from openPLM.plmapp.exceptions import PermissionError
 from openPLM.plmapp.forms import ConfirmPasswordForm
 from openPLM.plmapp.utils import r2r

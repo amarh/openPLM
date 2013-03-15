@@ -333,7 +333,7 @@ class BOMImporter(CSVImporter):
         return cls.HEADERS_SET
 
     def parse_row(self, line, row):
-        from openPLM.plmapp.base_views import get_obj
+        from openPLM.plmapp.views.base import get_obj
         ptype, preference, prevision = self.get_values(row,
                 *["parent-" + h for h in ("type", "reference", "revision")])
         parent = get_obj(ptype, preference, prevision, self.user)

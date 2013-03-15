@@ -1,8 +1,8 @@
 ========================================================
-:mod:`base_views` --- Functions common to all views
+:mod:`views.base` --- Functions common to all views
 ========================================================
 
-.. automodule:: plmapp.base_views
+.. automodule:: plmapp.views.base
     :members:
     :undoc-members:
     :show-inheritance:
