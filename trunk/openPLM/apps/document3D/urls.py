@@ -1,7 +1,7 @@
 from django.conf.urls import *
 import openPLM.apps.document3D.views as views
 import openPLM.apps.document3D.api as api3D
-from openPLM.plmapp.views.main import public
+from openPLM.plmapp.views import public
 
 def patterns2(view_prefix, url_prefix, *urls):
     urls2 = []
