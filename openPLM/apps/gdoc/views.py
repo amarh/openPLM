@@ -8,7 +8,7 @@ import gdata.client
 from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
 
-import openPLM.plmapp.views.main as pviews
+import openPLM.plmapp.views as pviews
 from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.views.base import handle_errors, get_generic_data, register_creation_view
 
