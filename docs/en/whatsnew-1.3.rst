@@ -69,6 +69,13 @@ Modules
 A new module, :mod:`plmapp.utils.importing` is available to import a function
 or a class from a string. It is based on the one provided by Mezzanine.
 
+:mod:`plmapp.base_views` moved to :mod:`plmapp.views.base`.
+
+A lot of views moved from :mod:`plmapp.views.main` to :mod:`plmapp.views.group`,
+:mod:`plmapp.views.document`, :mod:`plmapp.views.part`,
+:mod:`plmapp.views.plmobject` or :mod:`plmapp.views.user`.
+
+
 References
 ++++++++++++
 
