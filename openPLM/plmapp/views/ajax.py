@@ -44,7 +44,7 @@ from django.template.loader import render_to_string
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import PLMObjectController
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.base_views import get_obj, get_obj_by_id, get_obj_from_form, \
+from openPLM.plmapp.views.base import get_obj, get_obj_by_id, get_obj_from_form, \
         json_view, get_navigate_data, secure_required, get_creation_view
 from openPLM.plmapp.filters import richtext
 

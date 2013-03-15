@@ -35,7 +35,7 @@ from openPLM.apps.webdav.backends import BackendIOException
 from openPLM.apps.webdav.backends import BackendResourceNotFoundException
 
 from openPLM.plmapp.models import get_all_documents, Document, DocumentFile, docfs
-from openPLM.plmapp.base_views import get_obj
+from openPLM.plmapp.views.base import get_obj
 
 
 logger = logging.getLogger("webdav")

@@ -7,7 +7,7 @@ import json
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.base_views import get_obj_by_id, object_to_dict
+from openPLM.plmapp.views.base import get_obj_by_id, object_to_dict
 from openPLM.plmapp.views.api import login_json
 import openPLM.apps.document3D.models as models3D
 

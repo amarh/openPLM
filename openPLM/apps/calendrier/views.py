@@ -17,7 +17,7 @@ try:
 except ImportError:
     ICAL_INSTALLED = False
 
-from openPLM.plmapp.base_views import handle_errors, get_generic_data
+from openPLM.plmapp.views.base import handle_errors, get_generic_data
 from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.views import display_object_history
 from openPLM.plmapp import models

@@ -10,7 +10,7 @@ from oauth2client.client import OAuth2WebServerFlow
 
 import openPLM.plmapp.views.main as pviews
 from openPLM.plmapp.utils import r2r
-from openPLM.plmapp.base_views import handle_errors, get_generic_data, register_creation_view
+from openPLM.plmapp.views.base import handle_errors, get_generic_data, register_creation_view
 
 from openPLM.apps.gdoc.models import CredentialsModel, FlowModel
 from openPLM.apps.gdoc.models import GoogleDocument

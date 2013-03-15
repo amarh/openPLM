@@ -2,9 +2,6 @@
 :mod:`views` --- Views
 ========================================================
 
-Views
----------
-
 .. automodule:: plmapp.views
     :members:
     :undoc-members:
