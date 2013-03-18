@@ -72,7 +72,7 @@
                 {% block browse-state %}
                     {% if plmobjects and not restricted %}
                         <div>
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3>
+                            
                         </div>
                         <ul id="br-states" class="tb-collapse tb-in">
                             <li {% if state == "all"%}class="selected"{% endif %} >
@@ -90,7 +90,7 @@
                 {% block browse-subtypes %}
                     {% if subtypes and not restricted %}
                         <div>
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub types" %} </h3>
+                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub type" %} </h3>
                         </div>
                         <ul id="br-subtypes" class="tb-collapse">
                             {% for level, cls, cls_name in subtypes %}
