@@ -8,174 +8,174 @@
 {% block leftcolumn %} {% endblock %}
 
 {% block content %}
-<div id="browser" class="tb-container-fluid">
-    <div class="tb-row-fluid">
-    {% block browse-left-panel %}
-        <div id="type-panel" class="tb-span2">
-            {% block browse-type %}
-                <div>
-                    <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-types">{% trans "Type" %} </h3>
-                </div>
-                <ul id="br-types" class="tb-collapse tb-in">
-                    <li {% if type == "object"%}class="selected"{% endif %} >
-                    <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
-                    </li>
-                    <li {% if type == "part"%}class="selected"{% endif %} >
-                    <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
-                        </li>
-                        <li {% if type == "topassembly"%}class="selected"{% endif %} >
-                        <a href="/browse/topassembly/{% add_get page='1'%}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
-                        </li>
-                        <li {% if type == "document"%}class="selected"{% endif %} >
-                        <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
-                        </li>
-                        {% if not restricted %}
-                            <li {% if type == "group"%}class="selected"{% endif %} >
-                            <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
-                            <li {% if type == "user"%}class="selected"{% endif %} >
-                            <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
-                            </li>
-                        {% endif %}
-                        {% if request.user.is_authenticated %}
-                            {% for etype in extra_types %}
-                                <li {% if type == etype%}class="selected"{% endif %} >
-                                <a href="/browse/{{etype.lower}}/{% add_get page='1'%}"><span>{{ etype }}</span></a>
-                                </li>
-                            {% endfor %}
-                        {% endif %}
-                    </ul>
-                {% endblock %}
-
-                {% block browse-sort %}
-                    <div>
-                        <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-sorts">{% trans "Sort" %} </h3>
-                    </div>
-                    <ul id="br-sorts" class="tb-collapse tb-in">
-                        <li {% if sort == "recently-added"%}class="selected"{% endif %} > 
-                        <a href="{% add_get sort='recently-added' %}"><span>{% trans "Recently added" %}</span></a>
-                        </li>
-                        <li {% if sort == "name"%}class="selected"{% endif %} >
-                        <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
-                        </li>
-                        {% if type == "part" or type == "topassembly" %}
-                            <li {% if sort == "children"%}class="selected"{% endif %} >
-                            <a href="{% add_get sort='children' %}"><span>{% trans "Largest assemblies" %}</span></a>
-                            </li>
-                        {% endif %}
-                        {% if type == "part" %}
-                            <li {% if sort == "most-used"%}class="selected"{% endif %} >
-                            <a href="{% add_get sort='most-used' %}"><span>{% trans "Most used" %}</span></a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                {% endblock %}
-                {% block browse-state %}
-                    {% if plmobjects and not restricted %}
+    <div id="browser" class="tb-container-fluid">
+        <div class="tb-row-fluid">
+            {% block browse-left-panel %}
+                <div id="type-panel" class="tb-span2">
+                    {% block browse-type %}
                         <div>
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3> 
+                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-types">{% trans "Type" %} </h3>
                         </div>
-                        <ul id="br-states" class="tb-collapse tb-in">
-                            <li {% if state == "all"%}class="selected"{% endif %} >
-                            <a href="{% add_get state='all' %}"><span>{% trans "All states" %}</span></a>
+                        <ul id="br-types" class="tb-collapse tb-in">
+                            <li {% if type == "object"%}class="selected"{% endif %} >
+                            <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
                             </li>
-                            <li {% if state == "official"%}class="selected"{% endif %} >
-                            <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
+                            <li {% if type == "part"%}class="selected"{% endif %} >
+                            <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
                             </li>
-                            <li {% if state == "published"%}class="selected"{% endif %} >
-                            <a href="{% add_get state='published' %}"><span>{% trans "Published" %}</span></a>
-                            <li>
-                        </ul>
-                    {% endif %}
-                {% endblock %}
-                {% block browse-subtypes %}
-                    {% if subtypes and not restricted %}
-                        <div>
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub type" %} </h3>
-                        </div>
-                        <ul id="br-subtypes" class="tb-collapse">
-                            {% for level, cls, cls_name in subtypes %}
-                                <li {% if stype == cls_name %}class="selected"{% endif %} > 
-                                <a href="{% add_get stype=cls_name %}"><span style="padding-left:{{ level }}em;">{{ cls_name }}</span></a>
+                            <li {% if type == "topassembly"%}class="selected"{% endif %} >
+                            <a href="/browse/topassembly/{% add_get page='1'%}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
+                            </li>
+                            <li {% if type == "document"%}class="selected"{% endif %} >
+                            <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
+                            </li>
+                            {% if not restricted %}
+                                <li {% if type == "group"%}class="selected"{% endif %} >
+                                <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
+                                <li {% if type == "user"%}class="selected"{% endif %} >
+                                <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
                                 </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endblock %}
-            </div>
-        {% endblock %}
-        {% block browse-results %}
-            <div id="browse-results" class="tb-span10">
-                <h3 class="hplm">{% trans "Results" %}</h3>
-                <div id="object_list">
-                    <p id="results">
-                    <span id="rtype">
-                        {% if type == "object"%}
-                            {% trans "Objects" %}.
-                        {% elif type == "part" %}
-                            {% trans "Parts" %}.
-                        {% elif type == "topassembly" %}
-                            {% trans "Top assemblies" %}.
-                        {% elif type == "document" %}
-                            {% trans "Documents" %}.
-                        {% elif type == "user" %}
-                            {% trans "User" %}.
-                        {% elif type == "group" %}
-                            {% trans "Group" %}.
-                        {% else %}
-                            {{ type }}.
-                        {% endif %}
-                        {% if stype and stype != "Object" and type != stype.lower %} {{ stype }}. {% endif %}
-                    </span>
-
-                    {% block sort-method %}
-                        <span id="sort_method">
-                            {% if sort == "name" %}
-                                {% trans "Sorted by name" %}.
-                            {% elif type in "part topassembly" and sort == "children" %}
-                                {% trans "Largest assemblies" %}.
-                            {% elif type == "part" and sort == "most-used" %}
-                                {% trans "Most used" %}.
-                            {% else %}
-                                {% trans "Recently added" %}.
                             {% endif %}
-                        </span>
+                            {% if request.user.is_authenticated %}
+                                {% for etype in extra_types %}
+                                    <li {% if type == etype%}class="selected"{% endif %} >
+                                    <a href="/browse/{{etype.lower}}/{% add_get page='1'%}"><span>{{ etype }}</span></a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
                     {% endblock %}
-                    {% block selected-state %}
-                        {% if plmobjects %}
-                            <span id="state_filter">
-                                {% if state == "official" %}
-                                    {% trans "Only official objects" %}.
-                                {% elif state == "published" %}
-                                    {% trans "Only published objects" %}.
+
+                    {% block browse-sort %}
+                        <div>
+                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-sorts">{% trans "Sort" %} </h3>
+                        </div>
+                        <ul id="br-sorts" class="tb-collapse tb-in">
+                            <li {% if sort == "recently-added"%}class="selected"{% endif %} > 
+                            <a href="{% add_get sort='recently-added' %}"><span>{% trans "Recently added" %}</span></a>
+                            </li>
+                            <li {% if sort == "name"%}class="selected"{% endif %} >
+                            <a href="{% add_get sort='name' %}"><span>{% trans "Sorted by name" %}</span></a>
+                            </li>
+                            {% if type == "part" or type == "topassembly" %}
+                                <li {% if sort == "children"%}class="selected"{% endif %} >
+                                <a href="{% add_get sort='children' %}"><span>{% trans "Largest assemblies" %}</span></a>
+                                </li>
+                            {% endif %}
+                            {% if type == "part" %}
+                                <li {% if sort == "most-used"%}class="selected"{% endif %} >
+                                <a href="{% add_get sort='most-used' %}"><span>{% trans "Most used" %}</span></a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endblock %}
+                    {% block browse-state %}
+                        {% if plmobjects and not restricted %}
+                            <div>
+                                <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3> 
+                            </div>
+                            <ul id="br-states" class="tb-collapse tb-in">
+                                <li {% if state == "all"%}class="selected"{% endif %} >
+                                <a href="{% add_get state='all' %}"><span>{% trans "All states" %}</span></a>
+                                </li>
+                                <li {% if state == "official"%}class="selected"{% endif %} >
+                                <a href="{% add_get state='official' %}"><span>{% trans "Official state" %}</span></a>
+                                </li>
+                                <li {% if state == "published"%}class="selected"{% endif %} >
+                                <a href="{% add_get state='published' %}"><span>{% trans "Published" %}</span></a>
+                                <li>
+                            </ul>
+                        {% endif %}
+                    {% endblock %}
+                    {% block browse-subtypes %}
+                        {% if subtypes and not restricted %}
+                            <div>
+                                <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub type" %} </h3>
+                            </div>
+                            <ul id="br-subtypes" class="tb-collapse">
+                                {% for level, cls, cls_name in subtypes %}
+                                    <li {% if stype == cls_name %}class="selected"{% endif %} > 
+                                    <a href="{% add_get stype=cls_name %}"><span style="padding-left:{{ level }}em;">{{ cls_name }}</span></a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endblock %}
+                </div>
+            {% endblock %}
+            {% block browse-results %}
+                <div id="browse-results" class="tb-span10">
+                    <h3 class="hplm">{% trans "Results" %}</h3>
+                    <div id="object_list">
+                        <p id="results">
+                        <span id="rtype">
+                            {% if type == "object"%}
+                                {% trans "Objects" %}.
+                            {% elif type == "part" %}
+                                {% trans "Parts" %}.
+                            {% elif type == "topassembly" %}
+                                {% trans "Top assemblies" %}.
+                            {% elif type == "document" %}
+                                {% trans "Documents" %}.
+                            {% elif type == "user" %}
+                                {% trans "User" %}.
+                            {% elif type == "group" %}
+                                {% trans "Group" %}.
+                            {% else %}
+                                {{ type }}.
+                            {% endif %}
+                            {% if stype and stype != "Object" and type != stype.lower %} {{ stype }}. {% endif %}
+                        </span>
+
+                        {% block sort-method %}
+                            <span id="sort_method">
+                                {% if sort == "name" %}
+                                    {% trans "Sorted by name" %}.
+                                {% elif type in "part topassembly" and sort == "children" %}
+                                    {% trans "Largest assemblies" %}.
+                                {% elif type == "part" and sort == "most-used" %}
+                                    {% trans "Most used" %}.
                                 {% else %}
-                                    {% trans "All objects"%}.
+                                    {% trans "Recently added" %}.
                                 {% endif %}
                             </span>
-                        {% endif %}
-                    {% endblock %}
-                    {% trans "Results" %}
-                    <span id="numresults">
-                        {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
-                            ({{start}} - {{end}} on {{total}})
-                        {% endblocktrans %}
-                    </span> 
-                    </p>
-                    {% block browse-objects %}
+                        {% endblock %}
+                        {% block selected-state %}
+                            {% if plmobjects %}
+                                <span id="state_filter">
+                                    {% if state == "official" %}
+                                        {% trans "Only official objects" %}.
+                                    {% elif state == "published" %}
+                                        {% trans "Only published objects" %}.
+                                    {% else %}
+                                        {% trans "All objects"%}.
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        {% endblock %}
+                        {% trans "Results" %}
+                        <span id="numresults">
+                            {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
+                                ({{start}} - {{end}} on {{total}})
+                            {% endblocktrans %}
+                        </span> 
+                        </p>
+                        {% block browse-objects %}
 
-                        {% with restricted|yesno:"public/," as suffix_url %}
+                            {% with restricted|yesno:"public/," as suffix_url %}
 
-                            {% for object in objects.object_list %}
-                                {% with object|main_type|add:"s/identity_card.html" as tpl %}
-                                    {% include tpl %}
-                                {% endwith %}
-                            {% endfor %}
-                        {% endwith %}
-                    {% endblock %}
+                                {% for object in objects.object_list %}
+                                    {% with object|main_type|add:"s/identity_card.html" as tpl %}
+                                        {% include tpl %}
+                                    {% endwith %}
+                                {% endfor %}
+                            {% endwith %}
+                        {% endblock %}
+                    </div>
+
+                    {% show_pages_bar objects request %}
                 </div>
-
-                {% show_pages_bar objects request %}
-            </div>
-        {% endblock %}
-    </div>
+            {% endblock %}
+        </div>
     </div>
 {% endblock %}
