@@ -477,14 +477,14 @@ def get_id_card_data(doc_ids):
         ctx["num_files"] = num_files
     return ctx
 
-def get_pagination(r_GET, object_list, type):
+def get_pagination(request, object_list, type):
     """
     Returns a dictionary with pagination data.
 
     Called in view which returns a template where object id cards are displayed.
     """
     ctx = {}
-    sort = r_GET.get("sort", "children" if type == "topassembly" else "recently-added")
+    sort = request.GET.get("sort", "children" if type == "topassembly" else "recently-added")
     if sort == "name" :
         sort_critera = "username" if type == "user" else "name"
     elif type in ("part", "topassembly") and sort == "children":
@@ -499,7 +499,7 @@ def get_pagination(r_GET, object_list, type):
 
     paginator = Paginator(object_list, 24) # Show 24 objects per page
 
-    page = r_GET.get('page', 1)
+    page = request.GET.get('page', 1)
     try:
         objects = paginator.page(page)
     except PageNotAnInteger:
