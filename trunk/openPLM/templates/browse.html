@@ -109,8 +109,7 @@
                             <ul id="br-ctime" class="tb-collapse">
                                 {% for f in ctime_choices %}
                                     <li {% if f.selected %}class="selected"{% endif %} > 
-                                    {# ctime__XXX are required by any date case #}
-                                    <a href="{% add_get ctime__gte='' ctime__lt='' f.param_dict %}"><span>{{ f.display }}</span></a>
+                                    <a href="{% add_get f.param_dict %}"><span>{{ f.display }}</span></a>
                                     </li>
                                 {% endfor %}
                             </ul>

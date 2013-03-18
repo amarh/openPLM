@@ -629,7 +629,10 @@ class SimpleDateFilter(DateFieldListFilter):
 
     def filters(self):
         for title, param_dict in self.links:
-            params = {}
+            params = {
+                self.field_path2 + "__gte": "",
+                self.field_path2 + "__lt": "",
+            }
             for param, value in param_dict.iteritems():
                 params[param.replace(self.field, self.field_path2)] = value
             yield {
