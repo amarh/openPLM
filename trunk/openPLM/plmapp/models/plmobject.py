@@ -471,6 +471,18 @@ def get_all_subclasses_with_level(base, lst, level):
     for cls in subclasses:
         get_all_subclasses_with_level(cls, lst, level)
 
+
+def get_subclasses(base):
+    r = []
+    def populate(b, l):
+        r.append((l, b, b.__name__))
+        subclasses = b.__subclasses__()
+        subclasses.sort(key=lambda c: c.__name__)
+        for cls in subclasses:
+            populate(cls, l + 1)
+    populate(base, 0)
+    return r
+
 @memoize_noarg
 def get_all_users_and_plmobjects_with_level():
     choices = []

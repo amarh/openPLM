@@ -620,6 +620,7 @@ def browse(request, type="object"):
     if user.is_authenticated() and not models.get_profile(user).restricted:
         # only authenticated users can see all groups and users
         obj, ctx = get_generic_data(request, search=False)
+        plmtypes = ("object", "part", "topassembly", "document")
         try:
             type2manager = {
                 "object" : models.PLMObject.objects,
@@ -630,13 +631,27 @@ def browse(request, type="object"):
                 "user" : User.objects,
             }
             manager = type2manager[type]
+            main_cls = manager.model
+            stype = request.GET.get("stype")
+            if type in plmtypes and stype and stype != "Object":
+                cls = models.get_all_plmobjects()[stype]
+                if not issubclass(cls, main_cls):
+                    raise Http404
+                if type == "topassembly":
+                    manager = cls.top_assemblies
+                else:
+                    manager = cls.objects
+            ctx["stype"] = stype
         except KeyError:
             raise Http404
         object_list = manager.all()
         # this is only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
-        if type in ("object", "part", "topassembly", "document"):
+        if type in plmtypes:
             ctx["plmobjects"] = True
+            ctx["subtypes"] = models.get_subclasses(main_cls)
+            if type == "object":
+                ctx["subtypes"][0] = (0, models.PLMObject, "Object")
             object_list = object_list.exclude_cancelled()
             if state == "official":
                 object_list = object_list.officials()
