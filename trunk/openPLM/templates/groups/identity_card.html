@@ -13,7 +13,7 @@
     <span class="description">{{object.description|linebreaksbr}}</span>
     </p>
  
-    {% if sort == "recently-added" %}
+    {% if sort == "recently-added" and not restricted %}
         <p>
         <span class="sort">
             {% blocktrans with object.ctime|timesince as ctime %}created {{ctime}} ago{% endblocktrans %}

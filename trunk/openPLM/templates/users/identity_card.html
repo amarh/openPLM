@@ -15,7 +15,7 @@
     <span class="fullname">{{ object.get_full_name }}</span>
     </p>
 
-    {% if sort == "recently-added" %}
+    {% if sort == "recently-added" and not restricted %}
         <p>
         <span class="sort">
             {% blocktrans with object.date_joined|timesince as ctime %}joined {{ctime}} ago{% endblocktrans %}
