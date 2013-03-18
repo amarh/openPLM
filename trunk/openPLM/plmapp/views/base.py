@@ -25,34 +25,33 @@
 ################################################################################
 
 
-import re
-import json
 import datetime
-from django.utils import timezone
-from functools import wraps
 import functools
+import json
 import traceback
+import re
 import sys
 
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from django.core.mail import mail_admins
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.http import (HttpResponse, HttpResponseForbidden, Http404,
+     HttpResponseRedirect, HttpResponseServerError)
+from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
 from openPLM.plmapp.controllers import get_controller
 from openPLM.plmapp.exceptions import ControllerError
-from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.forms import get_navigate_form, SimpleSearchForm
+from openPLM.plmapp.navigate import NavigationGraph, OSR
 from openPLM.plmapp.utils import can_generate_pdf
+
 
 def get_obj(obj_type, obj_ref, obj_revi, user):
     """
@@ -187,7 +186,7 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
     a :class:`.django.http.HttpResponseServerError` is returned.
     """
     def decorator(f):
-        @wraps(f)
+        @functools.wraps(f)
         @secure_required
         @login_required
         def wrapper(request, *args, **kwargs):
