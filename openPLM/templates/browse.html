@@ -8,20 +8,20 @@
 {% block leftcolumn %} {% endblock %}
 
 {% block content %}
-    <div id="browser" class="tb-container-fluid">
-        <div class="tb-row-fluid">
-        {% block browse-left-panel %}
-            <div id="type-panel" class="tb-span2">
-                {% block browse-type %}
-                    <div>
-                        <h3 class="hplm alternate">{% trans "Type" %} </h3>
-                    </div>
-                    <ul>
-                        <li {% if type == "object"%}class="selected"{% endif %} >
-                        <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
-                        </li>
-                        <li {% if type == "part"%}class="selected"{% endif %} >
-                        <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
+<div id="browser" class="tb-container-fluid">
+    <div class="tb-row-fluid">
+    {% block browse-left-panel %}
+        <div id="type-panel" class="tb-span2">
+            {% block browse-type %}
+                <div>
+                    <h3 class="hplm alternate">{% trans "Type" %} </h3>
+                </div>
+                <ul>
+                    <li {% if type == "object"%}class="selected"{% endif %} >
+                    <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
+                    </li>
+                    <li {% if type == "part"%}class="selected"{% endif %} >
+                    <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
                         </li>
                         <li {% if type == "topassembly"%}class="selected"{% endif %} >
                         <a href="/browse/topassembly/{% add_get page='1'%}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
@@ -45,6 +45,7 @@
                         {% endif %}
                     </ul>
                 {% endblock %}
+
                 {% block browse-sort %}
                     <div>
                         <h3 class="hplm alternate">{% trans "Sort" %} </h3>
@@ -86,7 +87,20 @@
                         </ul>
                     {% endif %}
                 {% endblock %}
-
+                {% block browse-subtypes %}
+                    {% if subtypes and not restricted %}
+                        <div>
+                            <h3 class="hplm alternate">{% trans "Sub types" %} </h3>
+                        </div>
+                        <ul>
+                            {% for level, cls, cls_name in subtypes %}
+                                <li {% if stype == cls_name %}class="selected"{% endif %} > 
+                                <a href="{% add_get stype=cls_name %}"><span style="padding-left:{{ level }}em;">{{ cls_name }}</span></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endblock %}
             </div>
         {% endblock %}
         {% block browse-results %}
