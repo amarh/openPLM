@@ -457,7 +457,7 @@ def get_id_card_data(doc_ids):
 
     :param doc_ids: list of Document ids to treat
 
-    :return: a dictionary which contains the following informations
+    :return: a dictionary which contains the following data
 
         * ``thumbnails``
             list of tuple (document,thumbnail)
