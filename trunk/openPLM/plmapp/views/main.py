@@ -638,6 +638,13 @@ class SimpleDateFilter(DateFieldListFilter):
                 'display': title,
             }
 
+    def queryset(self, request, queryset):
+        try:
+            queryset = super(SimpleDateFilter, self).queryset(request, queryset)
+        except IncorrectLookupParameters:
+            # wrong query manually entered, ignore it
+            pass
+        return queryset
 
 
 @secure_required
@@ -691,11 +698,7 @@ def browse(request, type="object"):
         # date filters
         ctime = "date_joined" if type == "user" else "ctime"
         ctime_filter = SimpleDateFilter(ctime, request, object_list.model, "ctime")
-        try:
-            object_list = ctime_filter.queryset(request, object_list)
-        except IncorrectLookupParameters:
-            # wrong query manually entered, ignore it
-            pass
+        object_list = ctime_filter.queryset(request, object_list)
         ctx["ctime_choices"] = ctime_filter.filters()
     else:
         try:
