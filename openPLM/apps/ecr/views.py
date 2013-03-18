@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from openPLM.plmapp import models
 import openPLM.plmapp.views.base as bv
 from openPLM.plmapp.utils import r2r
-from openPLM.plmapp.views import create_object, get_pagination, ITEMS_PER_HISTORY
+from openPLM.plmapp.views import create_object, get_pagination, ITEMS_PER_HISTORY, SimpleDateFilter
 from openPLM.plmapp.forms import PLMObjectForm
 
 from openPLM.apps.ecr.forms import get_creation_form
@@ -36,6 +36,9 @@ def browse_ecr(request):
                 exclude(lifecycle=models.get_cancelled_lifecycle()).\
                 filter(state=F("lifecycle__official_state"))
         ctx["plmobjects"] = False
+        ctime_filter = SimpleDateFilter("ctime", request, ECR, "ctime")
+        object_list = ctime_filter.queryset(request, object_list)
+        ctx["ctime_choices"] = ctime_filter.filters()
     else:
         ctx = bv.init_ctx("-", "-", "-")
         ctx.update({
