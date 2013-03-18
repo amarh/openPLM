@@ -476,6 +476,7 @@ def get_id_card_data(doc_ids):
         ctx["num_files"] = num_files
     return ctx
 
+
 def get_pagination(request, object_list, type):
     """
     Returns a dictionary with pagination data.
@@ -484,6 +485,7 @@ def get_pagination(request, object_list, type):
     """
     ctx = {}
     sort = request.GET.get("sort", "children" if type == "topassembly" else "recently-added")
+    ctime = "date_joined" if type == "user" else "ctime"
     if sort == "name" :
         sort_critera = "username" if type == "user" else "name"
     elif type in ("part", "topassembly") and sort == "children":
@@ -493,7 +495,7 @@ def get_pagination(request, object_list, type):
         object_list = object_list.with_parents_counts()
         sort_critera = "-num_parents,reference,revision"
     else:
-        sort_critera = "-date_joined" if type == "user" else "-ctime"
+        sort_critera = "-%s" % ctime
     object_list = object_list.order_by(*sort_critera.split(","))
 
     paginator = Paginator(object_list, 24) # Show 24 objects per page
@@ -515,8 +517,8 @@ def get_pagination(request, object_list, type):
          ids = objects.object_list.values_list("id", flat=True)
          ctx.update(get_id_card_data(ids))
     ctx.update({
-         "objects" : objects,
-         "sort" : sort,
+         "objects": objects,
+         "sort": sort,
     })
     return ctx
 
