@@ -629,10 +629,10 @@ def browse(request, type="object"):
                 "group" : models.GroupInfo.objects,
                 "user" : User.objects,
             }
-            cls = type2manager[type]
+            manager = type2manager[type]
         except KeyError:
             raise Http404
-        object_list = cls.all()
+        object_list = manager.all()
         # this is only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
         if type in ("object", "part", "topassembly", "document"):
@@ -646,7 +646,7 @@ def browse(request, type="object"):
             ctx["plmobjects"] = False
     else:
         try:
-            cls = {
+            manager = {
                 "object" : models.PLMObject.objects,
                 "part" : models.Part.objects,
                 "topassembly" : models.Part.top_assemblies,
@@ -667,7 +667,7 @@ def browse(request, type="object"):
         if user.is_authenticated():
             readable = user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
-        object_list = cls.filter(query).exclude_cancelled()
+        object_list = manager.filter(query).exclude_cancelled()
 
     ctx.update(get_pagination(request.GET, object_list, type))
     extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
