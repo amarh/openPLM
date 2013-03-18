@@ -49,7 +49,7 @@ def browse_ecr(request):
         readable |= user.ecrs.now().filter(role=models.ROLE_OWNER)
         object_list = ECR.objects.filter(id__in=readable)
 
-    ctx.update(get_pagination(request.GET, object_list, "ECR"))
+    ctx.update(get_pagination(request, object_list, "ECR"))
     extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
     ctx.update({
         "object_type": _("Browse"),
@@ -65,7 +65,7 @@ def plmobjects(request, obj_ref):
     objects = models.PLMObject.objects.filter(
             id__in=obj.plmobjects.now().values_list("plmobject", flat=True))
     objects = objects.select_related("state", "lifecycle")
-    ctx.update(get_pagination(request.GET, objects, "object"))
+    ctx.update(get_pagination(request, objects, "object"))
     ctx["current_page"] = "part-doc-cads"
     ctx["detach_objects"] = obj.is_editable and ctx["is_owner"]
     return r2r("ecrs/plmobjects.html", ctx, request)
@@ -119,6 +119,6 @@ def redirect_history(request, hid):
 def changes(request, obj_type, obj_ref, obj_revi):
     obj, ctx = bv.get_generic_data(request, obj_type, obj_ref, obj_revi)
     ecrs = ECR.objects.filter(id__in=obj.ecrs.now().values_list("ecr", flat=True))
-    ctx.update(get_pagination(request.GET, ecrs, "ECR"))
+    ctx.update(get_pagination(request, ecrs, "ECR"))
     ctx["current_page"] = "changes"
     return r2r("changes.html", ctx, request)

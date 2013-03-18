@@ -684,7 +684,7 @@ def browse(request, type="object"):
             query |= Q(id__in=readable.values_list("plmobject_id", flat=True))
         object_list = manager.filter(query).exclude_cancelled()
 
-    ctx.update(get_pagination(request.GET, object_list, type))
+    ctx.update(get_pagination(request, object_list, type))
     extra_types = [c.__name__ for c in models.IObject.__subclasses__()]
     ctx.update({
         "object_type" : _("Browse"),
