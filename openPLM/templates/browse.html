@@ -108,6 +108,25 @@
                 <h3 class="hplm">{% trans "Results" %}</h3>
                 <div id="object_list">
                     <p id="results">
+                    <span id="rtype">
+                        {% if type == "object"%}
+                            {% trans "Objects" %}.
+                        {% elif type == "part" %}
+                            {% trans "Parts" %}.
+                        {% elif type == "topassembly" %}
+                            {% trans "Top assemblies" %}.
+                        {% elif type == "document" %}
+                            {% trans "Documents" %}.
+                        {% elif type == "user" %}
+                            {% trans "User" %}.
+                        {% elif type == "group" %}
+                            {% trans "Group" %}.
+                        {% else %}
+                            {{ type }}.
+                        {% endif %}
+                        {% if stype and stype != "Object" and type != stype.lower %} {{ stype }}. {% endif %}
+                    </span>
+
                     {% block sort-method %}
                         <span id="sort_method">
                             {% if sort == "name" %}

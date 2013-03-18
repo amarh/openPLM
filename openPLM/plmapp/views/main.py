@@ -641,6 +641,8 @@ def browse(request, type="object"):
                     manager = cls.top_assemblies
                 else:
                     manager = cls.objects
+            else:
+                stype = None
             ctx["stype"] = stype
         except KeyError:
             raise Http404
