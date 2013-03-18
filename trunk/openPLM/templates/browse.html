@@ -101,6 +101,21 @@
                             </ul>
                         {% endif %}
                     {% endblock %}
+                    {% block browse-ctime %}
+                         {% if not restricted %}
+                            <div>
+                                <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-ctime">{% trans "Date of creation" %} </h3>
+                            </div>
+                            <ul id="br-ctime" class="tb-collapse">
+                                {% for f in ctime_choices %}
+                                    <li {% if f.selected %}class="selected"{% endif %} > 
+                                    <a href="{% add_get f.param_dict %}"><span>{{ f.display }}</span></a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                    {% endblock %}
                 </div>
             {% endblock %}
             {% block browse-results %}

@@ -221,14 +221,18 @@ Original version's URL: http://django.mar.lt/2010/07/add-get-parameter-tag.html
 """
 
 class AddGetParameter(Node):
-    def __init__(self, values):
+    def __init__(self, values, variables):
         self.values = values
+        self.variables = variables
 
     def render(self, context):
         req = resolve_variable('request', context)
         params = req.GET.copy()
         for key, value in self.values.items():
             params[key] = value.resolve(context)
+        for var in self.variables:
+            for key, val in var.resolve(context).items():
+                params[key] = val
         return '?%s' %  params.urlencode()
 
 
@@ -236,10 +240,14 @@ class AddGetParameter(Node):
 def add_get(parser, token):
     pairs = token.split_contents()[1:]
     values = {}
+    variables = []
     for pair in pairs:
-        s = pair.split('=', 1)
-        values[s[0]] = parser.compile_filter(s[1])
-    return AddGetParameter(values)
+        if '=' in pair:
+            s = pair.split('=', 1)
+            values[s[0]] = parser.compile_filter(s[1])
+        else:
+            variables.append(parser.compile_filter(pair))
+    return AddGetParameter(values, variables)
 
 
 class AddSearchParameter(Node):

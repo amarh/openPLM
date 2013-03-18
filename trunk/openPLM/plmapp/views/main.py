@@ -41,6 +41,8 @@ import itertools
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin import DateFieldListFilter
+from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.comments.views.comments import post_comment
@@ -614,6 +616,30 @@ class OpenPLMSearchView(SearchView):
         return super(OpenPLMSearchView, self).__call__(request)
 
 
+class SimpleDateFilter(DateFieldListFilter):
+
+    def __init__(self, field, request, model, field_path):
+        params = {}
+        for param, value in request.GET.items():
+            params[param.replace(field_path, field)] = value
+        self.field_path2 = field_path
+
+        super(SimpleDateFilter, self).__init__(field, request,
+            params, model, None, field)
+
+    def filters(self):
+        for title, param_dict in self.links:
+            params = {}
+            for param, value in param_dict.iteritems():
+                params[param.replace(self.field, self.field_path2)] = value
+            yield {
+                'selected': self.date_params == param_dict,
+                'param_dict': params,
+                'display': title,
+            }
+
+
+
 @secure_required
 def browse(request, type="object"):
     user = request.user
@@ -661,6 +687,16 @@ def browse(request, type="object"):
                 object_list = object_list.filter(published=True)
         else:
             ctx["plmobjects"] = False
+
+        # date filters
+        ctime = "date_joined" if type == "user" else "ctime"
+        ctime_filter = SimpleDateFilter(ctime, request, object_list.model, "ctime")
+        try:
+            object_list = ctime_filter.queryset(request, object_list)
+        except IncorrectLookupParameters:
+            # wrong query manually entered, ignore it
+            pass
+        ctx["ctime_choices"] = ctime_filter.filters()
     else:
         try:
             manager = {
