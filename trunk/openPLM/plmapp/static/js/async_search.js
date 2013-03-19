@@ -27,7 +27,7 @@ function update_results(msg, data){
     //update link to search and create pages
     var search_link = $("#DisplayBox").find("a[href^='/search']");
     $(search_link).attr("href","/search/" + get_search_query(data));
-    if( data.type!="User"){
+    if( data.type != "User" && data.type != "all"){
         var create_link = $("#DisplayBox").find("a[href^='/object/create']");
         $(create_link).attr("href","/object/create/?type="+data.type);
     }

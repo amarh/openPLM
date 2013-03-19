@@ -258,7 +258,7 @@ class AddSearchParameter(Node):
         req = resolve_variable('request', context)
         params = req.GET.copy()
         if "type" not in self.values:
-            params["type"] = req.session.get("type", "Part")
+            params["type"] = req.session.get("type", "all")
         if "q" not in self.values:
             params["q"] = req.session.get("search_query", "*")
         if "search_official" not in self.values:
