@@ -675,7 +675,8 @@ def browse(request, type="object"):
             manager = type2manager[type]
             main_cls = manager.model
             stype = request.GET.get("stype")
-            if type in plmtypes and stype and stype != "Object":
+            plmobjects = ctx["plmobjects"] = type in plmtypes
+            if plmobjects and stype and stype != "Object":
                 cls = models.get_all_plmobjects()[stype]
                 if not issubclass(cls, main_cls):
                     raise Http404
@@ -691,8 +692,7 @@ def browse(request, type="object"):
         object_list = manager.all()
         # this is only relevant for authenticated users
         ctx["state"] = state = request.GET.get("state", "all")
-        if type in plmtypes:
-            ctx["plmobjects"] = True
+        if plmobjects:
             ctx["subtypes"] = models.get_subclasses(main_cls)
             if type == "object":
                 ctx["subtypes"][0] = (0, models.PLMObject, "Object")
@@ -701,14 +701,17 @@ def browse(request, type="object"):
                 object_list = object_list.officials()
             elif state == "published":
                 object_list = object_list.filter(published=True)
-        else:
-            ctx["plmobjects"] = False
 
         # date filters
+        model = object_list.model
         ctime = "date_joined" if type == "user" else "ctime"
-        ctime_filter = SimpleDateFilter(ctime, request, object_list.model, "ctime")
+        ctime_filter = SimpleDateFilter(ctime, request, model, "ctime")
         object_list = ctime_filter.queryset(request, object_list)
-        ctx["ctime_filter"] = ctime_filter
+        ctx["time_filters"] = [ctime_filter]
+        if plmobjects:
+            mtime_filter = SimpleDateFilter("mtime", request, model, "mtime")
+            object_list = mtime_filter.queryset(request, object_list)
+            ctx["time_filters"].append(mtime_filter)
     else:
         try:
             manager = {
