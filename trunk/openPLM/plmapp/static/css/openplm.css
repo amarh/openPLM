@@ -1302,11 +1302,11 @@ div.id_details a {
     font-weight: bold;;
 
 }
-div#type-panel li:hover {
+div#type-panel li:hover:not(.intermediate) {
     color: white;
     background-color: #343434;
 }
-div#type-panel li:hover * {
+div#type-panel li:hover:not(.intermediate) * {
     color: white;
 }
 
