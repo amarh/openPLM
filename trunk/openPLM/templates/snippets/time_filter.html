@@ -1,0 +1,12 @@
+{% load i18n plmapp_tags highlight %}
+
+<div>
+    <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-{{time_filter.field_path2}}">{{ time_filter.title|capfirst }} </h3>
+</div>
+<ul id="br-{{time_filter.field_path2}}" class="tb-collapse">
+    {% for f in time_filter.filters %}
+        <li {% if f.selected %}class="selected"{% endif %} > 
+        <a href="{% add_get f.param_dict %}"><span>{{ f.display }}</span></a>
+        </li>
+    {% endfor %}
+</ul>

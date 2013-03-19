@@ -38,7 +38,7 @@ def browse_ecr(request):
         ctx["plmobjects"] = False
         ctime_filter = SimpleDateFilter("ctime", request, ECR, "ctime")
         object_list = ctime_filter.queryset(request, object_list)
-        ctx["ctime_choices"] = ctime_filter.filters()
+        ctx["ctime_filter"] = ctime_filter
     else:
         ctx = bv.init_ctx("-", "-", "-")
         ctx.update({

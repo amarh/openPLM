@@ -617,26 +617,32 @@ class OpenPLMSearchView(SearchView):
 
 
 class SimpleDateFilter(DateFieldListFilter):
+    template = "snippets/time_filter.html"
 
     def __init__(self, field, request, model, field_path):
         params = {}
         for param, value in request.GET.items():
             params[param.replace(field_path, field)] = value
         self.field_path2 = field_path
-
-        super(SimpleDateFilter, self).__init__(field, request,
+        mfield = model._meta.get_field(field)
+        super(SimpleDateFilter, self).__init__(mfield, request,
             params, model, None, field)
+        self.display = ""
 
     def filters(self):
-        for title, param_dict in self.links:
+        for i, (title, param_dict) in enumerate(self.links):
             params = {
                 self.field_path2 + "__gte": "",
                 self.field_path2 + "__lt": "",
             }
             for param, value in param_dict.iteritems():
-                params[param.replace(self.field, self.field_path2)] = value
+                params[param.replace(self.field_path, self.field_path2)] = value
+            selected = (self.date_params == param_dict or
+                (i == 0 and not any(self.date_params.itervalues())))
+            if selected:
+                self.display = title
             yield {
-                'selected': self.date_params == param_dict,
+                'selected': selected,
                 'param_dict': params,
                 'display': title,
             }
@@ -702,7 +708,7 @@ def browse(request, type="object"):
         ctime = "date_joined" if type == "user" else "ctime"
         ctime_filter = SimpleDateFilter(ctime, request, object_list.model, "ctime")
         object_list = ctime_filter.queryset(request, object_list)
-        ctx["ctime_choices"] = ctime_filter.filters()
+        ctx["ctime_filter"] = ctime_filter
     else:
         try:
             manager = {

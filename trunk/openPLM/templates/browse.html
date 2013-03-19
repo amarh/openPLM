@@ -103,16 +103,7 @@
                     {% endblock %}
                     {% block browse-ctime %}
                          {% if not restricted %}
-                            <div>
-                                <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-ctime">{% trans "Date of creation" %} </h3>
-                            </div>
-                            <ul id="br-ctime" class="tb-collapse">
-                                {% for f in ctime_choices %}
-                                    <li {% if f.selected %}class="selected"{% endif %} > 
-                                    <a href="{% add_get f.param_dict %}"><span>{{ f.display }}</span></a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                             {% include "snippets/time_filter.html" with time_filter=ctime_filter %}
                         {% endif %}
 
                     {% endblock %}
@@ -166,6 +157,11 @@
                                         {% trans "All objects"%}.
                                     {% endif %}
                                 </span>
+                            {% endif %}
+                        {% endblock %}
+                        {% block selected-time %}
+                            {% if not restricted %}
+                                <span id="ctime_filter">{{ ctime_filter.display }}.</span>
                             {% endif %}
                         {% endblock %}
                         {% trans "Results" %}
