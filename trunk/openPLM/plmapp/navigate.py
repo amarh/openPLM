@@ -35,7 +35,7 @@ import xml.etree.cElementTree as ET
 from collections import defaultdict
 
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.html import linebreaks
 from django.utils.encoding import iri_to_uri
@@ -162,14 +162,10 @@ class NavigationGraph(object):
 
     def __init__(self, obj, results=()):
         self.object = obj
-        self.results = [r.id for r in results]
         # a PLMObject and a user may have the same id, so we add a variable
         # which tells if results contains users
-        self.users_result = self.groups_result = False
-        if results:
-            self.users_result = hasattr(results[0], "username")
-            self.groups_result = isinstance(results[0], Group)
-        self.plmobjects_result = not (self.groups_result or self.users_result)
+        self.user_results = [r.id for r in results if isinstance(r, User)]
+        self.plmobject_results = [r.id for r in results if isinstance(r, models.PLMObject)]
         options = ("child", "parents", "doc", "owner", "signer",
                    "notified", "part", "owned", "to_sign",
                    "request_notification_from", OSR)
@@ -251,11 +247,11 @@ class NavigationGraph(object):
             self.time = None
 
     def _create_child_edges(self, obj, *args):
-        if self.options[OSR] and not self.plmobjects_result:
+        if self.options[OSR] and not self.plmobject_results:
             return
         for child_l in obj.get_children(max_level=-1, related=("child",), date=self.time):
             link = child_l.link
-            if self.options[OSR] and link.child.id not in self.results:
+            if self.options[OSR] and link.child.id not in self.plmobject_results:
                 continue
             if link.parent_id not in self._part_to_node:
                 continue
@@ -266,11 +262,11 @@ class NavigationGraph(object):
             self._set_node_attributes(link.child)
 
     def _create_parents_edges(self, obj, *args):
-        if self.options[OSR] and not self.plmobjects_result:
+        if self.options[OSR] and not self.plmobject_results:
             return
         for parent_l in obj.get_parents(max_level=-1, related=("parent",), date=self.time):
             link = parent_l.link
-            if self.options[OSR] and link.parent.id not in self.results:
+            if self.options[OSR] and link.parent.id not in self.plmobject_results:
                 continue
             if link.child_id not in self._part_to_node:
                 continue
@@ -281,20 +277,21 @@ class NavigationGraph(object):
             self._set_node_attributes(parent)
 
     def _create_part_edges(self, obj, *args):
-        if self.options[OSR] and not self.plmobjects_result:
+        if self.options[OSR] and not self.plmobject_results:
             return
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
             parts = obj.get_attached_parts().only(*_attrs)
+            if self.options[OSR]:
+                parts = parts.filter(id__in=self.plmobject_results)
             for part in parts[:OBJECTS_LIMIT]:
-                if self.options[OSR] and part.id not in self.results:
-                    continue
                 self.edges.add((node, part.id, " "))
                 self._set_node_attributes(part)
         else:
-            for link in obj.get_attached_parts(self.time).select_related("part").only(*_parts_attrs)[:OBJECTS_LIMIT]:
-                if self.options[OSR] and link.part_id not in self.results:
-                    continue
+            links = obj.get_attached_parts(self.time).select_related("part").only(*_parts_attrs)
+            if self.options[OSR]:
+                links = links.filter(part__in=self.plmobject_results)
+            for link in links[:OBJECTS_LIMIT]:
                 # create a link part -> document:
                 # if layout is dot, the part is on top of the document
                 # cf. tickets #82 and #83
@@ -302,27 +299,27 @@ class NavigationGraph(object):
                 self._set_node_attributes(link.part)
 
     def _create_doc_edges(self, obj, obj_id=None, *args):
-        if self.options[OSR] and not self.plmobjects_result:
+        if self.options[OSR] and not self.plmobject_results:
             return
         if isinstance(obj, GroupController):
             node = "Group%d" % obj.id
             docs = obj.get_attached_documents().only(*_attrs)
+            if self.options[OSR]:
+                docs = docs.filter(id__in=self.plmobject_results)
             for doc in docs[:OBJECTS_LIMIT]:
-                if self.options[OSR] and doc.id not in self.results:
-                    continue
                 self.edges.add((node, doc.id, " "))
                 self._set_node_attributes(doc)
         else:
             # obj is the part id
             links = models.DocumentPartLink.objects.at(self.time).filter(part__id=obj).select_related("document")
+            if self.options[OSR]:
+                links = links.filter(document__in=self.plmobject_results)
             for link in links.only(*_documents_attrs)[:OBJECTS_LIMIT]:
-                if self.options[OSR] and link.document_id not in self.results:
-                    continue
                 self.edges.add((obj_id or obj, link.document_id, " "))
                 self._set_node_attributes(link.document)
 
     def _create_user_edges(self, obj, role):
-        if self.options[OSR] and not self.users_result:
+        if self.options[OSR] and not self.user_results:
             return
         if hasattr(obj, 'user_set'):
             if role == "owner":
@@ -334,7 +331,7 @@ class NavigationGraph(object):
             users = ((u.user, u.role) for u in users.all())
         node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
         for user, role in users:
-            if self.options[OSR] and user.id not in self.results:
+            if self.options[OSR] and user.id not in self.user_results:
                 continue
             user.plmobject_url = "/user/%s/" % user.username
             user_id = role + str(user.id)
@@ -342,7 +339,7 @@ class NavigationGraph(object):
             self._set_node_attributes(user, user_id, role)
 
     def _create_object_edges(self, obj, role):
-        if self.options[OSR] and not self.plmobjects_result:
+        if self.options[OSR] and not self.plmobject_results:
             return
         node = "User%d" % obj.id
         if role in ("owner", "notified"):
@@ -352,10 +349,10 @@ class NavigationGraph(object):
                 qs = obj.plmobjectuserlink_user.at(self.time).filter(role=role)
                 qs = qs.values_list("plmobject_id", flat=True).order_by()
                 qs = models.PLMObject.objects.filter(id__in=qs)
+            if self.options[OSR]:
+                qs = qs.filter(id__in=self.plmobject_results)
             links = qs.values("id", "type", "reference", "revision", "name").order_by()
             for plmobject in links[:OBJECTS_LIMIT]:
-                if self.options[OSR] and plmobject["id"] not in self.results:
-                    continue
                 part_doc_id = role + str(plmobject["id"])
                 self.edges.add((node, part_doc_id, role))
                 if is_part(plmobject):
@@ -366,9 +363,9 @@ class NavigationGraph(object):
         else:
             # signer roles
             qs = obj.plmobjectuserlink_user.at(self.time).filter(role__istartswith=role)
+            if self.options[OSR]:
+                qs = qs.filter(plmobject__in=self.plmobject_results)
             for link in qs.select_related("plmobject").only("role", *_plmobjects_attrs)[:OBJECTS_LIMIT]:
-                if self.options[OSR] and link.plmobject_id not in self.results:
-                    continue
                 part_doc_id = link.role + str(link.plmobject_id)
                 self.edges.add((node, part_doc_id, link.role.replace("_", "\\n")))
                 part_doc = link.plmobject
@@ -413,27 +410,25 @@ class NavigationGraph(object):
                 function(self.object, argument)
         # now that all parts have been added, we can add the documents
         if self.options["doc"]:
-            if not (self.options[OSR] and not self.plmobjects_result):
+            if not (self.options[OSR] and not self.plmobject_results):
                 if isinstance(self.object, GroupController):
                     self._create_doc_edges(self.object, None)
                 if self._part_to_node:
                     links = models.DocumentPartLink.objects.at(self.time).\
                             filter(part__in=self._part_to_node.keys())
+                    if self.options[OSR]:
+                        links = links.filter(document__in=self.plmobject_results)
                     for link in links.select_related("document"):
-                        if self.options[OSR] and link.document_id not in self.results:
-                            continue
-
                         self.edges.add((link.part_id, link.document_id, " "))
                         self._set_node_attributes(link.document)
 
         elif not isinstance(self.object, UserController):
-            if not (self.options[OSR] and not self.plmobjects_result):
+            if not (self.options[OSR] and not self.plmobject_results):
                 ids = self.options["doc_parts"].intersection(self._part_to_node.keys())
                 links = models.DocumentPartLink.objects.at(self.time).filter(part__in=ids)
+                if self.options[OSR]:
+                    links = links.filter(document__in=self.plmobject_results)
                 for link in links.select_related("document"):
-                    if self.options[OSR] and link.document_id not in self.results:
-                        continue
-
                     self.edges.add((link.part_id, link.document_id, " "))
                     self._set_node_attributes(link.document)
 
