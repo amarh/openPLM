@@ -35,16 +35,17 @@
                 </span> 
                 </p>
                 <ul class="Result">
-                {% endif %}
-
+            {% endif %}
                 {% include "search/result.html" %}
-                {% if forloop.last %}
+            {% if forloop.last %}
                 </ul>
             {% endif %}
 
-
         {% empty %}
             <p>{% trans "No result matching given query" %}</p>
+            {% if suggestion.strip %}
+                <p>{% trans "You may try:"%}&nbsp;<a href="{% add_search q=suggestion %}">{{ suggestion}}</a></p>
+            {% endif %}
         {% endfor %}
 
         {% show_pages_bar page request %}
