@@ -317,7 +317,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         elif "type" in request.session:
             search_form = SimpleSearchForm(request.session, auto_id=_SEARCH_ID)
         else:
-            request.session['type'] = 'Part'
+            request.session['type'] = 'all'
             search_form = SimpleSearchForm(auto_id=_SEARCH_ID)
             save_session = True
 
@@ -345,7 +345,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
            'search_count' : search_count,
            'search_form' : search_form,
            'navigation_history' : request.session.get("navigation_history", []),
-           'ctype': "Part" if request.session["type"] == "User" else request.session["type"],
+           'ctype': "Part" if request.session["type"] in ("all", "User") else request.session["type"],
         })
 
     ctx.update({

@@ -73,7 +73,7 @@
         </div>
         <div class="menuitem {% if not is_contributor %} disabled {% endif %}" style="margin-left:2em"> 
             {% if is_contributor %}
-                <a class="tooltip" href="/object/create/?type={{request.session.type}}">
+                <a class="tooltip" href="/object/create/?type={{ctype}}">
                     {% trans "Create" %}
                     <span class="triangle">&nbsp;</span>
                     <span class="info">{% trans "Create a new part, a new document or a new group." %}</span>
