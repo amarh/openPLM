@@ -166,6 +166,8 @@ class NavigationGraph(object):
         # which tells if results contains users
         self.user_results = [r.id for r in results if isinstance(r, User)]
         self.plmobject_results = [r.id for r in results if isinstance(r, models.PLMObject)]
+        self.plmobject_results.extend((r.document_id for r in results
+            if isinstance(r, models.DocumentFile)))
         options = ("child", "parents", "doc", "owner", "signer",
                    "notified", "part", "owned", "to_sign",
                    "request_notification_from", OSR)
