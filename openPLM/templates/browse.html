@@ -84,6 +84,18 @@
                                 <li {% if state == "published"%}class="selected"{% endif %} >
                                 <a href="{% add_get state='published' %}"><span>{% trans "Published" %}</span></a>
                                 <li>
+                                {% if states %}
+                                    <li data-toggle="collapse" data-target="#br-states-all" class="intermediate">
+                                    <a><span>{% trans "Other states..." %}</span></a>
+                                    <ul id="br-states-all" class="tb-collapse">
+                                        {% for st in states %}
+                                            <li {% if state == st %}class="selected"{% endif %} >
+                                            <a href="{% add_get state=st %}"><span>{{ st }}</span></a>
+                                            <li>
+                                        {% endfor %}
+                                    </ul>
+                                    </li>
+                                {% endif %}
                             </ul>
                         {% endif %}
                     {% endblock %}
@@ -155,8 +167,10 @@
                                         {% trans "Only official objects" %}.
                                     {% elif state == "published" %}
                                         {% trans "Only published objects" %}.
-                                    {% else %}
+                                    {% elif state == "all" %}
                                         {% trans "All objects"%}.
+                                    {% else %}
+                                        {{ state }}.
                                     {% endif %}
                                 </span>
                             {% endif %}

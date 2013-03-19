@@ -696,11 +696,15 @@ def browse(request, type="object"):
             ctx["subtypes"] = models.get_subclasses(main_cls)
             if type == "object":
                 ctx["subtypes"][0] = (0, models.PLMObject, "Object")
-            object_list = object_list.exclude_cancelled()
+            if state != models.get_cancelled_state().name:
+                object_list = object_list.exclude_cancelled()
             if state == "official":
                 object_list = object_list.officials()
             elif state == "published":
                 object_list = object_list.filter(published=True)
+            elif state != "all":
+                object_list = object_list.filter(state=state)
+            ctx["states"] = models.State.objects.order_by("name").values_list("name", flat=True)
 
         # date filters
         model = object_list.model
