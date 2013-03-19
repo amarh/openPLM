@@ -101,9 +101,11 @@
                             </ul>
                         {% endif %}
                     {% endblock %}
-                    {% block browse-ctime %}
+                    {% block browse-time %}
                          {% if not restricted %}
-                             {% include "snippets/time_filter.html" with time_filter=ctime_filter %}
+                             {% for time_filter in time_filters %}
+                                 {% include "snippets/time_filter.html" %}
+                                {% endfor %}
                         {% endif %}
 
                     {% endblock %}
@@ -161,7 +163,9 @@
                         {% endblock %}
                         {% block selected-time %}
                             {% if not restricted %}
-                                <span id="ctime_filter">{{ ctime_filter.display }}.</span>
+                                 {% for time_filter in time_filters %}
+                                     <span class="time_filter">{{time_filter.title|capfirst}}: {{ time_filter.display }}.</span>
+                                 {% endfor %}
                             {% endif %}
                         {% endblock %}
                         {% trans "Results" %}
