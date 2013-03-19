@@ -168,6 +168,7 @@
                                  {% endfor %}
                             {% endif %}
                         {% endblock %}
+                        <br/>
                         {% trans "Results" %}
                         <span id="numresults">
                             {% blocktrans with objects.start_index as start and objects.end_index as end and objects.paginator.count as total %}
