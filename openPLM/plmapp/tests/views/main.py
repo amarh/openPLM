@@ -591,7 +591,7 @@ class SearchViewTestCase(CommonViewTest):
 
         query = self.get_query(request)
         t = type or request["type"]
-        response = self.get("/user/%s/attributes/" % self.user.username,
+        response = self.get("/search/" ,
                 {"type" : t, "q" : query})
         results = list(response.context["results"])
         results.sort(key=lambda r:r.object.pk)

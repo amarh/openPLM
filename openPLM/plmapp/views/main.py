@@ -589,6 +589,7 @@ class OpenPLMSearchView(SearchView):
         obj, ctx = get_generic_data(self.request, search=False)
         ctx["type"] = self.request.session["type"]
         ctx["object_type"] = _("Search")
+        ctx["suggestion"] = self.suggestion
         extra.update(ctx)
         return extra
 
@@ -602,6 +603,7 @@ class OpenPLMSearchView(SearchView):
         # update request.session so that the left panel displays
         # the same results
         session = self.request.session
+        self.suggestion = results.spelling_suggestion(self.get_query())
         session["results"] = results[:30]
         session["search_count"] = results.count()
         session["search_official"] = self.request.GET.get("search_official", "")
