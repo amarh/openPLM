@@ -333,7 +333,7 @@ class Document2TypeForm(forms.Form):
 class SimpleSearchForm(SearchForm):
 
     LIST = group_types(m.get_all_users_and_plmobjects_with_level())
-    type = forms.TypedChoiceField(choices=LIST)
+    type = forms.TypedChoiceField(choices=[("all", _("All"))] + LIST)
     type.widget.attrs["autocomplete"] = "off"
     q = forms.CharField(label=_("Query"), required=False, initial="*")
     search_official = forms.BooleanField(label=_("Official objects"), required=False)
@@ -353,18 +353,22 @@ class SimpleSearchForm(SearchForm):
         from openPLM.plmapp.search import SmartSearchQuerySet
 
         if self.is_valid():
-            cls = m.get_all_users_and_plmobjects()[self.cleaned_data["type"]]
-            d = {}
-            m.get_all_subclasses(cls, d)
-            mods = d.values()
+            type_ = self.cleaned_data["type"]
             query = self.cleaned_data["q"].strip()
-            if issubclass(cls, m.Document) and query not in ("", "*"):
-            # include documentfiles if we search for a document and
-            # if the query does not retrieve all documents
-                mods.append(m.DocumentFile)
+            if type_ != "all":
+                cls = m.get_all_users_and_plmobjects()[type_]
+                d = {}
+                m.get_all_subclasses(cls, d)
+                mods = d.values()
+                if issubclass(cls, m.Document) and query not in ("", "*"):
+                # include documentfiles if we search for a document and
+                # if the query does not retrieve all documents
+                    mods.append(m.DocumentFile)
 
-            sqs = SmartSearchQuerySet().models(*mods)
-            if self.cleaned_data["search_official"] and issubclass(cls, m.PLMObject):
+                sqs = SmartSearchQuerySet().models(*mods)
+            else:
+                sqs = SmartSearchQuerySet()
+            if self.cleaned_data["search_official"]:
                 sqs = sqs.filter(state_class="official")
             if not query or query == "*":
                 return sqs.exclude(state_class="cancelled")
