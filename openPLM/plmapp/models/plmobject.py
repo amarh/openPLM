@@ -1,21 +1,18 @@
 
-import datetime
-from django.utils import timezone
 from functools import wraps
 
 from django.db import models
 from django.db.models import F
 from django.db.models.query import QuerySet
+from django.forms.util import ErrorList
 from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
-from django.forms.util import ErrorList
+from django.utils import timezone
+from django.utils.translation import ugettext_noop, ugettext_lazy as _
+
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
-
-
 from .iobject import IObject
 from .lifecycle import (State, Lifecycle, LifecycleStates,
         get_default_lifecycle, get_default_state, get_cancelled_lifecycle)
