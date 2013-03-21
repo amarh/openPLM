@@ -2,23 +2,25 @@
 
 {% with result|is_readable:request.user as is_readable %}
     <li class="Result {{result|result_class}} {{is_readable|yesno:"readable,unreadable"}}">
-    {% if navigate_bool and is_readable %}
-        {% if result|is_plmobject or result|is_documentfile %}
-            <div class="toolbar">
-                <button class="attach">{% trans "Attach" %}</button>
-                <button class="add_child">{% trans "Add child" %}</button>
-            </div>
-        {% endif %}
-    {% endif %}
-    {% if link_creation or navigate_bool and is_readable %}
-        <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">{% csrf_token %}
-            {{result.rendered_add|safe}}
-            {% if link_creation and result.object|can_add:attach %}
-                {% if order %}<input type="hidden" name="order" value="{{order}}"/>{% endif %}
-                <input type="submit" class="tb-btn" value="{% trans "ADD" %}"/>
+    {% if is_contributor %}
+        {% if navigate_bool and is_readable %}
+            {% if result|is_plmobject or result|is_documentfile %}
+                <div class="toolbar">
+                    <button class="attach">{% trans "Attach" %}</button>
+                    <button class="add_child">{% trans "Add child" %}</button>
+                </div>
             {% endif %}
-        </form>
+        {% endif %}
+        {% if link_creation or navigate_bool and is_readable %}
+            <form method="post" action="{{ link_creation_action|default:"."}}" enctype="multipart/form-data">{% csrf_token %}
+                {{result.rendered_add|safe}}
+                {% if link_creation and result.object|can_add:attach %}
+                    {% if order %}<input type="hidden" name="order" value="{{order}}"/>{% endif %}
+                    <input type="submit" class="tb-btn" value="{% trans "ADD" %}"/>
+                {% endif %}
+            </form>
 
+        {% endif %}
     {% endif %}
     <div class="reference">
         {% if result|is_plmobject or result.state %}
