@@ -466,7 +466,8 @@ def get_all_subclasses_with_level(base, lst, level):
     subclasses = base.__subclasses__()
     subclasses.sort(key=lambda c: c.__name__)
     for cls in subclasses:
-        get_all_subclasses_with_level(cls, lst, level)
+        if not getattr(cls, "_deferred", False):
+            get_all_subclasses_with_level(cls, lst, level)
 
 
 def get_subclasses(base):
@@ -476,7 +477,8 @@ def get_subclasses(base):
         subclasses = b.__subclasses__()
         subclasses.sort(key=lambda c: c.__name__)
         for cls in subclasses:
-            populate(cls, l + 1)
+            if not getattr(cls, "_deferred", False):
+                populate(cls, l + 1)
     populate(base, 0)
     return r
 
