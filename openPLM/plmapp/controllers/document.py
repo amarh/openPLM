@@ -540,7 +540,7 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
-        self.check_editable()
+        self.check_edit_files()
         if formset.is_valid():
             for form in formset.forms:
                 document = form.cleaned_data["document"]
