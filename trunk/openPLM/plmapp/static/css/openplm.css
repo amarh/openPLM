@@ -1382,3 +1382,7 @@ ul.tbi li {
 tr.locked td {
     background-color:#FCF8E3;
 }
+
+.hplm[data-toggle="collapse"] {
+    cursor: pointer ;
+}
