@@ -11,69 +11,21 @@
 }
 </style> 
 {% endblock %}
-{% block scripts %}
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#dialog_check-out").dialog({
-            modal: true,
-            autoOpen: false
-            });
-            $("a.check-out").click(function(e) {
-                e.preventDefault();
-                var url = $(this).attr("href");
-                $("#dialog_check-out").dialog('option', 'buttons', {
-                    "CANCEL": function() {
-                        $(this).dialog("close");
-                        },
-                        "CHECK-OUT": function() {
-                        $(location).attr('href',url); 
-                        $(this).dialog("close");
-                        }
-                    });
-                    $("#dialog_check-out").dialog();
-                    $("#dialog_check-out").dialog("open");
-                    return false;
-            });
-
-            $("#s_all").click(function(){
-                $("td.Content > input:checkbox").attr("checked",true);
-                $("#s_all").addClass("hidden");
-                $("#des_all").removeClass("hidden");
-            });
-            $("#des_all").click(function(){
-                $("td.Content > input:checkbox").attr("checked",false);
-                $("#s_all").removeClass("hidden");
-                $("#des_all").addClass("hidden");
-            });
-            $("a.check-out-link").click(function(){
-                var a=$(this);
-                setTimeout(function(){
-                    var tr = a.parents(".file");
-                    tr.find(".status, .checkin").toggle();
-                    tr.toggleClass("locked unlocked");
-                    a.hide();
-                }, 500);
-            });
-
-        });
-    </script>
-
-{% endblock scripts %}
 
 {% block content %}
-    {% if is_owner and obj.is_editable %}
-    <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
-        <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
-        {% include "documents/files_add.html" %}
-    </div>
-    {% elif is_owner %}
+    {% if is_contributor and obj.is_editable %}
+        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
+            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
+            {% include "documents/files_add.html" %}
+        </div>
+    {% elif is_contributor %}
         {% trans "The status of this document does not allow adding/deleting files." %}
     {% else %}
         {% trans "You don't have the necessary rights to add/delete files."%}
     {% endif %}
     <form method="POST" action="">{% csrf_token %}
-        {% if is_owner and obj.is_editable %}
+        {% if is_contributor and obj.is_editable %}
             {{ file_formset.management_form }}
             <noscript>
                 <a class="tb-btn" href="./add/">
@@ -117,7 +69,7 @@
                     <tr class="Content file {{ locked|yesno:"locked,unlocked" }}">
                         {{ form.id }}
                         {{ form.document }}
-                            <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                        <td class="Content" style="width:50px; text-align:center">{% if not locked %} {{ form.delete }}{% endif %}</td>
                             <td class="Content ui-state-default ui-state-corner-all">
                                 <span class="status ui-icon ui-icon-locked" {% if not locked %}style="display:none"{% endif %}>{% trans "Locked" %}</span>
                                 <span class="status ui-icon ui-icon-unlocked" {% if locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
@@ -131,28 +83,7 @@
                                 </a>
                             </td>
                             <td class="Content">
-
-                                {% if is_owner and obj.is_editable %}
-
-                                    <a class="tb-btn checkin" href="./checkin/{{instance.id|urlencode }}/" {% if not locked %}style="display:none"{% endif %}>
-                                        <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
-                                    </a>
-                                    {% if not locked %}
-                                        {% if instance.checkout_valid %}
-                                            <a class="tb-btn 
-                                            {% if instance.native_related %}check-out {%else %}check-out-link {% endif %} "
-                                            href="./checkout/{{instance.id|urlencode }}/">
-                                            <span id="{{instance.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                                        </a>                                    
-                                    {% else %}
-                                        {% trans "Native related file is locked" %}
-                                    {% endif %} 
-                                {% endif %} 
-
-                                {% else %}
-                                    {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
-                                {% endif %}
-
+                                {% include "documents/checkout_btn.html" with doc_file=instance %}
                             </td>
                             <td class="Content">
                                 <a href="/file/revisions/{{instance.id}}/">{{ instance.revision }}</a>

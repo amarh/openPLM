@@ -90,6 +90,11 @@ class DocumentController(PLMObjectController):
                     return True
         return False
 
+    def check_edit_files(self):
+        self.check_in_group(self._user)
+        self.check_contributor()
+        self.check_editable()
+
     def lock(self, doc_file):
         """
         Lock *doc_file* so that it can not be modified or deleted
@@ -106,8 +111,7 @@ class DocumentController(PLMObjectController):
         :param doc_file:
         :type doc_file: :class:`.DocumentFile`
         """
-        self.check_permission("owner")
-        self.check_editable()
+        self.check_edit_files()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if not doc_file.checkout_valid:
@@ -172,8 +176,7 @@ class DocumentController(PLMObjectController):
                  :attr:`settings.MAX_FILE_SIZE`
         :raises: :exc:`ValueError` if we try to add a native file while a relate standar file locked is present in the Document
         """
-        self.check_permission("owner")
-        self.check_editable()
+        self.check_edit_files()
 
         if settings.MAX_FILE_SIZE != -1 and f.size > settings.MAX_FILE_SIZE:
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
@@ -211,8 +214,7 @@ class DocumentController(PLMObjectController):
               :attr:`object`
             * :exc:`.PermissionError` if :attr:`object` is not editable.
         """
-        self.check_permission("owner")
-        self.check_editable()
+        self.check_edit_files()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if settings.MAX_FILE_SIZE != -1 and thumbnail_file.size > settings.MAX_FILE_SIZE:
@@ -246,8 +248,7 @@ class DocumentController(PLMObjectController):
         :type doc_file: :class:`.DocumentFile`
         """
 
-        self.check_permission("owner")
-        self.check_editable()
+        self.check_edit_files()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.locked:
@@ -441,8 +442,7 @@ class DocumentController(PLMObjectController):
         :param update_attributes: True if :meth:`handle_added_file` should be
                                   called
         """
-        self.check_permission("owner")
-        self.check_editable()
+        self.check_edit_files()
         if doc_file.document.pk != self.object.pk:
             raise ValueError("Bad file's document")
         if doc_file.filename != new_file.name:
@@ -540,7 +540,6 @@ class DocumentController(PLMObjectController):
         :raises: :exc:`.PermissionError` if :attr:`object` is not editable.
         """
 
-        self.check_permission("owner")
         self.check_editable()
         if formset.is_valid():
             for form in formset.forms:

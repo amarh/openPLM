@@ -519,8 +519,13 @@ function up_file(f_form){
     var form_action="";
     if($(f_form).attr("action")!="."){
         form_action= $(f_form).attr("action");
-        form_action=form_action.substr(2);
-        new_action+="get_"+form_action;
+        if (form_action[0] == "."){
+            form_action=form_action.substr(2);
+            new_action+="get_"+form_action;
+        } else {
+            new_action = form_action.replace("/checkin/", "/get_checkin/");
+        }
+
     }else{
         new_action+="up/";
     }
@@ -669,7 +674,7 @@ $(function(){
     
     $("input[type='submit'][name='_validate']").hide();
     
-    $("#add_file_container").toggleClass("hidden");
+    $("#add_file_container:not(.ci)").toggleClass("hidden");
     if(files_linked.length!=0){
         $("#add_form_file").toggleClass("hidden");
     }
@@ -686,9 +691,8 @@ $(function(){
         if($("#fileupload").find("input[type='file']").attr("disabled")!="disabled"){
             $("#fileupload").attr("action",$(this).parent().attr("href"));
             reset_upload();
-            $("#add_form_file").removeClass("hidden");
-            var line= $(this).parent().parent().parent();
-            var f_name = line.find("td a:first").text();
+            $("#add_form_file, #add_file_container").removeClass("hidden");
+            var f_name = $(this).attr("data-file");
             $("#add_text").text(trans["Check-in for file "]+f_name+":");
             $("#add_text").attr("checked-file",f_name);
         }
@@ -782,4 +786,47 @@ $(function(){
             $('form.hidden')[0].submit();
 	    });
     }
+});
+$(document).ready(function () {
+    $("#dialog_check-out").dialog({
+    modal: true,
+    autoOpen: false
+    });
+    $("a.check-out").click(function(e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+        $("#dialog_check-out").dialog('option', 'buttons', {
+            "CANCEL": function() {
+                $(this).dialog("close");
+                },
+                "CHECK-OUT": function() {
+                $(location).attr('href',url); 
+                $(this).dialog("close");
+                }
+            });
+            $("#dialog_check-out").dialog();
+            $("#dialog_check-out").dialog("open");
+            return false;
+    });
+
+    $("#s_all").click(function(){
+        $("td.Content > input:checkbox").attr("checked",true);
+        $("#s_all").addClass("hidden");
+        $("#des_all").removeClass("hidden");
+    });
+    $("#des_all").click(function(){
+        $("td.Content > input:checkbox").attr("checked",false);
+        $("#s_all").removeClass("hidden");
+        $("#des_all").addClass("hidden");
+    });
+    $("a.check-out-link").click(function(){
+        var a=$(this);
+        setTimeout(function(){
+            var tr = a.parents(".file");
+            tr.find(".status, .checkin").toggle();
+            tr.toggleClass("locked unlocked");
+            a.hide();
+        }, 500);
+    });
+
 });

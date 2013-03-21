@@ -133,7 +133,7 @@ def search(request, editable_only="true", with_file_only="true"):
                         continue
                     if editable_only == "true":
                         obj = DocumentController(res, request.user)
-                        if not obj.check_permission("owner", False):
+                        if not obj.check_in_group(request.user, False):
                             continue
                     ids.add(res.id)
                     objects.append(object_to_dict(res))
