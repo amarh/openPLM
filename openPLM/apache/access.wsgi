@@ -21,6 +21,7 @@ def allow_access(environ, host):
     """
 
     from django.contrib.auth import get_user
+    from openPLM.plmapp.models import get_profile
     # Fake this, allow_access gets a stripped environ
     environ['wsgi.input'] = None
 
@@ -31,7 +32,7 @@ def allow_access(environ, host):
     try:
         user = get_user(request)
         if user.is_authenticated():
-            allowed = not user.get_profile().restricted
+            allowed = not get_profile(user).restricted
     except Exception as e:
         errors.write('Exception: %s\n' % e)
     finally:
