@@ -65,8 +65,10 @@
             <span class="imgManagement" id="bottomControl">&nbsp;</span>
         </div>
         <div id="add-buttons">
-            {% if obj.is_part or obj.is_document %}
-                {% include "navigate/add_buttons.html" %}
+            {% if is_contributor %}
+                {% if obj.is_part or obj.is_document %}
+                    {% include "navigate/add_buttons.html" %}
+                {% endif %}
             {% endif %}
         </div>
         <div id="zoom-toolbar">
