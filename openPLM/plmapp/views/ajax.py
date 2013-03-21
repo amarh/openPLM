@@ -290,8 +290,10 @@ def ajax_richtext_preview(request, obj_type, obj_ref, obj_revi):
     This view returns a JSON response with one key, ``html``, the rendered
     content that can be included in a div element.
     """
+    content = request.GET["content"]
+    if obj_type in ("create", "object"):
+        return {"html": richtext(content, None)}
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     obj.check_readable()
-    content = request.GET["content"]
     return {"html": richtext(content, obj)}
 

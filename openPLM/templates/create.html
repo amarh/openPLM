@@ -11,6 +11,10 @@
     <script type="text/javascript" src="{{STATIC_URL}}js/create.js"></script>
 {% endblock %}
 
+{% block extrahead %}
+    {{ creation_form.media }}
+{% endblock %}
+
 {% block content %}
     {% if is_contributor %}
         <div>
