@@ -2,11 +2,19 @@
 {% load i18n plmapp_tags %}
 
 {% block css %}
-<link type="text/css" href="{{STATIC_URL}}css/files.css" rel="Stylesheet" />
+    <link type="text/css" href="{{STATIC_URL}}css/files.css" rel="Stylesheet" />
 {% endblock %}
 
 {% block content %}
-    {% with add_file_form as form %}
-        {% include "snippets/undo_form.html" %}
-    {% endwith %}
+    {% if obj|main_type == "user" or obj.is_editable %}
+        {% if is_contributor %}
+            {% with add_file_form as form %}
+                {% include "snippets/undo_form.html" %}
+            {% endwith %}
+        {% else %}
+            {% trans "You can not add a file because you are not a contributor" %}
+        {% endif %}
+    {% else %}
+        {% trans "This document is not editable." %}
+    {% endif %}
 {% endblock %}

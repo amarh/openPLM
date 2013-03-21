@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 {% load i18n plmapp_tags %}
+{% block css %}
+<link type="text/css" href="{{STATIC_URL}}css/files.css" rel="Stylesheet" />
+<style type="text/css">
+.hidden{
+    display:none;
+}
+</style> 
+{% endblock %}
+
 
 {% block content %}
-
+    {% if is_contributor and obj.is_editable and not last_revision.deprecated %}
+        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="ci hidden">
+            {% include "documents/files_add.html" %}
+        </div>
+    {% endif %}
     <div>
         <h3 class="hplm"> {{ last_revision.filename }} </h3>
         <div>
-            <div style="display:inline-block">
+            <div style="display:inline-block" class="file">
                 <p>
                 {% if last_revision.thumbnail %}
                 <img class="thumbnail" src="{{last_revision.thumbnail.url}}" align="left"/>
@@ -20,26 +33,9 @@
                 {% endif %}
                 {% if last_revision.deprecated %}
                     {% trans "Deprecated." %}
-                {% elif is_owner and obj.is_editable %}
-
-                    {% if last_revision.locked %}
-                        <a class="tb-btn" href="{{obj.plmobject_url}}files/checkin/{{last_revision.id|urlencode }}/">
-                            <span class="ui-button-text check-in">{% trans "CHECK-IN" %}</span>
-                        </a>
-                    {% elif last_revision.checkout_valid %}
-
-                        <a class="tb-btn
-                            {% if last_revision.native_related %}check-out {% endif %}"
-                            href="{{obj.plmobject_url}}files/checkout/{{last_revision.id|urlencode }}/">
-                            <span id="{{last_revision.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
-                        </a>                                    
-
-                    {% else %}
-                        {% trans "Native related file is locked" %}
-                    {% endif %} 
-
-                {% else %}
-                    {{ is_owner|yesno:"Object is not editable, you are not the owner" }}
+                 {% else %}
+                     {% include "documents/checkout_btn.html" with doc_file=last_revision %}
+           
                 {% endif %}
                 </p>
             </div>
@@ -122,6 +118,9 @@
             <p>{% trans "No previous revisions." %}</p>
         {% endif %}
         </div>
+    </div>
+       <div id="dialog_check-out" title="{% trans "Confirm CHECK-OUT" %}">
+        {% trans "You'are checking out a standardfile while a native file is available. Your native file will be deprecated and will not be usable anymore." %}
     </div>
 {% endblock %}
 

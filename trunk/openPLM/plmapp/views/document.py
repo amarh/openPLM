@@ -402,6 +402,9 @@ def file_revisions(request, docfile_id):
     doc_files = last_revision.older_files.order_by("-revision")
     ctx["last_revision"] = last_revision
     ctx["doc_files"] = doc_files
+    checkin_file_form = forms.AddFileForm()
+    ctx['add_file_form'] =  checkin_file_form
+    ctx["action"] = "%sfiles/checkin/%d/" % (obj.plmobject_url, last_revision.id)
     return r2r("documents/file_revisions.html", ctx, request)
 
 

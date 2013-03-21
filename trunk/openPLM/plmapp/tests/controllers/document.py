@@ -1,7 +1,7 @@
 ############################################################################
 # openPLM - open source PLM
 # Copyright 2010 Philippe Joulaud, Pierre Cosquer
-# 
+#
 # This file is part of openPLM.
 #
 #    openPLM is free software: you can redistribute it and/or modify
@@ -70,7 +70,7 @@ class DocumentControllerTest(ControllerTest):
         self.controller.promote()
         self.assertEqual(self.controller.state.name, "official")
         self.assertFalse(self.controller.is_editable)
-        lcl = LifecycleList("diop", "official", "draft", 
+        lcl = LifecycleList("diop", "official", "draft",
                 "issue1", "official", "deprecated")
         lc = models.Lifecycle.from_lifecyclelist(lcl)
         self.controller.lifecycle = lc
@@ -115,7 +115,7 @@ class DocumentControllerTest(ControllerTest):
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
         self.assertRaises(exc.LockError, self.controller.lock, d)
-    
+
     def test_lock_error2(self):
         "Error : bad file"
         controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
@@ -123,14 +123,14 @@ class DocumentControllerTest(ControllerTest):
         d = controller.add_file(self.get_file())
         self.old_files.append(d)
         self.assertRaises(ValueError, self.controller.lock, d)
-    
+
     def test_unlock(self):
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
         self.controller.unlock(d)
         self.assertEqual(d.locked, False)
         self.assertEqual(d.locker, None)
-    
+
     def test_unlock_error1(self):
         d = self.controller.add_file(self.get_file())
         self.assertRaises(exc.UnlockError, self.controller.unlock, d)
@@ -143,7 +143,7 @@ class DocumentControllerTest(ControllerTest):
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
         self.assertRaises(exc.UnlockError, controller.unlock, d)
-    
+
     def test_unlock_error3(self):
         "Error : bad file"
         controller = self.CONTROLLER.create("adoc2", self.TYPE, "a",
@@ -151,7 +151,7 @@ class DocumentControllerTest(ControllerTest):
         d = controller.add_file(self.get_file())
         self.assertRaises(ValueError, self.controller.unlock, d)
         self.old_files.append(d)
-    
+
     def test_add_file(self):
         f = self.get_file()
         self.controller.add_file(f)
@@ -180,7 +180,7 @@ class DocumentControllerTest(ControllerTest):
         for i, f2 in enumerate(files):
             self.assertEqual(f2.filename, "temp%d.test" % i)
             self.assertEqual(f2.file.read(), "data%d" % i)
- 
+
     def test_add_file_error1(self):
         """
         test add_file : file too big
@@ -197,7 +197,7 @@ class DocumentControllerTest(ControllerTest):
         self.controller.delete_file(f2)
         self.assertEqual([], list(self.controller.files.all()))
         self.assertFalse(os.path.exists(path))
- 
+
     def test_delete_file_error(self):
         self.controller.add_file(self.get_file())
         f2 = self.controller.files.all()[0]
@@ -217,10 +217,10 @@ class DocumentControllerTest(ControllerTest):
         self.controller.attach_to_part(part)
         attached = self.controller.get_attached_parts()[0].part
         self.assertEqual(part.id, attached.id)
-    
+
     def test_attach_to_part_error1(self):
         self.assertRaises(TypeError, self.controller.attach_to_part, None)
-    
+
     def test_attach_to_part_error2(self):
         self.assertRaises(TypeError, self.controller.attach_to_part, self)
 
@@ -229,11 +229,11 @@ class DocumentControllerTest(ControllerTest):
                            revision="a", creator=self.user, owner=self.user,
                            group=self.group)
         self.assertRaises(TypeError, self.controller.attach_to_part, obj)
-    
+
     def test_attach_to_part_error4(self):
         obj = self.CONTROLLER.create("ob", self.TYPE, "a", self.user, self.DATA)
         self.assertRaises(TypeError, self.controller.attach_to_part, obj)
-    
+
     def test_detach_part(self):
         part = self.get_part()
         self.controller.attach_to_part(part)
@@ -247,7 +247,7 @@ class DocumentControllerTest(ControllerTest):
         self.controller.attach_to_part(part)
         links = list(self.controller.get_attached_parts())
         self.assertEqual([l.part for l in links], [part.object])
-        
+
     def test_get_attached_parts_empty(self):
         links = list(self.controller.get_attached_parts())
         self.assertEqual(links, [])
@@ -283,10 +283,25 @@ class DocumentControllerTest(ControllerTest):
                                                  self.user, self.DATA)
         d = controller.add_file(self.get_file())
         self.old_files.append(d)
-        self.assertRaises(ValueError, self.controller.checkin, 
+        self.assertRaises(ValueError, self.controller.checkin,
                           d, self.get_file(data="new_data"))
-        
-    def test_checkin_error2(self):
+
+    def test_checkin_error_not_in_group(self):
+        user = User(username="baduser")
+        user.set_password("password")
+        user.save()
+        p = models.get_profile(user)
+        p.is_contributor = True
+        p.save()
+        controller = self.CONTROLLER(self.controller.object, user)
+        models.PLMObjectUserLink.objects.create(user=user, role="owner",
+                                         plmobject=controller.object)
+        d = self.controller.add_file(self.get_file())
+        self.controller.lock(d)
+        self.assertRaises(exc.PermissionError, controller.checkin, d,
+                          self.get_file())
+
+    def test_checkin_error_not_contributor(self):
         user = User(username="baduser")
         user.set_password("password")
         user.save()
@@ -296,19 +311,25 @@ class DocumentControllerTest(ControllerTest):
                                          plmobject=controller.object)
         d = self.controller.add_file(self.get_file())
         self.controller.lock(d)
-        self.assertRaises(exc.UnlockError, controller.checkin, d,
+        self.assertRaises(exc.PermissionError, controller.checkin, d,
                           self.get_file())
-    
+
+
     def test_checkin_errors3(self):
         """ Tests that only the user who locked a file can check-in it."""
         user = User(username="baduser")
         user.set_password("password")
         user.save()
+        user.groups.add(self.group)
+        p = models.get_profile(user)
+        p.is_contributor = True
+        p.save()
         models.DelegationLink.objects.create(delegator=self.user, delegatee=user,
                 role=models.ROLE_OWNER)
         controller = self.CONTROLLER(self.controller.object, user)
         d = self.controller.add_file(self.get_file())
-        self.assertRaises(exc.PermissionError, controller.checkin, d,
+        self.controller.lock(d)
+        self.assertRaises(exc.UnlockError, controller.checkin, d,
                           self.get_file())
 
     def test_add_thumbnail(self):
@@ -333,7 +354,7 @@ class DocumentControllerTest(ControllerTest):
     def test_cancel(self):
         """
         Tests :meth:`.Document.cancel`.
-        """ 
+        """
         self.assertFalse(self.controller.is_cancelled)
         part = self.get_part()
         self.controller.attach_to_part(part)
@@ -343,24 +364,24 @@ class DocumentControllerTest(ControllerTest):
         self.check_cancelled_object(self.controller)
         # tests the links
         self.assertEqual(0, self.controller.get_attached_parts().count())
-        
+
     def assertCancelError(self, ctrl):
         res = super(DocumentControllerTest, self).assertCancelError(ctrl)
         res = res or bool(ctrl.get_attached_parts())
         self.assertTrue(res)
-        
+
     def test_cancel_has_part_related(self):
         """ Tests that a document linked to a part can *not* be cancelled. """
         part = self.get_part()
         self.controller.attach_to_part(part)
         self.assertEqual(1, self.controller.get_attached_parts().count())
         self.assertCancelError(self.controller)
-        
+
     #clone test
-    
+
     def assertClone(self, ctrl, data, parts):
         new_ctrl = super(DocumentControllerTest, self).assertClone(ctrl, data)
-        
+
         import shutil
         for doc_file in ctrl.files.all():
             filename = doc_file.filename
@@ -379,11 +400,11 @@ class DocumentControllerTest(ControllerTest):
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
-            
+
         for part in parts:
             models.DocumentPartLink.objects.create(part=part,
                 document=new_ctrl.object)
-        
+
         # check that all files from the original are cloned
         same_qtity = len(ctrl.files.all()) == len(new_ctrl.files.all())
         files_cloned = True
@@ -396,13 +417,13 @@ class DocumentControllerTest(ControllerTest):
             files_cloned = files_cloned and new_f.file.read() == f.file.read()
             files_cloned = files_cloned and new_f.file.path != f.file.path
         self.assertTrue(files_cloned)
-            
+
         # check that all attached parts are attached to the original document
         part_cloned = True
         for part in new_ctrl.get_suggested_parts():
-            part_cloned = part_cloned and part in ctrl.get_suggested_parts()        
-        self.assertTrue(part_cloned) 
-        
+            part_cloned = part_cloned and part in ctrl.get_suggested_parts()
+        self.assertTrue(part_cloned)
+
     def test_clone_files(self):
         """
         Tests that a document with files can be cloned, and that
@@ -413,7 +434,7 @@ class DocumentControllerTest(ControllerTest):
         self.assertEqual(len(ctrl.files.all()), 1)
         data = self.getDataCloning(ctrl)
         self.assertClone(ctrl, data, [])
-        
+
     def test_clone_attached_parts(self):
         """
         Tests that a document attached to a part can be cloned.
