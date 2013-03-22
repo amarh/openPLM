@@ -69,17 +69,14 @@
                             <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3>
                         </div>
                         <ul id="br-states" class="tb-collapse">
-                        <li {% if not form.search_official.value %}class="selected"{% endif %} >
-                        <a href="/search/{% add_get page='1' search_official="" %}"><span>{% trans "All" %}</span></a>
-                        </li>
-                        <li {% if form.search_official.value %}class="selected"{% endif %} >
-                        <a href="/search/{% add_get page='1' search_official="on" %}"><span>{% trans "Officials" %}</span></a>
-                        </li>
-
+                            <li {% if not form.search_official.value %}class="selected"{% endif %} >
+                            <a href="/search/{% add_get page='1' search_official="" %}"><span>{% trans "All" %}</span></a>
+                            </li>
+                            <li {% if form.search_official.value %}class="selected"{% endif %} >
+                            <a href="/search/{% add_get page='1' search_official="on" %}"><span>{% trans "Officials" %}</span></a>
+                            </li>
                         </ul>
                     {% endif %}
-
-
                 </div>
 
                 <div id="browse-results" class="tb-span10">
