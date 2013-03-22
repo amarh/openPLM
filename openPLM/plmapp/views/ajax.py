@@ -84,7 +84,7 @@ def ajax_creation_form(request):
                 del initial["reference"]
         form = forms.get_creation_form(request.user, cls, initial=initial)
         return {"reload" : False, "form" : form.as_table(),
-                "type" : type_, "media": form.media.render(), }
+                "type" : type_, "form_media": form.media.render(), }
     else:
         return HttpResponseForbidden()
 
