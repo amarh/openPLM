@@ -30,6 +30,7 @@ $(
                     );
                     // add the new form
                     form.find("tbody").append(data["form"]);
+                    form.find("tbody").append(data["form_media"]);
                     make_combobox();
                     $("#reference-title > h2 > span.type").text(data["type"]);
                     form.hideLoading();
