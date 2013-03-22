@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.references import validate_reference
+from openPLM.plmapp.forms import enhance_fields
 
 from openPLM.apps.ecr.models import ECR, get_default_lifecycle
 
@@ -80,6 +81,7 @@ class ECRForm(forms.ModelForm):
         return cleaned_data
 
 ECRForm.base_fields["reference"].required = False
+enhance_fields(ECRForm, ECR)
 
 def get_creation_form(user, data=None, start=0, inbulk_cache=None, **kwargs):
     u"""
