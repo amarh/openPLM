@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import admin
+from django.utils.translation import ugettext_noop
 
 import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp.models import Document
@@ -15,6 +16,12 @@ class Page(Document):
     @classmethod
     def get_creation_fields(cls):
         return Document.get_creation_fields() + ["page_content",]
+
+    @property
+    def menu_items(self):
+        menu = super(Page, self).menu_items
+        menu[0] = ugettext_noop("page")
+        return menu
 
     def is_promotable(self):
         # a Page has no files, so we do not checks
