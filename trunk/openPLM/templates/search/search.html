@@ -10,47 +10,114 @@
 
 {% block content  %}
 
+    <div>
+        <div style="margin:1em">
+            <form id="inline_search_form" method="get" action=".">
+                {{ form.q }}
+                <div style="display: none">
+                    {{ form.type }}
+                    {{ form.search_official }}
+                </div>
+                <input id="search_button" type="submit" class="tb-btn" value="{% trans "SEARCH !" %}"/>
+            </form>
+        </div>
+        <div id="browser" class="tb-container-fluid">
+            <div class="tb-row-fluid">
 
-    <form id="inline_search_form" method="get" action=".">
-        {% for field in form %}
-            {{ field }}
-            {% if forloop.last %}
-                {{ field.label_tag }}
-            {% endif %}
-        {% endfor %}
-        <input id="search_button" type="submit" class="tb-btn" value="{% trans "SEARCH !" %}"/>
-    </form>
+                <div id="type-panel" class="tb-span2">
+                    <div>
+                        <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-types">{% trans "Type" %} </h3>
+                    </div>
+                    <ul id="br-types" class="tb-collapse tb-in">
+                        <li {% if type == "all"%}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' type="all" %}"><span>{% trans "All" %}</span></a>
+                        </li>
+                        <li {% if type == "Part"%}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' type="Part" %}"><span>{% trans "Parts" %}</span></a>
+                        </li>
+                        <li {% if type == "Document"%}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' type="Document" %}"><span>{% trans "Documents" %}</span></a>
+                        </li>
+                        <li {% if type == "Group"%}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' type="Group" %}"><span>{% trans "Groups" %}</span></a>
+                        </li>
+                        <li {% if type == "User"%}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' type="User" %}"><span>{% trans "Users" %}</span></a>
+                        </li>
+                        {% for etype in extra_types %}
+                            <li {% if type == etype%}class="selected"{% endif %} >
+                            <a href="/search/{% add_get page='1' type=etype%}"><span>{{ etype }}</span></a>
+                            </li>
+                        {% endfor %}
+                    </ul>
 
-    {% if query %}
-        <h3 class="hplm">{% trans "Results" %}</h3>
+                    {% if subtypes %}
+                        <div>
+                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub type" %} </h3>
+                        </div>
+                        <ul id="br-subtypes" class="tb-collapse">
+                            {% for level, cls, cls_name in subtypes %}
+                                <li {% if type == cls_name %}class="selected"{% endif %} > 
+                                <a href="{% add_get type=cls_name %}"><span style="padding-left:{{ level }}em;">{{ cls_name }}</span></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if type == "all" or type == "Part" or type == "Document" %}
+                        <div>
 
-        {% for result in page.object_list %}
-            {% if forloop.first %}
-                <p id="results">
-                {% trans "Results" %}
-                <span id="numresults">
-                    {% blocktrans with page.start_index as start and page.end_index as end and paginator.count as total %}
-                        ({{start}} - {{end}} on {{total}})
-                    {% endblocktrans %}
-                </span> 
-                </p>
-                <ul class="Result">
-            {% endif %}
-                {% include "search/result.html" %}
-            {% if forloop.last %}
-                </ul>
-            {% endif %}
+                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3>
+                        </div>
+                        <ul id="br-states" class="tb-collapse">
+                        <li {% if not form.search_official.value %}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' search_official="" %}"><span>{% trans "All" %}</span></a>
+                        </li>
+                        <li {% if form.search_official.value %}class="selected"{% endif %} >
+                        <a href="/search/{% add_get page='1' search_official="on" %}"><span>{% trans "Officials" %}</span></a>
+                        </li>
 
-        {% empty %}
-            <p>{% trans "No result matching given query" %}</p>
-            {% if suggestion.strip %}
-                <p>{% trans "You may try:"%}&nbsp;<a href="{% add_search q=suggestion %}">{{ suggestion}}</a></p>
-            {% endif %}
-        {% endfor %}
+                        </ul>
+                    {% endif %}
 
-        {% show_pages_bar page request %}
 
-    {% else %}
-        {# Show some example queries to run, maybe query syntax, something else? #}
-    {% endif %}
+                </div>
+
+                <div id="browse-results" class="tb-span10">
+                    {% if query %}
+                        <h3 class="hplm">{% trans "Results" %}</h3>
+
+                        {% for result in page.object_list %}
+                            {% if forloop.first %}
+                                <p id="results">
+                                {% trans "Results" %}
+                                <span id="numresults">
+                                    {% blocktrans with page.start_index as start and page.end_index as end and paginator.count as total %}
+                                        ({{start}} - {{end}} on {{total}})
+                                    {% endblocktrans %}
+                                </span> 
+                                </p>
+                                <ul class="Result">
+                                {% endif %}
+                                {% include "search/result.html" %}
+                                {% if forloop.last %}
+                                </ul>
+                            {% endif %}
+
+                        {% empty %}
+                            <p>{% trans "No result matching given query" %}</p>
+                            {% if suggestion.strip %}
+                                <p>{% trans "You may try:"%}&nbsp;<a href="{% add_search q=suggestion %}">{{ suggestion}}</a></p>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% show_pages_bar page request %}
+
+                    {% else %}
+                        {# Show some example queries to run, maybe query syntax, something else? #}
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
 {% endblock %}

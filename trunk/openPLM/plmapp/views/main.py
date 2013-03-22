@@ -587,9 +587,17 @@ class OpenPLMSearchView(SearchView):
     def extra_context(self):
         extra = super(OpenPLMSearchView, self).extra_context()
         obj, ctx = get_generic_data(self.request, search=False)
-        ctx["type"] = self.request.session["type"]
+        ctx["type"] = type = self.request.session["type"]
         ctx["object_type"] = _("Search")
         ctx["suggestion"] = self.suggestion
+        ctx["extra_types"] = [c.__name__ for c in models.IObject.__subclasses__()]
+        try:
+            cls = models.get_all_plmobjects()[type]
+            if issubclass(cls, models.PLMObject):
+                main_cls = models.Part if issubclass(cls, models.Part) else models.Document
+                ctx["subtypes"] = models.get_subclasses(main_cls)
+        except KeyError:
+            pass
         extra.update(ctx)
         return extra
 
