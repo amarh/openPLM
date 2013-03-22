@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{% block content %}
+
+    <div class="richtext">
+        {{ obj.page_content|richtext_filter }}
+    </div>
+    {% if is_contributor and obj.is_editable %}
+        <div class="center">
+            <a class="tb-btn" href="{{ obj.plmobject_url }}edit_content/">
+                <i class="tb-icon tb-icon-pencil"></i>
+                <span>{% trans "Edit" %}</span>
+            </a>
+        </div>
+    {% endif %}
+
+{% endblock %}

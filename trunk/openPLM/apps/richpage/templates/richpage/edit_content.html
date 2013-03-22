@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags highlight %}
+
+{% block extrahead %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    {% if is_contributor and obj.is_editable %}
+        {% include "snippets/undo_form.html" %}
+    {% endif %}
+{% endblock %}
