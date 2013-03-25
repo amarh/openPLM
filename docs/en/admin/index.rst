@@ -18,5 +18,6 @@ This documentation explains how to administrate openPLM.
     lifecycle
     publication
     references
+    richtext
     upgrade/*
 
