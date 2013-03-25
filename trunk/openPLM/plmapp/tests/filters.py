@@ -121,7 +121,7 @@ class MarkDownFilterTestCase(BaseTestCase):
         self.markdown(SIMPLE_TEXT,  u"<p><em>a</em> simple text</p>")
 
     def test_title(self):
-        wanted = u"<h1 id='hello'>Hello</h1><p>world</p>"
+        wanted = u"<h1 id='plm-hello'>Hello</h1><p>world</p>"
         self.markdown(u"# Hello #\n\nworld", wanted)
 
     def test_link(self):

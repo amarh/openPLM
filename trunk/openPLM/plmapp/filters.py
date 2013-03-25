@@ -67,6 +67,7 @@ try:
     from markdown.inlinepatterns import LinkPattern
     from markdown.util import etree
     from markdown.extensions.wikilinks import WikiLinkExtension
+    from markdown.extensions.headerid import slugify
     from django.utils.encoding import iri_to_uri
 except ImportError:
     pass
@@ -75,6 +76,9 @@ else:
     object_pattern = r'(\w+/{ref}/{ref})'.format(ref=ref)
     def build_url2(label, base, end):
         return iri_to_uri('%s%s%s' % (base, label, end))
+
+    def prefixed_slugify(*args, **kwargs):
+        return "plm-" + slugify(*args, **kwargs)
 
     class PLMLinkExtension(WikiLinkExtension):
         def __init__(self, pattern, configs):
@@ -131,6 +135,7 @@ else:
             safe_mode='escape',
             output_format='html5',
             extensions=["abbr", "tables", "def_list", "smart_strong", "toc",
+                "headerid",
                 # objects
                 PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/'),]),
                 # users
@@ -142,6 +147,9 @@ else:
                 PLMLinkExtension(r"(?<!\w)(\>\>)(?!\w)", [('build_url', next_revision)]),
 
             ],
+            extension_configs={
+                'headerid': [('slugify', prefixed_slugify), ],
+            }
         )
         return mark_safe(md)
 
