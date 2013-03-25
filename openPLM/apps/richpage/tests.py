@@ -1,5 +1,7 @@
 from openPLM.plmapp.tests.controllers import ControllerTest
+from openPLM.plmapp.tests.views import CommonViewTest
 import openPLM.plmapp.exceptions as exc
+from openPLM.plmapp.widgets import MarkdownWidget
 
 from .models import Page, PageController
 
@@ -49,4 +51,40 @@ class PageControllerTestCase(ControllerTest):
         self.assertRaises(exc.AddFileError, ctrl.add_file, self.get_file())
         page = Page.objects.get(reference="Page1")
         self.assertEqual(0, page.files.count())
+
+
+class PageViewTestCase(CommonViewTest):
+
+    CONTROLLER = PageController
+    TYPE = "Page"
+    DATA = {"page_content": u"a content"}
+
+    def test_page_view(self):
+        response = self.get(self.base_url + "page/", page="page")
+        self.assertContains(response, self.DATA["page_content"])
+        # edit link
+        self.assertContains(response, "edit_content/")
+        self.controller.approve_promotion()
+        response = self.get(self.base_url + "page/", page="page")
+        self.assertContains(response, self.DATA["page_content"])
+        self.assertNotContains(response, "edit_content/")
+
+    def test_redirect_files_to_page(self):
+        response = self.get(self.base_url + "files/", follow=False, status_code=302)
+        self.assertRedirects(response, self.base_url + "page/")
+
+    def test_edit_content_get(self):
+        response = self.get(self.base_url + "edit_content/", page="page")
+        form = response.context["form"]
+        self.assertEqual(self.controller.page_content, form.initial["page_content"])
+        media = MarkdownWidget().media.render()
+        self.assertEqual(form.media.render(), media)
+
+    def test_edit_content_post(self):
+        content = "hello pinkie"
+        response = self.post(self.base_url + "edit_content/", {"page_content": content})
+        page = Page.objects.get(id=self.controller.id)
+        self.assertEqual(content, page.page_content)
+        self.assertRedirects(response, self.base_url + "page/")
+        self.assertContains(response, content)
 
