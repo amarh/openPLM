@@ -92,3 +92,9 @@ class PageViewTestCase(CommonViewTest):
         self.assertContains(response, content)
         self.assertTemplateUsed(response, "richpage/page.html")
 
+    def test_richtext(self):
+        self.controller.edit_content(u"# Hello #\n\nworld")
+        response = self.get(self.base_url + "page/", page="page")
+        wanted = u"<div class='richtext'><h1 id='hello'>Hello</h1><p>world</p></div>"
+        self.assertContains(response, wanted, html=True)
+
