@@ -133,6 +133,7 @@ INSTALLED_APPS = (
     'openPLM.apps.subversion',
     'openPLM.apps.ecr',
     'openPLM.apps.badges',
+    'openPLM.apps.richpage',
     'openPLM.plmapp.tests',
 )
 
