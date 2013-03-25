@@ -62,12 +62,14 @@ class PageViewTestCase(CommonViewTest):
     def test_page_view(self):
         response = self.get(self.base_url + "page/", page="page")
         self.assertContains(response, self.DATA["page_content"])
+        self.assertTemplateUsed(response, "richpage/page.html")
         # edit link
         self.assertContains(response, "edit_content/")
         self.controller.approve_promotion()
         response = self.get(self.base_url + "page/", page="page")
         self.assertContains(response, self.DATA["page_content"])
         self.assertNotContains(response, "edit_content/")
+        self.assertTemplateUsed(response, "richpage/page.html")
 
     def test_redirect_files_to_page(self):
         response = self.get(self.base_url + "files/", follow=False, status_code=302)
@@ -77,6 +79,7 @@ class PageViewTestCase(CommonViewTest):
         response = self.get(self.base_url + "edit_content/", page="page")
         form = response.context["form"]
         self.assertEqual(self.controller.page_content, form.initial["page_content"])
+        self.assertTemplateUsed(response, "richpage/edit_content.html")
         media = MarkdownWidget().media.render()
         self.assertEqual(form.media.render(), media)
 
@@ -87,4 +90,5 @@ class PageViewTestCase(CommonViewTest):
         self.assertEqual(content, page.page_content)
         self.assertRedirects(response, self.base_url + "page/")
         self.assertContains(response, content)
+        self.assertTemplateUsed(response, "richpage/page.html")
 
