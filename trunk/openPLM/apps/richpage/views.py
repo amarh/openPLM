@@ -13,7 +13,7 @@ def display_page(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ctx['current_page'] = 'page'
-    return r2r('richpage/files.html', ctx, request)
+    return r2r('richpage/page.html', ctx, request)
 
 
 @handle_errors(undo="../page/")
