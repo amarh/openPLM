@@ -1416,8 +1416,15 @@ ul.tbi li {
     float: none;
 }
 
-.richtext > ul, .richtext ol, .richtext pre, .richtext blockquote {
+.richtext > ul, .richtext ol, .richtext pre {
     margin-left: 1em;
+}
+
+.richtext blockquote {
+    background-color: #F8F8F8;
+    border-radius: 3px 0 0 3px;
+    padding: 0.75em;
+    margin-left: 1.5em;
 }
 
 .richtext pre {
