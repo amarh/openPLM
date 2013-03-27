@@ -85,6 +85,10 @@ code {
     font-size: 0.91em;
 }
 
+pre {
+    margin: 1em 0;
+}
+
 h2 {
     font-size: 1.5em;
     line-height: 1.3;
