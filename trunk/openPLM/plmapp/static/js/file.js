@@ -625,6 +625,7 @@ function reset_upload(){
             check_in_file(this);
             $("#_up").removeClass("hidden");
             $("#_delete").removeClass("hidden");
+            $("#_up").click();
          }
     });
     var td_input = $("<td></td>");
