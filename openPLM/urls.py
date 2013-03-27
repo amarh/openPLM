@@ -186,9 +186,9 @@ urlpatterns += patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root' : 'media/'}),
     (r'^file/(?P<docfile_id>\d+)/$', download),
-    (r'^file/(?P<docfile_id>\d+)/(?P<filename>.*)$', download),
+    (r'^file/(?P<docfile_id>\d+)/(?:.*)$', download),
     (r'^file/public/(?P<docfile_id>\d+)/$', public_download),
-    (r'^file/public/(?P<docfile_id>\d+)/(?P<filename>.*)$', public_download),
+    (r'^file/public/(?P<docfile_id>\d+)/(?:.*)$', public_download),
     (r'^file/revisions/(?P<docfile_id>\d+)/', file_revisions),
 )
 

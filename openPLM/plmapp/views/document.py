@@ -425,7 +425,7 @@ def checkout_file(request, obj_type, obj_ref, obj_revi, docfile_id):
 
 
 @handle_errors
-def download(request, docfile_id, filename=""):
+def download(request, docfile_id):
     """
     View to download a document file.
 
@@ -437,11 +437,11 @@ def download(request, docfile_id, filename=""):
     doc_file = models.DocumentFile.objects.get(id=docfile_id)
     ctrl = get_obj_by_id(int(doc_file.document.id), request.user)
     ctrl.check_readable()
-    return serve(ctrl, doc_file, filename)
+    return serve(ctrl, doc_file, "view" in request.GET)
 
 
 @secure_required
-def public_download(request, docfile_id, filename=""):
+def public_download(request, docfile_id):
     """
     View to download a published document file.
 
@@ -460,10 +460,10 @@ def public_download(request, docfile_id, filename=""):
             raise Http404
     elif not ctrl.published:
         return HttpResponseForbidden()
-    return serve(ctrl, doc_file, filename)
+    return serve(ctrl, doc_file)
 
 
-def serve(ctrl, doc_file, filename):
+def serve(ctrl, doc_file, view=False):
     name = doc_file.filename.encode("utf-8", "ignore")
     content_type = guess_type(name, False)[0]
     if not content_type:
@@ -471,7 +471,7 @@ def serve(ctrl, doc_file, filename):
     f, size = ctrl.get_content_and_size(doc_file)
     response = StreamingHttpResponse(f, content_type=content_type)
     response["Content-Length"] = size
-    if not filename:
+    if not view:
         response['Content-Disposition'] = 'attachment; filename="%s"' % name
     return response
 
