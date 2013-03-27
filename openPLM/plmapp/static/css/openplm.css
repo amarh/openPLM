@@ -1396,12 +1396,13 @@ ul.tbi li {
     background: none;
     text-shadow: none;
     color: black;
-    margin: 1em;
+    margin: 1em 0;
+    padding: 0 0 0 15px;
 }
 
 .richtext > p {
     margin: 1em 0;
-    padding: 0 0 0 1em;
+    padding: 0 0 0 20px;
 }
 
 .richtext img {
