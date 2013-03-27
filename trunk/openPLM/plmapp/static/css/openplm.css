@@ -1393,6 +1393,12 @@ ul.tbi li {
     line-height: 1.3;
 }
 
+.richtext, .richtext ul *, .richtext ol *,
+.richtext p, .richtext p *, .richtext code, .richtext blockquote, 
+.richtext td, .richtext td * {
+    color: #111;
+}
+
 .richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6 {
     background: none;
     text-shadow: none;
