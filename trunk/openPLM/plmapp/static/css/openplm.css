@@ -1437,6 +1437,14 @@ ul.tbi li {
     padding: 6px 10px;
 }
 
+.richtext a {
+    text-decoration: none;
+    color: #E6007E;
+}
+.richtext a * {
+    color: #E6007E;
+}
+
 
 tr.locked td {
     background-color:#FCF8E3;
