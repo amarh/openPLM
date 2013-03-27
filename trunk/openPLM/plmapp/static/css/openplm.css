@@ -1399,6 +1399,10 @@ ul.tbi li {
     margin: 1em;
 }
 
+.richtext img {
+    float: none;
+}
+
 tr.locked td {
     background-color:#FCF8E3;
 }
