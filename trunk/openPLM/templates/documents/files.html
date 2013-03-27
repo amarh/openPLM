@@ -75,7 +75,7 @@
                                 <span class="status ui-icon ui-icon-unlocked" {% if locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
                             </td>
                             <td class="Content">
-                                <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}">{{instance.filename}}</a></td>
+                                <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}?view=1">{{instance.filename}}</a></td>
                             <td class="Content">{{instance.size|filesizeformat}}</td>
                             <td class="Content">
                                 <a class="tb-btn" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
