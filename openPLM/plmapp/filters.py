@@ -135,7 +135,7 @@ else:
             safe_mode='escape',
             output_format='html5',
             extensions=["abbr", "tables", "def_list", "smart_strong", "toc",
-                "headerid",
+                "headerid", "fenced_code", "sane_lists",
                 # objects
                 PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/'),]),
                 # users
