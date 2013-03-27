@@ -625,7 +625,7 @@ class DeleteFileForm(forms.ModelForm):
 FileFormset = modelformset_factory(m.DocumentFile, form=DeleteFileForm, extra=0)
 def get_file_formset(controller, data=None):
     if data is None:
-        queryset = controller.files.order_by("-ctime")
+        queryset = controller.files.order_by("-locked", "-ctime")
         formset = FileFormset(queryset=queryset)
     else:
         formset = FileFormset(data=data)
