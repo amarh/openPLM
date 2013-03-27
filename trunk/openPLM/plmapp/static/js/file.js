@@ -620,6 +620,9 @@ function reset_upload(){
              }
              $(".del_link").click();
              $(".up_fail").text(trans["You are checking-in for "]+up_f_name+".\n "+trans["You must add a file with this name."]);
+             $('html, body').animate({
+                 scrollTop: $("#add_file_container").offset().top
+             }, 500);
          }else{
             $(".up_fail").remove();
             check_in_file(this);
@@ -696,6 +699,7 @@ $(function(){
             var f_name = $(this).attr("data-file");
             $("#add_text").text(trans["Check-in for file "]+f_name+":");
             $("#add_text").attr("checked-file",f_name);
+            $("#id_filename").click();
         }
     });
 
