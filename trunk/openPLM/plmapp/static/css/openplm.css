@@ -1390,6 +1390,7 @@ ul.tbi li {
 .richtext {
     background-color: #E4E3E1;
     padding: 1em;
+    line-height: 1.3;
 }
 
 .richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6 {
