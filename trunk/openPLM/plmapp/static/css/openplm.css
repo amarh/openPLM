@@ -62,8 +62,6 @@ table {
 	border-spacing: 0;
 }
 
-/*********************/
-
 body {
     background-color: #7f7c7d;
 }
@@ -80,6 +78,11 @@ img {
 
 img.thumbnail {
     max-height:70px;
+}
+
+code {
+    font-family: Monaco,ProFont,"Bitstream Vera Sans Mono","American Typewriter","Andale Mono",monospace;
+    font-size: 0.91em;
 }
 
 h2 {
