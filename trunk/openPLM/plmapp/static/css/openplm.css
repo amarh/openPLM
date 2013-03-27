@@ -1408,6 +1408,10 @@ ul.tbi li {
     float: none;
 }
 
+.richtext > ul, .richtext ol, .richtext pre, .richtext blockquote {
+    margin-left: 1em;
+}
+
 tr.locked td {
     background-color:#FCF8E3;
 }
