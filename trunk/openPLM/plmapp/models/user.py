@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 class AvatarStorage(FileSystemStorage):
 
     def get_valid_name(self, name):
+        name = name.encode("utf-8")
         basename = os.path.basename(name)
         base, ext = os.path.splitext(basename)
         md5 = hashlib.md5()
