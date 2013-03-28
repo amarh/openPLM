@@ -588,7 +588,7 @@ table.Content td.description *{
 
 /* comments */
 
-div.comment {
+.comment {
     background-color: #e4e3e1;
     margin: 1em;
     padding-left:0.5em;
@@ -596,24 +596,32 @@ div.comment {
     border-radius: 0 1em;
 }
 
-div.comment * {
+.comment * {
     color: black;
 }
 
-div.comment_text {
+.comment_text {
     overflow-x: auto; /* scroll if there are too long lines (urls...) */ 
 }
 
-div.comment p {
+.comment p {
     margin: 1em 1em;
 }
 
-div#comments{
+.tb-media-heading {
+    margin: 0.5em;
+}
+.tb-media-heading * {
+    margin: 0.5em;
+    font-weight: normal;
+}
+
+#comments{
     margin:1em;
     border-top: 1px #444 solid;
 }
 
-div#comment_form {
+#comment_form {
     margin-top: 1em;
 }
 tr.Content.part {
@@ -1454,6 +1462,9 @@ ul.tbi li {
     color: #E6007E;
 }
 
+.comment_text {
+    padding: 0;
+}
 
 tr.locked td {
     background-color:#FCF8E3;

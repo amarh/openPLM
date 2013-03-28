@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n plmapp_tags more_like_this %}
+{% load i18n plmapp_tags more_like_this humanize %}
 {% load comments %}
 
 {% block content %}
@@ -92,23 +92,34 @@
                     {% endblocktrans %}
                 {% endif %}
                 </p>
+                <br/>
 
                 {% get_comment_list for obj.object as comment_list %}
+                <ul class="tb tb-media-list">
                 {% for comment in comment_list %}
-                    <div class="comment">
-                        <span class="comment posted-by">
+                    <li class="comment tb tb-media">
+                        <div class="tb-pull-left">
+                        <img class="avatar" src="{{ comment.user|avatar_url}}"/>
+                    </div>
+                    <div class="tb-media-object">
+                        <h4 class="tb-media-heading">
+                        <span class="posted-by">
                             {% trans "Posted by:" %}
                             <a href="/user/{{comment.user|urlencode }}/">{{ comment.user.get_full_name }}</a>
                         </span>
-                        <span class="comment date">
+                        <span class="date">
                             {% trans "Date:" %}
-                            {{ comment.submit_date|date:"r" }}
+                            {{ comment.submit_date|naturalday }},
+                            {{ comment.submit_date|naturaltime }}
                         </span>
-                        <div class="comment_text richtext">
+                    </h4>
+                        <div class="comment_text tb-media-body richtext">
                             {{ comment.comment|richtext_filter:obj }}
                         </div>
-                    </div>
+                        </div>
+                        </li>
                 {% endfor %}
+            </ul>
             {% else %}
                 <p>
                 {% trans "No comments have been posted yet." %}
