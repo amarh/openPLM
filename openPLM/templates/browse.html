@@ -18,28 +18,28 @@
                         </div>
                         <ul id="br-types" class="tb-collapse tb-in">
                             <li {% if type == "object"%}class="selected"{% endif %} >
-                            <a href="/browse/object/{% add_get page='1'%}"><span>{% trans "Objects" %}</span></a>
+                            <a href="/browse/object/{% add_get page='1' stype='' %}"><span>{% trans "Objects" %}</span></a>
                             </li>
                             <li {% if type == "part"%}class="selected"{% endif %} >
-                            <a href="/browse/part/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
+                            <a href="/browse/part/{% add_get page='1' stype='' %}"><span style="padding-left:1em;" >{% trans "Parts" %}</span></a>
                             </li>
                             <li {% if type == "topassembly"%}class="selected"{% endif %} >
-                            <a href="/browse/topassembly/{% add_get page='1'%}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
+                            <a href="/browse/topassembly/{% add_get page='1' stype='' %}"><span style="padding-left:2em;" >{% trans "Top assemblies" %}</span></a>
                             </li>
                             <li {% if type == "document"%}class="selected"{% endif %} >
-                            <a href="/browse/document/{% add_get page='1'%}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
+                            <a href="/browse/document/{% add_get page='1' stype='' %}"><span style="padding-left:1em;" >{% trans "Documents" %}</span></a>
                             </li>
                             {% if not restricted %}
                                 <li {% if type == "group"%}class="selected"{% endif %} >
-                                <a href="/browse/group/{% add_get page='1'%}"><span>{% trans "Groups" %}</span></a></li>
+                                <a href="/browse/group/{% add_get page='1' stype='' %}"><span>{% trans "Groups" %}</span></a></li>
                                 <li {% if type == "user"%}class="selected"{% endif %} >
-                                <a href="/browse/user/{% add_get page='1'%}"><span>{% trans "Users" %}</span></a>
+                                <a href="/browse/user/{% add_get page='1' stype='' %}"><span>{% trans "Users" %}</span></a>
                                 </li>
                             {% endif %}
                             {% if request.user.is_authenticated %}
                                 {% for etype in extra_types %}
                                     <li {% if type == etype%}class="selected"{% endif %} >
-                                    <a href="/browse/{{etype.lower}}/{% add_get page='1'%}"><span>{{ etype }}</span></a>
+                                    <a href="/browse/{{etype.lower}}/{% add_get page='1' stype='' %}"><span>{{ etype }}</span></a>
                                     </li>
                                 {% endfor %}
                             {% endif %}
