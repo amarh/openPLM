@@ -1,5 +1,5 @@
 {% extends "identity_card.html" %}
-{% load i18n plmapp_tags highlight %}
+{% load i18n plmapp_tags highlight humanize %}
 
 {% block object_url %}/user/{{object.username|urlencode}}{{ suffix_url }}{% endblock %}
 
@@ -18,7 +18,7 @@
     {% if sort == "recently-added" and not restricted %}
         <p>
         <span class="sort">
-            {% blocktrans with object.date_joined|timesince as ctime %}joined {{ctime}} ago{% endblocktrans %}
+            {% blocktrans with object.date_joined|naturaltime as ctime %}joined {{ctime}} ago{% endblocktrans %}
         </span>
         </p>
     {% endif %}

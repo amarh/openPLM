@@ -1,4 +1,4 @@
-{% load i18n plmapp_tags highlight %}
+{% load i18n plmapp_tags highlight humanize %}
 
 {% is_object_readable %}
 <div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}">
@@ -39,7 +39,7 @@
                 {% if sort == "recently-added" and not restricted %}
                     <p>
                     <span class="sort">
-                        {% blocktrans with object.ctime|timesince as ctime %}created {{ctime}} ago{% endblocktrans %}
+                        {% blocktrans with object.ctime|naturaltime as ctime %}created {{ctime}}{% endblocktrans %}
                     </span>
                     </p>
                 {% endif %}
