@@ -1219,7 +1219,7 @@ div#attributes {
     margin-top: 0em;
 }
 
-div.identity_card {
+.identity_card {
     display: inline-block;
     background-color: white;
     border: 1px solid #777;
@@ -1232,23 +1232,23 @@ div.identity_card {
     position: relative;
 }
 
-div.identity_card:hover {
+.identity_card:hover {
     background-color: #f3f3f1;
     -webkit-box-shadow: 1px 1px 3px #555;
     box-shadow: 1px 1px 3px #555;
 }
 
-div.identity_card > a {
+.identity_card > a {
     padding: 5px;
     display: block;
 }
 
 
-div.identity_card div.id_thumbnail,
-div.identity_card div.id_details {
+.identity_card .id_thumbnail,
+.identity_card .id_details {
     display: block;
 }
-div.identity_card div.id_thumbnail {
+.identity_card .id_thumbnail {
     width: 100px;
     height: 100px;
     float: left;
@@ -1257,21 +1257,21 @@ div.identity_card div.id_thumbnail {
     margin-top: 25px;
     display: table-cell;
 }
-div.identity_card div.id_thumbnail_inner {
+.identity_card .id_thumbnail_inner {
     vertical-align: middle;
     display: table-cell;
     height: 100px;
     width: 100px;
 }
 
-div.identity_card div.id_thumbnail img {
+.identity_card .id_thumbnail img {
     max-width: 100px;
     max-height: 100px;
     margin:auto;
     float: none;
     display: block;
 }
-div.identity_card div.id_details {
+.identity_card .id_details {
     height: 150px;
     border-left: 1px solid #ccc;
     padding: 0 1em;
@@ -1279,16 +1279,30 @@ div.identity_card div.id_details {
     left: 120px;
     width: 150px;
     font-size: 90%;
+    line-height: 0.9;
 }
-div.id_details span.type {
+.id_details span.type {
     font-weight: bold;
 }
-div.id_details p {
+.id_details p {
     margin-top: 0.5em;
     word-wrap: break-word;
 }
-div.id_details p:not(:last-child) {
+.id_details p:not(:last-child) {
     border-bottom: 1px dotted #ccc;
+}
+.id_details .name {
+    display: block;
+    max-height: 2em;
+    overflow: hidden;
+}
+.id_details .description {
+    overflow: hidden;
+    max-height: 2.2em;
+    display: block;
+}
+.id_details .sort, .id_details .num_files, .id_details .state {
+    font-size: 80%;
 }
 
 
@@ -1325,11 +1339,6 @@ div#type-panel li:hover:not(.intermediate) * {
     color: white;
 }
 
-.identity_card span.description {
-    overflow: hidden;
-    max-height: 5em;
-    display: block;
-}
 
 #add-file-nojs {
     float: right;
