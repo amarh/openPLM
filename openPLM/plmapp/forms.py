@@ -307,27 +307,24 @@ def group_types(types):
         group.append((type_, long_name))
     return res
 
+def type_field(choices):
+    f = forms.TypedChoiceField(choices=choices, label=_("Select a type") )
+    f.widget.attrs["autocomplete"] = "off"
+    return f
+
 class TypeForm(forms.Form):
-    LIST = group_types(m.get_all_users_and_plmobjects_with_level())
-    type = forms.TypedChoiceField(choices=LIST)
-    type.widget.attrs["autocomplete"] = "off"
+    type = type_field(group_types(m.get_all_users_and_plmobjects_with_level()))
 
 class PartTypeForm(forms.Form):
-    LIST = m.get_all_parts_with_level()
-    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
-    type.widget.attrs["autocomplete"] = "off"
+    type = type_field(m.get_all_parts_with_level())
 
 class DocumentTypeForm(forms.Form):
-    LIST = m.get_all_documents_with_level()
-    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
-    type.widget.attrs["autocomplete"] = "off"
+    type = type_field(m.get_all_documents_with_level())
 
 
 class Document2TypeForm(forms.Form):
     # only documents that accept files
-    LIST = m.get_all_documents_with_level(True)
-    type = forms.TypedChoiceField(choices=LIST, label=_("Select a type"))
-    type.widget.attrs["autocomplete"] = "off"
+    type = type_field(m.get_all_documents_with_level(True))
 
 
 class SimpleSearchForm(SearchForm):
