@@ -98,7 +98,8 @@ class UserViewTestCase(CommonViewTest):
         self.assertEqual(self.user.email, form.initial["email"])
 
     def test_modify_post(self):
-        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
+        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John",
+                "avatar": "",}
         response = self.post(self.user_url + "modify/", data)
         user = User.objects.get(username=self.user.username)
         self.assertEqual("Snow", user.last_name)
@@ -109,7 +110,8 @@ class UserViewTestCase(CommonViewTest):
                     email="you.lost@example.com", groups=[self.group.pk],
                     language=m.get_profile(self.user).language)
         response = self.post(self.user_url + "delegation/sponsor/", data0)
-        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John"}
+        data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John",
+                "avatar":None,}
          # brian can not edit these data
         self.client.login(username=self.brian.username, password="life")
         response = self.client.post("/user/loser/modify/", data)

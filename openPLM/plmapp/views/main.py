@@ -680,7 +680,7 @@ def browse(request, type="object"):
                 "topassembly" : models.Part.top_assemblies,
                 "document" : models.Document.objects,
                 "group" : models.GroupInfo.objects,
-                "user" : User.objects,
+                "user" : User.objects.select_related("profile"),
             }
             manager = type2manager[type]
             main_cls = manager.model

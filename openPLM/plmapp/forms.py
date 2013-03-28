@@ -36,6 +36,7 @@ from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 from django.utils.functional import memoize
+from django.template.defaultfilters import filesizeformat
 
 from haystack.forms import SearchForm
 
@@ -724,6 +725,8 @@ def get_navigate_form(obj):
     return cls
 
 
+MAX_AVATAR_SIZE = 100 * 1024
+
 class OpenPLMUserChangeForm(forms.ModelForm):
 
     class Meta:
@@ -731,6 +734,22 @@ class OpenPLMUserChangeForm(forms.ModelForm):
         exclude = ('username','is_staff', 'is_active', 'is_superuser',
                 'last_login', 'date_joined', 'groups', 'user_permissions',
                 'password')
+
+    avatar = forms.ImageField(required=False)
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data['avatar']
+        if avatar:
+            max_size = getattr(settings, "MAX_AVATAR_SIZE", MAX_AVATAR_SIZE)
+            content_type = avatar.content_type.split('/')[0]
+            if content_type == "image":
+                if avatar.size > max_size:
+                    raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') %
+                            (filesizeformat(max_size), filesizeformat(avatar.size)))
+            else:
+                raise forms.ValidationError(_('File type is not supported'))
+        return avatar
+
 
 USER_DOES_NOT_EXIST_MSG = _(
 """The user "%(username)s" does not exist.
@@ -905,3 +924,4 @@ class ConfirmPasswordForm(forms.Form):
         if not self.user.check_password(password):
             raise forms.ValidationError(_("Your password was entered incorrectly. Please enter it again."))
         return password
+

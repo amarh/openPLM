@@ -134,3 +134,6 @@ Apache
 
 static files
 
+avatars directory
+
+

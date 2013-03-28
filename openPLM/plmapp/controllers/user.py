@@ -107,6 +107,8 @@ class UserController(Controller):
         """
         self.check_update_data()
         if form.is_valid():
+            new_avatar = False
+            previous_avatar = self.profile.avatar.path if self.profile.avatar else False
             if self._user != self.object:
                 # to an user who has not yet logged in,
                 # it is quite surprising to receive a mail saying something
@@ -114,11 +116,18 @@ class UserController(Controller):
                 self.block_mails()
             need_save = False
             for key, value in form.cleaned_data.iteritems():
-                if key not in ["username"]:
+                if key not in ("username", "avatar"):
                     setattr(self, key, value)
                     need_save = True
+            avatar = form.cleaned_data["avatar"]
+            if avatar:
+                self.profile.avatar = avatar
+                need_save = new_avatar = True
+
             if need_save:
                 self.save()
+            if new_avatar and previous_avatar:
+                os.remove(previous_avatar)
         else:
             raise ValueError("form is invalid")
 

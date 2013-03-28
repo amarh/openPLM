@@ -227,7 +227,7 @@ def modify_user(request, obj_ref):
     obj, ctx = get_generic_data(request, "User", obj_ref)
     obj.check_update_data()
     if request.method == 'POST' and request.POST:
-        modification_form = forms.OpenPLMUserChangeForm(request.POST)
+        modification_form = forms.OpenPLMUserChangeForm(request.POST, request.FILES)
         if modification_form.is_valid():
             obj.update_from_form(modification_form)
             return HttpResponseRedirect("/user/%s/" % obj.username)

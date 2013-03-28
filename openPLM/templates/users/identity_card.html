@@ -3,7 +3,7 @@
 
 {% block object_url %}/user/{{object.username|urlencode}}{{ suffix_url }}{% endblock %}
 
-{% block thumbnail_url%}{{STATIC_URL}}img/icon_user.png{% endblock %}
+{% block thumbnail_url%}{{ object|avatar_url }}{% endblock %}
 {% block id_details%}
     <p>
     <span class="type">{% trans "User" %}</span>

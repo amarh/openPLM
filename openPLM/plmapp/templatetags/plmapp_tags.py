@@ -419,3 +419,15 @@ def plaintext_filter(content, obj=None):
     """
     return plaintext(content, obj)
 
+
+@register.filter
+def avatar_url(user):
+    if isinstance(user, dict):
+        profile = user.get("profile")
+    else:
+        profile = models.get_profile(user)
+    if profile and profile.avatar:
+        return profile.avatar.url
+    else:
+        return settings.STATIC_URL + "img/icon_user.png"
+
