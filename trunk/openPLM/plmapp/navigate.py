@@ -327,10 +327,10 @@ class NavigationGraph(object):
             if role == "owner":
                 users = ((obj.owner, role),)
             else:
-                users = ((u, role) for u in obj.user_set.all())
+                users = ((u, role) for u in obj.user_set.select_related("profile").all())
         else:
             users = obj.users.at(self.time).filter(role__istartswith=role)
-            users = ((u.user, u.role) for u in users.all())
+            users = ((u.user, u.role) for u in users.select_related("profile").all())
         node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
         for user, role in users:
             if self.options[OSR] and user.id not in self.user_results:
@@ -508,7 +508,7 @@ class NavigationGraph(object):
             type_ = "user"
             data["object"] = {"id" : obj.id, "username" : obj.username,
                     "first_name" :obj.first_name, "last_name" : obj.last_name,
-                    "get_full_name": obj.get_full_name(),
+                    "get_full_name": obj.get_full_name(), 'profile': obj.profile,
                     "type" : "User"}
         else:
             label = obj.name

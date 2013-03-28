@@ -1463,3 +1463,10 @@ tr.locked td {
     cursor: pointer ;
 }
 
+img.avatar {
+    max-width: 64px;
+    max-height: 64px;
+    float: None;
+    display: inline-block;
+    background-color: white;
+}

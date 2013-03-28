@@ -177,9 +177,7 @@ Change rights:
      
 Change rights for the directory where thumbnails will be stored:
     
-    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
-    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/public/thumbnails``
-
+    * ``chown -R www-data:www-data /var/django/openPLM/trunk/openPLM/media/``
 
 Collect staticfiles
 =======================

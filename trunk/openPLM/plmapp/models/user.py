@@ -1,12 +1,29 @@
+import os.path
+import hashlib
 
 from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
+
+
+class AvatarStorage(FileSystemStorage):
+
+    def get_valid_name(self, name):
+        basename = os.path.basename(name)
+        base, ext = os.path.splitext(basename)
+        md5 = hashlib.md5()
+        md5.update(basename)
+        md5_value = md5.hexdigest()
+        return md5_value + ext
+
+
+avatarfs = AvatarStorage()
 
 # user stuff
 class UserProfile(models.Model):
@@ -17,7 +34,7 @@ class UserProfile(models.Model):
     class Meta:
         app_label = "plmapp"
 
-    user = models.ForeignKey(User, unique=True)
+    user = models.OneToOneField(User, unique=True, related_name="profile")
     #: True if user is an administrator
     is_administrator = models.BooleanField(default=False, blank=True)
     #: True if user is a contributor
@@ -30,6 +47,8 @@ class UserProfile(models.Model):
     #: language
     language = models.CharField(max_length=5, default="en",
             choices=settings.LANGUAGES)
+
+    avatar = models.ImageField(upload_to='avatars', null=True, storage=avatarfs)
 
     @property
     def title(self):
@@ -95,7 +114,7 @@ def get_profile(user):
     Replaces ``user.get_profile()``.
     """
     if not hasattr(user, "_profile_cache"):
-        user._profile_cache = UserProfile.objects.get(user__id__exact=user.id)
+        user._profile_cache = user.profile # UserProfile.objects.get(user__id__exact=user.id)
         user._profile_cache.user = user
     return user._profile_cache
 
