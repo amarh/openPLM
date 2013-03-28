@@ -608,6 +608,8 @@ table.Content td.description *{
     margin: 1em 1em;
 }
 
+.tb-media-list { width: 100%; }
+
 .tb-media-heading {
     margin: 0.5em;
 }
