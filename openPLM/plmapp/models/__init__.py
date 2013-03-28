@@ -124,7 +124,16 @@ from openPLM.plmapp.models.document import *
 from openPLM.plmapp.models.history import *
 from openPLM.plmapp.models.link import *
 
+# monkey patch Comment models to select related fields
+from django.contrib.comments.models import Comment
+from django.contrib.comments.managers import CommentManager
 
+class CommentManager(CommentManager):
+    def get_query_set(self):
+        return (super(CommentManager, self)
+            .get_query_set()
+            .select_related('user', 'user__profile'))
+Comment.add_to_class('objects', CommentManager())
 
 # import_models should be the last function
 
