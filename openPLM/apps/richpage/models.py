@@ -28,6 +28,10 @@ class Page(Document):
         # if it has a locked file
         return self._is_promotable()
 
+    @property
+    def published_attributes(self):
+        return super(Page, self).published_attributes + ["page_content"]
+
 admin.site.register(Page)
 
 
