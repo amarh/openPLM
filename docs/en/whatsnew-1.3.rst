@@ -25,10 +25,27 @@ This means that all our work is free to use, modify and redistribute.
 
 Notable changes:
 
-    * Wiki syntax
+    * Wiki syntax and Page document
+    * Avatars
+    * 
 
 What's new for users
 =====================
+
+Wiki syntax
+++++++++++++++++++
+
+Avatars
+++++++++++++++++++
+
+Check-in improvements
+++++++++++++++++++++++
+
+Search: all types
++++++++++++++++++++++++
+
+
+
 
 What's new for administrators
 ===============================
@@ -42,6 +59,11 @@ Customize default references
 It is now possible to customize the default reference of parts and document.
 Read :ref:`admin-references` for details on how to customize default
 references.
+
+New application: richpage
++++++++++++++++++++++++++++++++++
+
+:ref:`richpage-admin`
 
 
 What's new for developers
