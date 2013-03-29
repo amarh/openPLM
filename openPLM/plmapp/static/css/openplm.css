@@ -46,6 +46,10 @@ ol {
     margin: 0 0 10px 25px;
     padding: 0;
 }
+ol > li {
+    list-style-type: decimal;
+}
+
 blockquote, q {
 	quotes: none;
     margin: 0.5em 0;
@@ -152,14 +156,14 @@ ul {
     text-indent: 0px;
 }
 
-ul li {
+ul > li {
     display: inline-block;
     vertical-align: middle;
     list-style-type: none;
     text-indent: 0px;
 }
 
-ul li > * {
+ul > li > * {
     vertical-align: middle;
 }
 
@@ -1426,6 +1430,10 @@ ul.tbi li {
     padding: 0 0 0 15px;
 }
 
+.richtext p {
+    display: inline;
+}
+
 .richtext > p {
     margin: 1em 0;
     padding: 0 0 0 20px;
@@ -1437,6 +1445,20 @@ ul.tbi li {
 
 .richtext > ul, .richtext ol, .richtext pre {
     margin-left: 1em;
+}
+
+.richtext ul {
+    list-style: disc inside none;
+}
+
+.richtext ul > li {
+    margin-left: 2em !important;
+    display: list-item !important;
+    list-style: disc !important;
+}
+.richtext ol > li {
+    margin-left: 1em !important;
+    display: list-item !important;
 }
 
 .richtext blockquote {
