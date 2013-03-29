@@ -420,7 +420,7 @@ def plaintext_filter(content, obj=None):
     return plaintext(content, obj)
 
 
-@register.filter
+@register.simple_tag
 def avatar_url(user):
     if isinstance(user, dict):
         profile = user.get("profile")
