@@ -469,7 +469,6 @@ class NavigationGraph(object):
             ref = (obj["type"], obj["reference"], obj["revision"])
             label = obj["name"].strip() or u"\n".join(ref)
             url = iri_to_uri(u"/object/%s/%s/%s/" % ref)
-            data["title_"] = u" - ".join(ref)
             # add data to show/hide thumbnails and attached documents
             if is_part(obj):
                 type_ = "part"
@@ -486,7 +485,6 @@ class NavigationGraph(object):
             # display the object's name if it is not empty
             ref = (obj.type, obj.reference, obj.revision)
             label = obj.name.strip() or u"\n".join(ref)
-            data["title_"] = u" - ".join(ref)
             # add data to show/hide thumbnails and attached documents
             if obj.is_document:
                 data["path"] = get_path(obj)
@@ -504,7 +502,6 @@ class NavigationGraph(object):
         elif isinstance(obj, (User, UserController)):
             full_name = u'%s\n%s' % (obj.first_name, obj.last_name)
             label = full_name.strip() or obj.username
-            data["title_"] = obj.username
             type_ = "user"
             data["object"] = {"id" : obj.id, "username" : obj.username,
                     "first_name" :obj.first_name, "last_name" : obj.last_name,
@@ -518,6 +515,7 @@ class NavigationGraph(object):
         id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), id_)
 
         data["label"] = label + "\n" + extra_label if extra_label else label
+        data["title_"] = label
         data["type"] = type_
         self.nodes[obj_id].update(
                 URL=(url or obj.plmobject_url) + "navigate/",

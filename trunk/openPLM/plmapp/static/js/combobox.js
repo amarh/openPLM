@@ -86,5 +86,9 @@ $(
             $("#SetLangForm").submit()
         });
         $("#SetLangForm input[type=submit]").hide();
+        $(".identity_card,.node").tooltip(
+            {title: function(){return $(this).find(".name").text();}}
+                
+        );
     }
 );
