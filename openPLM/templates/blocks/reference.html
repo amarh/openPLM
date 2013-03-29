@@ -31,15 +31,15 @@
     <div id="reference-title">
         {% if object_type == "User" %}
             <div class="icon">
-                <img class="avatar" src="{{ obj|avatar_url }}"/>
+                <img class="avatar" src="{% avatar_url obj %}"/>
             </div>
         {% else %}
-        <div class="icon {% if obj.is_document %}
-                document_icon
-            {%else %} {% if obj.is_part %}
-                part_icon
-            {% else %} user_icon {% endif %} {% endif %}">
-            
+            <div class="icon {% if obj.is_document %}
+                    document_icon
+                {%else %} {% if obj.is_part %}
+                    part_icon
+                {% else %} user_icon {% endif %} {% endif %}">
+
             </div>
         {% endif %}
         <h2>
