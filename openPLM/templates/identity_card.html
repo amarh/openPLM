@@ -1,7 +1,8 @@
 {% load i18n plmapp_tags highlight humanize %}
 
 {% is_object_readable %}
-<div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}">
+<div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}" 
+    data-toggle="tooltip">
     {% if detach_objects %}
         <div class="detach-form">
             <form method="POST" action="./delete/">{% csrf_token %}
