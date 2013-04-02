@@ -5,11 +5,6 @@
 
 {% block css %}
 <link type="text/css" href="{{STATIC_URL}}css/files.css" rel="Stylesheet" />
-<style type="text/css">
-.hidden{
-    display:none;
-}
-</style> 
 {% endblock %}
 
 
@@ -32,12 +27,12 @@
             {% if file_formset.total_form_count %}
                     <div style="margin-bottom:10px"></div>  
 <!--                <div class="tb-btn-toolbar"> -->
-                    <input type="submit" class="tb-btn-danger tb-btn-large" value="{% trans "DELETE" %}"/>
-                    <input type="button" class="tb-btn-large" value="{% trans "CHECK ALL" %}" id="s_all"/>
-                    <input type="button" class="tb-btn hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
+                    <input type="submit" class="tb-btn tb-btn-danger tb-btn-large" value="{% trans "DELETE" %}"/>
+                    <input type="button" class="tb-btn tb-btn-large" value="{% trans "CHECK ALL" %}" id="s_all"/>
+                    <input type="button" class="tb-btn tb-btn-large hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
 
                     <div class="tb-btn-group">
-                        <button class="tb-btn-large tb-dropdown-toggle" data-toggle="dropdown">
+                        <button class="tb-btn tb-btn-large tb-dropdown-toggle" data-toggle="dropdown">
                             {% trans "Download..." %}
                             <span class="tb-caret"></span>
                         </button>
@@ -77,7 +72,7 @@
                             <td class="Content">{{instance.size|filesizeformat}}</td>
                             <td class="Content">
                                 <a class="tb-btn" href="/file/{{instance.id}}/{{instance.filename|urlencode}}">
-                                    <span class="ui-button-text">{% trans "DOWNLOAD" %}</span>
+                                    <span>{% trans "DOWNLOAD" %}</span>
                                 </a>
                             </td>
                             <td class="Content">
@@ -101,7 +96,7 @@
 
     </form>
 
-    <div id="dialog_check-out" title="{% trans "Confirm CHECK-OUT" %}">
+    <div id="dialog_check-out" class="hidden" title="{% trans "Confirm CHECK-OUT" %}">
         {% trans "You'are checking out a standardfile while a native file is available. Your native file will be deprecated and will not be usable anymore." %}
     </div>
 

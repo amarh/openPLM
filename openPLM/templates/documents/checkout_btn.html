@@ -2,15 +2,15 @@
 {% with doc_file.locked as locked %}
 {% if is_contributor and obj.is_editable %}
     {% if not locked or doc_file.locker == request.user %}
-        <a data-file="{{doc_file.filename}}" class="tb-btn-large tb-btn-success checkin" href="{{ obj.plmobject_url }}files/checkin/{{doc_file.id|urlencode }}/" {% if not locked %}style="display:none"{% endif %}>
-            <span class="ui-button-text check-in" data-file="{{doc_file.filename}}" >{% trans "CHECK-IN" %}</span>
+        <a data-file="{{doc_file.filename}}" class="tb-btn tb-btn-large tb-btn-success checkin" href="{{ obj.plmobject_url }}files/checkin/{{doc_file.id|urlencode }}/" {% if not locked %}style="display:none"{% endif %}>
+            <span class="check-in" data-file="{{doc_file.filename}}" >{% trans "CHECK-IN" %}</span>
         </a>
     {% endif %}
     {% if not locked %}
         {% if doc_file.checkout_valid %}
-            <a class="tb-btn-large tb-btn-success {{ doc_file.native_related|yesno:"check-out,check-out-link"}} "
+            <a class="tb-btn tb-btn-large tb-btn-success {{ doc_file.native_related|yesno:"check-out,check-out-link"}} "
                 href="{{ obj.plmobject_url}}files/checkout/{{doc_file.id|urlencode }}/" data-file="{{doc_file.filename}}">
-                <span id="{{doc_file.id}}" class="ui-button-text">{% trans "CHECK-OUT" %}</span>
+                <span>{% trans "CHECK-OUT" %}</span>
             </a>                                    
         {% else %}
             {% trans "Native related file is locked" %}

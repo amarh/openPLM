@@ -39,8 +39,8 @@
                 {% elif is_owner and obj.is_editable %}
                     <a class="tb-btn tb-btn-success" 
                         href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
-                        <i class="tb-icon-pencil"></i>
-                        <span>{% trans "Edit this information" %}</span>
+                        <i class="tb-icon-pencil tb-icon-white"></i>
+                        {% trans "Edit this information" %}
                     </a>
                 {% endif %}
                 {% if can_generate_pdf and not restricted %}
