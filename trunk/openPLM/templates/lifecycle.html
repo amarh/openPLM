@@ -142,7 +142,7 @@
                 </div>
 
                 {# buttons #}
-                <input name="promote" type="submit" class="tb-btn-large tb-btn-success" 
+                <input name="promote" type="submit" class="tb-btn tb-btn-large tb-btn-success" 
                 {% if obj.is_last_promoter %}
                     value="{% trans "PROMOTE" %}"
                 {% else %}
@@ -159,7 +159,7 @@
 
         {# cancel #}
         {% if can_cancel %}
-            {% confirm "cancel" _("CANCEL") _("Warning, if you cancel this object, it won't be anymore accessible to everyone.") %}
+            {% confirm "cancel" _("CANCEL") _("Warning, if you cancel this object, it won't be anymore accessible to everyone.") btn_classes="tb-btn-danger" %}
         {% endif %}
 
 
@@ -218,7 +218,7 @@
                                     <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
                                         <input type="hidden" name="link_id" value="{{ link.id }}"/>
                                         <input name="action" type="submit"
-                                        class="tb-btn-large tb-btn-danger" value="—" 
+                                        class="tb-btn tb-btn-large tb-btn-danger" value="—" 
                                         title="{% trans "Remove" %}"/>
                                     </form>
                                 {% endif %}

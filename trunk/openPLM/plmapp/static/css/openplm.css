@@ -819,18 +819,6 @@ textarea {
 
 span.ui-button-text {
     padding:0.4em 0.4em;
-    color: #343434 !important;
-}
-
-.tb-btn-large:hover,
-li.ui-button:hover,
-a.ui-button:hover,
-input.ui-button:hover,
-.ui-state-hover {
-    background: url("../css/openplm/images/bg_hover.png") no-repeat scroll 50% 50% ,
-        url("../css/openplm/images/hover.png") repeat-x scroll left center;
-    background-size: auto 100%, auto;
-
 }
 
 
@@ -1369,6 +1357,12 @@ div#type-panel li:hover:not(.intermediate) * {
 }
 
 /* bootstrap hacks */
+
+
+input, button, select, textarea, a.tb-btn, a.tb-btn * {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
 ul.tb a {
     text-decoration: none;
 }
@@ -1379,39 +1373,19 @@ ul.tbi li {
     display: inline !important;
 }
 
-.tb-btn, .tb-btn-large {
-/*    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #c6c7c5; */
-    background-color : #FFFFFF;
+.tb-btn {
     border: 1px solid #7F7C7C;
-    color: #343434;
     font-weight: normal;
     text-decoration: none;
     padding: 0.4em 1em;
     line-height: 1.4em;
 }
 
-.tb-btn-group .tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]),
-.tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]) {
-/*    font-size: 15.4px; */
-}
-.tb-btn span {
-    color: #343434;
-}
 
 .tb-btn-mini {
     padding: 0.3em;
     line-height: 1em;
     font-size: 12px;
-}
-
-.tb-btn-large {
-    font-size: 14.7px !important;
-    text-decoration: none;
-    margin-top: -3px;
-}
-
-.tb-btn-success {
-    color:#FFFFFF;
 }
 
 .identity_card .detach-form {
