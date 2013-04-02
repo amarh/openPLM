@@ -1133,6 +1133,7 @@ a#linobject {
 #supermenuholder {
     -webkit-box-shadow: 0 0 115px 80px #888 inset;
     box-shadow: 0 0 115px 80px #888 inset;
+    background-color: #c8c6c5;
     padding: 3em;
 }
 #supermenu {
