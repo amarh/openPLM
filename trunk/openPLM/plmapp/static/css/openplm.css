@@ -67,7 +67,7 @@ table {
 }
 
 body {
-    background-color: #7f7c7d;
+    background-color: #FFFFFF;
 }
 
 form {
@@ -215,7 +215,7 @@ div.center-box {
 
 
 div#content-box {
-    background-color: #7f7d7d;
+    background-color: #C8C7C5;
     position:relative;
     margin: 1em;
     margin-top: 0;
@@ -228,6 +228,13 @@ div#content-box {
 div#left-col {
     float:left;
     width:300px;
+}
+
+div#SearchBox {
+    background-color: #FFFFFF;
+    margin-top: 18px;
+    -webkit-box-shadow: 1px 1px 15px #333333;
+    box-shadow: 1px 1px 15px #333333;
 }
 
 .clearfix:after {
@@ -252,7 +259,7 @@ div#left-col {
 /* FOR ALL BOXES */
 div.Box, div#ActiveBox, div#LoginBox
 {
-    background-color: #C8C6C5;
+/*    background-color: #C8C6C5; */
     margin: 8px;
     padding: 5px;
     text-align: left;
@@ -267,9 +274,9 @@ div#ActiveArea > *{
 
 /* BOX WHERE WE FIND DIFFERENT BUTTONS FOR PAGE DISPLAY (SHOW/HIDE BOXES & NAVIGATE/STUDY) */
 div#DisplayBox {
-    padding: 0.2em 0em;
+    padding: 0em 0em 0.2em 0em;
     text-align: center;
-    background-color: #c8c7c5;
+/*    background-color: #FFFFFF; */
     text-transform: uppercase;
 }
 
@@ -318,7 +325,7 @@ div.Box h2 {
 div#ActiveBox
 {
     min-height: 420px;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     padding: 0px;
     -webkit-box-shadow: 1px 1px 15px #333333;
     box-shadow: 1px 1px 15px #333333;
@@ -421,25 +428,25 @@ div#ActiveArea
 
 #main_content {
     padding-left: 1em !important;
-    min-height: 500px;
-    background-color: #c8c6c5;
-    margin: -1px 0.5em 0.5em 0.5em;
-    border: 1px solid #343434;
+    min-height: 430px;
+/*    background-color: #c8c6c5; */
+    margin: -2px 0.5em 0.5em 0.5em;
+/*    border: 1px solid #343434; */
 }
 
 .part #main_content,
 .part .CurrentPage {
-    border-color: #009FE3;
+    border: solid 2px #009FE3;
 }
 .document #main_content,
 .document .CurrentPage {
-    border-color: #312783;
+    border: solid 2px #312783;
 }
 .group #main_content,
 .group .CurrentPage,
 .user .CurrentPage,
 .user #main_content {
-    border-color: #E6007E;
+    border: solid 2px #E6007E;
 }
 
 /* menu stuff*/
@@ -459,9 +466,9 @@ ul#MenuList {
     margin-left: 1em;
     border-radius: 1em 1em 0 0;
     padding-left: 1.5em;
-    background-color: #4C4A4C;
+    background-color: #C8C7C5;
     padding-right: 1.5em;
-    border-bottom: 1px solid #4c4a4c;
+    border-bottom: 2px solid #4c4a4c;
 }
 
 ul#MenuList li {
@@ -485,15 +492,15 @@ ul#MenuList li {
 
 
 ul#MenuList li.CurrentPage {
-    background-color: #C8C6C5;
+    background-color: #FFFFFF;
     border-style: solid;
-    border-top-width: 1px;
-    border-left-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-bottom-color: #c8c6c5;
+    border-top-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-bottom-color: #FFFFFF;
     border-radius: 0.4em 0.4em 0 0;
-    margin: -1px;
+    margin: -2px;
 }
 
 ul#MenuList li:hover
@@ -573,6 +580,8 @@ table.Content td a,
 table.Content td p,
 table.Content td li {
     color: black;
+    text-align: left;
+    vertical-align: middle;
 }
 
 table.Content td div.ui-widget {
@@ -814,7 +823,7 @@ span.ui-button-text {
     color: #343434 !important;
 }
 
-.tb-btn:hover,
+.tb-btn-large:hover,
 li.ui-button:hover,
 a.ui-button:hover,
 input.ui-button:hover,
@@ -1062,10 +1071,11 @@ a#linobject {
     position: relative;
     overflow-x: hidden;
     height: 1.2em;
-    margin: 0.0em;
-    border-bottom: 1px solid #ccc;
+    margin: 0.0em 0.0em 0.0em 0.2em;
+/*    border-bottom: 1px solid #ccc; */
     padding: 0.2em;
-    background-color: #C8C7C5;
+/*    background-color: #C8C7C5; */
+    text-align: left;
 }
 
 #navigation_history_inner {
@@ -1369,8 +1379,9 @@ ul.tbi li {
     display: inline !important;
 }
 
-.tb-btn {
-    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #c6c7c5;
+.tb-btn, .tb-btn-large {
+/*    background: url("openplm/images/ui-bg_inset-soft_15_373737_1x100.png") repeat-x scroll 50% 50% #c6c7c5; */
+    background-color : #FFFFFF;
     border: 1px solid #7F7C7C;
     color: #343434;
     font-weight: normal;
@@ -1381,7 +1392,7 @@ ul.tbi li {
 
 .tb-btn-group .tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]),
 .tb-btn:not([class^="tb-btn-"]):not([class*=" tb-btn-"]) {
-    font-size: 15.4px;
+/*    font-size: 15.4px; */
 }
 .tb-btn span {
     color: #343434;
@@ -1391,6 +1402,16 @@ ul.tbi li {
     padding: 0.3em;
     line-height: 1em;
     font-size: 12px;
+}
+
+.tb-btn-large {
+    font-size: 14.7px !important;
+    text-decoration: none;
+    margin-top: -3px;
+}
+
+.tb-btn-success {
+    color:#FFFFFF;
 }
 
 .identity_card .detach-form {
