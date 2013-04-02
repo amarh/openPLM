@@ -15,7 +15,7 @@
     </noscript>
     <form class="hidden" action="" target="hidden_frame" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
     <div style="margin:1%;">
-        <input type="button" class="tb-btn hidden" value="{% trans "Upload" %}" id="_up"/>
+        <input type="button" class="tb-btn tb-btn-primary hidden" value="{% trans "Upload" %}" id="_up"/>
 		<input type="button" class="tb-btn hidden" value="{% trans "Delete" %}" id="_delete" title="{%trans "Delete the files selected for upload" %}"/>
     </div>
     <div id="div_files"></div>
