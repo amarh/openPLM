@@ -1388,6 +1388,10 @@ ul.tbi li {
     font-size: 12px;
 }
 
+.tb-btn-success span {
+    color: white;
+}
+
 .identity_card .detach-form {
     display: none;
 }
