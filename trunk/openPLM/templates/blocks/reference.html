@@ -1,33 +1,5 @@
 {% load i18n plmapp_tags %}
 <div id="ReferenceArea">
-    {% if navigation_history %}
-        <div id="navigation_history">
-            <div id="navigation_history_inner">
-                <ul>
-                    {% for url_, type, reference, revision, menu in navigation_history %}
-                        <li>
-                        <a href="{{ url_ }}">
-                            <span class="type">{{type}}</span> 
-                            // <span class="reference">{{reference}}</span>
-                            {% if revision != "-" %}
-                                // <span class="rev">{{revision}}</span>
-                            {% endif %}
-                        </a>
-                        <div class="quick_link">
-                            {% for item in menu %}
-                                {% if item != "management" %}
-                                <a class="quick_link" href="{{url_}}{{item}}">
-                                    {% filter upper %}{% trans item %}{% endfilter%}
-                                </a>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        </li>
-                    {% endfor%}
-                </ul>
-            </div>
-        </div>
-    {% endif %}
     <div id="reference-title">
         {% if object_type == "User" %}
             <div class="icon">
