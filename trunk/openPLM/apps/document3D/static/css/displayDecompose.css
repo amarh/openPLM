@@ -96,9 +96,6 @@ td.open span.display_level{
 td.open span.display_level:hover {
    background-image : url("../img/expander_open_hover.png");
 }
-.hidden{
-    display : none;
-}
 
 table.Content input[type=text] {
     width: 95%;
