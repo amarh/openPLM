@@ -146,9 +146,8 @@ h4.hplm ~ * {
 }
 
 hr {
-    margin-top: 10px;
+    margin: 10px 0;
     padding: 0px !important;
-    margin-bottom: 10px;
 }
 
 ul {
@@ -428,9 +427,7 @@ div#ActiveArea
 #main_content {
     padding-left: 1em !important;
     min-height: 430px;
-/*    background-color: #c8c6c5; */
     margin: -2px 0.5em 0.5em 0.5em;
-/*    border: 1px solid #343434; */
 }
 
 .part #main_content,
@@ -452,14 +449,12 @@ div#ActiveArea
 div#menu {
     padding-bottom: 0;
     margin-bottom: 0;
-    /*margin-left: -2px;*/
     padding: 0;
     margin: 0em 0.5em 0em 0.5em;
 }
 
 ul#MenuList {
     display: inline-block;
-    /*text-indent: 10px;*/
     text-align: left;
     font-size: 90%;
     margin-left: 1em;
@@ -639,10 +634,6 @@ table.Content td.description *{
 }
 tr.Content.part {
     background: url("../img/dark/bg_tr_part.png") repeat;
-}
-
-tr.Content.document {
-    /*background: url("../img/dark/bg_tr_doc.png") repeat;*/
 }
 
 tr.part:nth-child(odd), tr.document:nth-child(odd) {
@@ -1067,9 +1058,7 @@ a#linobject {
     overflow-x: hidden;
     height: 1.2em;
     margin: 0.0em 0.0em 0.0em 0.2em;
-/*    border-bottom: 1px solid #ccc; */
     padding: 0.2em;
-/*    background-color: #C8C7C5; */
     text-align: left;
 }
 
