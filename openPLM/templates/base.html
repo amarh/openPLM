@@ -98,31 +98,31 @@
 
                             <div class="main-nav tb-btn-toolbar">
 
-                                <a class="tb-btn" href="/home/">
+                                <a class="tb-btn tb-btn-large" href="/home/">
                                     <i class="tb-icon-home"></i>
                                     <span class="ui-button-text">{% trans "HOME" %}</span>
                                 </a>
 
                                 {% if not restricted %}
-                                    <a class="tb-btn" href="/search/{% add_search %}">
+                                    <a class="tb-btn tb-btn-large" href="/search/{% add_search %}">
                                         <i class="tb-icon-search"></i>
                                         <span class="ui-button-text">{% trans "SEARCH" %}</span>
                                     </a>
                                 {% endif %}
 
-                                <a class="tb-btn" href="/browse/object/">
+                                <a class="tb-btn tb-btn-large" href="/browse/object/">
                                     <i class="tb-icon-th-list"></i>
                                     <span class="ui-button-text">{% trans "BROWSE" %}</span>
                                 </a>
 
                                 {% if is_contributor %}
                                     <div class="tb-btn-group">
-                                        <a class="tb-btn" href="{{user|get_profile|attr:"plmobject_url"}}files/">
+                                        <a class="tb-btn tb-btn-large" href="{{user|get_profile|attr:"plmobject_url"}}files/">
                                             <i class="tb-icon-upload"></i>
                                             <span class="ui-button-text">{% trans "Upload" %}</span>
                                         </a>
 
-                                        <a class="tb-btn" href="/object/create/?type={{ctype}}">
+                                        <a class="tb-btn tb-btn-large" href="/object/create/?type={{ctype}}">
                                             <i class="tb-icon-plus"></i>
                                             <span class="ui-button-text">{% trans "CREATE" %}</span>
                                         </a>
@@ -130,13 +130,13 @@
                                 {% endif %}
 
                                 {% if not restricted and not navigate_bool %}
-                                    <a class="tb-btn" href="{{obj_url}}navigate/">
+                                    <a class="tb-btn tb-btn-large" href="{{obj_url}}navigate/">
                                         <i class="tb-icon-eye-open"></i>
                                         <span class="ui-button-text">{% trans "NAVIGATE" %}</span>
                                     </a>
                                 {% endif %}
                                 {% if restricted or navigate_bool %}
-                                    <a class="tb-btn" href="{{obj_url}}">
+                                    <a class="tb-btn tb-btn-large" href="{{obj_url}}">
                                         <i class="tb-icon-pencil"></i>
                                         <span class="ui-button-text">{% trans "STUDY" %}</span>
                                     </a>
