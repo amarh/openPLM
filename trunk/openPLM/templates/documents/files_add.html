@@ -2,7 +2,7 @@
 {% load i18n plmapp_tags %}
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
-<div id="add_text" class="tb-btn {% if obj.files.count == 0 %}tb-btn-primary{% endif %}" >{% trans "Add new files" %}</div>
+<div id="add_text" class="tb-btn" >{% trans "Add new files" %}</div>
 <div id="add_form_file">
     {% with add_file_form as form %}
         {% include "snippets/undo_form.html" %}
