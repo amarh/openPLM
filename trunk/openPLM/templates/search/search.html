@@ -26,7 +26,8 @@
 
                 <div id="type-panel" class="tb-span2">
                     <div>
-                        <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-types">{% trans "Type" %} </h3>
+                        <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-types"> 
+                                    <span class="expander"></span>{% trans "Type" %} </h3>
                     </div>
                     <ul id="br-types" class="tb-collapse tb-in">
                         <li {% if type == "all"%}class="selected"{% endif %} >
@@ -53,7 +54,8 @@
 
                     {% if subtypes %}
                         <div>
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-subtypes">{% trans "Sub type" %} </h3>
+                            <h3 class="hplm alternate collapsed" data-toggle="collapse" data-target="#br-subtypes"> 
+                                    <span class="expander"></span>{% trans "Sub type" %} </h3>
                         </div>
                         <ul id="br-subtypes" class="tb-collapse">
                             {% for level, cls, cls_name in subtypes %}
@@ -66,7 +68,8 @@
                     {% if type == "all" or type == "Part" or type == "Document" %}
                         <div>
 
-                            <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-states">{% trans "State" %} </h3>
+                            <h3 class="hplm alternate collapsed" data-toggle="collapse" data-target="#br-states"> 
+                                    <span class="expander"></span>{% trans "State" %} </h3>
                         </div>
                         <ul id="br-states" class="tb-collapse">
                             <li {% if not form.search_official.value %}class="selected"{% endif %} >

@@ -669,6 +669,15 @@ td.open span.expander:after {
     content: "  ▾";
     font-size: 1.4em;
 }
+.hplm:not(.collapsed) span.expander:after {
+    content: " ▾ ";
+    color: white;
+}
+.hplm.collapsed span.expander:after {
+    content: " ▸ ";
+    color: white;
+}
+
 
 table.bom tr {
     line-height: 1.2em;
