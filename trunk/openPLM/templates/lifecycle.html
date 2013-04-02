@@ -142,7 +142,7 @@
                 </div>
 
                 {# buttons #}
-                <input name="promote" type="submit" class="tb-btn" 
+                <input name="promote" type="submit" class="tb-btn-large tb-btn-success" 
                 {% if obj.is_last_promoter %}
                     value="{% trans "PROMOTE" %}"
                 {% else %}
@@ -218,7 +218,7 @@
                                     <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
                                         <input type="hidden" name="link_id" value="{{ link.id }}"/>
                                         <input name="action" type="submit"
-                                        class="tb-btn" value="—" 
+                                        class="tb-btn-large tb-btn-danger" value="—" 
                                         title="{% trans "Remove" %}"/>
                                     </form>
                                 {% endif %}
