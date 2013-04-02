@@ -65,6 +65,10 @@ class PageViewTestCase(CommonViewTest):
         self.assertNotContains(response, "edit_content/")
         self.assertTemplateUsed(response, "richpage/page.html")
 
+    def test_redirect_base_to_page(self):
+        response = self.get(self.base_url, follow=False, status_code=301)
+        self.assertRedirects(response, self.base_url + "page/", 301)
+
     def test_edit_content_get(self):
         response = self.get(self.base_url + "edit_content/", page="page")
         form = response.context["form"]
