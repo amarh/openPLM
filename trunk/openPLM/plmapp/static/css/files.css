@@ -33,6 +33,9 @@ span.del_link{
     background-color: #F03838;
 }
 
+#add_file_container {
+    margin: 1em;
+}
 .up_fail{
     display:table;
     color: black;
