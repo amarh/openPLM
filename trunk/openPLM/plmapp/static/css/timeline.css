@@ -17,9 +17,8 @@ div.timeline h3 > span {
 
 div.timeline dl {
     line-height: 1.3em;
-    margin-left: 0em;
+    margin-left: 0.5em;
     font-weight: 500;
-/*    background-color: #e4e3e1; */
 }
 
 div.timeline [color=""] {
