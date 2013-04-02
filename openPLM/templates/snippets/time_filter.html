@@ -1,7 +1,8 @@
 {% load i18n plmapp_tags highlight %}
 
 <div>
-    <h3 class="hplm alternate" data-toggle="collapse" data-target="#br-{{time_filter.field_path2}}">{{ time_filter.title|capfirst }} </h3>
+    <h3 class="hplm alternate collapsed" data-toggle="collapse" data-target="#br-{{time_filter.field_path2}}"> 
+        <span class="expander"></span>{{ time_filter.title|capfirst }} </h3>
 </div>
 <ul id="br-{{time_filter.field_path2}}" class="tb-collapse">
     {% for f in time_filter.filters %}
