@@ -1500,3 +1500,7 @@ img.avatar {
     display: inline-block;
     background-color: white;
 }
+
+.hidden {
+    display : none;
+}

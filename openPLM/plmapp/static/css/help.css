@@ -25,9 +25,6 @@ table.borderless td, table.borderless th {
 .last, .with-subtitle {
   margin-bottom: 0 ! important }
 
-.hidden {
-  display: none }
-
 a.toc-backref {
   text-decoration: none ;
   color: black }
