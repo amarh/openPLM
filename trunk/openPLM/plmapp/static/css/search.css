@@ -5,6 +5,9 @@ ul.Result {
 
 li.Result {
     list-style: none !important;
+    border-bottom: 3px solid #ccc;
+    margin-bottom: 1em;
+    margin-left: 0em !important;
 }
 
 #inline_search_form > * {
