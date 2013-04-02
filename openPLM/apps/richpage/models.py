@@ -1,14 +1,11 @@
 from django.db import models
 from django.contrib import admin
-from django.utils.translation import ugettext_noop
+from django.utils.translation import ugettext_noop, ugettext_lazy as _
 
-import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
 
 class Page(Document):
-
-    ACCEPT_FILES = False
 
     page_content = models.TextField(default="Edit me")
     page_content.richtext = True
@@ -20,13 +17,17 @@ class Page(Document):
     @property
     def menu_items(self):
         menu = super(Page, self).menu_items
-        menu[0] = ugettext_noop("page")
+        menu.insert(0, ugettext_noop("page"))
         return menu
 
     def is_promotable(self):
-        # a Page has no files, so we do not checks
-        # if it has a locked file
-        return self._is_promotable()
+        # if a Page has no files, it is still promotable
+        if not self._is_promotable():
+            return False
+        if self.files.filter(locked=True).exists():
+            self._promotion_errors.append(_("Some files are locked."))
+            return False
+        return True
 
     @property
     def published_attributes(self):
@@ -36,18 +37,6 @@ admin.site.register(Page)
 
 
 class PageController(DocumentController):
-
-    def lock(self, doc_file):
-        raise exc.LockError()
-
-    def unlock(self, doc_file):
-        raise exc.UnlockErrot()
-
-    def add_file(self, f, update_attributes=True):
-        raise exc.AddFileError()
-
-    def delete_file(self, doc_file):
-        raise exc.DeleteFileError()
 
     def edit_content(self, new_content):
         self.check_edit_files()

@@ -46,12 +46,6 @@ class PageControllerTestCase(ControllerTest):
         page2 = Page.objects.get(reference="Page1")
         self.assertEqual(self.DATA["page_content"], page2.page_content)
 
-    def test_add_file_error(self):
-        ctrl = self.create("Page1")
-        self.assertRaises(exc.AddFileError, ctrl.add_file, self.get_file())
-        page = Page.objects.get(reference="Page1")
-        self.assertEqual(0, page.files.count())
-
 
 class PageViewTestCase(CommonViewTest):
 
@@ -70,10 +64,6 @@ class PageViewTestCase(CommonViewTest):
         self.assertContains(response, self.DATA["page_content"])
         self.assertNotContains(response, "edit_content/")
         self.assertTemplateUsed(response, "richpage/page.html")
-
-    def test_redirect_files_to_page(self):
-        response = self.get(self.base_url + "files/", follow=False, status_code=302)
-        self.assertRedirects(response, self.base_url + "page/")
 
     def test_edit_content_get(self):
         response = self.get(self.base_url + "edit_content/", page="page")
