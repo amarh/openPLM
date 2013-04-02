@@ -15,10 +15,7 @@
 
 {% block content %}
     {% if is_contributor and obj.is_editable %}
-        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="hidden">
-            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
-            {% include "documents/files_add.html" %}
-        </div>
+        {% trans "You can add/modify/delete file(s)." %}
     {% elif is_contributor %}
         {% trans "The status of this document does not allow adding/deleting files." %}
     {% else %}
@@ -33,13 +30,14 @@
                 </a>
             </noscript>
             {% if file_formset.total_form_count %}
-                <div class="tb-btn-toolbar">
-                    <input type="submit" class="tb-btn" value="{% trans "DELETE" %}"/>
-                    <input type="button" class="tb-btn" value="{% trans "CHECK ALL" %}" id="s_all"/>
+                    <div style="margin-bottom:10px"></div>  
+<!--                <div class="tb-btn-toolbar"> -->
+                    <input type="submit" class="tb-btn-danger tb-btn-large" value="{% trans "DELETE" %}"/>
+                    <input type="button" class="tb-btn-large" value="{% trans "CHECK ALL" %}" id="s_all"/>
                     <input type="button" class="tb-btn hidden" value="{% trans "UNCHECK ALL" %}" id="des_all"/>
 
                     <div class="tb-btn-group">
-                        <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                        <button class="tb-btn-large tb-dropdown-toggle" data-toggle="dropdown">
                             {% trans "Download..." %}
                             <span class="tb-caret"></span>
                         </button>
@@ -57,7 +55,7 @@
                             {% endif %}
                         </ul>
                     </div>
-                </div>
+<!--                </div> -->
             {% endif %}
         {% else %}
             {# placeholder since archive_form: float is right #}
@@ -115,6 +113,12 @@
                 <p><a href="/file/revisions/{{doc_file.id}}/">{{doc_file.filename}}</a></p>            
             {% endfor %}    
         </div>
+    {% endif %}
+    {% if is_contributor and obj.is_editable %}
+        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin:1%" class="hidden">
+            {% include "documents/files_add.html" %}
+        </div>
+            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
     {% endif %}
 {% endblock %}
 
