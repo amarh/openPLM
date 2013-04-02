@@ -276,12 +276,11 @@ div#ActiveArea > *{
 div#DisplayBox {
     padding: 0em 0em 0.2em 0em;
     text-align: center;
-/*    background-color: #FFFFFF; */
-    text-transform: uppercase;
 }
 
-div#DisplayBox .tb-btn-toolbar {
+.main-nav  {
     margin: 3px;
+    text-transform: uppercase;
 }
 
 /* BOXES NECESSARY FOR THE CREATE FUNCTION AND SEARCH FUNCTION */
