@@ -432,7 +432,7 @@ function init(){
         else {
             uri = "/ajax/navigate/" + (result[1])  + "/";
         }
-        $("#FilterButton").button().click(function () {
+        $("#FilterButton").click(function () {
             $("#Navigate").showLoading();
             $.post(uri,
                 $("#FilterNav").find("form").serialize(),
