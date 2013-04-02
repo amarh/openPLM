@@ -505,7 +505,7 @@ ul#MenuList li.CurrentPage {
 
 ul#MenuList li:hover
 {
-    background: url("../img/dark/menu_hover_bg.png") no-repeat center center;
+    background-color: #828082;
     background-size: 100% 100%;
 }
 
@@ -514,8 +514,7 @@ ul#MenuList li a
     text-decoration: none;
     padding: 4px 0px;
     display: inline-block;
-    color: #eee;
-    text-shadow: 1px 1px rgba(50, 50, 50, 0.7)
+    color: black;
 }
 ul#MenuList li a img {
     margin: 0;
@@ -525,7 +524,7 @@ ul#MenuList li.CurrentPage a {
     color: #242424;
     text-shadow: none;
 }
-ul#MenuList li.CurrentPage:hover a {
+ul#MenuList li:hover a {
     color: #eee;
     text-shadow: 1px 1px rgba(50, 50, 50, 0.7)
 }
