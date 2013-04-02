@@ -101,7 +101,7 @@ h2 {
 .hplm {
     color: #eee;
     text-shadow: 1px 1px #000;
-    background: #afacab;
+    background: #c8c7c5;
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -299,7 +299,7 @@ div.Box h2 {
     font-weight: bold;
     font-variant:small-caps;
 
-    background-color:  #aaa;
+    background-color:  #c8c7c5;
     background-position: left center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -879,7 +879,7 @@ h2 div.toolbar > ul > li > * {
 }
 h2 div.toolbar > ul > li > button {
     height: 1.1em;
-    background: none;
+    background: #aaa;
 }
 
 /* Help dialog */
