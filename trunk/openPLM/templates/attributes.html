@@ -37,7 +37,7 @@
                         <a class="tb-btn" href="/user/{{object_reference|urlencode }}/password/"><span class="ui-button-text">{% trans "Change my password" %}</span></a>
                     {% endif %}
                 {% elif is_owner and obj.is_editable %}
-                    <a class="tb-btn" 
+                    <a class="tb-btn tb-btn-success" 
                         href="/object/{{object_type|urlencode }}/{{object_reference|urlencode }}/{{object_revision|urlencode }}/modify/">
                         <i class="tb-icon-pencil"></i>
                         <span>{% trans "Edit this information" %}</span>
