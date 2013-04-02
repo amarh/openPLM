@@ -303,11 +303,6 @@
 /* @end */
 
 /* @group Active  */
-.chzn-container-active {
-  border: 1px solid #5897fb !important;
-}
-.chzn-container-active .chzn-single-with-drop {
- }
 .chzn-container-active .chzn-single-with-drop div {
   background: transparent;
   border-left: none;

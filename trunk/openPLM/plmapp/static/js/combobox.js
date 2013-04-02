@@ -37,7 +37,7 @@ var make_combobox = function () {
     );
     $("select").chosen({disable_search_threshold: 7});
 
-    $("div.chzn-container").addClass("ui-widget ui-button ui-state-default ui-corner-all");
+    $("div.chzn-container>a").addClass("tb-btn");
     
     /* set the width of the drop-down menu */
     $("div.chzn-drop").each(
