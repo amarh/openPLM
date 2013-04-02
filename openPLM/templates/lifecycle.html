@@ -218,7 +218,7 @@
                                     <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
                                         <input type="hidden" name="link_id" value="{{ link.id }}"/>
                                         <input name="action" type="submit"
-                                        class="tb-btn tb-btn-danger" value="—" 
+                                        class="tb-btn" value="—" 
                                         title="{% trans "Remove" %}"/>
                                     </form>
                                 {% endif %}
