@@ -7,7 +7,7 @@
 
 {% block content %}
     {% if is_contributor and obj.is_editable and not last_revision.deprecated %}
-        <div id="add_file_container" style="border-bottom: 2px dotted black; padding-bottom:1%; margin-bottom:1%" class="ci hidden">
+        <div id="add_file_container" class="ci hidden">
             {% include "documents/files_add.html" %}
         </div>
     {% endif %}
