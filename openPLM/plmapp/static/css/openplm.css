@@ -1320,6 +1320,7 @@ div#attributes {
 #browser { margin-left: -1em; }
 div#type-panel {
     background-color: #fcfcfc;
+    border: 1px solid #ccc;
 }
 div#type-panel h3:first-child, #browse-results h3 {
     margin-top: 0;
