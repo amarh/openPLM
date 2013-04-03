@@ -96,22 +96,3 @@ div.timeline div.objects_inner {
     padding-bottom: 0.5em;
 }
 
-div.timeline span.expand {
-    cursor: pointer;
-    margin-top: auto;
-    margin-bottom: auto;
-    background-image: url("../img/expander_normal.png");
-    display:block; min-width:36px; 
-    text-indent: 16px;
-    background-repeat: no-repeat;
-    background-position: 0 5px;
-    padding-left:4px;
-    margin-left:6px;
-    /*color:black;*/
-    text-align:left;
-}
-
-div.open span.expand{
-   background-image : url("../img/expander_open.png");
-}
-
