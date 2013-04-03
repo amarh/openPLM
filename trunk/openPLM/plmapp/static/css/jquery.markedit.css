@@ -1,4 +1,4 @@
-.markedit textarea { width: 100%; }
+.markedit textarea { width: 100%; font-family: Monaco,ProFont,"Bitstream Vera Sans Mono","American Typewriter","Andale Mono",monospace; }
 
 .markedit-toolbar { padding: 0.3em; margin: 0; height: 22px; border-radius: 8px 8px 0px 0px; -moz-border-radius: 8px 8px 0px 0px;}
 .markedit-toolbar .toolbar-group { margin-right: 0.5em; padding: 0 0 0 5px; float: left; }
