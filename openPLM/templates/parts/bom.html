@@ -56,9 +56,11 @@ $(function() {
             <input type="submit" class="tb-btn" name="diff" value="{% trans "Compare two BOMs" %}"/>
         </div>
     </form>
-    <div id="decompose">
-        {{ decomposition_msg|safe }}
-    </div>
+    {% if decomposition_msg %}
+        <div id="decompose" class="tb-alert-info">
+            {{ decomposition_msg|safe }}
+        </div>
+    {% endif %}
     <div>
         {% include "parts/bom_table.html" %}        
     </div>
