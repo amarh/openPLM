@@ -112,8 +112,10 @@
     {% if is_contributor and obj.is_editable %}
         <div id="add_file_container" class="hidden">
             {% include "documents/files_add.html" %}
+            <div id="add-file-nojs">
+                <a href="add/">{% trans "Add file (no javascript)" %}</a>
+            </div>
         </div>
-            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
     {% endif %}
 {% endblock %}
 
