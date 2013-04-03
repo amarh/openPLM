@@ -5,8 +5,6 @@ function update_part_form() {
     form.showLoading();
     var prefix = $(this).attr("id").replace("-type_part", "").replace("id_", "");
 
-
-
     var assembly_reference = $(this).parent().attr("id").replace("_ref", "");  
     var selected=$(this).val()
 
@@ -21,41 +19,22 @@ function update_part_form() {
             
        
             $("#decompose_form a#"+assembly_reference+"_part").html("("+selected+")")
-               
-                
-            
-            
             make_combobox();
             form.hideLoading();
-            }
+        }
     });
 }
 
     
 $(document).ready(function() {
-    $("#decompose_form button.toggle_extra_attributes_button").button().click(
+    $("#decompose_form button.toggle").click(
         function () {
             var id = $(this).attr("id");
             $("tr." + id).toggle();
-            $(this).children("span").text($(this).children("span").text() == "+" ? "-" : "+");
+            $(this).text($(this).text() == "+" ? "-" : "+");
             return false;
         }
     );
     $("#decompose_form td.part_type_form > select").change(update_part_form);
-    });
-
-/*
-$(function() {
-    $("#decompose_form button.toggle_extra_attributes_button").button().click(
-        function () {
-            var id = $(this).attr("id");
-            $("tr." + id).toggle();
-            $(this).children("span").text($(this).children("span").text() == "+" ? "-" : "+");
-            return false;
-        }
-    );
-    $("#decompose_form td.part_type_form > select").change(update_part_form);
-    }
- );
- */
+});
 

@@ -178,9 +178,7 @@
                                             {% endfor %}
 
                                             <td>
-                                                <button class="toggle_extra_attributes_button"
-                                                    id="part_show-{{prefix}}"
-                                                    >{{part_doc_cforms.0.errors|yesno:"-,+"}}</button> 
+                                                <button class="tb-btn toggle" id="part_show-{{prefix}}" >{{part_doc_cforms.0.errors|yesno:"-,+"}}</button> 
                                             </td>
                                         </tr>
 
@@ -236,9 +234,7 @@
                                             {% endfor %}
 
                                             <td>
-                                                <button class="toggle_extra_attributes_button"
-                                                    id="doc_show-{{prefix}}"
-                                                    >{{part_doc_cforms.1.errors|yesno:"-,+"}}</button> 
+                                                <button class="tb-btn toggle" id="doc_show-{{prefix}}" >{{part_doc_cforms.1.errors|yesno:"-,+"}}</button> 
                                             </td>
 
                                         </tr> 
@@ -273,7 +269,7 @@
                 {% endfor %}
             </table>
         </div>
-        <input type="submit" value="{% trans "Create" %}"/> 
+        <input class="tb-btn tb-btn-large tb-btn-primary" type="submit" value="{% trans "Create" %}"/> 
 
     </form>       
 
