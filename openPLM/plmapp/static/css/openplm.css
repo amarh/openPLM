@@ -1351,7 +1351,7 @@ div#type-panel li:hover:not(.intermediate) * {
 
 
 #add-file-nojs {
-    float: right;
+    text-align: right;
 }
 
 /* bootstrap hacks */

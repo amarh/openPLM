@@ -14,8 +14,10 @@
         {% trans "Select files to upload, then click on upload button to create your document" %}
         </p>
         <div id="add_file_container" class="hidden">
-            <a id="add-file-nojs" href="add/">{% trans "Add file (no javascript)" %}</a>
             {% include "documents/files_add.html" %}
+            <div id="add-file-nojs">
+                <a href="add/">{% trans "Add file (no javascript)" %}</a>
+            </div>
         </div>
 
         <noscript>
