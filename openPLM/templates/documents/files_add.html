@@ -3,7 +3,7 @@
 
 <!-- Manage html display in the Content div which correspond to the "doc-cad" menu + "add new"-->
 {% if obj|main_type == "document" and obj.files.count > 0 %}
-    <div id="add_text" class="tb-btn" >{% trans "Add new files" %}</div>
+    <button id="add_text" class="tb-btn">{% trans "Add new files" %}</button>
 {% endif %}
 <div id="add_form_file">
     {% with add_file_form as form %}

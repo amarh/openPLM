@@ -687,6 +687,7 @@ $(function(){
     $("#add_text").attr("title",trans["Show/Hide the upload form"]);
 
     $("#add_text").click(function(){
+        $(this).toggleClass("tb-active");
         $("#add_form_file").toggleClass("hidden");
     });
 
