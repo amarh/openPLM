@@ -662,3 +662,11 @@ ul.keywordmatches li.goodmatch a {
 p.logo {
     text-align: center;
 }
+
+div.syntax-example {
+    background-color: #FCF8E3;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-left: 2em;
+    padding: 0.5em;
+}
