@@ -3,11 +3,10 @@ table.Content tr td{
 }
 table.Content tr.assembly td.assembly_level{
     height: 40px;
-    background-color: #597f8e;
+    background-color: #6496AB;
     vertical-align: middle;
     font-size: 155%;
     font-weight: bold;
-    border-radius: 4px 4px 0 0;
 }
 
 table.Content tr.part td {
@@ -34,67 +33,44 @@ table.Content th.cell_label {
 
 table.Content tr.assembly td.assembly_name{
     height: 30px;
-    background-color: #8f8d8d;
     vertical-align: middle;
     font-size: 115%;
     font-weight:600;
-    border-radius: 4px 4px 0 0;
 }
 
 td.assembly_name span.display_name {
     cursor: pointer;
     margin-top: auto;
     margin-bottom: auto;
-    background-image: url("../img/expander_normal.png");
     display:block; min-width:36px; 
     text-indent: 16px;
-    background-repeat: no-repeat;
-    background-position: 0 50%;
     padding-left:4px;
     margin-left:6px;
     color:black;
     text-align:left;
 }
 
-td.assembly_name span.display_name:hover {
-    background-image: url("../img/expander_normal_hover.png");
+.display_name:before, .display_level:before {
+    content: " ▸ "; 
+    font-size: 1.4em;
 }
 
-td.open span.display_name{
-   background-image : url("../img/expander_open.png");
-}
-
-td.open span.display_name:hover {
-   background-image : url("../img/expander_open_hover.png");
+td.open .display_name:before, td.open .display_level:before {
+    content: " ▾ ";
+    font-size: 1.4em;
 }
 
 td.assembly_level span.display_level {
     cursor: pointer;
     margin-top: auto;
     margin-bottom: auto;
-    background-image: url("../img/expander_normal.png");
-    background-size: 0.55%;
     display:block; min-width:36px; 
     text-indent: 16px;
-    background-repeat: no-repeat;
-    background-position: 0 50%;
     padding-left:4px;
     margin-left:6px;
-    color:black;
     text-align:left;
-}
-
-td.assembly_level span.display_level:hover {
-    background-image: url("../img/expander_normal_hover.png");
-}
-
-td.open span.display_level{
-    background-image : url("../img/expander_open.png");
-    background-size: 1%;
-}
-
-td.open span.display_level:hover {
-   background-image : url("../img/expander_open_hover.png");
+    color: #eee;
+    text-shadow: 1px 1px #000000;
 }
 
 table.Content input[type=text] {
