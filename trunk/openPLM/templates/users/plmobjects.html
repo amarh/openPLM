@@ -5,20 +5,16 @@
     <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/timeline.css" />
 {% endblock %}
 
-{% block scripts %}
-    <script type="text/javascript" src="{{STATIC_URL}}js/plmobjects.js"></script>
-{% endblock %}
-
-<!-- Manage html display in the Content div which correspond to the "attributes" menu -->
-
 {% block content %}
 
     {% if not restricted %}
         <div>
             <div class="timeline open" >
-                <h3 class="hplm"><span class="expand">{% trans "Last edited objects" %}</span></h3>
+                <h3 class="hplm" data-toggle="collapse" data-target="#last-objects">
+                    <span class="expander"></span>{% trans "Last edited objects" %}
+                </h3>
 
-                <div class="objects">
+                <div class="objects tb-collapse tb-in" id="last-objects">
 
                     <dl>
                         {% for histo in last_edited_objects %}
@@ -52,13 +48,16 @@
 
     {% for group in links %}
         <div class="timeline">
-            <h3 class="hplm"><span class="expand">{% trans group.grouper|capfirst %}</span></h3>
+            <h3 class="hplm collapsed" data-toggle="collapse" data-target="#group-{{ group.grouper }}">
+                <span class="expander"></span>{% trans group.grouper|capfirst %}
+            </h3>
 
+            <div class="tb-collapse" id="group-{{ group.grouper }}">
             {% regroup group.list by plmobject__type as groups %}
 
             {% for gp in groups %}
 
-                <div class="objects hidden">
+                <div class="objects">
 
                     <h4 class="hplm">{{ gp.grouper }} </h4>
                     <div class="objects_inner">
@@ -79,6 +78,7 @@
                     </div>
                 </div>
             {% endfor %}
+                </div>
         </div>
 
     {% endfor %}
