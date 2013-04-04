@@ -75,7 +75,7 @@ Django 1.5
     * StreamingHttpResponse
     * static files
 
-Call :func:`~models.user.get_profile` instead of ``user.get_profile()``.
+Call :func:`~user.profile` instead of ``user.get_profile()``.
 
 Rich text | Wiki syntax
 ++++++++++++++++++++++++++
