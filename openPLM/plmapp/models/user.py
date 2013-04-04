@@ -105,21 +105,6 @@ def add_profile(sender, instance, created, **kwargs):
         profile = UserProfile(user=instance)
         profile.save()
 
-
-def get_profile(user):
-    """
-    .. versionadded:: 1.3
-
-    Returns the :class:`UserProfile` associated with *user*.
-
-    Replaces ``user.get_profile()``.
-    """
-    if not hasattr(user, "_profile_cache"):
-        user._profile_cache = user.profile # UserProfile.objects.get(user__id__exact=user.id)
-        user._profile_cache.user = user
-    return user._profile_cache
-
-
 if __name__ == "openPLM.plmapp.models.user":
     post_save.connect(add_profile, sender=User)
 

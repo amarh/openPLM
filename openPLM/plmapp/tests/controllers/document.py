@@ -290,7 +290,7 @@ class DocumentControllerTest(ControllerTest):
         user = User(username="baduser")
         user.set_password("password")
         user.save()
-        p = models.get_profile(user)
+        p = user.profile
         p.is_contributor = True
         p.save()
         controller = self.CONTROLLER(self.controller.object, user)
@@ -321,7 +321,7 @@ class DocumentControllerTest(ControllerTest):
         user.set_password("password")
         user.save()
         user.groups.add(self.group)
-        p = models.get_profile(user)
+        p = user.profile
         p.is_contributor = True
         p.save()
         models.DelegationLink.objects.create(delegator=self.user, delegatee=user,

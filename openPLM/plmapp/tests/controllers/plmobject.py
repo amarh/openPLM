@@ -101,8 +101,8 @@ class ControllerTest(BaseTestCase):
 
     def test_create_error6(self):
         """Create error test : user is not a contributor"""
-        models.get_profile(self.user).is_contributor = False
-        models.get_profile(self.user).save()
+        self.user.profile.is_contributor = False
+        self.user.profile.save()
         def fail():
             controller = self.CONTROLLER.create("zee", "PLMOBject_", "a",
                                             self.user, self.DATA)
@@ -700,7 +700,7 @@ class ControllerTest(BaseTestCase):
         """ Tests that only a publisher can publish."""
         controller = self.create("P1")
         self.promote_to_official(controller)
-        self.assertFalse(models.get_profile(controller._user).can_publish)
+        self.assertFalse(controller._user.profile.can_publish)
         self.assertPublishError(controller)
 
     def test_publish_not_in_group(self):
@@ -767,7 +767,7 @@ class ControllerTest(BaseTestCase):
     def test_unpublish_not_publisher(self):
         """ Tests that only a publisher can unpublish."""
         controller = self.get_published_ctrl()
-        self.assertFalse(models.get_profile(controller._user).can_publish)
+        self.assertFalse(controller._user.profile.can_publish)
         self.assertUnpublishError(controller)
 
     def test_unpublish_not_in_group(self):
@@ -902,6 +902,6 @@ class ControllerTest(BaseTestCase):
         """ Tests that a non contributor can not clone
         an object."""
         ctrl= self.get_created_ctrl()
-        models.get_profile(ctrl._user).is_contributor = False
+        ctrl._user.profile.is_contributor = False
         self.assertRaises(exc.PermissionError, ctrl.check_contributor)
         self.assertRaises(exc.PermissionError, ctrl.clone, None, ctrl._user, [],[])

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from openPLM.plmapp.forms import SponsorForm
-from openPLM.plmapp.models import GroupInfo, get_profile
+from openPLM.plmapp.models import GroupInfo
 from openPLM.plmapp.controllers import UserController
 
 class Command(BaseCommand):
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         form = SponsorForm(data)
         if form.is_valid():
             new_user = form.save()
-            get_profile(new_user).language = form.cleaned_data["language"]
+            new_user.profile.language = form.cleaned_data["language"]
             role = form.cleaned_data["role"]
             obj.sponsor(new_user, role=="contributor", role=="restricted")
         else:

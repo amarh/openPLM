@@ -410,7 +410,7 @@ class UsersImporter(CSVImporter):
         form = SponsorForm(data, sponsor=self.user.id)
         if form.is_valid():
             new_user = form.save()
-            models.get_profile(new_user).language = form.cleaned_data["language"]
+            new_user.profile.language = form.cleaned_data["language"]
             self.ctrl.sponsor(new_user)
             self.objects.append(new_user)
         else:

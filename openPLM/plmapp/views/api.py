@@ -47,7 +47,7 @@ from openPLM.plmapp.views.base import json_view, get_obj_by_id, object_to_dict,\
 API_VERSION = "1.0"
 #: Decorator whichs requires that the user is login
 api_login_required = user_passes_test(lambda u: (u.is_authenticated()
-    and u.is_active and not models.get_profile(u).restricted), login_url="/api/needlogin/")
+    and u.is_active and not u.profile.restricted), login_url="/api/needlogin/")
 
 @json_view
 def need_login(request):
@@ -71,7 +71,7 @@ def login_json(func):
     def wrapper(request, *args, **kwargs):
         if request.META["HTTP_USER_AGENT"] != "openplm":
             return HttpResponseForbidden()
-        if models.get_profile(request.user).restricted:
+        if request.user.profile.restricted:
             return HttpResponseForbidden()
         return json_func(request, *args, **kwargs)
     return wrapper
@@ -341,7 +341,7 @@ def api_login(request):
     password = request.POST['password']
     user = authenticate(username=username, password=password)
     if user is not None:
-        if user.is_active and not models.get_profile(user).restricted:
+        if user.is_active and not user.profile.restricted:
             login(request, user)
             return {"username" : username, "first_name" : user.first_name,
                     "last_name" : user.last_name}

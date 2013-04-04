@@ -582,7 +582,7 @@ class ECRController(Controller):
         """
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
-        if not models.get_profile(self._user).restricted:
+        if not self._user.profile.restricted:
             return True
         else:
             if self.owner_id == self._user.id:
@@ -601,7 +601,7 @@ class ECRController(Controller):
         """
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
-        if not models.get_profile(self._user).restricted:
+        if not self._user.profile.restricted:
             return self.check_readable(raise_)
         if self._user == self.owner:
             return True

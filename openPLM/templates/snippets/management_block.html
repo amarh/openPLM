@@ -10,7 +10,7 @@
                 <span>{{link.user.first_name}}</span>
                 <span>{{link.user.last_name}},</span>
                 <a href="/user/{{link.user.username|urlencode }}/"><span>{{link.user.username}}</span></a>,
-                {% with link.user|get_profile as profile %}
+                {% with link.user.profile as profile %}
                     <span>{{ profile.rank }},</span>
                 {% endwith %}
 

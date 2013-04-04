@@ -193,7 +193,7 @@ def display_files(request, obj_type, obj_ref, obj_revi):
 @handle_errors
 def upload_and_create(request, obj_ref):
     obj, ctx = get_generic_data(request)
-    if not models.get_profile(obj).is_contributor:
+    if not obj.profile.is_contributor:
         raise ValueError("You are not a contributor")
     if request.method == "POST":
         if request.FILES:

@@ -16,8 +16,8 @@ class RestrictedTestCase(BaseTestCase):
         self.restricted_user = User(username="ru", email="ru@example.net")
         self.restricted_user.set_password("ru")
         self.restricted_user.save()
-        models.get_profile(self.restricted_user).restricted = True
-        models.get_profile(self.restricted_user).save()
+        self.restricted_user.profile.restricted = True
+        self.restricted_user.profile.save()
 
 
 class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
@@ -84,8 +84,8 @@ class RestrictedPLMObjectControllerTestCase(RestrictedTestCase):
         ruser = User(username="ru2", email="ru2@example.net")
         ruser.set_password("ru")
         ruser.save()
-        models.get_profile(ruser).restricted = True
-        models.get_profile(ruser).save()
+        ruser.profile.restricted = True
+        ruser.profile.save()
         self.assertRaises(exc.PermissionError, self.rctrl.add_reader, ruser)
 
     def test_set_role_reader(self):

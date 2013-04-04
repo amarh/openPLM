@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 from django.utils import importlib
 
-from openPLM.plmapp.models import GroupInfo, get_profile
+from openPLM.plmapp.models import GroupInfo
 
 RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
 
@@ -128,7 +128,7 @@ class Command(BaseCommand):
 
         cie.groups.add(gr)
         cie.save()
-        p = get_profile(cie)
+        p = cie.profile
         p.is_contributor = True
         p.save()
 
