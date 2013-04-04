@@ -25,19 +25,21 @@
 """
 """
 import difflib
-from django.utils import timezone
 from itertools import izip_longest
 from collections import namedtuple, defaultdict
 
+from django.db import transaction
 from django.db.models.query import Q
+from django.utils import timezone
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.utils.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
 from openPLM.plmapp.controllers.base import get_controller
 from openPLM.plmapp.files.formats import is_cad_file
-
-from openPLM.plmapp.exceptions import PermissionError
+from openPLM.plmapp.exceptions import PermissionError, PromotionError
+from openPLM.plmapp.tasks import update_indexes
+from openPLM.plmapp.utils import level_to_sign_str
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
@@ -58,6 +60,18 @@ def flatten_bom(data):
         for part in data["alternates"][link.child_id]:
             flatten.append(("alternate", part, data["states"][part.id]))
     return flatten
+
+
+def get_last_children(children):
+    previous_level = 0
+    last_children = []
+    for c in children:
+        if last_children and c.level > previous_level:
+            del last_children[-1]
+        last_children.append(c)
+        previous_level = c.level
+    return last_children
+
 
 class PartController(PLMObjectController):
     u"""
@@ -576,14 +590,7 @@ class PartController(PLMObjectController):
         children = self.get_children(max_level, date=date, only_official=only_official)
         if level == "last" and children:
             # only get "leaf" children
-            previous_level = 0
-            max_children = []
-            for c in children:
-                if max_children and c.level > previous_level:
-                    del max_children[-1]
-                max_children.append(c)
-                previous_level = c.level
-            children = max_children
+            children = get_last_children(children)
         children = list(children)
         # pcle
         extra_columns = []
@@ -1218,4 +1225,75 @@ class PartController(PLMObjectController):
         if self.is_deprecated:
             self.end_alternate()
         return r
+
+    @transaction.commit_on_success
+    def promote_assembly(self):
+        # FIXME Inefficient version
+        # FIXME does not check if alternates part are promoted
+        if not (self.is_proposed or self.is_draft):
+            raise ValueError("invalid state")
+
+        if self.is_promotable():
+            # do not need to promote the whole assembly, children are already promoted
+            self.approve_promotion()
+            return
+
+        # check permission
+        lcl = self.lifecycle.to_states_list()
+        role = level_to_sign_str(lcl.index(self.state.name))
+        self.check_permission(role)
+
+        self.block_mails()
+        self.object.no_index = True
+
+        children = self.get_children(-1)
+        # FIXME checks if multiple revisions of the same part are present
+
+        # XXX: get leaf parts ?
+
+        # check if assembly is promotable
+        to_promote = [c for c in children
+                if c.link.child.state == self.state and c.link.child.lifecycle == self.lifecycle]
+        # promote last children first
+        to_promote.sort(key=lambda c: c.level, reverse=True)
+        # remove duplicated children, only keep children with the higher level
+        to_promote2 = []
+        to_promote_ids = set()
+        for c in to_promote:
+            if c.link.child_id not in to_promote_ids:
+                to_promote2.append(c)
+                to_promote_ids.add(c.link.child_id)
+        to_promote = to_promote2
+
+        # other children have a different lifecycle or are already promoted
+        # they can not be at a previous state because their parents could not
+        # have been promoted in that case
+
+        # the assembly is promotable if the last children are promotable
+        if self.is_draft:
+            # proposed children are always promotable
+            last_children = get_last_children(children)
+            if not all(c.link.child.is_promotable() for c in last_children if c in to_promote):
+                # TODO: only test if they all have an official document attached
+                raise PromotionError("Some children are not promotable")
+
+        ctrls = []
+        for c in to_promote:
+            ctrl = PartController(c.link.child, self._user, block_mails=True, no_index=True)
+            ctrls.append(ctrl)
+        ctrls.append(self)
+        if not all(ctrl.is_last_promoter() for ctrl in ctrls):
+            # TODO: get all required signers in one query
+            # and compare with represented signers
+            # must still check signer permission
+            raise PromotionError()
+        for ctrl in ctrls:
+            # TODO: create (state) histories in bulk
+            ctrl.promote(checked=True)
+
+        # send mails and update indexes
+        for ctrl in ctrls:
+            # TODO merge mails ?
+            ctrl.unblock_mails()
+        update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in ctrls])
 
