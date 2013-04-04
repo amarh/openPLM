@@ -276,7 +276,7 @@ class Controller(object):
             user = self._user
         if not user.is_active:
             raise PermissionError(u"%s's account is inactive" % user)
-        profile = models.get_profile(user)
+        profile = user.profile
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError(u"%s is not a contributor" % user)
         if profile.restricted:

@@ -82,13 +82,13 @@ class UserViewTestCase(CommonViewTest):
         data = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
-                    language=m.get_profile(self.user).language)
+                    language=self.user.profile.language)
         response = self.post(self.user_url + "delegation/sponsor/", data)
         user = User.objects.get(username=data["username"])
         for attr in ("first_name", "last_name", "email"):
             self.assertEquals(data[attr], getattr(user, attr))
-        self.assertTrue(m.get_profile(user).is_contributor)
-        self.assertFalse(m.get_profile(user).is_administrator)
+        self.assertTrue(user.profile.is_contributor)
+        self.assertFalse(user.profile.is_administrator)
         self.assertTrue(user.groups.filter(id=self.group.id))
 
     def test_modify_get(self):
@@ -108,7 +108,7 @@ class UserViewTestCase(CommonViewTest):
         data0 = dict(sponsor=self.user.id,
                     username="loser", first_name="You", last_name="Lost",
                     email="you.lost@example.com", groups=[self.group.pk],
-                    language=m.get_profile(self.user).language)
+                    language=self.user.profile.language)
         response = self.post(self.user_url + "delegation/sponsor/", data0)
         data = {"last_name":"Snow", "email":"user@test.com", "first_name":"John",
                 "avatar":None,}

@@ -9,7 +9,7 @@ from django.utils.feedgenerator import Atom1Feed
 from django.utils.translation import ugettext_lazy as _
 
 from openPLM.plmapp.views.base import get_obj
-from openPLM.plmapp.models import timeline_histories, get_profile
+from openPLM.plmapp.models import timeline_histories
 
 
 def make_desc(action, details, username):
@@ -30,7 +30,7 @@ class HTTPAuthFeed(Feed):
 
     def __call__(self, request, *args, **kwargs):
         if request.user.is_authenticated():
-            if get_profile(request.user).restricted:
+            if request.user.profile.restricted:
                 return HttpResponseForbidden()
             # already logged in
             return super(HTTPAuthFeed, self).__call__(request, *args, **kwargs)
@@ -44,7 +44,7 @@ class HTTPAuthFeed(Feed):
                     user = authenticate(username=uname, password=passwd)
                     if user is not None:
                         if user.is_active:
-                            if get_profile(user).restricted:
+                            if user.profile.restricted:
                                 return HttpResponseForbidden()
                             login(request, user)
                             request.user = user

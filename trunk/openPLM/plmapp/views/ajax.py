@@ -51,7 +51,7 @@ from openPLM.plmapp.filters import richtext
 from openPLM.plmapp.navigate import TIME_FORMAT
 
 ajax_login_required = user_passes_test(lambda u: (u.is_authenticated()
-    and not models.get_profile(u).restricted))
+    and not u.profile.restricted))
 
 @ajax_login_required
 @json_view

@@ -117,7 +117,7 @@
 
                                 {% if is_contributor %}
                                     <div class="tb-btn-group">
-                                        <a class="tb-btn tb-btn-large" href="{{user|get_profile|attr:"plmobject_url"}}files/">
+                                        <a class="tb-btn tb-btn-large" href="{{user.profile.plmobject_url}}files/">
                                             <i class="tb-icon-upload"></i>
                                             <span class="ui-button-text">{% trans "Upload" %}</span>
                                         </a>

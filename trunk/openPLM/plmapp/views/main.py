@@ -78,8 +78,8 @@ def set_language(request):
     if request.method == "POST" and request.user.is_authenticated():
         language = request.session.get('django_language')
         if language:
-            models.get_profile(request.user).language = language
-            models.get_profile(request.user).save()
+            request.user.profile.language = language
+            request.user.profile.save()
     return response
 
 
@@ -88,7 +88,7 @@ def comment_post_wrapper(request):
     # from http://thejaswi.info/tech/blog/2008/11/20/part-2-django-comments-authenticated-users/
     # Clean the request to prevent form spoofing
     user = request.user
-    if user.is_authenticated() and not models.get_profile(user).restricted:
+    if user.is_authenticated() and not user.profile.restricted:
         if not (user.get_full_name() == request.POST['name'] and \
                 user.email == request.POST['email']):
             return HttpResponse("You registered user...trying to spoof a form...eh?")
@@ -176,7 +176,7 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     object_attributes = render_attributes(obj, obj.attributes)
-    ctx["is_contributor"] = models.get_profile(obj._user).is_contributor
+    ctx["is_contributor"] = obj._user.profile.is_contributor
     ctx.update({'current_page' : 'attributes',
                 'object_attributes' : object_attributes})
     if isinstance(obj.object, models.PLMObject):
@@ -500,7 +500,7 @@ def import_csv_init(request, target="csv"):
     """
     Manage page to import a csv file.
     """
-    if not models.get_profile(request.user).is_contributor:
+    if not request.user.profile.is_contributor:
         raise PermissionError("You are not a contributor.")
     obj, ctx = get_generic_data(request)
     if request.method == "POST":
@@ -530,7 +530,7 @@ def import_csv_apply(request, target, filename, encoding):
     View that display a preview of an uploaded csv file.
     """
     obj, ctx = get_generic_data(request)
-    if not models.get_profile(request.user).is_contributor:
+    if not request.user.profile.is_contributor:
         raise PermissionError("You are not a contributor.")
     ctx["encoding_error"] = False
     ctx["io_error"] = False
@@ -669,7 +669,7 @@ class SimpleDateFilter(DateFieldListFilter):
 @secure_required
 def browse(request, type="object"):
     user = request.user
-    if user.is_authenticated() and not models.get_profile(user).restricted:
+    if user.is_authenticated() and not user.profile.restricted:
         # only authenticated users can see all groups and users
         obj, ctx = get_generic_data(request, search=False)
         plmtypes = ("object", "part", "topassembly", "document")
@@ -813,7 +813,7 @@ def public(request, obj_type, obj_ref, obj_revi, template="public.html"):
         test = lambda x: x.published
         is_contributor = False
     else:
-        is_contributor = models.get_profile(request.user).is_contributor
+        is_contributor = request.user.profile.is_contributor
         readable = request.user.plmobjectuserlink_user.now().filter(role=models.ROLE_READER)\
                 .values_list("plmobject_id", flat=True)
         test = lambda x: x.published or x.id in readable

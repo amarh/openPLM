@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from openPLM.plmapp.models import GroupInfo, DocumentFile, get_profile
+from openPLM.plmapp.models import GroupInfo, DocumentFile
 from openPLM.plmapp.controllers import PLMObjectController
 
 class BaseTestCase(TestCase):
@@ -14,7 +14,7 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         self.cie = User.objects.create(username="company")
-        p = get_profile(self.cie)
+        p = self.cie.profile
         p.is_contributor = True
         p.save()
         self.leading_group = GroupInfo.objects.create(name="leading_group",
@@ -24,8 +24,8 @@ class BaseTestCase(TestCase):
         self.user.set_password("password")
         self.user.email = "test@example.net"
         self.user.save()
-        get_profile(self.user).is_contributor = True
-        get_profile(self.user).save()
+        self.user.profile.is_contributor = True
+        self.user.profile.save()
         self.group = GroupInfo(name="grp", owner=self.user, creator=self.user,
                 description="grp")
         self.group.save()
@@ -36,8 +36,8 @@ class BaseTestCase(TestCase):
         """ Returns a new contributor"""
         user = User(username=username)
         user.save()
-        get_profile(user).is_contributor = True
-        get_profile(user).save()
+        user.profile.is_contributor = True
+        user.profile.save()
         user.groups.add(self.group)
         return user
 
@@ -45,8 +45,8 @@ class BaseTestCase(TestCase):
         """ Returns a new contributor"""
         user = User(username=username)
         user.save()
-        get_profile(user).can_publish = True
-        get_profile(user).save()
+        user.profile.can_publish = True
+        user.profile.save()
         user.groups.add(self.group)
         return user
 

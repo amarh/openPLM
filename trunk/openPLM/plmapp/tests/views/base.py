@@ -46,8 +46,8 @@ class CommonViewTest(BaseTestCase):
         self.base_url = self.controller.plmobject_url
         brian = User.objects.create_user(username="Brian", password="life",
                 email="brian@example.net")
-        m.get_profile(brian).is_contributor = True
-        m.get_profile(brian).save()
+        brian.profile.is_contributor = True
+        brian.profile.save()
         self.brian = brian
 
     def post(self, url, data=None, follow=True, status_code=200,

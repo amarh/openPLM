@@ -25,7 +25,7 @@ bv.register_creation_view(ECR, create_ecr)
 @bv.handle_errors(restricted_access=False)
 def browse_ecr(request):
     user = request.user
-    if not models.get_profile(user).restricted:
+    if not user.profile.restricted:
         # only authenticated users can see all groups and users
         obj, ctx = bv.get_generic_data(request, search=False)
         object_list = ECR.objects.all()

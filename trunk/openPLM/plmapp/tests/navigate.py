@@ -319,8 +319,8 @@ class GroupNavigateTestCase(NavigateTestCase):
         """
         # add another user
         brian = User.objects.create(username="Brian", password="life")
-        models.get_profile(brian).is_contributor = True
-        models.get_profile(brian).save()
+        brian.profile.is_contributor = True
+        brian.profile.save()
         brian.groups.add(self.group)
         brian.save()
         for osr, results in ((False, ()), (True, (self.user, brian))):

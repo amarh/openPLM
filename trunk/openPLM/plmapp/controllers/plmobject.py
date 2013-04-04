@@ -81,7 +81,7 @@ class PLMObjectController(Controller):
         :rtype: :class:`PLMObjectController`
         """
 
-        profile = models.get_profile(user)
+        profile = user.profile
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
         if not user.is_active:
@@ -551,7 +551,7 @@ class PLMObjectController(Controller):
     def add_reader(self, new_reader):
         if not self.is_official:
             raise ValueError("Object is not official")
-        if not models.get_profile(new_reader).restricted:
+        if not new_reader.profile.restricted:
             raise ValueError("Not a restricted account")
         if not new_reader.is_active:
             raise PermissionError(u"%s's account is inactive" % new_reader)
@@ -780,7 +780,7 @@ class PLMObjectController(Controller):
         """
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
-        if not models.get_profile(self._user).restricted:
+        if not self._user.profile.restricted:
             if self.is_official or self.is_deprecated or self.is_cancelled:
                 return True
             if self._user.username == settings.COMPANY:
@@ -804,7 +804,7 @@ class PLMObjectController(Controller):
         """
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
-        if not models.get_profile(self._user).restricted:
+        if not self._user.profile.restricted:
             return self.check_readable(raise_)
         return super(PLMObjectController, self).check_permission(models.ROLE_READER, raise_)
 
@@ -849,7 +849,7 @@ class PLMObjectController(Controller):
         res = self.is_official
         if (not res) and raise_:
             raise PermissionError("Invalid state: the object is not official")
-        res = res and models.get_profile(self._user).can_publish
+        res = res and self._user.profile.can_publish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to publish an object")
         res = res and self.check_in_group(self._user, raise_=raise_)
@@ -902,7 +902,7 @@ class PLMObjectController(Controller):
             False otherwise.
         """
 
-        res = models.get_profile(self._user).can_publish
+        res = self._user.profile.can_publish
         if (not res) and raise_:
             raise PermissionError("You are not allowed to unpublish an object")
         res = res and self.check_in_group(self._user, raise_=raise_)
@@ -995,7 +995,7 @@ class PLMObjectController(Controller):
         res = self.check_readable(raise_=False)
         if (not res) and raise_:
             raise PermissionError("You can not clone this object : you shouldn't see it.")
-        res = res and models.get_profile(self._user).is_contributor
+        res = res and self._user.profile.is_contributor
         if (not res) and raise_:
             raise PermissionError("You can not clone this object since you are not a contributor.")
         res = res and self.is_cloneable

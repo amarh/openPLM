@@ -181,7 +181,7 @@ def sponsor(request, obj_ref):
         form = forms.SponsorForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            models.get_profile(new_user).language = form.cleaned_data["language"]
+            new_user.profile.language = form.cleaned_data["language"]
             role = form.cleaned_data["role"]
             obj.sponsor(new_user, role=="contributor", role=="restricted")
             return HttpResponseRedirect("..")
@@ -195,7 +195,7 @@ def sponsor(request, obj_ref):
 
 @handle_errors
 def create_user(request):
-    url = models.get_profile(request.user).plmobject_url + "delegation/sponsor/"
+    url = request.user.profile.plmobject_url + "delegation/sponsor/"
     return HttpResponseRedirect(url)
 register_creation_view(User, create_user)
 

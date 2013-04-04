@@ -69,7 +69,7 @@ class GroupController(Controller):
 
     @classmethod
     def create(cls, name, description, user, data={}):
-        profile = models.get_profile(user)
+        profile = user.profile
         if not (profile.is_contributor or profile.is_administrator):
             raise PermissionError("%s is not a contributor" % user)
         if profile.restricted:
@@ -154,7 +154,7 @@ class GroupController(Controller):
                 user = form.cleaned_data["user"]
                 if user == self.owner:
                     raise ValueError("Bad user %s" % user)
-                if models.get_profile(user).restricted:
+                if user.profile.restricted:
                     raise ValueError("Restricted account can not join a group")
                 if delete:
                     users.append(user)
@@ -173,7 +173,7 @@ class GroupController(Controller):
         """
         if not user.email:
             raise ValueError("user's email is empty")
-        if models.get_profile(user).restricted:
+        if user.profile.restricted:
             raise ValueError("Restricted account can not join a group")
         if not user.is_active:
             raise ValueError(u"%s's account is inactive" % user)
@@ -192,7 +192,7 @@ class GroupController(Controller):
         """
         if not self.owner.email:
             raise ValueError("user's email is empty")
-        if models.get_profile(self._user).restricted:
+        if self._user.profile.restricted:
             raise ValueError("Restricted account can not join a group")
         if not self._user.is_active:
             raise PermissionError(u"%s's account is inactive" % self._user)
@@ -319,7 +319,7 @@ class GroupController(Controller):
         return self.plmobject_group.exclude_cancelled().filter(type__in=types)
 
     def check_readable(self, raise_=True):
-        if models.get_profile(self._user).restricted or not self._user.is_active:
+        if self._user.profile.restricted or not self._user.is_active:
             if raise_:
                 raise PermissionError("You can not see this group")
             return False

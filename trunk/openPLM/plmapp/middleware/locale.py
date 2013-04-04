@@ -3,7 +3,6 @@
 from django.utils import translation
 from django.middleware.locale import LocaleMiddleware
 
-from openPLM.plmapp.models import get_profile
 
 class ProfileLocaleMiddleware(LocaleMiddleware):
     """
@@ -27,7 +26,7 @@ class ProfileLocaleMiddleware(LocaleMiddleware):
             # the session language is used
             # otherwise, the profile language is used
             language = request.session.get("django_language")
-            profile = get_profile(request.user)
+            profile = request.user.profile
             saved_language = profile.language
             if language is None:
                 language = saved_language

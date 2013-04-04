@@ -51,7 +51,7 @@ def can_add(obj, arg):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:
                 return False
-            if models.get_profile(obj).restricted:
+            if obj.profile.restricted:
                 return False
             if hasattr(cur_obj, "check_in_group"):
                 if obj.username == settings.COMPANY:
@@ -67,7 +67,7 @@ def can_add(obj, arg):
         if isinstance(obj, (User, UserController)):
             if not obj.is_active:
                 return False
-            if models.get_profile(obj).restricted:
+            if obj.profile.restricted:
                 if action == "add_reader":
                     return not cur_obj.users.now().filter(user=obj,
                             role=models.ROLE_READER).exists()
@@ -397,12 +397,6 @@ def confirm(context, action, action_label, msg, btn_classes=""):
         "btn_classes": btn_classes,
     }
 
-
-@register.filter
-def get_profile(user):
-    return models.get_profile(user)
-
-
 @register.filter
 def richtext_filter(content, obj=None):
     """
@@ -426,7 +420,7 @@ def avatar_url(user):
     if isinstance(user, dict):
         profile = user.get("profile")
     else:
-        profile = models.get_profile(user)
+        profile = user.profile
     if profile and profile.avatar:
         return profile.avatar.url
     else:

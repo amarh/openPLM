@@ -40,7 +40,7 @@ from django.db.models.loading import get_model
 from django.contrib.sites.models import Site
 from celery.task import task
 
-from openPLM.plmapp.models import (get_profile, User, UserProfile,
+from openPLM.plmapp.models import (User, UserProfile,
         DelegationLink, ROLE_OWNER, ROLE_SIGN)
 
 
@@ -170,7 +170,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
                 return
             if not recipient.email or recipient.email in blacklist:
                 return
-            lang_to_email[get_profile(recipient).language].add(recipient.email)
+            lang_to_email[recipient.profile.language].add(recipient.email)
         else:
             qs = UserProfile.objects.filter(user__in=recipients,
                     user__is_active=True).exclude(user__email="")

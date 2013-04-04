@@ -192,7 +192,7 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
         def wrapper(request, *args, **kwargs):
             if request.method == "POST" and request.POST.get("_undo"):
                 return HttpResponseRedirect(undo)
-            if restricted_access and models.get_profile(request.user).restricted:
+            if restricted_access and request.user.profile.restricted:
                 return HttpResponseForbidden()
             try:
                 response = f(request, *args, **kwargs)
@@ -292,7 +292,7 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
     ctx = init_ctx(type_, reference, revision)
     # This case happens when we create an object (and therefore can't get a controller)
     save_session = False
-    profile = models.get_profile(request.user)
+    profile = request.user.profile
     restricted = profile.restricted
     if type_ == reference == revision == '-':
         obj = request.user

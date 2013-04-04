@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
-from openPLM.plmapp.models import get_profile
 from .models import Badge as BadgeModel
 from .models import BadgeToUser, LEVEL_CHOICES
 
@@ -144,6 +143,6 @@ class MetaBadge(object):
         """
         user = self.get_user(instance)
         if user :
-            return get_profile(user).is_contributor
+            return user.profile.is_contributor
         else :
             return False
