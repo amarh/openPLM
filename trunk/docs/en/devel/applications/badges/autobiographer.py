@@ -11,8 +11,8 @@ class Autobiographer(MetaBadge):
     # not required
     progress_start = 0
     progress_finish = 2
-    
-    # optional functions    
+
+    # optional functions
     def get_user(self, instance):
         return instance.user
 
@@ -21,10 +21,10 @@ class Autobiographer(MetaBadge):
 
     def check_bio(self, instance):
         return instance.bio
-        
+
     # required functions
     def get_progress(self, user):
         has_email = 1 if user.email else 0
-        has_bio = 1 if user.get_profile().bio else 0
+        has_bio = 1 if user.profile.bio else 0
         return has_email + has_bio
-    
+
