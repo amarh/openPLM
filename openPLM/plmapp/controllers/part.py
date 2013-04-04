@@ -25,7 +25,6 @@
 """
 """
 import difflib
-import datetime
 from django.utils import timezone
 from itertools import izip_longest
 from collections import namedtuple, defaultdict
@@ -1212,7 +1211,7 @@ class PartController(PLMObjectController):
                 other_part = partset.parts.exclude(id=previous_revision.id)[0]
                 # do not check owner permission since the company owns the part
                 self.add_alternate(other_part, check_perm=False)
-            except (ValueError, PermissionError) as e:
+            except (ValueError, PermissionError):
                 # it should not failed, except if another alternate set was built
                 # or if alternate/bom rules are not respected
                 pass
