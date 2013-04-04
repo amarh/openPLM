@@ -157,11 +157,7 @@ class Part(AbstractPart, PLMObject):
                         lifecycle=self.lifecycle).exclude(state__in=invalid_states)
                 valid_alternates = set(valid_alternates.values_list("id", flat=True))
                 valid_partsets = set(s for p, s in alt.iteritems() if p in valid_alternates)
-                valid = True
-                for child in invalid_children:
-                    if alt.get(child) not in valid_partsets:
-                        valid = False
-                        break
+                valid = all(alt.get(child) in valid_partsets for child in invalid_children)
             else:
                 valid = False
             if not valid:
