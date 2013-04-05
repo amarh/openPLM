@@ -247,6 +247,26 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
             ]), P,
         )
 
+    def test_to_proposed2(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", D, data.copy(), [
+                ("P2", D, data.copy(), [
+                    ("P3", D, data.copy(), []),
+                ]),
+            ]), P,
+        )
+
+    def test_to_proposed3(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", D, data.copy(), [
+                ("P2", D, data.copy(), [
+                    ("P3", P, data.copy(), []),
+                ]),
+            ]), P,
+        )
+
     def test_proposed_to_official(self):
         data = { "lifecycle": self.DPOD }
         self.assertPromotion(
@@ -255,6 +275,52 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                 ("P3", P, data.copy(), []),
             ]),
         )
+
+    def test_proposed_to_official2(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), [
+                    ("P3", P, data.copy(), []),
+                ]),
+            ]),
+        )
+
+    def test_proposed_to_official3(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), [
+                    ("P3", O, data.copy(), []),
+                ]),
+            ]),
+        )
+
+    def test_proposed_to_official4(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), [
+                    ("P3", O, data.copy(), []),
+                    ("P4", P, data.copy(), []),
+                ]),
+                ("P5", P, data.copy(), [
+                    ("P3", O, data.copy(), []),
+                    ("P2", P, data.copy(), []),
+                ]),
+            ]),
+        )
+
+    def test_proposed_no_doc(self):
+        data = { "lifecycle": self.DPOD }
+        p3_data = {"lifecycle": self.DPOD, "doc": False}
+        self.assertNotPromotion(
+            ("P1", D, data.copy(), [
+                ("P2", P, data.copy(), []),
+                ("P3", D, p3_data, []),
+            ]),
+        )
+
     # TODO:
     #  * proposed state
     #  * different lifecycles
