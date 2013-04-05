@@ -40,6 +40,7 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                 user = data.get("user", self.user)
                 doc = data.pop("doc", not children)
                 signers = data.pop("signers", None)
+                approvers = data.pop("approvers", [])
                 d = self.DATA.copy()
                 d.update(data)
                 ctrl = self.CONTROLLER.create(ref, self.TYPE, rev,
@@ -55,6 +56,8 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                     new_links = [models.PLMObjectUserLink(plmobject=ctrl.object,
                         user=u, role=r) for r in roles for u in signers]
                     models.PLMObjectUserLink.objects.bulk_create(new_links)
+                for user in approvers:
+                    self.CONTROLLER(ctrl.object, user).approve_promotion()
 
                 ref_to_ctrls[(ref, rev)] = ctrl
             return ctrl
@@ -243,6 +246,27 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                     ("P3", D, {}, [
                         ("P4", D, {}, []),
                     ]),
+                ]),
+            ]),
+        )
+
+    def test_last_signer_one_approver(self):
+        brian = self.get_contributor()
+        self.assertPromotion(
+            ("P1", D, {}, [
+                ("P2", D, {}, [
+                    ("P3", D, {"signers": [brian, self.user], "approvers": [brian]}, []),
+                ]),
+            ]),
+        )
+
+    def test_not_last_signer2(self):
+        brian = self.get_contributor()
+        john = self.get_contributor("john")
+        self.assertNotPromotion(
+            ("P1", D, {}, [
+                ("P2", D, {}, [
+                    ("P3", D, {"signers": [brian, john, self.user], "approvers": [brian]}, []),
                 ]),
             ]),
         )
