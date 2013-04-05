@@ -1271,7 +1271,7 @@ class PartController(PLMObjectController):
 
         # the assembly is promotable if the last children are promotable
         if self.is_draft:
-            # proposed children are always promotable
+            # proposed last children are always promotable
             last_children = get_last_children(children)
             if not all(c.link.child.is_promotable() for c in last_children if c in to_promote):
                 # TODO: only test if they all have an official document attached

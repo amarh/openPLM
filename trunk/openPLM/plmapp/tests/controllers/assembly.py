@@ -22,6 +22,7 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
         super(AssemblyTestCase, self).setUp()
         self.doc = DocumentController.create("d1", "Document", "a", self.user, self.DATA)
         self.doc.promote(checked=True)
+        self.DPOD = models.Lifecycle.objects.get(name="draft_proposed_official_deprecated")
 
     # utility methods
 
@@ -47,7 +48,7 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                 ctrl.object.original_state = state
                 if signers:
                     roles = ctrl.users.filter(role__startswith=models.ROLE_SIGN).values_list("role", flat=True)
-                    links = ctrl.users.filter(role__startswith=models.ROLE_SIGN).end()
+                    ctrl.users.filter(role__startswith=models.ROLE_SIGN).end()
                     new_links = [models.PLMObjectUserLink(plmobject=ctrl.object,
                         user=u, role=r) for r in roles for u in signers]
                     models.PLMObjectUserLink.objects.bulk_create(new_links)
@@ -237,6 +238,23 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
             ]),
         )
 
+    def test_to_proposed(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", D, data.copy(), [
+                ("P2", D, data.copy(), []),
+                ("P3", D, data.copy(), []),
+            ]), P,
+        )
+
+    def test_proposed_to_official(self):
+        data = { "lifecycle": self.DPOD }
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), []),
+                ("P3", P, data.copy(), []),
+            ]),
+        )
     # TODO:
     #  * proposed state
     #  * different lifecycles
