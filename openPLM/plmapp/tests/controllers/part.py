@@ -26,7 +26,6 @@
 This module contains some tests for openPLM.
 """
 
-import datetime
 from django.utils import timezone
 import itertools
 
@@ -490,6 +489,19 @@ class PartControllerTest(ControllerTest):
         self.controller3.attach_to_document(self.document)
         self.controller3.attach_to_document(doc)
         self.assertTrue(self.controller3.is_promotable())
+
+    def test_is_promotable_proposed_child(self):
+        lifecycle = models.Lifecycle.objects.get(name="draft_proposed_official_deprecated")
+        data = self.DATA.copy()
+        data["lifecycle"] = lifecycle
+        p1 = PartController.create("p1", "Part", "a", self.user, data)
+        p2 = PartController.create("p2", "Part", "a", self.user, data)
+        p1.add_child(p2, 1, 1 , "-")
+        p2.promote(checked=True)
+        p1.approve_promotion()
+        self.assertFalse(p1.is_promotable())
+        p2.approve_promotion()
+        p1.approve_promotion()
 
     def test_promote(self):
         controller = self.controller

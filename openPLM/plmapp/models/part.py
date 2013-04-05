@@ -120,9 +120,9 @@ class Part(AbstractPart, PLMObject):
 
             #. its state is not the last state of its lifecycle
 
-            #. if the part is not editable (its state is official).
+            #. if the part is official.
 
-            #. the part is editable and:
+            #. the part is draft or proposed and:
 
                 #. there is a next state in its lifecycle and if its children
                     which have the same lifecycle are in a state as mature as
@@ -133,7 +133,10 @@ class Part(AbstractPart, PLMObject):
         """
         if not self._is_promotable():
             return False
-        if not self.is_editable:
+        if self.is_official:
+            return True
+        if self.approvals.now().exists():
+            # previous signers have already checked if it was promotable
             return True
         # is this part synchronized with other parts
         from .link import SynchronizedPartSet, AlternatePartSet
@@ -143,7 +146,7 @@ class Part(AbstractPart, PLMObject):
         # check children
         lcs = self.lifecycle.to_states_list()
         rank = lcs.index(self.state.name)
-        invalid_states = [lcs[0]] + lcs[:rank]
+        invalid_states = lcs[:rank + 1]
         invalid_children = list(self.parentchildlink_parent.now().\
                 filter(child__lifecycle=self.lifecycle, child__state__in=invalid_states).\
                 values_list("child", flat=True))
@@ -163,7 +166,7 @@ class Part(AbstractPart, PLMObject):
             if not valid:
                 self._promotion_errors.append(_("Some children are at a lower or draft state."))
             return valid
-        if not self.parentchildlink_parent.now().exists():
+        if self.is_draft and not self.parentchildlink_parent.now().exists():
             # check that at least one document is attached and its state is official
             # see ticket #57
             links = self.documentpartlink_part.now().filter(document__state=F("document__lifecycle__official_state"))
