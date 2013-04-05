@@ -138,11 +138,7 @@ class Part(AbstractPart, PLMObject):
         if self.approvals.now().exists():
             # previous signers have already checked if it was promotable
             return True
-        # is this part synchronized with other parts
-        from .link import SynchronizedPartSet, AlternatePartSet
-        partset = SynchronizedPartSet.get_partset(self)
-        if partset is not None:
-            return self.is_set_promotable(partset)
+        from .link import AlternatePartSet
         # check children
         lcs = self.lifecycle.to_states_list()
         rank = lcs.index(self.state.name)
@@ -174,35 +170,6 @@ class Part(AbstractPart, PLMObject):
             if not found:
                 self._promotion_errors.append(_("There are no official documents attached."))
             return found
-        return True
-
-    def is_set_promotable(self, partset):
-        # current implementation: at most 4 requests
-        # FIXME: handle alternate links
-        from .link import ParentChildLink, DocumentPartLink
-        part_ids = set(partset.parts.values_list("id", flat=True))
-        # get all direct children of all parts
-        # parent: test children's states, except for children in the partset
-        lcs = self.lifecycle.to_states_list()
-        rank = lcs.index(self.state.name)
-        invalid_states = [lcs[0]] + lcs[:rank]
-        invalid_children = ParentChildLink.current_objects.filter(parent__in=part_ids).\
-                filter(child__lifecycle=self.lifecycle, child__state__in=invalid_states).\
-                exclude(child__in=part_ids)
-        if invalid_children.exists():
-            self._promotion_errors.append(_("Some children are at a lower or draft state."))
-            return False
-
-        # leaf parts
-        leave = part_ids - set(ParentChildLink.current_objects.filter(parent__in=part_ids).\
-                values_list("parent", flat=True))
-        valid_leaves = set(DocumentPartLink.current_objects.filter(part__in=leave).\
-                filter(document__state=F("document__lifecycle__official_state")).\
-                values_list("part", flat=True))
-        if valid_leaves != leave:
-            self._promotion_errors.append(_("There are no official documents attached to some leaf parts."))
-            return False
-
         return True
 
     @property

@@ -1,4 +1,3 @@
-import datetime
 from django.utils import timezone
 import kjbuckets
 
@@ -85,7 +84,7 @@ class Link(models.Model):
     Abstract link base class.
 
     This class represents a link between two :class:`.PLMObject`
-    
+
     :model attributes:
         .. attribute:: ctime
 
@@ -116,7 +115,7 @@ class Link(models.Model):
     ACTION_NAME = "Link"
 
     class Meta:
-        abstract = True  
+        abstract = True
 
     def clean(self):
         """
@@ -164,7 +163,7 @@ class Link(models.Model):
 class ParentChildLink(Link):
     """
     Link between two :class:`.Part`: a parent and a child
-    
+
     :model attributes:
         .. attribute:: parent
 
@@ -173,26 +172,26 @@ class ParentChildLink(Link):
 
             a :class:`.Part`
         .. attribute:: quantity
-            
+
             amount of child (a positive float)
         .. attribute:: unit
-            
+
             unit of the quantity
         .. attribute:: order
-            
+
             positive integer
 
     """
 
     ACTION_NAME = "Link : parent-child"
 
-    parent = models.ForeignKey(Part, related_name="%(class)s_parent")    
-    child = models.ForeignKey(Part, related_name="%(class)s_child")    
+    parent = models.ForeignKey(Part, related_name="%(class)s_parent")
+    child = models.ForeignKey(Part, related_name="%(class)s_child")
     quantity = models.FloatField(default=lambda: 1)
     unit = models.CharField(max_length=4, choices=UNITS,
             default=lambda: DEFAULT_UNIT)
     order = models.PositiveSmallIntegerField(default=lambda: 1)
-    
+
     class Meta:
         app_label = "plmapp"
         unique_together = ("parent", "child", "end_time")
@@ -236,7 +235,7 @@ class ParentChildLink(Link):
         :param save: If True, the cloned link and its extensions are saved
         :param extension_data: dictionary PCLE module name -> data of data
             that are given to :meth:`.ParentChildLinkExtension.clone`.
-        
+
         :return: a tuple (cloned link, list of cloned extensions)
 
         Example::
@@ -252,7 +251,7 @@ class ParentChildLink(Link):
             ParentChildLink<Part<PART_2/MotherBoard/a>, Part<ttd/RAM/a>, 51.000000, -, 10>
             >>> print ext
             [<ReferenceDesignator: ReferenceDesignator<new_value>>]
-            
+
         """
         # original data
         data = dict(parent=self.parent, child=self.child,
@@ -269,7 +268,7 @@ class ParentChildLink(Link):
         extensions = []
         extension_data = extension_data or {}
         for ext in self.extensions:
-            extensions.append(ext.clone(link, save, 
+            extensions.append(ext.clone(link, save,
                 **extension_data.get(ext._meta.module_name, {})))
         return link, extensions
 
@@ -322,7 +321,7 @@ class ParentChildLinkExtension(ParentModel):
     :meth:`.get_visible_fields` or :meth:`.get_editable_fields`.
 
     .. seealso::
-    
+
         :ref:`bom_extensions` explains how to subclass this class.
     """
 
@@ -339,7 +338,7 @@ class ParentChildLinkExtension(ParentModel):
     def get_visible_fields(cls):
         """
         Returns the list of visible fieldnames.
-        
+
         By default, returns an empty list.
         """
         return []
@@ -360,7 +359,7 @@ class ParentChildLinkExtension(ParentModel):
         By default return True if :meth:`.get_visible_fields` returns a
         non empty list."""
         return bool(cls.get_visible_fields())
-    
+
     @classmethod
     def apply_to(cls, parent):
         """
@@ -368,7 +367,7 @@ class ParentChildLinkExtension(ParentModel):
 
         :param parent: part which will have a new child
         :type parent: :class:`.Part` (its most specific subclass).
-        
+
         Returns True by default.
         """
         return True
@@ -376,7 +375,7 @@ class ParentChildLinkExtension(ParentModel):
     def clone(self, link, save=False, **data):
         """
         Clone this extension.
-        
+
         **Subclass must define its implementation.** and respect the
         following specification:
 
@@ -387,7 +386,7 @@ class ParentChildLinkExtension(ParentModel):
                      (the default) if it must not be saved.
         :type save: boolean
         :param data: additional data that override the original values
-        
+
         :return: the cloned extension
         """
         raise NotImplementedError
@@ -399,7 +398,7 @@ class ParentChildLinkExtension(ParentModel):
         """
         Returns a dictionary fieldnames -> value that can be safely passed as
         a kwargument to :meth:`.clone` and that is used to compare two
-        extensions. 
+        extensions.
         """
         d = {}
         for field in self._meta.get_all_field_names():
@@ -407,7 +406,7 @@ class ParentChildLinkExtension(ParentModel):
                     'parentchildlinkextension_ptr'):
                 d[field] = getattr(self, field)
         return d
-    
+
 def register_PCLE(PCLE):
     """
     Register *PCLE* so that openPLM can show its visible fields.
@@ -428,7 +427,7 @@ def get_PCLEs(parent):
 class RevisionLink(Link):
     """
     Link between two revisions of a :class:`.PLMObject`
-    
+
     :model attributes:
         .. attribute:: old
 
@@ -437,22 +436,22 @@ class RevisionLink(Link):
 
             new revision (a :class:`.PLMObject`)
     """
-    
+
     class Meta:
         app_label = "plmapp"
         unique_together = ("old", "new", "end_time")
-    
+
     ACTION_NAME = "Link : revision"
-    old = models.ForeignKey(PLMObject, related_name="%(class)s_old")    
+    old = models.ForeignKey(PLMObject, related_name="%(class)s_old")
     new = models.ForeignKey(PLMObject, related_name="%(class)s_new")
-    
+
     def __unicode__(self):
         return u"RevisionLink<%s, %s>" % (self.old, self.new)
- 
+
 class DocumentPartLink(Link):
     """
     Link between a :class:`.Part` and a :class:`.Document`
-    
+
     :model attributes:
         .. attribute:: part
 
@@ -464,8 +463,8 @@ class DocumentPartLink(Link):
 
     ACTION_NAME = "Link : document-part"
 
-    document = models.ForeignKey(Document, related_name="%(class)s_document")    
-    part = models.ForeignKey(Part, related_name="%(class)s_part")    
+    document = models.ForeignKey(Document, related_name="%(class)s_document")
+    part = models.ForeignKey(Part, related_name="%(class)s_part")
 
     class Meta:
         app_label = "plmapp"
@@ -491,7 +490,7 @@ class DelegationLink(Link):
     """
     Link between two :class:`~.django.contrib.auth.models.User` to delegate
     his rights (abstract class)
-    
+
     :model attributes:
         .. attribute:: delegator
 
@@ -500,14 +499,14 @@ class DelegationLink(Link):
 
             :class:`~django.contrib.auth.models.User` who receives the role
         .. attribute:: role
-            
+
             right that is delegated
     """
 
     ACTION_NAME = "Link : delegation"
-    
-    delegator = models.ForeignKey(User, related_name="%(class)s_delegator")    
-    delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")    
+
+    delegator = models.ForeignKey(User, related_name="%(class)s_delegator")
+    delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")
     role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
             db_index=True)
 
@@ -518,7 +517,7 @@ class DelegationLink(Link):
     def __unicode__(self):
         return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
                                                 self.role)
-    
+
     @classmethod
     def get_delegators(cls, user, role):
         """
@@ -534,7 +533,7 @@ class PLMObjectUserLink(Link):
     """
     Link between a :class:`~.django.contrib.auth.models.User` and a
     :class:`.PLMObject`
-    
+
     :model attributes:
         .. attribute:: plmobject
 
@@ -543,14 +542,14 @@ class PLMObjectUserLink(Link):
 
             a :class:`.User`
         .. attribute:: role
-            
+
             role of *user* for *plmobject* (like `owner` or `notified`)
     """
 
     ACTION_NAME = "Link : PLMObject-user"
 
-    plmobject = models.ForeignKey(PLMObject, related_name="users") 
-    user = models.ForeignKey(User, related_name="%(class)s_user")    
+    plmobject = models.ForeignKey(PLMObject, related_name="users")
+    user = models.ForeignKey(User, related_name="%(class)s_user")
     role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
             db_index=True)
 
@@ -569,7 +568,7 @@ class PromotionApproval(Link):
     .. versionadded:: 1.2
 
     Model to track a promotion approval
-    
+
     :model attributes:
         .. attribute:: plmobject
 
@@ -585,8 +584,8 @@ class PromotionApproval(Link):
             next :class:`.State` of :attr:`plmobject` when if will be promoted
 
     """
-    plmobject = models.ForeignKey(PLMObject, related_name="approvals") 
-    user = models.ForeignKey(User, related_name="approvals")  
+    plmobject = models.ForeignKey(PLMObject, related_name="approvals")
+    user = models.ForeignKey(User, related_name="approvals")
     current_state = models.ForeignKey(State, related_name="+")
     next_state = models.ForeignKey(State, related_name="+")
 
@@ -648,13 +647,6 @@ class PartSet(Link):
         ps = cls.objects.now().filter(parts__in=parts).distinct()
         query = {"%ss__in" % cls.__name__.lower() : ps}
         return list(set(Part.objects.filter(**query).values_list("id", flat=True)))
-        
-
-
-class SynchronizedPartSet(PartSet):
-
-    class Meta:
-        app_label = "plmapp"
 
 
 class AlternatePartSet(PartSet):
