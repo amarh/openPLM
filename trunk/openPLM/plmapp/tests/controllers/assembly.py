@@ -5,6 +5,8 @@ from openPLM.plmapp.controllers import PartController, DocumentController
 from openPLM.plmapp import models
 from openPLM.plmapp import exceptions as exc
 from openPLM.plmapp.utils import level_to_sign_str
+from openPLM.plmapp.lifecycle import LifecycleList
+
 
 from openPLM.plmapp.tests.base import BaseTestCase
 
@@ -12,6 +14,7 @@ D = "draft"
 O = "official"
 P = "proposed"
 DE = "deprecated"
+I = "issue"
 
 class AssemblyTestCase(BaseTestCase, TransactionTestCase):
 
@@ -70,9 +73,11 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
         ctrl, ctrls = self.build_assembly(*assembly)
         ctrl.promote_assembly()
         for c in ctrls:
+            obj = models.Part.objects.get(id=c.id)
             if c.lifecycle == ctrl.lifecycle and c.original_state == ctrl.original_state:
-                obj = models.Part.objects.get(id=c.id)
                 self.assertEqual(obj.state.name, state)
+            else:
+                self.assertEqual(obj.state.name, c.original_state)
 
     def assertNotPromotion(self, assembly):
         ctrl, ctrls = self.build_assembly(*assembly)
@@ -82,6 +87,10 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
             obj = models.Part.objects.get(id=c.id)
             self.assertEqual(obj.state.name, c.original_state)
         self.assertEqual(outbox, mail.outbox)
+
+    def get_issue_lifecycle(self):
+        lcl = LifecycleList("lc_asm", O, D, P, I, O, DE)
+        return models.Lifecycle.from_lifecyclelist(lcl)
 
     # test cases
 
@@ -321,8 +330,86 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
             ]),
         )
 
+    def test_draft_to_proposed_issue(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", D, data.copy(), [
+                ("P2", D, data.copy(), [
+                    ("P3", I, data.copy(), []),
+                ]),
+            ]), P
+        )
+
+    def test_proposed_to_issue(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), [
+                    ("P3", P, data.copy(), []),
+                ]),
+            ]), I
+        )
+
+    def test_proposed_to_issue2(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", P, data.copy(), [
+                    ("P3", P, data.copy(), []),
+                    ("P4", O, data.copy(), []),
+                ]),
+            ]), I
+        )
+
+    def test_proposed_to_issue3(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", P, data.copy(), [
+                ("P2", I, data.copy(), [
+                    ("P3", I, data.copy(), []),
+                    ("P4", O, data.copy(), []),
+                ]),
+            ]), I
+        )
+
+    def test_issue_to_official(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", I, data.copy(), [
+                ("P2", I, data.copy(), [
+                    ("P3", I, data.copy(), []),
+                    ("P4", I, data.copy(), []),
+                ]),
+            ]),
+        )
+
+    def test_issue_to_official2(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", I, data.copy(), [
+                ("P2", I, data.copy(), [
+                    ("P3", O, data.copy(), []),
+                    ("P4", DE, data.copy(), []),
+                ]),
+            ]),
+        )
+
+    def test_issue_to_official3(self):
+        data = { "lifecycle": self.get_issue_lifecycle()}
+        self.assertPromotion(
+            ("P1", I, data.copy(), [
+                ("P2", I, data.copy(), [
+                    ("P3", O, data.copy(), []),
+                    ("P4", DE, data.copy(), []),
+                ]),
+                ("P5", I, data.copy(), [
+                    ("P2", I, data.copy(), []),
+                    ("P3", O, data.copy(), []),
+                ]),
+            ]),
+        )
+
     # TODO:
-    #  * proposed state
     #  * different lifecycles
     #  * multiple revisions of the same part
     #  * alternates
