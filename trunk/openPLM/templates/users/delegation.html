@@ -29,9 +29,8 @@
             </ul>
         </div>
         {% if obj.is_contributor or obj.is_administrator %}
-            <a class="tb-btn" href="./sponsor/">
-                <span class="ui-button-text">{% trans "Sponsor" %}</span>
-            </a>
+            <a class="tb-btn tb-btn-success" href="./sponsor/">
+                {% trans "Sponsor" %}</a>
         {% endif %}
     {% endif %}
     <table class="Content">

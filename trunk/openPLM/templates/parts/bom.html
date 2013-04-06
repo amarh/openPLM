@@ -31,19 +31,33 @@ $(function() {
 
     {% if is_owner and obj.is_editable %}
         <div class="tb-btn-toolbar">
-            <a class="tb-btn add-link" 
-                {% if obj.type|can_add_type:request.session.type %}
-                    href="./add/{% add_search %}"
-                {% else %}
-                    href="./add/{% add_search type='Part' %}"
-                {% endif %} ><span class="ui-button-text">{% trans "ADD" %}</span></a>
-
-            <a class="tb-btn"
-                href="/object/create/?type=Part&amp;related_parent={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"BOM-child/add/"|urlencode|add:"%3Ftype%3D%23%23type%23%23%26reference%3D%23%23ref%23%23%26revision%3D%23%23rev%23%23"}}">
-                <span class="ui-button-text">{% trans "Create a part and add it" %}</span>
-            </a>
-
-            <a class="tb-btn" href="./edit/"><span class="ui-button-text">{% trans "EDIT" %}</span></a>
+            <div class="tb-btn-group">
+                <a class="tb-btn tb-btn-success add-link" 
+                    {% if obj.type|can_add_type:request.session.type %}
+                        href="./add/{% add_search %}"
+                    {% else %}
+                        href="./add/{% add_search type='Part' %}"
+                    {% endif %} >{% trans "Add an existing part" %}</a>
+                <button class="tb-btn tb-btn-success tb-dropdown-toggle" data-toggle="dropdown">
+                    <span class="tb-caret"></span>
+                </button>
+                <ul class="tb tb-dropdown-menu">
+                    <li>
+                        <a class="add-link" 
+                           {% if obj.type|can_add_type:request.session.type %}
+                               href="./add/{% add_search %}"
+                           {% else %}
+                               href="./add/{% add_search type='Part' %}"
+                           {% endif %} >{% trans "Add an existing part" %}</a>
+                    </li>
+                    <li>
+                        <a href="/object/create/?type=Part&amp;related_parent={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"BOM-child/add/"|urlencode|add:"%3Ftype%3D%23%23type%23%23%26reference%3D%23%23ref%23%23%26revision%3D%23%23rev%23%23"}}">
+                            {% trans "Create a part and add it" %}
+                        </a>
+                    </li>
+                </ul>
+             </div>
+            <a class="tb-btn tb-btn-info" href="./edit/">{% trans "EDIT" %}</a>
         </div>
     {% endif %}
     <form method="GET" action="">

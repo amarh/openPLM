@@ -27,7 +27,7 @@
             {{ parts_formset.management_form }}
             <div class="tb-btn-toolbar">
                 <div class="tb-btn-group">
-                    <a class="tb-btn add-link" 
+                    <a class="tb-btn tb-btn-success add-link" 
                         {% if obj.type|can_link:request.session.type %}
                             href="./add/{% add_search %}"
                         {% else %}
@@ -36,7 +36,7 @@
                         <span class="ui-button-text">{% trans "Attach a part" %}</span>
                     </a>
                     {% if not obj.is_deprecated %}
-                        <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                        <button class="tb-btn tb-btn-success tb-dropdown-toggle" data-toggle="dropdown">
                             <span class="tb-caret"></span>
                         </button>
                         <ul class="tb tb-dropdown-menu">
@@ -61,7 +61,7 @@
                     {% endif %}
                 </div>
                 {% if parts_formset.forms %}
-                    <input type="submit" class="tb-btn" value="{% trans "Detach selected parts" %}"/>
+                    <input type="submit" class="tb-btn tb-btn-danger" value="{% trans "Detach selected parts" %}"/>
                 {% endif %}
             </div>
         {% endif %}
