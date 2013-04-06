@@ -20,14 +20,14 @@
                 {% if can_delete %}
                     <ul class="management">
                         <li>
-                        <a class="tb-btn" href="../management/replace/{{link.id}}/?q=&type=User"><span class="ui-button-text">{% trans "REPLACE" %}</span></a>
+                        <a class="tb-btn tb-btn-info" href="../management/replace/{{link.id}}/?q=&type=User">{% trans "REPLACE" %}</a>
                         </li>
                         {% if link.role == 'notified' or link.role == 'reader' %}
                             <li>
 
                             <form action="../management/delete/" method="POST">{% csrf_token %}
                                 <input name="link_id" type="hidden" value="{{link.id}}"/>
-                                <input name="action" type="submit" class="tb-btn" value="{% trans "Delete" %}" />
+                                <input name="action" type="submit" class="tb-btn tb-btn-danger" value="{% trans "DELETE" %}" />
                             </form>
                             </li>
                         {% endif %}
