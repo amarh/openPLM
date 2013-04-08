@@ -32,13 +32,13 @@ $(function() {
     {% if is_owner and obj.is_editable %}
         <div class="tb-btn-toolbar">
             <div class="tb-btn-group">
-                <a class="tb-btn tb-btn-success add-link" 
+                <a class="tb-btn tb-btn-primary add-link" 
                     {% if obj.type|can_add_type:request.session.type %}
                         href="./add/{% add_search %}"
                     {% else %}
                         href="./add/{% add_search type='Part' %}"
                     {% endif %} >{% trans "Add an existing part" %}</a>
-                <button class="tb-btn tb-btn-success tb-dropdown-toggle" data-toggle="dropdown">
+                <button class="tb-btn tb-btn-primary tb-dropdown-toggle" data-toggle="dropdown">
                     <span class="tb-caret"></span>
                 </button>
                 <ul class="tb tb-dropdown-menu">

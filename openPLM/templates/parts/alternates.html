@@ -5,7 +5,7 @@
     {# toolbar #}
     {% if is_owner and obj.is_editable %}
         <div class="toolbar">
-            <a class="tb-btn tb-btn-success" 
+            <a class="tb-btn tb-btn-primary" 
                 {% if obj.type|can_add_type:request.session.type %}
                     href="./add/{% add_search q='' %}"
                 {% else %}

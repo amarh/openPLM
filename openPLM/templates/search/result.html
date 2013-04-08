@@ -16,7 +16,7 @@
                 {{result.rendered_add|safe}}
                 {% if link_creation and result.object|can_add:attach %}
                     {% if order %}<input type="hidden" name="order" value="{{order}}"/>{% endif %}
-                    <input type="submit" class="tb-btn tb-btn-success" value="{% trans "ADD" %}"/>
+                    <input type="submit" class="tb-btn tb-btn-primary" value="{% trans "ADD" %}"/>
                 {% endif %}
             </form>
 
