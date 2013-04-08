@@ -20,7 +20,7 @@
                 {% if can_delete %}
                     <ul class="management">
                         <li>
-                        <a class="tb-btn tb-btn-info" href="../management/replace/{{link.id}}/?q=&type=User">{% trans "REPLACE" %}</a>
+                        <a class="tb-btn" href="../management/replace/{{link.id}}/?q=&type=User">{% trans "REPLACE" %}</a>
                         </li>
                         {% if link.role == 'notified' or link.role == 'reader' %}
                             <li>

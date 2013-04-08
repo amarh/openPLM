@@ -256,7 +256,7 @@
     {# owner and notified users #}
     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
         {% if obj.is_official and in_group %}
-            <a class="tb-btn tb-btn-success" href="../management/add-reader/" >{% trans "Give access to a restricted account" %}</a>
+            <a class="tb-btn tb-btn-primary" href="../management/add-reader/" >{% trans "Give access to a restricted account" %}</a>
         {% endif %}
         {% include "snippets/management_block.html" with links=reader_list can_delete=in_group %}
         {% include "snippets/management_block.html" with links=notified_list can_delete=is_owner %}

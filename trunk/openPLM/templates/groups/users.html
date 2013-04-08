@@ -10,7 +10,7 @@
 
             {{ user_formset.management_form }}
             {% if is_owner %}
-                <a class="tb-btn tb-btn-success" href="./add/">{% trans "Invite another user" %}</a>
+                <a class="tb-btn tb-btn-primary" href="./add/">{% trans "Invite another user" %}</a>
                 {% if user_formset.forms %}
                     <input type="submit" class="tb-btn tb-btn-danger" value="{% trans "Remove selected users" %}"/>
                 {% endif %}

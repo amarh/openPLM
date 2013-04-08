@@ -5,14 +5,14 @@
         {% if obj.is_part %}
             {% if obj.is_draft or obj.is_official %}
                 {# action valid if the part is a draft or official, since the user will own the document #}
-                <a class="tb-btn tb-btn-success"
+                <a class="tb-btn tb-btn-inverse"
                     href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"navigate/"|urlencode}}">
                     {% trans "Attach a new document" %}
                 </a>
             {% endif %}
 
             {% if is_owner and obj.is_editable %}
-                <a class="tb-btn tb-btn-success"
+                <a class="tb-btn tb-btn-inverse"
                     href="/object/create/?type=Part&amp;related_parent={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"navigate/"|urlencode|add:"%3Fadd%3Dt%26type%3D%23%23type%23%23%26reference%3D%23%23ref%23%23%26revision%3D%23%23rev%23%23"}}">
                     {% trans "Add a new part" %}
                 </a>
@@ -24,9 +24,9 @@
         {% if obj.is_document %}
             {% if not obj.is_deprecated %}
                 {# action valid if the doc is not deprecated, since the user will own the part #}
-                <a class="tb-btn"
+                <a class="tb-btn tb-btn-inverse"
                     href="/object/create/?type=Part&amp;related_doc={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"navigate/"|urlencode}}">
-                    <span class="ui-button-text">{% trans "Attach a new part" %}</span>
+                    {% trans "Attach a new part" %}
                 </a>
             {% endif %}
 
