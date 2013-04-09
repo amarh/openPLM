@@ -1,7 +1,7 @@
 from django.test import TransactionTestCase
 from django.core import mail
 
-from openPLM.plmapp.controllers import PartController, DocumentController
+from openPLM.plmapp.controllers import PartController
 from openPLM.plmapp import models
 from openPLM.plmapp import exceptions as exc
 from openPLM.plmapp.utils import level_to_sign_str
@@ -23,9 +23,12 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
 
     def setUp(self):
         super(AssemblyTestCase, self).setUp()
-        self.doc = DocumentController.create("d1", "Document", "a", self.user, self.DATA)
-        self.doc.promote(checked=True)
         self.DPOD = models.Lifecycle.objects.get(name="draft_proposed_official_deprecated")
+        official_state = models.State.objects.get(name=O)
+        # only create the Document object, not all Link objects
+        self.doc = models.Document.objects.create(type="Document", reference="d1",
+                revision="a", lifecycle=self.DPOD, state=official_state,
+                creator=self.user, owner=self.user, group=self.group)
 
     # utility methods
 
@@ -47,26 +50,34 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                 d.update(data)
                 ctrl = self.CONTROLLER.create(ref, self.TYPE, rev,
                     user, d, True, True)
+                object = ctrl.object
                 if doc:
-                    ctrl.attach_to_document(self.doc)
-                ctrl.object.state = models.State.objects.get(name=state)
-                ctrl.object.save()
-                ctrl.object.original_state = state
+                    models.DocumentPartLink.objects.create(part=object, document=self.doc)
+                if object.state.name != state:
+                    object.state = models.State.objects.get(name=state)
+                    object.save(update_fields=("state",))
+                object.original_state = state
                 if signers:
                     roles = ctrl.users.filter(role__startswith=models.ROLE_SIGN).values_list("role", flat=True)
                     ctrl.users.filter(role__startswith=models.ROLE_SIGN).end()
-                    new_links = [models.PLMObjectUserLink(plmobject=ctrl.object,
+                    new_links = [models.PLMObjectUserLink(plmobject=object,
                         user=u, role=r) for r in roles for u in signers]
                     models.PLMObjectUserLink.objects.bulk_create(new_links)
                 if prev:
                     rev = ref_to_ctrls[(ref, prev)].object
-                    models.RevisionLink.objects.create(old=rev, new=ctrl.object)
+                    models.RevisionLink.objects.create(old=rev, new=object)
                 if next:
                     rev = ref_to_ctrls[(ref, next)].object
-                    models.RevisionLink.objects.create(old=ctrl.object, new=rev)
+                    models.RevisionLink.objects.create(old=object, new=rev)
 
-                for user in approvers:
-                    self.CONTROLLER(ctrl.object, user).approve_promotion()
+                if approvers:
+                    lcl = object.lifecycle.to_states_list()
+                    next_state = lcl.next_state(state)
+                    nxt = models.State.objects.get(name=next_state)
+                    models.PromotionApproval.objects.bulk_create(
+                        models.PromotionApproval(user=user, plmobject=object,
+                            current_state=object.state, next_state=nxt)
+                        for user in approvers)
 
                 ref_to_ctrls[(ref, rev)] = ctrl
             return ctrl
