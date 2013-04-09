@@ -1262,9 +1262,14 @@ class PartController(PLMObjectController):
         parts.sort(key=attrgetter("type", "reference", "revision"))
         parts = unique_justseen(parts, attrgetter("id"))
         for (type, ref), group in groupby(parts, attrgetter("type", "reference")):
-            if len(list(group)) >= 2:
+            group = list(group)
+            if len(group) >= 2:
                 # at least two revisions
-                raise ValueError()
+                revisions = u", ".join(p.revision for p in group)
+                msg = (u"Several revisions of the same part are present: "
+                       u"{type}, {ref}, {revisions}")
+                msg = msg.format(type=type, ref=ref, revisions=revisions)
+                raise ValueError(msg)
 
         # XXX: get leaf parts ?
 
