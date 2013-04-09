@@ -25,7 +25,6 @@
 
 from django.contrib.auth.models import User
 
-import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import DocumentController, PartController
 
 from openPLM.plmapp.tests.base import BaseTestCase
@@ -41,14 +40,22 @@ class CommonViewTest(BaseTestCase):
         super(CommonViewTest, self).setUp()
         self.client.post("/login/", {'username' : self.user.username, 'password' : 'password'})
         self.client.post("/i18n/setlang/", {"language" : self.LANGUAGE})
-        self.controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
-                                                 self.user, self.DATA)
+        # block initial mails
+        controller = self.CONTROLLER.create(self.REFERENCE, self.TYPE, "a",
+                                            self.user, self.DATA, True)
+        self.controller = self.CONTROLLER(controller.object, self.user)
         self.base_url = self.controller.plmobject_url
-        brian = User.objects.create_user(username="Brian", password="life",
-                email="brian@example.net")
-        brian.profile.is_contributor = True
-        brian.profile.save()
-        self.brian = brian
+        self._brian = None
+
+    @property
+    def brian(self):
+        if self._brian is None:
+            brian = User.objects.create_user(username="Brian", password="life",
+                    email="brian@example.net")
+            brian.profile.is_contributor = True
+            brian.profile.save()
+            self._brian = brian
+        return self._brian
 
     def post(self, url, data=None, follow=True, status_code=200,
             link=False, page=""):

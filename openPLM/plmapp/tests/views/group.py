@@ -38,6 +38,7 @@ class GroupViewTestCase(CommonViewTest):
         self.part_controller = self.controller
         self.group_url = "/group/%s/" % self.group.name
         self.controller = GroupController(self.group, self.user)
+        self.brian # populate field
 
     def test_group_attributes(self):
         response = self.get(self.group_url + "attributes/", page="attributes")
