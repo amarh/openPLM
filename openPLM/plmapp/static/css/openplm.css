@@ -1444,14 +1444,14 @@ ul.tbi li {
     list-style: disc inside none;
 }
 
-.richtext ul > li {
+.richtext li {
+    display: list-item !important;
+    list-style-position: outside;
     margin-left: 2em !important;
-    display: list-item !important;
-    list-style: disc !important;
 }
-.richtext ol > li {
-    margin-left: 1em !important;
-    display: list-item !important;
+
+.richtext ul > li {
+    list-style: disc !important;
 }
 
 .richtext blockquote {
