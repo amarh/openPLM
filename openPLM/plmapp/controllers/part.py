@@ -1283,7 +1283,7 @@ class PartController(PLMObjectController):
         to_promote_ids = set()
         for c in to_promote:
             if c.link.child_id not in to_promote_ids:
-                to_promote2.append(c)
+                to_promote2.append(c.link.child)
                 to_promote_ids.add(c.link.child_id)
         to_promote = to_promote2
 
@@ -1294,15 +1294,12 @@ class PartController(PLMObjectController):
         # the assembly is promotable if the last children are promotable
         if self.is_draft:
             # proposed last children are always promotable
-            last_children = get_last_children(children)
-            if not all(c.link.child.is_promotable() for c in last_children if c in to_promote):
+            last_children = (c.link.child for c in get_last_children(children))
+            if not all(child.is_promotable() for child in last_children if child.id in to_promote_ids):
                 # TODO: only test if they all have an official document attached
                 raise PromotionError("Some children are not promotable")
 
-        ctrls = []
-        for c in to_promote:
-            ctrl = PartController(c.link.child, self._user, block_mails=True, no_index=True)
-            ctrls.append(ctrl)
+        ctrls = [PartController(c, self._user, True, True) for c in to_promote]
         ctrls.append(self)
         if not all(ctrl.is_last_promoter() for ctrl in ctrls):
             # TODO: get all required signers in one query
