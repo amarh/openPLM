@@ -1415,9 +1415,11 @@ ul.tbi li {
 
 .richtext, .richtext ul *, .richtext ol *,
 .richtext p, .richtext p *, .richtext code, .richtext blockquote, 
-.richtext td, .richtext td * {
+.richtext td, .richtext td *, .richtext dl * {
     color: #111;
 }
+.richtext dd { margin-left: 2em; }
+.richtext dt { font-weight: bold }
 
 .richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6 {
     background: none;
@@ -1436,7 +1438,7 @@ ul.tbi li {
     float: none;
 }
 
-.richtext > ul, .richtext ol, .richtext pre {
+.richtext > ul, .richtext ol, .richtext pre, .richtext dl {
     margin-left: 1em;
 }
 
