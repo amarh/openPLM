@@ -1481,6 +1481,8 @@ ul.tbi li {
     color: #E6007E;
 }
 
+.richtext li p { margin: 0}
+
 .comment_text {
     padding: 0;
 }
