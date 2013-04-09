@@ -25,7 +25,8 @@
 """
 """
 import difflib
-from itertools import izip_longest
+from itertools import imap, izip_longest, groupby
+from operator import attrgetter, itemgetter
 from collections import namedtuple, defaultdict
 
 from django.db import transaction
@@ -43,6 +44,12 @@ from openPLM.plmapp.utils import level_to_sign_str
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
+
+def unique_justseen(iterable, key=None):
+    "List unique elements, preserving order. Remember only the element just seen."
+    # unique_justseen('AAAABBBCCDAABBB') --> A B C D A B
+    # unique_justseen('ABBCcAD', str.lower) --> A B C A D
+    return imap(next, imap(itemgetter(1), groupby(iterable, key)))
 
 def flatten_bom(data):
     flatten = []
@@ -1247,7 +1254,17 @@ class PartController(PLMObjectController):
         self.object.no_index = True
 
         children = self.get_children(-1)
-        # FIXME checks if multiple revisions of the same part are present
+
+        # checks if multiple revisions of the same part are present
+        # XXX: replace old revisions with the newest in assembly ?
+        parts = [self.object]
+        parts.extend(c.link.child for c in children)
+        parts.sort(key=attrgetter("type", "reference", "revision"))
+        parts = unique_justseen(parts, attrgetter("id"))
+        for (type, ref), group in groupby(parts, attrgetter("type", "reference")):
+            if len(list(group)) >= 2:
+                # at least two revisions
+                raise ValueError()
 
         # XXX: get leaf parts ?
 
@@ -1255,7 +1272,7 @@ class PartController(PLMObjectController):
         to_promote = [c for c in children
                 if c.link.child.state == self.state and c.link.child.lifecycle == self.lifecycle]
         # promote last children first
-        to_promote.sort(key=lambda c: c.level, reverse=True)
+        to_promote.sort(key=attrgetter("level"), reverse=True)
         # remove duplicated children, only keep children with the higher level
         to_promote2 = []
         to_promote_ids = set()

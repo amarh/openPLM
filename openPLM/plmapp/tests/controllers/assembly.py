@@ -33,7 +33,7 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
         ref_to_ctrls = {}
 
         def create(ref, state, data, children):
-            rev = data.get("revision", "a")
+            rev = data.get("rev", "a")
             try:
                 ctrl = ref_to_ctrls[(ref, rev)]
             except KeyError:
@@ -41,6 +41,8 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                 doc = data.pop("doc", not children)
                 signers = data.pop("signers", None)
                 approvers = data.pop("approvers", [])
+                prev = data.pop("prev", None)
+                next = data.pop("next", None)
                 d = self.DATA.copy()
                 d.update(data)
                 ctrl = self.CONTROLLER.create(ref, self.TYPE, rev,
@@ -56,6 +58,13 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
                     new_links = [models.PLMObjectUserLink(plmobject=ctrl.object,
                         user=u, role=r) for r in roles for u in signers]
                     models.PLMObjectUserLink.objects.bulk_create(new_links)
+                if prev:
+                    rev = ref_to_ctrls[(ref, prev)].object
+                    models.RevisionLink.objects.create(old=rev, new=ctrl.object)
+                if next:
+                    rev = ref_to_ctrls[(ref, next)].object
+                    models.RevisionLink.objects.create(old=ctrl.object, new=rev)
+
                 for user in approvers:
                     self.CONTROLLER(ctrl.object, user).approve_promotion()
 
@@ -85,7 +94,7 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
     def assertNotPromotion(self, assembly):
         ctrl, ctrls = self.build_assembly(*assembly)
         outbox = list(mail.outbox)
-        self.assertRaises(exc.ControllerError, ctrl.promote_assembly)
+        self.assertRaises((ValueError, exc.ControllerError), ctrl.promote_assembly)
         for c in ctrls:
             obj = models.Part.objects.get(id=c.id)
             self.assertEqual(obj.state.name, c.original_state)
@@ -433,9 +442,42 @@ class AssemblyTestCase(BaseTestCase, TransactionTestCase):
             ]),
         )
 
+    def test_revisions(self):
+        # P3/a and P3/b
+        self.assertNotPromotion(
+            ("P1", D, {}, [
+                ("P2", D, {}, [
+                    ("P3", D, {}, []),
+                ]),
+                ("P4", D, {}, [
+                    ("P3", D, {"rev": "b", "prev": "a"}, []),
+                ]),
+            ]),
+        )
+
+    def test_revisions2(self):
+        # P3/a and P3/b
+        self.assertNotPromotion(
+            ("P1", D, {}, [
+                ("P2", D, {}, [
+                    ("P3", D, {}, []),
+                ]),
+                ("P3", D, {"rev": "b", "prev": "a"}, []),
+            ]),
+        )
+
+    def test_revisions3(self):
+        # P3/a and P3/b
+        self.assertNotPromotion(
+            ("P1", D, {}, [
+                ("P2", D, {}, [
+                    ("P3", D, {"rev": "b"}, []),
+                ]),
+                ("P3", D, {"next": "b"}, []),
+            ]),
+        )
+
+
     # TODO:
-    #  * different lifecycles
-    #  * multiple revisions of the same part
     #  * alternates
-    #  * multiple signers and last signer
 
