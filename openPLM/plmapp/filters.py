@@ -122,7 +122,7 @@ else:
         # TODO: optimize this code
         def previous_revision(label, base, end):
             try:
-                return object.get_previous_revisions()[0].plmobject_url
+                return object.get_previous_revisions()[-1].plmobject_url
             except Exception:
                 return ""
         def next_revision(label, base, end):

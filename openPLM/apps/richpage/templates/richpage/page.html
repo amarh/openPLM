@@ -4,7 +4,7 @@
 {% block content %}
 
     <div class="richtext">
-        {{ obj.page_content|richtext_filter }}
+        {{ obj.page_content|richtext_filter:obj }}
     </div>
     {% if is_contributor and obj.is_editable %}
         <div class="center">
