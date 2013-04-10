@@ -117,25 +117,28 @@ class PLMObjectController(Controller):
         details = u",".join(u"%s : %s" % (k, v) for k, v in infos.items()
                 if k not in ("auto", "pfiles"))
         res._save_histo("Create", details)
-        # add links
-        models.PLMObjectUserLink.objects.create(plmobject=obj, user=user, role="owner")
+
+        # add links (bulk create)
+        ctime = obj.ctime
+        links = [models.PLMObjectUserLink(plmobject=obj, user=user, role="owner", ctime=ctime)]
         try:
-            l = models.DelegationLink.current_objects.get(delegatee=user,
+            l = models.DelegationLink.current_objects.select_related("delegator").get(delegatee=user,
                     role=models.ROLE_SPONSOR)
             sponsor = l.delegator
             if sponsor.username == settings.COMPANY:
                 sponsor = user
-            if not res.check_in_group(sponsor, False):
+            elif not res.check_in_group(sponsor, False):
                 sponsor = user
         except models.DelegationLink.DoesNotExist:
             sponsor = user
         # the user can promote to the next state
-        models.PLMObjectUserLink.objects.create(plmobject=obj, user=user,
-                                                 role=level_to_sign_str(0))
+        links.append(models.PLMObjectUserLink(plmobject=obj, user=user,
+            role=level_to_sign_str(0), ctime=ctime))
         # from the next state, only the sponsor can promote this object
         for i in range(1, obj.lifecycle.nb_states - 1):
-            models.PLMObjectUserLink.objects.create(plmobject=obj, user=sponsor,
-                                                    role=level_to_sign_str(i))
+            links.append(models.PLMObjectUserLink(plmobject=obj, user=sponsor,
+                role=level_to_sign_str(i), ctime=ctime))
+        models.PLMObjectUserLink.objects.bulk_create(links)
 
         res._update_state_history()
         return res
