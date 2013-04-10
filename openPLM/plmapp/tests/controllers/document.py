@@ -51,7 +51,8 @@ class DocumentControllerTest(ControllerTest):
         self.old_files = []
 
     def get_part(self):
-        return PartController.create("mpart", "Part", "a", self.user, self.DATA)
+        return PartController.create("mpart", "Part", "a", self.user,
+                self.DATA, True, True)
 
     def tearDown(self):
         for f in list(self.controller.files.all()) + self.old_files:
