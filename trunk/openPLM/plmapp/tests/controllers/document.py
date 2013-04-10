@@ -27,7 +27,6 @@ This module contains some tests for openPLM.
 """
 
 import os
-import datetime
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
