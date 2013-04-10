@@ -358,8 +358,7 @@ class PLMObjectController(Controller):
 
         users = models.DelegationLink.get_delegators(self._user, role)
         if users:
-            qset = self.users.now().filter(user__in=users,
-                                                          role=role)
+            qset = self.users.now().filter(user__in=users, role=role)
             return qset.exists()
         else:
             return False
