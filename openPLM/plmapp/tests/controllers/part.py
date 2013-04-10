@@ -46,14 +46,19 @@ class PartControllerTest(ControllerTest):
         super(PartControllerTest, self).setUp()
         self.controller = self.create("aPart1")
         self.controller2 = self.create("aPart2")
-        self.controller3 = self.create("aPart3")
+        self._controller3 = None
         self.document = DocumentController.create("Doc1", "Document", "a",
-                self.user, self.DATA)
-        self.document.add_file(self.get_file())
+                self.user, self.DATA, True, True)
         self.document.state = self.document.lifecycle.official_state
         self.document.object.save()
         for ctrl in (self.controller, self.controller2):
             ctrl.attach_to_document(self.document)
+
+    @property
+    def controller3(self):
+        if self._controller3 is None:
+            self._controller3 = self.create("aPart3")
+        return self._controller3
 
     def add_child(self, qty=10, order=15, unit="-"):
         """ Adds controller2 to controller."""
@@ -315,7 +320,6 @@ class PartControllerTest(ControllerTest):
         """
         self.add_child()
         self.promote_to_official(self.controller)
-        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
         self.assertRaises(exc.PermissionError, self.controller.delete_child,
                 self.controller2)
         self.assertEqual(1, len(self.controller.get_children()))
@@ -327,7 +331,6 @@ class PartControllerTest(ControllerTest):
         """
         self.add_child()
         self.promote_to_deprecated(self.controller)
-        ctrl = self.CONTROLLER(self.controller.object, self.controller.owner)
         self.assertRaises(exc.PermissionError, self.controller.delete_child,
                 self.controller2)
         self.assertEqual(1, len(self.controller.get_children()))
@@ -612,7 +615,7 @@ class PartControllerTest(ControllerTest):
             self.assertFalse(suggested)
 
     def test_get_suggested_documents_deprecated(self):
-        self.document.promote()
+        self.document.promote(checked=True)
         self.assertTrue(self.document.is_deprecated)
         for ctrl in (self.controller, self.controller2, self.controller3):
             suggested = ctrl.get_suggested_documents()
