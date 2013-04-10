@@ -29,7 +29,7 @@
                 {{ docs_formset.management_form }}
             <div class="tb-btn-group">
                 {% if not obj.is_cancelled %}
-                    <a class="tb-btn tb-btn-primary add-link" 
+                    <a class="tb-btn add-link" 
                         {% if obj.type|can_link:request.session.type %}
                             href="./add/{% add_search %}"
                         {% else %}
@@ -40,7 +40,7 @@
                 {% endif %}
                 {% if obj.is_draft or obj.is_official %}
                     {# action valid if the part is a draft or official, since the user will own the document #}
-                    <button class="tb-btn tb-btn-primary tb-dropdown-toggle" data-toggle="dropdown">
+                    <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
                         <span class="tb-caret"></span>
                     </button>
                     <ul class="tb tb-dropdown-menu">
