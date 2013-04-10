@@ -44,14 +44,17 @@ def synchronized(cls=None, lock=None):
     cls.__class__.__call__ = call
     return cls
 
+
+_plmobject_fields = ("owner", "creator", "group", "state", "lifecycle")
+_documentfile_fields =  ("document", ) + tuple("document__" + f for f in _plmobject_fields)
 def _get_related_fields(model_class):
     from openPLM.plmapp import models
     if issubclass(model_class, models.PLMObject):
-        return ("owner", "creator", "group")
+        return _plmobject_fields
     elif issubclass(model_class, models.GroupInfo):
         return ("owner", "creator")
     elif issubclass(model_class, models.DocumentFile):
-        return ("document",)
+        return _documentfile_fields
     return ()
 
 @synchronized
