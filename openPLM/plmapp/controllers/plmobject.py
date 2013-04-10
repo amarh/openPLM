@@ -286,17 +286,12 @@ class PLMObjectController(Controller):
     def _update_state_history(self):
         """ Updates the :class:`.StateHistory` table of the object."""
         now = timezone.now()
-        try:
-            # ends previous StateHistory if it exists
-            # here we do not try to see if the state has not changed since
-            # we are sure it is not the case and it would not be a problem
-            # if it has not changed
-            sh = models.StateHistory.objects.get(plmobject__id=self.object.id,
-                    end_time=None)
-            sh.end_time = now
-            sh.save()
-        except models.StateHistory.DoesNotExist:
-            pass
+        # ends previous StateHistory if it exists
+        # here we do not try to see if the state has not changed since
+        # we are sure it is not the case and it would not be a problem
+        # if it has not changed
+        models.StateHistory.objects.filter(plmobject__id=self.object.id,
+            end_time=None).update(end_time=now)
         models.StateHistory.objects.create(plmobject=self.object,
                 start_time=now, end_time=None, state=self.state,
                 lifecycle=self.lifecycle)
