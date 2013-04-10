@@ -27,6 +27,8 @@ This module contains a function :func:`send_mail` which can be used to notify
 users about a changement in a :class:`.PLMObject`.
 """
 from collections import Iterable, Mapping, defaultdict
+from operator import itemgetter
+from itertools import groupby
 
 import kjbuckets
 
@@ -55,13 +57,14 @@ def get_recipients(obj, roles, users):
                 roles_filter |= Q(role__startswith=role)
             else:
                 roles_filter |= Q(role=role)
-        users = manager.filter(roles_filter).values_list("user", flat=True)
+        users = list(manager.filter(roles_filter).values_list("user", flat=True).distinct())
         recipients.update(users)
-        links = DelegationLink.current_objects.filter(roles_filter)\
-                        .values_list("delegator", "delegatee")
-        gr = kjbuckets.kjGraph(tuple(links))
-        for u in users:
-            recipients.update(gr.reachable(u).items())
+        links = tuple(DelegationLink.current_objects.filter(roles_filter).order_by("role")\
+                .values_list("role", "delegator", "delegatee"))
+        for role, group in groupby(links, itemgetter(0)):
+            gr = kjbuckets.kjGraph(tuple((x[1], x[2]) for x in group))
+            for u in users:
+                recipients.update(gr.reachable(u).items())
     elif roles == [ROLE_OWNER]:
         if hasattr(obj, "owner"):
             recipients.add(obj.owner_id)
@@ -165,7 +168,7 @@ def do_send_mail(subject, recipients, ctx, template, blacklist=()):
     if recipients:
         lang_to_email = defaultdict(set)
         if len(recipients) == 1:
-            recipient = User.objects.get(id=recipients.pop())
+            recipient = User.objects.select_related("profile__language").get(id=recipients.pop())
             if not recipient.is_active:
                 return
             if not recipient.email or recipient.email in blacklist:
