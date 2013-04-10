@@ -45,17 +45,27 @@ def synchronized(cls=None, lock=None):
     return cls
 
 
-_plmobject_fields = ("owner", "creator", "group", "state", "lifecycle")
+_plmobject_fields = ("owner__username", "creator__username", "group__name", "state", "lifecycle")
 _documentfile_fields =  ("document", ) + tuple("document__" + f for f in _plmobject_fields)
-def _get_related_fields(model_class):
+_deffered_user_fields = [
+ 'owner__password', 'owner__last_login', 'owner__is_superuser',
+ 'owner__first_name', 'owner__last_name', 'owner__email', 'owner__is_staff', 'owner__is_active',
+ 'owner__date_joined',
+ 'creator__password', 'creator__last_login', 'creator__is_superuser', 'creator__first_name',
+ 'creator__last_name', 'creator__email', 'creator__is_staff', 'creator__is_active',
+ 'creator__date_joined']
+
+def _get_manager(model_class):
     from openPLM.plmapp import models
+    manager = model_class.objects
     if issubclass(model_class, models.PLMObject):
-        return _plmobject_fields
+        return manager.select_related(*_plmobject_fields).defer(*_deffered_user_fields)
     elif issubclass(model_class, models.GroupInfo):
-        return ("owner", "creator")
+        return manager.select_related(*("owner", "creator")).defer(*_deffered_user_fields)
     elif issubclass(model_class, models.DocumentFile):
-        return _documentfile_fields
-    return ()
+        return manager.select_related(*_documentfile_fields)
+    return manager
+
 
 @synchronized
 @task(name="openPLM.plmapp.tasks.update_index",
@@ -65,15 +75,13 @@ def update_index(app_name, model_name, pk, fast_reindex=False, **kwargs):
     import openPLM.plmapp.search_indexes
 
     model_class = get_model(app_name, model_name)
-    fields = _get_related_fields(model_class)
-    if fields:
-        instance = model_class.objects.select_related(*fields).get(pk=pk)
-    else:
-        instance = model_class.objects.get(pk=pk)
+    manager = _get_manager(model_class)
+    instance = manager.get(pk=pk)
     if fast_reindex:
         instance.fast_reindex = True
     search_index = site.get_index(model_class)
     search_index.update_object(instance)
+
 
 @task(name="openPLM.plmapp.tasks.update_indexes",
       default_retry_delay=60, max_retries=10)
@@ -83,11 +91,8 @@ def update_indexes(instances, fast_reindex=False):
 
     for app_name, model_name, pk in instances:
         model_class = get_model(app_name, model_name)
-        fields = _get_related_fields(model_class)
-        if fields:
-            instance = model_class.objects.select_related(*fields).get(pk=pk)
-        else:
-            instance = model_class.objects.get(pk=pk)
+        manager = _get_manager(model_class)
+        instance = manager.get(pk=pk)
         if fast_reindex:
             instance.fast_reindex = True
         search_index = site.get_index(model_class)
