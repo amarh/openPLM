@@ -36,8 +36,12 @@ class DocumentViewTestCase(ViewTest):
     TYPE = "Document"
     CONTROLLER = DocumentController
 
+    def get_part(self, ref="P1"):
+        return PartController.create(ref, "Part", "a", self.user,
+               self.DATA, True, True)
+
     def test_related_parts_get(self):
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part()
         self.controller.attach_to_part(part)
 
         response = self.get(self.base_url + "parts/", page="parts")
@@ -47,8 +51,8 @@ class DocumentViewTestCase(ViewTest):
             [f.instance.part.id for f in response.context["parts_formset"].forms])
 
     def test_related_parts_update_post(self):
-        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
-        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        part1 = self.get_part("part1")
+        part2 = self.get_part("part2")
         self.controller.attach_to_part(part1)
         self.controller.attach_to_part(part2)
         data = {
@@ -75,8 +79,8 @@ class DocumentViewTestCase(ViewTest):
                 [f.instance.part.id for f in forms_.values()])
 
     def test_parts_update_post_empty_selection(self):
-        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
-        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        part1 = self.get_part("part1")
+        part2 = self.get_part("part2")
         self.controller.attach_to_part(part1)
         self.controller.attach_to_part(part2)
         data = {
@@ -101,8 +105,8 @@ class DocumentViewTestCase(ViewTest):
                 set(f.instance.part.id for f in forms_.values()))
 
     def test_doc_cad_update_post_all_selected(self):
-        part1 = PartController.create("part1", "Part", "a", self.user, self.DATA)
-        part2 = PartController.create("part2", "Part", "a", self.user, self.DATA)
+        part1 = self.get_part("part1")
+        part2 = self.get_part("part2")
         self.controller.attach_to_part(part1)
         self.controller.attach_to_part(part2)
         data = {
@@ -133,7 +137,7 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual("attach_part", attach[1])
 
     def test_add_related_part_post(self):
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         data = {
                 "reference" : part.reference,
                 "type" : part.type,
@@ -250,7 +254,7 @@ class DocumentViewTestCase(ViewTest):
         Tests a get request to revise a document which has one attached part.
         This part must be suggested when the user revises the document.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         response = self.get(self.base_url + "revisions/")
         # checks that it is necessary to confirm the revision
@@ -266,7 +270,7 @@ class DocumentViewTestCase(ViewTest):
         Tests a post request to revise a document with one attached part which
         is selected.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         data = { "revision" : "b",
                  "form-TOTAL_FORMS" : "1",
@@ -294,7 +298,7 @@ class DocumentViewTestCase(ViewTest):
         Tests a post request to revise a document with one attached part which
         is not selected.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         data = { "revision" : "b",
                  "form-TOTAL_FORMS" : "1",
@@ -321,12 +325,12 @@ class DocumentViewTestCase(ViewTest):
         Tests a get request to revise a document with two attached parts.
         One part is a draft, the other is official.
         """
-        p1 = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
-        self.controller.attach_to_part(p1)
-        p2 = PartController.create("part_2", "Part", "a", self.user, self.DATA)
-        self.controller.attach_to_part(p2)
-        p2.object.is_promotable = lambda: True
-        p2.promote()
+        part1 = self.get_part("part1")
+        part2 = self.get_part("part2")
+        self.controller.attach_to_part(part1)
+        self.controller.attach_to_part(part2)
+        part2.object.is_promotable = lambda: True
+        part2.promote()
         response = self.get(self.base_url + "revisions/")
         # checks that it is necessary to confirm the revision
         self.assertTrue(response.context["confirmation"])
@@ -335,27 +339,27 @@ class DocumentViewTestCase(ViewTest):
         form1, form2 = formset.forms
         self.assertTrue(form1.fields["selected"].initial)
         self.assertTrue(form2.fields["selected"].initial)
-        self.assertEqual([p1.id, p2.id], sorted([form1.instance.id, form2.instance.id]))
+        self.assertEqual([part1.id, part2.id], sorted([form1.instance.id, form2.instance.id]))
 
     def test_revise_two_attached_parts_post(self):
         """
         Tests a post request to revise a document with two attached parts.
         One part is a draft and not selected, the other is official and selected.
         """
-        p1 = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
-        self.controller.attach_to_part(p1)
-        p2 = PartController.create("part_2", "Part", "a", self.user, self.DATA)
-        self.controller.attach_to_part(p2)
-        p2.object.is_promotable = lambda: True
-        p2.promote()
+        part1 = self.get_part("part1")
+        part2 = self.get_part("part2")
+        self.controller.attach_to_part(part1)
+        self.controller.attach_to_part(part2)
+        part2.object.is_promotable = lambda: True
+        part2.promote()
         data = {
             "revision" : "b",
              "form-TOTAL_FORMS" : "2",
              "form-INITIAL_FORMS" : "2",
              "form-0-selected" : "",
-             "form-0-plmobject_ptr" : p1.id,
+             "form-0-plmobject_ptr" : part1.id,
              "form-1-selected" : "on",
-             "form-1-plmobject_ptr" : p2.id,
+             "form-1-plmobject_ptr" : part2.id,
              }
         response = self.post(self.base_url + "revisions/", data)
         revisions = self.controller.get_next_revisions()
@@ -364,13 +368,13 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual("b", rev.revision)
         # ensure p1 and p2 are still attached to the old revision
         parts = self.controller.get_attached_parts().values_list("part", flat=True)
-        self.assertEqual([p1.id, p2.id], sorted(parts))
+        self.assertEqual([part1.id, part2.id], sorted(parts))
         # ensure p2 is attached to the new revision
         parts = rev.documentpartlink_document.values_list("part", flat=True)
-        self.assertEqual([p2.id], list(parts))
+        self.assertEqual([part2.id], list(parts))
         # ensure both documents are attached to p2
         self.assertEqual([self.controller.id, rev.id],
-            sorted(p2.get_attached_documents().values_list("document", flat=True)))
+            sorted(part2.get_attached_documents().values_list("document", flat=True)))
 
     def test_revise_one_deprecated_part_attached_get(self):
         """
@@ -378,7 +382,7 @@ class DocumentViewTestCase(ViewTest):
         attached part.
         This part must not be suggested when the user revises the document.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         part.object.state = part.lifecycle.last_state
         part.object.save()
@@ -392,7 +396,7 @@ class DocumentViewTestCase(ViewTest):
         attached part.
         This part must not be suggested when the user revises the document.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         part.object.state = part.lifecycle.last_state
         part.object.save()
@@ -422,7 +426,7 @@ class DocumentViewTestCase(ViewTest):
         The part has been revised and so its revision must be suggested and
         the part must not be suggested when the user revises the document.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         p2 = part.revise("b")
         response = self.get(self.base_url + "revisions/")
@@ -439,7 +443,7 @@ class DocumentViewTestCase(ViewTest):
         Tests a post request to revise a document which has one attached part.
         The part has been revised and its revision is selected.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         p2 = part.revise("b")
         data = { "revision" : "b",
@@ -465,7 +469,7 @@ class DocumentViewTestCase(ViewTest):
         Tests a post request to revise a document which has one attached part.
         The part has been revised and has been selected instead of its revision.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         self.controller.attach_to_part(part)
         p2 = part.revise("b")
         data = { "revision" : "b",
@@ -486,7 +490,7 @@ class DocumentViewTestCase(ViewTest):
         """
         Tests a create request with a related part set.
         """
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         response = self.get("/object/create/", {"type" : self.TYPE,
             "__next__" : "/home/", "related_part" : part.id})
         self.assertEqual("/home/", response.context["next"])
@@ -496,7 +500,7 @@ class DocumentViewTestCase(ViewTest):
             forms.DocumentTypeForm))
 
     def test_create_and_attach_post(self):
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         data = self.DATA.copy()
         data.update({
                 "__next__" : "/home/",
@@ -510,7 +514,6 @@ class DocumentViewTestCase(ViewTest):
                 "lifecycle" : m.get_default_lifecycle().pk,
                 "state" : m.get_default_state().pk,
                 })
-        model_cls = m.get_all_plmobjects()[self.TYPE]
         response = self.post("/object/create/", data, follow=False,
                 status_code=302)
         self.assertRedirects(response, "/home/")
@@ -521,7 +524,7 @@ class DocumentViewTestCase(ViewTest):
         link = m.DocumentPartLink.current_objects.get(document=obj, part=part.id)
 
     def test_create_and_attach_post_error(self):
-        part = PartController.create("RefPart", "Part", "a", self.user, self.DATA)
+        part = self.get_part("part1")
         # cancels the part so that it can not be attached
         part.cancel()
         data = self.DATA.copy()
@@ -537,7 +540,6 @@ class DocumentViewTestCase(ViewTest):
                 "lifecycle" : m.get_default_lifecycle().pk,
                 "state" : m.get_default_state().pk,
                 })
-        model_cls = m.get_all_plmobjects()[self.TYPE]
         response = self.post("/object/create/", data, follow=True, page="parts")
         self.assertEqual(1, len(response.context["messages"]))
         msg = list(response.context["messages"])[0]
@@ -550,9 +552,7 @@ class DocumentViewTestCase(ViewTest):
             document=obj, part=part.id).exists())
 
 
-
 class SpecialCharactersDocumentViewTestCase(DocumentViewTestCase):
     REFERENCE = u"Pa *-\xc5\x93\xc3\xa9'"
-
 
 
