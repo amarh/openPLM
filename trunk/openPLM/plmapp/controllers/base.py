@@ -193,7 +193,7 @@ class Controller(object):
         if self._user not in users:
             blacklist += (self._user.email,)
         roles = [models.ROLE_OWNER] + list(roles)
-        self._send_mail(send_histories_mail, self, roles, action, [h],
+        self._send_mail(send_histories_mail, self.object, roles, action, [h],
                 self._user, blacklist, users)
 
     def get_verbose_name(self, attr_name):
