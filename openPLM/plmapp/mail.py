@@ -205,8 +205,6 @@ def send_mail(subject, recipients, ctx, template, blacklist=()):
 
 def send_histories_mail(plmobject, roles, last_action, histories, user, blacklist=(),
               users=(), template="mails/history"):
-    if hasattr(plmobject, "object"):
-        plmobject = plmobject.object
     plmobject = CT.from_object(plmobject)
     histories = serialize(histories)
     user = CT.from_object(user)
