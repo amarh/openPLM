@@ -78,6 +78,8 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                    ("publish", obj.publish), ("unpublish", obj.unpublish),
                    ("cancel", obj.safe_cancel),
                   )
+        if obj.is_part:
+            actions += (("promote_assembly", obj.promote_assembly),)
         if password_form.is_valid():
             for action_name, method in actions:
                 if action_name in request.POST:
@@ -139,6 +141,7 @@ def get_lifecycle_data(obj):
         links = roles.get(level_to_sign_str(i), [])
         object_lifecycle.append((st, st == state, links))
     is_signer = obj.check_permission(obj.get_current_sign_level(), False)
+    is_promotable = obj.is_promotable()
     can_approve = obj.can_approve_promotion()
     is_signer_dm = obj.check_permission(obj.get_previous_sign_level(), False)
     if obj.can_edit_signer():
@@ -152,17 +155,23 @@ def get_lifecycle_data(obj):
     deprecated = []
     previous_alternates = []
     alternates = obj.get_alternates() if obj.is_part else []
-    if is_signer and can_approve:
-        if lcs[-1] != state:
-            if lcs.next_state(state) == obj.lifecycle.official_state.name:
-                revisions = obj.get_previous_revisions()
-                for rev in revisions:
-                    if rev.is_official:
-                        deprecated.append(rev)
-                    elif rev.is_draft or rev.is_proposed:
-                        cancelled.append(rev)
-                if obj.is_part and not alternates and revisions:
-                    previous_alternates = type(obj)(revisions[-1].part, None).get_alternates()
+    if is_signer and can_approve and lcs[-1] != state:
+        if lcs.next_state(state) == obj.lifecycle.official_state.name:
+            revisions = obj.get_previous_revisions()
+            for rev in revisions:
+                if rev.is_official:
+                    deprecated.append(rev)
+                elif rev.is_draft or rev.is_proposed:
+                    cancelled.append(rev)
+            if obj.is_part and not alternates and revisions:
+                previous_alternates = type(obj)(revisions[-1].part, None).get_alternates()
+
+    # promote assembly
+    if obj.is_part and can_approve and is_signer and not is_promotable:
+        promote_assembly = (obj.is_draft or obj.is_proposed) and obj.parentchildlink_parent.now().exists()
+        # TODO: more restrictions
+    else:
+        promote_assembly = False
 
     ctx.update({
         'cancelled_revisions' : cancelled,
@@ -173,9 +182,10 @@ def get_lifecycle_data(obj):
         'object_lifecycle' : object_lifecycle,
         'is_signer' : is_signer,
         'is_signer_dm' : is_signer_dm,
-        'is_promotable' : obj.is_promotable(),
+        'is_promotable' : is_promotable,
         'can_approve' : can_approve,
         'can_cancel' : obj.can_cancel(),
+        'promote_assembly' : promote_assembly,
     })
     return ctx
 
