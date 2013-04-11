@@ -732,7 +732,7 @@ li.Result:hover {
     background-color: #ccc !important;
 }
 
-li.Result:hover *{
+li.Result:hover .not(.tb-btn) {
     color: black !important;
 }
 li.Result div.summary {
