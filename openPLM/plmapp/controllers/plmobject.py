@@ -274,14 +274,17 @@ class PLMObjectController(Controller):
             if rev.is_cancelled:
                 # nothing to do
                 pass
-            else:
-                if rev.is_editable or rev.is_official:
-                    ctrl = type(self)(rev.get_leaf_object(), self._user,
-                            self._mail_blocked, getattr(self.object, "no_index", False))
-                    if rev.is_editable:
-                        ctrl.cancel()
-                    else:
-                        ctrl._deprecate()
+            elif rev.is_editable or rev.is_official:
+                no_index = getattr(self.object, "no_index", False)
+                ctrl = type(self)(rev.get_leaf_object(), self._user,
+                        self._mail_blocked, no_index)
+                if rev.is_editable:
+                    ctrl.cancel()
+                else:
+                    ctrl._deprecate()
+                if self._mail_blocked:
+                    self._pending_mails.extends(ctrl._pending_mails)
+                    del ctrl._pending_mails[:]
 
     def _update_state_history(self):
         """ Updates the :class:`.StateHistory` table of the object."""
