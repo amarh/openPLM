@@ -1301,6 +1301,8 @@ class PartController(PLMObjectController):
 
         ctrls = [PartController(c, self._user, True, True) for c in to_promote]
         ctrls.append(self)
+        updated = to_promote[:]
+        updated.append(self.object)
         if not all(ctrl.is_last_promoter() for ctrl in ctrls):
             # TODO: get all required signers in one query
             # and compare with represented signers
@@ -1308,12 +1310,11 @@ class PartController(PLMObjectController):
             raise PromotionError()
         for ctrl in ctrls:
             # TODO: create (state) histories in bulk
-            ctrl.promote(checked=True)
+            updated.extend(ctrl.promote(checked=True)["updated_revisions"])
 
         # send mails and update indexes
         for ctrl in ctrls:
             # TODO merge mails ?
             ctrl.unblock_mails()
-        update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in ctrls])
-        # FIXME: cancelled/deprecated revisions are not reindexed
+        update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in updated])
 
