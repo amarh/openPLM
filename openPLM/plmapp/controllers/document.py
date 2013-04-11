@@ -653,8 +653,9 @@ class DocumentController(PLMObjectController):
                 fast_reindex=True)
 
     def promote(self, *args, **kwargs):
-        super(DocumentController, self).promote(*args, **kwargs)
+        r = super(DocumentController, self).promote(*args, **kwargs)
         self._fast_reindex_files()
+        return r
 
     def demote(self, *args, **kwargs):
         super(DocumentController, self).demote(*args, **kwargs)
