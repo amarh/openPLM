@@ -1297,6 +1297,7 @@ class PartController(PLMObjectController):
             last_children = (c.link.child for c in get_last_children(children))
             if not all(child.is_promotable() for child in last_children if child.id in to_promote_ids):
                 # TODO: only test if they all have an official document attached
+                # fixme: list parts
                 raise PromotionError("Some children are not promotable")
 
         ctrls = [PartController(c, self._user, True, True) for c in to_promote]

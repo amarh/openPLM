@@ -38,6 +38,9 @@
                 {% if not is_promotable %}
                     <p>{% trans "You can not promote this object:" %}</p>
                     {{ obj.promotion_errors.as_ul }}
+                    {% if promote_assembly %}
+                        <p>{% trans "But you can try to promote the whole assembly." %}</p>
+                    {% endif %}
                 {% elif not can_approve %}
                     {% trans "You already have approved this promotion." %}
                 {% endif %}
@@ -73,10 +76,11 @@
         {% endif %}
 
         {# promotion form #}
-        {% if is_signer and can_approve and is_promotable %}
-            <form id ="form-promote" class="confirmation" style="display: inline;"
+        {% if is_signer and can_approve and is_promotable or promote_assembly %}
+            {% with action_name=promote_assembly|yesno:"promote_assembly,promote" %}
+                <form id ="form-{{action_name}}" class="confirmation" style="display: inline;"
                 action="{{obj.plmobject_url}}lifecycle/apply/" method="POST">{% csrf_token %}
-                <div id="form-promote-dialog"
+                <div id="form-{{action_name}}-dialog"
                     title="{% trans "Are you sure?" %}"
                     {% if password_form.is_bound and not password_form.is_valid %} 
                         class="c-error action-{{ action }}"
@@ -134,6 +138,8 @@
                                 {% endfor %}
                             </ul>
                         {% endif %}
+
+                        {# TODO promote assembly #}
                     </div>
 
                     <div class="password">
@@ -142,14 +148,19 @@
                 </div>
 
                 {# buttons #}
-                <input name="promote" type="submit" class="tb-btn tb-btn-large tb-btn-success" 
+                <input name="{{ action_name }}" type="submit" class="tb-btn tb-btn-large tb-btn-success" 
                 {% if obj.is_last_promoter %}
-                    value="{% trans "PROMOTE" %}"
+                    {% if promote_assembly %}
+                        value="{% trans "Promote assembly" %}"
+                    {% else %}
+                        value="{% trans "PROMOTE" %}"
+                    {% endif %}
                 {% else %}
                     value="{% trans "Approve the promotion" %}"
                 {% endif %} />
 
             </form>
+        {% endwith %}
         {% endif %}
 
         {# discard approvals #}
@@ -256,7 +267,7 @@
     {# owner and notified users #}
     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
         {% if obj.is_official and in_group %}
-            <a class="tb-btn tb-btn-primary" href="../management/add-reader/" >{% trans "Give access to a restricted account" %}</a>
+            <a class="tb-btn" href="../management/add-reader/" >{% trans "Give access to a restricted account" %}</a>
         {% endif %}
         {% include "snippets/management_block.html" with links=reader_list can_delete=in_group %}
         {% include "snippets/management_block.html" with links=notified_list can_delete=is_owner %}
