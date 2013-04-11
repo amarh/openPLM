@@ -241,6 +241,13 @@ class PLMObjectController(Controller):
 
         :raise: :exc:`.PromotionError` if :attr:`object` is not promotable
         :raise: :exc:`.PermissionError` if the use can not sign :attr:`object`
+        :returns: a dictionary with two keys:
+
+            new_state
+                the new current :class:`.State` of the object
+
+            updated_revisions
+                a list of updated (deprecated or cancelled) revisions
         """
         if checked or self.object.is_promotable():
             state = self.object.state
@@ -248,20 +255,18 @@ class PLMObjectController(Controller):
             lcl = lifecycle.to_states_list()
             if not checked:
                 self.check_permission(level_to_sign_str(lcl.index(state.name)))
-            try:
-                new_state = lcl.next_state(state.name)
-                self.object.state = models.State.objects.get_or_create(name=new_state)[0]
-                self.object.save()
-                details = "change state from %(first)s to %(second)s" % \
-                                     {"first" :state.name, "second" : new_state}
-                self._save_histo("Promote", details, roles=["sign_"])
-                if self.object.state == lifecycle.official_state:
-                    self._officialize()
-                self._update_state_history()
-                self._clear_approvals()
-            except IndexError:
-                # FIXME raises it ?
-                pass
+            new_state = lcl.next_state(state.name)
+            self.object.state = models.State.objects.get_or_create(name=new_state)[0]
+            self.object.save()
+            details = "change state from %(first)s to %(second)s" % \
+                                 {"first" :state.name, "second" : new_state}
+            self._save_histo("Promote", details, roles=["sign_"])
+            updated_revisions = []
+            if self.object.state == lifecycle.official_state:
+               updated_revisions = self._officialize()
+            self._update_state_history()
+            self._clear_approvals()
+            return {"new_state": self.object, "updated_revisions": updated_revisions}
         else:
             raise PromotionError()
 
@@ -270,6 +275,7 @@ class PLMObjectController(Controller):
         # changes the owner to the company
         cie = models.User.objects.get(username=settings.COMPANY)
         self.set_owner(cie, True)
+        updated_revisions = []
         for rev in self.get_previous_revisions():
             if rev.is_cancelled:
                 # nothing to do
@@ -285,6 +291,8 @@ class PLMObjectController(Controller):
                 if self._mail_blocked:
                     self._pending_mails.extends(ctrl._pending_mails)
                     del ctrl._pending_mails[:]
+                updated_revisions.append(ctrl.object)
+        return updated_revisions
 
     def _update_state_history(self):
         """ Updates the :class:`.StateHistory` table of the object."""
