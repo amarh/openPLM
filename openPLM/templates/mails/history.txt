@@ -2,7 +2,7 @@
 {% autoescape off %}
 {% trans "Message from openPLM" %}
           
-{% trans "Object:" %}{{ plmobject.object }}
+{% trans "Object:" %}{{ plmobject }}
 
 {% trans "A new action has been done:" %} {{ last_action }}
 
