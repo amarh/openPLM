@@ -1315,4 +1315,5 @@ class PartController(PLMObjectController):
             # TODO merge mails ?
             ctrl.unblock_mails()
         update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in ctrls])
+        # FIXME: cancelled/deprecated revisions are not reindexed
 
