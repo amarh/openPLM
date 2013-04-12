@@ -157,6 +157,10 @@ More custom extensions are enabled, they added the following syntaxes:
 
     * - :samp:`[{type}/{reference}/{revision}]`
       - link to a PLMObject
+    * - :samp:`part:"{name}"` or :samp:`part:{name}`
+      - link to the most recent part named *name*
+    * - :samp:`doc:"{name}"` or :samp:`doc:{name}`
+      - link to the most recent document named *name*
     * - :samp:`<<`
       - link to the previous revision of the current object
     * - :samp:`>>`

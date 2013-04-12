@@ -29,7 +29,7 @@ from collections import defaultdict
 from mimetypes import guess_type
 
 from django.forms import HiddenInput
-from django.http import (HttpResponseRedirect,
+from django.http import (HttpResponseRedirect, Http404,
     HttpResponseForbidden, StreamingHttpResponse)
 from django.utils.translation import ugettext_lazy as _
 
@@ -40,6 +40,21 @@ from openPLM.plmapp.views.base import (get_obj, get_obj_from_form,
     handle_errors, get_generic_data, get_id_card_data)
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.utils import level_to_sign_str, get_next_revision, r2r
+
+
+@handle_errors(restricted_access=False)
+def redirect_from_name(request, type, name):
+    if type == "part":
+        cls = models.Part
+    elif type == "doc":
+        cls = models.Document
+    else:
+        raise Http404("type not found")
+    try:
+        obj = cls.objects.order_by("-ctime").filter(name=name)[0]
+    except IndexError:
+        raise Http404(_(u"No object has the name %(name)s") % name)
+    return HttpResponseRedirect(obj.plmobject_url)
 
 
 @handle_errors

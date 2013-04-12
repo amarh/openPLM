@@ -148,11 +148,20 @@ else:
                 "headerid", "fenced_code", "sane_lists", "footnotes",
                 # objects
                 PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/')]),
+                PLMLinkExtension(r"\bpart:(\w+)", [('base_url', '/redirect_name/part/'),
+                    ('base_label', 'part:')]),
+                PLMLinkExtension(r'\bpart:"([^"]+)"', [('base_url', '/redirect_name/part/'),
+                    ('base_label', 'part:')]),
+                PLMLinkExtension(r"\bdoc:(\w+)", [('base_url', '/redirect_name/doc/'),
+                    ('base_label', 'doc:')]),
+                PLMLinkExtension(r'\bdoc:"([^"]+)"', [('base_url', '/redirect_name/doc/'),
+                    ('base_label', 'doc:')]),
                 # users
                 PLMLinkExtension(r"(?<!\w)@(%s)" % ref, [('base_url', '/user/'),
                     ('base_label', '@')]),
                 # groups
-                PLMLinkExtension(r"\bgroup:(%s)\b" % ref, [('base_url', '/group/'),]),
+                PLMLinkExtension(r"\bgroup:(%s)\b" % ref, [('base_url', '/group/'),
+                    ('base_label', 'group:')]),
                 # previous/next revisions
                 PLMLinkExtension(r"(?<!\w)(\<\<)(?!\w)", [('build_url', previous_revision)]),
                 PLMLinkExtension(r"(?<!\w)(\>\>)(?!\w)", [('build_url', next_revision)]),
