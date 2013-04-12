@@ -402,6 +402,7 @@ class DocumentController(PLMObjectController):
             shutil.copy(doc_file.file.path, models.docfs.path(path))
             new_doc = models.DocumentFile.objects.create(file=path,
                 filename=filename, size=doc_file.size, document=rev.object)
+            os.chmod(new_doc.file.path, 0400)
             new_doc.thumbnail = doc_file.thumbnail
             if doc_file.thumbnail:
                 ext = os.path.splitext(doc_file.thumbnail.path)[1]
