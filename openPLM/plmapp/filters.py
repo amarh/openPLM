@@ -66,7 +66,7 @@ try:
     import markdown
     from markdown.inlinepatterns import LinkPattern
     from markdown.util import etree
-    from markdown.extensions.wikilinks import WikiLinkExtension
+    from markdown.extensions import Extension
     from markdown.extensions.headerid import slugify
     from django.utils.encoding import iri_to_uri
 except ImportError:
@@ -74,27 +74,37 @@ except ImportError:
 else:
     ref = r'(?:\\ |[^/?#\t\r\v\f\s])+'
     object_pattern = r'(\w+/{ref}/{ref})'.format(ref=ref)
-    def build_url2(label, base, end):
+    def build_url(label, base, end):
         return iri_to_uri('%s%s%s' % (base, label, end))
 
     def prefixed_slugify(*args, **kwargs):
         return "plm-" + slugify(*args, **kwargs)
 
-    class PLMLinkExtension(WikiLinkExtension):
+    class PLMLinkExtension(Extension):
         def __init__(self, pattern, configs):
-            if "build_url" not in [c[0] for c in configs]:
-                configs.append(("build_url", build_url2))
-            WikiLinkExtension.__init__(self, configs)
+            # set extension defaults
+            self.config = {
+                            'base_url' : ['/', 'String to append to beginning or URL.'],
+                            'end_url' : ['/', 'String to append to end of URL.'],
+                            'html_class' : ['wikilink', 'CSS hook. Leave blank for none.'],
+                            'build_url' : [build_url, 'Callable formats URL from label.'],
+                            'base_label' : ['', 'String to prepend to the label'],
+                            'end_label' : ['', 'String to append to the label'],
+            }
+
+            # Override defaults with user settings
+            for key, value in configs :
+                self.setConfig(key, value)
             self.pattern = pattern
 
         def extendMarkdown(self, md, md_globals):
             self.md = md
 
             # append to end of inline patterns
-            wikilinkPattern = PLMPattern(self.pattern, self.getConfigs())
-            wikilinkPattern.markdown = md
-            md.inlinePatterns.add('plmlink%d' % hash(self.pattern),
-                wikilinkPattern, "<not_strong")
+            pattern = PLMPattern(self.pattern, self.getConfigs())
+            pattern.markdown = md
+            md.inlinePatterns.add('plmlink%d' % hash(self.pattern), pattern,
+                "<not_strong")
 
     class PLMPattern(LinkPattern):
         def __init__(self, pattern, config):
@@ -107,10 +117,10 @@ else:
                 end_url = self.config['end_url']
                 html_class = self.config['html_class']
                 label = self.unescape(m.group(2).strip())
-                label = label.replace("\ ", " ")
+                label = label.replace("\\ ", " ")
                 url = self.config['build_url'](label, base_url, end_url)
                 a = etree.Element('a')
-                a.text = label.replace("\\ ", " ")
+                a.text = u'%s%s%s' % (self.config['base_label'],  label, self.config['end_label'])
                 a.set('href', self.unescape(url))
                 if html_class:
                     a.set('class', html_class)
@@ -137,9 +147,10 @@ else:
             extensions=["abbr", "tables", "def_list", "smart_strong", "toc",
                 "headerid", "fenced_code", "sane_lists", "footnotes",
                 # objects
-                PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/'),]),
+                PLMLinkExtension(r"\[%s\]" % object_pattern, [('base_url', '/object/')]),
                 # users
-                PLMLinkExtension(r"(?<!\w)@(%s)" % ref, [('base_url', '/user/'),]),
+                PLMLinkExtension(r"(?<!\w)@(%s)" % ref, [('base_url', '/user/'),
+                    ('base_label', '@')]),
                 # groups
                 PLMLinkExtension(r"\bgroup:(%s)\b" % ref, [('base_url', '/group/'),]),
                 # previous/next revisions
