@@ -104,11 +104,11 @@ class MarkDownFilterTestCase(BaseTestCase):
         self.markdown(u"next >> rev", wanted)
 
     def test_user_url(self):
-        wanted = u"<p><a class='wikilink' href='/user/robert/'>robert</a></p>"
+        wanted = u"<p><a class='wikilink' href='/user/robert/'>@robert</a></p>"
         self.markdown("@robert", wanted)
 
     def test_user_url_with_space(self):
-        wanted = u"<p><a class='wikilink' href='/user/robert%20baratheon/'>robert baratheon</a></p>"
+        wanted = u"<p><a class='wikilink' href='/user/robert%20baratheon/'>@robert baratheon</a></p>"
         self.markdown("@robert\\ baratheon", wanted)
 
     def test_group_url(self):
