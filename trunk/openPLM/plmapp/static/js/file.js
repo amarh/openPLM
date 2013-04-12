@@ -689,6 +689,9 @@ $(function(){
     $("#add_text").click(function(){
         $(this).toggleClass("tb-active");
         $("#add_form_file").toggleClass("hidden");
+        if (!$("#add_form_file").hasClass("hidden")){
+            $("#id_filename").click();
+        }
     });
 
     $(".check-in").click(function(e){
