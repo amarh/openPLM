@@ -4,12 +4,6 @@
     border: 1px solid #575453;
 }
 
-
-#calendar td.filled,
-#calendar td.weeknumber,
-#calendar td.empty {
-}
-
 #calendar td ul {
     max-height: 7em;
     height: 7em;
@@ -23,11 +17,6 @@
     margin: 0.4em;
     font-size: 85%;
 }
-
-
-#calendar td.filled * {
-}
-
 #calendar th {
     padding: 0.5em;
     border: 1px solid #575453;
@@ -38,6 +27,7 @@
     height: 8em;
     padding: 0;
     background-color: #fdfdfd;
+  vertical-align: top;
 }
 #calendar td > * {
     padding: 0.3em;
