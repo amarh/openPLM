@@ -112,8 +112,24 @@ class MarkDownFilterTestCase(BaseTestCase):
         self.markdown("@robert\\ baratheon", wanted)
 
     def test_group_url(self):
-        wanted = u"<p><a class='wikilink' href='/group/tortuesninja/'>tortuesninja</a></p>"
+        wanted = u"<p><a class='wikilink' href='/group/tortuesninja/'>group:tortuesninja</a></p>"
         self.markdown("group:tortuesninja", wanted)
+
+    def test_part_url(self):
+        wanted = u"<p><a class='wikilink' href='/redirect_name/part/tortuesninja/'>part:tortuesninja</a></p>"
+        self.markdown("part:tortuesninja", wanted)
+
+    def test_part_url2(self):
+        wanted = u"<p><a class='wikilink' href='/redirect_name/part/tortues%20ninja!/'>part:tortues ninja!</a></p>"
+        self.markdown('part:"tortues ninja!"', wanted)
+
+    def test_doc_url(self):
+        wanted = u"<p><a class='wikilink' href='/redirect_name/doc/tortuesninja/'>doc:tortuesninja</a></p>"
+        self.markdown("doc:tortuesninja", wanted)
+
+    def test_doc_url2(self):
+        wanted = u"<p><a class='wikilink' href='/redirect_name/doc/tortues%20ninja!/'>doc:tortues ninja!</a></p>"
+        self.markdown('doc:"tortues ninja!"', wanted)
 
     # builtin syntax
 

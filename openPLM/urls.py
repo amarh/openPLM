@@ -93,6 +93,7 @@ urlpatterns += patterns('',
     (r'^perform_search/$',async_search),
     ('^timeline/', display_object_history, {"timeline" : True}),
     ('^history_item/(?P<type>object|group|user)/(?P<hid>\d+)/', redirect_history),
+    ('^redirect_name/(?P<type>part|doc)/(?P<name>.+)/$', redirect_from_name),
     )
 
 urlpatterns += patterns2('', 'ajax/',
