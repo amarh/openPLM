@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import logging
 import tempfile
+from datetime import datetime
 from django.utils import timezone
 from xml.etree.ElementTree import Element
 
