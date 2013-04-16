@@ -30,6 +30,21 @@ To enable the *webdav* application, it must be enabled in the settings file: add
 ``'openPLM.apps.webdav'`` to the list of installed applications
 (:const:`INSTALLED_APPS`).
 
+
+Digest authentication
+=============================
+
+Windows client requires either a SSL connection (recommended) or
+a digest authentication.
+
+To enable the digest authentication:
+
+    * ``pip install "hg+https://bitbucket.org/scjody/django-digest" python_digest``
+    * Add ``django_digest`` to the list of installed applications
+    * Run ``./manage.py migrate django_digest``
+    * Users must login via the web interface before using the webdav access
+
+
 Apache
 =========
 

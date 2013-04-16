@@ -53,28 +53,25 @@ def get_class(name, raise_on_error = True):
 
 
 def format_http_datetime(dt):
-    return dt.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    return dt.strftime('%a, %d %b %Y %H:%M:%S %Z').strip()
 
 
 def format_iso8601_datetime(dt):
-    return dt.strftime('%Y%m%dT%H:%M:%SZ')
+    return dt.strftime('%Y%m%dT%H:%M:%SZ').strip()
 
 
 def get_propfind_properties_from_xml(xmlstring):
     if not xmlstring:
         return ["{DAV:}getcontentlength", "{DAV:}getlastmodified", "{DAV:}creationdate",
                 "{DAV:}resourcetype", "{DAV:}checked-in","{DAV:}checked-out",
-                "{http://apache.org/dav/props/}executable", "{DAV:}supportedlock",]
+                 "{DAV:}supportedlock", "{DAV:}getcontenttype",
+                ]
     ret = []
     tree = ET.fromstring(xmlstring)
     props = tree.findall("{DAV:}prop")
     if props:
         for prop in props:
             for child in prop.getchildren():
-                #i = child.tag.find("}")
-                #if i >= 0:
-                #    name = child.tag[i+1:]
-                #else:
                 name = child.tag
                 ret.append(name)
     return ret
@@ -86,7 +83,7 @@ def add_value_to_element(element, value):
         return
     setval = ""
     if isinstance(value, (datetime.date, datetime.datetime)):
-        setval = format_lastmodified(value)
+        setval = format_http_datetime(value)
     elif isinstance(value, bool):
         setval = value and "T" or "F"
     elif isinstance(value, _element_type):
@@ -94,6 +91,8 @@ def add_value_to_element(element, value):
     elif isinstance(value, (list, tuple)):
         for v in value:
             add_value_to_element(element, v)
+    elif isinstance(value, unicode):
+        setval = value.encode("utf-8")
     else:
         setval = str(value)
     if setval:
@@ -111,6 +110,8 @@ except AttributeError:
 def get_multistatus_response_xml(url_prefix, backend_items):
     register_namespace("D", "DAV:")
     root = Element("{DAV:}multistatus")
+    if not url_prefix.endswith("/"):
+        url_prefix += "/"
     for item in backend_items:
         response = Element("{DAV:}response")
         root.append(response)
@@ -135,9 +136,9 @@ def get_multistatus_response_xml(url_prefix, backend_items):
                 status.text ="HTTP/1.1 %s"%propset.status
                 propstat.append(status)
 
-    s = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" 
+    s = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
     s += ET.tostring(root, encoding = "utf-8")
-    return s
+    return s +"\n"
 
 
 def get_lock_response_xml(lock):
@@ -171,8 +172,8 @@ def get_lock_response_xml(lock):
         href.text = lock.get("token")
         locktoken.append(href)
         activelock.append(locktoken)
-    
-    s = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" 
+
+    s = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
     s += ET.tostring(root, encoding = "utf-8")
     return s
-    
+
