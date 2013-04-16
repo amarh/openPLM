@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import logging
 import tempfile
-from datetime import datetime
-from django.utils import timezone
+import datetime
+import time
 from xml.etree.ElementTree import Element
 
 from django.conf import settings
@@ -40,6 +40,16 @@ from openPLM.plmapp.views.base import get_obj
 
 
 logger = logging.getLogger("webdav")
+
+def rfc3339_date(date):
+    if not date:
+        return ''
+    if not isinstance(date, datetime.date):
+        date = datetime.date.fromtimestamp(date)
+    date = date + datetime.timedelta(seconds=-time.timezone)
+    if time.daylight:
+        date += datetime.timedelta(seconds=time.altzone)
+    return date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
@@ -75,14 +85,15 @@ class OpenPLMBackend(Backend):
                 raise BackendResourceNotFoundException(path)
         return None, p
 
-    def dav_propfind(self, path, property_list):
+    def dav_propfind(self, path, property_list, depth="1"):
         ret = []
         ctrl, p = self.get_doc(path)
-        now = datetime.utcnow()
+        now = datetime.datetime.utcnow()
+        self.now = now
 
         files = [ {"size": 4096, "locked" : False, "locker" : None,
                   "filename" : "", "is_dir" : True, "ctime" : now,  "mtime" : now,} ]
-        if ctrl is None:
+        if ctrl is None and depth != "0":
             if not p or not p[0]:
                 filenames = sorted(get_all_documents().keys())
             elif len(p) == 1:
@@ -100,7 +111,7 @@ class OpenPLMBackend(Backend):
             for name in filenames:
                 files.append({"size": 4096, "locked" : False, "locker" : None,
                     "filename" : name, "is_dir" : True, "ctime" : now,  "mtime" : now,})
-        else:
+        elif ctrl is not None:
             ctrl.check_readable(raise_=True)
             if p:
                 if len(p) != 1:
@@ -113,13 +124,13 @@ class OpenPLMBackend(Backend):
                     files = [ {"size": df.size, "locked" : df.locked, "locker" : df.locker,
                     "filename" : "", "is_dir" : False, "ctime" : now,  "mtime" : now,}]
 
-            else:
+            elif depth != "0":
                 for f in ctrl.files.values():
                     f["is_dir"] = False
                     try:
                         st = os.stat(docfs.path(f["file"]))
-                        f["ctime"] = datetime.fromtimestamp(st.st_ctime)
-                        f["mtime"] = datetime.fromtimestamp(st.st_mtime)
+                        f["ctime"] = datetime.datetime.fromtimestamp(st.st_ctime)
+                        f["mtime"] = datetime.datetime.fromtimestamp(st.st_mtime)
                     except OSError:
                         f["ctime"] = f["mtime"] = now
                     files.append(f)
@@ -129,11 +140,12 @@ class OpenPLMBackend(Backend):
             props_not_found = {}
             for prop in property_list:
                 if prop == "{DAV:}getcontentlength":
-                    props_ok["{DAV:}getcontentlength"] = f["size"]
+                    if not f["is_dir"]:
+                        props_ok["{DAV:}getcontentlength"] = f["size"]
                 elif prop == "{DAV:}getlastmodified":
                     props_ok["{DAV:}getlastmodified"] = format_http_datetime(f["mtime"])
                 elif prop == "{DAV:}creationdate":
-                    props_ok["{DAV:}creationdate"] = format_iso8601_datetime(f["ctime"])
+                    props_ok["{DAV:}creationdate"] = rfc3339_date(f["ctime"])
                 elif prop == "{DAV:}resourcetype":
                     if f["is_dir"]:
                         props_ok["{DAV:}resourcetype"] = Element("{DAV:}collection")
@@ -161,9 +173,17 @@ class OpenPLMBackend(Backend):
                     type_.append(Element("{DAV:}write"))
                     lockentries[1].append(type_)
                     props_ok["{DAV:}supportedlock"] = lockentries
+                elif prop == "{DAV:}displayname":
+                    pass
+                elif prop == "{DAV:}ishidden":
+                    props_ok[prop] = False
+                elif prop == "{DAV:}getcontenttype":
+                    if f["is_dir"]:
+                        props_ok[prop] = "httpd/unix-directory"
                 else:
                     logger.debug("unsupported property '%s'"%prop)
                     props_not_found[prop] = None
+
             f = BackendItem(
                 f["filename"],
                 f["is_dir"],
@@ -175,7 +195,9 @@ class OpenPLMBackend(Backend):
         return ret
 
     def dav_set_properties(self, path, properties):
-        raise NotImplementedError()
+        # TODO: really implement this method
+        # dummy implementation required by the Windows client
+        return []
 
     def dav_remove_properties(self, path, property_names):
         raise NotImplementedError()
@@ -213,6 +235,7 @@ class OpenPLMBackend(Backend):
 
     def dav_put(self, path, readable, token = None, estimated_size = 0):
         d, p = self.get_doc(path)
+        print path
         if d and p:
             if len(p) > 1:
                 raise BackendIOException()

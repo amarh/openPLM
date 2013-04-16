@@ -24,7 +24,7 @@ import logging
 from urlparse import urlparse
 
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.core.exceptions import ImproperlyConfigured
 
 from openPLM.apps.webdav.backends import BackendIOException
@@ -35,6 +35,7 @@ from openPLM.apps.webdav.backends import BackendItem, PropertySet
 from openPLM.apps.webdav.util import get_propfind_properties_from_xml
 from openPLM.apps.webdav.util import get_multistatus_response_xml
 from openPLM.apps.webdav.util import get_lock_response_xml
+from openPLM.apps.webdav.util import format_http_datetime
 
 
 logger = logging.getLogger("webdav")
@@ -155,27 +156,34 @@ class WebDavHandler(object):
         res["DAV"] = "1, 2"
         return res
 
+    def get_200_response(self):
+        response = HttpResponse("200 OK", None, 200, "text/plain")
+        response["Content-Length"] = 6
+        return response
+
     def handle_propfind(self, request):
         path = self.get_final_path_part(request.path)
         props = get_propfind_properties_from_xml(request.body)
-        items = self.backend.dav_propfind(path, props)
-        # NOT sure whether or not this is a good idea:
-        #sub_setups = request.setup.get_sub_setups()
-        #for sub in sub_setups:
-        #    subname = sub.name[len(request.setup.name) + 1:]
-        #    subname = subname.split("/", 1)[0]
-        #    propset = PropertySet({"getcontentlength":0})
-        #    items.append(BackendItem(subname, True,
-        #                             [propset]))
-        s = get_multistatus_response_xml(request.build_absolute_uri(), items)
+        depth = request.META.get("HTTP_DEPTH", "1")
+        items = self.backend.dav_propfind(path, props, depth)
+        s = get_multistatus_response_xml(request.path, items)
         response = HttpResponse(s, None, 207, "text/xml; charset=utf-8")
         response["Content-Length"] = len(s)
         response["DAV"] = "1, 2"
-        response["Depth"] = "1"
+        response["Depth"] = depth
         return response
 
     def handle_proppatch(self, request):
-        return HttpResponse("200 OK", None, 200, "text/plain")
+        path = self.get_final_path_part(request.path)
+        props = get_propfind_properties_from_xml(request.body)
+        depth = request.META.get("HTTP_DEPTH", "1")
+        items = self.backend.dav_set_properties(path, props)
+        s = get_multistatus_response_xml(request.path, items)
+        response = HttpResponse(s, None, 207, "text/xml; charset=utf-8")
+        response["Content-Length"] = len(s)
+        response["DAV"] = "1, 2"
+        response["Depth"] = depth
+        return response
 
     def handle_mkcol(self, request):
         path = self.get_final_path_part(request.path)
@@ -186,28 +194,25 @@ class WebDavHandler(object):
     def handle_get(self, request):
         path = self.get_final_path_part(request.path)
         f = self.backend.dav_get(path)
-        response = HttpResponse(f, None, 200, "text/plain")
+        response = StreamingHttpResponse(f, None, 200, "text/plain")
         return response
 
     def handle_head(self, request):
         path = self.get_final_path_part(request.path)
         self.backend.dav_head(path)
-        response = HttpResponse("200 OK", None, 200, "text/plain")
-        return response
+        return self.get_200_response()
 
     def handle_delete(self, request):
         path = self.get_final_path_part(request.path)
         token = self.get_matching_token(request, path)
         self.backend.dav_delete(path, token)
-        response = HttpResponse("200 OK", None, 200, "text/plain")
-        return response
+        return self.get_200_response()
 
     def handle_put(self, request):
         path = self.get_final_path_part(request.path)
         token = self.get_matching_token(request, path)
         self.backend.dav_put(path, request, token)
-        response = HttpResponse("200 OK", None, 200, "text/plain")
-        return response
+        return self.get_200_response()
 
     def handle_copy(self, request):
         path1 = self.get_final_path_part(request.path)

@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 import base64
 
-from django.http import HttpResponse, HttpResponseForbidden
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 
@@ -35,6 +36,10 @@ from openPLM.plmapp.views.base import secure_required
 from openPLM.plmapp.exceptions import ControllerError
 
 logger = logging.getLogger("webdav")
+
+@csrf_exempt
+def not_found(request, *args, **kwargs):
+    return HttpResponseNotFound("Not found")
 
 def basic_auth(request):
     """
@@ -89,3 +94,55 @@ def openplm_webdav(request, local_path):
     response.status_code = 401
     response['WWW-Authenticate'] = 'Basic realm="openPLM-dav"'
     return response
+
+
+if "django_digest" in settings.INSTALLED_APPS:
+    # pip install "hg+https://bitbucket.org/scjody/django-digest" python_digest
+    from django_digest import HttpDigestAuthenticator
+    import python_digest
+
+    from hashlib import md5
+
+    def calc_ha2_rspauth(uri):
+        return md5(":" + uri).hexdigest()
+
+    def calc_hash(**parameters):
+        hash_text = "%(ha1)s:%(nonce)s:%(nc)s:%(cnonce)s:auth:%(ha2)s" % parameters
+        return md5(hash_text).hexdigest()
+
+    def calc_rspauth(parameters):
+        ha2_rspauth = calc_ha2_rspauth(parameters["uri"])
+        return calc_hash(ha2=ha2_rspauth, **parameters)
+
+    def _httpdigest(f):
+        @csrf_exempt
+        def wrapper(request, *args, **kwargs):
+            authenticator = HttpDigestAuthenticator()
+            if not authenticator.authenticate(request):
+                return authenticator.build_challenge_response()
+
+            response = f(request, *args, **kwargs)
+            if hasattr(response, 'status_code') and response.status_code in [401, 403]:
+                return authenticator.build_challenge_response()
+            if 200 <= response.status_code < 300:
+                digest = python_digest.parse_digest_credentials(
+                    request.META['HTTP_AUTHORIZATION'])
+                nc = "%08d" % digest.nc
+                partial_digest = authenticator._account_storage.get_partial_digest(digest.username)
+                parameters = {
+                        "username": request.user.username,
+                        "ha1": partial_digest,
+                        "nonce": digest.nonce,
+                        "cnonce": digest.cnonce,
+                        "method":digest.algorithm,
+                        "uri": digest.uri,
+                        "nc": nc,
+                        }
+                rspauth = calc_rspauth(parameters)
+                info = 'rspauth="%s",cnonce="%s",nc=%s,qop=%s' % (rspauth, digest.cnonce,
+                        nc, digest.qop)
+                response["Authentication-Info"] = info
+            return response
+        return wrapper
+    openplm_webdav = _httpdigest(openplm_webdav)
+
