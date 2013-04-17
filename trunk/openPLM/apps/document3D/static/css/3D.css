@@ -37,6 +37,7 @@
 .menu span {
     color: #222;
 }
+.menu .part { word-wrap: break-word; }
 span.expander, .part {
     cursor: pointer;
 }
