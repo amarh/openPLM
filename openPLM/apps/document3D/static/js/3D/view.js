@@ -270,6 +270,7 @@ View3D.prototype = {
                 ctrl.maxDistance = this.radius * 1000;
                 ctrl.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ] [A,S,D]               
             }
+            
             if (this.has_menu){ 
                 this.menu();
                 for (var i=0; i < this.object3D.children.length; i++) {
@@ -308,7 +309,7 @@ View3D.prototype = {
                 slide: function( event, ui ) {
                     total=self.zoom_var-ui.value;
                     self.zoom_var=ui.value;
-                    camera.translateZ(1.49999*self.radius*(total/50));
+                    camera.translateZ(1.5 *self.radius*(total/50));
                 }
 
             });
@@ -328,8 +329,10 @@ View3D.prototype = {
             });
 
             s = function(f){
-                return function(){ return self[f]();};
+                return function(e){ return self[f](e);};
             }
+            renderer.domElement.addEventListener( 'mousewheel', s("mousewheel"), false );
+            renderer.domElement.addEventListener( 'DOMMouseScroll', s("mousewheel"), false );
             $("#colors-toolbar").buttonset();
             $("#random-color").button({text:false, icons:{primary:'random'}}).click(s("random_color"));
             $("#initial-color").button({text:false, icons:{primary:'axo'}}).click(s("reinit_color"));
@@ -354,8 +357,24 @@ View3D.prototype = {
     set_scale : function (factor) {
         total=this.zoom_var-factor;
         this.zoom_var=factor;
-        this.camera.translateZ(1.49999*this.radius*(total/50));
+        this.camera.translateZ(1.5 * this.radius*(total/50));
         $("#zoom").slider("value", factor);
+    },
+
+    mousewheel : function (event ) {
+        event.preventDefault();
+        event.stopPropagation();
+        var delta = 0;
+
+        if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+            delta = event.wheelDelta / 40;
+        } else if ( event.detail ) { // Firefox
+            delta = - event.detail * 1.5;
+        }
+        var factor = this.zoom_var + delta;
+        if (factor >= 5 && factor <= 100){
+            this.set_scale(factor);
+        }
     },
 
     highlight_part : function (part_id) {
