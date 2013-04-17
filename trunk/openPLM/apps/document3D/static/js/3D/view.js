@@ -224,7 +224,6 @@ View3D.prototype = {
                 obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
                 obj.material.original_opacity = obj.material.opacity; 
-
             }
             this.object3D.castShadow = true;
             this.object3D.receiveShadow = true;
@@ -273,8 +272,18 @@ View3D.prototype = {
             }
             if (this.has_menu){ 
                 this.menu();
+                for (var i=0; i < this.object3D.children.length; i++) {
+                    var obj = this.object3D.children[i];
+                    $("#color-"+ obj.part).css("background-color", obj.material.color.getContextStyle());
+                }
+                $("span.expander").click(function () {
+                    var row = $(this).parent();
+                    row.toggleClass("expanded open");
+                    var nodes = row.children('ul');
+                    nodes.toggle();
+                });
 
-                $('.menu a').hover(
+                $('.menu .part').hover(
                     function (){
                         var part = "part" + $(this).attr("id").replace("li-part-", "");
                         self.highlight_part(part);
@@ -445,6 +454,7 @@ View3D.prototype = {
             var obj = object3D.children[i];
             obj.material.color.setRGB(Math.random(), Math.random(), Math.random());
             obj.material.original_color = obj.material.color.getHex();
+            $("#color-"+ obj.part).css("background-color", obj.material.color.getContextStyle());
         }
     },
 
@@ -454,6 +464,7 @@ View3D.prototype = {
             var obj = object3D.children[i];
             obj.material.color.setHex(obj.material.original_step_color);
             obj.material.original_color = obj.material.original_step_color;
+            $("#color-"+ obj.part).css("background-color", obj.material.color.getContextStyle());
         }
     },
 

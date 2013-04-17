@@ -17,10 +17,11 @@
 
         </p>
     {% else %}
-        <div class="trans" >
-            <div class="menu" id="menu_">   </div>
-        </div> 
-
+        {% if javascript_arborescense %}
+            <div class="trans" >
+                <div class="menu" id="menu_">   </div>
+            </div> 
+        {% endif %}
 
         <span id="toolbar" class="ui-widget-header ui-corner-all" style="display:none">
 
