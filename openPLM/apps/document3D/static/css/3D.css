@@ -1,118 +1,57 @@
+.trans {    
+    position:absolute;
+    z-index:10;      
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #E4E3E2;
+}  
+
 .menu {
-    margin: 10px;
-    height: 100px;
     font-size: 9pt;
-    font-family: roman;
+    width: 15em;
+    overflow: auto;
+    line-height: 1.3;
+    max-height: 100%;
+}
+
+#tree {
+    padding: 5px;
+    margin-left: 0;
+}
+#main_content #tree > li {
+    margin-left: 0.5em;
 }
 .menu ul {
 
-    margin: 0pt;
-    padding: 0pt;
-    position: relative;
+    margin: 0;
+    padding: 0;
     z-index: 500;
     list-style-type: none;
-    width: 11em;
+    display: list-item;
 
 }
-.menu li {
+.menu li.expander {
+    list-style-type: none !important;
+}
+.menu span {
+    color: #222;
+}
+span.expander, .part {
+    cursor: pointer;
+}
 
-    background-color: #cccc99;
-    float: left;
-}
-.menu li.sub {
-    background-color: #cccc99;
+.menu span.part_hidden {
+    color: #656565;
 }
 
-.menu a, .menu a:visited {
-    border: 1px solid #ffffff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    text-decoration: none;
-    height: 2em;
-    line-height: 2em;
-    width: 11em;
-    color: #000000;
-    padding-left: 1em;
-    font-weight: normal;
-    font-style: normal;
-    font-variant: normal;
-    text-transform: none;
+li.expanded > span.expander:after {
+    content: "▸  ";
 }
-.menu b {
-    float: right;
-    margin-right: 5px;
+
+li.open > span.expander:after {
+    content: "▾  ";
 }
-* html .menu a, * html .menu a:visited {
-    width: 11em;
-}
-* html .menu a:hover {
-    color: #ccff66;
-    background-color: #999966;
-    position: relative;
-    font-weight: normal;
-    font-style: normal;
-    font-variant: normal;
-    text-decoration: none;
-    text-transform: none;
-}
-.menu li:hover {
-    position: relative;
-}
-.menu a:active, .menu a:focus {
-    color: #ccff66;
-    background-color: #999966;
-    font-weight: normal;
-    font-style: normal;
-    font-variant: normal;
-    text-decoration: none;
-    text-transform: none;
-}
-.menu li:hover > a {
-    color: #ccff66;
-    background-color: #999966;
-    font-weight: normal;
-    font-style: normal;
-    font-variant: normal;
-    text-decoration: none;
-    text-transform: none;
-}
-.menu li ul {
-    padding: 2em;
-    visibility: hidden;
-    position: absolute;
-    top: -2em;
-    left: 7em;
-    background-color: transparent;
-}
-.menu li:hover > ul {
-    visibility: visible;
-}
-.menu ul a:hover ul ul {
-    visibility: hidden;
-}
-.menu ul a:hover ul a:hover ul ul {
-    visibility: hidden;
-}
-.menu ul a:hover ul a:hover ul a:hover ul ul {
-    visibility: hidden;
-}
-.menu ul a:hover ul {
-    visibility: visible;
-}
-.menu ul a:hover ul a:hover ul {
-    visibility: visible;
-}
-.menu ul a:hover ul a:hover ul a:hover ul {
-    visibility: visible;
-}
-.menu ul a:hover ul a:hover ul a:hover ul a:hover ul {
-    visibility: visible;
-}
-.trans{    
-    position:absolute;
-    z-index:10;      
-}  
 #zoom {
     position:absolute;
     height: 60%;
