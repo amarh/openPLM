@@ -26,6 +26,8 @@
 """
 
 import re
+import difflib
+import itertools
 from functools import wraps
 from collections import deque
 
@@ -157,9 +159,17 @@ class Controller(object):
             obj = object.__getattribute__(self, "object")
             old_value = getattr(obj, attr)
             setattr(obj, attr, value)
-            field = obj._meta.get_field(attr).verbose_name.capitalize()
+            mfield = obj._meta.get_field(attr)
+            field = mfield.verbose_name.capitalize()
             if old_value != value:
-                message = "%(field)s : changes from '%(old)s' to '%(new)s'" % \
+                if getattr(mfield, "richtext", False):
+                    # store a unified diff (shorter than storing both values)
+                    message = u"{field}:\n".format(field=field)
+                    diff = difflib.unified_diff(old_value.splitlines(), value.splitlines())
+                    # skip the ---/+++ lines
+                    message += u"\n".join(itertools.islice(diff, 3, None))
+                else:
+                    message = u"%(field)s : changes from '%(old)s' to '%(new)s'" % \
                         {"field" : field, "old" : old_value, "new" : value}
                 self._histo += message + "\n"
         else:
