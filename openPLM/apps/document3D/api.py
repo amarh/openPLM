@@ -160,13 +160,17 @@ def add_zip_file(request, doc_id, unlock, thumbnail_extension="False" , thumbnai
         if not filename.endswith(thumbnail_extension):
             tmp_file = zip_file.open(filename)
             dummy_file = File(tmp_file)
-            dummy_file.name = filename
+            try:
+                dummy_file.name = filename.decode("utf-8")
+            except UnicodeError:
+                # WinZIP always decode filename as cp437,
+                dummy_file.name = filename.decode("cp437")
             dummy_file.size = zip_file.getinfo(filename).file_size
             dummy_file.file = tmp_file
             df = doc.add_file(dummy_file,thumbnail=True)
             if unlock == "False" or unlock == "false":
                 doc.lock(df)
-            th = filename + "." + thumbnail_extension
+            th = df.filename + "." + thumbnail_extension
             if thumbnail and th in files:
                 tmp_file = zip_file.open(th)
                 dummy_file = File(tmp_file)
