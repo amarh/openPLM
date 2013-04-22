@@ -185,10 +185,7 @@ class DocumentController(PLMObjectController):
         if self.has_standard_related_locked(f.name):
             raise ValueError("Native file has a standard related locked file.")
 
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-        f.seek(0)
-        doc_file = models.DocumentFile.objects.create(filename=f.name, size=size,
+        doc_file = models.DocumentFile.objects.create(filename=f.name, size=f.size,
                         file=models.docfs.save(f.name,f), document=self.object)
         self.save(False)
         # set read only file

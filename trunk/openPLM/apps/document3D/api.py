@@ -161,7 +161,7 @@ def add_zip_file(request, doc_id, unlock, thumbnail_extension="False" , thumbnai
             tmp_file = zip_file.open(filename)
             dummy_file = File(tmp_file)
             dummy_file.name = filename
-            dummy_file.size = zip_file.getinfo(filename)
+            dummy_file.size = zip_file.getinfo(filename).file_size
             dummy_file.file = tmp_file
             df = doc.add_file(dummy_file,thumbnail=True)
             if unlock == "False" or unlock == "false":
@@ -171,7 +171,7 @@ def add_zip_file(request, doc_id, unlock, thumbnail_extension="False" , thumbnai
                 tmp_file = zip_file.open(th)
                 dummy_file = File(tmp_file)
                 dummy_file.name = th
-                dummy_file.size = zip_file.get_info(th).size
+                dummy_file.size = zip_file.get_info(th).file_size
                 dummy_file.file = tmp_file
                 doc.add_thumbnail(df, dummy_file)
     return {}
