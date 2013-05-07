@@ -566,25 +566,25 @@ register_PCLE(Location_link)
 
 def generate_extra_location_links(link, pcl):
     """
-    For a :class:`.ParentChildLink`, it generates the whole necessary :class:`Location_link`
+    Creates all :class:`Location_link` bound to *link and *pcl*.
 
-
-    :param link: :class:`.openPLM.apps.document3D.classes.Link` which will be used to generate extra :class:`.Location_link`
+    :param link: :class:`.openPLM.apps.document3D.classes.Link` which will be used to create :class:`.Location_link`
     :type plmobject: :class:`.Link`
-    :param ParentChildLink: :class:`.ParentChildLink` for that the extra :class:`Location_link` are generated
+    :param ParentChildLink: Parent child link that is extended
     :type plmobject: :class:`.ParentChildLink`
 
     """
+    # Location_link inherits from PCLE: it is not possible to call bulk_create
     for i in range(link.quantity):
-        loc=Location_link()
+        loc = Location_link()
         loc.link = pcl
-
-        array=link.locations[i].to_array()
-
-        loc.name=link.names[i]
-        loc.x1, loc.x2, loc.x3, loc.x4, loc.y1, loc.y2, loc.y3, loc.y4, loc.z1, loc.z2, loc.z3, loc.z4 = map(lambda x: 0.0 if abs(x) < 1e-50 else x, array)
-
+        array = link.locations[i].to_array()
+        loc.name = link.names[i]
+        (loc.x1, loc.x2, loc.x3, loc.x4,
+         loc.y1, loc.y2, loc.y3, loc.y4,
+         loc.z1, loc.z2, loc.z3, loc.z4) = map(lambda x: 0.0 if abs(x) < 1e-50 else x, array)
         loc.save()
+
 
 @memoize_noarg
 def get_all_plmDocument3Dtypes_with_level():
