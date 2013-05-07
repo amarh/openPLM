@@ -6,6 +6,7 @@ import tempfile
 import copy
 from collections import defaultdict
 
+from django.conf import settings
 from django.db import models
 from django.contrib import admin
 from django.db.models import Q
@@ -15,16 +16,16 @@ import json
 from celery.task import task
 
 from openPLM.plmapp.controllers import get_controller
-from openPLM.apps.document3D.classes import *
+from openPLM.apps.document3D import classes
 from openPLM.plmapp.controllers import DocumentController
-from openPLM.plmapp.models import *
+import openPLM.plmapp.models as pmodels
 from openPLM.plmapp.exceptions import ControllerError
 from openPLM.plmapp.controllers.part import PartController
 
 #./manage.py graph_models document3D > models.dot   dot -Tpng models.dot > models.png
 
 
-class Document3D(Document):
+class Document3D(pmodels.Document):
     u"""
     Model which allows to treat :class:`~django.core.files.File` **.stp**  attached to  :class:`.DocumentFile` for his later **visualization** and **decomposition**. It extends :class:`.Document` with the attribute/tab 3D
 
@@ -33,7 +34,7 @@ class Document3D(Document):
         If the :class:`.Document3D` has been *decomposed*, :class:`.Part` from which we generate the **decomposition**
     """
 
-    PartDecompose = models.ForeignKey(Part,null=True)
+    PartDecompose = models.ForeignKey(pmodels.Part,null=True)
 
     @property
     def menu_items(self):
@@ -56,12 +57,28 @@ class Document3D(Document):
 
         fileName, fileExtension = os.path.splitext(doc_file.filename)
         if fileExtension.upper() in ('.STP', '.STEP') and not doc_file.deprecated:
-
-            tempfile_size=composer_step(doc_file)
+            tempfile_size = self.recompose_step_file(doc_file)
             if tempfile_size:
                 return tempfile_size[0] ,tempfile_size[1]  #temp_file , size
 
         return super(Document3D, self).get_content_and_size(doc_file)
+
+    def recompose_step_file(self, doc_file):
+        product = Document3DController(self, None).get_product(doc_file, True)
+
+        if product and product.is_decomposed:
+            temp_file = tempfile.NamedTemporaryFile(delete=True)
+            temp_file.write(json.dumps(classes.data_for_product(product)))
+            temp_file.seek(0)
+            dirname = os.path.dirname(__file__)
+            composer = os.path.join(dirname, "generateComposition.py")
+            if subprocess.call(["python", composer, temp_file.name]) == 0:
+                size = os.path.getsize(temp_file.name)
+                temp_file.seek(0)
+                return temp_file, size
+            else:
+                raise RuntimeError("Could not recompose step file")
+        return False
 
     @property
     def documents_related(self):
@@ -72,30 +89,13 @@ class Document3D(Document):
         document_related = []
         part = self.PartDecompose
         if part:
-            links = ParentChildLink.current_objects.filter(parent=part)
+            links = pmodels.ParentChildLink.current_objects.filter(parent=part)
             for link in links:
                 if Location_link.objects.filter(link=links).exists():
                     document_related.append(Document3D.objects.get(PartDecompose=link.child))
         return document_related
 
 admin.site.register(Document3D)
-
-def composer_step(doc_file):
-    product = Document3DController(doc_file.document.document3d, None).get_product(doc_file, True)
-
-    if product and product.is_decomposed:
-        temp_file = tempfile.NamedTemporaryFile(delete=True)
-        temp_file.write(json.dumps(data_for_product(product)))
-        temp_file.seek(0)
-        dirname = os.path.dirname(__file__)
-        composer = os.path.join(dirname, "generateComposition.py")
-        if subprocess.call(["python", composer, temp_file.name]) == 0:
-            size = os.path.getsize(temp_file.name)
-            temp_file.seek(0)
-            return temp_file, size
-        else:
-            raise RuntimeError("Could not recompose step file")
-    return False
 
 
 @task(name="openPLM.apps.document3D.handle_step_file",
@@ -115,12 +115,12 @@ def handle_step_file(doc_file_pk):
     """
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)
     logger = handle_step_file.get_logger()
-    doc_file = DocumentFile.objects.get(pk=doc_file_pk)
+    doc_file = pmodels.DocumentFile.objects.get(pk=doc_file_pk)
     temp_file = tempfile.TemporaryFile()
     error_file = tempfile.NamedTemporaryFile()
     stdout = temp_file.fileno()
     name = "%s.png" % (doc_file_pk)
-    thumbnail_path = thumbnailfs.path(name)
+    thumbnail_path = pmodels.thumbnailfs.path(name)
 
     try:
         dirname = os.path.dirname(__file__)
@@ -233,12 +233,12 @@ class Document3DController(DocumentController):
 
             elif self.object.PartDecompose: #and not self.object.PartDecompose in selected_parts
                 product=self.get_product(STP_file[0], True)
-                tempfile_size=composer_step(STP_file[0])
+                tempfile_size = self.recompose_step_file(STP_file[0])
                 if tempfile_size:
                     filename = new_STP_file.filename
-                    path = docfs.get_available_name(filename.encode("utf-8"))
-                    shutil.copy(tempfile_size[0].name, docfs.path(path))
-                    new_doc = DocumentFile.objects.create(file=path,
+                    path = pmodels.docfs.get_available_name(filename.encode("utf-8"))
+                    shutil.copy(tempfile_size[0].name, pmodels.docfs.path(path))
+                    new_doc = pmodels.DocumentFile.objects.create(file=path,
                         filename=filename, size=tempfile_size[1], document=rev.object)
                     new_doc.thumbnail = new_STP_file.thumbnail
                     if new_STP_file.thumbnail:
@@ -246,7 +246,7 @@ class Document3DController(DocumentController):
                         thumb = "%d%s" %(new_doc.id, ext)
                         dirname = os.path.dirname(new_STP_file.thumbnail.path)
                         thumb_path = os.path.join(dirname, thumb)
-                        shutil.copy(doc_file.thumbnail.path, thumb_path)
+                        shutil.copy(new_STP_file.thumbnail.path, thumb_path)
                         new_doc.thumbnail = os.path.basename(thumb_path)
                     new_doc.locked = False
                     new_doc.locker = None
@@ -302,13 +302,13 @@ class Document3DController(DocumentController):
                 children_ids = [c.link.child_id for c in pctrl.get_children(-1, related=("child__id"),
                     only=("child__id", "parent__id",))]
                 if children_ids:
-                    docs = DocumentPartLink.objects.now().filter(document__type="Document3D",
+                    docs = pmodels.DocumentPartLink.objects.now().filter(document__type="Document3D",
                             part__in=children_ids).values_list("document", flat=True)
-                    dfs = DocumentFile.objects.filter(document__in=docs, deprecated=False)\
+                    dfs = pmodels.DocumentFile.objects.filter(document__in=docs, deprecated=False)\
                             .filter(is_stp).values_list("id", flat=True)
                     self._stps = dfs
                 else:
-                    self._stps = DocumentFile.objects.none().values_list("id", flat=True)
+                    self._stps = pmodels.DocumentFile.objects.none().values_list("id", flat=True)
             q = Q(stp=doc_file)
             stps = list(self._stps)
             if stps:
@@ -328,7 +328,7 @@ class Document3DController(DocumentController):
             af = ArbreFile.objects.get(stp=doc_file)
         except:
             return None
-        product = Product_from_Arb(json.loads(af.file.read()))
+        product = classes.Product_from_Arb(json.loads(af.file.read()))
         if recursive and product:
             if self.PartDecompose is not None:
                 # Here be dragons
@@ -345,7 +345,7 @@ class Document3DController(DocumentController):
                 links, children_ids = zip(*[(c.link.id, c.link.child_id) for c in children])
                 docs = []
                 part_to_docs = defaultdict(list)
-                for doc, part in DocumentPartLink.current_objects.filter(document__type="Document3D",
+                for doc, part in pmodels.DocumentPartLink.current_objects.filter(document__type="Document3D",
                         part__in=children_ids).values_list("document", "part").order_by("-ctime"):
                     # order by -ctime to test the most recently attached document first
                     part_to_docs[part].append(doc)
@@ -353,7 +353,7 @@ class Document3DController(DocumentController):
                 if not docs:
                     return product
 
-                dfs = dict(DocumentFile.objects.filter(document__in=docs, deprecated=False)\
+                dfs = dict(pmodels.DocumentFile.objects.filter(document__in=docs, deprecated=False)\
                         .filter(is_stp).values_list("document", "id"))
                 # cache this values as it may be useful for get_all_geometry_files
                 self._stps = dfs.values()
@@ -377,7 +377,7 @@ class Document3DController(DocumentController):
                             break
                     if stp is not None and stp in jsons:
                         pr = products[-1]
-                        prod = Product_from_Arb(jsons[stp], product=False,
+                        prod = classes.Product_from_Arb(jsons[stp], product=False,
                                 product_root=product, deep=level, to_update_product_root=pr)
                         for location in locs[link.id]:
                             pr.links[-1].add_occurrence(location.name, location)
@@ -387,8 +387,7 @@ class Document3DController(DocumentController):
         return product
 
 
-
-media3DGeometryFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
+media3DGeometryFile = pmodels.DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
 class GeometryFile(models.Model):
     u"""
 
@@ -412,7 +411,7 @@ class GeometryFile(models.Model):
 
     """
     file = models.FileField(upload_to='.',storage=media3DGeometryFile)
-    stp = models.ForeignKey(DocumentFile)
+    stp = models.ForeignKey(pmodels.DocumentFile)
     index = models.IntegerField()
 
     def __unicode__(self):
@@ -434,7 +433,7 @@ def delete_GeometryFiles(doc_file):
     to_delete.delete()
 
 
-media3DArbreFile = DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
+media3DArbreFile = pmodels.DocumentStorage(location=settings.MEDIA_ROOT+"3D/")
 #admin.site.register(ArbreFile)
 class ArbreFile(models.Model):
     u"""
@@ -456,7 +455,7 @@ class ArbreFile(models.Model):
         this attribute indicates if the :class:`.DocumentFile` can be decompose
     """
     file = models.FileField(upload_to='.',storage=media3DArbreFile)
-    stp = models.ForeignKey(DocumentFile)
+    stp = models.ForeignKey(pmodels.DocumentFile)
     decomposable = models.BooleanField()
 
 def delete_ArbreFile(doc_file):
@@ -497,7 +496,7 @@ class Document_Generate_Bom_Error(ControllerError):
 
 
 
-class Location_link(ParentChildLinkExtension):
+class Location_link(pmodels.ParentChildLinkExtension):
     """
     Extend :class:`.ParentChildLinkExtension`
     Represents the matrix of transformation (rotation and translation) and the name of one relation between assemblys.
@@ -514,24 +513,25 @@ class Location_link(ParentChildLinkExtension):
      0  0  0  1   1 = 1
      == == == == == = ==
     """
-    x1=models.FloatField(default=lambda: 0)
-    x2=models.FloatField(default=lambda: 0)
-    x3=models.FloatField(default=lambda: 0)
-    x4=models.FloatField(default=lambda: 0)
-    y1=models.FloatField(default=lambda: 0)
-    y2=models.FloatField(default=lambda: 0)
-    y3=models.FloatField(default=lambda: 0)
-    y4=models.FloatField(default=lambda: 0)
-    z1=models.FloatField(default=lambda: 0)
-    z2=models.FloatField(default=lambda: 0)
-    z3=models.FloatField(default=lambda: 0)
-    z4=models.FloatField(default=lambda: 0)
+    x1 = models.FloatField(default=lambda: 0)
+    x2 = models.FloatField(default=lambda: 0)
+    x3 = models.FloatField(default=lambda: 0)
+    x4 = models.FloatField(default=lambda: 0)
+    y1 = models.FloatField(default=lambda: 0)
+    y2 = models.FloatField(default=lambda: 0)
+    y3 = models.FloatField(default=lambda: 0)
+    y4 = models.FloatField(default=lambda: 0)
+    z1 = models.FloatField(default=lambda: 0)
+    z2 = models.FloatField(default=lambda: 0)
+    z3 = models.FloatField(default=lambda: 0)
+    z4 = models.FloatField(default=lambda: 0)
 
-    name=models.CharField(max_length=100,default="no_name")
-
+    name = models.CharField(max_length=100, default="no_name")
 
     def to_array(self):
-        return [self.x1,self.x2,self.x3,self.x4,self.y1,self.y2,self.y3,self.y4,self.z1,self.z2,self.z3,self.z4]
+        return [self.x1, self.x2, self.x3, self.x4,
+                self.y1, self.y2, self.y3, self.y4,
+                self.z1, self.z2, self.z3, self.z4]
 
     @classmethod
     def apply_to(cls, parent):
@@ -540,28 +540,31 @@ class Location_link(ParentChildLinkExtension):
 
     def clone(self, link, save, **data):
 
-        x1=data.get("x1", self.x1)
-        x2=data.get("x2", self.x2)
-        x3=data.get("x3", self.x3)
-        x4=data.get("x4", self.x4)
-        y1=data.get("y1", self.y1)
-        y2=data.get("y2", self.y2)
-        y3=data.get("y3", self.y3)
-        y4=data.get("y4", self.y4)
-        z1=data.get("z1", self.z1)
-        z2=data.get("z2", self.z2)
-        z3=data.get("z3", self.z3)
-        z4=data.get("z4", self.z4)
+        x1 = data.get("x1", self.x1)
+        x2 = data.get("x2", self.x2)
+        x3 = data.get("x3", self.x3)
+        x4 = data.get("x4", self.x4)
+        y1 = data.get("y1", self.y1)
+        y2 = data.get("y2", self.y2)
+        y3 = data.get("y3", self.y3)
+        y4 = data.get("y4", self.y4)
+        z1 = data.get("z1", self.z1)
+        z2 = data.get("z2", self.z2)
+        z3 = data.get("z3", self.z3)
+        z4 = data.get("z4", self.z4)
 
-        name=data.get("name", self.name)
-        clone = Location_link(link=link, x1=x1,x2=x2,x3=x3,x4=x4, y1=y1,y2=y2,y3=y3,y4=y4,z1=z1,z2=z2,z3=z3,z4=z4,name=name)
+        name = data.get("name", self.name)
+        clone = Location_link(link=link, name=name,
+                x1=x1, x2=x2, x3=x3, x4=x4,
+                y1=y1, y2=y2, y3=y3, y4=y4,
+                z1=z1,z2=z2,z3=z3,z4=z4)
         if save:
             clone.save()
         return clone
 
 
 #admin.site.register(Location_link)
-register_PCLE(Location_link)
+pmodels.register_PCLE(Location_link)
 
 
 def generate_extra_location_links(link, pcl):
@@ -585,13 +588,6 @@ def generate_extra_location_links(link, pcl):
          loc.z1, loc.z2, loc.z3, loc.z4) = map(lambda x: 0.0 if abs(x) < 1e-50 else x, array)
         loc.save()
 
-
-@memoize_noarg
-def get_all_plmDocument3Dtypes_with_level():
-    lst = []
-    level=">>"
-    get_all_subclasses_with_level(Document3D, lst , level)
-    return lst
 
 @task(name="openPLM.apps.document3D.decomposer_all",
       soft_time_limit=60*25,time_limit=60*25)
@@ -653,15 +649,15 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         -We set the :class:`.Part` (**part_pk**) like the attribute PartDecompose of the :class:`.Document3D` that contains the :class:`.DocumentFile` (**stp_file_pk**)
     """
     try:
-        stp_file = DocumentFile.objects.get(pk=stp_file_pk)
+        stp_file = pmodels.DocumentFile.objects.get(pk=stp_file_pk)
         ctrl=get_controller(stp_file.document.type)
-        user=User.objects.get(pk=user_pk)
+        user=pmodels.User.objects.get(pk=user_pk)
         ctrl=ctrl(stp_file.document,user)
-        part=Part.objects.get(pk=part_pk)
+        part=pmodels.Part.objects.get(pk=part_pk)
 
-        product=Product_from_Arb(json.loads(arbre))   #whit doc_id and doc_path updated for every node
-        old_product=Product_from_Arb(json.loads(old_arbre)) # doc_id and doc_path original
-        new_stp_file=DocumentFile()
+        product=classes.Product_from_Arb(json.loads(arbre))   #whit doc_id and doc_path updated for every node
+        old_product=classes.Product_from_Arb(json.loads(old_arbre)) # doc_id and doc_path original
+        new_stp_file=pmodels.DocumentFile()
         name = new_stp_file.file.storage.get_available_name((product.name+".stp").encode("utf-8"))
         new_stp_path = os.path.join(new_stp_file.file.storage.location, name)
         f = File(open(new_stp_path, 'w'))
@@ -671,7 +667,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         product.doc_id=new_stp_file.id # the old documentfile will be deprecated
 
         temp_file = tempfile.NamedTemporaryFile(delete=True)
-        temp_file.write(json.dumps(data_for_product(product)))
+        temp_file.write(json.dumps(classes.data_for_product(product)))
         temp_file.seek(0)
         dirname = os.path.dirname(__file__)
         if subprocess.call(["python", os.path.join(dirname, "generateDecomposition.py"),
@@ -688,7 +684,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
 
     finally:
         if native_related_pk is not None:
-            native_related = DocumentFile.objects.get(pk=native_related_pk)
+            native_related = pmodels.DocumentFile.objects.get(pk=native_related_pk)
             native_related.deprecated=False
             native_related.save()
         stp_file.locked = False
@@ -767,7 +763,7 @@ def update_child_files_BD(product,user,old_product):
             old_product_copy=copy.copy(old_link.product)
             product_copy.links=[]       #when we decompose we delete the links
             old_product_copy.links=[]
-            doc_file=DocumentFile.objects.get(id=product_copy.doc_id)
+            doc_file=pmodels.DocumentFile.objects.get(id=product_copy.doc_id)
             doc_file.filename=product_copy.name+".stp".encode("utf-8")
             doc_file.no_index=False
             doc_file.size=os.path.getsize(doc_file.file.path)
@@ -785,7 +781,7 @@ def update_child_files_BD(product,user,old_product):
             ctrl._save_histo("File generated by decomposition", "file : %s" % doc_file.filename)
             update_child_files_BD(link.product,user,old_link.product)
 
-def copy_geometry(product,doc_file):
+def copy_geometry(product, doc_file):
     """
     :param product: :class:`.Product` that represents a sub-arborescense original of the file step that was decompose
     :param doc_file: :class:`.DocumentFile` for which the files **.geo** that generated
@@ -798,11 +794,10 @@ def copy_geometry(product,doc_file):
 
     """
 
-    if not product.geometry==False:
-        product.visited=True
-        old_GeometryFile=GeometryFile.objects.get(stp__id=product.doc_id,index=product.geometry)
-        new_GeometryFile= GeometryFile()
-
+    if product.geometry:
+        product.visited = True
+        old_GeometryFile = GeometryFile.objects.get(stp__id=product.doc_id, index=product.geometry)
+        new_GeometryFile = GeometryFile()
         fileName, fileExtension = os.path.splitext(doc_file.filename)
 
         new_GeometryFile.file = new_GeometryFile.file.storage.get_available_name(fileName+".geo")
@@ -810,15 +805,17 @@ def copy_geometry(product,doc_file):
         new_GeometryFile.index = product.geometry
         new_GeometryFile.save()
 
-        infile = open(old_GeometryFile.file.path,"r")
-        outfile = open(new_GeometryFile.file.path,"w")
-        for line in infile.readlines():
-            new_line=line.replace("_%s_%s"%(product.geometry,product.doc_id),"_%s_%s"%(product.geometry,doc_file.id))
-            outfile.write(new_line)
+        with open(old_GeometryFile.file.path, "r") as infile:
+            with open(new_GeometryFile.file.path, "w") as outfile:
+                old_var = "_%s_%s" % (product.geometry, product.doc_id)
+                new_var = "_%s_%s" % (product.geometry, doc_file.id)
+                for line in infile.readlines():
+                    new_line = line.replace(old_var, new_var)
+                    outfile.write(new_line)
 
     for link in product.links:
         if not link.product.visited:
-            copy_geometry(link.product,doc_file)
+            copy_geometry(link.product, doc_file)
 
 def Product_to_ArbreFile(product,doc_file):
     """
@@ -831,7 +828,7 @@ def Product_to_ArbreFile(product,doc_file):
     Departing from the information contained in the :class:`.Product` it is going to generate a :class:`~django.core.files.File` **.arb** for the new :class:`.ArbreFile`
 
     """
-    data=data_for_product(product)
+    data=classes.data_for_product(product)
 
     fileName, fileExtension = os.path.splitext(doc_file.filename)
     new_ArbreFile= ArbreFile(decomposable=product.is_decomposable)

@@ -1,27 +1,30 @@
 import os
 import fileinput
+import json
 from collections import namedtuple
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
+from django.core.files.base import File
 from django.db import transaction
 from django.http import (HttpResponse, HttpResponseRedirect,
         HttpResponseForbidden, Http404, StreamingHttpResponse)
-import json
 
 from openPLM.plmapp.views.base import (handle_errors, secure_required,
         get_generic_data, get_obj, get_obj_by_id, init_ctx)
-from openPLM.apps.document3D.forms import *
-from openPLM.apps.document3D.models import *
+from openPLM.apps.document3D import forms
+from openPLM.apps.document3D import models
 from openPLM.apps.document3D.arborescense import JSGenerator
-from openPLM.apps.document3D.classes import *
-from openPLM.plmapp.forms import *
+from openPLM.apps.document3D import classes
+from openPLM.plmapp import forms as pforms
+from openPLM.plmapp import models as pmodels
 from openPLM.plmapp.models import get_all_plmobjects
 from openPLM.plmapp.tasks import update_indexes
 from openPLM.plmapp.decomposers.base import Decomposer, DecomposersManager
 from django.template.loader import render_to_string
 from openPLM.plmapp.utils import r2r
+
 
 @handle_errors
 def display_3d(request, obj_ref, obj_revi):
@@ -40,13 +43,13 @@ def display_3d(request, obj_ref, obj_revi):
     ctx['stl'] = False
 
     try:
-        doc_file = obj.files.filter(is_stp)[0]
+        doc_file = obj.files.filter(models.is_stp)[0]
     except IndexError:
         doc_file = None
         geometry_files = []
         javascript_arborescense=""
         try:
-            doc_file = obj.files.filter(is_stl)[0]
+            doc_file = obj.files.filter(models.is_stl)[0]
             ctx["stl"] = True
             ctx["stl_file"] = doc_file
         except IndexError:
@@ -76,13 +79,13 @@ def display_public_3d(request, obj_ref, obj_revi):
     ctx['stl'] = False
 
     try:
-        doc_file = obj.files.filter(is_stp)[0]
+        doc_file = obj.files.filter(models.is_stp)[0]
     except IndexError:
         doc_file = None
 
         javascript_arborescense=""
         try:
-            doc_file = obj.files.filter(is_stl)[0]
+            doc_file = obj.files.filter(models.is_stl)[0]
             ctx["stl"] = True
             ctx["stl_file"] = doc_file
         except IndexError:
@@ -103,6 +106,7 @@ def display_public_3d(request, obj_ref, obj_revi):
 
     return r2r("public_3d_view.html", ctx, request)
 
+
 @secure_required
 def public_3d_js(request, obj_id):
     obj = get_obj_by_id(int(obj_id), request.user)
@@ -113,7 +117,7 @@ def public_3d_js(request, obj_id):
     elif not obj.published and not obj.check_restricted_readable(False):
         raise Http404
     try:
-        doc_file = obj.files.filter(is_stp)[0]
+        doc_file = obj.files.filter(models.is_stp)[0]
     except IndexError:
         js_files = []
     else:
@@ -133,18 +137,18 @@ class StepDecomposer(Decomposer):
     __slots__ = ("part", "decompose_valid")
 
     def _get_decomposable_stpfile(self, doc):
-        if not ArbreFile.objects.filter(stp__document=doc,
+        if not models.ArbreFile.objects.filter(stp__document=doc,
             stp__deprecated=False, stp__locked=False,
             decomposable=True).exists():
             return None
         try:
-            stp_file = DocumentFile.objects.only("document",
-                    "filename").get(is_stp, locked=False,
+            stp_file = pmodels.DocumentFile.objects.only("document",
+                    "filename").get(models.is_stp, locked=False,
                             deprecated=False, document=doc)
         except:
             return None
         else:
-            if not ArbreFile.objects.filter(stp=stp_file, decomposable=True).exists():
+            if not models.ArbreFile.objects.filter(stp=stp_file, decomposable=True).exists():
                 return None
             if stp_file.checkout_valid:
                 return stp_file
@@ -152,14 +156,14 @@ class StepDecomposer(Decomposer):
 
     def is_decomposable(self, msg=True):
         decompose_valid = []
-        if not Document3D.objects.filter(PartDecompose=self.part).exists():
-            links = DocumentPartLink.objects.now().filter(part=self.part,
+        if not models.Document3D.objects.filter(PartDecompose=self.part).exists():
+            links = pmodels.DocumentPartLink.objects.now().filter(part=self.part,
                     document__type="Document3D",
                     document__document3d__PartDecompose=None).values_list("document", flat=True)
             for doc_id in links:
                 try:
                     if msg:
-                        doc = Document3D.objects.get(id=doc_id)
+                        doc = models.Document3D.objects.get(id=doc_id)
                     else:
                         doc = doc_id
                     file_stp = self._get_decomposable_stpfile(doc)
@@ -171,7 +175,7 @@ class StepDecomposer(Decomposer):
                     pass
         else:
             try:
-                doc = Document3D.objects.get(PartDecompose=self.part)
+                doc = models.Document3D.objects.get(PartDecompose=self.part)
                 file_stp = self._get_decomposable_stpfile(doc)
                 if file_stp and msg:
                     decompose_valid.append((doc, file_stp))
@@ -187,22 +191,22 @@ class StepDecomposer(Decomposer):
         decomposable = set()
         if parts:
             # invalid parts are parts already decomposed by a StepDecomposer
-            invalid_parts = Document3D.objects.filter(PartDecompose__in=parts)\
+            invalid_parts = models.Document3D.objects.filter(PartDecompose__in=parts)\
                     .values_list("PartDecompose", flat=True)
-            links = list(DocumentPartLink.objects.now().filter(part__in=parts,
+            links = list(pmodels.DocumentPartLink.objects.now().filter(part__in=parts,
                     document__type="Document3D", # Document3D has no subclasses
                     document__document3d__PartDecompose=None). \
                     exclude(part__in=invalid_parts).values_list("document", "part"))
             docs = [l[0] for l in links]
             if docs:
                 # valid documents are documents with a step file that is decomposable
-                valid_docs = dict(ArbreFile.objects.filter(stp__document__in=docs,
+                valid_docs = dict(models.ArbreFile.objects.filter(stp__document__in=docs,
                     stp__deprecated=False, stp__locked=False,
                     decomposable=True).values_list("stp__document", "stp"))
                 for doc_id, part_id in links:
                     if (doc_id not in valid_docs) or (part_id in decomposable):
                         continue
-                    stp = DocumentFile.objects.only("document", "filename").get(id=valid_docs[doc_id])
+                    stp = pmodels.DocumentFile.objects.only("document", "filename").get(id=valid_docs[doc_id])
                     if stp.checkout_valid:
                         decomposable.add(part_id)
         return decomposable
@@ -266,29 +270,31 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
     """
 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    stp_file=DocumentFile.objects.get(id=stp_id)
+    stp_file=pmodels.DocumentFile.objects.get(id=stp_id)
     assemblys=[]
 
     if stp_file.locked:
         raise ValueError("Not allowed operation.This DocumentFile is locked")
     if not obj.get_attached_documents().filter(document=stp_file.document).exists():
         raise ValueError("Not allowed operation.The Document and the Part are not linked")
-    if Document3D.objects.filter(PartDecompose=obj.object).exists() and not Document3D.objects.get(PartDecompose=obj.object).id==stp_file.document.id: #a same document could be re-decomposed for the same part
+    if (models.Document3D.objects.filter(PartDecompose=obj.object).exists()
+            and not models.Document3D.objects.get(PartDecompose=obj.object).id==stp_file.document.id):
+        #a same document could be re-decomposed for the same part
 
         raise ValueError("Not allowed operation.This Part already forms part of another split BOM")
     try:
-        doc3D=Document3D.objects.get(id=stp_file.document_id)
-    except Document3D.DoesNotExist:
+        doc3D=models.Document3D.objects.get(id=stp_file.document_id)
+    except models.Document3D.DoesNotExist:
         raise ValueError("Not allowed operation.The document is not a subtype of document3D")
 
     if doc3D.PartDecompose and not doc3D.PartDecompose.id==obj.object.id:
         raise ValueError("Not allowed operation.This Document already forms part of another split BOM")
 
-    document_controller=Document3DController(doc3D, User.objects.get(username=settings.COMPANY))
+    document_controller = models.Document3DController(doc3D, pmodels.User.objects.get(username=settings.COMPANY))
     if request.method == 'POST':
         extra_errors = ""
         product = document_controller.get_product(stp_file, False)
-        last_mtime = Form_save_time_last_modification(request.POST)
+        last_mtime = forms.Form_save_time_last_modification(request.POST)
         obj.block_mails()
 
         if last_mtime.is_valid() and product:
@@ -302,7 +308,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                     and stp_file.checkout_valid and not stp_file.locked):
 
                     stp_file.locked=True
-                    stp_file.locker=User.objects.get(username=settings.COMPANY)
+                    stp_file.locker=pmodels.User.objects.get(username=settings.COMPANY)
                     stp_file.save()
 
                     native_related=stp_file.native_related
@@ -315,12 +321,12 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
                     try:
                         instances = []
-                        old_product = json.dumps(data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
+                        old_product = json.dumps(classes.data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
                         generate_part_doc_links_AUX(request, product, obj,instances,doc3D)
                         update_indexes.delay(instances)
                     except Exception as excep:
-                        if isinstance(excep, Document_Generate_Bom_Error):
-                            delete_files(excep.to_delete)
+                        if isinstance(excep, models.Document_Generate_Bom_Error):
+                            models.delete_files(excep.to_delete)
 
                         extra_errors = unicode(excep)
                         stp_file.locked = False
@@ -331,8 +337,8 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                             native_related.save()
                     else:
 
-                        decomposer_all.delay(stp_file.pk,
-                                json.dumps(data_for_product(product)),
+                        models.decomposer_all.delay(stp_file.pk,
+                                json.dumps(classes.data_for_product(product)),
                                 obj.object.pk, native_related_pk, obj._user.pk, old_product)
 
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")
@@ -345,7 +351,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             extra_errors = INVALID_TIME_ERROR
     else:
 
-        last_mtime=Form_save_time_last_modification()
+        last_mtime=forms.Form_save_time_last_modification()
         last_mtime.fields["last_modif_time"].initial = stp_file.document.mtime
         last_mtime.fields["last_modif_microseconds"].initial= stp_file.document.mtime.microsecond
         product= document_controller.get_product(stp_file, False)
@@ -434,7 +440,7 @@ def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
         part_docs = []
         for link in product.links:
             link.visited=index[0]
-            oq = Order_Quantity_Form(request.POST,prefix=index[0])
+            oq = forms.Order_Quantity_Form(request.POST,prefix=index[0])
             if not oq.is_valid():
                 valid=False
 
@@ -443,14 +449,14 @@ def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
             if not link.product.visited:
                 link.product.visited = index[0]
 
-                part_type = Doc_Part_type_Form(request.POST, prefix=index[0])
+                part_type = forms.Doc_Part_type_Form(request.POST, prefix=index[0])
                 if not part_type.is_valid():
                     valid = False
                 part = part_type.cleaned_data["type_part"]
                 cls = get_all_plmobjects()[part]
-                part_cform = get_creation_form(request.user, cls, request.POST,
+                part_cform = pforms.get_creation_form(request.user, cls, request.POST,
                         inbulk_cache=inbulk_cache, prefix=str(index[0])+"-part")
-                doc_cform = get_creation_form(request.user, Document3D, request.POST,
+                doc_cform = pforms.get_creation_form(request.user, models.Document3D, request.POST,
                         inbulk_cache=inbulk_cache, prefix=str(index[0])+"-document")
                 if not part_cform.is_valid():
                     valid = False
@@ -520,19 +526,19 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type, inbulk_c
         part_docs = []
         for order, link in enumerate(product.links):
             prefix = index[0]
-            oq=Order_Quantity_Form(prefix=index[0])
+            oq=forms.Order_Quantity_Form(prefix=index[0])
             oq.fields["order"].initial = (order + 1)*10
             oq.fields["quantity"].initial = link.quantity
             is_assembly = link.product.is_assembly
             name = link.product.name
             if not link.product.visited:
                 link.product.visited = index[0]
-                part_type = Doc_Part_type_Form(prefix=index[0])
-                part_cform = get_creation_form(user, Part, None, index[1], inbulk_cache) # index[0].initial=1 -> -1
+                part_type = forms.Doc_Part_type_Form(prefix=index[0])
+                part_cform = pforms.get_creation_form(user, pmodels.Part, None, index[1], inbulk_cache) # index[0].initial=1 -> -1
                 part_cform.prefix = str(index[0])+"-part"
                 part_cform.fields["group"].initial = group
                 part_cform.fields["name"].initial = link.product.name
-                doc_cform = get_creation_form(user, Document3D, None, index[1], inbulk_cache)
+                doc_cform = pforms.get_creation_form(user, models.Document3D, None, index[1], inbulk_cache)
                 doc_cform.prefix = str(index[0])+"-document"
                 doc_cform.fields["name"].initial = link.product.name
                 doc_cform.fields["group"].initial = group
@@ -582,7 +588,7 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
     for link in product.links:
         try:
 
-            oq=Order_Quantity_Form(request.POST,prefix=link.visited)
+            oq=forms.Order_Quantity_Form(request.POST,prefix=link.visited)
             oq.is_valid()
             options=oq.cleaned_data
             order=options["order"]
@@ -591,11 +597,11 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
 
             if not link.product.part_to_decompose:
 
-                part_ctype=Doc_Part_type_Form(request.POST,prefix=link.product.visited)
+                part_ctype=forms.Doc_Part_type_Form(request.POST,prefix=link.product.visited)
                 part_ctype.is_valid()
                 options = part_ctype.cleaned_data
                 cls = get_all_plmobjects()[options["type_part"]]
-                part_form = get_creation_form(user, cls, request.POST,
+                part_form = pforms.get_creation_form(user, cls, request.POST,
                     inbulk_cache=inbulk_cache, prefix=str(link.product.visited)+"-part")
 
                 part_ctrl = parent_ctrl.create_from_form(part_form, user, True, True)
@@ -605,11 +611,11 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
 
                 c_link = parent_ctrl.add_child(part_ctrl.object,quantity,order,unit)
 
-                generate_extra_location_links(link, c_link)
+                models.generate_extra_location_links(link, c_link)
 
-                doc_form = get_creation_form(user, Document3D, request.POST,
+                doc_form = pforms.get_creation_form(user, models.Document3D, request.POST,
                     inbulk_cache=inbulk_cache, prefix=str(link.product.visited)+"-document")
-                doc_ctrl = Document3DController.create_from_form(doc_form,
+                doc_ctrl = models.Document3DController.create_from_form(doc_form,
                         user, True, True)
 
                 link.product.part_to_decompose=part_ctrl.object
@@ -618,13 +624,13 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
                 instances.append((doc_ctrl.object._meta.app_label,
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
                 part_ctrl.attach_to_document(doc_ctrl.object)
-                new_Doc3D=Document3D.objects.get(id=doc_ctrl.object.id)
+                new_Doc3D=models.Document3D.objects.get(id=doc_ctrl.object.id)
                 new_Doc3D.PartDecompose=part_ctrl.object
                 new_Doc3D.no_index=True
                 new_Doc3D.save()
 
                 #IMPORTANT############################## diferenciar entre node y feuille ###############################"
-                for doc_file in doc3D.files.filter(is_catia):
+                for doc_file in doc3D.files.filter(models.is_catia):
                     fileName,  fileExtension= os.path.splitext(doc_file.filename)
                     if fileName==link.product.name:
                         doc_file.document=new_Doc3D
@@ -635,10 +641,10 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
             else:
 
                 c_link = parent_ctrl.add_child(link.product.part_to_decompose,quantity,order,unit)
-                generate_extra_location_links(link, c_link)
+                models.generate_extra_location_links(link, c_link)
 
-        except Exception as excep:
-            raise Document_Generate_Bom_Error(to_delete,link.product.name)
+        except Exception:
+            raise models.Document_Generate_Bom_Error(to_delete,link.product.name)
 
 def generateGhostDocumentFile(product,Doc_controller):
     """
@@ -651,7 +657,7 @@ def generateGhostDocumentFile(product,Doc_controller):
     It updates the attributes **doc_id** and **doc_path** of the :class:`.Product` (**product**) in relation of the generated :class:`.DocumentFile`
 
     """
-    doc_file=DocumentFile()
+    doc_file=pmodels.DocumentFile()
     name = doc_file.file.storage.get_available_name(product.name+".stp")
     path = os.path.join(doc_file.file.storage.location, name)
     f = File(open(path.encode(), 'w'))
@@ -663,7 +669,7 @@ def generateGhostDocumentFile(product,Doc_controller):
     doc_file.file=name
     doc_file.document=Doc_controller.object
     doc_file.locked = True
-    doc_file.locker = User.objects.get(username=settings.COMPANY)
+    doc_file.locker = pmodels.User.objects.get(username=settings.COMPANY)
     doc_file.save()
 
     product.doc_id=doc_file.id
@@ -680,11 +686,11 @@ def ajax_part_creation_form(request, prefix):
     The attributes can change depending on the type of part selected
 
     """
-    tf = Doc_Part_type_Form(request.GET, prefix=prefix)
+    tf = forms.Doc_Part_type_Form(request.GET, prefix=prefix)
 
     if tf.is_valid():
-        cls = get_all_parts()[tf.cleaned_data["type_part"]]
-        cf = get_creation_form(request.user, cls, prefix=prefix+"-part",
+        cls = pmodels.get_all_parts()[tf.cleaned_data["type_part"]]
+        cf = pforms.get_creation_form(request.user, cls, prefix=prefix+"-part",
                 data=dict(request.GET.iteritems()))
 
         return r2r("extra_attributes.html", {"creation_form" : cf}, request)

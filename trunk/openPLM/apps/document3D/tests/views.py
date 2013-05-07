@@ -1,6 +1,7 @@
 from openPLM.apps.document3D.views import *
 from openPLM.apps.document3D.models import *
 from openPLM.apps.document3D.forms import *
+from openPLM.apps.document3D.classes import *
 from openPLM.plmapp.tests.views import CommonViewTest
 from openPLM.apps.document3D.models import Document3DController
 from openPLM.plmapp.decomposers import DecomposersManager
