@@ -51,7 +51,7 @@ class NEW_STEP_Import(object):
 
     -A set of files **.geo** that represents the geometry of the different simple products that are useful to realize the visualization 3D across the web browser.
 
-    -A structure of information that represents the arborescencse of the different assemblys,represented in a  :class:`.Product` . (Including his spatial location and orientation and his label of reference (:class:`.OCC.TDF.TDF_Label`))
+    -A structure of information that represents the arborescencse of the different assemblies,represented in a  :class:`.Product` . (Including his spatial location and orientation and his label of reference (:class:`.OCC.TDF.TDF_Label`))
 
 
     This class is invoked from three different subprocesses related to the functionality of pythonOCC(generate3D.py , generateComposition.py , generateDecomposition.py).
@@ -155,7 +155,7 @@ class NEW_STEP_Import(object):
     def generate_product_arbre(self):
         """
 
-        Generates a :class:`.Product` relative to the assemblys of the file **.stp**, for every node of the :class:`.Product` it includes a label (:class:`.OCC.TDF.TDF_Label`) that represents and identifies the node , openPLM can only work whit a single root **.stp** files
+        Generates a :class:`.Product` relative to the assemblies of the file **.stp**, for every node of the :class:`.Product` it includes a label (:class:`.OCC.TDF.TDF_Label`) that represents and identifies the node , openPLM can only work whit a single root **.stp** files
 
         """
 

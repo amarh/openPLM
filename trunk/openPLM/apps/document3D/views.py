@@ -271,7 +271,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     stp_file=pmodels.DocumentFile.objects.get(id=stp_id)
-    assemblys=[]
+    assemblies=[]
 
     if stp_file.locked:
         raise ValueError("Not allowed operation.This DocumentFile is locked")
@@ -302,7 +302,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             old_microseconds = last_mtime.cleaned_data['last_modif_microseconds']
 
             index=[1]
-            if clear_form(request,assemblys,product,index,obj_type, {}):
+            if clear_form(request,assemblies,product,index,obj_type, {}):
 
                 if (same_time(old_time, old_microseconds, document_controller.mtime)
                     and stp_file.checkout_valid and not stp_file.locked):
@@ -361,22 +361,22 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
         group = obj.group
         index=[1,0] # index[1] to evade generate holes in part_revision_default generation
         inbulk_cache = {}
-        initialize_assemblies(assemblys,product,group,request.user,index,obj_type, inbulk_cache)
+        initialize_assemblies(assemblies,product,group,request.user,index,obj_type, inbulk_cache)
         extra_errors = ""
 
-    deep_assemblys=sort_assemblys_by_depth(assemblys)
+    deep_assemblies=sort_assemblies_by_depth(assemblies)
     ctx.update({'current_page':'decomposer',
-                'deep_assemblys' : deep_assemblys,
+                'deep_assemblies' : deep_assemblies,
                 'extra_errors' :  extra_errors,
                 'last_mtime' : last_mtime
     })
     return r2r('DisplayDecompose.htm', ctx, request)
 
 
-def sort_assemblys_by_depth(assemblys):
+def sort_assemblies_by_depth(assemblies):
 
     new_assembly=[]
-    for elem in assemblys:
+    for elem in assemblies:
         for i in range(elem[3]+1-len(new_assembly)):
             new_assembly.append([])
         new_assembly[elem[3]].append(elem)
@@ -384,11 +384,11 @@ def sort_assemblys_by_depth(assemblys):
     return new_assembly
 
 
-def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
+def clear_form(request, assemblies, product, index, obj_type, inbulk_cache):
 
     """
 
-    :param assemblys: will be refill whit the information necessary the generate the forms
+    :param assemblies: will be refill whit the information necessary the generate the forms
     :param product: :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp contained in a :class:`.DocumentFile`
     :param index: Use  to mark and to identify the **product** s that already have been visited
     :param obj_type: Type of the :class:`.Part` from which we want to realize the decomposition
@@ -397,9 +397,9 @@ def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
 
 
 
-    If the forms are not valid, it returns the information to refill the new forms contained in **assemblys**.
+    If the forms are not valid, it returns the information to refill the new forms contained in **assemblies**.
 
-    Refill **assemblys** with the different assemblys of the file step , we use **index** to mark and to identify the **products** that already have been visited
+    Refill **assemblies** with the different assemblies of the file step , we use **index** to mark and to identify the **products** that already have been visited
 
     For every Assembly we have the next information:
 
@@ -425,7 +425,7 @@ def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
 
                 - creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
 
-                - name_child_assemblys contains the name of the element
+                - name_child_assemblies contains the name of the element
 
                 - is_assembly determine if the element is a single product or another assembly
 
@@ -466,27 +466,27 @@ def clear_form(request, assemblys, product, index, obj_type, inbulk_cache):
                 part_docs.append(PartDoc(part_type, oq, (part_cform, doc_cform), name, is_assembly,
                     prefix, None))
                 index[0]+=1
-                if not clear_form(request, assemblys, link.product,index, part, inbulk_cache):
+                if not clear_form(request, assemblies, link.product,index, part, inbulk_cache):
                     valid = False
             else:
                 index[0]+=1
                 part_docs.append(PartDoc(False, oq, False, name, is_assembly, None, link.product.visited))
 
-        assemblys.append(Assembly(part_docs, product.name , product.visited , product.deep, obj_type))
+        assemblies.append(Assembly(part_docs, product.name , product.visited , product.deep, obj_type))
     return valid
 
 
-def initialize_assemblies(assemblys,product,group,user,index, obj_type, inbulk_cache):
+def initialize_assemblies(assemblies,product,group,user,index, obj_type, inbulk_cache):
     """
 
-    :param assemblys: will be refill whit the information necessary the generate the forms
+    :param assemblies: will be refill whit the information necessary the generate the forms
     :param product: :class:`.Product` that represents the arborescense of the :class:`~django.core.files.File` .stp contained in a :class:`.DocumentFile`
     :param index: Use  to mark and to identify the **product** s that already have been visited
     :param obj_type: Type of the :class:`.Part` from which we want to realize the decomposition
     :param group: group by default from which we want to realize the decomposition
 
 
-    Returns in assemblys a list initialized with the different assemblies of the file step
+    Returns in assemblies a list initialized with the different assemblies of the file step
 
 
     For every Assembly we have the next information:
@@ -513,7 +513,7 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type, inbulk_c
 
                 - creation_formset contains the form for the creation of the part selected in part_type and of one :class:`.Document3D`
 
-                - name_child_assemblys contains the name of the element
+                - name_child_assemblies contains the name of the element
 
                 - is_assembly determine if the element is a single product or another assembly
 
@@ -548,12 +548,12 @@ def initialize_assemblies(assemblys,product,group,user,index, obj_type, inbulk_c
                     prefix, None))
                 index[0]+=1
                 index[1]+=1
-                initialize_assemblies(assemblys,link.product,group,user,index, "Part", inbulk_cache)
+                initialize_assemblies(assemblies,link.product,group,user,index, "Part", inbulk_cache)
             else:
                 index[0]+=1
                 part_docs.append(PartDoc(False, oq, False, name, is_assembly, None, link.product.visited))
 
-        assemblys.append(Assembly(part_docs, product.name, product.visited, product.deep, obj_type))
+        assemblies.append(Assembly(part_docs, product.name, product.visited, product.deep, obj_type))
 
 @transaction.commit_on_success
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances,doc3D):

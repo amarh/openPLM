@@ -499,7 +499,7 @@ class Document_Generate_Bom_Error(ControllerError):
 class Location_link(pmodels.ParentChildLinkExtension):
     """
     Extend :class:`.ParentChildLinkExtension`
-    Represents the matrix of transformation (rotation and translation) and the name of one relation between assemblys.
+    Represents the matrix of transformation (rotation and translation) and the name of one relation between assemblies.
     When a file STEP is decomposed in Parts a :class:`.ParentChildLink` is generated between the Parts
     and each of these :class:`.ParentChildLink` could have attached one or more :class:`.Location_link`
 

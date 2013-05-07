@@ -40,12 +40,12 @@
                         <td class="errors" colspan="10">{{extra_errors}}</td>
                     </tr>
                 {% endif %}
-                {% for deep in deep_assemblys %} 
+                {% for deep in deep_assemblies %} 
 
 
                     <tr class="assembly"> 
                         <td class="assembly_level{% if forloop.counter0 == 0 %} open {% endif %}" id="{{forloop.counter0}}" colspan="10">
-                            <span class="display_level" title="{%trans "Display or Hide all assemblys at this level"%}">{% trans "Level" %} {{forloop.counter0}}</span>
+                            <span class="display_level" title="{%trans "Display or Hide all assemblies at this level"%}">{% trans "Level" %} {{forloop.counter0}}</span>
                         </td>        
 
                     </tr>
