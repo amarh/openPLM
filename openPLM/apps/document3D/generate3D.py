@@ -33,7 +33,7 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_pat
 
 def write_ArbFile_from_Product(product,fileName,location):
     """
-    :param product: :class:`.Product` relative to the structure of assemblys of a file **.stp**
+    :param product: :class:`.Product` relative to the structure of assemblies of a file **.stp**
     :param fileName: Name of the file **.stp** for which we are going to generate the file **.arb**
     :param location: Path where to store the file **.arb** generated  
     """ 
