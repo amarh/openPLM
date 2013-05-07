@@ -633,6 +633,8 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
 
                 for doc_file in other_files:
                     filename, ext = os.path.splitext(doc_file.filename)
+                    # add files with the same name (for example a .sldXXX
+                    # or.CATXXX file)
                     if filename == link.product.name:
                         f = File(doc_file.file)
                         f.name = doc_file.filename
