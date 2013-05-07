@@ -585,6 +585,8 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
 
     to_delete=[]
     user = parent_ctrl._user
+    company = pmodels.User.objects.get(username=settings.COMPANY)
+    other_files = list(doc3D.files.exclude(models.is_stp))
     for link in product.links:
         try:
 
@@ -619,21 +621,29 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
                         user, True, True)
 
                 link.product.part_to_decompose=part_ctrl.object
-                to_delete.append(generateGhostDocumentFile(link.product,doc_ctrl))
+                to_delete.append(generateGhostDocumentFile(link.product, doc_ctrl.object, company))
 
                 instances.append((doc_ctrl.object._meta.app_label,
                     doc_ctrl.object._meta.module_name, doc_ctrl.object._get_pk_val()))
                 part_ctrl.attach_to_document(doc_ctrl.object)
-                new_Doc3D=models.Document3D.objects.get(id=doc_ctrl.object.id)
-                new_Doc3D.PartDecompose=part_ctrl.object
-                new_Doc3D.no_index=True
+                new_Doc3D = doc_ctrl.object
+                new_Doc3D.PartDecompose = part_ctrl.object
+                new_Doc3D.no_index = True
                 new_Doc3D.save()
 
-                #IMPORTANT############################## diferenciar entre node y feuille ###############################"
-                for doc_file in doc3D.files.filter(models.is_catia):
-                    fileName,  fileExtension= os.path.splitext(doc_file.filename)
-                    if fileName==link.product.name:
-                        doc_file.document=new_Doc3D
+                for doc_file in other_files:
+                    filename, ext = os.path.splitext(doc_file.filename)
+                    if filename == link.product.name:
+                        f = File(doc_file.file)
+                        f.name = doc_file.filename
+                        f.size = doc_file.size
+                        df = doc_ctrl.add_file(f, False, False)
+                        if doc_file.thumbnail:
+                            doc_ctrl.add_thumbnail(df, File(doc_file.thumbnail))
+                        instances.append((df._meta.app_label, df._meta.module_name, df.pk))
+                        instances.append((doc_file._meta.app_label, doc_file._meta.module_name, doc_file.pk))
+                        doc_file.no_index = True
+                        doc_file.deprecated = True
                         doc_file.save()
 
                 generate_part_doc_links(request,link.product, part_ctrl,instances,doc3D, inbulk_cache)
@@ -646,7 +656,7 @@ def generate_part_doc_links(request,product, parent_ctrl,instances,doc3D, inbulk
         except Exception:
             raise models.Document_Generate_Bom_Error(to_delete,link.product.name)
 
-def generateGhostDocumentFile(product,Doc_controller):
+def generateGhostDocumentFile(product, document, locker):
     """
     :param product: :class:`.Product` that represents the arborescense
     :param Doc_controller: :class:`.Document3DController` from which we want to generate the :class:`.DocumentFile`
@@ -657,23 +667,21 @@ def generateGhostDocumentFile(product,Doc_controller):
     It updates the attributes **doc_id** and **doc_path** of the :class:`.Product` (**product**) in relation of the generated :class:`.DocumentFile`
 
     """
-    doc_file=pmodels.DocumentFile()
+    doc_file = pmodels.DocumentFile()
     name = doc_file.file.storage.get_available_name(product.name+".stp")
     path = os.path.join(doc_file.file.storage.location, name)
     f = File(open(path.encode(), 'w'))
     f.close()
-
-    doc_file.no_index=True
-    doc_file.filename="Ghost.stp"
-    doc_file.size=f.size
-    doc_file.file=name
-    doc_file.document=Doc_controller.object
+    doc_file.no_index = True
+    doc_file.filename = "Ghost.stp"
+    doc_file.size = f.size
+    doc_file.file = name
+    doc_file.document = document
     doc_file.locked = True
-    doc_file.locker = pmodels.User.objects.get(username=settings.COMPANY)
+    doc_file.locker = locker
     doc_file.save()
-
-    product.doc_id=doc_file.id
-    product.doc_path=doc_file.file.path
+    product.doc_id = doc_file.id
+    product.doc_path = doc_file.file.path
     return doc_file.file.path
 
 
