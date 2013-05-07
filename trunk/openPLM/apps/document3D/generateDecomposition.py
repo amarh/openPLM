@@ -1,79 +1,61 @@
 import sys
+import json
+import itertools
 
 from OCC.TDF import *
 from OCC.XSControl import XSControl_WorkSession
-from OCC.STEPCAFControl import * 
+from OCC.STEPCAFControl import *
 from OCC.STEPControl import *
 from OCC.Utils.DataExchange.STEP import StepOCAF_Export
 from STP_converter_WebGL import NEW_STEP_Import
-import json
 from classes import Product_from_Arb
 from OCC.GarbageCollector import garbage
 
 def new_collect_object(self, obj_deleted):
-        self._kill_pointed()
+    self._kill_pointed()
 
 garbage.collect_object=new_collect_object
 
 
-  
-def decomposer(path,temp_file_name):
-
+def decompose(path, temp_file_name):
     """
-    
-    :param path: Path of a file **.stp**
-    :param temp_file_name: path of a  :class:`.tempfile` **.arb** that contains the information to generate a :class:`.Product` relative to the arborescense of a **.stp** file
+    Decomposes a STEP file into several STEP files (one per unique assembly/part)
 
-    
-    For every node of the :class:`.Product`  the attribute **doc_file_path** indicates where it is necessary to store the file generate by the decomposition
-    
+    :param path: Path of a file **.stp**
+    :param temp_file_name: path of a  :class:`.tempfile` **.arb** that contains the data required
+          to generate a :class:`.Product` relative to the arborescense of a **.stp** file
     """
     output = open(temp_file_name.encode(),"r")
-    old_product=Product_from_Arb(json.loads(output.read()))
-    my_step_importer = NEW_STEP_Import(path)
-    shape_tool=my_step_importer.shape_tool 
-    product=my_step_importer.generate_product_arbre()
-    decomposer_links(product,old_product,shape_tool)
-    cascade_decompose(product,old_product,shape_tool)
+    old_product = Product_from_Arb(json.loads(output.read()))
+    step_importer = NEW_STEP_Import(path)
+    shape_tool = step_importer.shape_tool
+    product = step_importer.generate_product_arbre()
+    decompose_children(product, old_product, shape_tool)
+    write_step(product, old_product, shape_tool)
 
 
-def decomposer_links(product,old_product,shape_tool): 
+def decompose_children(product, old_product, shape_tool):
 
-
-    
-           
-    for index,link in enumerate(product.links):
+    for old_link, link in itertools.izip(old_product.links, product.links):
         if not link.product.visited:
-            link.product.visited=True
-            decomposer_links(link.product,old_product.links[index].product,shape_tool)
-            
-            cascade_decompose(link.product,old_product.links[index].product,shape_tool)
+            link.product.visited = True
+            decompose_children(link.product, old_link.product, shape_tool)
+            write_step(link.product, old_link.product, shape_tool)
 
-            
-
-
-
-
-
-def cascade_decompose(product,old_product,shape_tool):
+def write_step(product, old_product, shape_tool):
 
     if shape_tool.IsAssembly(product.label_reference):
         l_c = TDF_LabelSequence()
         shape_tool.GetComponents(product.label_reference,l_c)
         for e in range(l_c.Length()):
-            shape_tool.RemoveComponent(l_c.Value(e+1)) 
-            
+            shape_tool.RemoveComponent(l_c.Value(e+1))
+
     WS = XSControl_WorkSession()
-    writer = STEPCAFControl_Writer( WS.GetHandle(), False )     
-    writer.Transfer(product.label_reference, STEPControl_AsIs) 
-    status = writer.Write(old_product.doc_path.encode("utf-8"))                      
- 
-    
+    writer = STEPCAFControl_Writer( WS.GetHandle(), False )
+    writer.Transfer(product.label_reference, STEPControl_AsIs)
+    writer.Write(old_product.doc_path.encode("utf-8"))
 
 
-
-if __name__ == "__main__":    
-    decomposer(sys.argv[1],sys.argv[2]) 
-    
-
+if __name__ == "__main__":
+    decompose(sys.argv[1], sys.argv[2])
 
