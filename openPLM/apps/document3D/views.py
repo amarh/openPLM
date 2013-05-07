@@ -302,7 +302,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
             old_microseconds = last_mtime.cleaned_data['last_modif_microseconds']
 
             index=[1]
-            if clear_form(request,assemblies,product,index,obj_type, {}):
+            if clean_form(request,assemblies,product,index,obj_type, {}):
 
                 if (same_time(old_time, old_microseconds, document_controller.mtime)
                     and stp_file.checkout_valid and not stp_file.locked):
@@ -384,7 +384,7 @@ def sort_assemblies_by_depth(assemblies):
     return new_assembly
 
 
-def clear_form(request, assemblies, product, index, obj_type, inbulk_cache):
+def clean_form(request, assemblies, product, index, obj_type, inbulk_cache):
 
     """
 
@@ -466,7 +466,7 @@ def clear_form(request, assemblies, product, index, obj_type, inbulk_cache):
                 part_docs.append(PartDoc(part_type, oq, (part_cform, doc_cform), name, is_assembly,
                     prefix, None))
                 index[0]+=1
-                if not clear_form(request, assemblies, link.product,index, part, inbulk_cache):
+                if not clean_form(request, assemblies, link.product,index, part, inbulk_cache):
                     valid = False
             else:
                 index[0]+=1
