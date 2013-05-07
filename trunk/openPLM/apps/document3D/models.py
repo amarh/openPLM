@@ -226,7 +226,7 @@ class Document3DController(DocumentController):
             if self.object.PartDecompose and self.object.PartDecompose in selected_parts:
                 rev.object.PartDecompose=self.object.PartDecompose
                 rev.object.save()
-                product=self.get_product(STP_file[0], True)
+                product=self.get_product(STP_file[0], False)
                 copy_geometry(product,new_STP_file)
                 product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
                 Product_to_ArbreFile(product,new_STP_file)
