@@ -5,7 +5,7 @@ import tempfile
 import logging
 import json
 
-from classes import data_for_product, get_available_name
+from classes import get_available_name
 from STP_converter_WebGL import StepImporter, MultiRootError, OCCReadingStepError
 from pov import create_thumbnail
 
@@ -39,7 +39,7 @@ def write_arbrefile(product,fileName,location):
     :param fileName: Name of the file **.stp** for which we are going to generate the file **.arb**
     :param location: Path where to store the file **.arb** generated
     """
-    data = data_for_product(product)
+    data = product.to_list()
     name = get_available_name(location,fileName+".arb")
     path = os.path.join(location, name)
     directory = os.path.dirname(path.encode())

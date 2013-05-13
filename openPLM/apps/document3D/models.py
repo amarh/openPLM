@@ -68,7 +68,7 @@ class Document3D(pmodels.Document):
 
         if product and product.is_decomposed:
             temp_file = tempfile.NamedTemporaryFile(delete=True)
-            temp_file.write(json.dumps(classes.data_for_product(product)))
+            temp_file.write(json.dumps(product.to_list()))
             temp_file.seek(0)
             dirname = os.path.dirname(__file__)
             composer = os.path.join(dirname, "generateComposition.py")
@@ -328,7 +328,7 @@ class Document3DController(DocumentController):
             af = ArbreFile.objects.get(stp=doc_file)
         except:
             return None
-        product = classes.Product_from_Arb(json.loads(af.file.read()))
+        product = classes.Product.from_list(json.loads(af.file.read()))
         if recursive and product:
             if self.PartDecompose is not None:
                 # Here be dragons
@@ -377,7 +377,7 @@ class Document3DController(DocumentController):
                             break
                     if stp is not None and stp in jsons:
                         pr = products[-1]
-                        prod = classes.Product_from_Arb(jsons[stp], product=False,
+                        prod = classes.Product.from_list(jsons[stp], product=False,
                                 product_root=product, deep=level, to_update_product_root=pr)
                         for location in locs[link.id]:
                             pr.links[-1].add_occurrence(location.name, location)
@@ -655,8 +655,8 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         ctrl=ctrl(stp_file.document,user)
         part=pmodels.Part.objects.get(pk=part_pk)
 
-        product=classes.Product_from_Arb(json.loads(arbre))   #whit doc_id and doc_path updated for every node
-        old_product=classes.Product_from_Arb(json.loads(old_arbre)) # doc_id and doc_path original
+        product=classes.Product.from_list(json.loads(arbre))   #whit doc_id and doc_path updated for every node
+        old_product=classes.Product.from_list(json.loads(old_arbre)) # doc_id and doc_path original
         new_stp_file=pmodels.DocumentFile()
         name = new_stp_file.file.storage.get_available_name((product.name+".stp").encode("utf-8"))
         new_stp_path = os.path.join(new_stp_file.file.storage.location, name)
@@ -667,7 +667,7 @@ def decomposer_all(stp_file_pk,arbre,part_pk,native_related_pk,user_pk,old_arbre
         product.doc_id=new_stp_file.id # the old documentfile will be deprecated
 
         temp_file = tempfile.NamedTemporaryFile(delete=True)
-        temp_file.write(json.dumps(classes.data_for_product(product)))
+        temp_file.write(json.dumps(product.to_list()))
         temp_file.seek(0)
         dirname = os.path.dirname(__file__)
         if subprocess.call(["python", os.path.join(dirname, "generateDecomposition.py"),
@@ -828,7 +828,7 @@ def Product_to_ArbreFile(product,doc_file):
     Departing from the information contained in the :class:`.Product` it is going to generate a :class:`~django.core.files.File` **.arb** for the new :class:`.ArbreFile`
 
     """
-    data=classes.data_for_product(product)
+    data=product.to_list()
 
     fileName, fileExtension = os.path.splitext(doc_file.filename)
     new_ArbreFile= ArbreFile(decomposable=product.is_decomposable)
