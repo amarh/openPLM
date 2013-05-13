@@ -19,15 +19,20 @@
 
 import os.path
 from OCC.STEPCAFControl import STEPCAFControl_Reader
-from OCC import XCAFApp, TDocStd , XCAFDoc
-from OCC.TCollection import TCollection_ExtendedString , TCollection_AsciiString
-from OCC.TDF import TDF_LabelSequence , TDF_Tool , TDF_Label
+from OCC import XCAFApp, TDocStd, XCAFDoc
+from OCC.TCollection import TCollection_ExtendedString, TCollection_AsciiString
+from OCC.TDF import TDF_LabelSequence, TDF_Tool, TDF_Label
 from OCC.Utils.Topology import Topo
-from OCC.TDataStd import Handle_TDataStd_Name ,TDataStd_Name_GetID
+from OCC.TDataStd import Handle_TDataStd_Name, TDataStd_Name_GetID
 from OCC.Quantity import Quantity_Color
-import OCC.BRepTools
-from mesh import *
-from classes import *
+from OCC.Bnd import Bnd_Box
+from OCC.TopLoc import TopLoc_Location
+from OCC.BRepMesh import BRepMesh_Mesh
+from OCC.BRepBndLib import BRepBndLib_Add
+from OCC.BRep import BRep_Tool_Triangulation
+from mesh import GeometryWriter, get_mesh_precision
+from classes import (Link, Product, TransformationMatrix,  search_assembly,
+        get_available_name)
 from OCC.GarbageCollector import garbage
 
 
@@ -135,7 +140,7 @@ class StepImporter(object):
 
         For each :class:`.SimpleShape` in the list **shapes_simples**:
 
-            We call the method :func:`.mesh_shape` to generate a file **.geo** representative of its geometry,the content of the file is identified by the index+1 (>0) of the position of the :class:`.SimpleShape` in the list of **SimpleShapes**  and by the attribue id of :class:`.StepImporter`
+            We call the method :func:`.write_geometries` to generate a file **.geo** representative of its geometry,the content of the file is identified by the index+1 (>0) of the position of the :class:`.SimpleShape` in the list of **SimpleShapes**  and by the attribue id of :class:`.StepImporter`
 
         Returns the list of the path of the generated **.geo** files
 
@@ -146,11 +151,13 @@ class StepImporter(object):
         for index, shape in enumerate(self.shapes_simples):
             name=get_available_name(root_path,self.fileName+".geo")
             path=os.path.join(root_path, name)
-            _index_id="_"+str(index+1)+"_"+str(self.id)
-            qmt = mesh_shape(shape,path,_index_id, pov_dir)
+            identifier="_"+str(index+1)+"_"+str(self.id)
+            writer = GeometryWriter(shape, 0.3)
+            pov_filename = os.path.join(pov_dir, os.path.basename(path + ".inc"))
+            writer.write_geometries(identifier, path, pov_filename)
             files_index+="GEO:"+name+" , "+str(index+1)+"\n"
-            if qmt.triangle_count:
-                self.povs.append((os.path.basename(name + ".inc"), _index_id))
+            if writer.triangle_count:
+                self.povs.append((os.path.basename(name + ".inc"), identifier))
 
         return files_index
 

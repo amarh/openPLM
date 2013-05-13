@@ -15,10 +15,9 @@
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC. If not, see <http://www.gnu.org/licenses/>.
 
+import os, os.path
+from kjbuckets import  kjDict
 
-
-import random
-from math import sqrt as math_sqrt
 from OCC.Utils.Topology import *
 from OCC.TopoDS import *
 from OCC.TopAbs import *
@@ -34,72 +33,7 @@ from OCC.BRepBuilderAPI import *
 from OCC.StdPrs import *
 from OCC.TColgp import *
 from OCC.Poly import *
-import time
-import os, os.path
-from kjbuckets import  kjDict
-import time
-from OCC.GarbageCollector import garbage
-def mesh_shape(shape,filename,_index_id, pov_dir):
-    """
 
-    :param shape: :class:`.SimpleShape` of which we are going to generate the file **.geo**
-    :param filename: name of the :class:`.DocumentFile` of which we are going to generate the file **.geo**
-    :param _index_id: id to to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile`
-
-
-
-    The files **.geo** are a series of judgments javascript that turn the geometry of the object into representable triangles by means of Webgl
-
-    We can select the **opacity** and the **quality_factor** of the representation
-
-
-    """
-
-    quality_factor=0.3
-    opacity=0.8
-    a_mesh = QuickTriangleMesh(shape.shape,quality_factor)
-
-
-
-    directory = os.path.dirname(filename)
-
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-    output = open(filename,"w")
-    output.write("//Computation for : %s\n"%shape.name)
-    output.write("var %s = new THREE.Geometry();\n"%_index_id)
-    output.write("var material_for%s = new THREE.MeshBasicMaterial({opacity:%s,shading:THREE.SmoothShading});\n"%(_index_id,opacity))
-    pov_file = open(os.path.join(pov_dir, os.path.basename(filename + ".inc")), "w")
-    pov_file.write("""
-#declare m%s = mesh {
-""" % _index_id)
-
-    if shape.color:
-        output.write("material_for%s.color.setRGB(%f,%f,%f);\n"%(_index_id,shape.color.Red(),shape.color.Green(),shape.color.Blue()))
-
-    a_mesh.compute(output, pov_file, _index_id)
-    if shape.color:
-        color = shape.color.Red(),shape.color.Green(),shape.color.Blue()
-    else:
-        color = 1, 1, 0
-    pov_file.write("""
-};
-
-#declare t%s = texture {
-    pigment {
-        color <%f,%f, %f, 0.9>
-    }
-     finish {ambient 0.1
-         diffuse 0.9
-         phong 1}
-  }
-""" % ((_index_id, ) + color))
-
-    output.close()
-    pov_file.close()
-
-    return a_mesh
 
 triangle_fmt = """ smooth_triangle {
         <%f, %f, %f>, <%f, %f, %f>,
@@ -110,6 +44,7 @@ triangle_fmt = """ smooth_triangle {
 vertice_fmt = "%s.vertices.push(new THREE.Vector3(%.4f,%.4f,%.4f));\n"
 face_fmt = "%s.faces.push( new THREE.Face3( %i, %i, %i, [ new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ), new THREE.Vector3( %.4f, %.4f, %.4f ) ]  ) );\n"
 
+
 def get_mesh_precision(shape, quality_factor):
     bbox = Bnd_Box()
     BRepBndLib_Add(shape, bbox)
@@ -118,31 +53,28 @@ def get_mesh_precision(shape, quality_factor):
                              gp_Pnt(x_max, y_max, z_max)).Magnitude()
     return (diagonal_length / 20.) / quality_factor
 
-class QuickTriangleMesh(object):
 
+class GeometryWriter(object):
     """
-
+    Tool to convert an OpenCascade shape into a javascript file.
 
     :model attributes:
 
-
     .. attribute:: shape
 
-        :class:`.OCC.TopoDS.TopoDS_Shape` that contains the geometry
+        :class:`.SimpleShape` that contains the geometry
 
     .. attribute:: quality_factor
 
         quality of applied to the geometry
-
-
     """
-    def __init__(self,shape,quality_factor):
-
-        self._shape = shape
-        self._precision = get_mesh_precision(shape, quality_factor)
+    def __init__(self, shape, quality_factor):
+        self.shape = shape
+        self.topo_shape = shape.shape
+        self._precision = get_mesh_precision(self.topo_shape, quality_factor)
         self.triangle_count = 0
 
-    def triangle_is_valid(self, P1,P2,P3):
+    def _triangle_is_valid(self, P1,P2,P3):
 
         V1 = gp_Vec(P1,P2)
         V2 = gp_Vec(P2,P3)
@@ -156,25 +88,60 @@ class QuickTriangleMesh(object):
         else:
             return False
 
-    def compute(self,output, pov_file, _index_id):
-
+    def write_geometries(self, identifier, filename, pov_filename):
+        """
+        Write the geometry to *filename* (javascript) * and *pov_filename* (POVRay)
+        *identifier* is the name of the generated variable describing the whole geometry.
         """
 
-        :param _index_id: id to differentiate the content between the diverse files **.geo** generated .Composed of the id of the :class:`.DocumentFile` and by one index that will be diferent for each file **.geo** generated for the same :class:`.DocumentFile`
-        :param output: :class:`~django.core.files.File` **.geo**
+        opacity = 0.8
 
-        Divides the geometry in triangles and generates the code javascript of each of these writing in **output**
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
+        shape = self.shape
+
+        output = open(filename, "w")
+        with open(filename, "w") as output:
+            output.write("//Computation for : %s\n"%shape.name)
+            output.write("var %s = new THREE.Geometry();\n"%identifier)
+            output.write("var material_for%s = new THREE.MeshBasicMaterial({opacity:%s,shading:THREE.SmoothShading});\n"%(identifier,opacity))
+
+            with open(pov_filename, "w") as pov_file:
+                pov_file.write("""
+                #declare m%s = mesh {
+                    """ % identifier)
+                if shape.color:
+                    output.write("material_for%s.color.setRGB(%f,%f,%f);\n"%(identifier,shape.color.Red(),shape.color.Green(),shape.color.Blue()))
+
+                self._write_faces(output, pov_file, identifier)
+                if shape.color:
+                    color = shape.color.Red(), shape.color.Green(), shape.color.Blue()
+                else:
+                    color = 1, 1, 0
+                pov_file.write("""
+            };
+
+            #declare t%s = texture {
+                pigment {
+                    color <%f,%f, %f, 0.9>
+                }
+                finish {ambient 0.1
+                    diffuse 0.9
+                    phong 1}
+              }
+            """ % ((identifier, ) + color))
+
+    def _write_faces(self, output, pov_file, identifier):
         """
-        if self._shape is None:
-            raise "Error: first set a shape"
-            return False
-        BRepMesh_Mesh(self._shape,self._precision)
+        Triangulates all faces and writes them to *output* (javascript) and *pov_file* (POVRay).
+        """
+        BRepMesh_Mesh(self.topo_shape, self._precision)
 
         _points = kjDict()
 
-        uv = []
-        faces_iterator = Topo(self._shape).faces()
+        faces_iterator = Topo(self.topo_shape).faces()
         index=0
 
         for F in faces_iterator:
@@ -188,7 +155,7 @@ class QuickTriangleMesh(object):
                 the_normal = TColgp_Array1OfDir(tab.Lower(), tab.Upper())
                 StdPrs_ToolShadedShape_Normal(F, Poly_Connect(facing.GetHandle()), the_normal)
 
-                for i in range(1,facing.NbTriangles()+1):
+                for i in range(1, facing.NbTriangles()+1):
 
                     trian = tri.Value(i)
 
@@ -203,18 +170,18 @@ class QuickTriangleMesh(object):
                     p1_coord = P1.XYZ().Coord()
                     p2_coord = P2.XYZ().Coord()
                     p3_coord = P3.XYZ().Coord()
-                    if self.triangle_is_valid(P1, P2, P3):
+                    if self._triangle_is_valid(P1, P2, P3):
                         for point in (p1_coord, p2_coord, p3_coord):
                             if not _points.has_key(point):
                                 _points.add(point, index)
-                                output.write(vertice_fmt % (_index_id, point[0], point[1], point[2]))
+                                output.write(vertice_fmt % (identifier, point[0], point[1], point[2]))
                                 index+=1
 
                         n1 = the_normal(index1)
                         n2 = the_normal(index2)
                         n3 = the_normal(index2)
                         output.write(face_fmt %
-                                (_index_id, _points.neighbors(p1_coord)[0],
+                                (identifier, _points.neighbors(p1_coord)[0],
                                             _points.neighbors(p2_coord)[0],
                                             _points.neighbors(p3_coord)[0],
                                             n1.X(), n1.Y(), n1.Z(),
@@ -230,10 +197,4 @@ class QuickTriangleMesh(object):
                             n3.X(), n3.Y(), n3.Z(),
                             ))
                         self.triangle_count += 1
-
-
-        return True
-
-
-
 
