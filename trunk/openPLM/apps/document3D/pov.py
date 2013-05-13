@@ -1,26 +1,30 @@
+"""
+This module can generate a thumbnail of a STEP file using POVRay.
+"""
+
 import os
 import shutil
 import subprocess
 
-       
+
 def generate_pov(product, loc, mesh_ids, output):
-    
+
     if not product.geometry:
         for link in product.links:
             for i in range(link.quantity):
                 loc2=loc[:]
                 loc2.append(link.locations[i])
-                generate_pov(link.product, loc2, mesh_ids, output) 
-       
-    else:       
+                generate_pov(link.product, loc2, mesh_ids, output)
+
+    else:
         mesh_id = "_%s_%s" % (product.geometry, product.doc_id)
         if mesh_id in mesh_ids:
             generate_object(loc, mesh_id, output)
- 
+
 
 def generate_object(loc, mesh_id, output):
-    
-    output.write( """ 
+
+    output.write( """
 object {
     m%s
 """ % mesh_id)
@@ -33,15 +37,15 @@ object {
             %f, %f,%f,
             %f, %f, %f >
     """ % (
-            l.x1, l.y1, l.z1, 
-            l.x2, l.y2, l.z2, 
-            l.x3, l.y3, l.z3, 
-            l.x4, l.y4, l.z4, 
+            l.x1, l.y1, l.z1,
+            l.x2, l.y2, l.z2,
+            l.x3, l.y3, l.z3,
+            l.x4, l.y4, l.z4,
         )
     )
     output.write("""
-    translate Trans 
-    scale Scale 
+    translate Trans
+    scale Scale
     texture { t%s }
 
 }
@@ -55,9 +59,9 @@ pov_tpl = """#include "math.inc"
 background {color rgb 1}
 
 light_source {
-        <-10,-45,200> 
+        <-10,-45,200>
         rgb 1
-        shadowless        
+        shadowless
 }
 
 global_settings {
@@ -99,12 +103,12 @@ def create_thumbnail(product, step_importer, pov_dir, thumb_path):
             f.write('#include "%s"\n' % p)
             mesh_ids.add(id_)
         f.write(pov_tpl)
-        f.write("#declare Scale = %f; \n" % step_importer.scale) 
-        f.write("#declare Trans = <%f, %f, %f>; \n" % step_importer.trans) 
+        f.write("#declare Scale = %f; \n" % step_importer.scale)
+        f.write("#declare Trans = <%f, %f, %f>; \n" % step_importer.trans)
         generate_pov(product, [], mesh_ids, f)
         f.close()
     with open(os.devnull, "w") as null:
-        args = ["povray", "-GA", "-I"+path, "-O"+thumb, 
+        args = ["povray", "-GA", "-I"+path, "-O"+thumb,
                 "-H400", "-W400",
                 "+A", "+AM2", "+Q9", "-d", "+WL0"]
         try:
