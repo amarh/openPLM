@@ -17,7 +17,7 @@
 
 
 
-import os, os.path
+import os.path
 from OCC.STEPCAFControl import STEPCAFControl_Reader
 from OCC import XCAFApp, TDocStd , XCAFDoc
 from OCC.TCollection import TCollection_ExtendedString , TCollection_AsciiString
@@ -37,7 +37,7 @@ def new_collect_object(self, obj_deleted):
 garbage.collect_object=new_collect_object
 
 
-class NEW_STEP_Import(object):
+class StepImporter(object):
 
     """
 
@@ -58,15 +58,14 @@ class NEW_STEP_Import(object):
 
    """
 
-    def __init__(self, file_path,id=None):
+    def __init__(self, file_path, id=None):
 
-        self.file =file_path.encode("utf-8")
-        self.id =id
+        self.file = file_path.encode("utf-8")
+        self.id = id
         self.shapes_simples = []
-        self.product_relationship_arbre=None
-        basefile=os.path.basename(self.file)
-        fileName, fileExtension = os.path.splitext(basefile)
-        self.fileName=fileName
+        self.main_product=None
+        basename = os.path.basename(self.file)
+        self.fileName = os.path.splitext(basename)[0]
 
         self.STEPReader = STEPCAFControl_Reader()
 
@@ -75,7 +74,7 @@ class NEW_STEP_Import(object):
 
         self.h_doc = TDocStd.Handle_TDocStd_Document()
         self.app = XCAFApp.GetApplication().GetObject()
-        self.app.NewDocument(TCollection_ExtendedString("MDTV-XCAF"),self.h_doc)
+        self.app.NewDocument(TCollection_ExtendedString("MDTV-XCAF"), self.h_doc)
 
         self.STEPReader.Transfer(self.h_doc)
 
@@ -88,11 +87,14 @@ class NEW_STEP_Import(object):
         self.shapes = TDF_LabelSequence()
         self.shape_tool.GetShapes(self.shapes)
         for i in range(self.shapes.Length()):
-            if self.shape_tool.IsSimpleShape(self.shapes.Value(i+1)):
-                compShape=self.shape_tool.GetShape(self.shapes.Value(i+1))
-                t=Topo(compShape)
+            shape = self.shapes.Value(i+1)
+            if self.shape_tool.IsSimpleShape(shape):
+                compShape = self.shape_tool.GetShape(shape)
+                t = Topo(compShape)
                 if t.number_of_vertices() > 0:
-                    self.shapes_simples.append(simple_shape(GetLabelNom(self.shapes.Value(i+1)),compShape,find_color(self.shapes.Value(i+1),self.color_tool,self.shape_tool)))
+                    label = get_label_name(shape)
+                    color = find_color(shape, self.color_tool, self.shape_tool)
+                    self.shapes_simples.append(SimpleShape(label, compShape, color))
 
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
@@ -109,19 +111,19 @@ class NEW_STEP_Import(object):
                 faces_iterator = Topo(shape).faces()
                 for F in faces_iterator:
                     face_location = TopLoc_Location()
-                    triangulation = BRep_Tool_Triangulation(F, face_location)
+                    BRep_Tool_Triangulation(F, face_location)
                 BRepBndLib_Add(shape, bbox)
-                x_min,y_min,z_min,x_max,y_max,z_max = bbox.Get()
-                diagonal = max(x_max-x_min, y_max-y_min, z_max-z_min)
+                x_min, y_min, z_min, x_max, y_max, z_max = bbox.Get()
+                diagonal = max(x_max - x_min, y_max - y_min, z_max - z_min)
                 if diagonal > 0:
-                    self.scale = 200 / diagonal
-                    self.trans = ((x_max-x_min) / 2. -x_max,
-                                  (y_max-y_min) / 2. -y_max,
-                                  (z_max-z_min) / 2. -z_max)
+                    self.scale = 200. / diagonal
+                    self.trans = ((x_max - x_min) / 2. - x_max,
+                                  (y_max - y_min) / 2. - y_max,
+                                  (z_max - z_min) / 2. - z_max)
                     self.thumbnail_valid = True
 
-        ws=self.STEPReader.Reader().WS().GetObject()
-        model=ws.Model().GetObject()
+        ws = self.STEPReader.Reader().WS().GetObject()
+        model = ws.Model().GetObject()
         model.Clear()
 
     def compute_geometries(self,root_path, pov_dir):
@@ -129,11 +131,11 @@ class NEW_STEP_Import(object):
 
         :param root_path: Path where to store the files **.geo** generated
 
-        When we generate a new :class:`.NEW_STEP_Import` we will refill a list(**shapes_simples**) whit the :class:`.simple_shape` contained in the file **.stp**
+        When we generate a new :class:`.StepImporter` we will refill a list(**shapes_simples**) whit the :class:`.SimpleShape` contained in the file **.stp**
 
-        For each :class:`.simple_shape` in the list **shapes_simples**:
+        For each :class:`.SimpleShape` in the list **shapes_simples**:
 
-            We call the method :func:`.mesh_shape` to generate a file **.geo** representative of its geometry,the content of the file is identified by the index+1 (>0) of the position of the :class:`.simple_shape` in the list of **simple_shapes**  and by the attribue id of :class:`.NEW_STEP_Import`
+            We call the method :func:`.mesh_shape` to generate a file **.geo** representative of its geometry,the content of the file is identified by the index+1 (>0) of the position of the :class:`.SimpleShape` in the list of **SimpleShapes**  and by the attribue id of :class:`.StepImporter`
 
         Returns the list of the path of the generated **.geo** files
 
@@ -161,20 +163,22 @@ class NEW_STEP_Import(object):
 
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
-        if not roots.Length()==1:
+        if roots.Length() != 1:
             raise MultiRoot_Error
 
-        deep=0
-        product_id=[1]
-        self.product_relationship_arbre=Product(GetLabelNom(roots.Value(1)),deep,roots.Value(1),self.id,product_id[0],self.file)
-        product_id[0]+=1
-        parcour_product_relationship_arbre(self.shape_tool,self.product_relationship_arbre,self.shapes_simples,
-        (deep+1),self.id,self.product_relationship_arbre,product_id,self.file)
+        deep = 0
+        product_id = [1]
+        root = roots.Value(1)
+        name = get_label_name(root)
+        self.main_product = Product(name, deep, root, self.id, product_id[0], self.file)
+        product_id[0] += 1
+        expand_product(self.shape_tool,self.main_product, self.shapes_simples,
+                      deep+1, self.id, self.main_product, product_id, self.file)
 
-        return self.product_relationship_arbre
+        return self.main_product
 
 
-class simple_shape():
+class SimpleShape():
     """
     Class used to represent a simple shape geometry (not assembly)
 
@@ -200,11 +204,11 @@ class simple_shape():
         self.color = color
 
 
-def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,doc_id,product_root,product_id,file_path):
+def expand_product(shape_tool,product,shapes_simples,deep,doc_id,product_root,product_id,file_path):
     """
     :param shape_tool: :class:`.OCC.XCAFDoc.XCAFDoc_ShapeTool`
     :param product: :class:`.Product` that will be expanded
-    :param shapes_simples: list of :class:`.simple_shape`
+    :param shapes_simples: list of :class:`.SimpleShape`
     :param deep: Depth of the node that we explore
     :param doc_id: id that references a :class:`.DocumentFile` of which we are generating the :class:`.Product`
     :param product_root: :class:`.Product` root of the arborescense
@@ -234,38 +238,42 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
 
        * We look in the list of **shapes_simples** for his partner
 
-       * We set the attribute **product**.geometry like the index+1 (>0) of the position of his partner in the list of **simple_shape**
+       * We set the attribute **product**.geometry like the index+1 (>0) of the position of his partner in the list of **SimpleShape**
 
     """
     if shape_tool.IsAssembly(product.label_reference):
         l_c = TDF_LabelSequence()
         shape_tool.GetComponents(product.label_reference,l_c)
         for i in range(l_c.Length()):
-            if shape_tool.IsReference(l_c.Value(i+1)):
+            label = l_c.Value(i+1)
+            if shape_tool.IsReference(label):
                 label_reference=TDF_Label()
-                shape_tool.GetReferredShape(l_c.Value(i+1),label_reference)
-                reference_found=False
+                shape_tool.GetReferredShape(label, label_reference)
+                reference_found = False
+                matrix = TransformationMatrix(get_matrix(shape_tool.GetLocation(label).Transformation()))
+                shape = shape_tool.GetShape(label_reference)
                 for link in product.links:
-                    if shape_tool.GetShape(link.product.label_reference).IsPartner(shape_tool.GetShape(label_reference)):
-                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),TransformationMatrix(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
-                        reference_found=True
+                    if shape_tool.GetShape(link.product.label_reference).IsPartner(shape):
+                        link.add_occurrence(get_label_name(label), matrix)
+                        reference_found = True
                         break
 
                 if not reference_found:
-                    new_product=Product(GetLabelNom(label_reference),deep,label_reference,doc_id,product_id[0],file_path)
-                    product_assembly=search_assembly(new_product,product_root)
+                    new_product = Product(get_label_name(label_reference), deep,
+                                          label_reference, doc_id, product_id[0], file_path)
+                    product_assembly = search_assembly(new_product, product_root)
                     if product_assembly:
                         product.links.append(Link(product_assembly))
                     else:
                         product.links.append(Link(new_product))
-                        product_id[0]+=1
-                        parcour_product_relationship_arbre(shape_tool,new_product,shapes_simples,deep+1,doc_id,product_root,product_id,file_path)
+                        product_id[0] += 1
+                        expand_product(shape_tool, new_product, shapes_simples,
+                            deep+1, doc_id, product_root,product_id, file_path)
 
 
-                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),TransformationMatrix(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
+                    product.links[-1].add_occurrence(get_label_name(label), matrix)
     else:
-        compShape=shape_tool.GetShape(product.label_reference)
-
+        compShape = shape_tool.GetShape(product.label_reference)
         for index in range(len(shapes_simples)):
             if compShape.IsPartner(shapes_simples[index].shape):
                 product.set_geometry(index+1) #to avoid index==0
@@ -273,39 +281,39 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
 
 def get_matrix(location):
     """
-     Converts *location* in an array ([x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4])
+    Converts *location* in an array ([x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4])
 
-     == == == == == = ==
-     x1 x2 x3 x4  x = x'
-     y1 y2 y3 y4  y = y'
-     z1 z2 z3 z4  z = z'
-     0  0  0  1   1 = 1
-     == == == == == = ==
+    == == == == == = ==
+    x1 x2 x3 x4  x = x'
+    y1 y2 y3 y4  y = y'
+    z1 z2 z3 z4  z = z'
+    0  0  0  1   1 = 1
+    == == == == == = ==
 
     :param location: location
     :type location: :class:`.OCC.TopLoc.TopLoc_Location`
 
     """
 
-    m=location.VectorialPart()
-    gp=m.Row(1)
-    x1=gp.X()
-    x2=gp.Y()
-    x3=gp.Z()
-    x4=location.Transforms()[0]
-    gp=m.Row(2)
-    y1=gp.X()
-    y2=gp.Y()
-    y3=gp.Z()
-    y4=location.Transforms()[1]
-    gp=m.Row(3)
-    z1=gp.X()
-    z2=gp.Y()
-    z3=gp.Z()
-    z4=location.Transforms()[2]
-    return [x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4]
+    m = location.VectorialPart()
+    gp = m.Row(1)
+    x1 = gp.X()
+    x2 = gp.Y()
+    x3 = gp.Z()
+    x4 = location.Transforms()[0]
+    gp = m.Row(2)
+    y1 = gp.X()
+    y2 = gp.Y()
+    y3 = gp.Z()
+    y4 = location.Transforms()[1]
+    gp = m.Row(3)
+    z1 = gp.X()
+    z2 = gp.Y()
+    z3 = gp.Z()
+    z4 = location.Transforms()[2]
+    return [x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4]
 
-def GetLabelNom(lab):
+def get_label_name(lab):
     """
 
     Returns the name of a :class:`.OCC.TDF.TDF_Label` (**lab**)
@@ -321,24 +329,24 @@ def GetLabelNom(lab):
     return unicode(n.Get().PrintToString(),errors='ignore')#.decode("latin-1")
 
 
-def SetLabelNom(lab,nom):
+def set_label_name(label, name):
     """
 
-    Sets the name of a :class:`.OCC.TDF.TDF_Label` (**lab**)
+    Sets the name of a :class:`.OCC.TDF.TDF_Label` (**label**)
 
-    :param lab: :class:`.OCC.TDF.TDF_Label`
-    :param nom: new name for a :class:`.OCC.TDF.TDF_Label`
+    :param label: :class:`.OCC.TDF.TDF_Label`
+    :param name: new name for a :class:`.OCC.TDF.TDF_Label`
 
     """
     entry = TCollection_AsciiString()
-    TDF_Tool.Entry(lab,entry)
+    TDF_Tool.Entry(label, entry)
     N = Handle_TDataStd_Name()
-    lab.FindAttribute(TDataStd_Name_GetID(),N)
+    label.FindAttribute(TDataStd_Name_GetID(),N)
     n=N.GetObject()
-    n.Set(TCollection_ExtendedString(nom.encode("latin-1")))
+    n.Set(TCollection_ExtendedString(name.encode("latin-1")))
 
 
-def find_color(label,color_tool,shape_tool):
+def find_color(label, color_tool, shape_tool):
     """
 
     Gets the color of a :class:`.OCC.TDF.TDF_Label` (**label**)
@@ -348,18 +356,20 @@ def find_color(label,color_tool,shape_tool):
     :param color_tool: :class:`.OCC.XCAFDoc.XCAFDoc_ColorTool`
 
     """
-    c=Quantity_Color()
-    if( color_tool.GetInstanceColor(shape_tool.GetShape(label),0,c) or  color_tool.GetInstanceColor(shape_tool.GetShape(label),1,c) or color_tool.GetInstanceColor(shape_tool.GetShape(label),2,c)):
-        color_tool.SetColor(label,c,0)
-        color_tool.SetColor(label,c,1)
-        color_tool.SetColor(label,c,2)
+    c = Quantity_Color()
+    if (color_tool.GetInstanceColor(shape_tool.GetShape(label), 0, c) or
+        color_tool.GetInstanceColor(shape_tool.GetShape(label), 1, c) or
+        color_tool.GetInstanceColor(shape_tool.GetShape(label), 2, c)):
+        for i in (0, 1, 2):
+            color_tool.SetInstanceColor(label, i, c)
         return c
 
-    if( color_tool.GetColor(label,0,c) or  color_tool.GetColor(label,1,c) or color_tool.GetColor(label,2,c) ):
-        color_tool.SetInstanceColor(shape_tool.GetShape(label),0,c)
-        color_tool.SetInstanceColor(shape_tool.GetShape(label),1,c)
-        color_tool.SetInstanceColor(shape_tool.GetShape(label),2,c)
-
+    if (color_tool.GetColor(label, 0, c) or
+        color_tool.GetColor(label, 1, c) or
+        color_tool.GetColor(label, 2, c)):
+        shape = shape_tool.GetShape(label)
+        for i in (0, 1, 2):
+            color_tool.SetInstanceColor(shape, i, c)
         return c
 
     return False
@@ -368,6 +378,8 @@ def find_color(label,color_tool,shape_tool):
 class MultiRoot_Error(Exception):
     def __unicode__(self):
         return u"OpenPLM does not support files step with multiple roots"
+
+
 class OCC_ReadingStep_Error(Exception):
     def __unicode__(self):
         return u"PythonOCC could not read the file"

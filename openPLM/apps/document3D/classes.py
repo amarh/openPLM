@@ -31,7 +31,7 @@ class Product(object):
 
 
     There are two ways of generating a :class:`.Product`, reading the file
-    **.stp** across the class :class:`.NEW_STEP_Import` ( will refill the
+    **.stp** across the class :class:`.StepImporter` ( will refill the
     attribute **label_reference**  for every :class:`Product`), or reading
     a file **.arb** related to a :class:`.ArbreFile`  .
     Therefore there exist two ways of distinguishing the different :class:`.Product`,
@@ -49,7 +49,7 @@ class Product(object):
 
     .. attribute:: label_reference
 
-        When we generate an arborescense using :class:`.NEW_STEP_Import` ,
+        When we generate an arborescense using :class:`.StepImporter` ,
         here we will store the label that represents the :class:`.Product` ,
         if we generate the arborescense reading a file **.geo**, this attribute will be **False**
 
@@ -255,7 +255,7 @@ def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_pro
 
     The :class:`.Product` generated from a file **.arb** (The case of this function) have its attribute **label_reference** set to False.
 
-    When we generate a :class:`.Product` using :class:`.NEW_STEP_Import` , the attribute **label_reference** will represent and identify the :class:`.Product`.
+    When we generate a :class:`.Product` using :class:`.StepImporter` , the attribute **label_reference** will represent and identify the :class:`.Product`.
 
 
     From the information contained in a file **.arb** (**arbre**), it generates the corresponding :class:`Product`.
@@ -347,7 +347,7 @@ def search_assembly(product,product_root):
     """
     Checks if a :class:`Product` is already present in a arborescense :class:`Product` (**product_root**)
     There are two manners of comparison, across **label_reference**
-    ( generated for :class:`.NEW_STEP_Import` for every :class:`Product`),
+    ( generated for :class:`.StepImporter` for every :class:`Product`),
     or across **id** and **doc_id** (extracted of a file **.geo** for every :class:`Product`)
 
     :param product_root: :class:`Product` root of the arborescense

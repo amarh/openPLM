@@ -7,7 +7,7 @@ from OCC.XSControl import XSControl_WorkSession
 from OCC.STEPCAFControl import *
 from OCC.STEPControl import *
 from OCC.Utils.DataExchange.STEP import StepOCAF_Export
-from STP_converter_WebGL import NEW_STEP_Import
+from STP_converter_WebGL import StepImporter
 from classes import Product_from_Arb
 from OCC.GarbageCollector import garbage
 
@@ -27,7 +27,7 @@ def decompose(path, temp_file_name):
     """
     output = open(temp_file_name.encode(),"r")
     old_product = Product_from_Arb(json.loads(output.read()))
-    step_importer = NEW_STEP_Import(path)
+    step_importer = StepImporter(path)
     shape_tool = step_importer.shape_tool
     product = step_importer.generate_product_arbre()
     decompose_children(product, old_product, shape_tool)
