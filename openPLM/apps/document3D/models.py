@@ -229,7 +229,7 @@ class Document3DController(DocumentController):
                 product=self.get_product(STP_file[0], False)
                 copy_geometry(product,new_STP_file)
                 product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
-                Product_to_ArbreFile(product,new_STP_file)
+                ArbreFile.create_from_product(product,new_STP_file)
 
             elif self.object.PartDecompose: #and not self.object.PartDecompose in selected_parts
                 product=self.get_product(STP_file[0], True)
@@ -256,12 +256,12 @@ class Document3DController(DocumentController):
 
                 copy_geometry(product, new_STP_file)
                 product.set_new_root(new_STP_file.id, new_STP_file.file.path, for_child=True)
-                Product_to_ArbreFile(product, new_STP_file)
+                ArbreFile.create_from_product(product, new_STP_file)
             else:
                 product=self.get_product(STP_file[0], False)
                 copy_geometry(product,new_STP_file)
                 product.set_new_root(new_STP_file.id,new_STP_file.file.path,for_child=False)
-                Product_to_ArbreFile(product,new_STP_file)
+                ArbreFile.create_from_product(product,new_STP_file)
         return rev
 
     def delete_file(self, doc_file):
@@ -457,6 +457,31 @@ class ArbreFile(models.Model):
     file = models.FileField(upload_to='.',storage=media3DArbreFile)
     stp = models.ForeignKey(pmodels.DocumentFile)
     decomposable = models.BooleanField()
+
+    @classmethod
+    def create_from_product(cls, product, doc_file):
+        """
+        Creates a new ArbreFile from product. Its content is seririalized to
+        a new *..arb* file.
+
+        Returns the created ArbreFile.
+        """
+        data=product.to_list()
+        filename, ext = os.path.splitext(doc_file.filename)
+        arbre_file = ArbreFile(decomposable=product.is_decomposable)
+        arbre_file.stp = doc_file
+        name = arbre_file.file.storage.get_available_name(filename+".arb")
+        path = os.path.join(arbre_file.file.storage.location, name)
+        arbre_file.file = name
+        arbre_file.save()
+        directory = os.path.dirname(path.encode())
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        output = open(path.encode(),"w")
+        output.write(json.dumps(data))
+        output.close()
+        return arbre_file
+
 
 def delete_ArbreFile(doc_file):
     """
@@ -735,7 +760,7 @@ def update_root_BD(new_stp_file,stp_file,ctrl,product,file,name,part):
     product.doc_id=new_stp_file.id
     product.doc_path=new_stp_file.file.path
 
-    Product_to_ArbreFile(product,new_stp_file)
+    ArbreFile.create_from_product(product,new_stp_file)
     ctrl.deprecate_file(stp_file,by_decomposition=True)
 
 
@@ -773,7 +798,7 @@ def update_child_files_BD(product,user,old_product):
             os.chmod(doc_file.file.path, 0400)
 
             copy_geometry(old_product_copy,doc_file) #we utilise old_product
-            Product_to_ArbreFile(product_copy,doc_file)
+            ArbreFile.create_from_product(product_copy,doc_file)
             doc_file.document.no_index=False # to reverse no_index=True make in document3D.views.generate_part_doc_links
             doc_file.document.save()
             ctrl=get_controller(doc_file.document.type)
@@ -816,33 +841,5 @@ def copy_geometry(product, doc_file):
     for link in product.links:
         if not link.product.visited:
             copy_geometry(link.product, doc_file)
-
-def Product_to_ArbreFile(product,doc_file):
-    """
-
-    :param product: :class:`.Product` that contains the information about the arborescense to generate a new :class:`~django.core.files.File` **.arb**
-    :param doc_file: :class:`.DocumentFile` related to **product** for which the new :class:`.ArbreFile` will be generated
-
-    Generates a new :class:`.ArbreFile` associated with a :class:`.DocumentFile` from a :class:`.Product`
-
-    Departing from the information contained in the :class:`.Product` it is going to generate a :class:`~django.core.files.File` **.arb** for the new :class:`.ArbreFile`
-
-    """
-    data=product.to_list()
-
-    fileName, fileExtension = os.path.splitext(doc_file.filename)
-    new_ArbreFile= ArbreFile(decomposable=product.is_decomposable)
-    new_ArbreFile.stp = doc_file
-    name = new_ArbreFile.file.storage.get_available_name(fileName+".arb")
-    path = os.path.join(new_ArbreFile.file.storage.location, name)
-    new_ArbreFile.file = name
-    new_ArbreFile.save()
-    directory = os.path.dirname(path.encode())
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    output = open(path.encode(),"w")
-    output.write(json.dumps(data))
-    output.close()
-    return new_ArbreFile.file.path
 
 
