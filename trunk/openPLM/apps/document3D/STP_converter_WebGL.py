@@ -247,7 +247,7 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
                 reference_found=False
                 for link in product.links:
                     if shape_tool.GetShape(link.product.label_reference).IsPartner(shape_tool.GetShape(label_reference)):
-                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
+                        link.add_occurrence(GetLabelNom(l_c.Value(i+1)),TransformationMatrix(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
                         reference_found=True
                         break
 
@@ -262,7 +262,7 @@ def parcour_product_relationship_arbre(shape_tool,product,shapes_simples,deep,do
                         parcour_product_relationship_arbre(shape_tool,new_product,shapes_simples,deep+1,doc_id,product_root,product_id,file_path)
 
 
-                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),Matrix_rotation(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
+                    product.links[-1].add_occurrence(GetLabelNom(l_c.Value(i+1)),TransformationMatrix(get_matrix(shape_tool.GetLocation(l_c.Value(i+1)).Transformation())))
     else:
         compShape=shape_tool.GetShape(product.label_reference)
 
