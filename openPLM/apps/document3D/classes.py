@@ -165,7 +165,7 @@ class Link(object):
 
     .. attribute:: locations
 
-        :class:`Matrix_rotation` of each instances of the :class:`Link`
+        :class:`TransformationMatrix` of each instances of the :class:`Link`
 
     .. attribute:: product
 
@@ -202,7 +202,7 @@ class Link(object):
         self.quantity += 1
 
 
-class Matrix_rotation(object):
+class TransformationMatrix(object):
     """
 
     Defines a non-persistent transformation in 3D space
@@ -330,7 +330,7 @@ def generateLink(arbre,product,product_child):
     """
     product.links.append(Link(product_child))
     for i in range(len(arbre[0])):
-        product.links[-1].add_occurrence(arbre[0][i][0],Matrix_rotation(arbre[0][i][1]))
+        product.links[-1].add_occurrence(arbre[0][i][0],TransformationMatrix(arbre[0][i][1]))
 
 
 def generateProduct(arbre,deep):
