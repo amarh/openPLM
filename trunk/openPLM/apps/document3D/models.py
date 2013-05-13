@@ -144,10 +144,10 @@ def handle_step_file(doc_file_pk):
             logger.info(temp_file.read())
             logger.info(error_file.read())
             if status == -1:
-                #MultiRoot_Error  SEND MAIL?
+                #MultiRootError  SEND MAIL?
                 raise ValueError("OpenPLM does not support files STEP with multiple roots")
             elif status == -2:
-                #OCC_ReadingStep_Error SEND MAIL?
+                #OCCReadingStepError SEND MAIL?
                 raise ValueError("PythonOCC could not read the file")
             else:
                 #Indeterminate error SEND MAIL?

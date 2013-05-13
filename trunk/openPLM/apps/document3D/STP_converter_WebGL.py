@@ -74,8 +74,8 @@ class StepImporter(object):
 
         self.STEPReader = STEPCAFControl_Reader()
 
-        if not self.STEPReader.ReadFile(self.file) == 1:
-            raise OCC_ReadingStep_Error
+        if self.STEPReader.ReadFile(self.file) != 1:
+            raise OCCReadingStepError
 
         self.h_doc = TDocStd.Handle_TDocStd_Document()
         self.app = XCAFApp.GetApplication().GetObject()
@@ -171,7 +171,7 @@ class StepImporter(object):
         roots = TDF_LabelSequence()
         self.shape_tool.GetFreeShapes(roots)
         if roots.Length() != 1:
-            raise MultiRoot_Error
+            raise MultiRootError
 
         deep = 0
         product_id = [1]
@@ -382,12 +382,12 @@ def find_color(label, color_tool, shape_tool):
     return False
 
 
-class MultiRoot_Error(Exception):
+class MultiRootError(Exception):
     def __unicode__(self):
         return u"OpenPLM does not support files step with multiple roots"
 
 
-class OCC_ReadingStep_Error(Exception):
+class OCCReadingStepError(Exception):
     def __unicode__(self):
         return u"PythonOCC could not read the file"
 
