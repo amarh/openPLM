@@ -18,21 +18,17 @@
 import os, os.path
 from kjbuckets import  kjDict
 
-from OCC.Utils.Topology import *
-from OCC.TopoDS import *
-from OCC.TopAbs import *
-from OCC.Bnd import *
-from OCC.BRepBndLib import *
-from OCC.gp import *
-from OCC.BRepMesh import *
-from OCC.BRep import *
-from OCC.BRepTools import *
-from OCC.TopLoc import *
-from OCC.Poly import *
-from OCC.BRepBuilderAPI import *
-from OCC.StdPrs import *
-from OCC.TColgp import *
-from OCC.Poly import *
+from OCC.Utils.Topology import Topo
+from OCC.TopAbs import TopAbs_REVERSED
+from OCC.Bnd import Bnd_Box
+from OCC.BRepBndLib import BRepBndLib_Add
+from OCC.gp import gp_Vec, gp_Pnt
+from OCC.BRepMesh import BRepMesh_Mesh
+from OCC.BRep import BRep_Tool_Triangulation
+from OCC.TopLoc import TopLoc_Location
+from OCC.Poly import Poly_Connect
+from OCC.StdPrs import StdPrs_ToolShadedShape_Normal
+from OCC.TColgp import TColgp_Array1OfDir
 
 
 triangle_fmt = """ smooth_triangle {
