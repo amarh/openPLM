@@ -321,7 +321,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
 
                     try:
                         instances = []
-                        old_product = json.dumps(classes.data_for_product(product)) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
+                        old_product = json.dumps(product.to_list()) # we save the product before update nodes whit new doc_id and doc_path generated during the bomb-child
                         generate_part_doc_links_AUX(request, product, obj,instances,doc3D)
                         update_indexes.delay(instances)
                     except Exception as excep:
@@ -338,7 +338,7 @@ def display_decompose(request, obj_type, obj_ref, obj_revi, stp_id):
                     else:
 
                         models.decomposer_all.delay(stp_file.pk,
-                                json.dumps(classes.data_for_product(product)),
+                                json.dumps(product.to_list()),
                                 obj.object.pk, native_related_pk, obj._user.pk, old_product)
 
                         return HttpResponseRedirect(obj.plmobject_url+"BOM-child/")

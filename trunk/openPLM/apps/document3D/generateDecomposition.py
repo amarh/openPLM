@@ -8,7 +8,7 @@ from OCC.STEPCAFControl import *
 from OCC.STEPControl import *
 from OCC.Utils.DataExchange.STEP import StepOCAF_Export
 from STP_converter_WebGL import StepImporter
-from classes import Product_from_Arb
+from classes import Product
 from OCC.GarbageCollector import garbage
 
 def new_collect_object(self, obj_deleted):
@@ -26,7 +26,7 @@ def decompose(path, temp_file_name):
           to generate a :class:`.Product` relative to the arborescense of a **.stp** file
     """
     output = open(temp_file_name.encode(),"r")
-    old_product = Product_from_Arb(json.loads(output.read()))
+    old_product = Product.from_list(json.loads(output.read()))
     step_importer = StepImporter(path)
     shape_tool = step_importer.shape_tool
     product = step_importer.generate_product_arbre()

@@ -4,8 +4,6 @@ import random
 import os
 
 def get_available_name(location, name):
-
-
     def rand():
         r = ""
         for i in xrange(7):
@@ -21,6 +19,7 @@ def get_available_name(location, name):
     while os.path.exists(os.path.join(location, path)):
         path = os.path.join(ext2, md5_value % rand())
     return path
+
 
 class Product(object):
     """
@@ -147,13 +146,94 @@ class Product(object):
             return self.name
         return False
 
+    def to_list(self):
+        output = [[self.name, self.doc_id, self.geometry, self.doc_path, self.id]]
+        for link in self.links:
+            output.append(link.to_list())
+        return output
+
+    @classmethod
+    def from_list(cls, arbre, product=False, product_root=False, deep=0, to_update_product_root=False):
+        """
+        Returns a new Product built from *arbre*. *arbre* is a serialized version as returned
+        by :meth:`.to_list`.
+
+        Example:
+
+            - To generate a **product** of a single file **.arb** ::
+
+                tree=Product.from_list(json.loads(new_ArbreFile.file.read()))
+
+
+            - To generate a **product** of a single file .arb and link this one like a branch
+              of a certain **product_root_node** of an already existing **product_root**
+
+              .. code-block:: python
+
+                    product=Product.from_list(json.loads(new_ArbreFile.file.read()),product=False, product_root=product_root, deep=xxx, to_update_product_root=product_root_node)
+
+              This method generates the :class:`Link` between **product_root_node** and  **product** ,
+              **BUT** it does not add the occurrences, generally this occurrences are stored in the
+              existing :class:`Location_link`
+
+              After generating the **product** and the :class:`Link`, we will have to refill the
+              :class:`Link` calling the function :meth:`.add_occurrence` for the :class:`Link`:
+
+                .. code-block:: python
+
+                    for location in locations:
+                        product_root_node.links[-1].add_occurrence(location.name,location)
+
+        :param arbre:
+        :param product: Product that represents an arborescense , **ONLY** used in successive
+                        recursive calls of the function
+        :type plmobject: :class:`.Product`
+        :param product_root: Product that represents a root arborescense , used to determine if
+                             the product to generate is already present in the tree
+        :type plmobject: :class:`.Product`
+        :param deep: depth of **product** in the arborescense
+        :param to_update_product_root: Product that represents a node of an arborescense
+                                       (sub-branch of arborescense referenced by **product_root**)
+        :type plmobject: :class:`.Product`
+      """
+
+
+        def prod(a, d):
+            return cls(a[0], d, False, a[1], a[4], a[3], a[2])
+        if not product_root:
+            product = prod(arbre[0], deep)
+            product_root = product
+
+        elif to_update_product_root: #Important, in case of generation of a tree contained in several files, it supports updated product_root
+            product= prod(arbre[0], deep)
+
+            product_assembly=search_assembly(product,product_root)
+            if product_assembly:
+                to_update_product_root.links.append(Link(product_assembly))
+                return False
+            else:
+                to_update_product_root.links.append(Link(product))
+
+        for i in range(len(arbre)-1):
+            arbre_child = arbre[i+1]
+            product_child = prod(arbre_child[1][0], deep+1)
+            product_assembly = search_assembly(product_child, product_root)
+            if product_assembly:
+                product_child = product_assembly
+            link = Link(product_child)
+            product.links.append(link)
+            for name, matrix in arbre_child[0]:
+                link.add_occurrence(name, TransformationMatrix(matrix))
+            if not product_assembly:
+                cls.from_list(arbre_child[1], product_child, product_root, deep+1)
+        return product
+
 
 class Link(object):
     """
 
-    Class used to represent a :class:`Link` with a :class:`.Product`,
-    a :class:`Link` can have several references, each one with his own name and matrix of transformation.
-    Every :class:`Link` points at a :class:`.Product`
+    Class used to represent a parent child link between two `.Product`.
+    A :class:`Link` can have several references, each one with its name and transformation matrix.
 
     :model attributes:
 
@@ -201,6 +281,17 @@ class Link(object):
         self.locations.append(matrix)
         self.quantity += 1
 
+    def to_list(self):
+        output=[]
+        name_loc=[]
+        for i in range(self.quantity):
+            name_loc.append([self.names[i], self.locations[i].to_array()])
+
+        output.append(name_loc)
+        output.append(self.product.to_list())
+
+        return output
+
 
 class TransformationMatrix(object):
     """
@@ -231,121 +322,9 @@ class TransformationMatrix(object):
                 self.z1, self.z2, self.z3, self.z4]
 
 
-
-def Product_from_Arb(arbre,product=False,product_root=False,deep=0,to_update_product_root=False):
-
+def search_assembly(product, product_root):
     """
-
-    :param arbre: chain of characters formatted (following the criteria of the function
-                  :func:`.data_for_product`) that represents an arborescense. It contains necessary
-                  information to construct :class:`.Product` and :class:`Link`
-
-    :param product: Product that represents an arborescense , **ONLY** used in successive
-                    recursive calls of the function
-    :type plmobject: :class:`.Product`
-    :param product_root: Product that represents a root arborescense , used to determine if
-                         the product to generate is already present in the tree
-    :type plmobject: :class:`.Product`
-    :param deep: depth of **product** in the arborescense
-    :param to_update_product_root: Product that represents a node of an arborescense
-                                   (sub-branch of arborescense referenced by **product_root**)
-    :type plmobject: :class:`.Product`
-
-
-
-    The :class:`.Product` generated from a file **.arb** (The case of this function) have its attribute **label_reference** set to False.
-
-    When we generate a :class:`.Product` using :class:`.StepImporter` , the attribute **label_reference** will represent and identify the :class:`.Product`.
-
-
-    From the information contained in a file **.arb** (**arbre**), it generates the corresponding :class:`Product`.
-    In case of files STEP decomposed, this information can be distributed in several files **.arb** and due to the
-    nature of the decomposition, a **product** could be generated more than once , to avoid this we use the **product_root**.
-    Whenever we generate a new product we verify that it is not already present in **product_root**,we use **to_update_product_root**
-    to support updated **product_root** (**to_update_product_root** is a branch of **product_root**)
-
-    Example:
-        - If we want to generate a **product** of a single file **.arb** :
-
-            .. code-block:: python
-
-                tree=Product_from_Arb(json.loads(new_ArbreFile.file.read()))
-
-
-        - If we want to generate a **product** of a single file .arb and link this one like a branch
-          of a certain **product_root_node** of an already existing **product_root**
-
-            .. code-block:: python
-
-                product=Product_from_Arb(json.loads(new_ArbreFile.file.read()),product=False, product_root=product_root, deep=xxx, to_update_product_root=product_root_node)
-
-          This method generates the :class:`Link` between **product_root_node** and  **product** ,
-          **BUT** it does not add the occurrences, generally this occurrences are stored in the
-          existing  :class:`Location_link` between :class:`Part`
-
-          After generating the **product** and the :class:`Link`, we will have to refill the
-          :class:`Link` calling the function :meth:`.add_occurrence` for the :class:`Link`:
-
-            .. code-block:: python
-
-                    for location in locations:
-                        product_root_node.links[-1].add_occurrence(location.name,location)
-    """
-
-    if not product_root:
-        product=generateProduct(arbre,deep)
-        product_root=product
-
-
-    elif to_update_product_root: #Important, in case of generation of a tree contained in several files, it supports updated product_root
-        product=generateProduct(arbre,deep)
-
-        product_assembly=search_assembly(product,product_root)
-        if product_assembly:
-            to_update_product_root.links.append(Link(product_assembly))
-            return False
-        else:
-            to_update_product_root.links.append(Link(product))
-
-
-    for i in range(len(arbre)-1):
-        product_child=generateProduct(arbre[i+1][1],deep+1)
-        product_assembly=search_assembly(product_child,product_root)
-        if product_assembly:
-            product_child=product_assembly
-        generateLink(arbre[i+1],product,product_child)
-        if not product_assembly:
-            Product_from_Arb(arbre[i+1][1],product_child,product_root,deep+1)
-    return product
-
-
-
-def generateLink(arbre,product,product_child):
-    """
-    :param arbre: chain of characters formatted (following the criteria of the function :func:`.data_for_product`)
-                  that represents the different occurrences of a :class:`Link`
-    :param product: :class:`Product` root of the assembly
-    :param product_child: :class:`Product` child of the assembly
-
-    """
-    product.links.append(Link(product_child))
-    for i in range(len(arbre[0])):
-        product.links[-1].add_occurrence(arbre[0][i][0],TransformationMatrix(arbre[0][i][1]))
-
-
-def generateProduct(arbre,deep):
-    """
-    :param arbre: chain of characters formatted (following the criteria of the function :class:`.data_for_product`) that represents a :class:`Product`
-    :param deep: depth of :class:`Product`
-
-    """
-    label_reference=False
-    return Product(arbre[0][0],deep,label_reference,arbre[0][1],arbre[0][4],arbre[0][3],arbre[0][2])
-
-
-def search_assembly(product,product_root):
-    """
-    Checks if a :class:`Product` is already present in a arborescense :class:`Product` (**product_root**)
+    Checks if a :class:`Product` is already present in an arborescense :class:`Product` (**product_root**)
     There are two manners of comparison, across **label_reference**
     ( generated for :class:`.StepImporter` for every :class:`Product`),
     or across **id** and **doc_id** (extracted of a file **.geo** for every :class:`Product`)
@@ -366,35 +345,4 @@ def search_assembly(product,product_root):
             if product_found:
                 return product_found
 
-
-def data_for_product(product):
-    """
-    :param product: :class:`Product` for which the chain was generated
-
-    generate a chain of characters formatted that contains information about a :class:`Product`
-
-    """
-
-    output = [[product.name,product.doc_id,product.geometry,product.doc_path,product.id]]
-    for link in product.links:
-        output.append(data_for_link(link))
-    return output
-
-
-def data_for_link(link):
-    """
-    :param product: :class:`Link` for which the chain was generated
-
-    generate a chain of characters formatted that contains information about a :class:`Link`
-
-    """
-    output=[]
-    name_loc=[]
-    for i in range(link.quantity):
-        name_loc.append([link.names[i],link.locations[i].to_array()])
-
-    output.append(name_loc)
-    output.append(data_for_product(link.product))
-
-    return output
 

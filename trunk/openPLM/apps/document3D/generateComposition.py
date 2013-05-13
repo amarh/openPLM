@@ -12,11 +12,12 @@ from OCC.STEPCAFControl import STEPCAFControl_Writer
 from OCC.TopLoc import TopLoc_Location
 from OCC.gp import gp_Trsf
 from STP_converter_WebGL import set_label_name
-from classes import Product_from_Arb
 
 from OCC.STEPCAFControl import STEPCAFControl_Reader
 from OCC import XCAFApp, TDocStd , XCAFDoc
 from OCC.TCollection import TCollection_ExtendedString
+
+from classes import Product
 
 class StepImporter(object):
     def __init__(self, file_path):
@@ -52,7 +53,7 @@ def composer(temp_file_name):
 
     """
     output = open(temp_file_name.encode(),"r")
-    product =Product_from_Arb(json.loads(output.read()))
+    product =Product.from_list(json.loads(output.read()))
     output.close()
     output = open(temp_file_name.encode(),"w+")# erase old data
     output.close()
