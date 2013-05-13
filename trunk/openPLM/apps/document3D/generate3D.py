@@ -2,7 +2,7 @@ import sys
 import os
 import tempfile
 from classes import data_for_product , get_available_name
-from STP_converter_WebGL import NEW_STEP_Import , MultiRoot_Error , OCC_ReadingStep_Error 
+from STP_converter_WebGL import StepImporter , MultiRoot_Error , OCC_ReadingStep_Error 
 import logging
 import json
     
@@ -22,7 +22,7 @@ def generateGeometrys_Arborescense(doc_file_path,doc_file_id,location, thumb_pat
     
     """ 
     logging.getLogger("GarbageCollector").setLevel(logging.ERROR)    
-    step_importer = NEW_STEP_Import(doc_file_path,doc_file_id) 
+    step_importer = StepImporter(doc_file_path,doc_file_id) 
     product = step_importer.generate_product_arbre()   
     pov_dir = tempfile.mkdtemp(suffix="openplm_pov")
     geo = step_importer.compute_geometries(location, pov_dir)

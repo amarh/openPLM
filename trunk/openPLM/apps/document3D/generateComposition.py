@@ -11,7 +11,7 @@ from OCC.STEPControl import STEPControl_AsIs
 from OCC.STEPCAFControl import STEPCAFControl_Writer
 from OCC.TopLoc import TopLoc_Location
 from OCC.gp import gp_Trsf
-from STP_converter_WebGL import SetLabelNom
+from STP_converter_WebGL import set_label_name
 from classes import Product_from_Arb
 
 from OCC.STEPCAFControl import STEPCAFControl_Reader
@@ -98,7 +98,7 @@ def add_labels(product,lr,st):
                     link.locations[d].z3,link.locations[d].z4,1,1)
 
                     new_label=st.AddComponent(lr,link.product.label_reference,TopLoc_Location(transformation))
-                    SetLabelNom(new_label,link.names[d])
+                    set_label_name(new_label,link.names[d])
 
 if __name__ == "__main__":
     composer(sys.argv[1])
