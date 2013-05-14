@@ -5,7 +5,7 @@
 from django.contrib.comments import Comment
 from django.utils.translation import ugettext_lazy as _
 
-from openPLM.plmapp.models import *
+from openPLM.plmapp import models
 
 from utils import MetaBadge
 
@@ -14,7 +14,7 @@ class Autobiographer(MetaBadge):
     Badge won by user who completed his (her) profile (first name, last name and e mail)
     """
     id = "autobiographer"
-    model = UserProfile
+    model = models.UserProfile
     one_time_only = True
 
     title = _("Autobiographer")
@@ -50,7 +50,7 @@ class SerialKiller(MetaBadge):
     (number of object set to 20 here but it can be modified)
     """
     id= "serialkiller"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Serial Killer")
@@ -76,7 +76,7 @@ class WelcomeAA(MetaBadge):
     Badge won by user who sponsored at least 4 users
     """
     id = "welcomeaa"
-    model = DelegationLink
+    model = models.DelegationLink
     one_time_only = True
 
     title = _("Welcome A.A.")
@@ -102,7 +102,7 @@ class GodFather(MetaBadge):
     Badge won by user who sponsored more than 10 users
     """
     id = "godfather"
-    model = DelegationLink
+    model = models.DelegationLink
     one_time_only = True
 
     title = _("God Father")
@@ -128,7 +128,7 @@ class DelegateSponsor(MetaBadge):
     Badge won by user who delegate to his(her) sponsor
     """
     id="delegatesponsor"
-    model = DelegationLink
+    model = models.DelegationLink
     one_time_only = True
 
     title = _("Who's the boss now")
@@ -152,80 +152,15 @@ class DelegateSponsor(MetaBadge):
 
 #: badges won by manipulating files
 
-def string_in(src, str_list):
-    """
-    check if all string in str_list are in src
-    """
-    ret = True
-    if isinstance(str_list, str):
-        str_list=str_list.split(" ")
+PONY_NAMES = set(["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"])
 
-    for s in str_list:
-        if src.find(s)==-1 :
-            ret = False
-            break
-    return ret
-
-def is_pony(src, file_names=None, found_name=False):
-    """
-    Test if src contains at least one file name from file_names list
-
-    :param src: file name to test
-    :param file_names: list of suggested files name (pony names)
-    :param found_name: if True return the file name which was founded
-
-    :return: True if src contains a file name from file_names and a string
-    """
-    if not file_names:
-        file_names=["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"]
-    ret = False
-    founded = ""
-    for pony in file_names:
-        ret = string_in(src,pony)
-        if ret :
-            if found_name:
-                founded=pony
-            break
-    return ret,founded
-
-def remove_pony(pony,pony_names):
-    new_ponies=[]
-    for p in pony_names:
-        if p!=pony:
-            new_ponies.append(p)
-    return new_ponies
-
-
-def has_all_pony(f_names, pony_names):
-    """
-    Test if a list of file names contains files named by all pony
-
-    :param f_names: list of file names to test
-    :param pony_names: list of pony names
-
-    """
-    if not pony_names:
-        return True
-
-    if not f_names or len(f_names)<len(pony_names):
-        return False
-
-    f_n = f_names.pop(0)
-    pony, founded = is_pony(f_n, file_names=pony_names, found_name=True)
-    if pony and len(pony_names)==1:
-        return True
-    elif pony:
-        new_ponies = remove_pony(founded,pony_names)
-        return has_all_pony(f_names, new_ponies)
-    else:
-        return has_all_pony(f_names, pony_names)
 
 class PonyRider(MetaBadge):
     """
     Badge won by user who added a file named pinkie pie, applejack, twilight sparkle, rarity, rainbow dash OR fluttershy
     """
     id="ponyrider"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Pony Rider")
@@ -233,15 +168,13 @@ class PonyRider(MetaBadge):
     level = "2"
 
     def get_progress(self, user):
-        doc_file_hist = self.model.objects.filter(user=user , action="File added")
+        doc_file_hist = self.model.objects.filter(user=user, action="File added")
         progress = 0
-        if bool(doc_file_hist) :
-            for h in doc_file_hist :
-                f_name = h.details.split(" : ")[1]
-                ret, f = is_pony(f_name)
-                if ret :
-                    progress = 1
-                    break
+        for h in doc_file_hist :
+            f_name = h.details.split(" : ")[1]
+            if f_name in PONY_NAMES:
+                progress = 1
+                break
         return progress
 
     def check_action(self, instance):
@@ -254,7 +187,7 @@ class SuperPonyRider(MetaBadge):
     Badge won by users who added files named according to ALL characters from my little pony
     """
     id="superponyrider"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Super Pony Rider")
@@ -264,22 +197,16 @@ class SuperPonyRider(MetaBadge):
     pony_names=["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"]
 
     def get_progress(self, user):
-        doc_file_hist = self.model.objects.filter(user=user , action='File added')
+        doc_file_hist = self.model.objects.filter(user=user, action='File added')
         progress = 0
-        if doc_file_hist :
-            f_names = []
-            for h in doc_file_hist :
-                f_names.append(h.details.split(" : ")[1])
-            progress = 1 if has_all_pony(f_names, self.pony_names) else 0
+        f_names = []
+        for h in doc_file_hist :
+            f_names.append(h.details.split(" : ")[1])
+        progress = int(set(f_names).issuperset(PONY_NAMES))
         return progress
 
     def check_action(self, instance):
         return instance.action == "File added"
-
-    def check_has_added_enough_files(self, instance):
-        user = instance.user
-        return self.model.objects.filter(user=user, action='File added').count()>= len(self.pony_names)
-
 
 
 class DragonSlayer(MetaBadge):
@@ -287,7 +214,7 @@ class DragonSlayer(MetaBadge):
     Badge won by user who added and destroyed a file named spike
     """
     id = "drangonslayer"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Dragon Slayer")
@@ -317,7 +244,7 @@ class Herald(MetaBadge):
     Badge won by user who notified 50 users
     """
     id ="herald"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Herald")
@@ -340,7 +267,7 @@ class Journalist(MetaBadge):
     Badge won by users who published XX objects.
     """
     id="journalist"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Journalist")
@@ -372,7 +299,7 @@ class HiruleHero(MetaBadge):
     Badge won by users who created 100 part-document links
     """
     id="hirulehero"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Hirule's Hero")
@@ -394,7 +321,7 @@ class WelcomeToHogwarts(MetaBadge):
     Create a Part named "Wizard Wand"
     """
     id="welcometohogwarts"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Welcome To Hogwarts")
@@ -402,7 +329,7 @@ class WelcomeToHogwarts(MetaBadge):
     level = "4"
 
     def get_progress(self, user):
-        wizard = Part.objects.filter(creator=user, name__icontains="Wizard Wand").exists()
+        wizard = models.Part.objects.filter(creator=user, name__icontains="Wizard Wand").exists()
         progress = 1 if wizard else 0
         return progress
 
@@ -415,7 +342,7 @@ class EmmettBrown(MetaBadge):
     Created 121 parts/documents
     """
     id="emmettbrown"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Emmett Brown")
@@ -425,7 +352,7 @@ class EmmettBrown(MetaBadge):
     progress_finish = 121
 
     def get_progress(self, user):
-        created = PLMObject.objects.filter(creator=user).count()
+        created = models.PLMObject.objects.filter(creator=user).count()
         return created
 
     def check_action(self, instance):
@@ -438,7 +365,7 @@ class Guru(MetaBadge):
     Create XX groups
     """
     id="guru"
-    model = GroupHistory
+    model = models.GroupHistory
     one_time_only = True
 
     title = _("Guru")
@@ -451,7 +378,7 @@ class Guru(MetaBadge):
         return instance.user
 
     def get_progress(self, user):
-        created = GroupInfo.objects.filter(creator=user).count()
+        created = models.GroupInfo.objects.filter(creator=user).count()
         return created
 
     def check_action(self, instance):
@@ -464,7 +391,7 @@ class Archivist(MetaBadge):
     Badge won by user who deprecated XX documents
     """
     id="archivist"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Archivist")
@@ -475,8 +402,9 @@ class Archivist(MetaBadge):
     progress_finish = 20
 
     def get_progress(self, user):
-        docs_deprecated = Document.objects.filter(state='deprecated').values_list('id', flat=True)
-        deprecated = self.model.objects.filter(user=user, action__in=["Promote", "Modify"], details__regex=r'changes?.* from.* to .*deprecated.*$', plmobject__in=docs_deprecated).count()
+        docs_deprecated = models.Document.objects.filter(state='deprecated').values_list('id', flat=True)
+        deprecated = self.model.objects.filter(user=user, action__in=["Promote", "Modify"],
+                details__regex=r'changes?.* from.* to .*deprecated.*$', plmobject__in=docs_deprecated).count()
         return deprecated
 
     def check_action(self, instance):
@@ -493,7 +421,7 @@ class WisedOne(MetaBadge):
     Reject 500 documents signatures
     """
     id="wisedone"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Wised One")
@@ -516,7 +444,7 @@ class Replicant(MetaBadge):
     Badge won by user who cloned a part/document
     """
     id="replicant"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Replicant")
@@ -537,7 +465,7 @@ class Frankeinstein(MetaBadge):
     Badge won by user who clonee a cancelled or deprecated object
     """
     id="frankeinstein"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Frankeinstein")
@@ -563,7 +491,7 @@ class Tipiak(MetaBadge):
     Badge won by user who cloned object (s)he doesn't own/ didn't create
     """
     id="tipiak"
-    model = History
+    model = models.History
     one_time_only = True
 
     title = _("Tipiak")
@@ -590,7 +518,7 @@ class Materialistic(MetaBadge):
     Badge won by user who owns more than 1000 objects
     """
     id="materialistic"
-    model = PLMObject
+    model = models.PLMObject
     one_time_only = True
 
     title = _("Materialistic")
@@ -612,7 +540,7 @@ class Popular(MetaBadge):
     Badge won by user who belongs to 20 groups or more
     """
     id="popular"
-    model = GroupHistory
+    model = models.GroupHistory
     one_time_only = True
 
     title = _("Popular")
@@ -624,13 +552,13 @@ class Popular(MetaBadge):
     def get_user(self, instance):
         if instance.action == "User added":
             user_name = instance.details
-            return User.objects.get(username=user_name)
+            return models.User.objects.get(username=user_name)
         else :
             return None
 
     def get_progress(self, user):
         if user :
-            groups = GroupInfo.objects.filter(id__in=user.groups.all()).count()
+            groups = models.GroupInfo.objects.filter(id__in=user.groups.all()).count()
             return groups
         else :
             return 0
