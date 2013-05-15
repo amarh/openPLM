@@ -40,7 +40,7 @@ from django.db.models import Model, Q
 from django.template.loader import render_to_string
 from django.db.models.loading import get_model
 from django.contrib.sites.models import Site
-from celery.task import task
+from djcelery_transactions import task
 
 from openPLM.plmapp.models import (User, UserProfile,
         DelegationLink, ROLE_OWNER, ROLE_SIGN)

@@ -1,0 +1,5 @@
+The files transaction_signal.py, __init__.py, LICENSE, and AUTHORS comes from:
+
+ * https://github.com/eproficz/django-celery-transactions (commit 45b4f531cabf73089115dd3ad05737f6868d6dbb)
+
+

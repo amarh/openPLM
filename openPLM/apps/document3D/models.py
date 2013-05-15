@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.core.files import File
 import json
 
-from celery.task import task
+from djcelery_transactions import task
 
 from openPLM.plmapp.controllers import get_controller
 from openPLM.apps.document3D import classes

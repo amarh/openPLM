@@ -21,7 +21,7 @@ import pngthumbnailer
 import swthumbnailer
 
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
-from celery.task import task
+from djcelery_transactions import task
 
 @task(name="openPLM.plmapp.thumbnailers.generate_thumbnail",
       ignore_result=True, soft_time_limit=60, time_limit=65)
