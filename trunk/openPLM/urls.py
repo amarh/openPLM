@@ -209,6 +209,8 @@ urlpatterns += patterns2('', '^api/',
     (r'create/$', api.create),
     (r'search_fields/(?P<typename>[\w_]+)/$', api.get_search_fields),
     (r'creation_fields/(?P<typename>[\w_]+)/$', api.get_creation_fields),
+    (r'get/(?P<obj_id>\d+)/', api.get_object),
+    (r'object/(?P<part_id>\d+)/attached_documents/', api.get_attached_documents),
     )
 
 urlpatterns += patterns2('', api_url,
@@ -226,6 +228,7 @@ urlpatterns += patterns2('', api_url,
     (r'checkin/(?P<df_id>\d+)/$', api.check_in),
     (r'checkin/(?P<df_id>\d+)/thumbnail/$', api.check_in, {"thumbnail" : True}),
     (r'add_thumbnail/(?P<df_id>\d+)/$', api.add_thumbnail),
+    (r'attached_parts/$', api.get_attached_parts),
 )
 
 from haystack.views import search_view_factory

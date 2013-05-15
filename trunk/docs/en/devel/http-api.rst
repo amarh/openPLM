@@ -28,7 +28,7 @@ Returned value
 Results are returned in a JSON format. Each result contains at least two fields:
 
     api_version
-        the api version (current : **1.0**)
+        the api version (current : **1.1**)
 
     result
         - ``"ok"`` if no error occurred (i.e. the query was valid and succeed)
@@ -38,7 +38,7 @@ For example, a minimal result would be:
 
 .. code-block:: javascript
     
-    {"result": "ok", "api_version": "1.0"}
+    {"result": "ok", "api_version": "1.1"}
 
 If an error occurred, an extra field is add:
     
@@ -49,7 +49,7 @@ For example, a result could be:
 
 .. code-block:: javascript
 
-    {"result": "error", "api_version": "1.0", "error": "Oups an error occured"}
+    {"result": "error", "api_version": "1.1", "error": "Oups an error occured"}
 
 
 Authentication
@@ -87,7 +87,7 @@ The fields are:
 Query fields
 ============
 
-Some queries returns a description of an object field, this description contains
+Some queries return a description of an object field, this description contains
 the following fields:
 
     =============== =============================================================
@@ -320,6 +320,39 @@ General queries
            the list of fields need to create an object of type *typename*, see
            :ref:`http-api-fields`.
 
+.. py:function:: get
+
+    .. versionadded:: 1.1
+
+    Returns description of an object (part or document) identified by its id.
+
+    :url: :samp:`{server}/get/{object_id}/`
+    :type: GET
+    :login required: yes
+    :implemented by: :func:`plmapp.views.api.get_object`
+    :returned fields:
+        object
+           dictionary describing the object, see :ref:`http-api-object`.
+
+
+Part queries
+++++++++++++++++
+
+In the following queries, *part_id* is a the id (an integer) of a
+:class:`.Part` 
+
+.. py:function:: attached_documents
+
+    .. versionadded:: 1.1
+
+    Returns the list of attached parts. 
+
+    :url: :samp:`{server}/api/object/{part_id}/attached_documents/` 
+    :type: GET
+    :login required: yes
+    :implemented by: :func:`plmapp.views.api.get_attached_documents`
+    :returned fields: parts, a list of dictionaries describing attached documents
+
 
 Document queries
 ++++++++++++++++
@@ -409,6 +442,17 @@ In the following queries, *doc_id* is a the id (an integer) of a
         doc_file
             the file that has been had, see :ref:`http-api-file`.
 
+.. py:function:: attached_parts
+
+    .. versionadded:: 1.1
+
+    Returns the list of attached parts. 
+
+    :url: :samp:`{server}/api/object/{doc_id}/attached_parts/` 
+    :type: GET
+    :login required: yes
+    :implemented by: :func:`plmapp.views.api.get_attached_parts`
+    :returned fields: parts, a list of dictionaries describing attached parts
 
 Document file queries
 -----------------------
@@ -475,3 +519,5 @@ In the following queries, *df_id* is the id (an integer) of a
     :implemented by: :func:`plmapp.views.api.add_thumbnail`
     :post param: filename
     :returned fields: None
+    
+

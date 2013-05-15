@@ -2,8 +2,7 @@ from json import JSONDecoder
 from django.core.files.base import ContentFile
 
 from openPLM.plmapp.tests.views import CommonViewTest
-from openPLM.plmapp.controllers.document import DocumentController
-
+from openPLM.plmapp.controllers import DocumentController, PartController
 
 class ApiTestCase(CommonViewTest):
 
@@ -36,7 +35,7 @@ class ApiTestCase(CommonViewTest):
         self.assertFalse("Part" in data["types"])
         self.assertTrue("Document" in data["types"])
         self.assertTrue("OfficeDocument" in data["types"])
-    
+
     def test_get_all_parts(self):
         data = self.get("/api/parts/")
         self.assertEqual("ok", data["result"])
@@ -47,7 +46,7 @@ class ApiTestCase(CommonViewTest):
     def test_test_login(self):
         data = self.get("/api/testlogin/")
         self.assertEqual("ok", data["result"])
-        
+
     def test_search(self):
         for url in ("/api/search/", "/api/search/false/",
                 "/api/search/false/false/"):
@@ -69,7 +68,7 @@ class ApiTestCase(CommonViewTest):
     def test_search_error_missing_type(self):
         data = self.get("/api/search/")
         self.assertEqual("error", data["result"])
-    
+
     def test_search_with_file_only(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -81,7 +80,7 @@ class ApiTestCase(CommonViewTest):
         data = self.get("/api/search/true/true/", type="Document")
         self.assertEqual("ok", data["result"])
         self.assertEqual(1, len(data["objects"]))
-        
+
         d = data["objects"][0]
         self.assertEqual(doc.name, d["name"])
         self.assertEqual(doc.id, d["id"])
@@ -93,7 +92,7 @@ class ApiTestCase(CommonViewTest):
         fields = data["fields"]
         reference_field = [f for f in fields if f["name"] == "q"][0]
         self.assertEqual("text", reference_field["type"])
-   
+
     def test_get_creation_fields_part(self):
         data = self.get("/api/creation_fields/Part/")
         self.assertEqual("ok", data["result"])
@@ -104,7 +103,7 @@ class ApiTestCase(CommonViewTest):
         self.assertEqual("text", reference_field["type"])
         group_field = [f for f in fields if f["name"] == "group"][0]
         self.assertTrue(group_field["choices"])
-    
+
     def test_get_creation_fields_harddisk(self):
         data = self.get("/api/creation_fields/HardDisk/")
         self.assertEqual("ok", data["result"])
@@ -113,7 +112,7 @@ class ApiTestCase(CommonViewTest):
         self.assertEqual("text", name_field["type"])
         capacity_field = [f for f in fields if f["name"] == "capacity_in_go"][0]
         self.assertEqual("int", capacity_field["type"])
-    
+
     def test_get_creation_fields_unknown_type(self):
         data = self.get("/api/creation_fields/UnknownType/")
         self.assertEqual("error", data["result"])
@@ -181,7 +180,7 @@ class ApiTestCase(CommonViewTest):
         data = self.get("/api/object/%d/files/" % doc.id)
         self.assertEqual("ok", data["result"])
         self.assertEqual([], data["files"])
-    
+
     def test_get_files(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -202,7 +201,7 @@ class ApiTestCase(CommonViewTest):
         data = self.get("/api/object/%d/files/all/" % doc.id)
         self.assertEqual("ok", data["result"])
         self.assertEqual([df.id], [f["id"] for f in data["files"]])
-   
+
     def test_add_file(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -213,14 +212,14 @@ class ApiTestCase(CommonViewTest):
         self.assertTrue(doc.files)
         self.assertEqual(mock_file.name, data["doc_file"]["filename"])
         self.assertEqual(doc.files[0].id, data["doc_file"]["id"])
-        
+
     def test_add_file_error_missing_file(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
         data = self.post("/api/object/%d/add_file/" % doc.id)
         self.assertEqual("error", data["result"])
         self.assertFalse(doc.files)
-    
+
     def test_attach_to_part(self):
         doc = DocumentController.create("Doc", "Document", "a", self.user,
                 self.DATA)
@@ -264,7 +263,7 @@ class ApiTestCase(CommonViewTest):
                 self.DATA)
         df = doc.add_file(self.get_file())
         mock_file = self.get_file(data="robert")
-        data = self.post("/api/object/%d/checkin/%d/" % (doc.id, df.id), 
+        data = self.post("/api/object/%d/checkin/%d/" % (doc.id, df.id),
                 filename=mock_file)
         self.assertEqual("ok", data["result"])
         self.assertEqual("robert", doc.files[0].file.read())
@@ -275,9 +274,120 @@ class ApiTestCase(CommonViewTest):
         df = doc.add_file(self.get_file())
         thumbnail = ContentFile(file("datatests/thumbnail.png").read())
         thumbnail.name = "Thumbnail.png"
-        data = self.post("/api/object/%d/add_thumbnail/%d/" % (doc.id, df.id), 
+        data = self.post("/api/object/%d/add_thumbnail/%d/" % (doc.id, df.id),
                 filename=thumbnail)
         self.assertEqual("ok", data["result"])
         self.assertNotEqual(None, doc.files[0].thumbnail)
+
+    def test_get(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        data = self.get("/api/get/%d/" % doc.id)
+        wanted = {
+            "id": doc.id,
+            "reference": "Doc",
+            "type": "Document",
+            "revision": "a",
+            "name": doc.name,
+            }
+        self.assertEqual("ok", data["result"])
+        self.assertEqual(data["object"], wanted)
+
+    def test_attached_parts_empty(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        url = "/api/object/%d/attached_parts/" % doc.id
+        data = self.get(url)
+        self.assertEqual(data["parts"], [])
+
+    def test_attached_parts_one_part(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        doc.attach_to_part(self.controller)
+        url = "/api/object/%d/attached_parts/" % doc.id
+        data = self.get(url)
+        wanted = [{
+            "id": self.controller.id,
+            "reference": self.controller.reference,
+            "type": self.controller.type,
+            "revision": self.controller.revision,
+            "name": self.controller.name,
+            }]
+        self.assertEqual(data["parts"], wanted)
+
+    def test_attached_parts_two_parts(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        doc.attach_to_part(self.controller)
+        part2 = PartController.create("Part2", "Part", "a", self.user, self.DATA)
+        doc.attach_to_part(part2)
+        wanted = [
+            {
+                "id": self.controller.id,
+                "reference": self.controller.reference,
+                "type": self.controller.type,
+                "revision": self.controller.revision,
+                "name": self.controller.name,
+            },
+            {
+                "id": part2.id,
+                "reference": part2.reference,
+                "type": part2.type,
+                "revision": part2.revision,
+                "name": part2.name,
+            },
+        ]
+        key = lambda x: x["id"]
+        url = "/api/object/%d/attached_parts/" % doc.id
+        data = self.get(url)
+        self.assertEqual(sorted(data["parts"], key=key), sorted(wanted, key=key))
+
+    def test_attached_documents_empty(self):
+        url = "/api/object/%d/attached_documents/" % self.controller.id
+        data = self.get(url)
+        self.assertEqual(data["documents"], [])
+
+    def test_attached_documents_one_part(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        doc.attach_to_part(self.controller)
+        url = "/api/object/%d/attached_documents/" % self.controller.id
+        data = self.get(url)
+        wanted = [{
+            "id": doc.id,
+            "reference": doc.reference,
+            "type": doc.type,
+            "revision": doc.revision,
+            "name": doc.name,
+            }]
+        self.assertEqual(data["documents"], wanted)
+
+    def test_attached_documents_two_parts(self):
+        doc = DocumentController.create("Doc", "Document", "a", self.user,
+                self.DATA)
+        doc.attach_to_part(self.controller)
+        doc2 = DocumentController.create("Doc2", "Document", "a", self.user,
+                self.DATA)
+        doc2.attach_to_part(self.controller)
+        wanted = [
+            {
+                "id": doc.id,
+                "reference": doc.reference,
+                "type": doc.type,
+                "revision": doc.revision,
+                "name": doc.name,
+            },
+            {
+                "id": doc2.id,
+                "reference": doc2.reference,
+                "type": doc2.type,
+                "revision": doc2.revision,
+                "name": doc2.name,
+            },
+        ]
+        key = lambda x: x["id"]
+        url = "/api/object/%d/attached_documents/" % self.controller.id
+        data = self.get(url)
+        self.assertEqual(sorted(data["documents"], key=key), sorted(wanted, key=key))
 
 
