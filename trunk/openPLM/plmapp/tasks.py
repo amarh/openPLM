@@ -9,7 +9,7 @@ from django.db.models.loading import get_model
 import openPLM.plmapp.mail
 import openPLM.plmapp.thumbnailers
 
-from celery.task import task
+from djcelery_transactions import task
 
 def synchronized(cls=None, lock=None):
     """Class decorator to synchronize execution of a task's run method.
