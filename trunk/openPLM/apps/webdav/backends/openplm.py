@@ -235,7 +235,6 @@ class OpenPLMBackend(Backend):
 
     def dav_put(self, path, readable, token = None, estimated_size = 0):
         d, p = self.get_doc(path)
-        print path
         if d and p:
             if len(p) > 1:
                 raise BackendIOException()
