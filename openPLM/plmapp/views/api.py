@@ -43,8 +43,8 @@ from openPLM.plmapp.utils import get_next_revision
 from openPLM.plmapp.views.base import json_view, get_obj_by_id, object_to_dict,\
         secure_required
 
-#: Version of the API (value: ``'1.0'``)
-API_VERSION = "1.0"
+#: Version of the API (value: ``'1.1'``)
+API_VERSION = "1.1"
 #: Decorator whichs requires that the user is login
 api_login_required = user_passes_test(lambda u: (u.is_authenticated()
     and u.is_active and not u.profile.restricted), login_url="/api/needlogin/")
@@ -462,7 +462,7 @@ def add_file(request, doc_id, thumbnail=False):
 @login_json
 def add_thumbnail(request, doc_id, df_id):
     """
-    Add a thumbnail the :class:`.DocumentFile` identified by *df_id* from
+    Adds a thumbnail to the :class:`.DocumentFile` identified by *df_id* from
     the :class:`.Document` identified by *doc_id*.
 
     :implements: :func:`http_api.add_thumbnail`
@@ -478,4 +478,65 @@ def add_thumbnail(request, doc_id, df_id):
     df = models.DocumentFile.objects.get(id=df_id)
     doc.add_thumbnail(df, request.FILES["filename"])
     return {}
+
+
+@login_json
+def get_object(request, obj_id):
+    """
+    .. versionadded:: 1.3
+
+    Returns basic fields of the :class:`.PLMObject` identified by *obj_id*.
+
+    :implements: :func:`http_api.get`
+
+    :param request: the request
+    :param obj_id: id of a :class:`.PLMObject`
+    :returned fields: object, a dictionary of object fields
+    """
+    obj = get_obj_by_id(obj_id, request.user)
+    obj.check_readable()
+    return {"object": object_to_dict(obj)}
+
+
+@login_json
+def get_attached_parts(request, doc_id):
+    """
+    .. versionadded:: 1.3
+
+    Returns parts attached to the :class:`.Document` identified by *doc_id*.
+
+    :implements: :func:`http_api.attached_parts`
+
+    :param request: the request
+    :param doc_id: id of a :class:`.Document`
+    :returned fields: parts, a list of dictionaries describing attached parts
+    """
+
+    doc = get_obj_by_id(doc_id, request.user)
+    doc.check_readable()
+    parts = []
+    for link in doc.get_attached_parts():
+        parts.append(object_to_dict(link.part))
+    return {"parts": parts}
+
+
+@login_json
+def get_attached_documents(request, part_id):
+    """
+    .. versionadded:: 1.3
+
+    Returns documents attached to the :class:`.Part` identified by *part_id*.
+
+    :implements: :func:`http_api.attached_documents`
+
+    :param request: the request
+    :param part_id: id of a :class:`.Part`
+    :returned fields: documents, a list of dictionaries describing attached documents
+    """
+    part = get_obj_by_id(part_id, request.user)
+    part.check_readable()
+    docs = []
+    for link in part.get_attached_documents():
+        docs.append(object_to_dict(link.document))
+    return {"documents": docs}
 
