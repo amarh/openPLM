@@ -451,7 +451,7 @@ class DocumentController(PLMObjectController):
             raise ValueError("File too big, max size : %d bytes" % settings.MAX_FILE_SIZE)
         if doc_file.deprecated:
             raise ValueError("File is deprecated")
-
+        doc_file.no_index = True
         if doc_file.locked:
             self.unlock(doc_file)
         now = timezone.now()
@@ -473,6 +473,7 @@ class DocumentController(PLMObjectController):
                     last_revision=doc_file)
         if doc_file.thumbnail:
             path = models.thumbnailfs.save("%d.png" % deprecated_df.id, doc_file.thumbnail)
+            deprecated_df.no_index = True
             deprecated_df.thumbnail = os.path.basename(path)
             deprecated_df.save()
         # update the doc_file
@@ -482,6 +483,7 @@ class DocumentController(PLMObjectController):
         doc_file.revision += 1
         doc_file.ctime = now
         os.chmod(doc_file.file.path, 0400)
+        doc_file.no_index = False
         doc_file.save()
         # delete "old" files (not the document file)
         self._delete_old_files(doc_file, ON_CHECKIN_SELECTORS)
