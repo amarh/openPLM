@@ -137,7 +137,7 @@ def handle_step_file(doc_file_pk):
             if os.path.exists(thumbnail_path):
                 doc_file.no_index = True
                 doc_file.thumbnail = os.path.basename(thumbnail_path)
-                doc_file.save()
+                doc_file.save(update_fields=("thumbnail",))
         else:
             error_file.seek(0)
             temp_file.seek(0)
