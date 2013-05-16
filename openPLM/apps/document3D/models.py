@@ -5,22 +5,21 @@ import subprocess
 import tempfile
 import copy
 from collections import defaultdict
+import json
 
+from djcelery_transactions import task
 from django.conf import settings
 from django.db import models
 from django.contrib import admin
 from django.db.models import Q
 from django.core.files import File
-import json
 
-from djcelery_transactions import task
 
-from openPLM.plmapp.controllers import get_controller
+from openPLM.plmapp.controllers import get_controller, PartController
 from openPLM.apps.document3D import classes
 from openPLM.plmapp.controllers import DocumentController
 import openPLM.plmapp.models as pmodels
 from openPLM.plmapp.exceptions import ControllerError
-from openPLM.plmapp.controllers.part import PartController
 
 #./manage.py graph_models document3D > models.dot   dot -Tpng models.dot > models.png
 
@@ -136,6 +135,7 @@ def handle_step_file(doc_file_pk):
             delete_GeometryFiles(doc_file)
             generate_relations_BD(doc_file,temp_file)# We associate the files generated to classes and the classes to the documentFile
             if os.path.exists(thumbnail_path):
+                doc_file.no_index = True
                 doc_file.thumbnail = os.path.basename(thumbnail_path)
                 doc_file.save()
         else:
@@ -268,13 +268,11 @@ class Document3DController(DocumentController):
         """
         We erase also the classes :class:`.GeometryFile` and :class:`.ArbreFile` associated with the :class:`.DocumentFile` (**doc_file**)
         """
+        super(Document3DController, self).delete_file(doc_file)
         fileName, fileExtension = os.path.splitext(doc_file.filename)
-
         if fileExtension.upper() in ('.STP', '.STEP'):
             delete_GeometryFiles(doc_file)
             delete_ArbreFile(doc_file)
-
-        super(Document3DController, self).delete_file(doc_file)
 
     def deprecate_file(self, doc_file,by_decomposition=False):
         """

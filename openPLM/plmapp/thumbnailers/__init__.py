@@ -55,6 +55,7 @@ def generate_thumbnail(doc_file_id):
         else:
             if os.path.exists(thumbnail_path):
                 doc_file.thumbnail = os.path.basename(thumbnail_path)
+                doc_file.no_index = True
                 doc_file.save()
                 generated = True
                 break
