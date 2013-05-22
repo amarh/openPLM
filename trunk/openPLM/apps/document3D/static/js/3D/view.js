@@ -193,11 +193,13 @@ View3D.prototype = {
             // init the lights
 
             this.ambient = new THREE.AmbientLight( 0xffffff, 1.1 );
+            this.ambient.shadowDarkness = 0.001;
             scene.add(this.ambient );
 
             var light   = new THREE.DirectionalLight( 0xffffff, 1.2 );
             light.position.set(1, 1, 4 ).normalize();
             this.spot1 = light;
+            light.shadowDarkness = 0.002;
             scene.add( light );
 
             var light   = new THREE.SpotLight( 0xffffff, 1.1 );
@@ -205,22 +207,41 @@ View3D.prototype = {
             light.target.position.set( 0, 10, 0 ).normalize();
             light.shadowCameraNear = 0.01;     
             light.castShadow = true;
-            light.shadowDarkness = 0.05;
+            light.shadowDarkness = 0.005;
+                     
+
+            light.shadowCameraRight     =  5;
+            light.shadowCameraLeft     = -5;
+            light.shadowCameraTop      =  5;
+            light.shadowCameraBottom   = -5;
+
             scene.add( light );
 
             this.center_object(this.object3D);
             for (var i=0; i < this.object3D.children.length; i++) {
                 var obj = this.object3D.children[i];
+                var geo = THREE.GeometryUtils.clone(obj.geometry);
+                delete obj.geometry;
+                geo.computeBoundingSphere();
+                geo.computeCentroids();
+                geo.computeFaceNormals();
                 obj.receiveShadow=true;
                 obj.castShadow=true;
-                obj.material =  new THREE.MeshPhongMaterial({
-                    ambient		: 0x000000,
-                    shininess	: 1000, 
-                    specular	: 0x000000,
-                    shading		: THREE.SmoothShading,
-                    color: obj.material.color.getHex(),
+                var color = obj.material.color.getHex();
+                obj.geometry = geo;
+
+                obj.material = new THREE.MeshPhongMaterial({
+                    ambient		: 0x000000, 
+                    shininess	: 128, 
+                    specular	: color,
+                    shading		: THREE.FlatShading,
+                    color: color,
+                    side: THREE.DoubleSide,
+                    depthTest: true,
                     opacity: 0.8
                 });
+
+
                 obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
                 obj.material.original_opacity = obj.material.opacity; 
@@ -238,7 +259,7 @@ View3D.prototype = {
             this.toggle_axis();
 
             camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(),
-                0.001, this.radius*200);
+                1, this.radius*200);
             camera.position.z = this.radius*1.5;
             this.camera = camera;
 
@@ -246,6 +267,7 @@ View3D.prototype = {
                 antialias		: true,	// to get smoother output
                 preserveDrawingBuffer	: true	// to allow screenshot
             });
+            renderer.shadowMapCullFrontFaces = false;
             this.renderer = renderer;
             renderer.setSize( $(container).width(), $(container).height() );
             renderer.shadowMapEnabled	= true;
