@@ -259,7 +259,7 @@ View3D.prototype = {
             this.toggle_axis();
 
             camera = new THREE.PerspectiveCamera( 40, $(container).width() / $(container).height(),
-                1, this.radius*200);
+                                                 this.radius/50, this.radius*200);
             camera.position.z = this.radius*1.5;
             this.camera = camera;
 
