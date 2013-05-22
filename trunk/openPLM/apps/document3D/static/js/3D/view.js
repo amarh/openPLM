@@ -199,7 +199,7 @@ View3D.prototype = {
             var light   = new THREE.DirectionalLight( 0xffffff, 1.2 );
             light.position.set(1, 1, 4 ).normalize();
             this.spot1 = light;
-            light.shadowDarkness = 0.002;
+            light.shadowDarkness = 0.05;
             scene.add( light );
 
             var light   = new THREE.SpotLight( 0xffffff, 1.1 );
@@ -232,7 +232,7 @@ View3D.prototype = {
 
                 obj.material = new THREE.MeshPhongMaterial({
                     ambient		: 0x000000, 
-                    shininess	: 128, 
+                    shininess	: 200, 
                     specular	: color,
                     shading		: THREE.FlatShading,
                     color: color,
@@ -240,7 +240,7 @@ View3D.prototype = {
                     depthTest: true,
                     opacity: 0.8
                 });
-
+                
 
                 obj.material.original_step_color = obj.material.color.getHex(); 
                 obj.material.original_color = obj.material.color.getHex(); 
@@ -493,7 +493,8 @@ View3D.prototype = {
         var object3D = this.object3D;
         for (var i=0; i < object3D.children.length; i++) {
             var obj = object3D.children[i];
-            obj.material.color.setRGB(Math.random(), Math.random(), Math.random());
+            // avoid darkest colors
+            obj.material.color.setHSV(Math.random(), Math.random() * 0.3+0.7, Math.random()*0.4+0.6);
             obj.material.original_color = obj.material.color.getHex();
             $("#color-"+ obj.part).css("background-color", obj.material.color.getContextStyle());
         }
