@@ -49,7 +49,8 @@ class UserProfile(models.Model):
     language = models.CharField(max_length=5, default="en",
             choices=settings.LANGUAGES)
 
-    avatar = models.ImageField(upload_to='avatars', null=True, storage=avatarfs)
+    avatar = models.ImageField(upload_to='avatars', null=True,
+            storage=avatarfs, blank=True)
 
     @property
     def title(self):
