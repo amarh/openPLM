@@ -221,6 +221,7 @@ View3D.prototype = {
             for (var i=0; i < this.object3D.children.length; i++) {
                 var obj = this.object3D.children[i];
                 var geo = THREE.GeometryUtils.clone(obj.geometry);
+                obj.geometry.deallocate();
                 delete obj.geometry;
                 geo.computeBoundingSphere();
                 geo.computeCentroids();
@@ -228,6 +229,7 @@ View3D.prototype = {
                 obj.receiveShadow=true;
                 obj.castShadow=true;
                 var color = obj.material.color.getHex();
+                obj.material.deallocate();
                 obj.geometry = geo;
 
                 obj.material = new THREE.MeshPhongMaterial({
@@ -485,6 +487,7 @@ View3D.prototype = {
                     boundingBox.z[1]=Math.max(BB.max.z, boundingBox.z[1]);
                 }
             }   
+            geo.deallocate();
         }
         return boundingBox;
     },
