@@ -35,6 +35,7 @@ import sys
 from django.conf import settings
 from django.core.mail import mail_admins
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.http import (HttpResponse, HttpResponseForbidden, Http404,
@@ -118,7 +119,7 @@ def json_view(func, API_VERSION=""):
             msg = _('Internal error') + ': ' + str(e)
             response = {'result' : 'error', 'error' : msg}
         response["api_version"] = API_VERSION
-        json_data = json.dumps(response)
+        json_data = json.dumps(response, cls=DjangoJSONEncoder)
         return HttpResponse(json_data, content_type='application/json')
 
     return secure_required(wrapper)
