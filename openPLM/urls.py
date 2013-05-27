@@ -211,6 +211,7 @@ urlpatterns += patterns2('', '^api/',
     (r'creation_fields/(?P<typename>[\w_]+)/$', api.get_creation_fields),
     (r'get/(?P<obj_id>\d+)/', api.get_object),
     (r'object/(?P<part_id>\d+)/attached_documents/', api.get_attached_documents),
+    (r'lock_files/', api.lock_files),
     )
 
 urlpatterns += patterns2('', api_url,

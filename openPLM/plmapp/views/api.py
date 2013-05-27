@@ -27,12 +27,13 @@ This modules contains all stuff related to the api
 
 .. seealso:: The public api :mod:`http_api`,
 """
-
+import json
 import functools
 
 import django.forms
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
+from django.db import transaction
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 
@@ -539,4 +540,34 @@ def get_attached_documents(request, part_id):
     for link in part.get_attached_documents():
         docs.append(object_to_dict(link.document))
     return {"documents": docs}
+
+
+@login_json
+def lock_files(request):
+    """
+    .. versionadded:: 1.3
+
+    Locks several files in one transactional block.
+
+    Files are set by a POST parameter, ``files`` which must be a json list
+    of ids of :class:`.DocumentFile` to be locked.
+
+    If one file can not be locked, no files are locked.
+
+    :implements: :func:`http_api.lock_files`
+    """
+    try:
+        files = map(int, json.loads(request.POST["files"]))
+    except (KeyError, ValueError):
+        return {"result": "error", "error": "invalid POST parameter ('files')"}
+    docfiles = models.DocumentFile.objects.filter(deprecated=False,
+        locked=False, id__in=files)
+    if len(docfiles) == len(files):
+        with transaction.commit_on_success():
+            for df in docfiles:
+                doc = get_obj_by_id(df.document.id, request.user)
+                doc.lock(df)
+    else:
+        return {"result": "error", "error": "files already locked or deprecated"}
+    return {"result": "ok"}
 
