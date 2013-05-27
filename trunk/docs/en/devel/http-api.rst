@@ -521,3 +521,22 @@ In the following queries, *df_id* is the id (an integer) of a
     :returned fields: None
     
 
+.. py:function:: lock_files
+    
+    .. versionadded:: 1.1
+
+    Locks several files in one transactional block.
+
+    Files are set by a POST parameter, ``files`` which must be a json list
+    of ids of :class:`.DocumentFile` to be locked.
+
+    If one file can not be locked, no files are locked.
+
+    :url: :samp:`{server}/api/lock_files`
+    :type: POST
+    :login required: yes
+    :implemented by: :func:`plmapp.views.api.lock_files`
+    :post param: files, a list of ids of document files
+    :returned fields: None
+    
+
