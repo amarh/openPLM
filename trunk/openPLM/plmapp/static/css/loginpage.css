@@ -26,7 +26,7 @@ body{
     height: 100%;
 }
 
-ul.errorlist li{
+.error p {
     color: #e26161;
 }
 
@@ -98,13 +98,6 @@ div#Login-box{
     background-color: rgb(232,232,232);
     width: 380px;
     line-height: 16px;
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fff), color-stop(100%, #ddd));
-    background: -webkit-linear-gradient(top, #fff 0, #ddd 100%);
-    background: -moz-linear-gradient(top, #fff 0, #ddd 100%);
-    background: -ms-linear-gradient(top, #fff 0, #ddd 100%);
-    background: -o-linear-gradient(top, #fff 0, #ddd 100%);
-    background: linear-gradient(top, #fff 0, #ddd 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dddddd', GradientType=0);
 }
 
 div#Login-box:hover{

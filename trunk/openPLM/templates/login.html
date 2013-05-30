@@ -59,11 +59,11 @@
             <div class="content-box">
                 <div class="box" id="Login-box" style="right: 10%; top: 15%">
                     <h2 style="margin-bottom: 5px;">{% trans "openPLM connexion :" %}</h2>
-                        {% for error in form.errors.values %}
-                             <div class="error">
-                            {{ error }}
-                            </div>
-                        {% endfor %}
+                    {% if form.errors %}
+                         <div class="error">
+                              <p>{% trans "Your username and password didn't match. Please try again." %}</p>
+                        </div>
+                    {% endif %}
 
                     <form action="{% url 'django.contrib.auth.views.login' %}" method="post">{% csrf_token %}
                         <table style="display:inline-block">
