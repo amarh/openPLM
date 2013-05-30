@@ -90,7 +90,7 @@ class Document3D(pmodels.Document):
         if part:
             links = pmodels.ParentChildLink.current_objects.filter(parent=part)
             for link in links:
-                if Location_link.objects.filter(link=links).exists():
+                if Location_link.objects.filter(link=link).exists():
                     document_related.append(Document3D.objects.get(PartDecompose=link.child))
         return document_related
 

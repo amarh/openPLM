@@ -10,6 +10,17 @@ import openPLM.plmapp.models as models
 from openPLM.plmapp.views.base import get_obj_by_id, object_to_dict
 from openPLM.plmapp.views.api import login_json
 import openPLM.apps.document3D.models as models3D
+from openPLM.apps.document3D.forms import AssemblyForm
+
+from .assembly import AssemblyBuilder, get_assembly_info
+
+
+def get_document3D(request, doc_id):
+    doc = get_obj_by_id(doc_id, request.user)
+    if doc.type != "Document3D":
+        raise ValueError("Document must be a Document3D")
+    doc.check_readable()
+    return doc
 
 
 @login_json
@@ -159,6 +170,7 @@ def files_for_decomposition(doc, type_check_out):
             check_out_valid = False
     return files, check_out_valid
 
+
 @login_json
 def add_zip_file(request, doc_id, unlock, thumbnail_extension="False" , thumbnail=False ):
     """
@@ -191,4 +203,27 @@ def add_zip_file(request, doc_id, unlock, thumbnail_extension="False" , thumbnai
                 dummy_file.file = tmp_file
                 doc.add_thumbnail(df, dummy_file)
     return {}
+
+
+@login_json
+def add_assembly(request, doc_id):
+    doc = get_document3D(request, doc_id)
+    form = AssemblyForm(request.POST, request.FILES)
+    if form.is_valid():
+        builder = AssemblyBuilder(doc)
+        tree = form.cleaned_data["assembly"]
+        lock = form.cleaned_data["lock"]
+        native_files = request.FILES.getlist("native_files")
+        step_files = request.FILES.getlist("step_files")
+        df = builder.build_assembly(tree, native_files, step_files, lock)
+        return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
+    else:
+        s = {"result": "error", "error": "invalid form", "form-errors": dict(form.errors)}
+        return s
+
+
+@login_json
+def get_assembly(request, doc_id):
+    doc = get_document3D(request, doc_id)
+    return get_assembly_info(doc)
 

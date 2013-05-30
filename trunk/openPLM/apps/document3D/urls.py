@@ -32,7 +32,8 @@ urlpatterns += patterns2('', api_url,
     (r'add_zip_file/thumbnail/(?P<thumbnail_extension>[\w]+)/(?P<unlock>True|False|true|false)/$', api3D.add_zip_file, {"thumbnail" : True}),
     (r'prepare_multi_check_out/$', api3D.prepare_multi_check_out),
     (r'decomposed_documents/(?P<type_check_out>[\w\,]+)/$', api3D.get_decomposition_documents),
-
+    (r'add_assembly/', api3D.add_assembly),
+    (r'get_assembly/', api3D.get_assembly),
 )
 
 
