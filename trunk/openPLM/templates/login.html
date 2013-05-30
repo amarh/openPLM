@@ -23,48 +23,48 @@
     </head>
 
     <body>
-        <div class="main-box" id="Page">
+        <div class="main-box">
             <div class="top-box">
-                <div class="top-box-content">
-                    <h1>{% trans "Welcome to openPLM" %}   </h1>
-                    {% get_current_language as LANGUAGE_CODE %}
-                    <form id="SetLangForm" action="/i18n/setlang/" method="post">{% csrf_token %}
-                        <ul>
-                            <li>
-                            <select name="language">
-
-                                {% for lang in LANGUAGES %}
-                                    <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
-                                    {{ lang.1 }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            </li>
-                            <li>
-                            <input type="submit" class="tb-btn" value="{% trans "Go" %}" />
-                            </li>
-                        </ul>
-                    </form>
-
+                <div id="home">
+                    <a href="/home/">
+                        <img title="Page d'accueil" alt="logo-openplm" src="/static/img/dark/logo_openplm_linear.png"></img>
+                    </a>
                 </div>
+                <div class="important" >
+                    <p style="color: white;"> {% trans "Welcome to OpenPLM." %}
+                        <span style="font-weight:bold; color: white">openPLM</span> {% trans "is the first genuine open source PLM."%} 
+                        <br/>
+                        {% trans "For more information about openPLM, see" %} <a href="http://www.openplm.org">http://www.openplm.org</a>.
+                    </p>
+                </div>
+                <form id="SetLangForm" action="/i18n/setlang/" method="post">{% csrf_token %}
+                    <ul>
+                        <li>
+                        <select name="language">
+
+                            {% for lang in LANGUAGES %}
+                                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                                {{ lang.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        </li>
+                        <li>
+                        <input type="submit" class="tb-btn" value="{% trans "Go" %}" />
+                        </li>
+                    </ul>
+                </form>
             </div>
-            <div id="content-box" class="clearfix">
-                <p>
-                <span style="font-weight:bold">openPLM</span> {% trans "is the first genuine open source PLM based on" %} <a href="http://djangoproject.com/">Django</a>
-                {% trans "intended to provide a starting point for companies CMS/PLM/BIM projects." %}
-                {% trans "By integrating numerous standard reusable PLM functionalities to take care of the things that companies have in common, it lets you focus on what makes your company different." %}
-                </p> 
-                <br />
-                <p>
-                {% trans "For more information about openPLM, see" %} <a href="http://www.openplm.org">http://www.openplm.org</a>.
-                </p>
-                <div id="LoginBox">
-                    <h2>{% trans "openPLM connexion :" %}</h2>
-                    <div class="error">
+            
+            <div class="content-box">
+                <div class="box" id="Login-box" style="right: 10%; top: 15%">
+                    <h2 style="margin-bottom: 5px;">{% trans "openPLM connexion :" %}</h2>
                         {% for error in form.errors.values %}
+                             <div class="error">
                             {{ error }}
+                            </div>
                         {% endfor %}
-                    </div>
+
                     <form action="{% url 'django.contrib.auth.views.login' %}" method="post">{% csrf_token %}
                         <table style="display:inline-block">
                             <tr>
@@ -82,30 +82,36 @@
                         </table>
                         <input type="hidden" name="next" value="{{ next|default:"/home/"|iriencode }}"/>
                     </form>
-                    <p style="line-height:15px; text-align:left">{% trans "If you have any trouble logging in to your account, contact your administrator" %} </p>
-                </div>
-                <hr />
-                <p>
-                <a href="/browse/object/">{% trans "Browse public data." %}</a>
-                </p>
-                <hr />
-                <h4 class="hplm">{% trans "Professionals" %}</h4>
-                <div style="padding:1em;">
+                    <p style="font-size:10px; line-height:15px; text-align:left">{% trans "*If you have any trouble logging in to your account, contact your administrator" %} </p>
+                    <hr />
+                    <a href="/browse/object/">{% trans "Browse public data." %}</a>
+                    </p>
+                    <hr />
                     <p>
-                    {% trans "You are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
-                    <a href="http://www.linobject.com/contact/">
-                        {% trans "contact us" %}.
-                    </a>
+                        {% trans "If you are planning to use openPLM in a <b>professional</b> context. If you want to work with other professionals for your project management, for other solutions plugins, for openPLM software maintenance, " %}
+                        <a href="http://www.linobject.com/contact/">
+                            {% trans "contact us" %}.
+                        </a>
                     </p>
                 </div>
             </div>
-            <div id"bottom-box">
-                <div id="links">
-                    <div class="legal">
-                        2010-2012 openPLM &#0153;
-                        - <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License</a>
-                    </div>
+        
+            
+            <div id="bottom-box">
+                <div id="links"><div class="legal">
+                    2010-2013 openPLM ™ 
+                    <a target="_blank" href="http://www.gnu.org/licenses/gpl-3.0.html">
+                        GNU General Public License
+                    </a>
+      
+                        - 
+                    <a target="_blank" href="http://wiki.openplm.org/trac/wiki/Credits">
+                      Credits
+                    </a>
                 </div>
+                <a id="linobject" href="http://www.linobject.com">
+                      Powered by LinObject
+                </a>
             </div>
         </div>
     </body>

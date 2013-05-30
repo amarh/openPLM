@@ -2,40 +2,56 @@
 /*                                  LOGIN PAGE STYLE                                          */
 /* *************************************************************************************** */
 
+.important{
+    display: inline-block;
+    position: absolute;
+    left: 35%;
+    top: 25px;
+    font-size: 14px;
+    text-align: center;
+}
+
+a:hover, .important a:hover{
+    color: black;
+}
+
+.important a{
+    color: white;
+}
+
+body{
+    position: absolute;
+    background-color: rgb(32,32,32);
+    width: 100%;
+    height: 100%;
+}
+
+ul.errorlist li{
+    color: #e26161;
+}
 
 div.main-box {
     position:relative;
     text-align:left;
     overflow:hidden;
     font-size: small;
+    height: 100%;
 }
 
-div.top-box-content {
-    position:relative;
-    margin: auto;
-    margin-top: 30px;
-    width: 700px;
+div.content-box {
+    position: relative;
     padding: 1em;
-    padding-top: 0.5em;
-    height: 2.5em;
-
-    color: #eee;
-    background: #afacab;
+    background-color: #C8C6C5;
+    background:url(/static/img/dark/background-login-page2.jpg); 
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url("../img/dark/h2_bg_2.png");
-}
+    height: 80%;
+    -moz-box-shadow:inset 0px 0px 10px 7px gray;
+    -webkit-box-shadow:inset 0px 0px 10px 8px gray;
+    box-shadow:inset 0px 0px 10px 7px gray;
+    bottom: 33px;
+    top: 0;
 
-div#content-box {
-    width: 700px;
-    padding: 1em;
-    margin: auto;
-    margin-bottom: 33px;
-    background-color: #C8C6C5;
-}
-
-div#LoginBox {
-    left:0%;
 }
 
 div.legal {
@@ -54,27 +70,78 @@ h1 {
     text-shadow: 1px 1px #000;
     padding: 0.5em;
 }
+
 h2 { 
     font-size: 105%;
 }
 
 #SetLangForm {
     position: absolute;
-    right: 0;
+    right: 50px;
+    top: 45px;
 }
 
 /* BOX WE FIND IN THE LOGIN PAGE */
-div#LoginBox
-{
+
+div#Login-box{
     display: inline-block;
-    vertical-align: middle;
     line-height: 30px;
-    width: 70%;
-    position: relative;
-    left: 15%;
-    margin: auto;
+    position: absolute;
+    margin: 1px;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding: 25px;
+    padding: 15px;
     text-align: center;
+    -moz-box-shadow:0px 0px 10px 5px #757575;
+    -webkit-box-shadow:0px 0px 10px 5px #757575;
+    box-shadow:0px 0px 10px 5px #757575;
+    background-color: rgb(232,232,232);
+    width: 380px;
+    line-height: 16px;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fff), color-stop(100%, #ddd));
+    background: -webkit-linear-gradient(top, #fff 0, #ddd 100%);
+    background: -moz-linear-gradient(top, #fff 0, #ddd 100%);
+    background: -ms-linear-gradient(top, #fff 0, #ddd 100%);
+    background: -o-linear-gradient(top, #fff 0, #ddd 100%);
+    background: linear-gradient(top, #fff 0, #ddd 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dddddd', GradientType=0);
+}
+
+div#Login-box:hover{
+    background-color: rgb(232,232,232);
+}
+
+div.box h2{
+    background: url("../img/dark/h2_bg_2.png") no-repeat  #c8c7c5;
+    background-size: cover;  
+    margin-bottom: 2px;
+    font-size: 15px;
+    padding-left: 1em;
+    font-weight: bold;
+    font-variant:small-caps;
+    border-radius: 1em 0px 1em 0px;
+}
+
+div.box h4 {
+    background: url("../img/dark/h2_bg_1.png") no-repeat  #c8c7c5;
+    background-size: cover;  
+    margin-bottom: 2px;
+    font-size: 15px;
+    padding-left: 1em;
+    font-weight: bold;
+    font-variant:small-caps;
+    border-radius: 1em 0px 1em 0px;
+}
+
+div#bottom-box{
+    position: absolute;
+    left: 0%;
+    right:0%;
+    bottom : 0%;
+    height: 33px;
+    background-image: none;
+    -moz-box-shadow:9px 0px 10px 7px gray;
+    -webkit-box-shadow:9px 0px 10px 7px gray;
+    box-shadow:9px 0px 10px 7px gray;
+
 }
