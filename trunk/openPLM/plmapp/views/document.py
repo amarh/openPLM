@@ -35,6 +35,7 @@ from django.http import (HttpResponseRedirect, HttpResponse, Http404,
                         HttpResponseBadRequest, StreamingHttpResponse)
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.contrib import messages
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
@@ -128,6 +129,7 @@ def add_part(request, obj_type, obj_ref, obj_revi):
         if add_part_form.is_valid():
             part_obj = get_obj_from_form(add_part_form, request.user)
             obj.attach_to_part(part_obj)
+            messages.info(request, "The part has been successfully attached to the document.")
             return HttpResponseRedirect(obj.plmobject_url + "parts/")
     else:
         add_part_form = forms.AddPartForm()

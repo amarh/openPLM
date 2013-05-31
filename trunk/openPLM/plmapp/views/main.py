@@ -92,6 +92,7 @@ def comment_post_wrapper(request):
         if not (user.get_full_name() == request.POST['name'] and \
                 user.email == request.POST['email']):
             return HttpResponse("You registered user...trying to spoof a form...eh?")
+        messages.success(request, "Your comments has been send successfully.")
         return post_comment(request)
     return HttpResponse("You anonymous cheater...trying to spoof a form?")
 
@@ -428,9 +429,11 @@ def create_object(request, from_registered_view=False, creation_form=None):
         if creation_form.is_valid():
             ctrl_cls = get_controller(type_)
             ctrl = ctrl_cls.create_from_form(creation_form, request.user)
+            messages.info(request, "The " + type_ +" has been created")
             if attach is not None:
                 try:
                     attach(ctrl)
+                    messages.info(request, "Files has been attached")
                 except (ControllerError, ValueError) as e:
                     # crtl cannot be attached (maybe the state of the
                     # related object as changed)
