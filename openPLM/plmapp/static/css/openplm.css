@@ -1506,3 +1506,7 @@ img.avatar {
 .hidden {
     display : none;
 }
+
+.tb-alert{
+    margin-top:20px;
+}
