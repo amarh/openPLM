@@ -32,6 +32,7 @@ from django.forms import HiddenInput
 from django.http import (HttpResponseRedirect, Http404,
     HttpResponseForbidden, StreamingHttpResponse)
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
@@ -99,6 +100,10 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
             for action_name, method in actions:
                 if action_name in request.POST:
                     method()
+                    if 'cancel' in request.POST:
+                        messages.info(request, "The " + obj_type + " has been successfully cancelled.")
+                    elif 'promote' in request.POST:
+                        messages.info(request, "The " + obj_type + " has been successfully promoted.")
                     break
             return HttpResponseRedirect("..")
         for action_name, method in actions:
@@ -626,6 +631,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
     else:
         role = level_to_sign_str(int(level))
     if request.method == "POST":
+        messages.info(request, "The user you have selected has been successfully add in role of " + role + "." )
         add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
@@ -634,7 +640,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
             return HttpResponseRedirect("../../lifecycle/")
     else:
         add_management_form = forms.SelectUserForm()
-
+    
     ctx.update({'current_page':'lifecycle',
                 'replace_manager_form': add_management_form,
                 'link_creation': True,
@@ -644,7 +650,7 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
 
 
 @handle_errors
-def delete_management(request, obj_type, obj_ref, obj_revi):
+def delete_management(request, obj_type, obj_ref, obj_revi, reader=False, level=None):
     """
     View to remove a notified user or a restricted user.
 
@@ -661,6 +667,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi):
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
         try:
+            messages.info(request, "The user you have selected has been successfully deleted.")
             link_id = int(request.POST["link_id"])
             link = obj.users.now().get(id=link_id)
             obj.remove_user(link)

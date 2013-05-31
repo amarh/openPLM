@@ -18,35 +18,45 @@
 
     {% for group in histories %}
         <div class="timeline">
+            What did you want to display?
+            <br />
+            <form action="." method="POST">{% csrf_token %}
+                <label for="docs">Documents</label>
+                <input type="checkbox" name="display_documents" value="true" id="docs"/>
+                <label for="parts">Parts</label>
+                <input type="checkbox" name="display_parts" value="1" id="parts"/>
+                <input type="submit" value="Submit" name="WhatDispaly">
+            </form>
             <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
 
             <dl>
+                {{display_all}} : {{true}}
                 {% for histo in group.list %}
-                    <dt class="changeset" id="{{histo.id}}">
-                    <span class="time">
-                        {{histo.date|date:"G:i"}}
-                    </span>
-                    {% spaceless %}
-                    <a href="/user/{{histo.user|urlencode }}/">
-                        <span class="user">{{histo.user}}</span>
-                    </a>
-                    {% endspaceless %}
-                    <span class="action">
-                        {{histo.action}}
-                    </span>
-                    {% if show_identifiers %}
-                        <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a>
-                        <span>:</span>
-                    {% endif %}
-                    {% if show_revisions %}
-                        <span class="revision">{{ histo.plmobject.revision }}</span>
-                    {% endif %}
-                    </dt>
-                    <dd>
-                    <div class="details">
-                        {{ histo.details|linebreaksbr }}
-                    </div>
-                    </dd>
+                            <dt class="changeset" id="{{histo.id}}">
+                            <span class="time">
+                                {{histo.date|date:"G:i"}}
+                            </span>
+                            {% spaceless %}
+                            <a href="/user/{{histo.user|urlencode }}/">
+                                <span class="user">{{histo.user}}</span>
+                            </a>
+                            {% endspaceless %}
+                            <span class="action">
+                                {{histo.action}}
+                            </span>
+                            {% if show_identifiers %}
+                                <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
+                                <span>:</span>
+                            {% endif %}
+                            {% if show_revisions %}
+                                <span class="revision">{{ histo.plmobject.revision }}</span>
+                            {% endif %}
+                            </dt>
+                            <dd>
+                            <div class="details">
+                                {{ histo.details|linebreaksbr }}
+                            </div>
+                            </dd>
                 {% endfor %}
             </dl>
         </div>
