@@ -101,10 +101,10 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 if action_name in request.POST:
                     method()
                     if 'cancel' in request.POST:
-                        message = _(u"The %(Ocject_type)s has been successfully cancelled." % dict(Ocject_type=obj_type))
+                        message = _(u"The %(object_type)s has been successfully cancelled." % dict(object_type=obj_type))
                         messages.info(request, message)
                     elif 'promote' in request.POST:
-                        message = _(u"The %(Ocject_type)s has been successfully promoted." % dict(Ocject_type=obj_type))
+                        message = _(u"The %(object_type)s has been successfully promoted." % dict(object_type=obj_type))
                         messages.info(request, message)
                     break
             return HttpResponseRedirect("..")
