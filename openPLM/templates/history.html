@@ -15,7 +15,6 @@
 {% endblock %}
 {% block content %}
     {% regroup object_history.object_list by get_day as histories %}
-
     {% for group in histories %}
         <div class="timeline">
             What did you want to display?
