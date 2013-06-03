@@ -101,9 +101,11 @@ def display_object_lifecycle(request, obj_type, obj_ref, obj_revi):
                 if action_name in request.POST:
                     method()
                     if 'cancel' in request.POST:
-                        messages.info(request, "The " + obj_type + " has been successfully cancelled.")
+                        message = _(u"The %(Ocject_type)s has been successfully cancelled." % dict(Ocject_type=obj_type))
+                        messages.info(request, message)
                     elif 'promote' in request.POST:
-                        messages.info(request, "The " + obj_type + " has been successfully promoted.")
+                        message = _(u"The %(Ocject_type)s has been successfully promoted." % dict(Ocject_type=obj_type))
+                        messages.info(request, message)
                     break
             return HttpResponseRedirect("..")
         for action_name, method in actions:
@@ -631,7 +633,8 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
     else:
         role = level_to_sign_str(int(level))
     if request.method == "POST":
-        messages.info(request, "The user you have selected has been successfully add in role of " + role + "." )
+        message = _(u"The user you have selected has been successfully add in role of %(Add_role)s." % dict(Add_role = role)) 
+        messages.info(request, message )
         add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
@@ -667,7 +670,7 @@ def delete_management(request, obj_type, obj_ref, obj_revi, reader=False, level=
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
         try:
-            messages.info(request, "The user you have selected has been successfully deleted.")
+            messages.info(request, _(u"The user you have selected has been successfully deleted."))
             link_id = int(request.POST["link_id"])
             link = obj.users.now().get(id=link_id)
             obj.remove_user(link)

@@ -231,7 +231,7 @@ def modify_user(request, obj_ref):
         modification_form = forms.OpenPLMUserChangeForm(request.POST, request.FILES)
         if modification_form.is_valid():
             obj.update_from_form(modification_form)
-            messages.success(request, "Your profile has been modified.")
+            messages.success(request, _(u"Your profile has been modified."))
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = forms.OpenPLMUserChangeForm(instance=obj.object)
@@ -263,7 +263,7 @@ def change_user_password(request, obj_ref):
         if modification_form.is_valid():
             obj.set_password(modification_form.cleaned_data['new_password2'])
             obj.save()
-            messages.info(request, "Your password has been modified successfully.")
+            messages.info(request, _(u"Your password has been modified successfully."))
             return HttpResponseRedirect("/user/%s/" % obj.username)
     else:
         modification_form = PasswordChangeForm(obj)
