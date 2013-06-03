@@ -541,9 +541,10 @@ class DocumentViewTestCase(ViewTest):
                 "state" : m.get_default_state().pk,
                 })
         response = self.post("/object/create/", data, follow=True, page="parts")
-        self.assertEqual(2, len(response.context["messages"]))
-        msg = list(response.context["messages"])[0]
-        self.assertEqual(messages.ERROR, msg.level)
+        msgs = list(response.context["messages"])
+        self.assertEqual(2, len(msgs))
+        self.assertEqual(messages.INFO, msgs[0].level)
+        self.assertEqual(messages.ERROR, msgs[1].level)
         obj = m.PLMObject.objects.get(type=self.TYPE, reference="doc2", revision="a")
         self.assertEqual("Docc", obj.name)
         self.assertEqual(self.user, obj.owner)

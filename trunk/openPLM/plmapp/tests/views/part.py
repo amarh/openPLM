@@ -89,11 +89,11 @@ class PartViewTestCase(ViewTest):
                 "lifecycle" : m.get_default_lifecycle().pk,
                 "state" : m.get_default_state().pk,
                 })
-        model_cls = m.get_all_plmobjects()[self.TYPE]
         response = self.post("/object/create/", data, follow=True, page="doc-cad")
-        self.assertEqual(1, len(response.context["messages"]))
-        msg = list(response.context["messages"])[0]
-        self.assertEqual(messages.ERROR, msg.level)
+        msgs = list(response.context["messages"])
+        self.assertEqual(2, len(msgs))
+        self.assertEqual(messages.INFO, msgs[0].level)
+        self.assertEqual(messages.ERROR, msgs[1].level)
         obj = m.PLMObject.objects.get(type=self.TYPE, reference="mapart", revision="a")
         self.assertEqual("MaPart", obj.name)
         self.assertEqual(self.user, obj.owner)
