@@ -59,6 +59,8 @@ def can_add(obj, arg):
                 if cur_obj.check_in_group(obj):
                     if action.startswith("add_"):
                         role = action[4:]
+                        if obj.profile.is_viewer and role != models.ROLE_NOTIFIED:
+                            return False
                         return not cur_obj.users.now().filter(user=obj,
                             role=role).exists()
                     return True
