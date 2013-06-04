@@ -31,6 +31,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\
@@ -745,6 +746,8 @@ class PLMObjectController(Controller):
         :raise: :exc:`.PermissionError` if *user* is not allowed to has role
             *role*
         """
+        if self.users.now().filter(user=user, role=role).exists():
+            raise ValueError(_("%(username)s has already this role.") % dict(username=user.username))
         if role == "owner":
             self.check_permission("owner")
             self.set_owner(user)
