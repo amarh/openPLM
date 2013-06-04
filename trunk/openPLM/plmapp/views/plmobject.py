@@ -633,17 +633,17 @@ def add_management(request, obj_type, obj_ref, obj_revi, reader=False, level=Non
     else:
         role = level_to_sign_str(int(level))
     if request.method == "POST":
-        message = _(u"The user you have selected has been successfully add in role of %(Add_role)s." % dict(Add_role = role)) 
-        messages.info(request, message )
         add_management_form = forms.SelectUserForm(request.POST)
         if add_management_form.is_valid():
             if add_management_form.cleaned_data["type"] == "User":
                 user_obj = get_obj_from_form(add_management_form, request.user)
                 obj.set_role(user_obj.object, role)
+            message = _(u"Role %(add_role)s granted." % dict(add_role=role))
+            messages.info(request, message)
             return HttpResponseRedirect("../../lifecycle/")
     else:
         add_management_form = forms.SelectUserForm()
-    
+
     ctx.update({'current_page':'lifecycle',
                 'replace_manager_form': add_management_form,
                 'link_creation': True,
@@ -670,10 +670,10 @@ def delete_management(request, obj_type, obj_ref, obj_revi, reader=False, level=
     obj = get_obj(obj_type, obj_ref, obj_revi, request.user)
     if request.method == "POST":
         try:
-            messages.info(request, _(u"The user you have selected has been successfully deleted."))
             link_id = int(request.POST["link_id"])
             link = obj.users.now().get(id=link_id)
             obj.remove_user(link)
+            messages.info(request, _(u"The user you have selected has been successfully deleted."))
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
     return HttpResponseRedirect("../../lifecycle/")
