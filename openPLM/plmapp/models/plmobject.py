@@ -172,6 +172,9 @@ class PLMObject(AbstractPLMObject):
     name = models.CharField(_("name"), max_length=100, blank=True,
                             help_text=_(u"Name of the product"))
 
+    description = models.TextField(_("description"), blank=True, default="")
+    description.richtext = True
+
     creator = models.ForeignKey(User, verbose_name=_("creator"),
                                 related_name="%(class)s_creator")
     owner = models.ForeignKey(User, verbose_name=_("owner"),
@@ -190,7 +193,6 @@ class PLMObject(AbstractPLMObject):
                               default=get_default_state)
 
     published = models.BooleanField(verbose_name=_("published"), default=False)
-
 
     class Meta:
         # keys in the database
@@ -340,8 +342,8 @@ class PLMObject(AbstractPLMObject):
     @property
     def attributes(self):
         u"Attributes to display in `Attributes view`"
-        return ["type", "reference", "revision", "name", "creator", "owner",
-                "group", "ctime", "mtime"]
+        return ["type", "reference", "revision", "name", "description",
+                "creator", "owner", "group", "ctime", "mtime"]
 
     @property
     def published_attributes(self):
