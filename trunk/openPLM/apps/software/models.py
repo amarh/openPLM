@@ -16,12 +16,7 @@ class Package(Part):
     u"""
     Package : represent a package of softwares
     """
-    description = models.TextField(verbose_name=_("description"), blank=True)
-    description.richtext = True
-
-    @property
-    def attributes(self):
-        return super(Package,self).attributes + ["description"]
+    pass
 
 
 class Software(Part):
@@ -43,15 +38,13 @@ class Software(Part):
         Url for the issue tracker of the software
     """
     licence = models.CharField(verbose_name=_("licence"), max_length=50, blank=False, null=False)
-    description = models.TextField(verbose_name=_("description"), blank=True)
-    description.richtext = True
     linobject_developpement = models.BooleanField(verbose_name=_("developed by LinObject"), default=False)
     public = models.BooleanField(verbose_name=_("public"), default=False)
     bugtracker_uri = models.CharField(verbose_name=_("bugtracker uri"), max_length=250, blank=True)
 
     @property
     def attributes(self):
-        attrs = ["licence", "description", "linobject_developpement", "public", "bugtracker_uri"]
+        attrs = ["licence", "linobject_developpement", "public", "bugtracker_uri"]
         return super(Software, self).attributes + attrs
 
     @property
