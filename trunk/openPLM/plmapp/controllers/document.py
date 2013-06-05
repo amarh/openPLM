@@ -31,6 +31,7 @@ from django.utils import timezone
 
 import Image
 from django.conf import settings
+from djcelery_transactions import task
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import LockError, UnlockError, DeleteFileError, PermissionError
@@ -41,6 +42,22 @@ from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.files.deletable import (get_deletable_files, ON_CHECKIN_SELECTORS,
         ON_DEPRECATE_SELECTORS, ON_DELETE_SELECTORS, ON_CANCEL_SELECTORS)
 from openPLM.plmapp.tasks import update_indexes
+
+
+@task
+def delete_old_files(doc_file_pk, selectors):
+    doc_file = models.DocumentFile.objects.get(id=doc_file_pk)
+    for df in get_deletable_files(doc_file, selectors):
+        os.chmod(df.file.path, 0700)
+        os.remove(df.file.path)
+        if df.thumbnail:
+            df.thumbnail.delete(save=False)
+            df.thumbnail = None
+        if df.end_time is None:
+            df.end_time = timezone.now()
+        df.deleted = True
+        df.deprecated = True
+        df.save()
 
 
 class DocumentController(PLMObjectController):
@@ -258,9 +275,9 @@ class DocumentController(PLMObjectController):
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
         filename = doc_file.filename
-        self._delete_old_files(doc_file, ON_DELETE_SELECTORS)
         doc_file.deprecated = True
         doc_file.save()
+        self._delete_old_files(doc_file, ON_DELETE_SELECTORS)
         self._save_histo("File deleted", "file : %s" % filename)
 
     def handle_added_file(self, doc_file):
@@ -494,17 +511,7 @@ class DocumentController(PLMObjectController):
             generate_thumbnail.delay(doc_file.id)
 
     def _delete_old_files(self, doc_file, selectors):
-        for df in get_deletable_files(doc_file, selectors):
-            os.chmod(df.file.path, 0700)
-            os.remove(df.file.path)
-            if df.thumbnail:
-                df.thumbnail.delete(save=False)
-                df.thumbnail = None
-            if df.end_time is None:
-                df.end_time = timezone.now()
-            df.deleted = True
-            df.deprecated = True
-            df.save()
+        delete_old_files.delay(doc_file.pk, selectors)
 
     def update_rel_part(self, formset):
         u"""
