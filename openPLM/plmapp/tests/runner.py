@@ -62,9 +62,9 @@ class OpenPLMTestSuiteRunner(TestSuiteRunner):
                 if pkg == "openPLM":
                     tests.append(case)
             suite._tests = tests
-        from openPLM.plmapp import utils, lifecycle
-        suite.addTest(doctest.DocTestSuite(utils))
-        suite.addTest(doctest.DocTestSuite(lifecycle))
+            from openPLM.plmapp import utils, lifecycle
+            suite.addTest(doctest.DocTestSuite(utils))
+            suite.addTest(doctest.DocTestSuite(lifecycle))
         return suite
 
     if COLORS:
