@@ -24,6 +24,7 @@
 
 import re
 from collections import defaultdict
+import datetime
 
 from django import forms
 from django.conf import settings
@@ -924,4 +925,18 @@ class ConfirmPasswordForm(forms.Form):
         if not self.user.check_password(password):
             raise forms.ValidationError(_("Your password was entered incorrectly. Please enter it again."))
         return password
+
+class HistoryObjectForm(forms.Form):
+    """
+    A Form asking the user the information he wants displayed in the history
+    """
+    document = forms.BooleanField(required = False, initial=True)
+    part = forms.BooleanField(required = False, initial=True)
+
+class HistoryDateForm(forms.Form):
+    date_history_begin = forms.DateTimeField(label=_(u"View Changes From *"),
+        widget=forms.DateInput(attrs={"size":10}), initial=datetime.date.today(), 
+        error_messages = {"invalid":"The date isn't valid (format valid: AAAA-MM-JJ)."})
+    number_days = forms.IntegerField(label=_(u"and *"), help_text = "days back",  initial=30, max_value=90, min_value=1)
+    done_by = forms.CharField(label = _(u"Done by "), required = False)
 

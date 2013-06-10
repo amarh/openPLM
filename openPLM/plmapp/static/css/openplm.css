@@ -940,6 +940,7 @@ ul.errorlist li {
     display: list-item;
     list-style-type: disc;
     margin-left: 1em;
+    color: #FF6464;
 }
 
 .inline-form > * {

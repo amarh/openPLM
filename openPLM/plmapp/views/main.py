@@ -37,6 +37,7 @@ import os
 import csv
 import json
 import tempfile
+import datetime 
 import itertools
 
 from django.conf import settings
@@ -55,6 +56,8 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.i18n import set_language as dj_set_language
+from django.contrib.auth.models import User
+from django.forms.util import from_current_timezone
 
 from haystack.views import SearchView
 
@@ -200,7 +203,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
-
+    
     if obj_type in ('User', 'Group'):
         url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
     else:
@@ -221,9 +224,10 @@ def redirect_history(request, type, hid):
          "user" : models.UserHistory,
          "object" : models.History,}[type]
     h = H.objects.get(id=int(hid))
+    date_page = str(h.date)[:10]
     items = H.objects.filter(plmobject=h.plmobject, date__gte=h.date).count() - 1
     page = items // ITEMS_PER_HISTORY + 1
-    url = u"%shistory/?page=%d#%s" % (h.plmobject.plmobject_url, page, hid)
+    url = u"%shistory/?date_history_begin=%s&number_days=30#%s" % (h.plmobject.plmobject_url, date_page, hid)
     return HttpResponseRedirect(url)
 
 
@@ -260,11 +264,54 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         True if the template should show the type, reference and revision
         of each history row
     """
+    
+        
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+    
+    form_date = forms.HistoryDateForm(request.GET if request.GET else None)
+    if form_date.is_valid():
+        date_begin = form_date.cleaned_data["date_history_begin"]
+        number_days = form_date.cleaned_data["number_days"]
+        done_by = form_date.cleaned_data["done_by"]
+    else:
+        done_by = ""
+        if 'date_history_begin' in request.GET:
+            if len(request.GET['date_history_begin']) == 10 :
+                date_begin = request.GET['date_history_begin']
+                date_begin = datetime.datetime(int(date_begin[:4]), int(date_begin[5:7]), int(date_begin[8:10]))
+            else:
+                date_begin = datetime.datetime.today()
+        else : 
+            date_begin = datetime.datetime.today()
+        number_days = 30
+    date_begin = from_current_timezone(date_begin)
+    if date_begin >  from_current_timezone(datetime.datetime.today()):
+        date_begin = from_current_timezone(datetime.datetime.today())
+
+
     if timeline:
         # global timeline: shows objects owned by the company and readable objects
+        ctx["timeline"] = True
         history = models.timeline_histories(obj)
         ctx['object_type'] = _("Timeline")
+        
+        form_object = forms.HistoryObjectForm(request.GET if request.GET else None)
+        if form_object.is_valid():
+            display_part = form_object.cleaned_data["part"]
+            display_document = form_object.cleaned_data["document"]
+        else:
+            display_part = True
+            display_document = True        
+            
+        if display_document and not display_part:
+            document = models.document.get_all_documents().keys()
+            history = history.filter(plmobject__type__in = document)
+        elif display_part and display_document == False:
+            part = models.part.get_all_parts().keys()
+            history = history.filter(plmobject__type__in = part)
+        ctx['form_object'] = form_object
+            
+        
     elif hasattr(obj, "revision"):
         # display history of all revisions
         history = obj.histories
@@ -272,15 +319,26 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     else:
         ctx["show_revisions"] = False
         history = obj.histories
-    paginator = Paginator(history, ITEMS_PER_HISTORY)
-    page = request.GET.get('page', 1)
-    try:
-        history = paginator.page(page)
-    except PageNotAnInteger:
-        history = paginator.page(1)
-        page = 1
-    except EmptyPage:
-        history = paginator.page(paginator.num_pages)
+    
+    date_end = date_begin - datetime.timedelta(days = int(number_days))
+    date_end = from_current_timezone(date_end)
+    history = history.filter(date__gte = date_end, date__lt = from_current_timezone(date_begin + datetime.timedelta(days = 1)))
+    
+    if done_by != "":
+        if models.User.objects.filter(username= done_by).exists():
+            history = history.filter(user__username = done_by)
+        else:
+            history = history.none()
+            messages.error(request, "This user doesn't exist")  
+    
+    ctx['form_date'] = form_date
+    ctx['date_before'] = (date_begin - datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
+    date_after = from_current_timezone(date_begin + datetime.timedelta(days = 1))
+    if date_after < from_current_timezone(datetime.datetime.today()):
+        ctx['date_after'] = (date_begin + datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
+    ctx['date_begin_period']  = date_begin.strftime('%Y-%m-%d')
+    ctx['date_end_period']  = date_end.strftime('%Y-%m-%d')
+   
     ctx.update({
         'current_page' : 'history',
         'object_history' : history,
