@@ -284,7 +284,7 @@ class PartController(PLMObjectController):
         if (link.quantity == new_quantity and link.order == new_order and
             link.unit == new_unit and original_extension_data == extension_data):
             # do not make an update if it is useless
-            return
+            return link
         link.end_time = timezone.now()
         link.save()
         # make a new link
