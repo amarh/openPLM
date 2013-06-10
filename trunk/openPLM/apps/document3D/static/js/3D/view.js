@@ -1,9 +1,21 @@
+jQuery.cachedScript = function(url, success, options) {
+    // allow user to set any option except for dataType, cache, and url
+    options = $.extend(options || {}, {
+        dataType: "script",
+        cache: true,
+        success: success,
+        url: url
+    });
+    // Use $.ajax() since it is more flexible than $.getScript
+    // Return the jqXHR object so we can chain callbacks
+    return jQuery.ajax(options);
+};
 // from http://api.jquery.com/jQuery.getScript/#comment-34269778
 jQuery.getScripts = function(scripts, onComplete) {
     var i = 1;
     var ii = scripts.length;
     var onScriptLoaded = function(data, response) { if (i++ == ii) onComplete(); } ;
-    for(var s in scripts) { $.getScript(scripts[s], onScriptLoaded); } ;
+    for(var s in scripts) { $.cachedScript(scripts[s], onScriptLoaded); } ;
 };
 /**
 * old AxisHelper
