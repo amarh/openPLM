@@ -14,52 +14,73 @@
     <link rel="alternate" type="application/rss+xml" href="../rss/">
 {% endblock %}
 {% block content %}
-    {% regroup object_history.object_list by get_day as histories %}
-    {% for group in histories %}
+    <div id="display_form" style="border: solid 1px black; text-align: center; display: inline-block; padding: 10px; background-color: white">
+        <form action="." method="get">
+            {%if timeline%}
+                <span style="text-decoration: underline" class='title_form_history'> {% trans "What did you want to display?" %} </span> <br /> <br />
+                {{ form_object.as_p }}
+                <hr />
+            {% endif %}
+                <span style="text-decoration: underline" class='title_form_history'> {%trans "Select the period of history you want to view." %} </span> <br /> <br />
+                {{ form_date.as_p }}
+                <hr/>
+            <input style="margin-bottom:10px" type="submit" value="Submit" /> <br/>
+            *: Required fields
+        </form>
+    </div>
+    <br />
+    <br />
+    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get date_history_begin=date_before%}">← Previous Period</a> {% endif %}
+    <span style="position: absolute; left: 45%; text-decoration: underline"> Period: {{date_end_period}} - {{date_begin_period}} </span> 
+    {% if date_after %}<a style="position: absolute; right: 50px" href= "{%add_get date_history_begin=date_after%}">Next Period →</a> {% endif %}
+
+    {% if object_history%}
+        {% regroup object_history by get_day as histories %}
+        {% for group in histories %}
+            <div class="timeline">
+                <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
+
+                <dl style="overflow: auto; max-height: 500px; margin: 10px">
+                    {% for histo in group.list %}
+                                <dt class="changeset" id="{{histo.id}}">
+                                <span class="time">
+                                    {{histo.date|date:"G:i"}}
+                                </span>
+                                {% spaceless %}
+                                <a href="/user/{{histo.user|urlencode }}/">
+                                    <span class="user">{{histo.user}}</span>
+                                </a>
+                                {% endspaceless %}
+                                <span class="action">
+                                    {{histo.action}}
+                                </span>
+                                {% if show_identifiers %}
+                                    <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
+                                    <span>:</span>
+                                {% endif %}
+                                {% if show_revisions %}
+                                    <span class="revision">{{ histo.plmobject.revision }}</span>
+                                {% endif %}
+                                </dt>
+                                <dd>
+                                <div class="details">
+                                    {{ histo.details|linebreaksbr }}
+                                </div>
+                                </dd>
+                    {% endfor %}
+                    
+                </dl>
+            </div>
+        {% endfor %}
+    {% else %}
         <div class="timeline">
-            What did you want to display?
-            <br />
-            <form action="." method="POST">{% csrf_token %}
-                <label for="docs">Documents</label>
-                <input type="checkbox" name="display_documents" value="true" id="docs"/>
-                <label for="parts">Parts</label>
-                <input type="checkbox" name="display_parts" value="1" id="parts"/>
-                <input type="submit" value="Submit" name="WhatDispaly">
-            </form>
-            <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
-
-            <dl>
-                {{display_all}} : {{true}}
-                {% for histo in group.list %}
-                            <dt class="changeset" id="{{histo.id}}">
-                            <span class="time">
-                                {{histo.date|date:"G:i"}}
-                            </span>
-                            {% spaceless %}
-                            <a href="/user/{{histo.user|urlencode }}/">
-                                <span class="user">{{histo.user}}</span>
-                            </a>
-                            {% endspaceless %}
-                            <span class="action">
-                                {{histo.action}}
-                            </span>
-                            {% if show_identifiers %}
-                                <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
-                                <span>:</span>
-                            {% endif %}
-                            {% if show_revisions %}
-                                <span class="revision">{{ histo.plmobject.revision }}</span>
-                            {% endif %}
-                            </dt>
-                            <dd>
-                            <div class="details">
-                                {{ histo.details|linebreaksbr }}
-                            </div>
-                            </dd>
-                {% endfor %}
-            </dl>
+             <h3 class="hplm">{{ date_begin_period|naturalday|capfirst}} - {{ date_end_period|naturalday|capfirst}}</h3>
+             <p> There are no event to display for this period</p>
         </div>
-    {% endfor %}
-    {% show_pages_bar object_history request %}
+    {% endif %}
+    <hr />
+    {% if date_before%} <a style="position: absolute; left: 50px" href= "{%add_get date_history_begin=date_before%}">← Previous Period</a> {% endif %}
+    <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span>
+    {% if date_after %}<a style="position: absolute; right: 50px" href= "{%add_get date_history_begin=date_after%}">Next Period →</a> {% endif %}
+    <br />
 {% endblock %}
-

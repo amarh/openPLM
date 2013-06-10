@@ -27,6 +27,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core.files.base import File
+import datetime
 
 import lxml.html
 
@@ -34,6 +35,7 @@ from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as m
 from openPLM.plmapp.controllers import DocumentController, PartController
 from openPLM.plmapp.lifecycle import LifecycleList
+from django.forms.util import from_current_timezone
 
 
 from .base import CommonViewTest
@@ -326,27 +328,64 @@ class ViewTest(CommonViewTest):
 
     def test_history(self):
         response = self.get(self.base_url + "history/")
-        history = response.context["object_history"].object_list
+        history = response.context["object_history"]
         # it should contains at least one item
         self.assertTrue(history)
         # edit the controller and checks that the history grows
         self.controller.name = "new name"
         self.controller.save()
         response = self.get(self.base_url + "history/")
-        history2 = response.context["object_history"].object_list
+        history2 = response.context["object_history"]
         self.assertTrue(len(history2) > len(history))
         # create a new revision: both should appear in the history
         revb = self.controller.revise("new_revision")
         response = self.get(self.base_url + "history/")
-        history3 = response.context["object_history"].object_list
+        history3 = response.context["object_history"]
         self.assertTrue([x for x in history3 if x.plmobject.id == self.controller.id])
         self.assertTrue([x for x in history3 if x.plmobject.id == revb.id])
         # also check revb/history/ page
         response = self.get(revb.plmobject_url + "history/")
-        history4 = response.context["object_history"].object_list
+        history4 = response.context["object_history"]
         self.assertTrue([x for x in history4 if x.plmobject.id == self.controller.id])
         self.assertTrue([x for x in history4 if x.plmobject.id == revb.id])
+        
+        # Test for history's form
+        #date + number days valid. User entered in done_by field does not exists
+        response = self.get(self.base_url +"history/"  , {"date_history_begin":"2013-06-07","number_days":"30","done_by":"efzgfezf"})
+        history5 = response.context["object_history"]
+        messages = response.context['messages']
+        self.assertTrue(len(history5) == 0)
+        self.assertEqual(1, len(messages))
+        
+    def test_timeline(self):
+        #Test for timeline's form
 
+        date_begin = from_current_timezone(datetime.datetime.today() + datetime.timedelta(days = 1))
+        date_end = from_current_timezone(datetime.datetime.today() - datetime.timedelta(days = 30))
+        
+        # document + part selected + no date specified
+        response = self.get("/timeline/", {"part":"on","document":"on"})
+        history = response.context["object_history"]
+        self.assertEqual(list(history), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin)))
+        # Only document selected + no date specified
+        response = self.get("/timeline/", {"document":"on"})
+        history2 = response.context["object_history"]
+        self.assertEqual(list(history2), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin, plmobject__type__in = m.document.get_all_documents().keys())))
+        # Only part selected + no date specified
+        response = self.get("/timeline/", {"part":"on"})
+        history3 = response.context["object_history"]
+        self.assertEqual(list(history3), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin, plmobject__type__in = m.part.get_all_parts().keys())))
+        # part + document selected and date specified / done_by not informed 
+        response = self.get("/timeline/", {"part":"on", "document":"on", "date_history_begin":"2013-06-8", "number_days": "15"})
+        history4 = response.context["object_history"]
+        date_begin = from_current_timezone(datetime.datetime(2013,6,9))
+        date_end = from_current_timezone(date_begin - datetime.timedelta(days = 15))
+        self.assertEqual(list(history4), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin)))
+        # part + document selected and date specified + done_by informed 
+        response = self.get("/timeline/" , {"part":"on", "document":"on", "date_history_begin":"2013-06-8", "number_days": "15", "done_by": "company"})
+        history5 = response.context["object_history"]
+        self.assertEqual(list(history5), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin, user__username="company")))
+        
     def test_navigate_get(self):
         response = self.get(self.base_url + "navigate/")
         self.assertTrue(response.context["filter_object_form"])
