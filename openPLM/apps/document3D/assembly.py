@@ -9,8 +9,8 @@ from datetime import timedelta
 from django.db import transaction
 from django.core.files.base import ContentFile
 
-from openPLM.plmapp.views.base import object_to_dict
-from openPLM.plmapp.models import DelegationLink, Part, ROLE_OWNER, ROLE_NOTIFIED
+from openPLM.plmapp.views.base import object_to_dict, get_obj_by_id
+from openPLM.plmapp.models import DocumentFile, DelegationLink, Part, ROLE_OWNER, ROLE_NOTIFIED
 from openPLM.plmapp.controllers import PartController
 from openPLM.plmapp.references import get_new_reference
 from openPLM.plmapp.tasks import update_indexes
@@ -67,8 +67,10 @@ class AssemblyBuilder(object):
         self.created_parts = []
         self.created_docs = []
         self.added_files = []
+        self._updated_parts = set()
         self._files = [] # to delete files in case of an error
         self._parts = {}
+        self._documents = {}
         self._inbulk_cache = {}
         # test if their will be at least one recipients
         self._send_mails = DelegationLink.current_objects.filter(delegator=controller._user,
@@ -118,6 +120,106 @@ class AssemblyBuilder(object):
         update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in updated])
         return native
 
+    def update_assembly(self, tree, native_files, step_files, lock=False):
+        self.controller.check_editable()
+        self.controller.check_permission(ROLE_OWNER)
+        self._lock = lock
+        if self.controller.PartDecompose is None:
+            raise ValueError("Document is not decomposed")
+        try:
+            native = self._update(tree, native_files, step_files)
+        except:
+            # remove added files
+            for path in self._files:
+                os.remove(path)
+            raise
+        return native
+
+    @transaction.commit_on_success
+    def _update(self, tree, native_files, step_files):
+        # tasks (handle_step_files, update_indexes) are executed
+        # once the transaction is commited, so we do not have to
+        # block mails and indexing
+        # all instances are indexing by one task to avoid a lot of lock/unlock
+        # calls
+        self._native_files = dict((f.name.lower(), f) for f in native_files)
+        self._step_files = dict((f.name.lower(), f) for f in step_files)
+        self.controller.object.no_index = True
+        if not self._send_mails:
+            self.controller.block_mails()
+        self.root = self._get_part(tree)
+        if tree["children"]:
+            self._checkin_decomposed_step(self.controller, tree)
+            self._update_children(self.root, tree)
+        else:
+            self._checkin_step(self.controller, tree)
+        # native files are added after step files and PCL
+        # so that it is easier to test if it is possible to checkout a whole
+        # assembly using native files
+        native = self._checkin_native(self.controller, tree)
+        # indexes all parts, documents and files
+        updated = itertools.chain(self.created_parts, self.created_docs, self.added_files)
+        update_indexes.delay([(c._meta.app_label, c._meta.module_name, c.pk) for c in updated])
+        return native
+
+    def _get_native_docfile(self, node):
+        df_id = node["native"]["id"]
+        return DocumentFile.objects.get(id=df_id)
+
+    def _get_step_docfile(self, node):
+        df_id = node["step"]["id"]
+        return DocumentFile.objects.get(id=df_id)
+
+    def _checkin_decomposed_step(self, doc, node):
+        # just add a new revision with the same content
+        df = self._get_step_docfile(node)
+        fake_file = ContentFile(df.file.read())
+        fake_file.name = df.filename
+        # no thumbnail
+        doc.checkin(df, fake_file, True, False)
+        self.added_files.append(df)
+        self._files.append(df.file.path)
+
+    def _checkin_native(self, doc, node):
+        df = self._get_native_docfile(node)
+        filename = df.filename.lower()
+        doc.checkin(df, self._native_files[filename])
+        self.added_files.append(df)
+        self._files.append(df.file.path)
+
+    def _checkin_step(self, doc, node):
+        df = self._get_step_docfile(node)
+        filename = df.filename.lower()
+        doc.checkin(df, self._step_files[filename])
+        self.added_files.append(df)
+        self._files.append(df.file.path)
+
+    def _get_part(self, node):
+        part_id = node["part"]["id"]
+        try:
+            part = self._parts[part_id]
+        except KeyError:
+            part = get_obj_by_id(part_id, self.controller._user)
+            part.check_readable()
+            # indexed content is up to date, indexed attributes are not modified
+            part.object.no_index = True
+            self._parts[part_id] = part
+        return part
+
+    def _get_doc(self, node):
+        doc_id = node["document"]["id"]
+        try:
+            doc = self._documents["id"]
+        except KeyError:
+            doc = get_obj_by_id(doc_id, self.controller._user)
+            if doc.type != "Document3D":
+                raise ValueError("invalid document")
+            doc.check_readable()
+            # indexed content is up to date, indexed attributes are not modified
+            doc.object.no_index = True
+            self._documents[doc_id] = doc
+        return doc
+
     def _get_part_name(self, node):
         name = node["part_name"].strip()
         if not name:
@@ -152,6 +254,7 @@ class AssemblyBuilder(object):
         part = PartController.create(ref, "Part", "a", self.controller._user, data,
                 not self._send_mails, True)
         self._parts[name] = part
+        self._parts[part.id] = part
         doc.attach_to_part(part)
         doc.object.PartDecompose = part.object
         doc.object.save()
@@ -219,6 +322,82 @@ class AssemblyBuilder(object):
                     pcle.y1, pcle.y2, pcle.y3, pcle.y4,
                     pcle.z1, pcle.z2, pcle.z3, pcle.z4) = matrix
                 pcle.save()
+
+    def _update_children(self, parent, node):
+        if parent.id in self._updated_parts:
+            return
+        self._updated_parts.add(parent.id)
+        current_children = parent.get_children(1)
+        children = defaultdict(list)
+        for child in node["children"]:
+            try:
+                # existing part
+                part = self._get_part(child)
+            except KeyError:
+                # new part
+                name = self._get_part_name(child)
+                try:
+                    part = self._parts[name]
+                except KeyError:
+                    doc = self._add_doc(name)
+                    part = self._add_part(doc, name)
+                    if child["children"]:
+                        self._update_children(part, child)
+                        self._add_decomposed_step(doc, name)
+                    else:
+                        self._add_step_file(doc, child)
+                    self._add_native_file(doc, child)
+            else:
+                if part.id not in self._updated_parts:
+                    doc = self._get_doc(child)
+                    if doc.PartDecompose.id != part.id:
+                        raise ValueError("Invalid pair of part/document")
+                    if child["document"]["checkin"]:
+                        if child["children"]:
+                            self._checkin_decomposed_step(doc, child)
+                            self._update_children(part, child)
+                        else:
+                            self._checkin_step(doc, child)
+                        self._checkin_native(doc, child)
+            self._updated_parts.add(part.id)
+            children[part.id].append((child["local_name"].strip(), child["local_matrix"]))
+
+        order = 0
+        for level, link in current_children:
+            order = max(order, link.order)
+            if link.child_id in children:
+                # child has new locations
+                locations = children[link.child_id]
+                quantity = len(locations)
+                new_link = parent.modify_child(link.child, quantity, link.order, link.unit,
+                        location=None)
+                # delete locations cloned by modify_child
+                Location_link.objects.filter(link=new_link).delete()
+                self._add_locations(new_link, locations)
+                del children[link.child_id]
+            else:
+                extensions = link.extensions
+                if any(isinstance(ext, Location_link) for ext in extensions):
+                    # child has been removed
+                    parent.delete_child(link.child)
+        order += 1
+
+        # new parts
+        for order, (part_id, locations) in enumerate(children.iteritems(), order):
+            quantity = len(locations)
+            part = self._parts[part_id]
+            pcl = parent.add_child(part, quantity, order)
+            self._add_locations(pcl, locations)
+
+    def _add_locations(self, pcl, locations):
+        for local_name, matrix in locations:
+            if not local_name:
+                local_name = pcl.child.name
+            pcle = Location_link(name=local_name, link=pcl)
+            (pcle.x1, pcle.x2, pcle.x3, pcle.x4,
+                pcle.y1, pcle.y2, pcle.y3, pcle.y4,
+                pcle.z1, pcle.z2, pcle.z3, pcle.z4) = matrix
+            pcle.save()
 
 
 class AssemblyInfo(object):
