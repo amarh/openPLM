@@ -10,6 +10,7 @@
 {% block scripts %}
     <script type="text/javascript" src="{{STATIC_URL}}js/jquery.showLoading.min.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}js/raphael-min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/screenfull.min.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}js/navigate.js"></script>
 
     <script>
@@ -97,6 +98,7 @@
 
         </div>
 
+
         <div id="RevisionsNav">
         {% if obj.is_part or obj.is_document %}
 
@@ -123,8 +125,8 @@
 
         {% endif %}
         </div>
+        <button id="full-screen" class="tb-btn tb-btn-small" title="{% trans "Toggle fullscreen display" %}"><i class="tb-icon-fullscreen"></i></button>
         <div id="FilterNav">
-            
             {% trans "Display :" %}
             <form method="post" action="." >{% csrf_token %}
                 <ul id="FilterNavUl">
