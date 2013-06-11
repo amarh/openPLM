@@ -330,16 +330,17 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         else:
             history = history.none()
             messages.error(request, "This user doesn't exist")  
-    
-    ctx['form_date'] = form_date
-    ctx['date_before'] = (date_begin - datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
     date_after = from_current_timezone(date_begin + datetime.timedelta(days = 1))
+    
     if date_after < from_current_timezone(datetime.datetime.today()):
         ctx['date_after'] = (date_begin + datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
-    ctx['date_begin_period']  = date_begin.strftime('%Y-%m-%d')
-    ctx['date_end_period']  = date_end.strftime('%Y-%m-%d')
-   
+    history = history.select_related("plmobject", "user__profile")
     ctx.update({
+        'date_before' : (date_begin - datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d'),
+        'form_date': form_date,
+        'date_begin_period' : date_begin.strftime('%Y-%m-%d'),
+        'date_end_period':date_end.strftime('%Y-%m-%d'),
+        "number_days" : number_days,
         'current_page' : 'history',
         'object_history' : history,
         'show_identifiers' : timeline,

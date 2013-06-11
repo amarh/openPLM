@@ -28,9 +28,9 @@
     </form>
     <br />
     <br />
-    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get date_history_begin=date_before%}">{%trans "← Previous Period" %}</a> {% endif %}
+    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
     <span style="position: absolute; left: 45%; text-decoration: underline">{{date_end_period}} - {{date_begin_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after%}">{% trans "Next Period →" %}</a> {% endif %}
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
 
     {% if object_history%}
         {% regroup object_history by get_day as histories %}
@@ -38,8 +38,12 @@
             <div class="timeline" >
                 <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
 
-                <dl style="overflow: auto; max-height: 500px; margin: 10px">
+                <dl style="overflow: auto; min-height: 100px; max-height: 500px; margin: 10px; width: 98%">
                     {% for histo in group.list %}
+                            <div style="min-height: 80px">
+                                <div class="tb-pull-left" style="height: 55px;">
+                                    <img class="avatar" src="{% avatar_url histo.user %}"/>
+                                </div>
                                 <dt class="changeset" id="{{histo.id}}">
                                 <span class="time">
                                     {{histo.date|date:"G:i"}}
@@ -57,7 +61,14 @@
                                     <span>:</span>
                                 {% endif %}
                                 {% if show_revisions %}
-                                    <span class="revision">{{ histo.plmobject.revision }}</span>
+                                    <span class="revision">
+                                        {%if obj.revision == histo.plmobject.revision%}
+                                            <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
+                                        {% else %}
+                                            <span style="background: #68A7FF; color: #3B3A3D; padding-left: 5px; padding-right: 5px">{{histo.plmobject.revision}}</span>
+                                            
+                                        {% endif %}
+                                    </span>
                                 {% endif %}
                                 </dt>
                                 <dd>
@@ -65,8 +76,8 @@
                                     {{ histo.details|linebreaksbr }}
                                 </div>
                                 </dd>
+                            </div>
                     {% endfor %}
-                    
                 </dl>
             </div>
         {% endfor %}
@@ -77,8 +88,8 @@
         </div>
     {% endif %}
     <hr />
-    {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get date_history_begin=date_before%}">{%trans "← Previous Period" %}</a> {% endif %}
-    <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span>
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after%}">{%trans "Next Period →"%} </a> {% endif %}
+    {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
+    <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span> 
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after number_days=number_days%}">{%trans "Next Period →"%} </a> {% endif %}
     <br />
 {% endblock %}
