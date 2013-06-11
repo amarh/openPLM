@@ -179,6 +179,8 @@ class AssemblyBuilder(object):
         doc.checkin(df, fake_file, True, False)
         self.added_files.append(df)
         self._files.append(df.file.path)
+        if self._lock:
+            doc.lock(df)
 
     def _checkin_native(self, doc, node):
         df = self._get_native_docfile(node)
@@ -186,6 +188,8 @@ class AssemblyBuilder(object):
         doc.checkin(df, self._native_files[filename])
         self.added_files.append(df)
         self._files.append(df.file.path)
+        if self._lock:
+            doc.lock(df)
 
     def _checkin_step(self, doc, node):
         df = self._get_step_docfile(node)
@@ -193,6 +197,8 @@ class AssemblyBuilder(object):
         doc.checkin(df, self._step_files[filename])
         self.added_files.append(df)
         self._files.append(df.file.path)
+        if self._lock:
+            doc.lock(df)
 
     def _get_part(self, node):
         part_id = node["part"]["id"]
