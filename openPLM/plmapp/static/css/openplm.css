@@ -1490,6 +1490,25 @@ tr.locked td {
     background-color:#FCF8E3;
 }
 
+
+.file-status {
+    width: 50px;
+
+}
+.icon-locked, .icon-unlocked {
+    display: block;
+    background-image: url("../img/lock_unlock.png");
+    width: 48px;
+    height: 48px;
+    margin: auto;
+    text-indent: -9000px;
+}
+
+.icon-unlocked {
+    background-position: 48px 0px;
+}
+
+
 .hplm[data-toggle="collapse"] {
     cursor: pointer ;
 }

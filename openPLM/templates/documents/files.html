@@ -63,9 +63,9 @@
                         {{ form.id }}
                         {{ form.document }}
                         <td class="Content" style="width:50px; text-align:center">{% if not locked %} {{ form.delete }}{% endif %}</td>
-                            <td class="Content ui-state-default ui-state-corner-all">
-                                <span class="status ui-icon ui-icon-locked" {% if not locked %}style="display:none"{% endif %}>{% trans "Locked" %}</span>
-                                <span class="status ui-icon ui-icon-unlocked" {% if locked %}style="display:none"{% endif %}>{% trans "Unlocked" %}</span>
+                            <td class="Content file-status">
+                                <span class="status icon-locked" {% if not locked %}style="display:none"{% endif %} title="{% trans "Locked" %}"></span>
+                                <span class="status icon-unlocked" {% if locked %}style="display:none"{% endif %} title="{% trans "Unlocked" %}"></span>
                             </td>
                             <td class="Content">
                                 <a href="/file/{{instance.id}}/{{instance.filename|urlencode}}?view=1">{{instance.filename}}</a></td>
