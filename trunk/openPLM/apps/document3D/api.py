@@ -223,6 +223,23 @@ def add_assembly(request, doc_id):
 
 
 @login_json
+def update_assembly(request, doc_id):
+    doc = get_document3D(request, doc_id)
+    form = AssemblyForm(request.POST, request.FILES)
+    if form.is_valid():
+        builder = AssemblyBuilder(doc)
+        tree = form.cleaned_data["assembly"]
+        lock = form.cleaned_data["lock"]
+        native_files = request.FILES.getlist("native_files")
+        step_files = request.FILES.getlist("step_files")
+        df = builder.update_assembly(tree, native_files, step_files, lock)
+        return {"doc_file" : dict(id=df.id, filename=df.filename, size=df.size)}
+    else:
+        s = {"result": "error", "error": "invalid form", "form-errors": dict(form.errors)}
+        return s
+
+
+@login_json
 def get_assembly(request, doc_id):
     doc = get_document3D(request, doc_id)
     return get_assembly_info(doc)
