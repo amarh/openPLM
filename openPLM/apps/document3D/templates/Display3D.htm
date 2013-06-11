@@ -42,6 +42,7 @@
 
             <input type="checkbox" checked="on" id="transparency"><label for="transparency" class="tb-btn view">{% trans "Toggle transparency" %}</label></input>
             <input type="checkbox" id="axis"><label for="axis" class="tb-btn view">{% trans "Toggle axis visibility" %}</label></input>
+            <button id="full-screen" class="tb-btn view" title="{% trans "Toggle fullscreen display" %}"><i class="tb-icon-fullscreen"></i></button>
         </span>
 
         <div id="webgl_warning" class="main" style="display:none;">
@@ -80,6 +81,7 @@
 {% block scripts %} 
     {% if javascript_arborescense or stl %}
 
+        <script type="text/javascript" src="{{STATIC_URL}}js/screenfull.min.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}js/3D/three-min.js"></script> 
         <script type="text/javascript" src="{{STATIC_URL}}js/3D/struct.js"></script> 
         <script type="text/javascript" src="{{STATIC_URL}}js/jquery.showLoading.min.js"></script>
