@@ -283,7 +283,10 @@ View3D.prototype = {
             });
             renderer.shadowMapCullFrontFaces = false;
             this.renderer = renderer;
-            renderer.setSize( $(container).width(), $(container).height() );
+            this.width = $(container).width();
+            this.height = $(container).height();
+
+            renderer.setSize(this.width , this.height);
             renderer.shadowMapEnabled	= true;
             renderer.shadowMapSoft		= true;
             container.appendChild( renderer.domElement );
@@ -387,9 +390,31 @@ View3D.prototype = {
 
             $("#toolbar, #zoom-toolbar").show();
 
+            $("#full-screen").click(s("fullscreen"));
+            screenfull.onchange = function() {
+                var main = $(window);
+                var w, h;
+                if( screenfull.isFullscreen ) {
+                    w = main.width() *0.95;
+                    h = main.height() * 0.95;
+                } else {
+                    w = self.width;
+                    h = self.height;
+                }
+                renderer.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                self.center_object(self.object3D);
+            };
         }
     },			
 
+    fullscreen: function(){
+        var main = document.getElementById("main_content");
+         if (screenfull.enabled) {
+             screenfull.toggle(main);
+        }
+    },
     set_scale : function (factor) {
         total=this.zoom_var-factor;
         this.zoom_var=factor;
@@ -464,6 +489,7 @@ View3D.prototype = {
 
     animate : function() {
         var self = this;
+        var main = $("#main_content");
         anim = function (){
             requestAnimationFrame(anim);
             self.controls.update();
