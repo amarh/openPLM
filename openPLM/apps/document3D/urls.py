@@ -34,6 +34,7 @@ urlpatterns += patterns2('', api_url,
     (r'decomposed_documents/(?P<type_check_out>[\w\,]+)/$', api3D.get_decomposition_documents),
     (r'add_assembly/', api3D.add_assembly),
     (r'get_assembly/', api3D.get_assembly),
+    (r'update_assembly/', api3D.update_assembly),
 )
 
 
