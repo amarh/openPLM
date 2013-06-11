@@ -14,25 +14,23 @@
     <link rel="alternate" type="application/rss+xml" href="../rss/">
 {% endblock %}
 {% block content %}
-    <div id="display_form" style="position: relative; left: 60%; border: solid 1px gray; text-align: center; display: inline-block; padding: 10px; background-color: rgb(200, 199, 197);">
-        <form action="." method="get">
+     <form action="." method="get"  >
             {%if timeline%}
-                <span style="text-decoration: underline" class='title_form_history'> {%trans "What did you want to display?" %} </span> <br /> <br />
+                <div class="history_form">
                 {{ form_object.as_p }}
-                <hr />
+            {% else %}
+                <div class="history_form" style="top: 220px">
             {% endif %}
-                <span style="text-decoration: underline" class='title_form_history'> {%trans "Select the period of history you want to view." %} </span> <br /> <br />
                 {{ form_date.as_p }}
-                <hr/>
-            <input style="margin-bottom:10px" type="submit" value="Submit" /> <br/>
+            <input type="submit" value="Submit" style="height: 20px; text-align: center; font-size: 12px"/>
             {%trans "*: Required fields" %}
-        </form>
-    </div>
+        </div>
+    </form>
     <br />
     <br />
     {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get date_history_begin=date_before%}">{%trans "← Previous Period" %}</a> {% endif %}
     <span style="position: absolute; left: 45%; text-decoration: underline">{{date_end_period}} - {{date_begin_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 50px" href= "{%add_get date_history_begin=date_after%}">{% trans "Next Period →" %}</a> {% endif %}
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after%}">{% trans "Next Period →" %}</a> {% endif %}
 
     {% if object_history%}
         {% regroup object_history by get_day as histories %}
@@ -81,6 +79,6 @@
     <hr />
     {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get date_history_begin=date_before%}">{%trans "← Previous Period" %}</a> {% endif %}
     <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span>
-    {% if date_after %}<a style="position: absolute; right: 50px" href= "{%add_get date_history_begin=date_after%}">{%trans "Next Period →"%} </a> {% endif %}
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after%}">{%trans "Next Period →"%} </a> {% endif %}
     <br />
 {% endblock %}

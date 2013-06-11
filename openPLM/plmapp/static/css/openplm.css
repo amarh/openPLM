@@ -1511,3 +1511,18 @@ img.avatar {
 .tb-alert{
     margin-top:20px;
 }
+
+.history_form{
+    font-size: 10px;
+    position: absolute; 
+    right: 22px; 
+    border: solid 1px #FF6464; 
+    display: inline-block;
+    top: 150px; 
+    padding: 2px;
+    background-color: rgb(200, 199, 197);
+}
+
+.history_form input{
+    width: 60px; 
+}
