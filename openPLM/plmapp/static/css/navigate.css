@@ -326,8 +326,8 @@ span.imgManagement {
 div#RevisionsNav
 {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 20px;
+    top: 20px;
     z-index : 99;
     padding: 2px;
     width: 250px;
@@ -347,6 +347,14 @@ div#FilterNav
     background-color: #555555;
     -moz-border-radius: 5px;
     color: #eee;
+}
+
+#full-screen {
+    position: absolute;
+    z-index: 500;
+    display: block;
+    top: 5px;
+    right: 5px;
 }
 
 div#FilterNav label {

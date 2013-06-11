@@ -609,13 +609,38 @@ $(document).ready(function(){
         $("#zoom-fit-all").button().click(scale_fit_all);
         $("#zoom-original").button().click(function (){ center(); scale(1);});
         $("#zoom-in").button().click(function () {
-                if (scale_level < 1.95){
-                    scale(scale_level + 0.05);
-                }});
+            if (scale_level < 1.95){
+                scale(scale_level + 0.05);
+            }
+        });
         $("#zoom-out").button().click(function () {
-                if (scale_level > 0.1){
-                    scale(scale_level - 0.05);
-                }});
+            if (scale_level > 0.1){
+                scale(scale_level - 0.05);
+            }
+        });
+
+        $("#full-screen").click(function() {
+            var main = document.getElementById("main_content");
+            if (screenfull.enabled) {
+                screenfull.toggle(main);
+            }
+
+        });
+        var width = $("#main_content").width();
+        var height = $("#main_content").height();
+        screenfull.onchange = function() {
+            var main = $(window);
+            var w, h;
+            if( screenfull.isFullscreen ) {
+                w = main.width() +"px";
+                h = main.height() +"px";
+                $("#main_content, #Navigate").css({"width": w, "height": h});
+            } else {
+                $("#main_content, #Navigate").css({"width": "inherit", "height": height+"px"});
+            }
+            center();
+        };
+
 
         init();
         center();
