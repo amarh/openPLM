@@ -932,7 +932,8 @@ class HistoryObjectForm(forms.Form):
     """
     document = forms.BooleanField(required = False, initial=True)
     part = forms.BooleanField(required = False, initial=True)
-
+    group = forms.BooleanField(required = False, initial=True)
+    
 class HistoryDateForm(forms.Form):
     date_history_begin = forms.DateTimeField(label=_(u"View Changes From *"),
         widget=forms.DateInput(attrs={"size":10}), initial=datetime.date.today(), 

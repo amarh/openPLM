@@ -385,6 +385,10 @@ class ViewTest(CommonViewTest):
         response = self.get("/timeline/" , {"part":"on", "document":"on", "date_history_begin":"2013-06-8", "number_days": "15", "done_by": "company"})
         history5 = response.context["object_history"]
         self.assertEqual(list(history5), list(m.History.objects.filter(date__gte = date_end, date__lt = date_begin, user__username="company")))
+        # only group selected
+        response = self.get("/timeline/" , {"group":"on","date_history_begin":"2013-06-8", "number_days": "15", "done_by": "company"})
+        history6 = response.context["object_history"]
+        self.assertEqual(list(history6), list(m.GroupHistory.objects.filter(date__gte = date_end, date__lt = date_begin, user__username="company")))
         
     def test_navigate_get(self):
         response = self.get(self.base_url + "navigate/")

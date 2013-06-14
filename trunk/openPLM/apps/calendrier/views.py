@@ -198,7 +198,7 @@ def history_calendar(request, year=None, month=None, obj_type="-", obj_ref="-", 
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     if timeline:
         hcls = TimelineCalendar
-        histories = models.timeline_histories(request.user)
+        histories = models.timeline_histories(request.user, None, None, None, None)
         ctx['object_type'] = _("Timeline")
     elif hasattr(obj, "get_all_revisions"):
         # display history of all revisions
@@ -292,7 +292,7 @@ if ICAL_INSTALLED:
         def items(self, obj):
             year = obj.h_year
             month = obj.h_month
-            return models.timeline_histories(obj).filter(date__year=year, date__month=month).order_by("date")
+            return models.timeline_histories(obj, None, None, None, None).filter(date__year=year, date__month=month).order_by("date")
 
         def item_title(self, item):
             return strip_tags(item.title)
