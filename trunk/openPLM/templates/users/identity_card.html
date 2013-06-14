@@ -18,7 +18,7 @@
     {% if sort == "recently-added" and not restricted %}
         <p>
         <span class="sort">
-            {% blocktrans with object.date_joined|naturaltime as ctime %}joined {{ctime}} ago{% endblocktrans %}
+            {% blocktrans with object.date_joined|naturaltime as ctime %}joined {{ctime}} {% endblocktrans %}
         </span>
         </p>
     {% endif %}
