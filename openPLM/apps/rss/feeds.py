@@ -112,7 +112,7 @@ class TimelineRssFeed(RssFeed):
         return _("Timeline")
 
     def items(self, obj):
-        return timeline_histories(obj)[:10]
+        return timeline_histories(obj, None, None, None, None)[:10]
 
 class TimelineAtomFeed(TimelineRssFeed):
     feed_type = Atom1Feed

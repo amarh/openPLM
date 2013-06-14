@@ -287,54 +287,50 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
     date_begin = from_current_timezone(date_begin)
     if date_begin >  from_current_timezone(datetime.datetime.today()):
         date_begin = from_current_timezone(datetime.datetime.today())
+    date_end = date_begin - datetime.timedelta(days = int(number_days))
+    date_end = from_current_timezone(date_end)
 
 
     if timeline:
         # global timeline: shows objects owned by the company and readable objects
         ctx["timeline"] = True
-        history = models.timeline_histories(obj)
         ctx['object_type'] = _("Timeline")
         
         form_object = forms.HistoryObjectForm(request.GET if request.GET else None)
         if form_object.is_valid():
             display_part = form_object.cleaned_data["part"]
             display_document = form_object.cleaned_data["document"]
+            display_group = form_object.cleaned_data["group"]
         else:
             display_part = True
-            display_document = True        
-            
-        if display_document and not display_part:
-            document = models.document.get_all_documents().keys()
-            history = history.filter(plmobject__type__in = document)
-        elif display_part and display_document == False:
-            part = models.part.get_all_parts().keys()
-            history = history.filter(plmobject__type__in = part)
+            display_document = True
+            display_group = True
+        list_display = {"display_document": display_document, "display_part": display_part, "display_group" : display_group}
+        history = models.timeline_histories(obj, from_current_timezone(date_begin + datetime.timedelta(days = 1)), date_end, done_by, list_display)
         ctx['form_object'] = form_object
-            
         
-    elif hasattr(obj, "revision"):
-        # display history of all revisions
-        history = obj.histories
-        ctx["show_revisions"] = True
     else:
-        ctx["show_revisions"] = False
         history = obj.histories
-    
-    date_end = date_begin - datetime.timedelta(days = int(number_days))
-    date_end = from_current_timezone(date_end)
-    history = history.filter(date__gte = date_end, date__lt = from_current_timezone(date_begin + datetime.timedelta(days = 1)))
-    
-    if done_by != "":
-        if models.User.objects.filter(username= done_by).exists():
-            history = history.filter(user__username = done_by)
+        history = history.filter(date__gte = date_end, date__lt = from_current_timezone(date_begin + datetime.timedelta(days = 1)))
+        if done_by != "":
+            if models.User.objects.filter(username= done_by).exists():
+                history = history.filter(user__username = done_by)
+            else:
+                history = history.none()
+                messages.error(request, "This user doesn't exist")  
+        elif hasattr(obj, "revision"):
+            # display history of all revisions
+            ctx["show_revisions"] = True
         else:
-            history = history.none()
-            messages.error(request, "This user doesn't exist")  
+            ctx["show_revisions"] = False
+        history = history.select_related("plmobject", "user__profile")
+    
+    
+    
     date_after = from_current_timezone(date_begin + datetime.timedelta(days = 1))
     
     if date_after < from_current_timezone(datetime.datetime.today()):
         ctx['date_after'] = (date_begin + datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
-    history = history.select_related("plmobject", "user__profile")
     ctx.update({
         'date_before' : (date_begin - datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d'),
         'form_date': form_date,
