@@ -1286,11 +1286,16 @@ div#attributes {
     position: absolute;
     left: 120px;
     width: 150px;
-    font-size: 90%;
-    line-height: 0.9;
+    font-size: 85%;
+    line-height: 0.8;
 }
 .id_details span.type {
+    display: inline-block;
     font-weight: bold;
+    left: -130px;
+    top: -5px;
+    width: 300px;
+    position: relative;
 }
 .id_details p {
     margin-top: 0.5em;
