@@ -35,6 +35,12 @@ What's new for users
 Wiki syntax
 ++++++++++++++++++
 
+Parts and documents: new *description* field
+++++++++++++++++++++++++++++++++++++++++++++++
+
+Assembly promotion in two clicks
++++++++++++++++++++++++++++++++++++
+
 Avatars
 ++++++++++++++++++
 
@@ -43,6 +49,15 @@ Check-in improvements
 
 Search: all types
 +++++++++++++++++++++++
+
+Timeline: browse by date and filtering
+++++++++++++++++++++++++++++++++++++++++++
+
+Navigate: full screen display
+++++++++++++++++++++++++++++++
+
+3D view: full screen display and BOM
++++++++++++++++++++++++++++++++++++++
 
 
 
