@@ -2,7 +2,7 @@
 Upgrading from OpenPLM 1.2 to OpenPLM 1.3
 ===========================================
 
-:Date: 2013-03-12
+:Date: 2013-06-17
 
 New/updated dependencies
 ==============================
@@ -42,7 +42,7 @@ South 0.7.6
 South is used to migrate the database. You should always upgrade south
 before migrating a database:
 
-    * ``pip install -U south``
+    * ``pip install -U 'south==0.7.6'``
 
 psycopg2
 ++++++++++++++
@@ -84,56 +84,215 @@ Settings
 Required
 ++++++++++++
 
-ALLOWED_HOSTS
+.. data:: PROJECT_ROOT
 
-COMMENT_APPS
+    Add the following line at the top of file::
 
-USE_TZ
+        import sys
+        import os.path
 
-AUTH_PROFILE_MODULE
-
-BROKER_URL
-
-INSTALLED_APPS
-
-STATIC_ROOT
-
-STATIC_URL
-
-ADMIN_MEDIA_PREFIX
-
-TEMPLATE_LOADERS
-
-MIDDLEWARE_CLASSES
+        PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-TEMPLATE_CONTEXT_PROCESSORS
+.. data:: ALLOWED_HOSTS
+
+    It must be set to a list of strings representing the host/domain names that this Django site can serve.
+
+    For example::
+
+        ALLOWED_HOSTS = [
+            '.example.com', # Allow domain and subdomains
+            '.example.com.', # Also allow FQDN and subdomains
+        ]
+
+    See :setting:`django:ALLOWED_HOSTS`
 
 
-LOCALE_PATHS
+.. data:: COMMENT_APPS
+
+    Must be set to::
+        
+        COMMENTS_APP = "openPLM.plmapp"
+
+.. data:: USE_TZ
+
+    Must be set to::
+
+        USE_TZ = True
+
+.. data:: BROKER_URL
+
+    Adds the following lines after all ``BROKER_*`` lines::
+                
+        BROKER_URL = "amqp://%s:%s@%s:%d/%s" % (BROKER_USER,
+                BROKER_PASSWORD, BROKER_HOST, BROKER_PORT, BROKER_VHOST)
+        del BROKER_USER, BROKER_PASSWORD, BROKER_HOST, BROKER_PORT, BROKER_VHOST
+
+.. data:: INSTALLED_APPS
+
+    The first installed applications must be::
+
+        INSTALLED_APPS = (
+            'django.contrib.auth',
+            'django.contrib.contenttypes',
+            'django.contrib.sessions',
+            'django.contrib.sites',
+            'django.contrib.admin',
+            'django.contrib.comments',
+            'django.contrib.humanize',
+            'django.contrib.messages',
+            'django.contrib.staticfiles',
+            'djcelery',
+            'haystack',
+            'south',
+            'openPLM.plmapp',
+            # your optional applications are set here
+        )
+
+
+.. data:: STATIC_ROOT
+
+    Must be set to::
+        
+        STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+        
+
+.. data:: STATIC_URL
+    
+    Must be set to::
+        
+        STATIC_URL = "/static/"
+
+
+.. data:: TEMPLATE_LOADERS
+
+    Must be set to::
+
+        TEMPLATE_LOADERS = (
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        )
+
+    or (cached version)::
+
+        TEMPLATE_LOADERS = (
+            ('django.template.loaders.cached.Loader', (
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            )),
+        )
+
+.. data:: MIDDLEWARE_CLASSES
+
+    Must be set to::
+                
+        MIDDLEWARE_CLASSES = (
+            'django.middleware.common.CommonMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
+        )
+
+
+.. data:: TEMPLATE_CONTEXT_PROCESSORS
+
+    Must be set to::
+
+        TEMPLATE_CONTEXT_PROCESSORS = (
+                "django.contrib.auth.context_processors.auth",
+                "django.core.context_processors.debug",
+                "django.core.context_processors.i18n",
+                "django.core.context_processors.media",
+                "django.core.context_processors.static",
+                "django.core.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
+        )
+
+.. data:: LOCALE_PATHS
+    
+    Must be set to::
+
+        LOCALE_PATHS = (
+            os.path.join(PROJECT_ROOT, "locale"),
+        )
+
+Removed
+++++++++++
+
+The settings ``AUTH_PROFILE_MODULE`` and ``ADMIN_MEDIA_PREFIX`` are no longer required
+and can be safely removed.
+
 
 Optional
 ++++++++++
 
-RICHTEXT_FILTER
+.. data:: RICHTEXT_FILTER and RICHTEXT_WIDGET_CLASS
 
-REFERENCES
+    This settings set the wiki syntax used by comments and description fields.
+
+    To enable the Markdown syntaxe, add the following lines::
+
+        RICHTEXT_FILTER = 'openPLM.plmapp.filters.markdown_filter'
+        RICHTEXT_WIDGET_CLASS = 'openPLM.plmapp.widgets.MarkdownWidget'
+
+    See :ref:`richtext-admin`.
+    
+.. data:: REFERENCE_PATTERNS
+
+    This setting describes how new document and part references are generated.
+    See :ref:`admin-references`.
+
 
 Applications
 ===================
 
-Badges: new required middleware
+Badges
+++++++++
+
+If the badges application is installed, set the ``MIDDLEWARE_CLASSES`` setting to::
+
+
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'openPLM.plmapp.middleware.locale.ProfileLocaleMiddleware',
+        'openPLM.apps.badges.middleware.GlobalRequest',
+    )
 
 Commands
 ==============
 
-Collect static
+It is necessary to run the following commands to serve all static files:
+
+    * ``./manage.py collectstatic --noinput``
 
 Apache
 ================
+   
+Apache must serve the ``static/`` folder. It must also be able to write in the ``media/`` directory.
 
-static files
+    * ``chown -R www-data:www-data media/``
 
-avatars directory
+Apache files look like:
 
+.. literalinclude:: ../apache/simple_1.3.conf
+    :language: apache
+
+SSL:
+
+.. literalinclude:: ../apache/ssl_1.3.conf
+    :language: apache
+
+Ad the following lines if document3D application is installed (befor the ``<Location /media>`` line):
+
+.. code-block:: apache
+
+    <Location /media/3D>
+        WSGIAccessScript /var/django/openPLM/trunk/openPLM/apache/access.wsgi
+    </Location>
 
