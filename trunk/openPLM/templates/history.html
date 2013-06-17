@@ -28,9 +28,9 @@
     </form>
     <br />
     <br />
-    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
+    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get document='on' part='on' group='on' date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
     <span style="position: absolute; left: 45%; text-decoration: underline">{{date_end_period}} - {{date_begin_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get document='on' part='on' group='on' date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
 
     {% if object_history%}
         {% regroup object_history by get_day as histories %}
@@ -88,8 +88,8 @@
         </div>
     {% endif %}
     <hr />
-    {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
+    {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get document='on' part='on' group='on' date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
     <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get date_history_begin=date_after number_days=number_days%}">{%trans "Next Period →"%} </a> {% endif %}
+    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get  document='on' part='on' group='on' date_history_begin=date_after number_days=number_days%}">{%trans "Next Period →"%} </a> {% endif %}
     <br />
 {% endblock %}
