@@ -309,6 +309,18 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         history = models.timeline_histories(obj, from_current_timezone(date_begin + datetime.timedelta(days = 1)), date_end, done_by, list_display)
         ctx['form_object'] = form_object
         
+        if display_document:
+            display_document = 'on'
+        if display_part:
+            display_part = 'on'
+        if display_group:
+            display_group = 'on'
+        
+        ctx['display_document'] = display_document
+        ctx['display_part'] = display_part
+        ctx['display_group'] = display_group
+        
+        
     else:
         history = obj.histories
         history = history.filter(date__gte = date_end, date__lt = from_current_timezone(date_begin + datetime.timedelta(days = 1)))
@@ -339,7 +351,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         "number_days" : number_days,
         'current_page' : 'history',
         'object_history' : history,
-        'show_identifiers' : timeline,
+        'show_identifiers' : timeline
         })
     return r2r(template, ctx, request)
 
