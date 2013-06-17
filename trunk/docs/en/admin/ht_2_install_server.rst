@@ -41,21 +41,8 @@ Install necessary packages
 
 First, you must install some dependencies:
 
-    #. ``apt-get install swig build-essential pkg-config gettext``
-    #. ``apt-get install apache2 libapache2-mod-wsgi``
-    #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
-    #. ``pip install odfpy``
-    #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
-    #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django python-django-south python-tz``
-    #. ``pip install docutils``
-    #. ``pip install django-celery``
-    #. ``pip install 'django-haystack<2'``
-    #. ``pip install librabbitmq``
-    #. ``pip install markdown```
-    #. ``apt-get install postgresql python-psycopg2``
-    #. ``pip install lepl``
-    #. ``apt-get install python-pisa libgsf-bin``
+    #. ``apt-get install swig build-essential pkg-config gettext apache2 libapache2-mod-wsgi python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython graphviz graphviz-dev python-pygraphviz  python-xapian rabbitmq-server postgresql libpq-dev python-tz python-pisa libgsf-bin imagemagick python-pisa libgsg-bin python-lxml``
+    #. ``pip install odfpy docutils celery django-celery 'django==1.5.1' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
 
 To enable plain text search on files, you need to install the following
 dependencies:
@@ -74,7 +61,7 @@ All files used for a new django site will be stored in this directory.
     
     * ``cd /var/django``
     
-    * ``svn co svn://openplm.org/openPLM``
+    * ``svn co http://svn.openplm.org/svn/openPLM/``
     
 The directory ./openPLM is created and all codes are downloaded.
     
