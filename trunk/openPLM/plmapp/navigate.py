@@ -73,13 +73,13 @@ def get_id_card_data(doc_ids, date=None):
     ctx = { "thumbnails" : {}, "num_files" : {} }
     if doc_ids:
         thumbnails = models.DocumentFile.objects.filter(deprecated=False,
-                    document__in=doc_ids, thumbnail__isnull=False)
+            document__in=doc_ids, thumbnail__isnull=False).exclude(thumbnail="")
         ctx["thumbnails"].update(thumbnails.values_list("document", "thumbnail"))
         num_files = dict.fromkeys(doc_ids, 0)
         for doc_id in models.DocumentFile.objects.filter(deprecated=False,
             document__in=doc_ids).values_list("document", flat=True):
                 num_files[doc_id] += 1
-                ctx["num_files"] = num_files
+        ctx["num_files"] = num_files
     return ctx
 
 class FrozenAGraph(pgv.AGraph):
