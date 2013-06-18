@@ -6,7 +6,6 @@ from OCC.TDF import *
 from OCC.XSControl import XSControl_WorkSession
 from OCC.STEPCAFControl import *
 from OCC.STEPControl import *
-from OCC.Utils.DataExchange.STEP import StepOCAF_Export
 from STP_converter_WebGL import StepImporter
 from classes import Product
 from OCC.GarbageCollector import garbage
