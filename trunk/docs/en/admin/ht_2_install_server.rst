@@ -224,7 +224,7 @@ For example:
     * ``cp /var/django/openPLM/trunk/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
     * ``cp /var/django/openPLM/trunk/openPLM/etc/default/celeryd /etc/default/celeryd``
     * ``chmod +x /etc/init.d/celeryd``
-    * ``update-rc.d celeryd default``
+    * ``update-rc.d celeryd defaults``
 
 To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 
