@@ -1262,7 +1262,7 @@ div#attributes {
     float: left;
     background-color: #343434;
     border: 1px solid #343434;
-    margin-top: 25px;
+    margin-top: 20px;
     display: table-cell;
 }
 .identity_card .id_thumbnail_inner {
@@ -1324,6 +1324,7 @@ div#attributes {
 .id_thumbnail > p {
     font-size: 85%;
     line-height: 1;
+    margin-top: 0.2em;
     text-align: center;
 }
 
