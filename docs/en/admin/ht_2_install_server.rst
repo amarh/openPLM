@@ -248,7 +248,7 @@ Check required modules
 Configure Apache server
 =======================
 
-Edit you Apache configuration file (:file:`/etc/apache2/httpd.conf`) and
+Edit you Apache configuration file (:file:`/etc/apache2/sites-available/openplm`) and
 add the following lines:
     
 .. literalinclude:: apache/simple_1.3.conf
@@ -257,6 +257,7 @@ add the following lines:
 Restart Apache server
 =====================
 
+    * ``a2ensite openplm``
     * ``service apache2 restart``
 
 First steps in openPLM
