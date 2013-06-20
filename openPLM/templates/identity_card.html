@@ -17,9 +17,11 @@
             {% endif %}
         {% endif %}
         <div class="id_thumbnail">
-            <div class="id_thumbnail_inner">
-                <img src="{% block thumbnail_url %}{% endblock %}"/>
-            </div>
+            {% block thumbnail %}
+                <div class="id_thumbnail_inner">
+                    <img src="{% block thumbnail_url %}{% endblock %}"/>
+                </div>
+            {% endblock %}
         </div>
         <div class="id_details">
 

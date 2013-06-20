@@ -1280,28 +1280,31 @@ div#attributes {
     display: block;
 }
 .identity_card .id_details {
-    height: 150px;
+    height: 130px;
     border-left: 1px solid #ccc;
     padding: 0 1em;
     position: absolute;
     left: 120px;
+    top: 20px;
     width: 150px;
     font-size: 85%;
-    line-height: 0.8;
+    line-height: 1;
 }
 .id_details span.type {
     display: inline-block;
     font-weight: bold;
     left: -130px;
-    top: -5px;
+    top: -2px;
     width: 300px;
     position: relative;
 }
 .id_details p {
-    margin-top: 0.5em;
+    margin-top: 0.3em;
+    top: -20px;
+    position: relative;
     word-wrap: break-word;
 }
-.id_details p:not(:last-child) {
+.id_details p:not(:last-child):not(:first-child) {
     border-bottom: 1px dotted #ccc;
 }
 .id_details .name {
@@ -1314,10 +1317,15 @@ div#attributes {
     max-height: 2.2em;
     display: block;
 }
-.id_details .sort, .id_details .num_files, .id_details .state {
-    font-size: 80%;
+.id_details .sort, .id_thumbnail .num_files, .id_details .state {
+    font-size: 85%;
 }
 
+.id_thumbnail > p {
+    font-size: 85%;
+    line-height: 1;
+    text-align: center;
+}
 
 #browser { margin-left: -1em; }
 div#type-panel {
