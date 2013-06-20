@@ -296,3 +296,16 @@ Ad the following lines if document3D application is installed (befor the ``<Loca
         WSGIAccessScript /var/django/openPLM/trunk/openPLM/apache/access.wsgi
     </Location>
 
+
+celeryd
+========
+
+The init script (:file:`/etc/init.d/celeryd`) has been updated.
+It now creates the :file:`/var/log/celery` and :file:`/var/run/celery` directories on startup.
+
+You can copy the new file:
+
+    * ``cp etc/init.d/celeryd /etc/default/celeryd``
+
+
+
