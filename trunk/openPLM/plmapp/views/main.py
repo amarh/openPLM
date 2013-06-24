@@ -93,8 +93,10 @@ def comment_post_wrapper(request):
         if not (user.get_full_name() == request.POST['name'] and \
                 user.email == request.POST['email']):
             return HttpResponse("You registered user...trying to spoof a form...eh?")
-        messages.success(request, _(u"Your comments has been send successfully."))
-        return post_comment(request)
+        resp = post_comment(request)
+        if isinstance(resp, HttpResponseRedirect):
+            messages.success(request, _(u"Your comment was posted."))
+        return resp
     return HttpResponse("You anonymous cheater...trying to spoof a form?")
 
 
