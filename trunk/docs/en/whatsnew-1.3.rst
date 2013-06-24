@@ -9,7 +9,7 @@ What's new in OpenPLM 1.3
 .. warning::
 
     OpenPLM 1.3 is still in development, you can read the 
-    :ref`whatsnew-1.2 <previous release notes>`.
+    :ref:`previous release notes <whatsnew-1.2>`.
 
 
 Introduction
