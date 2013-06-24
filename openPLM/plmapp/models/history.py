@@ -1,4 +1,4 @@
-from itertools import chain, permutations
+from itertools import chain
 import datetime
 from django.utils import timezone
 
@@ -10,7 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from .lifecycle import State, Lifecycle, get_cancelled_state
 from .plmobject import PLMObject
-from openPLM.plmapp.models import User, document, part
+from .part import get_all_parts
+from .document import get_all_documents
 
 # history stuff
 class AbstractHistory(models.Model):
@@ -271,41 +272,41 @@ def timeline_histories(user, date_begin, date_end, done_by, list_display):
         if list_display["display_document"] | list_display["display_part"]:
             history_plmobject = History.timeline_items(user)
             if list_display["display_document"]:
-                documents = document.get_all_documents().keys()
+                documents = get_all_documents().keys()
                 history_document = history_plmobject.filter(plmobject__type__in = documents)
             if list_display["display_part"]:
-                parts = part.get_all_parts().keys()
+                parts = get_all_parts().keys()
                 if list_display["display_document"]:
-                    history_plmobject =  history_document | history_plmobject.filter(plmobject__type__in = parts) 
+                    history_plmobject =  history_document | history_plmobject.filter(plmobject__type__in = parts)
                 else:
                     history_plmobject = history_plmobject.filter(plmobject__type__in = parts)
             else:
                 history_plmobject = history_document
             history_plmobject = history_plmobject.filter(date__gte = date_end, date__lt = date_begin)
             history_plmobject = history_plmobject.select_related("plmobject", "user__profile")
-            
+
             if done_by != "":
                 if User.objects.filter(username= done_by).exists():
                     history_plmobject = history_plmobject.filter(user__username = done_by)
                 else:
                     history_plmobject = history_plmobject.none()
-            
+
         if list_display["display_group"]:
             history_group = GroupHistory.timeline_items(user)
             history_group = history_group.filter(date__gte = date_end, date__lt = date_begin)
             history_group = history_group.select_related("plmobject", "user__profile")
-        
+
             if done_by != "":
                 if User.objects.filter(username= done_by).exists():
                     history_group = history_group.filter(user__username = done_by)
                 else:
                     history_group = history_group.none()
-        
+
         if list_display["display_document"] | list_display["display_part"] and list_display["display_group"]:
             history = sorted(chain(history_group, history_plmobject), key=lambda instance: instance.date, reverse=True)
         elif list_display["display_group"]:
             history = history_group
         elif list_display["display_document"] | list_display["display_part"]:
             history = history_plmobject
-            
+
         return history
