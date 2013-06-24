@@ -37,7 +37,7 @@ import os
 import csv
 import json
 import tempfile
-import datetime 
+import datetime
 import itertools
 
 from django.conf import settings
@@ -47,7 +47,6 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.comments.views.comments import post_comment
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.db.models.fields import FieldDoesNotExist
 from django.http import (HttpResponseRedirect, HttpResponse, Http404,
@@ -56,7 +55,6 @@ from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.i18n import set_language as dj_set_language
-from django.contrib.auth.models import User
 from django.forms.util import from_current_timezone
 
 from haystack.views import SearchView
@@ -203,7 +201,7 @@ def display_object(request, obj_type, obj_ref, obj_revi):
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
-    
+
     if obj_type in ('User', 'Group'):
         url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
     else:
@@ -264,10 +262,10 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         True if the template should show the type, reference and revision
         of each history row
     """
-    
-        
+
+
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
-    
+
     form_date = forms.HistoryDateForm(request.GET if request.GET else None)
     if form_date.is_valid():
         date_begin = form_date.cleaned_data["date_history_begin"]
@@ -281,7 +279,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
                 date_begin = datetime.datetime(int(date_begin[:4]), int(date_begin[5:7]), int(date_begin[8:10]))
             else:
                 date_begin = datetime.datetime.today()
-        else : 
+        else :
             date_begin = datetime.datetime.today()
         number_days = 30
     date_begin = from_current_timezone(date_begin)
@@ -295,7 +293,7 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         # global timeline: shows objects owned by the company and readable objects
         ctx["timeline"] = True
         ctx['object_type'] = _("Timeline")
-        
+
         form_object = forms.HistoryObjectForm(request.GET if request.GET else None)
         if form_object.is_valid():
             display_part = form_object.cleaned_data["part"]
@@ -308,19 +306,19 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
         list_display = {"display_document": display_document, "display_part": display_part, "display_group" : display_group}
         history = models.timeline_histories(obj, from_current_timezone(date_begin + datetime.timedelta(days = 1)), date_end, done_by, list_display)
         ctx['form_object'] = form_object
-        
+
         if display_document:
             display_document = 'on'
         if display_part:
             display_part = 'on'
         if display_group:
             display_group = 'on'
-        
+
         ctx['display_document'] = display_document
         ctx['display_part'] = display_part
         ctx['display_group'] = display_group
-        
-        
+
+
     else:
         history = obj.histories
         history = history.filter(date__gte = date_end, date__lt = from_current_timezone(date_begin + datetime.timedelta(days = 1)))
@@ -329,18 +327,18 @@ def display_object_history(request, obj_type="-", obj_ref="-", obj_revi="-", tim
                 history = history.filter(user__username = done_by)
             else:
                 history = history.none()
-                messages.error(request, "This user doesn't exist")  
+                messages.error(request, "This user doesn't exist")
         elif hasattr(obj, "revision"):
             # display history of all revisions
             ctx["show_revisions"] = True
         else:
             ctx["show_revisions"] = False
         history = history.select_related("plmobject", "user__profile")
-    
-    
-    
+
+
+
     date_after = from_current_timezone(date_begin + datetime.timedelta(days = 1))
-    
+
     if date_after < from_current_timezone(datetime.datetime.today()):
         ctx['date_after'] = (date_begin + datetime.timedelta(days = number_days +1)).strftime('%Y-%m-%d')
     ctx.update({
