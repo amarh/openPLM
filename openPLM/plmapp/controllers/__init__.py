@@ -170,4 +170,6 @@ from openPLM.plmapp.controllers.document import DocumentController
 from openPLM.plmapp.controllers.user import UserController
 from openPLM.plmapp.controllers.group import GroupController
 
+MetaController.controllers_dict["GroupInfo"] = GroupController
+
 

@@ -324,3 +324,4 @@ class GroupController(Controller):
                 raise PermissionError("You can not see this group")
             return False
         return True
+
