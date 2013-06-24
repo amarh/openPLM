@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load i18n plmapp_tags more_like_this humanize %}
+{% load comments %}
+{% load i18n %}
+
+{% block title %}{% trans "Preview your comment" %}{% endblock %}
+
+{% block leftcolumn %} {% endblock %}
+{% block main %}
+    <form action="{% comment_form_target %}" method="post">
+        {% csrf_token %}
+        {% if next %}<div><input type="hidden" name="next" value="{{ next }}" /></div>{% endif %}
+        {% if form.errors %}
+            <h1>{% blocktrans count counter=form.errors|length %}Please correct the error below{% plural %}Please correct the errors below{% endblocktrans %}</h1>
+        {% else %}
+            <h1>{% trans "Preview your comment" %}</h1>
+            <blockquote>{{ comment|linebreaks }}</blockquote>
+            <p>
+            {% trans "and" %} <input type="submit" name="submit" class="submit-post" value="{% trans "Post your comment" %}" id="submit" /> {% trans "or make changes" %}:
+            </p>
+        {% endif %}
+
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+                <div
+                    {% if field.errors %} class="error"{% endif %}
+                    {% ifequal field.name "honeypot" %} style="display:none;"{% endifequal %}
+                    {% ifequal field.name "name" %} style="display:none;"{% endifequal %}
+                    {% ifequal field.name "email" %} style="display:none;"{% endifequal %}
+                    {% ifequal field.name "url" %} style="display:none;"{% endifequal %}
+                    {% ifequal field.name "title" %} style="display:none;"{% endifequal %}
+                    >
+                    {% if field.name == "name" or field.name == "email" %}
+                        <input type="text"
+                        id="id_{{field.name}}" name="{{field.name}}"
+                        {% ifequal field.name "name" %}
+                            max_length=50 value="{{request.user.get_full_name}}"
+                        {% else %}
+                            value="{{request.user.email}}"
+                        {% endifequal %}
+                        >
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="submit">
+            <input type="submit" class="tb-btn tb-btn-primary" name="post" class="submit-post" value="{% trans "Post" %}" />
+        </div>
+        {{ form.media|safe }}
+
+    </form>
+{% endblock %}
+
