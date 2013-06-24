@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User, Group
+from django.contrib.comments.signals import comment_was_posted
 from django.utils.translation import ugettext_lazy as _
 
 from .lifecycle import State, Lifecycle, get_cancelled_state
@@ -262,8 +263,8 @@ class StateHistory(models.Model):
         self.state_category = category
         super(StateHistory, self).save(*args, **kwargs)
 
-def timeline_histories(user, date_begin, date_end, done_by, list_display):
-    if date_begin == None and date_end == None:
+def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_display=None):
+    if date_begin is None and date_end is None:
         return History.timeline_items(user)
     else:
         history = None
@@ -285,8 +286,8 @@ def timeline_histories(user, date_begin, date_end, done_by, list_display):
             history_plmobject = history_plmobject.filter(date__gte = date_end, date__lt = date_begin)
             history_plmobject = history_plmobject.select_related("plmobject", "user__profile")
 
-            if done_by != "":
-                if User.objects.filter(username= done_by).exists():
+            if done_by:
+                if User.objects.filter(username=done_by).exists():
                     history_plmobject = history_plmobject.filter(user__username = done_by)
                 else:
                     history_plmobject = history_plmobject.none()
@@ -310,3 +311,17 @@ def timeline_histories(user, date_begin, date_end, done_by, list_display):
             history = history_plmobject
 
         return history
+
+
+def _save_comment_history(sender, comment, request, **kwargs):
+    """
+    Save an history line when a comment is posted.
+    """
+    from openPLM.plmapp.controllers import get_controller
+    obj = comment.content_object
+    ctrl_cls = get_controller(obj.__class__.__name__)
+    ctrl = ctrl_cls(comment.content_object, request.user, no_index=True)
+    ctrl._save_histo("New comment", comment.comment)
+
+comment_was_posted.connect(_save_comment_history)
+
