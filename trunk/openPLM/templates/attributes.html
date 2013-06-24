@@ -132,7 +132,7 @@
 
             {% get_comment_form for obj.object as form %}
             <div>
-                <form action="{% comment_form_target %}" method="post">{% csrf_token %}
+                <form action="{% comment_form_target %}" method="post">
                         {% csrf_token %}
 
                         <input type="hidden" name="next" value="{{obj.plmobject_url}}attributes/" />
