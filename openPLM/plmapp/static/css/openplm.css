@@ -632,6 +632,16 @@ table.Content td.description *{
 #comment_form {
     margin-top: 1em;
 }
+
+.permalink {
+    color: #999;
+    float: right;
+    margin: 0 1em;
+}
+.permalink:hover {
+    color: #333;
+}
+
 tr.Content.part {
     background: url("../img/dark/bg_tr_part.png") repeat;
 }

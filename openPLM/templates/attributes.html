@@ -97,7 +97,7 @@
                 {% get_comment_list for obj.object as comment_list %}
                 <ul class="tb tb-media-list">
                 {% for comment in comment_list %}
-                    <li class="comment tb tb-media">
+                    <li class="comment tb tb-media" id="comment-{{comment.id}}">
                         <div class="tb-pull-left">
                             <img class="avatar" src="{% avatar_url comment.user %}"/>
                         </div>
@@ -112,6 +112,7 @@
                             {{ comment.submit_date|naturalday }},
                             {{ comment.submit_date|naturaltime }}
                         </span>
+                        <a class="permalink" href="#comment-{{comment.id}}" title="{% trans "Permalink"%}">#</a>
                     </h4>
                         <div class="comment_text tb-media-body richtext">
                             {{ comment.comment|richtext_filter:obj }}
