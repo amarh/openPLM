@@ -39,6 +39,7 @@ a digest authentication.
 
 To enable the digest authentication:
 
+    * Install mercurial (``apt-get install mercurial``)
     * ``pip install "hg+https://bitbucket.org/scjody/django-digest" python_digest``
     * Add ``django_digest`` to the list of installed applications
     * Run ``./manage.py migrate django_digest``
