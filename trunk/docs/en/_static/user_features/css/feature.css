@@ -43,17 +43,6 @@
     min-width: 200px;
     position:absolute;
 }
-
-#search_type{
-    top: 14%;
-    left: 10%;
-}
-
-#search_request{
-    top: 14%;
-    left: 25%;
-}
-
 #create_type{
     top: 23%;
     left: 40%;
