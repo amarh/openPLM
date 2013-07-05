@@ -60,7 +60,13 @@ Navigate: full screen display
 +++++++++++++++++++++++++++++++++++++
 
 
+.. figure:: /whatsnew/1.3/3D_mendelmax.png
+    :align: center
+    
+    The model is done by `Brojt <http://www.thingiverse.com/thing:19782>`_.
+    It is licenced under the `Attribution - Share Alike - Creative Commons license`_. 
 
+.. _Attribution - Share Alike - Creative Commons license: http://creativecommons.org/licenses/by-sa/3.0/
 
 What's new for administrators
 ===============================
@@ -124,6 +130,7 @@ Previous versions
 
 .. toctree::
     :maxdepth: 1
-    :glob:
 
-    whatsnew/*
+    whatsnew/whatsnew-1.2
+    whatsnew/whatsnew-1.1
+
