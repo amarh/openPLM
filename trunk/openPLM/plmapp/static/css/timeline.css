@@ -15,7 +15,7 @@ div.timeline h3 > span {
 }
 
 div.timeline dl {
-    line-height: 1.3em;
+    line-height: 1em;
     margin-left: 0.5em;
     font-weight: 500;
 }
@@ -27,8 +27,37 @@ div.timeline [color=""] {
 div.timeline dt {
     padding: 0.3em 0;
     padding-left: 0.5em;
-    font-size: 90%;
+    font-size: 60%;
     font-weight: 600;
+}
+
+ .individual_action {
+/*    background-color: white;
+    border: 1px solid #777777;
+    border-radius: 0.4em 0.4em 0.4em 0.4em;
+    box-shadow: 1px 1px 3px #888888; */
+    margin: 2px;
+}
+
+.tb-pull-left, .individual_action, .tb-pull-left img {
+    height: 35px;
+}
+
+div.individual_action:hover{
+    background-color: #F3F3F1;
+    border-radius: 0.4em 0.4em 0.4em 0.4em;
+    box-shadow: 1px 1px 3px #555555;
+
+}
+
+div.individual_action:hover,
+div.individual_action:hover .tb-pull-left,
+div.individual_action:hover .tb-pull-left img {
+    height: 70px;
+}
+div.individual_action:hover dt,
+div.individual_action:hover dd {
+    font-size: 110%;
 }
 
 div.timeline dt :link:hover,
@@ -45,7 +74,7 @@ div.timeline dt em {
 }
 div.timeline dt.highlight { background-color: #ffa; } 
 div.timeline dd { 
-    font-size: 80%;
+    font-size: 50%;
     padding: 0 0 .75em 1em;
     border-radius: 0 0 12px 0;
     
@@ -54,6 +83,9 @@ div.timeline dd {
     list-style-image: url("../img/puce.png");
 }
 
+div.timeline dd { 
+    font-size: 50%;
+}
 div.timeline div.details,
 div.timeline div.details > p {
     display: inline;
