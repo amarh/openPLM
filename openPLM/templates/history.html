@@ -37,10 +37,10 @@
             <div class="timeline" >
                 <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
 
-                <dl style="overflow: auto; min-height: 100px; max-height: 500px; margin: 10px; width: 98%">
+                <dl style="min-height: 100px margin: 10px; width: 98%">
                     {% for histo in group.list %}
-                            <div style="min-height: 80px">
-                                <div class="tb-pull-left" style="height: 55px;">
+                            <div class="individual_action">
+                                <div class="tb-pull-left">
                                     <img class="avatar" src="{% avatar_url histo.user %}"/>
                                 </div>
                                 <dt class="changeset" id="{{histo.id}}">
