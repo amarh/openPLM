@@ -139,15 +139,15 @@ class DocumentController(PLMObjectController):
             doc_file.locked = True
             doc_file.locker = self._user
             doc_file.save()
-            self._save_histo("Locked",
+            self._save_histo("locked file in ",
                              "%s locked by %s" % (doc_file.filename, self._user))
 
             doc_to_deprecated=doc_file.native_related
             if doc_to_deprecated:
                 doc_to_deprecated.deprecated = True
                 doc_to_deprecated.save()
-                self._save_histo("Deprecated",
-                                 "file : %s" % doc_to_deprecated.filename)
+                self._save_histo("deprecated file in ",
+                                 "file : %s deprecated" % doc_to_deprecated.filename)
         else:
             raise LockError("File already locked")
 
@@ -173,8 +173,8 @@ class DocumentController(PLMObjectController):
         doc_file.locked = False
         doc_file.locker = None
         doc_file.save()
-        self._save_histo("Unlocked",
-                         "%s unlocked by %s" % (doc_file.filename, self._user))
+        self._save_histo("unlocked file in ",
+                         "file : %s unlocked by %s" % (doc_file.filename, self._user))
 
 
     def add_file(self, f, update_attributes=True, thumbnail=True):
@@ -209,7 +209,7 @@ class DocumentController(PLMObjectController):
         self.save(False)
         # set read only file
         os.chmod(doc_file.file.path, 0400)
-        self._save_histo("File added", "file : %s" % f.name)
+        self._save_histo("added file to ", "file : %s added" % f.name)
         if update_attributes:
             self.handle_added_file(doc_file)
         if thumbnail:
@@ -278,7 +278,7 @@ class DocumentController(PLMObjectController):
         doc_file.deprecated = True
         doc_file.save()
         self._delete_old_files(doc_file, ON_DELETE_SELECTORS)
-        self._save_histo("File deleted", "file : %s" % filename)
+        self._save_histo("deleted file in ", "file : %s was deleted" % filename)
 
     def handle_added_file(self, doc_file):
         """
@@ -504,7 +504,7 @@ class DocumentController(PLMObjectController):
         doc_file.save()
         # delete "old" files (not the document file)
         self._delete_old_files(doc_file, ON_CHECKIN_SELECTORS)
-        self._save_histo("Check-in", doc_file.filename)
+        self._save_histo("checked-in ", doc_file.filename)
         if update_attributes:
             self.handle_added_file(doc_file)
         if thumbnail:
@@ -614,8 +614,8 @@ class DocumentController(PLMObjectController):
             for part in parts:
                 models.DocumentPartLink.objects.create(part=part,
                     document=new_ctrl.object)
-        details = "to %s//%s//%s//%s " %(new_ctrl.type, new_ctrl.reference, new_ctrl.revision, new_ctrl.name)
-        self._save_histo("Clone", details)
+        details = "to %s (%s//%s//%s) " %(new_ctrl.name, new_ctrl.type, new_ctrl.reference, new_ctrl.revision)
+        self._save_histo("cloned", details)
         return new_ctrl
 
     def has_links(self):
