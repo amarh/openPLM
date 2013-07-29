@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with openPLM.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Contact :
+# Contact
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
@@ -227,7 +227,7 @@ class PartController(PLMObjectController):
                 ext.save()
         # records creation in history
         self._save_histo(link.ACTION_NAME,
-                         "parent : %s\nchild : %s" % (self.object, child))
+                         "parent : %s (%s//%s//%s) => child : %s (%s//%s//%s), quantity : %s %s, order : %s" % (self.object.name, self.object.type, self.object.reference, self.object.revision, child.name, child.type, child.reference, child.revision, link.quantity, link.unit, link.order))
         return link
 
     def delete_child(self, child):
@@ -250,7 +250,7 @@ class PartController(PLMObjectController):
             child = child.object
         link = self.parentchildlink_parent.now().get(child=child)
         link.end()
-        self._save_histo("Delete - %s" % link.ACTION_NAME, "child : %s" % child)
+        self._save_histo("Undo - %s" % link.ACTION_NAME, "child : %s (%s//%s//%s)" % (child.name, child.type, child.reference, child.revision))
 
     def modify_child(self, child, new_quantity, new_order, new_unit,
             **extension_data):
@@ -871,7 +871,7 @@ class PartController(PLMObjectController):
             document = document.object
         self.documentpartlink_part.create(document=document)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
-                         "Part : %s - Document : %s" % (self.object, document))
+                         "%s (%s//%s//%s) <=> %s (%s//%s//%s)" % (self.object.name, self.object.type, self.object.reference, self.object.revision, document.name, document.type, document.reference, document.revision))
 
     def detach_document(self, document):
         """
@@ -887,8 +887,8 @@ class PartController(PLMObjectController):
             document = document.object
         link = self.documentpartlink_part.now().get(document=document)
         link.end()
-        self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
-                         "Part : %s - Document : %s" % (self.object, document))
+        self._save_histo("Undo " + models.DocumentPartLink.ACTION_NAME,
+                         "%s (%s//%s//%s) <=> %s (%s//%s//%s)" % (self.object.name, self.object.type, self.object.reference, self.object.revision, document.name, document.type, document.reference, document.revision))
 
     def get_attached_documents(self, time=None):
         """
@@ -1058,7 +1058,7 @@ class PartController(PLMObjectController):
             for doc in documents:
                 models.DocumentPartLink.objects.create(part=new_ctrl.object,
                     document=doc)
-        details = "to %s//%s//%s//%s " %(new_ctrl.type, new_ctrl.reference, new_ctrl.revision, new_ctrl.name)
+        details = "to %s (%s//%s//%s)" %(new_ctrl.name, new_ctrl.type, new_ctrl.reference, new_ctrl.revision)
         self._save_histo("Clone", details)
         return new_ctrl
 

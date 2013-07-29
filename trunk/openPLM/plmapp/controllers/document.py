@@ -304,7 +304,7 @@ class DocumentController(PLMObjectController):
             part = part.object
         self.documentpartlink_document.create(part=part)
         self._save_histo(models.DocumentPartLink.ACTION_NAME,
-                         "Part : %s - Document : %s" % (part, self.object))
+                         "%s (%s//%s//%s) <=> %s (%s//%s//%s)" % (part.name, part.type, part.reference, part.revision, self.object.name, self.object.type, self.object.reference, self.object.revision))
 
     def detach_part(self, part):
         """
@@ -317,8 +317,8 @@ class DocumentController(PLMObjectController):
             part = part.object
         link = self.documentpartlink_document.now().get(part=part)
         link.end()
-        self._save_histo(models.DocumentPartLink.ACTION_NAME + " - delete",
-                         "Part : %s - Document : %s" % (part, self.object))
+        self._save_histo("Undo - " + models.DocumentPartLink.ACTION_NAME,
+                         "%s (%s//%s//%s) <=> %s (%s//%s//%s)" % (part.name, part.type, part.reference, part.revision, self.object.name, self.object.type, self.object.reference, self.object.revision))
 
     def get_attached_parts(self, time=None):
         """

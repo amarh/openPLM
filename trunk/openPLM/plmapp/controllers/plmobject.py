@@ -115,9 +115,9 @@ class PLMObjectController(Controller):
         # record creation in history
         infos = {"type" : type, "reference" : reference, "revision" : revision}
         infos.update(data)
-        details = u",".join(u"%s : %s" % (k, v) for k, v in infos.items()
-                if k not in ("auto", "pfiles"))
-        res._save_histo("Create", details)
+        details = u" / ".join(u"%s : %s" % (k, v) for k, v in infos.items()
+                if k not in ("auto", "pfiles", "type", "reference", "revision", "name"))
+        res._save_histo("created", details)
 
         # add links (bulk create)
         ctime = obj.ctime
@@ -219,9 +219,9 @@ class PLMObjectController(Controller):
             if self._all_approved():
                 self.promote(checked=True)
             else:
-                details = u"Current state: %s, next state:%s\n" % (self.state.name, next_state)
-                details += u"Represented users: %s" % u", ".join(u.username for u in users)
-                self._save_histo(u"Approved promotion", details, roles=(role,))
+                details = u"Represented users: %s" % u", ".join(u.username for u in users)
+                details += u"promoted from state: %s to state:%s" % (self.state.name, next_state)
+                self._save_histo(u"promoted", details, roles=(role,))
         else:
             raise PromotionError()
 
@@ -229,8 +229,8 @@ class PLMObjectController(Controller):
         role = self.get_current_signer_role()
         self.check_permission(role)
         self._clear_approvals()
-        details = u"Current state:%s" % self.state.name
-        self._save_histo(u"Removed promotion approvals", details, roles=(role,))
+        details = u"Current state stays : %s" % self.state.name
+        self._save_histo(u"removed promotion approvals", details, roles=(role,))
 
     def _clear_approvals(self):
         self.approvals.now().end()
@@ -259,9 +259,9 @@ class PLMObjectController(Controller):
             new_state = lcl.next_state(state.name)
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
-            details = "change state from %(first)s to %(second)s" % \
+            details = "from state %(first)s to state %(second)s" % \
                                  {"first" :state.name, "second" : new_state}
-            self._save_histo("Promote", details, roles=["sign_"])
+            self._save_histo("promoted", details, roles=["sign_"])
             updated_revisions = []
             if self.object.state == lifecycle.official_state:
                updated_revisions = self._officialize()
@@ -335,9 +335,9 @@ class PLMObjectController(Controller):
             self.object.state = models.State.objects.get_or_create(name=new_state)[0]
             self.object.save()
             self._clear_approvals()
-            details = "change state from %(first)s to %(second)s" % \
+            details = "from state %(first)s to state %(second)s" % \
                     {"first" :state.name, "second" : new_state}
-            self._save_histo("Demote", details, roles=["sign_"])
+            self._save_histo("demoted", details, roles=["sign_"])
             self._update_state_history()
         except IndexError:
             # FIXME raises it ?
@@ -554,8 +554,8 @@ class PLMObjectController(Controller):
         self.check_in_group(new_notified)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_notified, role="notified")
-        details = u"user: %s" % new_notified
-        self._save_histo("New notified", details)
+        details = u"user: %s to be notified" % new_notified
+        self._save_histo("added new notification right", details)
 
     def add_reader(self, new_reader):
         if not self.is_official:
@@ -567,8 +567,8 @@ class PLMObjectController(Controller):
         self.check_in_group(self._user)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_reader, role=models.ROLE_READER)
-        details = "user: %s" % new_reader
-        self._save_histo("New reader", details)
+        details = "user: %s is a reader" % new_reader
+        self._save_histo("added new reader", details)
 
     def check_edit_signer(self, raise_=True):
         """
@@ -632,8 +632,8 @@ class PLMObjectController(Controller):
         self.check_signer(new_signer, role)
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
             user=new_signer, role=role)
-        details = u"user: %s" % new_signer
-        self._save_histo("New %s" % role, details, roles=(role,))
+        details = u"user: %s 's signature is necessary" % new_signer
+        self._save_histo("added new %s" % role, details, roles=(role,))
 
     def remove_notified(self, notified):
         """
@@ -651,8 +651,8 @@ class PLMObjectController(Controller):
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=notified, role="notified")
         link.end()
-        details = u"user: %s" % notified
-        self._save_histo("Notified removed", details)
+        details = u"user: %s is no longer notified" % notified
+        self._save_histo("removed notification right", details)
 
     def remove_reader(self, reader):
         """
@@ -668,8 +668,8 @@ class PLMObjectController(Controller):
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=reader, role=models.ROLE_READER)
         link.end()
-        details = u"user: %s" % reader
-        self._save_histo("Reader removed", details)
+        details = u"user: %s is no longer a reader" % reader
+        self._save_histo("removed reader", details)
 
     def remove_signer(self, signer, role):
         """
@@ -695,8 +695,8 @@ class PLMObjectController(Controller):
         link = models.PLMObjectUserLink.current_objects.get(plmobject=self.object,
                 user=signer, role=role)
         link.end()
-        details = u"user: %s" % signer
-        self._save_histo("%s removed" % role, details, roles=(role,))
+        details = u"user: %s 's signature is no longer necessary" % signer
+        self._save_histo("removed %s" % role, details, roles=(role,))
 
     def replace_signer(self, old_signer, new_signer, role):
         """
@@ -730,9 +730,9 @@ class PLMObjectController(Controller):
         # add new signer
         models.PLMObjectUserLink.objects.create(plmobject=self.object,
                                                 user=new_signer, role=role)
-        details = u"new signer: %s" % new_signer
-        details += u", old signer: %s" % old_signer
-        self._save_histo("New %s" % role, details, roles=(role,))
+        details = u"user : %s " % old_signer
+        details += u"is replaced by user : %s" % new_signer
+        self._save_histo("changed %s" % role, details, roles=(role,))
 
     def set_role(self, user, role):
         """
@@ -834,7 +834,7 @@ class PLMObjectController(Controller):
         self.users.filter(role__startswith=models.ROLE_SIGN).end()
         self._clear_approvals()
         self.save(with_history=False)
-        self._save_histo("Cancel", "Object cancelled")
+        self._save_histo("cancelled", "%s (%s//%s//%s) cancelled"%(self.object.name, self.object.type, self.object.reference, self.object.revision))
         self._update_state_history()
 
     def check_publish(self, raise_=True):
@@ -890,8 +890,8 @@ class PLMObjectController(Controller):
         self.check_publish()
         self.object.published = True
         self.object.save()
-        details = u"Published by %s (%s)" % (self._user.get_full_name(), self._user.username)
-        self._save_histo("Publish", details)
+        details = u"%s (%s//%s//%s) published by %s (%s)" % (self.object.name, self.object.type, self.object.reference, self.object.revision, self._user.get_full_name(), self._user.username)
+        self._save_histo("published", details)
 
     def check_unpublish(self, raise_=True):
         """
@@ -941,8 +941,8 @@ class PLMObjectController(Controller):
         self.check_unpublish()
         self.object.published = False
         self.object.save()
-        details = u"Unpublished by %s (%s)" % (self._user.get_full_name(), self._user.username)
-        self._save_histo("Unpublish", details)
+        details = u"%s (%s//%s//%s) unpublished by %s (%s)" % (self.object.name, self.object.type, self.object.reference, self.object.revision, self._user.get_full_name(), self._user.username)
+        self._save_histo("unpublished", details)
 
     def check_cancel(self,raise_=True):
         """
