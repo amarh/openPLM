@@ -252,7 +252,7 @@ class UserController(Controller):
         for r in roles:
             models.DelegationLink.current_objects.get_or_create(delegator=self.object,
                         delegatee=user, role=r)
-        details = "%(delegator)s delegates the role %(role)s to %(delegatee)s"
+        details = "%(delegator)s delegated the role %(role)s to %(delegatee)s"
         details = details % dict(role=role, delegator=self.object,
                                  delegatee=user)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
@@ -265,7 +265,7 @@ class UserController(Controller):
         """
         if delegation_link.delegator != self.object:
             raise ValueError("%s is not the delegator of %s" % (self.object, ValueError))
-        details = "%(delegator)s removes his delegation for the role %(role)s to %(delegatee)s"
+        details = "%(delegator)s removed his delegation for the role %(role)s to %(delegatee)s"
         details = details % dict(role=delegation_link.role, delegator=self.object,
                                  delegatee=delegation_link.delegatee)
         self._save_histo(models.DelegationLink.ACTION_NAME, details)
