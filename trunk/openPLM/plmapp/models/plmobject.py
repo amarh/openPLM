@@ -214,9 +214,9 @@ class PLMObject(AbstractPLMObject):
 
     @property
     def title(self):
-        attrs = tuple(esc(x) for x in [self.type, self.reference, self.revision, self.name])
-        return mark_safe(u'''<span class="type">%s</span> // <span class="reference">%s</span>
- // <span class="revision">%s</span> // <span class="name">%s</span>''' % attrs)
+        attrs = tuple(esc(x) for x in [self.name, self.type, self.reference, self.revision])
+        return mark_safe(u'''<span class="name">%s</span> (<span class="type">%s</span> // <span class="reference">%s</span>
+ // <span class="revision">%s</span>)''' % attrs)
 
     def _is_promotable(self):
         """
