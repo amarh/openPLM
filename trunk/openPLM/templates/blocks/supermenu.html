@@ -3,13 +3,17 @@
 <div id="supermenu">
     {# Search #}
     <div class="menurow">
-        <div class="menuitem {% if restricted %} disabled {% endif %}"> 
+        <div class="{% if restricted %} disabled {% endif %}"> 
             {% if not restricted %}
-                <a class="tooltip" href="/search/{% add_search %}">
-                    {% trans "Search" %}
-                    <span class="triangle">&nbsp;</span>
-                    <span class="info">{% trans "Search for a part, a document, a file and more." %}</span>
-                </a>
+                <form id="inline_search_form" method="get" action="/search/">
+                    <input type="text" id="id_q" name="q" size="30" style="padding: 0.4em;">
+                        <div style="display: none">
+                            <select class="chzn-done" style="width: 11.8em; display: none;" autocomplete="off" id="id_type" name="type">
+                                <option value="all" selected="selected">All</option>
+                            </select>
+                        </div>
+                    <input type="submit" id="search_button" class="tb-btn tb-btn-primary tb-btn-large" value="SEARCH !" style="margin-top:-4px;background-image: url(../static/img/menuitem_home.png);background-position: center center; box-shadow: 2px 2px 5px #000000;">
+                </form>
             {% else %}
                 <div class="tooltip">
                     {% trans "Search" %}
