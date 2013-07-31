@@ -24,22 +24,23 @@ div#Navigate
 div.node {
     text-align:center;
     display: block;
-    overflow: hidden;
     background-repeat: no-repeat;
     position: absolute;
-    width: 100px;
-    height: 70px;
 }
+
+div.node:hover .identity_card .id_details {
+    bottom: 0px;
+    height: 150px;
+}
+
+div.node:hover .identity_card .id_details .name {
+    height: 60px;
+}
+
 
 
 .node, .node * {
     z-index: 5;
-}
-
-div.main_node {
-    width: 110px;
-    height: 80px;
-
 }
 
 div.node > div.table {
@@ -63,11 +64,8 @@ div.node.nocard p {
 }
 
 div.node.card {
-    width: 200px;
-    height: 117px;
-}
-div.node.card.n_part {
-    width: 150px;
+    width: 162px;
+    height: 170px;
 }
 
 div.card div.bar {
@@ -120,64 +118,15 @@ div.card div.bar {
 
 
 div.identity_card {
-    width: 195px;
-    height: 105px;
     margin: 0;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    border-radius: 0;
 }
 div.n_part .identity_card {
-    height: 105px;
-    width: 145px;
+    width: 160px;
 }
-div.n_part.card div.id_thumbnail {
-    display: none;
-}
-
-div.identity_card div.id_details {
-    height: 105px;
-    left: 100px;
-    width: 95px;
-    border-left: none;
-}
-.n_part .identity_card div.id_details {
-    left: -6px;
-    width: 145px;
-}
-div.identity_card div.id_thumbnail {
-    width: 70px;
-    top: 10px;
-    position: relative;
-    height: 70px;
-    margin: 2px;
-    border-radius: 2px;
-}
-
-div.identity_card div.id_thumbnail_inner {
-    height: 70px;
-    width: 70px;
-}
-
-div.identity_card div.id_thumbnail img {
-    max-width: 70px;
-    max-height: 70px;
-}
-div.identity_card div.id_details {
-    height: 100px;
-    padding: 0 0.5em;
-    left: 90px;
-    font-size: 80%;
-}
-
 
 .identity_card .id_details span.type {
     left: 0;
     width: inherit;
-}
-.n_document .identity_card .id_details span.type {
-    left: -95px;
-    width: 195px;
 }
 
 div.main_node.nocard p {
