@@ -2124,7 +2124,7 @@ msgstr "← Période précédente"
 
 #: templates/history.html:32 templates/history.html.py:92
 msgid "Next Period →"
-msgstr "Période suivante →""
+msgstr "Période suivante →"
 
 #: templates/history.html:86
 #, fuzzy
