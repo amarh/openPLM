@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-15 17:43+0100\n"
+"POT-Creation-Date: 2013-07-31 14:57+0200\n"
 "PO-Revision-Date: 2011-11-21 11:12+0100\n"
 "Last-Translator: Pierre Cosquer <pcosquer@linobject.com>\n"
 "Language-Team: LANGUAGE <openplm_translate@list.openplm.org>\n"
@@ -17,430 +17,843 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: plmapp/base_views.py:116
-msgid "Internal error"
-msgstr "Erreur interne"
-
-#: plmapp/encoding.py:4
-msgid "Ascii"
-msgstr "Ascii"
-
-#: plmapp/encoding.py:5
-msgid "Big5"
-msgstr "Big5"
-
-#: plmapp/encoding.py:6
-msgid "Big5hkscs"
-msgstr "Big5hkscs"
-
-#: plmapp/encoding.py:7
-msgid "Charmap"
-msgstr "Charmap"
-
-#: plmapp/encoding.py:8
-msgid "CP-037"
-msgstr "CP-037"
-
-#: plmapp/encoding.py:9
-msgid "CP-1006"
-msgstr "CP-1006"
-
-#: plmapp/encoding.py:10
-msgid "CP-1026"
-msgstr "CP-1026"
-
-#: plmapp/encoding.py:11
-msgid "CP-1140"
-msgstr "CP-1140"
-
-#: plmapp/encoding.py:12
-msgid "CP-1250"
-msgstr "CP-1250"
-
-#: plmapp/encoding.py:13
-msgid "CP-1251"
-msgstr "CP-1251"
-
-#: plmapp/encoding.py:14
-msgid "CP-1252"
-msgstr "CP-1252"
-
-#: plmapp/encoding.py:15
-msgid "CP-1253"
-msgstr "CP-1253"
-
-#: plmapp/encoding.py:16
-msgid "CP-1254"
-msgstr "CP-1254"
+#: apps/badges/meta_badges.py:20
+msgid "Autobiographer"
+msgstr ""
 
-#: plmapp/encoding.py:17
-msgid "CP-1255"
-msgstr "CP-1255"
+#: apps/badges/meta_badges.py:21
+msgid "Completed the User Profile"
+msgstr ""
 
-#: plmapp/encoding.py:18
-msgid "CP-1256"
-msgstr "CP-1256"
+#: apps/badges/meta_badges.py:56
+msgid "Serial Killer"
+msgstr ""
 
-#: plmapp/encoding.py:19
-msgid "CP-1257"
-msgstr "CP-1257"
+#: apps/badges/meta_badges.py:57
+#, fuzzy
+msgid "Cancelled XX objects"
+msgstr "Tous les objets"
 
-#: plmapp/encoding.py:20
-msgid "CP-1258"
-msgstr "CP-1258"
+#: apps/badges/meta_badges.py:82
+msgid "Welcome A.A."
+msgstr ""
 
-#: plmapp/encoding.py:21
-msgid "CP-424"
-msgstr "CP-424"
+#: apps/badges/meta_badges.py:83
+#, fuzzy
+msgid "Sponsored 4 users"
+msgstr "Parrainer un nouvel utilisateur"
 
-#: plmapp/encoding.py:22
-msgid "CP-437"
-msgstr "CP-437"
+#: apps/badges/meta_badges.py:108
+msgid "God Father"
+msgstr ""
 
-#: plmapp/encoding.py:23
-msgid "CP-500"
-msgstr "CP-500"
+#: apps/badges/meta_badges.py:109
+#, fuzzy
+msgid "Sponsored more than 10 users"
+msgstr "Parrainer un nouvel utilisateur"
 
-#: plmapp/encoding.py:24
-msgid "CP-737"
-msgstr "CP-737"
+#: apps/badges/meta_badges.py:134
+msgid "Who's the boss now"
+msgstr ""
 
-#: plmapp/encoding.py:25
-msgid "CP-775"
-msgstr "CP-775"
+#: apps/badges/meta_badges.py:135
+msgid "Delegate right(s) to his (her) sponsor"
+msgstr ""
 
-#: plmapp/encoding.py:26
-msgid "CP-850"
-msgstr "CP-850"
+#: apps/badges/meta_badges.py:166
+msgid "Pony Rider"
+msgstr ""
 
-#: plmapp/encoding.py:27
-msgid "CP-852"
-msgstr "CP-852"
+#: apps/badges/meta_badges.py:167
+msgid ""
+"Added a file named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
+"dash or fluttershy"
+msgstr ""
 
-#: plmapp/encoding.py:28
-msgid "CP-855"
-msgstr "CP-855"
+#: apps/badges/meta_badges.py:193
+msgid "Super Pony Rider"
+msgstr ""
 
-#: plmapp/encoding.py:29
-msgid "CP-856"
-msgstr "CP-856"
+#: apps/badges/meta_badges.py:194
+msgid ""
+"Added files named pinkie pie, applejack, twilight sparkle, rarity, rainbow "
+"dash and fluttershy"
+msgstr ""
 
-#: plmapp/encoding.py:30
-msgid "CP-857"
-msgstr "CP-857"
+#: apps/badges/meta_badges.py:220
+msgid "Dragon Slayer"
+msgstr ""
 
-#: plmapp/encoding.py:31
-msgid "CP-860"
-msgstr "CP-860"
+#: apps/badges/meta_badges.py:221
+msgid "Added and destroyed a file named spike"
+msgstr ""
 
-#: plmapp/encoding.py:32
-msgid "CP-861"
-msgstr "CP-861"
+#: apps/badges/meta_badges.py:250
+msgid "Herald"
+msgstr ""
 
-#: plmapp/encoding.py:33
-msgid "CP-862"
-msgstr "CP-862"
+#: apps/badges/meta_badges.py:251
+msgid "Notified 50 users"
+msgstr ""
 
-#: plmapp/encoding.py:34
-msgid "CP-863"
-msgstr "CP-863"
+#: apps/badges/meta_badges.py:273
+msgid "Journalist"
+msgstr ""
 
-#: plmapp/encoding.py:35
-msgid "CP-864"
-msgstr "CP-864"
+#: apps/badges/meta_badges.py:274
+#, fuzzy
+msgid "Published XX objects"
+msgstr "Objets publiés seulement"
 
-#: plmapp/encoding.py:36
-msgid "CP-865"
-msgstr "CP-865"
+#: apps/badges/meta_badges.py:305
+msgid "Hirule's Hero"
+msgstr ""
 
-#: plmapp/encoding.py:37
-msgid "CP-866"
-msgstr "CP-866"
+#: apps/badges/meta_badges.py:306
+msgid "Created 100 part-documents links"
+msgstr ""
 
-#: plmapp/encoding.py:38
-msgid "CP-869"
-msgstr "CP-869"
+#: apps/badges/meta_badges.py:327
+msgid "Welcome To Hogwarts"
+msgstr ""
 
-#: plmapp/encoding.py:39
-msgid "CP-874"
-msgstr "CP-874"
+#: apps/badges/meta_badges.py:328
+#, fuzzy
+msgid "Created a Part named `Wizard Wand`"
+msgstr "Créer une part et l'ajouter"
 
-#: plmapp/encoding.py:40
-msgid "CP-875"
+#: apps/badges/meta_badges.py:348
+msgid "Emmett Brown"
 msgstr ""
 
-#: plmapp/encoding.py:41
-msgid "CP-932"
-msgstr ""
+#: apps/badges/meta_badges.py:349
+#, fuzzy
+msgid "Created 121 parts and documents"
+msgstr "Créer une part et l'ajouter"
 
-#: plmapp/encoding.py:42
-msgid "CP-949"
+#: apps/badges/meta_badges.py:371
+msgid "Guru"
 msgstr ""
 
-#: plmapp/encoding.py:43
-msgid "CP-950"
+#: apps/badges/meta_badges.py:372
+msgid "Created XX groups"
 msgstr ""
 
-#: plmapp/encoding.py:44
-msgid "Euc-jis-2004"
+#: apps/badges/meta_badges.py:397
+msgid "Archivist"
 msgstr ""
 
-#: plmapp/encoding.py:45
-msgid "Euc-jisx0213"
-msgstr ""
+#: apps/badges/meta_badges.py:398
+#, fuzzy
+msgid "Deprecated XX documents"
+msgstr "Afficher les documents liés"
 
-#: plmapp/encoding.py:46
-msgid "Euc-jp"
+#: apps/badges/meta_badges.py:427
+msgid "Wised One"
 msgstr ""
 
-#: plmapp/encoding.py:47
-msgid "Euc-kr"
+#: apps/badges/meta_badges.py:428
+msgid "Rejected 500 objects signatures (or demoted 500 objects)"
 msgstr ""
 
-#: plmapp/encoding.py:48
-msgid "Gb18030"
-msgstr ""
+#: apps/badges/meta_badges.py:450
+#, fuzzy
+msgid "Replicant"
+msgstr "Remplacer"
 
-#: plmapp/encoding.py:49
-msgid "Gb2312"
-msgstr ""
+#: apps/badges/meta_badges.py:451
+#, fuzzy
+msgid "Cloned a part/document"
+msgstr "Connecter un nouveau document :"
 
-#: plmapp/encoding.py:50
-msgid "GBK"
+#: apps/badges/meta_badges.py:471
+msgid "Frankeinstein"
 msgstr ""
 
-#: plmapp/encoding.py:51
-msgid "HP-roman8"
+#: apps/badges/meta_badges.py:472
+msgid "Cloned a cancelled or deprecated object"
 msgstr ""
 
-#: plmapp/encoding.py:52
-msgid "HZ"
+#: apps/badges/meta_badges.py:497
+msgid "Tipiak"
 msgstr ""
 
-#: plmapp/encoding.py:53
-msgid "ISO-2022-JP"
+#: apps/badges/meta_badges.py:498
+msgid "Cloned object owned and created by another user"
 msgstr ""
 
-#: plmapp/encoding.py:54
-msgid "ISO-2022-JP-1"
+#: apps/badges/meta_badges.py:524
+msgid "Materialistic"
 msgstr ""
 
-#: plmapp/encoding.py:55
-msgid "ISO-2022-JP-2"
+#: apps/badges/meta_badges.py:525
+msgid "Owns more than 1000 objects"
 msgstr ""
 
-#: plmapp/encoding.py:56
-msgid "ISO-2022-JP-2004"
+#: apps/badges/meta_badges.py:546
+msgid "Popular"
 msgstr ""
 
-#: plmapp/encoding.py:57
-msgid "ISO-2022-JP-3"
+#: apps/badges/meta_badges.py:547
+msgid "Belongs to 20 groups or more"
 msgstr ""
 
-#: plmapp/encoding.py:58
-msgid "ISO-2022-JP-EXT"
+#: apps/badges/meta_badges.py:579
+msgid "Darth Vader"
 msgstr ""
 
-#: plmapp/encoding.py:59
-msgid "ISO-2022-KR"
+#: apps/badges/meta_badges.py:580
+msgid "Posted the comment `Chocking Hazard`"
 msgstr ""
 
-#: plmapp/encoding.py:60
-msgid "ISO-8859-1"
+#: apps/badges/meta_badges.py:602
+msgid "Radical Edward"
 msgstr ""
 
-#: plmapp/encoding.py:61
-msgid "ISO-8859-10"
-msgstr ""
+#: apps/badges/meta_badges.py:603
+#, fuzzy
+msgid "Posted 100 :) comments"
+msgstr "Poster un commentaire"
 
-#: plmapp/encoding.py:62
-msgid "ISO-8859-11"
+#: apps/badges/models.py:85
+#, python-format
+msgid "You just got the %s Badge!"
 msgstr ""
 
-#: plmapp/encoding.py:63
-msgid "ISO-8859-13"
+#: apps/badges/views.py:40
+msgid "Badges"
 msgstr ""
 
-#: plmapp/encoding.py:64
-msgid "ISO-8859-14"
+#: apps/badges/views.py:77
+#, python-format
+msgid "Badge : %s"
 msgstr ""
 
-#: plmapp/encoding.py:65
-msgid "ISO-8859-15"
+#: apps/badges/templates/badges/detail.html:6
+#: apps/badges/templates/user/badges_overview.html:22
+msgid "<a href=\"/badges/\">List</a> of all badges available"
 msgstr ""
 
-#: plmapp/encoding.py:66
-msgid "ISO-8859-16"
-msgstr ""
+#: apps/badges/templates/badges/detail.html:11
+#, fuzzy
+msgid "Level :"
+msgstr "Niveau"
 
-#: plmapp/encoding.py:67
-msgid "ISO-8859-2"
+#: apps/badges/templates/badges/detail.html:14
+#, python-format
+msgid ""
+"\n"
+"        <a href=%(link)s target=\"_blank\"><img src=\"%(STATIC_URL)simg/"
+"focus.png\" title=\"Related documentation\"/></a>\n"
+"        "
 msgstr ""
 
-#: plmapp/encoding.py:68
-msgid "ISO-8859-3"
+#: apps/badges/templates/badges/detail.html:19
+msgid "Users who won this badge :"
 msgstr ""
 
-#: plmapp/encoding.py:69
-msgid "ISO-8859-4"
+#: apps/badges/templates/badges/detail.html:24
+msgid "Nobody has earned this badge!"
 msgstr ""
 
-#: plmapp/encoding.py:70
-msgid "ISO-8859-5"
+#: apps/badges/templates/badges/overview.html:20
+msgid ""
+"\n"
+"\t        <h3 style=\"margin-top:0\">The Badge System</h3>\n"
+"\t\t    <p><!-- description badge and why--></p>\n"
+"\t\t    <p><span style=\"color:#855e42\">Bronze Badges</span> are given for "
+"completing basic tasks.</p><br/>\n"
+"\t\t    <p><span style=\"color:#a8a8a8\">Silver Badges</span> are given for "
+"being an active member.</p><br/>\n"
+"\t\t    <p><span style=\"color:#cd7f32\">Gold Badges</span> are given for "
+"going above the role of active participation.</p><br/>\n"
+"\t\t    <p><span style=\"color:#cdcdcd\">Diamond Badges</span> are the one "
+"you may not win except if you really want them.</p><br/>\n"
+"\t\t    "
 msgstr ""
 
-#: plmapp/encoding.py:71
-msgid "ISO-8859-6"
+#: apps/badges/templates/badges/overview.html:38
+#: apps/badges/templates/user/badges_overview.html:27
+msgid ""
+"Badges are fun! They're just little reminders that <strong>you are awesome</"
+"strong> "
 msgstr ""
 
-#: plmapp/encoding.py:72
-msgid "ISO-8859-7"
+#: apps/badges/templates/badges/overview.html:44
+msgid "Badges you have won are checked"
 msgstr ""
 
-#: plmapp/encoding.py:73
-msgid "ISO-8859-8"
+#: apps/badges/templates/badges/overview.html:44
+msgid "Got it"
 msgstr ""
 
-#: plmapp/encoding.py:74
-msgid "ISO-8859-9"
+#: apps/badges/templates/badges/overview.html:45
+#: apps/badges/templates/user/badges_overview.html:33
+msgid "Badge"
 msgstr ""
 
-#: plmapp/encoding.py:75
-msgid "JOHAB"
+#: apps/badges/templates/badges/overview.html:46
+msgid "Number of users who won the badge"
 msgstr ""
 
-#: plmapp/encoding.py:76
-msgid "KOI8-R"
+#: apps/badges/templates/badges/overview.html:47
+#: apps/badges/templates/user/badges_overview.html:34
+msgid "Description"
 msgstr ""
 
-#: plmapp/encoding.py:77
-msgid "KOI8-U"
-msgstr ""
+#: apps/badges/templates/badges/overview.html:52
+#, fuzzy
+msgid "You have earned this badge"
+msgstr "Vous êtes déjà dans ce groupe."
 
-#: plmapp/encoding.py:78
-msgid "Latin-1"
+#: apps/badges/templates/user/badges_overview.html:14
+msgid ""
+"\n"
+"    <h3 class=\"hplm\" style=\"margin-top:0\">The Badge System</h3>\n"
+"    <p><!-- description badge and why--></p>\n"
+"    <p><span style=\"color:#855e42\">Bronze Badges</span> are given for "
+"completing basic tasks.</p><br/>\n"
+"    <p><span style=\"color:#a8a8a8\">Silver Badges</span> are given for "
+"being an active member.</p><br/>\n"
+"    <p><span style=\"color:#cd7f32\">Gold Badges</span> are given for going "
+"above the role of active participation.</p><br/>\n"
+"    <p><span style=\"color:#cdcdcd\">Diamond Badges</span> are the one you "
+"may not win except if you really want them.</p><br/>\n"
+"    "
 msgstr ""
 
-#: plmapp/encoding.py:79
-msgid "MacArabic"
-msgstr ""
+#: apps/cad/models.py:51 apps/office/models.py:45
+msgid "Number of pages"
+msgstr "Nombre de pages"
 
-#: plmapp/encoding.py:80
-msgid "MacCenteuro"
-msgstr ""
+#: apps/cad/models.py:52 apps/office/models.py:46
+msgid "format"
+msgstr "format"
 
-#: plmapp/encoding.py:81
-msgid "MacCroatian"
-msgstr ""
+#: apps/cad/models.py:76 apps/computer/models.py:188
+msgid "customer"
+msgstr "client"
 
-#: plmapp/encoding.py:82
-msgid "MacCyrillic"
-msgstr ""
+#: apps/cad/models.py:88 apps/computer/models.py:42 apps/computer/models.py:49
+msgid "supplier"
+msgstr "fournisseur"
 
-#: plmapp/encoding.py:83
-msgid "MacFarsi"
-msgstr ""
+#: apps/cad/models.py:121
+#, fuzzy
+msgid "expiration date"
+msgstr "date d'expiration"
 
-#: plmapp/encoding.py:84
-msgid "MacGreek"
-msgstr ""
+#: apps/cad/models.py:122
+msgid "inventor"
+msgstr "inventeur"
 
-#: plmapp/encoding.py:85
-msgid "MacIceland"
-msgstr ""
+#: apps/calendrier/views.py:202 apps/rss/feeds.py:106 apps/rss/feeds.py:112
+#: plmapp/views/main.py:297 templates/blocks/user.html:32
+msgid "Timeline"
+msgstr "Timeline"
 
-#: plmapp/encoding.py:86
-msgid "MacLatin2"
-msgstr ""
+#: apps/calendrier/templates/calendar.html:34
+#, fuzzy
+msgid "Download as iCalendar (.ics)"
+msgstr "Télécharger tous les fichiers (%(format)s)"
 
-#: plmapp/encoding.py:87
-msgid "MacRoman"
-msgstr ""
+#: apps/calendrier/templates/history_cal.html:8
+msgid "Calendar"
+msgstr "Calendrier"
 
-#: plmapp/encoding.py:88
-msgid "MacRomanian"
-msgstr ""
+#: apps/computer/models.py:43 apps/computer/models.py:213
+#, fuzzy
+msgid "tech details"
+msgstr "Détails"
+
+#: apps/computer/models.py:49
+#, fuzzy
+msgid "tech_details"
+msgstr "Détails"
+
+#: apps/computer/models.py:60
+msgid "motherboard type"
+msgstr "type carte mère"
 
-#: plmapp/encoding.py:89
-msgid "MacTurkish"
+#: apps/computer/models.py:72
+#, fuzzy
+msgid "reference designator"
+msgstr "référence"
+
+#: apps/computer/models.py:97 apps/computer/models.py:228
+msgid "size in mo"
 msgstr ""
 
-#: plmapp/encoding.py:90
-msgid "PTCP154"
+#: apps/computer/models.py:109
+msgid "capacity in go"
 msgstr ""
 
-#: plmapp/encoding.py:91
-msgid "Rot-13"
+#: apps/computer/models.py:134
+msgid "number of buttons"
 msgstr ""
 
-#: plmapp/encoding.py:92
-msgid "Shift-JIS"
+#: apps/computer/models.py:149
+msgid "keymap"
 msgstr ""
 
-#: plmapp/encoding.py:93
-msgid "Shift-JIS-2004"
+#: apps/computer/models.py:161
+msgid "horizontal resolution"
 msgstr ""
 
-#: plmapp/encoding.py:94
-msgid "Shift-JISX0213"
+#: apps/computer/models.py:162
+msgid "vertical resolution"
 msgstr ""
 
-#: plmapp/encoding.py:95
-msgid "TIS-620"
+#: apps/computer/models.py:176
+msgid "manufacturer"
 msgstr ""
 
-#: plmapp/encoding.py:96
-msgid "UTF-16"
+#: apps/computer/models.py:200
+msgid "tech characteristics"
 msgstr ""
 
-#: plmapp/encoding.py:97
-msgid "UTF-16-be"
+#: apps/document3D/templates/decompose_msg.html:5
+#, python-format
+msgid ""
+"\n"
+"        A document (<a href=\"/object/%(type)s/%(ref)s/%(rev)s/\">%(ref)s</"
+"a> )\n"
+"        with a STEP file (<a href=\"/file/%(f_id)s/\">%(f_name)s</a>)\n"
+"        is linked to this part. Do you want to analyse it to build the BOM?\n"
+"        <a class=\"tb-btn tb-btn-primary\" href=\"%(plmobject_url)sdecompose/"
+"%(f_id)s/\">Yes</a>\n"
+"        "
 msgstr ""
+"\n"
+"        Un document (<a href=\"/object/%(type)s/%(ref)s/%(rev)s/\">%(ref)s</"
+"a> )\n"
+"        avec un fichier STEP (<a href=\"/file/%(f_id)s/\">%(f_name)s</a>)\n"
+"        est lié à cette part. Voulez-vous l'analyser pour construire la nomenclature ?\n"
+"        <a class=\"tb-btn tb-btn-primary\" href=\"%(plmobject_url)sdecompose/"
+"%(f_id)s/\">OUI</a>\n"
+"        "
 
-#: plmapp/encoding.py:98
-msgid "UTF-16-le"
+#: apps/document3D/templates/public_3d.html:10
+msgid "3D"
 msgstr ""
+
+#: apps/document3D/templates/public_3d.html:12
+msgid "View in 3D"
+msgstr "Voir en 3D"
+
+#: apps/ecr/forms.py:56
+#, fuzzy
+msgid "Checking this box, you allow OpenPLM to set the reference of the ECR."
+msgstr "En cochant cette case, vous autorisez OpenPLM à choisir la référence de l'ECR."
+
+#: apps/ecr/forms.py:75 plmapp/forms.py:220
+msgid "You did not check the Auto box: the reference is required."
+msgstr "Vous n'avez pas coché la case Auto: la référence est requise."
 
-#: plmapp/encoding.py:99
-msgid "UTF-32"
+#: apps/ecr/forms.py:78 plmapp/forms.py:223
+msgid "An object with the same type, reference and revision already exists"
+msgstr "Un objet avec le même type, la même référence et la même révision existe déjà"
+
+#: apps/ecr/models.py:19
+msgid "changes"
+msgstr "changements"
+
+#: apps/ecr/models.py:66 plmapp/models/plmobject.py:163
+#: plmapp/models/plmobject.py:393
+msgid "reference"
+msgstr "référence"
+
+#: apps/ecr/models.py:67 plmapp/models/plmobject.py:164
+msgid ""
+"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. "
+"characters"
 msgstr ""
+"Requis. 50 caractères maximum. Uniquement les lettres, nombres, sauf les "
+"caractères #, ?, / et .."
 
-#: plmapp/encoding.py:100
-msgid "UTF-32-be"
+#: apps/ecr/models.py:73 plmapp/models/plmobject.py:172
+msgid "name"
+msgstr "nom"
+
+#: apps/ecr/models.py:74
+#, fuzzy
+msgid "Name of the ECR"
+msgstr "Nom du produit"
+
+#: apps/ecr/models.py:75 plmapp/models/plmobject.py:175
+msgid "description"
 msgstr ""
+
+#: apps/ecr/models.py:78 plmapp/controllers/user.py:97
+#: plmapp/models/plmobject.py:178 plmapp/models/plmobject.py:395
+msgid "creator"
+msgstr "créateur"
+
+#: apps/ecr/models.py:80 plmapp/forms.py:696 plmapp/forms.py:702
+#: plmapp/forms.py:712 plmapp/controllers/user.py:98 plmapp/models/group.py:24
+#: plmapp/models/plmobject.py:180 plmapp/models/plmobject.py:396
+msgid "owner"
+msgstr "propriétaire"
+
+#: apps/ecr/models.py:82 plmapp/models/group.py:26 plmapp/models/group.py:87
+#: plmapp/models/plmobject.py:182
+msgid "date of creation"
+msgstr "date de création"
+
+#: apps/ecr/models.py:84 plmapp/models/group.py:28
+#: plmapp/models/plmobject.py:184
+msgid "date of last modification"
+msgstr "date de la dernière modification"
+
+#: apps/ecr/models.py:87 apps/ecr/models.py:212 plmapp/models/plmobject.py:188
+#: plmapp/models/plmobject.py:358
+msgid "lifecycle"
+msgstr "cycle de vie"
+
+#: apps/ecr/models.py:89 plmapp/models/plmobject.py:191
+msgid "state"
+msgstr "état"
+
+#: apps/ecr/models.py:119 plmapp/models/plmobject.py:227
+msgid "The object is at its last state."
+msgstr "L'objet est à son dernier état"
+
+#: apps/ecr/models.py:212 plmapp/models/plmobject.py:358
+msgid "attributes"
+msgstr "attributs"
+
+#: apps/ecr/models.py:213 plmapp/models/plmobject.py:359
+msgid "history"
+msgstr "historique"
+
+#: apps/ecr/models.py:213
+#, fuzzy
+msgid "part-doc-cads"
+msgstr "doc-cao"
 
-#: plmapp/encoding.py:101
-msgid "UTF-32-le"
+#: apps/ecr/views.py:60 plmapp/views/main.py:828
+#: templates/blocks/supermenu.html:52
+msgid "Browse"
+msgstr "Parcourir"
+
+#: apps/ecr/templates/browse_ecr.html:6 templates/browse.html:78
+#: templates/search/search.html:72
+msgid "State"
+msgstr "Etat"
+
+#: apps/ecr/templates/browse_ecr.html:10 templates/browse.html:82
+msgid "All states"
+msgstr "Tous les états"
+
+#: apps/ecr/templates/browse_ecr.html:13 templates/browse.html:85
+msgid "Official state"
+msgstr "État officiel"
+
+#: apps/ecr/templates/browse_ecr.html:21 templates/browse.html:171
+msgid "Only official objects"
+msgstr "Objets officialisés seulement"
+
+#: apps/ecr/templates/browse_ecr.html:23 templates/browse.html:175
+msgid "All objects"
+msgstr "Tous les objets"
+
+#: apps/ecr/templates/changes.html:7
+#, fuzzy
+msgid "No ECR are attached to this object."
+msgstr "Aucune part n'est lié à ce document."
+
+#: apps/ecr/templates/changes.html:12
+msgid "Engineering Change Requests"
+msgstr "Demande de modifications"
+
+#: apps/ecr/templates/changes.html:13
+#: apps/ecr/templates/ecrs/plmobjects.html:19 templates/groups/objects.html:13
+#, python-format
+msgid " %(start)s - %(end)s on %(total)s "
+msgstr " %(start)s - %(end)s sur %(total)s "
+
+#: apps/ecr/templates/ecrs/plmobjects.html:7 templates/search/result.html:9
+msgid "Attach"
+msgstr "Attacher"
+
+#: apps/ecr/templates/ecrs/plmobjects.html:13
+#, fuzzy
+msgid "No objects are attached to this ECR"
+msgstr "Aucune part n'est lié à ce document."
+
+#: apps/ecr/templates/ecrs/plmobjects.html:18 templates/browse.html:22
+#: templates/browse.html.py:137 templates/groups/objects.html:12
+msgid "Objects"
+msgstr "Objets"
+
+#: apps/gdoc/templates/gdoc_files.html:8
+#, fuzzy
+msgid "You cannot add a file to a GoogleDocument."
+msgstr "Vous ne pouvez télécharger qu'un fichier à la fois."
+
+#: apps/gdoc/templates/gdoc_files.html:12
+msgid ""
+"\n"
+"            You cannot access to this Google Document. If you did not "
+"created\n"
+"            this document, you can ask its owner to grant you the "
+"permission\n"
+"            to read this file in Google Document.\n"
+"        "
 msgstr ""
+"\n"
+"            Vous ne pouvez pas accéder à ce document Google. Si vous n'avez pas"
+"créé\n"
+"            ce document, vous pouvez demander à son propriétaire de vous donner la"
+"permission\n"
+"            de lire ce fichier dans Google Document.\n"
+"        "
+
+#: apps/gdoc/templates/gdoc_files.html:21
+#, fuzzy
+msgid "Click here to edit the file in Google Document ."
+msgstr "Cliquez ici pour accepter l'invitation"
 
-#: plmapp/encoding.py:102
-msgid "UTF-7"
+#: apps/gdoc/templates/gdoc_files.html:24
+#, fuzzy
+msgid "Click here to download the file from Google."
+msgstr "Cliquer ici pour télécharger le fichier depuis Google"
+"Cliquez ici pour parrainer plusieurs utilisateurs en utilisant un fichier "
+"CSV."
+
+#: apps/oerp/views.py:14 apps/oerp/templates/erp_summary.html:90
+msgid "Could not connect to OpenERP"
+msgstr "Ne peut se connecter à OpenERP"
+
+#: apps/oerp/templates/erp_summary.html:15
+#: apps/oerp/templates/erp_summary.html:40
+msgid "Cost"
+msgstr "Coût"
+
+#: apps/oerp/templates/erp_summary.html:18
+msgid "Individual cost"
+msgstr "Coût individuel"
+
+#: apps/oerp/templates/erp_summary.html:26
+#, fuzzy
+msgid "Update"
+msgstr "Mettre à jour la vue"
+
+#: apps/oerp/templates/erp_summary.html:29
+msgid "Update cost from OpenERP"
+msgstr "Mettre à jour le coût depuis OpenERP"
+
+#: apps/oerp/templates/erp_summary.html:44 templates/parts/bom_diff.html:33
+#: templates/parts/bom_edit.html:13 templates/parts/bom_thead.html:7
+msgid "Unit"
+msgstr "Unité"
+
+#: apps/oerp/templates/erp_summary.html:53
+#, fuzzy
+msgid "Total cost"
+msgstr "Total"
+
+#: apps/oerp/templates/erp_summary.html:61
+msgid "Total cost (OpenPLM)"
+msgstr "Coût total (OpenPLM)"
+
+#: apps/oerp/templates/erp_summary.html:65
+msgid "Total cost (OpenERP)"
+msgstr "Coût total (OpenERP)"
+
+#: apps/oerp/templates/erp_summary.html:75
+msgid "OpenERP"
 msgstr ""
+
+#: apps/oerp/templates/erp_summary.html:78
+#, fuzzy
+msgid "This part has been published on OpenERP."
+msgstr "Cette part a été pubiée dans OpenERP."
+
+#: apps/oerp/templates/erp_summary.html:80
+#, fuzzy
+msgid "Links:"
+msgstr "Liens:"
+
+#: apps/oerp/templates/erp_summary.html:83
+#, python-format
+msgid "Product: %(name)s"
+msgstr "Produits: %(name)s"
+
+#: apps/oerp/templates/erp_summary.html:85
+#, python-format
+msgid "BOM: %(name)s"
+msgstr "nomenclature: %(name)s"
+
+#: apps/oerp/templates/erp_summary.html:97 templates/lifecycle.html:84
+#: templates/documents/revisions.html:7 templates/parts/revisions.html:7
+#: templates/snippets/confirmation_form.html:6
+msgid "Are you sure?"
+msgstr "Êtes-vous sur ?"
 
-#: plmapp/encoding.py:103
-msgid "UTF-8"
+#: apps/oerp/templates/erp_summary.html:103
+msgid "Note that this will also export the complete BOM."
+msgstr "A noter que cela va aussi exporter la nomenclature complète."
+
+#: apps/oerp/templates/erp_summary.html:111
+msgid "Publish on OpenERP"
+msgstr "Publier dans OpenERP"
+
+#: apps/oerp/templates/erp_summary.html:115
+msgid "You can not publish this part on the ERP."
+msgstr "Vous ne pouvez pas publier cette part dans l'ERP"
+
+#: apps/oerp/templates/erp_summary.html:120
+msgid "This part is not official and so, cannot be published on the ERP."
+msgstr "Cette part n'est pas officielle et donc ne peut pas être publiée dans l'ERP."
+
+#: apps/pdfgen/templates/select_pdf.html:8
+msgid ""
+"\n"
+"            Select PDF files that will be merged into a unique PDF\n"
+"            and click on the Download button.\n"
+"        "
 msgstr ""
+"\n"
+"            Selectinner les fichiers PDF qui seront fusionnés dans un unique fichier PDF\n"
+"            et cliquer sur le bouton Télécharger.\n"
+"        "
+
+#: apps/pdfgen/templates/select_pdf.html:17
+#: templates/documents/file_revisions.html:74
+msgid "Download"
+msgstr "Télécharger"
+
+#: apps/pdfgen/templates/select_pdf_doc.html:16
+#, fuzzy
+msgid "There are no PDF files."
+msgstr "Ce document n'a pas de fichier."
+
+#: apps/pdfgen/templates/select_pdf_part.html:19
+#, fuzzy
+msgid "Level:"
+msgstr "Niveau"
 
-#: plmapp/encoding.py:104
-msgid "UTF-8-sig"
+#: apps/richpage/models.py:20
+#, fuzzy
+msgid "page"
+msgstr "Page d'accueil"
+
+#: apps/richpage/models.py:28 plmapp/models/document.py:273
+msgid "Some files are locked."
+msgstr "Des fichiers sont verrouillés."
+
+#: apps/richpage/templates/richpage/page.html:13
+msgid "Edit"
+msgstr "Editer"
+
+#: apps/rss/feeds.py:77
+#, python-format
+msgid "Updates on changes on %(title)s"
+msgstr "Mises à jour des changements sur %(title)s"
+
+#: apps/software/models.py:40
+msgid "licence"
 msgstr ""
+
+#: apps/software/models.py:41
+msgid "developed by LinObject"
+msgstr "développé par LinObject"
+
+#: apps/software/models.py:42
+#, fuzzy
+msgid "public"
+msgstr "Publiés"
+
+#: apps/software/models.py:43
+msgid "bugtracker uri"
+msgstr "uri du bugtracker"
 
-#: plmapp/forms.py:53
-msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
-msgstr "Référence non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
+#: apps/software/models.py:66
+msgid "required"
+msgstr "requis"
+
+#: apps/software/models.py:67
+msgid "version range"
+msgstr "niveau de version"
+
+#: apps/subversion/models.py:20
+msgid "Valid value are HEAD, a number or a date between brackets"
+msgstr "Les valeurs autorisées sont HEAD, un nombre ou une date entre parenthèses"
+
+#: apps/subversion/models.py:26
+msgid "repository uri"
+msgstr "uri du dépôt"
+
+#: apps/subversion/models.py:27
+#, fuzzy
+msgid "svn revision"
+msgstr "révision svn"
+
+#: apps/subversion/models.py:29
+msgid "issue tracking system"
+msgstr "système de gestion des problèmes"
+
+#: apps/subversion/templates/ajax_logs.html:6
+msgid "Sorry, openPLM cannot access to this repository."
+msgstr "Désolé, OpenPLM ne peut pas accéder à ce dépôt."
+
+#: apps/subversion/templates/ajax_logs.html:9
+#, fuzzy
+msgid "Last changelogs:"
+msgstr "Dernièrs changements:"
+
+#: apps/subversion/templates/logs.html:28
+msgid "Loading..."
+msgstr "En téléchargement ..."
+
+#: apps/subversion/templates/subversion_files.html:8
+#, fuzzy
+msgid "You cannot add a file to a SubversionRepository."
+msgstr "Vous ne pouvez pas ajouter un fichier à un dépôt Subversion."
+
+#: apps/subversion/templates/subversion_files.html:12
+msgid "To check-out this repository, run the following command:"
+msgstr "Pour sortir ce dépôt, lancer la commande suivante:"
+
+#: apps/subversion/templates/subversion_files.html:19
+msgid "To export this repository, run the following command:"
+msgstr "Pour exporter ce dépôt, lancer la commande suivante:"
+
+#: apps/urldoc/models.py:20
+msgid "location uri"
+msgstr "uri de l'emplacement"
+
+#: apps/urldoc/models.py:34
+#, fuzzy
+msgid "content"
+msgstr "Contenu"
+
+#: apps/urldoc/templates/content.html:22
+#, python-format
+msgid ""
+"\n"
+"        You can not display this content on this page. Click\n"
+"        <a href=%(uri)s target=\"_blank\">here</a>to see it.\n"
+"        "
+msgstr ""
+"\n"
+"        Vous ne pouvez pas afficher ce contenu sur cette page. Cliquez\n"
+"        <a href=%(uri)s target=\"_blank\">ici</a>pour le voir.\n"
+"        "
 
-#: plmapp/forms.py:59
-msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
-msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
+#: apps/urldoc/templates/content.html:29
+msgid "There's no url specified for this URLDoc."
+msgstr "Il n'y a pas d'uri de spécifiée pour cette URLDoc."
 
-#: plmapp/forms.py:62
+#: plmapp/forms.py:71
 msgid ""
 "Bad group, check that the group exists and that you belong to this group."
 msgstr ""
 "Mauvais groupe, vérifiez que ce groupe existe et que vous faites bien parti "
 "de ce groupe."
 
-#: plmapp/forms.py:148
+#: plmapp/forms.py:139
 msgid ""
 "Checking this box, you allow OpenPLM to set the reference of the object."
 msgstr ""
@@ -448,15 +861,6 @@ msgstr ""
 "l'objet."
 
 #: plmapp/forms.py:227
-msgid "You did not check the Auto box: the reference is required."
-msgstr "Vous n'avez pas coché la case Auto: la référence est requise."
-
-#: plmapp/forms.py:230
-msgid "An object with the same type, reference and revision already exists"
-msgstr ""
-"Un objet avec le même type, la même référence et la même révision existe déjà"
-
-#: plmapp/forms.py:234
 msgid ""
 "An object with the same type and reference exists, you may consider to "
 "revise it."
@@ -464,15 +868,25 @@ msgstr ""
 "Un objet avec le même type et la même référence existe, vous devriez "
 "réfléchir à le réviser."
 
-#: plmapp/forms.py:326 plmapp/forms.py:331 plmapp/forms.py:338
+#: plmapp/forms.py:313
 msgid "Select a type"
 msgstr "Sélectionnez un type"
 
-#: plmapp/forms.py:348
+#: plmapp/forms.py:335 templates/search/search.html:34
+#: templates/search/search.html.py:76
+msgid "All"
+msgstr "Tous"
+
+#: plmapp/forms.py:337
 msgid "Query"
 msgstr "Requête"
 
-#: plmapp/forms.py:380
+#: plmapp/forms.py:338
+#, fuzzy
+msgid "Official objects"
+msgstr "Objets officialisés seulement"
+
+#: plmapp/forms.py:381
 #, python-format
 msgid ""
 "The object %(type)s // %(reference)s // %(revision)s does not exist.\n"
@@ -481,109 +895,113 @@ msgstr ""
 "L'objet %(type)s // %(reference)s // %(revision)s n'existe pas.\n"
 " Notez que tous les champs sont sensibles à la casse.\n"
 
-#: plmapp/forms.py:438
+#: plmapp/forms.py:445
 msgid "All levels"
 msgstr "Tous les niveaux"
 
-#: plmapp/forms.py:439
+#: plmapp/forms.py:446
 msgid "First level"
 msgstr "Premier niveau"
 
-#: plmapp/forms.py:440
+#: plmapp/forms.py:447
 msgid "Last level"
 msgstr "Dernier niveau"
 
-#: plmapp/forms.py:441
+#: plmapp/forms.py:448
 msgid "All status"
 msgstr "Tous les états"
 
-#: plmapp/forms.py:442
+#: plmapp/forms.py:449
 msgid "Official"
 msgstr "Officiel"
 
-#: plmapp/forms.py:446
+#: plmapp/forms.py:453
 msgid "Show alternates"
 msgstr "Montrer alternates"
 
-#: plmapp/forms.py:448
+#: plmapp/forms.py:455
 msgid "Show documents"
 msgstr "Afficher les documents"
 
-#: plmapp/forms.py:452
+#: plmapp/forms.py:459
 msgid "Fisrt date"
 msgstr "Première date"
 
-#: plmapp/forms.py:453
+#: plmapp/forms.py:460
 msgid "Second date"
 msgstr "Deuxième date"
 
-#: plmapp/forms.py:669
+#: plmapp/forms.py:676
 msgid "only search results"
 msgstr "seulement les résultats de recherche"
 
-#: plmapp/forms.py:670
+#: plmapp/forms.py:677
 msgid "Hierarchical"
 msgstr "Hiérarchique"
 
-#: plmapp/forms.py:671
+#: plmapp/forms.py:678
 msgid "Radial 1"
 msgstr ""
 
-#: plmapp/forms.py:672
+#: plmapp/forms.py:679
 msgid "Radial 2"
 msgstr ""
 
-#: plmapp/forms.py:675
+#: plmapp/forms.py:682
 msgid "layout"
 msgstr "disposition"
 
-#: plmapp/forms.py:686
+#: plmapp/forms.py:693
 msgid "child"
 msgstr "enfants"
 
-#: plmapp/forms.py:687 plmapp/models/part.py:112
+#: plmapp/forms.py:694 plmapp/models/part.py:111
 msgid "parents"
 msgstr "parents"
 
-#: plmapp/forms.py:688 plmapp/forms.py:708
+#: plmapp/forms.py:695 plmapp/forms.py:715
 msgid "doc"
 msgstr "doc"
 
-#: plmapp/forms.py:689 plmapp/forms.py:695 plmapp/forms.py:705
-#: plmapp/controllers/user.py:98 plmapp/models/group.py:23
-#: plmapp/models/plmobject.py:131 plmapp/models/plmobject.py:348
-msgid "owner"
-msgstr "propriétaire"
-
-#: plmapp/forms.py:690 plmapp/forms.py:696
+#: plmapp/forms.py:697 plmapp/forms.py:703
 msgid "signer"
 msgstr "signataire"
 
-#: plmapp/forms.py:691 plmapp/forms.py:697 plmapp/views/main.py:2324
+#: plmapp/forms.py:698 plmapp/forms.py:704 plmapp/views/user.py:152
 msgid "notified"
 msgstr "notifié"
 
-#: plmapp/forms.py:694 plmapp/forms.py:707
+#: plmapp/forms.py:701 plmapp/forms.py:714
 msgid "part"
 msgstr "part"
 
-#: plmapp/forms.py:700
+#: plmapp/forms.py:707
 msgid "owned"
 msgstr "dont on est propriétaire"
 
-#: plmapp/forms.py:701
+#: plmapp/forms.py:708
 msgid "to sign"
 msgstr "à signer"
 
-#: plmapp/forms.py:702
+#: plmapp/forms.py:709
 msgid "request notification from"
 msgstr "dont on a demandé à être notifié"
 
-#: plmapp/forms.py:706
+#: plmapp/forms.py:713
 msgid "user"
 msgstr "utilisateur"
 
-#: plmapp/forms.py:731
+#: plmapp/forms.py:748
+#, python-format
+msgid "Please keep filesize under %s. Current filesize %s"
+msgstr "SVP gardez la taille de fichier sous %s. La taille de fichier en court %s"
+
+#: plmapp/forms.py:751
+msgid "File type is not supported"
+msgstr "Type de fichier non supporté"
+
+#: plmapp/forms.py:756
+#, python-format
 msgid ""
 "The user \"%(username)s\" does not exist.\n"
 "Note that username field is case-sensitive.\n"
@@ -591,351 +1009,770 @@ msgstr ""
 "L'utilisateur \"%(username)s\" n'est pas répertorié.\n"
 " Notez que les champs sont sensibles à la casse.\n"
 
-#: plmapp/forms.py:736 templates/browse.html:16 templates/create.html:38
-#: templates/edit.html:11 templates/parts/bom_diff.html:39
-#: templates/parts/bom_thead.html:10 templates/users/password.html:11
+#: plmapp/forms.py:761 templates/browse.html:18 templates/create.html:42
+#: templates/edit.html:13 templates/parts/bom_diff.html:39
+#: templates/parts/bom_thead.html:10 templates/search/search.html:30
+#: templates/users/password.html:11
 msgid "Type"
 msgstr "Type"
 
-#: plmapp/forms.py:737 templates/groups/pending_invitations.html:9
+#: plmapp/forms.py:762 templates/groups/pending_invitations.html:9
 #: templates/groups/users.html:28 templates/users/delegation.html:38
 msgid "Username"
 msgstr "Identifiant"
 
-#: plmapp/forms.py:773
+#: plmapp/forms.py:798
 msgid ""
 "Contributor: can create parts, documents, groups and sponsor other users"
 msgstr ""
 "Contributeur : peut créer des parts, des documents, des groupes et parrainer "
 "d'autres utilisateurs"
 
-#: plmapp/forms.py:774
+#: plmapp/forms.py:799
 msgid "Reader: can not edit or create contents"
 msgstr "Lecteur: ne peut ni éditer ni créer du contenu"
 
-#: plmapp/forms.py:775
+#: plmapp/forms.py:800
 msgid "Restricted account: can only access to specific contents"
 msgstr "Compte restreint : peut seulement accéder aux contenus spécifiques"
 
-#: plmapp/forms.py:798
+#: plmapp/forms.py:823
 msgid "The new user will belong to the selected groups"
 msgstr "Le nouvel utilisateur appartiendra aux groupes sélectionnés"
 
-#: plmapp/forms.py:805
+#: plmapp/forms.py:830
 msgid "Email address must be unique."
 msgstr "L'adresse mail doit être unique."
 
-#: plmapp/forms.py:812
+#: plmapp/forms.py:837
 msgid "Email's domain not valid"
 msgstr "Domaine du mail non valide"
 
-#: plmapp/forms.py:832
+#: plmapp/forms.py:857
 #, python-format
 msgid "Warning! There are homonyms: %s!"
 msgstr "Attention ! Il y a des homonymes: %s!"
 
-#: plmapp/forms.py:840
+#: plmapp/forms.py:865
 msgid "A contributor or reader must belong to at least one group."
 msgstr "Un contributeur ou lecteur doit appartenir à au moins un groupe."
 
-#: plmapp/forms.py:873
+#: plmapp/forms.py:898
 msgid "Columns must have distinct headers."
 msgstr "Chaque colonne doit avoir un en-tête différent."
 
-#: plmapp/forms.py:892
+#: plmapp/forms.py:913
 msgid "Password"
 msgstr "Mot de passe"
 
-#: plmapp/forms.py:905
+#: plmapp/forms.py:926
 msgid "Your password was entered incorrectly. Please enter it again."
-msgstr ""
-"Votre mot de passe a été saisi de façon incorrect. SVP veuillez le saisir à "
-"nouveau."
+msgstr "Votre mot de passe a été saisi de façon incorrect. SVP veuillez le saisir à nouveau."
 
-#: plmapp/units.py:18
-msgid "Amounts"
-msgstr "Montants"
+#: plmapp/forms.py:938
+msgid "View Changes From *"
+msgstr "Voir les changements depuis *"
 
-#: plmapp/units.py:19
-msgid "Each"
-msgstr "Pièce"
+#: plmapp/forms.py:941
+msgid "and *"
+msgstr "et *"
 
-#: plmapp/units.py:20
-msgid "mol"
-msgstr "Mole"
+#: plmapp/forms.py:942
+msgid "Done by "
+msgstr "Fait par "
 
-#: plmapp/units.py:23
-msgid "Lengths"
-msgstr "Longueurs"
+#: plmapp/references.py:24
+msgid "Bad reference: '#', '?', '/' and '..' are not allowed"
+msgstr "Référence non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
-#: plmapp/units.py:24
-msgid "mm"
-msgstr "mm"
+#: plmapp/references.py:31
+msgid "Bad revision: '#', '?', '/' and '..' are not allowed"
+msgstr "Révision non correcte: '#', '?', '/' et '..' ne sont pas autorisés"
 
-#: plmapp/units.py:25
-msgid "cm"
-msgstr "cm"
-
-#: plmapp/units.py:26
-msgid "dm"
-msgstr "dm"
-
-#: plmapp/units.py:27
-msgid "m"
-msgstr "m"
-
-#: plmapp/units.py:28
-msgid "km"
-msgstr "km"
-
-#: plmapp/units.py:31
-msgid "Volumes"
-msgstr ""
-
-#: plmapp/units.py:32
-msgid "m³"
-msgstr ""
-
-#: plmapp/units.py:33
-msgid "mL"
-msgstr ""
-
-#: plmapp/units.py:34
-msgid "cL"
-msgstr ""
-
-#: plmapp/units.py:35
-msgid "dL"
-msgstr ""
-
-#: plmapp/units.py:36
-msgid "L"
-msgstr ""
-
-#: plmapp/units.py:39
-msgid "Masses"
-msgstr ""
-
-#: plmapp/units.py:40
-msgid "mg"
-msgstr ""
-
-#: plmapp/units.py:41
-msgid "cg"
-msgstr ""
-
-#: plmapp/units.py:42
-msgid "dg"
-msgstr ""
-
-#: plmapp/units.py:43
-msgid "g"
-msgstr ""
-
-#: plmapp/units.py:44
-msgid "kg"
-msgstr ""
+#: plmapp/controllers/plmobject.py:750
+#, fuzzy, python-format
+msgid "%(username)s has already this role."
+msgstr "Vous êtes déjà dans ce groupe."
 
 #: plmapp/controllers/user.py:96
 msgid "role in PLM"
 msgstr "rôle dans le PLM"
 
-#: plmapp/controllers/user.py:97 plmapp/models/plmobject.py:129
-#: plmapp/models/plmobject.py:347
-msgid "creator"
-msgstr "créateur"
-
 #: plmapp/management/commands/createcompany.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Veuillez saisir une adresse mail valide."
 
-#: plmapp/models/document.py:269
+#: plmapp/models/document.py:270
 msgid "This document has no files."
 msgstr "Ce document n'a pas de fichier."
 
-#: plmapp/models/document.py:272
-msgid "Some files are locked."
-msgstr "Des fichiers sont verrouillés."
-
-#: plmapp/models/document.py:279
+#: plmapp/models/document.py:280
 msgid "files"
 msgstr "fichiers"
 
-#: plmapp/models/document.py:280
+#: plmapp/models/document.py:281
 msgid "parts"
 msgstr "parts"
 
-#: plmapp/models/group.py:25 plmapp/models/group.py:86
-#: plmapp/models/plmobject.py:133
-msgid "date of creation"
-msgstr "date de création"
-
-#: plmapp/models/group.py:27 plmapp/models/plmobject.py:135
-msgid "date of last modification"
-msgstr "date de la dernière modification"
-
-#: plmapp/models/group.py:88
+#: plmapp/models/group.py:89
 msgid "date of validation"
 msgstr "date de validation"
 
-#: plmapp/models/group.py:89
+#: plmapp/models/group.py:90
 msgid "True if guest created the invitation"
 msgstr "Vrai si l'invité a créé l'invitation"
 
-#: plmapp/models/history.py:242
+#: plmapp/models/history.py:245
 msgid "date of promotion"
 msgstr "date de validation"
 
-#: plmapp/models/part.py:112
+#: plmapp/models/part.py:111
 msgid "BOM-child"
 msgstr "nomenclature"
 
-#: plmapp/models/part.py:113
+#: plmapp/models/part.py:112
 msgid "alternates"
 msgstr ""
 
-#: plmapp/models/part.py:113
+#: plmapp/models/part.py:112
 msgid "doc-cad"
 msgstr "doc-cao"
 
-#: plmapp/models/part.py:169 plmapp/models/part.py:195
+#: plmapp/models/part.py:163
 msgid "Some children are at a lower or draft state."
 msgstr "Des parts enfants sont à un statut inférieur ou au statut brouillon."
 
-#: plmapp/models/part.py:177
+#: plmapp/models/part.py:171
 msgid "There are no official documents attached."
 msgstr "Il n'y a pas de document officiel attaché à cette part"
 
-#: plmapp/models/part.py:205
-msgid "There are no official documents attached to some leaf parts."
-msgstr "Il n'y a pas de document officiel attaché à certaines parts."
-
-#: plmapp/models/plmobject.py:117 plmapp/models/plmobject.py:345
-msgid "reference"
-msgstr "référence"
-
-#: plmapp/models/plmobject.py:118
-msgid ""
-"Required. 50 characters or fewer. Letters, numbers , except #, ?, / and .. "
-"characters"
-msgstr ""
-"Requis. 50 caractères maximum. Uniquement les lettres, nombres, sauf les "
-"caractères #, ?, / et .."
-
-#: plmapp/models/plmobject.py:119 plmapp/models/plmobject.py:345
+#: plmapp/models/plmobject.py:165 plmapp/models/plmobject.py:393
 msgid "type"
 msgstr "type"
 
-#: plmapp/models/plmobject.py:120 plmapp/models/plmobject.py:346
+#: plmapp/models/plmobject.py:166 plmapp/models/plmobject.py:394
 msgid "revision"
 msgstr "révision"
 
-#: plmapp/models/plmobject.py:126
-msgid "name"
-msgstr "nom"
-
-#: plmapp/models/plmobject.py:127
+#: plmapp/models/plmobject.py:173
 msgid "Name of the product"
 msgstr "Nom du produit"
 
-#: plmapp/models/plmobject.py:136 plmapp/models/plmobject.py:349
+#: plmapp/models/plmobject.py:185 plmapp/models/plmobject.py:397
 msgid "group"
 msgstr "groupe"
 
-#: plmapp/models/plmobject.py:139 plmapp/models/plmobject.py:310
-msgid "lifecycle"
-msgstr "cycle de vie"
-
-#: plmapp/models/plmobject.py:142
-msgid "state"
-msgstr "état"
-
-#: plmapp/models/plmobject.py:146
+#: plmapp/models/plmobject.py:195
 msgid "published"
 msgstr "Publiés"
 
-#: plmapp/models/plmobject.py:179
-msgid "The object is at its last state."
-msgstr "L'objet est à son dernier état"
-
-#: plmapp/models/plmobject.py:310
-msgid "attributes"
-msgstr "attributs"
-
-#: plmapp/models/plmobject.py:311
+#: plmapp/models/plmobject.py:359
 msgid "revisions"
 msgstr "révisions"
 
-#: plmapp/models/plmobject.py:311
-msgid "history"
-msgstr "historique"
-
-#: plmapp/models/plmobject.py:347 plmapp/models/plmobject.py:348
+#: plmapp/models/plmobject.py:395 plmapp/models/plmobject.py:396
 msgid "ctime"
 msgstr "date de création"
 
-#: plmapp/models/plmobject.py:349
+#: plmapp/models/plmobject.py:397
 msgid "mtime"
 msgstr "date de modification"
 
-#: plmapp/models/user.py:59
+#: plmapp/models/user.py:80
 msgid "administrator"
 msgstr "administrateur"
 
-#: plmapp/models/user.py:61
+#: plmapp/models/user.py:82
 msgid "contributor"
 msgstr "contributeur"
 
-#: plmapp/models/user.py:63
+#: plmapp/models/user.py:84
 msgid "restricted account"
 msgstr "compte restreint"
 
-#: plmapp/models/user.py:65
+#: plmapp/models/user.py:86
 msgid "viewer"
 msgstr "lecteur"
 
-#: plmapp/tests/views.py:2049
-msgid "e-mail address"
+#: plmapp/tests/views/user.py:54
+#, fuzzy
+msgid "email address"
 msgstr "Adresse E-mail"
 
-#: plmapp/views/main.py:801 templates/blocks/user.html:33
-msgid "Timeline"
-msgstr "Timeline"
+#: plmapp/utils/encoding.py:4
+msgid "Ascii"
+msgstr "Ascii"
 
-#: plmapp/views/main.py:1461 plmapp/views/main.py:1515 templates/base.html:89
-#: templates/blocks/supermenu.html:76 templates/documents/files_add.html:19
+#: plmapp/utils/encoding.py:5
+msgid "Big5"
+msgstr "Big5"
+
+#: plmapp/utils/encoding.py:6
+msgid "Big5hkscs"
+msgstr "Big5hkscs"
+
+#: plmapp/utils/encoding.py:7
+msgid "Charmap"
+msgstr "Charmap"
+
+#: plmapp/utils/encoding.py:8
+msgid "CP-037"
+msgstr "CP-037"
+
+#: plmapp/utils/encoding.py:9
+msgid "CP-1006"
+msgstr "CP-1006"
+
+#: plmapp/utils/encoding.py:10
+msgid "CP-1026"
+msgstr "CP-1026"
+
+#: plmapp/utils/encoding.py:11
+msgid "CP-1140"
+msgstr "CP-1140"
+
+#: plmapp/utils/encoding.py:12
+msgid "CP-1250"
+msgstr "CP-1250"
+
+#: plmapp/utils/encoding.py:13
+msgid "CP-1251"
+msgstr "CP-1251"
+
+#: plmapp/utils/encoding.py:14
+msgid "CP-1252"
+msgstr "CP-1252"
+
+#: plmapp/utils/encoding.py:15
+msgid "CP-1253"
+msgstr "CP-1253"
+
+#: plmapp/utils/encoding.py:16
+msgid "CP-1254"
+msgstr "CP-1254"
+
+#: plmapp/utils/encoding.py:17
+msgid "CP-1255"
+msgstr "CP-1255"
+
+#: plmapp/utils/encoding.py:18
+msgid "CP-1256"
+msgstr "CP-1256"
+
+#: plmapp/utils/encoding.py:19
+msgid "CP-1257"
+msgstr "CP-1257"
+
+#: plmapp/utils/encoding.py:20
+msgid "CP-1258"
+msgstr "CP-1258"
+
+#: plmapp/utils/encoding.py:21
+msgid "CP-424"
+msgstr "CP-424"
+
+#: plmapp/utils/encoding.py:22
+msgid "CP-437"
+msgstr "CP-437"
+
+#: plmapp/utils/encoding.py:23
+msgid "CP-500"
+msgstr "CP-500"
+
+#: plmapp/utils/encoding.py:24
+msgid "CP-737"
+msgstr "CP-737"
+
+#: plmapp/utils/encoding.py:25
+msgid "CP-775"
+msgstr "CP-775"
+
+#: plmapp/utils/encoding.py:26
+msgid "CP-850"
+msgstr "CP-850"
+
+#: plmapp/utils/encoding.py:27
+msgid "CP-852"
+msgstr "CP-852"
+
+#: plmapp/utils/encoding.py:28
+msgid "CP-855"
+msgstr "CP-855"
+
+#: plmapp/utils/encoding.py:29
+msgid "CP-856"
+msgstr "CP-856"
+
+#: plmapp/utils/encoding.py:30
+msgid "CP-857"
+msgstr "CP-857"
+
+#: plmapp/utils/encoding.py:31
+msgid "CP-860"
+msgstr "CP-860"
+
+#: plmapp/utils/encoding.py:32
+msgid "CP-861"
+msgstr "CP-861"
+
+#: plmapp/utils/encoding.py:33
+msgid "CP-862"
+msgstr "CP-862"
+
+#: plmapp/utils/encoding.py:34
+msgid "CP-863"
+msgstr "CP-863"
+
+#: plmapp/utils/encoding.py:35
+msgid "CP-864"
+msgstr "CP-864"
+
+#: plmapp/utils/encoding.py:36
+msgid "CP-865"
+msgstr "CP-865"
+
+#: plmapp/utils/encoding.py:37
+msgid "CP-866"
+msgstr "CP-866"
+
+#: plmapp/utils/encoding.py:38
+msgid "CP-869"
+msgstr "CP-869"
+
+#: plmapp/utils/encoding.py:39
+msgid "CP-874"
+msgstr "CP-874"
+
+#: plmapp/utils/encoding.py:40
+msgid "CP-875"
+msgstr ""
+
+#: plmapp/utils/encoding.py:41
+msgid "CP-932"
+msgstr ""
+
+#: plmapp/utils/encoding.py:42
+msgid "CP-949"
+msgstr ""
+
+#: plmapp/utils/encoding.py:43
+msgid "CP-950"
+msgstr ""
+
+#: plmapp/utils/encoding.py:44
+msgid "Euc-jis-2004"
+msgstr ""
+
+#: plmapp/utils/encoding.py:45
+msgid "Euc-jisx0213"
+msgstr ""
+
+#: plmapp/utils/encoding.py:46
+msgid "Euc-jp"
+msgstr ""
+
+#: plmapp/utils/encoding.py:47
+msgid "Euc-kr"
+msgstr ""
+
+#: plmapp/utils/encoding.py:48
+msgid "Gb18030"
+msgstr ""
+
+#: plmapp/utils/encoding.py:49
+msgid "Gb2312"
+msgstr ""
+
+#: plmapp/utils/encoding.py:50
+msgid "GBK"
+msgstr ""
+
+#: plmapp/utils/encoding.py:51
+msgid "HP-roman8"
+msgstr ""
+
+#: plmapp/utils/encoding.py:52
+msgid "HZ"
+msgstr ""
+
+#: plmapp/utils/encoding.py:53
+msgid "ISO-2022-JP"
+msgstr ""
+
+#: plmapp/utils/encoding.py:54
+msgid "ISO-2022-JP-1"
+msgstr ""
+
+#: plmapp/utils/encoding.py:55
+msgid "ISO-2022-JP-2"
+msgstr ""
+
+#: plmapp/utils/encoding.py:56
+msgid "ISO-2022-JP-2004"
+msgstr ""
+
+#: plmapp/utils/encoding.py:57
+msgid "ISO-2022-JP-3"
+msgstr ""
+
+#: plmapp/utils/encoding.py:58
+msgid "ISO-2022-JP-EXT"
+msgstr ""
+
+#: plmapp/utils/encoding.py:59
+msgid "ISO-2022-KR"
+msgstr ""
+
+#: plmapp/utils/encoding.py:60
+msgid "ISO-8859-1"
+msgstr ""
+
+#: plmapp/utils/encoding.py:61
+msgid "ISO-8859-10"
+msgstr ""
+
+#: plmapp/utils/encoding.py:62
+msgid "ISO-8859-11"
+msgstr ""
+
+#: plmapp/utils/encoding.py:63
+msgid "ISO-8859-13"
+msgstr ""
+
+#: plmapp/utils/encoding.py:64
+msgid "ISO-8859-14"
+msgstr ""
+
+#: plmapp/utils/encoding.py:65
+msgid "ISO-8859-15"
+msgstr ""
+
+#: plmapp/utils/encoding.py:66
+msgid "ISO-8859-16"
+msgstr ""
+
+#: plmapp/utils/encoding.py:67
+msgid "ISO-8859-2"
+msgstr ""
+
+#: plmapp/utils/encoding.py:68
+msgid "ISO-8859-3"
+msgstr ""
+
+#: plmapp/utils/encoding.py:69
+msgid "ISO-8859-4"
+msgstr ""
+
+#: plmapp/utils/encoding.py:70
+msgid "ISO-8859-5"
+msgstr ""
+
+#: plmapp/utils/encoding.py:71
+msgid "ISO-8859-6"
+msgstr ""
+
+#: plmapp/utils/encoding.py:72
+msgid "ISO-8859-7"
+msgstr ""
+
+#: plmapp/utils/encoding.py:73
+msgid "ISO-8859-8"
+msgstr ""
+
+#: plmapp/utils/encoding.py:74
+msgid "ISO-8859-9"
+msgstr ""
+
+#: plmapp/utils/encoding.py:75
+msgid "JOHAB"
+msgstr ""
+
+#: plmapp/utils/encoding.py:76
+msgid "KOI8-R"
+msgstr ""
+
+#: plmapp/utils/encoding.py:77
+msgid "KOI8-U"
+msgstr ""
+
+#: plmapp/utils/encoding.py:78
+msgid "Latin-1"
+msgstr ""
+
+#: plmapp/utils/encoding.py:79
+msgid "MacArabic"
+msgstr ""
+
+#: plmapp/utils/encoding.py:80
+msgid "MacCenteuro"
+msgstr ""
+
+#: plmapp/utils/encoding.py:81
+msgid "MacCroatian"
+msgstr ""
+
+#: plmapp/utils/encoding.py:82
+msgid "MacCyrillic"
+msgstr ""
+
+#: plmapp/utils/encoding.py:83
+msgid "MacFarsi"
+msgstr ""
+
+#: plmapp/utils/encoding.py:84
+msgid "MacGreek"
+msgstr ""
+
+#: plmapp/utils/encoding.py:85
+msgid "MacIceland"
+msgstr ""
+
+#: plmapp/utils/encoding.py:86
+msgid "MacLatin2"
+msgstr ""
+
+#: plmapp/utils/encoding.py:87
+msgid "MacRoman"
+msgstr ""
+
+#: plmapp/utils/encoding.py:88
+msgid "MacRomanian"
+msgstr ""
+
+#: plmapp/utils/encoding.py:89
+msgid "MacTurkish"
+msgstr ""
+
+#: plmapp/utils/encoding.py:90
+msgid "PTCP154"
+msgstr ""
+
+#: plmapp/utils/encoding.py:91
+msgid "Rot-13"
+msgstr ""
+
+#: plmapp/utils/encoding.py:92
+msgid "Shift-JIS"
+msgstr ""
+
+#: plmapp/utils/encoding.py:93
+msgid "Shift-JIS-2004"
+msgstr ""
+
+#: plmapp/utils/encoding.py:94
+msgid "Shift-JISX0213"
+msgstr ""
+
+#: plmapp/utils/encoding.py:95
+msgid "TIS-620"
+msgstr ""
+
+#: plmapp/utils/encoding.py:96
+msgid "UTF-16"
+msgstr ""
+
+#: plmapp/utils/encoding.py:97
+msgid "UTF-16-be"
+msgstr ""
+
+#: plmapp/utils/encoding.py:98
+msgid "UTF-16-le"
+msgstr ""
+
+#: plmapp/utils/encoding.py:99
+msgid "UTF-32"
+msgstr ""
+
+#: plmapp/utils/encoding.py:100
+msgid "UTF-32-be"
+msgstr ""
+
+#: plmapp/utils/encoding.py:101
+msgid "UTF-32-le"
+msgstr ""
+
+#: plmapp/utils/encoding.py:102
+msgid "UTF-7"
+msgstr ""
+
+#: plmapp/utils/encoding.py:103
+msgid "UTF-8"
+msgstr ""
+
+#: plmapp/utils/encoding.py:104
+msgid "UTF-8-sig"
+msgstr ""
+
+#: plmapp/utils/units.py:18
+msgid "Amounts"
+msgstr "Montants"
+
+#: plmapp/utils/units.py:19
+msgid "Each"
+msgstr "Pièce"
+
+#: plmapp/utils/units.py:20
+msgid "mol"
+msgstr "Mole"
+
+#: plmapp/utils/units.py:23
+msgid "Lengths"
+msgstr "Longueurs"
+
+#: plmapp/utils/units.py:24
+msgid "mm"
+msgstr "mm"
+
+#: plmapp/utils/units.py:25
+msgid "cm"
+msgstr "cm"
+
+#: plmapp/utils/units.py:26
+msgid "dm"
+msgstr "dm"
+
+#: plmapp/utils/units.py:27
+msgid "m"
+msgstr "m"
+
+#: plmapp/utils/units.py:28
+msgid "km"
+msgstr "km"
+
+#: plmapp/utils/units.py:31
+msgid "Volumes"
+msgstr ""
+
+#: plmapp/utils/units.py:32
+msgid "m³"
+msgstr ""
+
+#: plmapp/utils/units.py:33
+msgid "mL"
+msgstr ""
+
+#: plmapp/utils/units.py:34
+msgid "cL"
+msgstr ""
+
+#: plmapp/utils/units.py:35
+msgid "dL"
+msgstr ""
+
+#: plmapp/utils/units.py:36
+msgid "L"
+msgstr ""
+
+#: plmapp/utils/units.py:39
+msgid "Masses"
+msgstr ""
+
+#: plmapp/utils/units.py:40
+msgid "mg"
+msgstr ""
+
+#: plmapp/utils/units.py:41
+msgid "cg"
+msgstr ""
+
+#: plmapp/utils/units.py:42
+msgid "dg"
+msgstr ""
+
+#: plmapp/utils/units.py:43
+msgid "g"
+msgstr ""
+
+#: plmapp/utils/units.py:44
+msgid "kg"
+msgstr ""
+
+#: plmapp/views/base.py:119
+msgid "Internal error"
+msgstr "Erreur interne"
+
+#: plmapp/views/document.py:132
+#, fuzzy
+msgid "The part has been successfully attached to the document."
+msgstr "Aucune part n'est lié à ce document."
+
+#: plmapp/views/document.py:208 plmapp/views/document.py:261
+#: templates/base.html:122 templates/blocks/supermenu.html:65
+#: templates/blocks/supermenu.html.py:71 templates/documents/files_add.html:20
 msgid "Upload"
 msgstr "Télécharger"
 
-#: plmapp/views/main.py:1903
+#: plmapp/views/main.py:98
+#, fuzzy
+msgid "Your comment was posted."
+msgstr "Aucun commentaire n'a encore été posté."
+
+#: plmapp/views/main.py:499
+#, python-format
+msgid "The %(Object_type)s has been created"
+msgstr "Le %(Object_type)s a été créé"
+
+#: plmapp/views/main.py:504
+msgid "Files has been attached"
+msgstr "Des fichiers ont été atachés"
+
+#: plmapp/views/main.py:510
 #, python-format
 msgid "Error: %(details)s"
 msgstr "Erreur : %(details)s"
 
-#: plmapp/views/main.py:2119
-msgid "It's not a valid child."
-msgstr "Ce n'est pas un enfant (part) valide."
-
-#: plmapp/views/main.py:2134
-msgid "It's not a valid document."
-msgstr "Ce n'est pas un document valide."
-
-#: plmapp/views/main.py:2320
-msgid "signer level"
-msgstr "signataire niveau"
-
-#: plmapp/views/main.py:2322
-msgid "signer all levels"
-msgstr "signataire tous niveaux"
-
-#: plmapp/views/main.py:2786 templates/base.html:125
-#: templates/blocks/supermenu.html:9 templates/blocks/supermenu.html.py:15
+#: plmapp/views/main.py:662 templates/base.html:160
+#: templates/blocks/supermenu.html:19
 msgid "Search"
 msgstr "Rechercher"
 
-#: plmapp/views/main.py:2914 templates/blocks/supermenu.html:48
-msgid "Browse"
-msgstr "Parcourir"
+#: plmapp/views/plmobject.py:57
+#, python-format
+msgid "No object has the name %(name)s"
+msgstr "Aucun objet n'a le même nom que %(name)s"
+
+#: plmapp/views/plmobject.py:104
+#, python-format
+msgid "The %(object_type)s has been successfully cancelled."
+msgstr "Le %(object_type)s a été annulé avec succès."
+
+#: plmapp/views/plmobject.py:107
+#, fuzzy, python-format
+msgid "The %(object_type)s has been successfully promoted."
+msgstr "Les données ont été importées avec succès."
+
+#: plmapp/views/plmobject.py:641
+#, python-format
+msgid "Role %(add_role)s granted."
+msgstr "Rôle %(add_role)s attribué."
+
+#: plmapp/views/plmobject.py:676
+msgid "The user you have selected has been successfully deleted."
+msgstr "L'utilisateur que vous avez sélectionné a été supprimé avec sccès."
+
+#: plmapp/views/plmobject.py:894
+msgid "It's not a valid child."
+msgstr "Ce n'est pas un enfant (part) valide."
+
+#: plmapp/views/plmobject.py:909
+msgid "It's not a valid document."
+msgstr "Ce n'est pas un document valide."
+
+#: plmapp/views/user.py:148
+msgid "signer level"
+msgstr "signataire niveau"
+
+#: plmapp/views/user.py:150
+msgid "signer all levels"
+msgstr "signataire tous niveaux"
+
+#: plmapp/views/user.py:234
+msgid "Your profile has been modified."
+msgstr "Votre profil a été modifié."
+
+#: plmapp/views/user.py:266
+msgid "Your password has been modified successfully."
+msgstr "Votre mot de passe a été modifié avec succès."
 
 #: templates/404.html:11
 msgid "Error 404"
@@ -966,38 +1803,38 @@ msgstr ""
 "Erreur interne du serveur.\n"
 "   "
 
-#: templates/attributes.html:11
-msgid "Similar contents"
-msgstr "Contenus similaires"
-
-#: templates/attributes.html:31 templates/public.html:57
-#: templates/documents/file_revisions.html:70
-#: templates/documents/file_revisions.html:120
+#: templates/attributes.html:15 templates/public.html:57
+#: templates/documents/file_revisions.html:56
+#: templates/documents/file_revisions.html:106
 #, python-format
 msgid "%(time_since)s ago"
 msgstr "Il y a %(time_since)s"
 
-#: templates/attributes.html:44 templates/attributes.html.py:53
+#: templates/attributes.html:33 templates/attributes.html.py:43
 msgid "Edit this information"
 msgstr "Éditer ces informations"
 
-#: templates/attributes.html:47
+#: templates/attributes.html:37
 msgid "Change my password"
 msgstr "Changer mon mot de passe"
 
-#: templates/attributes.html:59 templates/parts/bom.html:65
+#: templates/attributes.html:49 templates/parts/bom.html:84
 msgid "Download as PDF"
 msgstr "Télécharger au format PDF"
 
-#: templates/attributes.html:64
+#: templates/attributes.html:54
 msgid "Clone"
 msgstr "Cloner"
 
-#: templates/attributes.html:71
+#: templates/attributes.html:64
+msgid "Similar contents"
+msgstr "Contenus similaires"
+
+#: templates/attributes.html:80
 msgid "Comments"
 msgstr "Commentaires"
 
-#: templates/attributes.html:77
+#: templates/attributes.html:86
 msgid ""
 "\n"
 "                        One comment has been posted.\n"
@@ -1007,7 +1844,7 @@ msgstr ""
 "Un commentaire a été envoyé.\n"
 "   "
 
-#: templates/attributes.html:81
+#: templates/attributes.html:90
 #, python-format
 msgid ""
 "\n"
@@ -1018,145 +1855,147 @@ msgstr ""
 "%(comment_count)s commentaires ont été postés.\n"
 "   "
 
-#: templates/attributes.html:91
+#: templates/attributes.html:107
 msgid "Posted by:"
 msgstr "Posté par:"
 
-#: templates/attributes.html:95
+#: templates/attributes.html:111
 msgid "Date:"
 msgstr "Date:"
 
-#: templates/attributes.html:105
+#: templates/attributes.html:115
+msgid "Permalink"
+msgstr ""
+
+#: templates/attributes.html:126
 msgid "No comments have been posted yet."
 msgstr "Aucun commentaire n'a encore été posté."
 
-#: templates/attributes.html:111
+#: templates/attributes.html:132
 msgid "Post a comment"
 msgstr "Poster un commentaire"
 
-#: templates/attributes.html:152
+#: templates/attributes.html:173 templates/comments/preview.html:55
 msgid "Post"
 msgstr "Envoyer"
 
-#: templates/base.html:48
+#: templates/base.html:47
 msgid "Home page"
 msgstr "Page d'accueil"
 
-#: templates/base.html:73
+#: templates/base.html:103
 msgid "HOME"
 msgstr "ACCUEIL"
 
-#: templates/base.html:78
+#: templates/base.html:109
 msgid "SEARCH"
 msgstr "RECHERCHER"
 
-#: templates/base.html:83
+#: templates/base.html:115
 msgid "BROWSE"
 msgstr "PARCOURIR"
 
-#: templates/base.html:93 templates/create.html:70
+#: templates/base.html:127 templates/create.html:74
 msgid "CREATE"
 msgstr "CRÉER"
 
-#: templates/base.html:100
+#: templates/base.html:135
 msgid "NAVIGATE"
 msgstr "NAVIGUER"
 
-#: templates/base.html:105
+#: templates/base.html:141
 msgid "STUDY"
 msgstr "ÉTUDIER"
 
-#: templates/base.html:118
+#: templates/base.html:154
 msgid "Toggle the left panel"
 msgstr "Afficher/cacher le panneau de gauche"
 
-#: templates/base.html:162
+#: templates/base.html:197
 msgid "You are not allowed to see this object"
 msgstr "Vous n'êtes pas autorisé à voir cet objet"
 
-#: templates/browse.html:20 templates/groups/objects.html:12
-msgid "Objects"
-msgstr "Objets"
-
-#: templates/browse.html:23
+#: templates/browse.html:25 templates/browse.html.py:139
+#: templates/search/search.html:37
 msgid "Parts"
 msgstr "Parts"
 
-#: templates/browse.html:26
+#: templates/browse.html:28 templates/browse.html.py:141
 msgid "Top assemblies"
 msgstr "Têtes d'assemblage"
 
-#: templates/browse.html:29
+#: templates/browse.html:31 templates/browse.html.py:143
+#: templates/search/search.html:40
 msgid "Documents"
 msgstr "Documents"
 
-#: templates/browse.html:33
+#: templates/browse.html:35 templates/search/search.html:43
 msgid "Groups"
 msgstr "Groupes"
 
-#: templates/browse.html:35 templates/groups/users.html:8
+#: templates/browse.html:37 templates/groups/users.html:8
+#: templates/search/search.html:46
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: templates/browse.html:47
+#: templates/browse.html:53
 msgid "Sort"
 msgstr "Trier"
 
-#: templates/browse.html:51 templates/browse.html.py:105
+#: templates/browse.html:57 templates/browse.html.py:163
 msgid "Recently added"
 msgstr "Ajoutés récemment"
 
-#: templates/browse.html:54 templates/browse.html.py:97
+#: templates/browse.html:60 templates/browse.html.py:157
 msgid "Sorted by name"
 msgstr "Triés selon le nom"
 
-#: templates/browse.html:58 templates/browse.html.py:100
+#: templates/browse.html:64 templates/browse.html.py:159
 msgid "Largest assemblies"
 msgstr "Plus grands assemblages"
 
-#: templates/browse.html:63 templates/browse.html.py:103
+#: templates/browse.html:69 templates/browse.html.py:161
 msgid "Most used"
 msgstr "Les plus utilisés"
 
-#: templates/browse.html:71
-msgid "State"
-msgstr "Etat"
-
-#: templates/browse.html:75
-msgid "All states"
-msgstr "Tous les états"
-
-#: templates/browse.html:78
-msgid "Official state"
-msgstr "État officiel"
-
-#: templates/browse.html:81
+#: templates/browse.html:88
 msgid "Published"
 msgstr "Publiés"
 
-#: templates/browse.html:91 templates/browse.html.py:126
-#: templates/blocks/search.html:22 templates/search/search.html:22
-#: templates/search/search.html.py:27
+#: templates/browse.html:92
+msgid "Other states..."
+msgstr "Autres états..."
+
+#: templates/browse.html:109 templates/search/search.html:58
+#, fuzzy
+msgid "Sub type"
+msgstr "type"
+
+#: templates/browse.html:132 templates/browse.html.py:190
+#: templates/blocks/search.html:22 templates/search/search.html:87
+#: templates/search/search.html.py:92
 msgid "Results"
 msgstr "Résultats"
 
-#: templates/browse.html:115
-msgid "Only official objects"
-msgstr "Objets officialisés seulement"
+#: templates/browse.html:145 templates/users/identity_card.html:9
+msgid "User"
+msgstr "Utilisateur"
 
-#: templates/browse.html:118
+#: templates/browse.html:147 templates/groups/identity_card.html:7
+#: templates/groups/pending_invitations.html:7
+msgid "Group"
+msgstr "Groupe"
+
+#: templates/browse.html:173
 msgid "Only published objects"
 msgstr "Objets publiés seulement"
 
-#: templates/browse.html:120
-msgid "All objects"
-msgstr "Tous les objets"
-
-#: templates/browse.html:128
+#: templates/browse.html:192
+#, fuzzy, python-format
 msgid ""
 "\n"
-"                            (%(start)s - %(end)s on %(total)s)\n"
-"                        "
+"                                (%(start)s - %(end)s on %(total)s)\n"
+"                            "
 msgstr ""
 "\n"
 "(%(start)s - %(end)s sur %(total)s)\n"
@@ -1184,14 +2023,13 @@ msgstr "CLONER"
 
 #: templates/clone.html:51
 msgid "You can not clone this object since you are not a contributor."
-msgstr ""
-"Vous ne pouvez pas cloner cet objet puisque vous n'êtes pas un contributeur."
+msgstr "Vous ne pouvez pas cloner cet objet puisque vous n'êtes pas un contributeur."
 
-#: templates/create.html:17
+#: templates/create.html:21
 msgid "OBJECT CREATION:"
 msgstr "CREATION DE L'OBJET"
 
-#: templates/create.html:52
+#: templates/create.html:56
 #, python-format
 msgid ""
 " \n"
@@ -1203,7 +2041,7 @@ msgstr ""
 "%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
 "    "
 
-#: templates/create.html:57
+#: templates/create.html:61
 #, python-format
 msgid ""
 " \n"
@@ -1215,7 +2053,7 @@ msgstr ""
 "%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
 "    "
 
-#: templates/create.html:61
+#: templates/create.html:65
 #, python-format
 msgid ""
 " \n"
@@ -1227,40 +2065,39 @@ msgstr ""
 "%(related_reference)s // %(related_revision)s // %(related_name)s.\n"
 "    "
 
-#: templates/create.html:75
+#: templates/create.html:79
 msgid "Other creation tools:"
 msgstr "Autres outils de création:"
 
-#: templates/create.html:79
+#: templates/create.html:83
 msgid "Import several parts or documents from CSV file."
 msgstr "Importer plusieurs parts ou document à partir d'un fichier CSV."
 
-#: templates/create.html:84
+#: templates/create.html:88
 msgid "Import a BOM from a CSV file."
 msgstr "Importer une nomenclature à partir d'un fichier CSV."
 
-#: templates/create.html:88 templates/users/sponsor.html:9
+#: templates/create.html:92 templates/users/sponsor.html:9
 msgid "Sponsor a new user"
 msgstr "Parrainer un nouvel utilisateur"
 
-#: templates/create.html:92
+#: templates/create.html:96
 msgid "Sponsor several users from a CSV file."
-msgstr ""
-"Parrainer plusieurs utilisateurs en utilisant à partir d'un fichier CSV."
+msgstr "Parrainer plusieurs utilisateurs en utilisant à partir d'un fichier CSV."
 
-#: templates/create.html:98
+#: templates/create.html:102
 msgid "You can not create an object since you are not a contributor."
 msgstr "Vous ne pouvez pas créer un objet car vous n'êtes pas contributeur."
 
-#: templates/edit.html:7
+#: templates/edit.html:9
 msgid "OBJECT MODIFICATION:"
 msgstr "MODIFICATION DE L'OBJET"
 
-#: templates/edit.html:26
+#: templates/edit.html:28
 msgid "MODIFY"
 msgstr "MODIFIER"
 
-#: templates/edit.html:28 templates/import/csv.html:82
+#: templates/edit.html:30 templates/import/csv.html:82
 #: templates/parts/bom_edit.html:51
 msgid "Undo"
 msgstr "Défaire"
@@ -1277,6 +2114,23 @@ msgstr "Erreur"
 msgid "go back"
 msgstr "revenir en arrière"
 
+#: templates/history.html:25
+msgid "*: Required fields"
+msgstr "*: champs requis"
+
+#: templates/history.html:30 templates/history.html.py:90
+msgid "← Previous Period"
+msgstr "← Période précédente"
+
+#: templates/history.html:32 templates/history.html.py:92
+msgid "Next Period →"
+msgstr "Période suivante →""
+
+#: templates/history.html:86
+#, fuzzy
+msgid "There are no event to display for this period"
+msgstr "Il n'y a pas de document attaché à cette part."
+
 #: templates/home.html:13
 #, python-format
 msgid "Welcome %(full_name)s"
@@ -1286,16 +2140,17 @@ msgstr "Bienvenue %(full_name)s!"
 msgid "Groups that you own: pending invitations"
 msgstr "Les groupes dont vous êtes propriétaire: invitations en attente"
 
-#: templates/home.html:39
+#: templates/home.html:38
 msgid "Groups that you may join: pending invitations"
 msgstr "Les groupes que vous pouvez rejoindre: invitations en attente"
 
-#: templates/identity_card.html:9 templates/parts/doccad.html:68
+#: templates/identity_card.html:10
 msgid "Detach"
 msgstr "Détacher"
 
-#: templates/identity_card.html:42 templates/groups/identity_card.html:19
-msgid "created %(ctime)s ago"
+#: templates/identity_card.html:43 templates/groups/identity_card.html:19
+#, fuzzy, python-format
+msgid "created %(ctime)s"
 msgstr "créé il y a %(ctime)s"
 
 #: templates/lifecycle.html:17
@@ -1306,8 +2161,7 @@ msgstr "Vous avez les droits de propriétaire sur cet objet"
 msgid ""
 "You can not demote this object since its state is official or more advanced."
 msgstr ""
-"Vous ne pouvez pas refuser cet objet car son statut est officiel ou encore "
-"plus avancé."
+"Vous ne pouvez pas refuser cet objet car son statut est officiel ou encore plus avancé."
 
 #: templates/lifecycle.html:32
 msgid "You do not have the permission to demote this object."
@@ -1317,25 +2171,29 @@ msgstr "Vous n'avez pas la permission de refuser cet objet."
 msgid "You can not promote this object:"
 msgstr "Vous ne pouvez pas valider cet objet:"
 
-#: templates/lifecycle.html:43
+#: templates/lifecycle.html:42
+msgid "But you can try to promote the whole assembly."
+msgstr "Mais vous pouvez essayer de promouvoir l'assemblage en entier."
+
+#: templates/lifecycle.html:45
 msgid "You already have approved this promotion."
 msgstr "Vous avez déjà approuvé cette promotion"
 
-#: templates/lifecycle.html:47
+#: templates/lifecycle.html:48
 msgid "You do not have the permission to promote this object."
 msgstr "Vous n'avez pas la permission de valider cet objet."
 
-#: templates/lifecycle.html:55
+#: templates/lifecycle.html:56
 msgid "You can not cancel this object since it has more than one revision."
 msgstr "Vous ne pouvez pas annuler cet objet car il a plus d'une révision."
 
-#: templates/lifecycle.html:59
+#: templates/lifecycle.html:60
 msgid ""
 "You can not cancel this object since it is related to another object (part, "
 "document)."
 msgstr ""
-"Vous ne pouvez pas annuler cet objet tant qu'il est lié à un autre objet (part, "
-"document)."
+"Vous ne pouvez pas annuler cet objet tant qu'il est lié à un autre objet "
+"(part, document)."
 
 #: templates/lifecycle.html:64
 msgid "You do not have the permission to cancel this object."
@@ -1347,30 +2205,24 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas annuler cet objet, il n'est plus à l'état de brouillon."
 
-#: templates/lifecycle.html:77
+#: templates/lifecycle.html:75
 msgid "DEMOTE"
 msgstr "REFUSER"
 
-#: templates/lifecycle.html:78
+#: templates/lifecycle.html:75
 msgid "Are you sure you want to demote this object."
 msgstr "Etes-vous sur de vouloir rétrograder cet objet."
 
-#: templates/lifecycle.html:90 templates/documents/revisions.html:7
-#: templates/parts/revisions.html:7
-#: templates/snippets/confirmation_form.html:6
-msgid "Are you sure?"
-msgstr "Êtes-vous sur ?"
-
-#: templates/lifecycle.html:97
+#: templates/lifecycle.html:91
 msgid "If you promote this object, you may not be allowed to undo this action."
-msgstr ""
-"Si vous validez cet objet, vous pouvez ne plus être autorisé à annuler cette action."
+msgstr "Si vous validez cet objet, vous pourriez ne plus être autorisé à annuler cette action."
 
-#: templates/lifecycle.html:104
+#: templates/lifecycle.html:98
 msgid "The following revisions will be cancelled:"
 msgstr "Les révisions suivantes vont être annulées"
 
-#: templates/lifecycle.html:108 templates/lifecycle.html.py:120
+#: templates/lifecycle.html:102 templates/lifecycle.html.py:114
+#, python-format
 msgid ""
 "\n"
 "                                        Revision %(revision)s : %(name)s\n"
@@ -1379,24 +2231,28 @@ msgstr ""
 "\n"
 "                                        Révision %(revision)s : %(name)s\n"
 "   "
-
-#: templates/lifecycle.html:116
+#: templates/lifecycle.html:110
 msgid "The following revisions will be deprecated:"
 msgstr "Les révisions suivantes vont être dépréciées:"
 
-#: templates/lifecycle.html:128
+#: templates/lifecycle.html:122
 msgid ""
 "The following alternate links will switch from the previous revision to the "
 "current one:"
 msgstr ""
-"Les liens alternate suivant vont basculer de la révision précédente vers la"
-"revision en cours:"
+"Les liens alternate suivant vont basculer de la révision précédente vers "
+"larevision en cours:"
 
-#: templates/lifecycle.html:138
+#: templates/lifecycle.html:132
 msgid "Current alternate links will be dropped:"
 msgstr "Les liens alternate en cours vont être cassés:"
 
-#: templates/lifecycle.html:157
+#: templates/lifecycle.html:154
+#, fuzzy
+msgid "Promote assembly"
+msgstr "Têtes d'assemblage"
+
+#: templates/lifecycle.html:156
 msgid "PROMOTE"
 msgstr "VALIDER"
 
@@ -1408,26 +2264,26 @@ msgstr "Approuver la promotion"
 msgid "Discard approvals"
 msgstr "Annuler les approbations"
 
-#: templates/lifecycle.html:169
+#: templates/lifecycle.html:168
 msgid "Warning, all signers will have to approve again the promotion."
 msgstr "Attention, tous les signataires devront approuver à nouveau la promotion."
 
-#: templates/lifecycle.html:179
+#: templates/lifecycle.html:173
 msgid "CANCEL"
 msgstr "ANNULER"
 
-#: templates/lifecycle.html:180
+#: templates/lifecycle.html:173
 msgid ""
 "Warning, if you cancel this object, it won't be anymore accessible to "
 "everyone."
 msgstr ""
 "Attention , si vous annulez cet objet, il ne sera plus accessible à tous."
 
-#: templates/lifecycle.html:191
+#: templates/lifecycle.html:179
 msgid "PUBLISH"
 msgstr "PUBLIER"
 
-#: templates/lifecycle.html:192
+#: templates/lifecycle.html:179
 msgid ""
 "Warning, if you publish this object, it will be accessible to everyone, "
 "including anonymous users."
@@ -1435,11 +2291,11 @@ msgstr ""
 "Attention, si vous publiez cet objet, il sera accessible à tous, "
 "utilisateurs anonymes inclus."
 
-#: templates/lifecycle.html:203
+#: templates/lifecycle.html:185
 msgid "UNPUBLISH"
 msgstr "ANNULER LA PUBLICATION"
 
-#: templates/lifecycle.html:204
+#: templates/lifecycle.html:185
 msgid ""
 "Warning, if you unpublish this object, it won't be anymore accessible to "
 "everyone."
@@ -1447,47 +2303,43 @@ msgstr ""
 "Attention, si vous annulez la publication de cet objet, il ne sera plus "
 "accessible à tous."
 
-#: templates/lifecycle.html:213
+#: templates/lifecycle.html:190
 msgid "This object has been published:"
 msgstr "Cet objet a été publié:"
 
-#: templates/lifecycle.html:214
+#: templates/lifecycle.html:191
 msgid "Public link"
 msgstr "Lien public"
 
-#: templates/lifecycle.html:251
-msgid "Replace"
-msgstr "Remplacer"
-
-#: templates/lifecycle.html:252 templates/snippets/management_block.html:23
-msgid "REPLACE"
-msgstr "REMPLACER"
-
-#: templates/lifecycle.html:260
-msgid "Remove"
-msgstr "Enlever"
-
-#: templates/lifecycle.html:265
-msgid "Approved"
-msgstr "Approuvé"
-
-#: templates/lifecycle.html:273
-msgid "Add"
-msgstr "Ajouter"
-
-#: templates/lifecycle.html:284
+#: templates/lifecycle.html:196
 msgid "Notify"
 msgstr "Notifier"
 
-#: templates/lifecycle.html:289
+#: templates/lifecycle.html:200
 msgid "Unnotify me"
 msgstr "Ne plus me notifier"
 
-#: templates/lifecycle.html:295
+#: templates/lifecycle.html:205
 msgid "Notify me"
 msgstr "Me notifier"
 
-#: templates/lifecycle.html:301
+#: templates/lifecycle.html:238
+msgid "Replace"
+msgstr "Remplacer"
+
+#: templates/lifecycle.html:246
+msgid "Remove"
+msgstr "Enlever"
+
+#: templates/lifecycle.html:251
+msgid "Approved"
+msgstr "Approuvé"
+
+#: templates/lifecycle.html:259
+msgid "Add"
+msgstr "Ajouter"
+
+#: templates/lifecycle.html:270
 msgid "Give access to a restricted account"
 msgstr "Autoriser l'accès à un compte restreint"
 
@@ -1495,78 +2347,68 @@ msgstr "Autoriser l'accès à un compte restreint"
 msgid "Cancelled"
 msgstr "Annulé"
 
-#: templates/login.html:19
+#: templates/login.html:18
 msgid "openPLM LOGIN PAGE"
 msgstr "PAGE D'ACCÈS à OpenPLM"
 
-#: templates/login.html:30
-msgid "Welcome to openPLM"
+#: templates/login.html:34
+#, fuzzy
+msgid "Welcome to OpenPLM."
 msgstr "Bienvenue dans openPLM"
 
-#: templates/login.html:45 templates/blocks/user.html:25
-msgid "Go"
-msgstr "Go"
-
-#: templates/login.html:54
-msgid "is the first genuine open source PLM based on"
+#: templates/login.html:35
+#, fuzzy
+msgid "is the first genuine open source PLM."
 msgstr "est le premier véritable PLM open source s'appuyant sur"
 
-#: templates/login.html:55
-msgid ""
-"intended to provide a starting point for companies CMS/PLM/BIM projects."
-msgstr ""
-"avec l'intention de fournir une base de départ pour les projets CMS/PLM/BIM "
-"des sociétés."
-
-#: templates/login.html:56
-msgid ""
-"By integrating numerous standard reusable PLM functionalities to take care "
-"of the things that companies have in common, it lets you focus on what makes "
-"your company different."
-msgstr ""
-"En intégrant de nombreuses fonctionalités standards et réutilisables pour "
-"prendre en charge les choses que les sociétés ont en commun, cela vous "
-"permet de vous concentrer sur ce qui fait votre spécificité."
-
-#: templates/login.html:60
+#: templates/login.html:37
 msgid "For more information about openPLM, see"
 msgstr "Pour plus d'information concernant openPLM, voir"
 
-#: templates/login.html:63
+#: templates/login.html:53 templates/blocks/user.html:24
+msgid "Go"
+msgstr "Go"
+
+#: templates/login.html:61
 msgid "openPLM connexion :"
 msgstr "Connexion à OpenPLM :"
 
-#: templates/login.html:72
+#: templates/login.html:64
+#, fuzzy
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+"Votre mot de passe a été saisi de façon incorrect. SVP veuillez le saisir à "
+"nouveau."
+
+#: templates/login.html:71
 msgid "Login :"
 msgstr "Identifiant : "
 
-#: templates/login.html:76
+#: templates/login.html:75
 msgid "Password :"
 msgstr "Mot de passe :"
 
-#: templates/login.html:81
+#: templates/login.html:80
 msgid "LOGIN"
 msgstr "ENTRER"
 
-#: templates/login.html:86
+#: templates/login.html:85
+#, fuzzy
 msgid ""
-"If you have any trouble logging in to your account, contact your "
+"*If you have any trouble logging in to your account, contact your "
 "administrator"
 msgstr ""
 "Si vous rencontrez des difficultés à vous connecter, contactez votre "
 "administrateur"
 
-#: templates/login.html:90
+#: templates/login.html:87
 msgid "Browse public data."
 msgstr "Parcourir les données publiques."
 
-#: templates/login.html:93
-msgid "Professionals"
-msgstr "Professionels"
-
-#: templates/login.html:96
+#: templates/login.html:91
+#, fuzzy
 msgid ""
-"You are planning to use openPLM in a <b>professional</b> context. If you "
+"If you are planning to use openPLM in a <b>professional</b> context. If you "
 "want to work with other professionals for your project management, for other "
 "solutions plugins, for openPLM software maintenance, "
 msgstr ""
@@ -1575,7 +2417,7 @@ msgstr ""
 "pour des interfaces avec d'autres solutions, pour une maintenance logiciel "
 "d'openPLM,"
 
-#: templates/login.html:98
+#: templates/login.html:93
 msgid "contact us"
 msgstr "contactez-nous"
 
@@ -1583,68 +2425,72 @@ msgstr "contactez-nous"
 msgid "Select a user for your delegation as : "
 msgstr "Sélectionez un utilisateur pour déléguer votre rôle de : "
 
-#: templates/navigate.html:37
+#: templates/navigate.html:38
 msgid "Attach document?"
 msgstr "Attacher le document ?"
 
-#: templates/navigate.html:40
+#: templates/navigate.html:41
 msgid "Attach the selected document?"
 msgstr "Attacher le document sélectionné ?"
 
-#: templates/navigate.html:55
+#: templates/navigate.html:56
 msgid "Close"
 msgstr "Fermer"
 
-#: templates/navigate.html:76
+#: templates/navigate.html:79
 msgid "Zoom out"
 msgstr "Dézoomer"
 
-#: templates/navigate.html:80
+#: templates/navigate.html:83
 msgid "Zoom in"
 msgstr "Zoomer"
 
-#: templates/navigate.html:84
+#: templates/navigate.html:87
 msgid "Fit all"
 msgstr "Ajuster le graph à la fenêtre"
 
-#: templates/navigate.html:88
+#: templates/navigate.html:91
 msgid "Original"
 msgstr "Zoomer à 1:1"
 
-#: templates/navigate.html:101
+#: templates/navigate.html:105
 msgid "Other revisions of the object"
 msgstr "Autre révisions de l'objet"
 
-#: templates/navigate.html:105 templates/navigate.html.py:108
+#: templates/navigate.html:109 templates/navigate.html.py:112
 msgid "previous"
 msgstr "précédent"
 
-#: templates/navigate.html:105
+#: templates/navigate.html:109
 msgid "displays previous revision as current object"
 msgstr "affiche la révision précédente de l'objet"
 
-#: templates/navigate.html:108
+#: templates/navigate.html:112
 msgid "you are on the first revision of this object"
 msgstr "vous êtes sur la première révision de l'objet"
 
-#: templates/navigate.html:115 templates/navigate.html.py:118
+#: templates/navigate.html:119 templates/navigate.html.py:122
 msgid "next"
 msgstr "suivante"
 
-#: templates/navigate.html:115
+#: templates/navigate.html:119
 msgid "displays next revision as current object"
 msgstr "affiche la révision suivante de l'objet"
 
-#: templates/navigate.html:118
+#: templates/navigate.html:122
 msgid "you are on the last revision of this object"
 msgstr "vous êtes sur la dernière révision de l'objet"
 
-#: templates/navigate.html:126 templates/parts/bom.html:49
+#: templates/navigate.html:128
+msgid "Toggle fullscreen display"
+msgstr "Basculer en mode plein écran"
+
+#: templates/navigate.html:130 templates/parts/bom.html:64
 #: templates/parts/parents.html:20
 msgid "Display :"
 msgstr "Afficher :"
 
-#: templates/navigate.html:130
+#: templates/navigate.html:134
 msgid "FILTER"
 msgstr "FILTRER"
 
@@ -1652,14 +2498,14 @@ msgstr "FILTRER"
 msgid "Files"
 msgstr "Fichiers"
 
-#: templates/public.html:27 templates/documents/file_revisions.html:18
-#: templates/documents/file_revisions.html:106
-#: templates/documents/files.html:127
+#: templates/public.html:27 templates/documents/file_revisions.html:26
+#: templates/documents/file_revisions.html:92
+#: templates/documents/files.html:75
 msgid "DOWNLOAD"
 msgstr "TÉLÉCHARGER"
 
-#: templates/public.html:35 templates/documents/file_revisions.html:115
-#: templates/documents/files.html:167
+#: templates/public.html:35 templates/documents/file_revisions.html:101
+#: templates/documents/files.html:89
 msgid "No thumbnail available"
 msgstr "Aucun aperçu disponible"
 
@@ -1667,59 +2513,56 @@ msgstr "Aucun aperçu disponible"
 msgid "Attributes"
 msgstr "Attributs"
 
-#: templates/public.html:70
+#: templates/public.html:74
 msgid "Revisions"
 msgstr "Révisions"
 
-#: templates/public.html:92
+#: templates/public.html:96
 msgid "Attached documents"
 msgstr "Documents liés"
 
-#: templates/public.html:94
+#: templates/public.html:98
 msgid "Attached parts"
 msgstr "Parts liées"
 
-#: templates/public.html:119
+#: templates/public.html:123
 msgid "This part is unpublished."
 msgstr "Cette part n'est plus publique."
 
-#: templates/public.html:121
+#: templates/public.html:125
 msgid "This document is unpublished."
 msgstr "Ce document n'est plus public."
 
-#: templates/revisions.html:22
+#: templates/revisions.html:23
 msgid "NEW"
 msgstr "NOUVEAU"
 
-#: templates/revisions.html:26
+#: templates/revisions.html:27
 msgid "You can not revise this object since you are not a contributor."
-msgstr ""
-"Vous ne pouvez pas reviser cet objet puisque vous n'êtes pas un contributeur."
+msgstr "Vous ne pouvez pas reviser cet objet puisque vous n'êtes pas un contributeur."
 
 #: templates/revisions.html:31
 msgid "You can not revise this object since it is cancelled."
 msgstr "Vous ne pouvez pas reviser cet objet car il a été annulé."
 
-#: templates/revisions.html:34
+#: templates/revisions.html:33
 msgid "You can not revise this object since it is deprecated."
 msgstr "Vous ne pouvez pas reviser cet objet car il a été déprécié."
 
-#: templates/revisions.html:36
+#: templates/revisions.html:35
 msgid "You can not revise this object since a revision already exist."
-msgstr ""
-"Vous ne pouvez pas reviser cet objet car une révision plus récente existe "
-"déjà"
+msgstr "Vous ne pouvez pas reviser cet objet car une révision plus récente existe déjà"
 
-#: templates/blocks/menu.html:11 templates/blocks/reference.html:46
+#: templates/blocks/menu.html:11 templates/blocks/reference.html:24
 msgid "click here to subscribe to the related feed"
 msgstr "cliquez ici pour vous abonner au flux rss correspondant"
 
-#: templates/blocks/reference.html:57
+#: templates/blocks/reference.html:35
 #, python-format
 msgid "Last modified %(mtime)s ago"
 msgstr "Modifié il y a %(mtime)s"
 
-#: templates/blocks/search.html:7 templates/search/search.html:18
+#: templates/blocks/search.html:7 templates/search/search.html:21
 msgid "SEARCH !"
 msgstr "RECHERCHER !"
 
@@ -1742,78 +2585,101 @@ msgstr ""
 msgid "All results"
 msgstr "Tous les résultats"
 
-#: templates/blocks/search.html:40 templates/search/search.html:44
+#: templates/blocks/search.html:40 templates/search/search.html:107
 msgid "No result matching given query"
 msgstr "Aucun résultat ne correspond à la recherche"
 
-#: templates/blocks/supermenu.html:11
-msgid "Search for a part, a document, a file and more."
-msgstr "Rechercher une part, un document, un ficher et plus encore."
-
-#: templates/blocks/supermenu.html:17
+#: templates/blocks/supermenu.html:21
 msgid "Restricted account, search not available."
 msgstr "Compte restreint, vous n'avez pas accés à la recherche."
 
-#: templates/blocks/supermenu.html:29 templates/blocks/supermenu.html.py:35
+#: templates/blocks/supermenu.html:33 templates/blocks/supermenu.html.py:39
 msgid "Navigate"
 msgstr "Naviguer"
 
-#: templates/blocks/supermenu.html:31
+#: templates/blocks/supermenu.html:35
 msgid "Graphically explore your parts and documents."
 msgstr "Explorer graphiquements vos parts et documents."
 
-#: templates/blocks/supermenu.html:37
+#: templates/blocks/supermenu.html:41
 msgid "Restricted account, navigate not available."
 msgstr "Compte restreint, vous n'avez pas accés à la navigation."
 
-#: templates/blocks/supermenu.html:50
+#: templates/blocks/supermenu.html:54
 msgid "Browse all parts, groups, users and documents."
 msgstr "Parcourir tous les parts, groupes, utilisateurs et documents."
 
-#: templates/blocks/supermenu.html:60 templates/blocks/supermenu.html.py:66
-#: templates/blocks/supermenu.html:82
-msgid "Create"
-msgstr "Créer"
-
-#: templates/blocks/supermenu.html:62
-msgid "Create a new part, a new document or a new group."
-msgstr "Créer une nouvelle part, un nouveau document ou un nouveau group."
-
-#: templates/blocks/supermenu.html:68
-msgid "You can not create a part or document since you are not a contributor."
-msgstr ""
-"Vous ne pouvez créer ni une part ni un document car vous n'êtes pas "
-"contributeur."
-
-#: templates/blocks/supermenu.html:78
+#: templates/blocks/supermenu.html:67
 msgid "Upload one or more files and create a document"
 msgstr "Télécharger un ou plusieurs fichiers et créer un document"
 
-#: templates/blocks/supermenu.html:84
+#: templates/blocks/supermenu.html:73
 msgid "You can not upload a file since you are not a contributor."
 msgstr "Vous ne pouvez pas télécharger un fichier dans le système tant que vous n'êtes pas contributeur."
 
-#: templates/blocks/supermenu.html:92 templates/navigate/node.html:28
-msgid "Study"
-msgstr "Étudier"
+#: templates/blocks/supermenu.html:81 templates/blocks/supermenu.html.py:87
+msgid "Create"
+msgstr "Créer"
 
-#: templates/blocks/supermenu.html:94
-msgid "See/edit your personal data and explore your parts and document."
-msgstr ""
-"Afficher ou éditer vos données personnelles et explorer vos parts et "
-"documents."
+#: templates/blocks/supermenu.html:83
+msgid "Create a new part, a new document or a new group."
+msgstr "Créer une nouvelle part, un nouveau document ou un nouveau group."
 
-#: templates/blocks/user.html:9
+#: templates/blocks/supermenu.html:89
+msgid "You can not create a part or document since you are not a contributor."
+msgstr "Vous ne pouvez créer ni une part ni un document car vous n'êtes pas contributeur."
+
+#: templates/blocks/user.html:8
 msgid "Log in"
 msgstr "Entrer"
 
-#: templates/blocks/user.html:38
+#: templates/blocks/user.html:37
 msgid "Help"
 msgstr "Aide"
 
-#: templates/blocks/user.html:43
+#: templates/blocks/user.html:42
 msgid "Logout"
 msgstr "Sortir"
+
+#: templates/comments/preview.html:6 templates/comments/preview.html.py:16
+msgid "Preview your comment"
+msgstr "Pré-visualiser votre commentaire"
+
+#: templates/comments/preview.html:14
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "SVP corrigez l'erreur ci-dessous"
+msgstr[1] "SVP corrigez les errreurs ci-dessous"
+
+#: templates/comments/preview.html:19
+msgid "and"
+msgstr "et"
+
+#: templates/comments/preview.html:19
+#, fuzzy
+msgid "Post your comment"
+msgstr "Poster un commentaire"
+
+#: templates/comments/preview.html:19
+msgid "or make changes"
+msgstr "ou faites des changements"
+
+#: templates/documents/checkout_btn.html:6
+msgid "CHECK-IN"
+msgstr "CHECK-IN"
+
+#: templates/documents/checkout_btn.html:13
+msgid "CHECK-OUT"
+msgstr "CHECK-OUT"
+
+#: templates/documents/checkout_btn.html:16
+msgid "Native related file is locked"
+msgstr "Le fichier natif lié est verrouillé"
+
+#: templates/documents/checkout_btn.html:19
+#, python-format
+msgid "Locked by %(locker)s"
+msgstr "Verrouillé par %(locker)s"
 
 #: templates/documents/clone.html:3
 msgid ""
@@ -1824,125 +2690,58 @@ msgstr ""
 "Selectionnez les parts que vous voulez attacher et validez pour créer un "
 "nouveau document."
 
-#: templates/documents/file_revisions.html:15
+#: templates/documents/file_revisions.html:23
 msgid "Deleted."
 msgstr "Effacé."
 
-#: templates/documents/file_revisions.html:22
+#: templates/documents/file_revisions.html:30
 msgid "Deprecated."
 msgstr "Déprécié."
 
-#: templates/documents/file_revisions.html:28
-#: templates/documents/files.html:136
-msgid "CHECK-IN"
-msgstr "CHECK-IN"
-
-#: templates/documents/file_revisions.html:37
-#: templates/documents/files.html:145
-msgid "CHECK-OUT"
-msgstr "CHECK-OUT"
-
 #: templates/documents/file_revisions.html:41
-#: templates/documents/files.html:150
-msgid "Native related file is locked"
-msgstr "Le fichier natif lié est verrouillé"
-
-#: templates/documents/file_revisions.html:55
 msgid "Filename"
 msgstr "Nom de fichier"
 
-#: templates/documents/file_revisions.html:59
-#: templates/documents/file_revisions.html:86 templates/parts/bom_diff.html:38
+#: templates/documents/file_revisions.html:45
+#: templates/documents/file_revisions.html:72 templates/parts/bom_diff.html:38
 #: templates/parts/bom_thead.html:9
 msgid "Revision"
 msgstr "Révisions"
 
-#: templates/documents/file_revisions.html:63
-#: templates/documents/file_revisions.html:87
+#: templates/documents/file_revisions.html:49
+#: templates/documents/file_revisions.html:73
 msgid "Size"
 msgstr "Taille"
 
-#: templates/documents/file_revisions.html:67
-#: templates/documents/file_revisions.html:90
+#: templates/documents/file_revisions.html:53
+#: templates/documents/file_revisions.html:76
 msgid "Date of creation"
 msgstr "Date de création"
 
-#: templates/documents/file_revisions.html:80
+#: templates/documents/file_revisions.html:66
 #, python-format
 msgid "Previous revisions of %(filename)s"
 msgstr "Révisions précédentes de %(filename)s"
 
-#: templates/documents/file_revisions.html:88
-msgid "Download"
-msgstr "Télécharger"
-
-#: templates/documents/file_revisions.html:89
+#: templates/documents/file_revisions.html:75
 msgid "Thumbnail"
 msgstr "Aperçu"
 
-#: templates/documents/file_revisions.html:103
+#: templates/documents/file_revisions.html:89
 msgid "File deleted"
 msgstr "Fichier supprimé"
 
-#: templates/documents/file_revisions.html:127
+#: templates/documents/file_revisions.html:113
 msgid "No previous revisions."
 msgstr "Pas de révision précédente."
 
-#: templates/documents/files.html:58 templates/users/files.html:22
-msgid "Add file (no javascript)"
-msgstr "Ajouter un fichier (sans javascript)"
-
-#: templates/documents/files.html:63
-msgid "The status of this document does not allow adding/deleting files."
-msgstr ""
-"L'état de ce document ne permet ni l'ajout ni la suppression de fichiers."
-
-#: templates/documents/files.html:65
-msgid "You don't have the necessary rights to add/delete files."
-msgstr "Vous n'avez pas les droits requis pour ajouter/supprimer des fichiers."
-
-#: templates/documents/files.html:74 templates/parts/bom.html:39
-#: templates/search/result.html:28 templates/users/files.html:29
-msgid "ADD"
-msgstr "AJOUTER"
-
-#: templates/documents/files.html:79
-msgid "DELETE"
-msgstr "DÉTRUIRE"
-
-#: templates/documents/files.html:80
-msgid "CHECK ALL"
-msgstr "TOUT SÉLECTIONNER"
-
-#: templates/documents/files.html:81
-msgid "UNCHECK ALL"
-msgstr "TOUT DÉ-SELECTIONNER"
-
-#: templates/documents/files.html:85 templates/parts/doccad.html:74
-msgid "Download..."
-msgstr "Télécharger..."
-
-#: templates/documents/files.html:91 templates/parts/doccad.html:80
-msgid "Download all files (%(format)s)"
-msgstr "Télécharger tous les fichiers (%(format)s)"
-
-#: templates/documents/files.html:97 templates/parts/doccad.html:92
-msgid "Download merged PDF files"
-msgstr "Télécharger les fichiers pdf fusionnés"
-
-#: templates/documents/files.html:117
-msgid "Locked"
-msgstr "Verrouillé"
-
-#: templates/documents/files.html:119
-msgid "Unlocked"
-msgstr "Déverrouillé"
-
-#: templates/documents/files.html:177
+#: templates/documents/file_revisions.html:117
+#: templates/documents/files.html:99
 msgid "Confirm CHECK-OUT"
 msgstr "Confirmez CHECK-OUT"
 
-#: templates/documents/files.html:178
+#: templates/documents/file_revisions.html:118
+#: templates/documents/files.html:100
 msgid ""
 "You'are checking out a standardfile while a native file is available. Your "
 "native file will be deprecated and will not be usable anymore."
@@ -1951,105 +2750,171 @@ msgstr ""
 "natif est disponible. Votrefichier natif sera déprécié et ne sera plus "
 "utilisable."
 
-#: templates/documents/files.html:184
+#: templates/documents/files.html:13
+msgid "You can add/modify/delete file(s)."
+msgstr "Vous pouvez ajouter/modifier/supprimer de(s) fichier(s)."
+
+#: templates/documents/files.html:15
+msgid "The status of this document does not allow adding/deleting files."
+msgstr ""
+"L'état de ce document ne permet ni l'ajout ni la suppression de fichiers."
+
+#: templates/documents/files.html:17
+msgid "You don't have the necessary rights to add/delete files."
+msgstr "Vous n'avez pas les droits requis pour ajouter/supprimer des fichiers."
+
+
+#: templates/documents/files.html:24 templates/search/result.htm/l:19
+#: templates/users/files.html:25
+msgid "ADD"
+msgstr "AJOUTER"
+
+#: templates/documents/files.html:30
+#: templates/snippets/management_block.html:30
+msgid "DELETE"
+msgstr "DÉTRUIRE"
+
+#: templates/documents/files.html:31
+msgid "CHECK ALL"
+msgstr "TOUT SÉLECTIONNER"
+
+#: templates/documents/files.html:32
+msgid "UNCHECK ALL"
+msgstr "TOUT DÉ-SELECTIONNER"
+
+#: templates/documents/files.html:36 templates/parts/doccad.html:73
+msgid "Download..."
+msgstr "Télécharger..."
+
+#: templates/documents/files.html:42 templates/parts/doccad.html:79
+#, python-format
+msgid "Download all files (%(format)s)"
+msgstr "Télécharger tous les fichiers (%(format)s)"
+
+#: templates/documents/files.html:48 templates/parts/doccad.html:91
+msgid "Download merged PDF files"
+msgstr "Télécharger les fichiers pdf fusionnés"
+
+#: templates/documents/files.html:67
+msgid "Locked"
+msgstr "Verrouillé"
+
+#: templates/documents/files.html:68
+msgid "Unlocked"
+msgstr "Déverrouillé"
+
+#: templates/documents/files.html:106
 msgid "Deprecated files:"
 msgstr "Fichiers dépréciés:"
 
-#: templates/documents/files_add.html:6
-msgid "Add new files / Check-in file :"
-msgstr "Ajouter de nouveaux fichiers / Check-in fichier :"
+#: templates/documents/files.html:116 templates/users/files.html:19
+msgid "Add file (no javascript)"
+msgstr "Ajouter un fichier (sans javascript)"
 
-#: templates/documents/files_add.html:13
+#: templates/documents/files_add.html:6
+msgid "Add new files"
+msgstr "Ajouter de nouveaux fichiers"
+
+#: templates/documents/files_add.html:14
 msgid "You can only upload one file at a time."
 msgstr "Vous ne pouvez télécharger qu'un fichier à la fois."
 
-#: templates/documents/files_add.html:14
+#: templates/documents/files_add.html:15
 msgid "Use the Validate button to send your file."
 msgstr "Utilisez le bouton Valider pour envoyer votre fichier."
 
-#: templates/documents/files_add.html:20
-#: templates/snippets/management_block.html:30
+#: templates/documents/files_add.html:21
 msgid "Delete"
 msgstr "Effacer"
 
-#: templates/documents/files_add.html:20
+#: templates/documents/files_add.html:21
 msgid "Delete the files selected for upload"
 msgstr "Supprime les fichiers sélectionnés pour le téléchargement"
 
-#: templates/documents/files_add.html:32
+#: templates/documents/files_add.html:33
 msgid "Select at least one file"
 msgstr "Sélectionnez au moins un fichier"
 
-#: templates/documents/files_add.html:33
+#: templates/documents/files_add.html:34
 msgid "A STEP file is already linked to this document."
 msgstr "Un fichier STEP est déjà attaché à ce document."
 
-#: templates/documents/files_add.html:34
+#: templates/documents/files_add.html:35
 msgid "A file named "
 msgstr "Un fichier "
 
-#: templates/documents/files_add.html:35
+#: templates/documents/files_add.html:36
 msgid "is already linked to this document."
 msgstr "est déjà lié au document"
 
-#: templates/documents/files_add.html:36
+#: templates/documents/files_add.html:37
 msgid "You have already selected the file"
 msgstr "Vous avez déjà sélectionnez le fichier"
 
-#: templates/documents/files_add.html:37
+#: templates/documents/files_add.html:38
 msgid "for upload"
 msgstr "pour l'envoyer"
 
-#: templates/documents/files_add.html:38
+#: templates/documents/files_add.html:39
 msgid "remove the file from the queue"
 msgstr "supprime le fichier de la liste d'attente"
 
-#: templates/documents/files_add.html:39
+#: templates/documents/files_add.html:40
 msgid "Your upload(s) failed"
 msgstr "Votre(vos) envoi(s) ont échoué"
 
-#: templates/documents/files_add.html:40
+#: templates/documents/files_add.html:41
 msgid "Try again"
 msgstr "Recommencez"
 
-#: templates/documents/files_add.html:41
+#: templates/documents/files_add.html:42
 msgid "maybe with less files. "
 msgstr "peut-être avec moins de fichiers. "
 
-#: templates/documents/files_add.html:42
+#: templates/documents/files_add.html:43
 msgid "You are checking-in for "
 msgstr "Vous êtes en train de télécharger "
 
-#: templates/documents/files_add.html:43
+#: templates/documents/files_add.html:44
 msgid "You must add a file with this name."
 msgstr "Vous devez sélectionnez un fichier avec ce nom."
 
-#: templates/documents/files_add.html:44
+#: templates/documents/files_add.html:45
 msgid "Show/Hide the upload form"
 msgstr "Affiche/Masque le formulaire d'envoi de fichier"
 
-#: templates/documents/files_add.html:45
+#: templates/documents/files_add.html:46
 msgid "Check-in for file "
 msgstr "Check-in pour "
 
-#: templates/documents/files_add.html:46
+#: templates/documents/files_add.html:47
 msgid "You can only upload files, but you wont get progress of this upload"
 msgstr ""
 "Vous ne pourrez qu'envoyer des fichiers. La progression de l'envoi ne sera "
 "pas affichée"
 
-#: templates/documents/files_add.html:47
+#: templates/documents/files_add.html:48
 msgid "Do not leave the current page before the upload ends"
 msgstr ""
 "Ne quittez pas cette page tant que le téléchargement n'est pas terminé."
 
-#: templates/documents/files_add.html:48
+#: templates/documents/files_add.html:49
 msgid "waiting"
 msgstr "en attente"
 
-#: templates/documents/files_add.html:49
+#: templates/documents/files_add.html:50
 msgid "Total"
 msgstr "Total"
+
+#: templates/documents/files_add_noscript.html:15
+#, fuzzy
+msgid "You can not add a file because you are not a contributor"
+msgstr "Vous ne pouvez pas télécharger un fichier dans le système tant que vous n'êtes pas contributeur."
+
+#: templates/documents/files_add_noscript.html:18
+#, fuzzy
+msgid "This document is not editable."
+msgstr "Ce document n'a pas de fichier."
 
 #: templates/documents/identity_card.html:18
 #, python-format
@@ -2070,19 +2935,19 @@ msgstr[1] ""
 "                    %(file_count)s fichiers\n"
 "                "
 
-#: templates/documents/parts.html:37 templates/documents/parts.html.py:51
+#: templates/documents/parts.html:36 templates/documents/parts.html.py:50
 msgid "Attach a part"
 msgstr "Attacher une part"
 
-#: templates/documents/parts.html:57
+#: templates/documents/parts.html:56
 msgid "Create a part and attach it to the document."
 msgstr "Créer une part et l'attacher à ce document."
 
-#: templates/documents/parts.html:65
+#: templates/documents/parts.html:64
 msgid "Detach selected parts"
 msgstr "Détacher parts sélectionnées"
 
-#: templates/documents/parts.html:97
+#: templates/documents/parts.html:96
 msgid "There are no parts attached to this document"
 msgstr "Il n'y a pas de part attachée à ce document"
 
@@ -2141,19 +3006,9 @@ msgstr "Vous êtes déjà dans ce groupe."
 msgid "Join this group ?"
 msgstr "Rejoindre ce groupe ?"
 
-#: templates/groups/identity_card.html:7
-#: templates/groups/pending_invitations.html:7
-msgid "Group"
-msgstr "Groupe"
-
 #: templates/groups/objects.html:7
 msgid "No object belongs to this group."
 msgstr "Aucun objet n'appartient à ce groupe."
-
-#: templates/groups/objects.html:13
-#, python-format
-msgid " %(start)s - %(end)s on %(total)s "
-msgstr " %(start)s - %(end)s sur %(total)s "
 
 #: templates/groups/pending_invitations.html:10 templates/groups/users.html:29
 msgid "First name"
@@ -2240,7 +3095,7 @@ msgstr "Ligne %(line)s"
 
 #: templates/import/csv.html:45
 msgid "Error while reading the CSV file. Try upload a new file."
-msgstr ""
+msgstr "Erreur pendant la lecture du fichier CSV. Essayez de télécharger un nouveau fichier."
 "Erreur de lecture du fichier csv. Essayez de télécharger un nouveau fichier."
 
 #: templates/import/csv.html:48
@@ -2460,6 +3315,10 @@ msgstr "Afficher les aperçus"
 msgid "Show related documents"
 msgstr "Afficher les documents liés"
 
+#: templates/navigate/node.html:28
+msgid "Study"
+msgstr "Étudier"
+
 #: templates/parts/alternates.html:14
 msgid "Add an alternate part"
 msgstr "Attacher une part alternate"
@@ -2472,19 +3331,24 @@ msgstr "Supprimer les liens alternate de cette part"
 msgid "No alternate parts."
 msgstr "Pas de pièce alternate"
 
-#: templates/parts/bom.html:43
+#: templates/parts/bom.html:40 templates/parts/bom.html.py:51
+#, fuzzy
+msgid "Add an existing part"
+msgstr "Attacher une nouvelle part"
+
+#: templates/parts/bom.html:55
 msgid "Create a part and add it"
 msgstr "Créer une part et l'ajouter"
 
-#: templates/parts/bom.html:46
+#: templates/parts/bom.html:60
 msgid "EDIT"
 msgstr "ÉDITER"
 
-#: templates/parts/bom.html:53
+#: templates/parts/bom.html:69
 msgid "Update view"
 msgstr "Mettre à jour la vue"
 
-#: templates/parts/bom.html:54
+#: templates/parts/bom.html:70
 msgid "Compare two BOMs"
 msgstr "Comparer deux nomenclatures"
 
@@ -2511,11 +3375,6 @@ msgstr "Ord."
 #: templates/parts/bom_diff.html:32 templates/parts/bom_thead.html:6
 msgid "Qty"
 msgstr "Qté"
-
-#: templates/parts/bom_diff.html:33 templates/parts/bom_edit.html:13
-#: templates/parts/bom_thead.html:7
-msgid "Unit"
-msgstr "Unité"
 
 #: templates/parts/bom_diff.html:35
 msgid "Type/ref./rev."
@@ -2594,19 +3453,25 @@ msgstr ""
 "Voici la liste des parts que vous pourriez ajouter à la nouvelle part."
 "Sélectionnez les parts que vous voulez ajouter."
 
-#: templates/parts/doccad.html:39 templates/parts/doccad.html.py:54
+#: templates/parts/doccad.html:38 templates/parts/doccad.html.py:53
 msgid "Attach another document"
 msgstr "Attacher un autre document"
 
-#: templates/parts/doccad.html:60
+#: templates/parts/doccad.html:59
 msgid "Create a document and attach it to the part"
 msgstr "Créer un document et l'attacher à cette part"
 
-#: templates/parts/doccad.html:86
+#: templates/parts/doccad.html:67
+#, fuzzy
+msgid "Detach selected document"
+msgstr "Attacher le document sélectionné ?"
+
+#: templates/parts/doccad.html:85
+#, python-format
 msgid "Download all CAD files (%(format)s)"
 msgstr "Télécharger tous les fichiers CAO (%(format)s)"
 
-#: templates/parts/doccad.html:125
+#: templates/parts/doccad.html:124
 msgid "There are no documents attached to this part."
 msgstr "Il n'y a pas de document attaché à cette part."
 
@@ -2675,24 +3540,33 @@ msgstr ""
 "en les liant à la nouvelle révision. Sélectionnez les parts que vous voulez "
 "mettre à jour."
 
-#: templates/search/result.html:8
-msgid "Attach"
-msgstr "Attacher"
-
-#: templates/search/result.html:9
+#: templates/search/result.html:10
 msgid "Add child"
 msgstr "Ajouter enfants"
 
-#: templates/search/search.html:29
-#, python-format
+#: templates/search/search.html:79
+#, fuzzy
+msgid "Officials"
+msgstr "Officiel"
+
+#: templates/search/search.html:94
+#, fuzzy, python-format
 msgid ""
 "\n"
-"                        (%(start)s - %(end)s on %(total)s)\n"
-"                    "
+"                                        (%(start)s - %(end)s on %(total)s)\n"
+"                                    "
 msgstr ""
 "\n"
 "(%(start)s - %(end)s sur %(total)s)\n"
 "   "
+
+#: templates/search/search.html:109
+msgid "You may try:"
+msgstr "Vous devriez essayer:"
+
+#: templates/snippets/management_block.html:23
+msgid "REPLACE"
+msgstr "REMPLACER"
 
 #: templates/snippets/pagination.html:8
 msgid "First page"
@@ -2715,30 +3589,31 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #: templates/users/delegation.html:10
-msgid "Delegate:"
+#, fuzzy
+msgid "Delegate..."
 msgstr "Déléguer:"
 
-#: templates/users/delegation.html:14
+#: templates/users/delegation.html:15
 msgid "Ownership"
 msgstr "Propriété"
 
-#: templates/users/delegation.html:17
+#: templates/users/delegation.html:18
 msgid "Signature 1st level"
 msgstr "Signature 1er niveau"
 
-#: templates/users/delegation.html:20
+#: templates/users/delegation.html:21
 msgid "Signature 2nd level"
 msgstr "Signature 2e niveau"
 
-#: templates/users/delegation.html:23
+#: templates/users/delegation.html:24
 msgid "All signatures"
 msgstr "Toutes les signatures"
 
-#: templates/users/delegation.html:26
+#: templates/users/delegation.html:27
 msgid "Notifications"
 msgstr "Notifications"
 
-#: templates/users/delegation.html:32
+#: templates/users/delegation.html:33
 msgid "Sponsor"
 msgstr "Parrain"
 
@@ -2762,14 +3637,16 @@ msgstr "ARRETER DÉLÉGATION"
 msgid "Resend mail"
 msgstr "Envoyer le mail à nouveau"
 
-#: templates/users/files.html:16
+#: templates/users/files.html:11
 msgid "Upload files and document creation"
 msgstr "Télécharger fichier(s) et créer le document"
 
-#: templates/users/files.html:19
+#: templates/users/files.html:14
 msgid ""
 "Select files to upload, then click on upload button to create your document"
-msgstr "Sélectionner les fichiers à télécharger et cliquer ensuite sur le bouton Télécharger pour créer votre document"
+msgstr ""
+"Sélectionner les fichiers à télécharger et cliquer ensuite sur le bouton "
+"Télécharger pour créer votre document"
 
 #: templates/users/groups.html:15
 msgid "Click here to create another group."
@@ -2779,12 +3656,9 @@ msgstr "Cliquez ici pour créer un nouveau groupe."
 msgid "You are in the following groups:"
 msgstr "Vous êtes dans les groupes suivants :"
 
-#: templates/users/identity_card.html:9
-msgid "User"
-msgstr "Utilisateur"
-
 #: templates/users/identity_card.html:21
-msgid "joined %(ctime)s ago"
+#, fuzzy, python-format
+msgid "joined %(ctime)s "
 msgstr "s'est connecté pour la première fois il y a %(ctime)s"
 
 #: templates/users/password.html:7
@@ -2795,21 +3669,58 @@ msgstr "MODIFICATION MOT DE PASSE:"
 msgid "CHANGE PASSWORD"
 msgstr "CHANGER MOT DE PASSE"
 
-#: templates/users/plmobjects.html:19
+#: templates/users/plmobjects.html:14
 msgid "Last edited objects"
 msgstr "Derniers objets édités"
 
 #: templates/users/sponsor.html:10
 msgid "Click here to sponsor several users from a CSV file."
-msgstr ""
-"Cliquez ici pour parrainer plusieurs utilisateurs en utilisant un fichier "
-"CSV."
+msgstr "Cliquez ici pour parrainer plusieurs utilisateurs en utilisant un fichier CSV."
 
 #: templates/users/sponsor.html:16
 msgid "You can not sponsor a new user since you are not a contributor."
-msgstr ""
-"Vous ne pouvez pas parrainer un nouvel utilisateur car vous n'êtes pas un "
-"contributeur"
+msgstr "Vous ne pouvez pas parrainer un nouvel utilisateur car vous n'êtes pas un contributeur"
+
+#~ msgid "There are no official documents attached to some leaf parts."
+#~ msgstr "Il n'y a pas de document officiel attaché à certaines parts."
+
+#~ msgid ""
+#~ "intended to provide a starting point for companies CMS/PLM/BIM projects."
+#~ msgstr ""
+#~ "avec l'intention de fournir une base de départ pour les projets CMS/PLM/"
+#~ "BIM des sociétés."
+
+#~ msgid ""
+#~ "By integrating numerous standard reusable PLM functionalities to take "
+#~ "care of the things that companies have in common, it lets you focus on "
+#~ "what makes your company different."
+#~ msgstr ""
+#~ "En intégrant de nombreuses fonctionalités standards et réutilisables pour "
+#~ "prendre en charge les choses que les sociétés ont en commun, cela vous "
+#~ "permet de vous concentrer sur ce qui fait votre spécificité."
+
+#~ msgid "Professionals"
+#~ msgstr "Professionels"
+
+#~ msgid "Search for a part, a document, a file and more."
+#~ msgstr "Rechercher une part, un document, un ficher et plus encore."
+
+#~ msgid "See/edit your personal data and explore your parts and document."
+#~ msgstr ""
+#~ "Afficher ou éditer vos données personnelles et explorer vos parts et "
+#~ "documents."
+
+#~ msgid "Add new files / Check-in file :"
+#~ msgstr "Ajouter de nouveaux fichiers / Check-in fichier :"
+
+#~ msgid ""
+#~ "\n"
+#~ "                        (%(start)s - %(end)s on %(total)s)\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "(%(start)s - %(end)s sur %(total)s)\n"
+#~ "   "
 
 #~ msgid "DISCONNECT"
 #~ msgstr "DECONNECTER"
