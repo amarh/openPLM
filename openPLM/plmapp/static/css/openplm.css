@@ -1244,7 +1244,7 @@ div#attributes {
     border-radius: 0.4em;
     -webkit-box-shadow: 1px 1px 3px #888;
     box-shadow: 1px 1px 3px #888;
-    width: 20em;
+    width: 160px;
     height: 160px;
     margin: 0.5em;
     position: relative;
@@ -1267,60 +1267,76 @@ div#attributes {
     display: block;
 }
 .identity_card .id_thumbnail {
-    width: 100px;
-    height: 100px;
-    float: left;
+    width: 150px;
+    height: 150px;
+/*    float: left; */
     background-color: #343434;
-    border: 1px solid #343434;
-    margin-top: 20px;
+    border: 0px solid #343434;
+    border-radius: 4px;
+/*    margin-top: 20px; */
     display: table-cell;
 }
 .identity_card .id_thumbnail_inner {
     vertical-align: middle;
     display: table-cell;
-    height: 100px;
-    width: 100px;
+    height: 150px;
+    width: 150px;
 }
 
 .identity_card .id_thumbnail img {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 150px;
+    max-height: 150px;
     margin:auto;
     float: none;
     display: block;
+    background-color: #FFFFFF;
 }
 .identity_card .id_details {
-    height: 130px;
-    border-left: 1px solid #ccc;
-    padding: 0 1em;
+    height: 30px;
+/*    border-left: 1px solid #ccc; */
+    padding: 5px;
     position: absolute;
-    left: 120px;
-    top: 20px;
+    left: 0px;
+    bottom: 0px;
     width: 150px;
-    font-size: 85%;
-    line-height: 1;
+    font-size: 80%;
+    line-height: 15px;
+    background-color: white;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.identity_card:hover .id_details {
+    bottom: 0px;
+    height: 150px;
+}
+
+.identity_card:hover .id_details .name {
+    height: 60px;
 }
 .id_details span.type {
-    display: inline-block;
-    font-weight: bold;
-    left: -130px;
+/*    display: inline-block; 
+    font-weight: bold; 
+    left: -130px; 
     top: -2px;
     width: 300px;
-    position: relative;
+    position: relative;*/
 }
 .id_details p {
-    margin-top: 0.3em;
-    top: -20px;
+/*    margin-top: 0.3em; */
+    top: 0px;
     position: relative;
     word-wrap: break-word;
+    margin-bottom: 5px;
 }
 .id_details p:not(:last-child):not(:first-child) {
     border-bottom: 1px dotted #ccc;
 }
 .id_details .name {
     display: block;
-    max-height: 2em;
+    height: 30px;
     overflow: hidden;
+    font-size: 15px;
 }
 .id_details .description {
     overflow: hidden;
@@ -1329,6 +1345,13 @@ div#attributes {
 }
 .id_details .sort, .id_thumbnail .num_files, .id_details .state {
     font-size: 85%;
+}
+
+.num_files {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background-color: white;
 }
 
 .id_thumbnail > p {
