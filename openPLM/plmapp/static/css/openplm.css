@@ -958,7 +958,7 @@ ul.errorlist li {
 }
 
 /* type, reference, revision, name */
-span.name {
+span.type, span.reference, span.revision {
     font-style: italic;
     font-weight: normal;
 }
