@@ -259,8 +259,8 @@ class NavigationGraph(object):
             if link.parent_id not in self._part_to_node:
                 continue
             child = link.child
-            label = "Qty: %.2f %s\\nOrder: %d" % (link.quantity,
-                    link.get_shortened_unit(), link.order)
+            label = "Qty: %.1f %s" % (link.quantity,
+                    link.get_shortened_unit())
             self.edges.add((link.parent_id, child.id, label))
             self._set_node_attributes(link.child)
 
