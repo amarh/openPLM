@@ -71,7 +71,10 @@ class Badge(models.Model):
         return reverse('badge_detail', kwargs={'slug': self.id})
 
     def award_to(self, user, ignore_message=False):
-        has_badge = self in user.badges.all()
+        request = get_request()
+        if request.user != user:
+            return False
+        has_badge = user.badges.filter(id=self.id).exists()
         if self.meta_badge.one_time_only and has_badge:
             return False
         if self.meta_badge.get_progress_percentage(user=user) < 100 :
@@ -83,7 +86,6 @@ class Badge(models.Model):
 
         if not ignore_message:
             message_template = _(u"You just got the %s Badge!")
-            request = get_request()
             if request is not None:
                 messages.info(request, message_template % self.title)
 
