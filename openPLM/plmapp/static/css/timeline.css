@@ -27,10 +27,14 @@ div.timeline [color=""] {
 div.timeline dt {
     padding: 0.3em 0;
     padding-left: 0.5em;
-    font-size: 60%;
+    font-size: 80%;
     font-weight: 600;
 }
 
+.timeline .avatar {
+    float: left;
+
+}
  .individual_action {
 /*    background-color: white;
     border: 1px solid #777777;
@@ -39,33 +43,13 @@ div.timeline dt {
     margin: 2px;
 }
 
-.tb-pull-left, .individual_action, .tb-pull-left img {
-    height: 35px;
-}
-
-div.individual_action:hover{
+.timeline dt:hover, .timeline dt:hover + dd,
+.timeline dd:hover, .timeline dt.active
+{
     background-color: #F3F3F1;
-    border-radius: 0.4em 0.4em 0.4em 0.4em;
-    box-shadow: 1px 1px 3px #555555;
-
 }
 
-div.individual_action:hover,
-div.individual_action:hover .tb-pull-left,
-div.individual_action:hover .tb-pull-left img {
-    height: 70px;
-}
-div.individual_action:hover dt,
-div.individual_action:hover dd {
-    font-size: 110%;
-}
 
-div.timeline dt :link:hover,
-div.timeline dt :link:hover *,
-div.timeline dt :visited:hover *, 
-div.timeline dt :visited:hover { 
-    background-color: #ccc;
-}
 div.timeline dt em {
     border-bottom: 1px dotted #bbb;
     color: #b00;
@@ -74,7 +58,7 @@ div.timeline dt em {
 }
 div.timeline dt.highlight { background-color: #ffa; } 
 div.timeline dd { 
-    font-size: 50%;
+    font-size: 70%;
     padding: 0 0 .75em 1em;
     border-radius: 0 0 12px 0;
     
@@ -83,9 +67,6 @@ div.timeline dd {
     list-style-image: url("../img/puce.png");
 }
 
-div.timeline dd { 
-    font-size: 50%;
-}
 div.timeline div.details,
 div.timeline div.details > p {
     display: inline;

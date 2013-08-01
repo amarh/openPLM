@@ -39,43 +39,39 @@
 
                 <dl style="min-height: 100px margin: 10px; width: 98%">
                     {% for histo in group.list %}
-                            <div class="individual_action">
-                                <div class="tb-pull-left">
-                                    <img class="avatar" src="{% avatar_url histo.user %}"/>
-                                </div>
-                                <dt class="changeset" id="{{histo.id}}">
-                                <span class="time">
-                                    {{histo.date|date:"G:i"}}
-                                </span>
-                                {% spaceless %}
-                                <a href="/user/{{histo.user|urlencode }}/">
-                                    <span class="user">{{histo.user}}</span>
-                                </a>
-                                {% endspaceless %}
-                                <span class="action">
-                                    {{histo.action}}
-                                </span>
-                                {% if show_identifiers %}
-                                    <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
-                                    <span>:</span>
+                        <dt class="changeset" id="{{histo.id}}">
+                        <img class="avatar" src="{% avatar_url histo.user %}"/>
+                        <span class="time">
+                            {{histo.date|date:"G:i"}}
+                        </span>
+                        {% spaceless %}
+                            <a href="/user/{{histo.user|urlencode }}/">
+                                <span class="user">{{histo.user}}</span>
+                            </a>
+                        {% endspaceless %}
+                        <span class="action">
+                            {{histo.action}}
+                        </span>
+                        {% if show_identifiers %}
+                            <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
+                            <span>:</span>
+                        {% endif %}
+                        {% if show_revisions %}
+                            <span class="revision">
+                                {%if obj.revision == histo.plmobject.revision%}
+                                    <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
+                                {% else %}
+                                    <span style="background: #68A7FF; color: #3B3A3D; padding-left: 5px; padding-right: 5px">{{histo.plmobject.revision}}</span>
+
                                 {% endif %}
-                                {% if show_revisions %}
-                                    <span class="revision">
-                                        {%if obj.revision == histo.plmobject.revision%}
-                                            <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
-                                        {% else %}
-                                            <span style="background: #68A7FF; color: #3B3A3D; padding-left: 5px; padding-right: 5px">{{histo.plmobject.revision}}</span>
-                                            
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                                </dt>
-                                <dd>
-                                <div class="details">
-                                    {{ histo.details|linebreaksbr }}
-                                </div>
-                                </dd>
-                            </div>
+                            </span>
+                        {% endif %}
+                        </dt>
+                        <dd class="clearfix">
+                        <div class="details">
+                            {{ histo.details|linebreaksbr }}
+                        </div>
+                        </dd>
                     {% endfor %}
                 </dl>
             </div>
