@@ -132,7 +132,6 @@ class PartNavigateTestCase(NavigateTestCase):
             self.assertCount(2, 1)
             main, child_node = self.nodes
             # check the edge
-            self.assertTrue("789" in self.edges[0].text_content())
             self.assertTrue("15" in self.edges[0].text_content())
             self.assertTrue("kg" in self.edges[0].text_content())
             text = child_node.text_content().strip()
