@@ -306,7 +306,7 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
             for h in history_group:
                 h.plmobject.plmobject_url = h.plmobject.groupinfo.plmobject_url
 
-        if list_display["display_document"] or list_display["display_part"] and list_display["display_group"]:
+        if (list_display["display_document"] or list_display["display_part"]) and list_display["display_group"]:
             history = sorted(chain(history_group, history_plmobject), key=lambda instance: instance.date, reverse=True)
         elif list_display["display_group"]:
             history = history_group
