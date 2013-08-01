@@ -270,7 +270,8 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
         history = None
         history_plmobject = None
         history_group = None
-        if list_display["display_document"] | list_display["display_part"]:
+
+        if list_display["display_document"] or list_display["display_part"]:
             history_plmobject = History.timeline_items(user)
             if list_display["display_document"]:
                 documents = get_all_documents().keys()
@@ -302,12 +303,14 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
                     history_group = history_group.filter(user__username = done_by)
                 else:
                     history_group = history_group.none()
+            for h in history_group:
+                h.plmobject.plmobject_url = h.plmobject.groupinfo.plmobject_url
 
-        if list_display["display_document"] | list_display["display_part"] and list_display["display_group"]:
+        if list_display["display_document"] or list_display["display_part"] and list_display["display_group"]:
             history = sorted(chain(history_group, history_plmobject), key=lambda instance: instance.date, reverse=True)
         elif list_display["display_group"]:
             history = history_group
-        elif list_display["display_document"] | list_display["display_part"]:
+        elif list_display["display_document"] or list_display["display_part"]:
             history = history_plmobject
 
         return history
