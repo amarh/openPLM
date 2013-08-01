@@ -16,7 +16,7 @@ class CalendarTestCase(CommonViewTest):
         response = self.get(self.base_url + "history/calendar/")
         self.assertEqual("", response.context["prefix_url"])
         calendar = response.context["calendar"]
-        self.assertTrue("Create" in calendar)
+        self.assertTrue("create" in calendar)
         # TODO: check calendar
         # checks months
         previous_month = response.context["previous_month"]
@@ -26,7 +26,7 @@ class CalendarTestCase(CommonViewTest):
         self.assertNotEqual(previous_month.month, current_month.month)
         self.assertNotEqual(next_month.month, current_month.month)
         # get calendar of next month
-        response_next = self.get(self.base_url + "history/calendar/%d/%d/" % 
+        response_next = self.get(self.base_url + "history/calendar/%d/%d/" %
                 (next_month.year, next_month.month))
         self.assertEqual("../../", response_next.context["prefix_url"])
         calendar_next = response_next.context["calendar"]
@@ -34,7 +34,7 @@ class CalendarTestCase(CommonViewTest):
         self.assertEqual(current_month.year, response_next.context["previous_month"].year)
         self.assertEqual(current_month.month, response_next.context["previous_month"].month)
         # get calendar of previous month
-        response_previous = self.get(self.base_url + "history/calendar/%d/%d/" % 
+        response_previous = self.get(self.base_url + "history/calendar/%d/%d/" %
                 (previous_month.year, previous_month.month))
         self.assertEqual("../../", response_previous.context["prefix_url"])
         calendar_previous = response_previous.context["calendar"]
@@ -88,7 +88,7 @@ class CalendarTestCase(CommonViewTest):
         cal = Calendar.from_ical(ics)
         first_event = cal.walk('vevent')[0]
         self.assertTrue(first_event["summary"].startswith("Part // %s" % self.controller.reference))
-    
+
     def test_icalendar_timeline(self):
         ics = self.client.get("/timeline/calendar/ics/").content
         cal = Calendar.from_ical(ics)
