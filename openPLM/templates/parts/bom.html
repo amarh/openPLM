@@ -61,12 +61,14 @@ $(function() {
         </div>
     {% endif %}
     <form method="GET" action="">
-        {% trans "Display :" %}
-        <ul>
-            {{display_form.as_ul}}
-        </ul>
-        <div class="tb-btn-toolbar">
+        <div class="inline-form">
+            {% for field in display_form %}
+                {{ field.errors }}
+                {{ field.label_tag }}: {{ field }}
+            {% endfor %}
             <input type="submit" class="tb-btn" name="update" value="{% trans "Update view" %}"/>
+        </div>
+        <div class="tb-btn-toolbar">
             <input type="submit" class="tb-btn" name="diff" value="{% trans "Compare two BOMs" %}"/>
         </div>
     </form>
