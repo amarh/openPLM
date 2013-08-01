@@ -68,7 +68,7 @@ class Preview(object):
     def _guess_headers(self, known_headers):
         headers = []
         for header in self.headers:
-            h = _to_underscore(header.lower())
+            h = _to_underscore(header.lower().strip())
             if h in known_headers:
                 headers.append(h)
             else:
@@ -199,7 +199,7 @@ class CSVImporter(object):
             self._errors[line].append(e)
 
     def get_value(self, row, header):
-        return row[self.headers_dict[header]]
+        return row[self.headers_dict[header]].strip()
 
     def get_values(self, row, *headers):
         return [self.get_value(row, h) for h in headers]
