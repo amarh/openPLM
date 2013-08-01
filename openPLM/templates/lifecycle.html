@@ -12,6 +12,63 @@
 <!-- Manage html display in the Content div which correspond to the "lifecycle" menu -->
 
 {% block content %}
+
+    {# lifecycle : display all states #}
+    <div class="lifecycle">
+        {% for status, is_current_state, links in object_lifecycle %}
+            <div class="state_wrapper">
+                <div class="state
+                    {% if forloop.first %}
+                        draft
+                    {% elif status == obj.lifecycle.official_state.name %}
+                        official 
+                    {% elif forloop.last %}
+                        deprecated
+                    {% endif %}
+                    {% if is_current_state %}
+                        active
+                    {% endif %}
+                    ">
+                    <span class="state">{{status}}</span>
+                </div>
+
+            </div>
+            {% if not forloop.last %}
+                <div class="management">
+                    <div class="arrow {% if is_current_state %} active {% endif %}" style="">&gt;</div>
+                    {% for link in links %}
+                        <span class="signer">
+                            <a href="/user/{{link.user.username|urlencode}}">{{link.user.username}}</a>
+                            {% if can_edit_signer %}
+                                <a title="{% trans "Replace" %}" class="tb-btn tb-btn-small" href="../management/replace/{{link.id}}/?q=&type=User">
+                                    <i class="tb-icon-refresh"></i>
+                                </a>
+                                {% if links|length > 1 %}
+                                    <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
+                                        <input type="hidden" name="link_id" value="{{ link.id }}"/>
+                                        <input name="action" type="submit"
+                                        class="tb-btn" value="—" 
+                                        title="{% trans "Remove" %}"/>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                {% if is_current_state and link.user_id in approvers %}
+                                    <span class="approver">{% trans "Approved" %}</span>
+                                {% endif %}
+
+                            {% endif %}
+                        </span>
+                        <br/>
+                    {% endfor %}
+                    {% if can_edit_signer %}
+                        <a class="tb-btn" href="../management/add-signer{{forloop.counter0}}/?q=&type=User"><span class="ui-button-text">{% trans "Add" %}</span></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
     <div style="padding:1%">
         {% if is_owner %}
             {% trans 'You have the rights of owner on this object' %}
@@ -207,62 +264,6 @@
         {% endif %}
 
     {% endwith %}
-
-    {# lifecycle : display all states #}
-    <div class="lifecycle">
-        {% for status, is_current_state, links in object_lifecycle %}
-            <div class="state_wrapper">
-                <div class="state
-                    {% if forloop.first %}
-                        draft
-                    {% elif status == obj.lifecycle.official_state.name %}
-                        official 
-                    {% elif forloop.last %}
-                        deprecated
-                    {% endif %}
-                    {% if is_current_state %}
-                        active
-                    {% endif %}
-                    ">
-                    <span class="state">{{status}}</span>
-                </div>
-
-            </div>
-            {% if not forloop.last %}
-                <div class="management">
-                    <div class="arrow {% if is_current_state %} active {% endif %}" style="">&gt;</div>
-                    {% for link in links %}
-                        <span class="signer">
-                            <a href="/user/{{link.user.username|urlencode}}">{{link.user.username}}</a>
-                            {% if can_edit_signer %}
-                                <a title="{% trans "Replace" %}" class="tb-btn tb-btn-small" href="../management/replace/{{link.id}}/?q=&type=User">
-                                    <i class="tb-icon-refresh"></i>
-                                </a>
-                                {% if links|length > 1 %}
-                                    <form style="display:inline" method="POST" action="../management/delete/">{% csrf_token %}
-                                        <input type="hidden" name="link_id" value="{{ link.id }}"/>
-                                        <input name="action" type="submit"
-                                        class="tb-btn" value="—" 
-                                        title="{% trans "Remove" %}"/>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                {% if is_current_state and link.user_id in approvers %}
-                                    <span class="approver">{% trans "Approved" %}</span>
-                                {% endif %}
-
-                            {% endif %}
-                        </span>
-                        <br/>
-                    {% endfor %}
-                    {% if can_edit_signer %}
-                        <a class="tb-btn" href="../management/add-signer{{forloop.counter0}}/?q=&type=User"><span class="ui-button-text">{% trans "Add" %}</span></a>
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
-
-    </div>
 
     {# owner and notified users #}
     <div style="margin-top:2%;padding-top:1%;border-top:2px dotted black">
