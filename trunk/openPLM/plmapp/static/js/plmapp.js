@@ -88,7 +88,14 @@ $(
         $("#SetLangForm input[type=submit]").hide();
         $(".identity_card").tooltip(
             {title: function(){return $(this).find(".name").text();}}
-                
+        );
+        $(".timeline dd").hover(
+            function () {
+                $(this).prev().addClass("active");
+            },
+            function () {
+                $(this).prev().removeClass("active");
+            }
         );
     }
 );
