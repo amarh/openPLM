@@ -956,6 +956,15 @@ ul.errorlist li {
 .inline-form > * {
     vertical-align: middle;
 }
+.inline-form label {
+    margin-left: 1em;
+}
+
+#main_content .inline-form > ul, #main_content .inline-form > ul li {
+    display: inline;
+    list-style: none;
+    margin: 0;
+}
 
 /* type, reference, revision, name */
 span.type, span.reference, span.revision {
