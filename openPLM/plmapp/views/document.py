@@ -40,7 +40,7 @@ from django.contrib import messages
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils.archive import ARCHIVE_FORMATS
-from openPLM.plmapp.views.base import (get_obj, get_obj_from_form,
+from openPLM.plmapp.views.base import (get_obj, get_obj_from_form, get_id_card_data,
     get_obj_by_id, handle_errors, get_generic_data,  secure_required)
 from openPLM.plmapp.controllers import UserController
 from openPLM.plmapp.utils import r2r
@@ -88,11 +88,13 @@ def display_parts(request, obj_type, obj_ref, obj_revi):
     else:
         formset = forms.get_rel_part_formset(obj)
     rforms = dict((form.instance.id, form) for form in formset.forms)
-
+    parts = obj.get_attached_parts()
     ctx.update({'current_page':'parts',
-                'parts': obj.get_attached_parts(),
+                'parts': parts,
                 'forms' : rforms,
                 'parts_formset': formset})
+    if request.session.get("as_table"):
+        ctx.update(get_id_card_data([p.id for p in parts]))
     return r2r('documents/parts.html', ctx, request)
 
 
@@ -137,6 +139,24 @@ def add_part(request, obj_type, obj_ref, obj_revi):
                 'add_part_form': add_part_form,
                 'attach' : (obj, "attach_part") })
     return r2r('documents/parts_add.html', ctx, request)
+
+@handle_errors
+def delete_part(request, obj_type, obj_ref, obj_revi):
+    """
+    View to detach a part referred by the POST parameter ``plmobject``.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/parts/delete/`
+
+    .. include:: views_params.txt
+    """
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+
+    if request.POST:
+        part_id = int(request.POST["plmobject"])
+        part = get_obj_by_id(part_id, request.user)
+        obj.detach_part(part)
+    return HttpResponseRedirect(obj.plmobject_url + "parts/")
+
 
 
 @handle_errors
