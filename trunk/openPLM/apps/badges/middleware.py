@@ -7,9 +7,9 @@ class GlobalRequest(object):
 
     @staticmethod
     def get_request():
-	try:
+        try:
             return GlobalRequest._requests[current_thread()]
-	except KeyError:
+        except KeyError:
             return None
 
     def process_request(self, request):
