@@ -72,7 +72,7 @@ class Badge(models.Model):
 
     def award_to(self, user, ignore_message=False):
         request = get_request()
-        if request.user != user:
+        if request is None or request.user != user:
             return False
         has_badge = user.badges.filter(id=self.id).exists()
         if self.meta_badge.one_time_only and has_badge:
