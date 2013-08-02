@@ -306,6 +306,14 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
             save_session = update_navigation_history(request, obj,
                 type_, reference, revision)
 
+    table = request.GET.get("table", "")
+    save_session = save_session or table != ""
+    if table == "1":
+        request.session["as_table"] = True
+    elif table == "0":
+        request.session["as_table"] = False
+    ctx["as_table"] = request.session.get("as_table")
+
     if not restricted: # a restricted account can not perform a search
         # Builds, update and treat Search form
         search_needed = "results" not in request.session or load_all
