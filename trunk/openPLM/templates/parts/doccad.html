@@ -152,7 +152,7 @@
                     {% include "documents/identity_card.html" with object=link.document %}
                 {% endif %}
             {% empty %}
-                {% trans "No alternate parts." %}
+                {% trans "No attached documents." %}
             {% endfor %}
 
         </div>
