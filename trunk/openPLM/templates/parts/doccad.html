@@ -17,7 +17,7 @@
             }
             add_link.attr("href","./add/" + get_search_query(query));
         }
-</script>
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -27,43 +27,43 @@
         <div class="tb-btn-toolbar">
             {% if is_contributor %}
                 {{ docs_formset.management_form }}
-            <div class="tb-btn-group">
-                {% if not obj.is_cancelled %}
-                    <a class="tb-btn add-link" 
-                        {% if obj.type|can_link:request.session.type %}
-                            href="./add/{% add_search %}"
-                        {% else %}
-                            href="./add/{% add_search type='Document' %}"
-                        {% endif %}>
-                        <span>{% trans "Attach another document" %}</span>
-                    </a>
-                {% endif %}
-                {% if obj.is_draft or obj.is_official %}
-                    {# action valid if the part is a draft or official, since the user will own the document #}
-                    <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
-                        <span class="tb-caret"></span>
-                    </button>
-                    <ul class="tb tb-dropdown-menu">
-                        <li>
-                        <a class="add-link" {% if obj.type|can_link:request.session.type %}
+                <div class="tb-btn-group">
+                    {% if not obj.is_cancelled %}
+                        <a class="tb-btn add-link" 
+                            {% if obj.type|can_link:request.session.type %}
                                 href="./add/{% add_search %}"
                             {% else %}
                                 href="./add/{% add_search type='Document' %}"
                             {% endif %}>
-                            {% trans "Attach another document" %}
+                            <span>{% trans "Attach another document" %}</span>
                         </a>
-                        </li>
+                    {% endif %}
+                    {% if obj.is_draft or obj.is_official %}
+                        {# action valid if the part is a draft or official, since the user will own the document #}
+                        <button class="tb-btn tb-dropdown-toggle" data-toggle="dropdown">
+                            <span class="tb-caret"></span>
+                        </button>
+                        <ul class="tb tb-dropdown-menu">
+                            <li>
+                            <a class="add-link" {% if obj.type|can_link:request.session.type %}
+                                    href="./add/{% add_search %}"
+                                {% else %}
+                                    href="./add/{% add_search type='Document' %}"
+                                {% endif %}>
+                                {% trans "Attach another document" %}
+                            </a>
+                            </li>
 
-                        <li>
-                        <a href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
-                            {% trans "Create a document and attach it to the part" %}
-                        </a>
-                        </li>
-                    </ul>
-                {% endif %}
-            </div>
+                            <li>
+                            <a href="/object/create/?type=Document&amp;related_part={{obj.id}}&amp;__next__={{obj.plmobject_url|add:"doc-cad/"|urlencode}}">
+                                {% trans "Create a document and attach it to the part" %}
+                            </a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
 
-                {% if forms %}
+                {% if forms and as_table %}
                     <input type="submit" class="tb-btn tb-btn-danger" value="{% trans "Detach selected document" %}"/>
                 {% endif %}
             {% endif %}
@@ -93,41 +93,70 @@
                     </ul>
                 {% endif %}
             </div>
+            {% include "snippets/astable.html" %}
         </div>
-        <table class="Content">
-            {% for link in documents %}
 
-                <tr class="Content">
-                    {% with link.document as document %}
-                        {% if is_contributor and link.id in forms %}
-                            {% with forms|key:link.id as form %} 
-                                {{ form.id }}
-                                {{ form.document }}
-                                {{ form.part }}
-                                <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
-                            {% endwith %}
-                        {% else %}
-                            <td class="Content"> - </td>
-                        {% endif %}
-                        <td class="Content">{{ document.type }}</td>
-                        <td class="Content">
-                            <a href="{{ document.plmobject_url }}"/>
-                                {{ document.reference }}
-                            </a>
+        {% if as_table %}
+            <table class="Content">
+                {% for link in documents %}
+
+                    <tr class="Content">
+                        {% with link.document as document %}
+                            {% if is_contributor and link.id in forms %}
+                                {% with forms|key:link.id as form %} 
+                                    {{ form.id }}
+                                    {{ form.document }}
+                                    {{ form.part }}
+                                    <td class="Content" style="width:50px; text-align:center">{{ form.delete }}</td>
+                                {% endwith %}
+                            {% else %}
+                                <td class="Content"> - </td>
+                            {% endif %}
+                            <td class="Content">{{ document.type }}</td>
+                            <td class="Content">
+                                <a href="{{ document.plmobject_url }}"/>
+                                    {{ document.reference }}
+                                </a>
+                            </td>
+                            <td class="Content">{{ document.revision }}</td>
+                            <td class="Content">{{ document.name }}</td>
+                            <td class="Content">
+                                {% blocktrans count num_files|key:document.id as file_count %}
+                                    {{file_count}} file
+                                    {% plural %}
+                                    {{file_count}} files
+                                {% endblocktrans %}
+                            </td>
+                        {% endwith %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td>
+                            {% trans "There are no documents attached to this part." %}
                         </td>
-                        <td class="Content">{{ document.revision }}</td>
-                    {% endwith %}
-                </tr>
-            {% empty %}
-                <tr>
-                    <td>
-                        {% trans "There are no documents attached to this part." %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
 
     </form>
+
+
+    {% if not as_table %}
+        <div>
+
+            {% for link in documents %}
+                {% if is_contributor and link.id in forms %}
+                    {% include "documents/identity_card.html" with object=link.document detach_objects=True%}
+                {% else %}
+                    {% include "documents/identity_card.html" with object=link.document %}
+                {% endif %}
+            {% empty %}
+                {% trans "No alternate parts." %}
+            {% endfor %}
+
+        </div>
+    {% endif %}
 {% endblock %}
 
 

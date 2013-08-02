@@ -31,7 +31,7 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.utils.archive import ARCHIVE_FORMATS
-from openPLM.plmapp.views.base import get_obj_from_form, handle_errors, get_generic_data
+from openPLM.plmapp.views.base import (get_obj_from_form, handle_errors, get_generic_data, get_id_card_data, get_obj_by_id)
 from openPLM.plmapp.decomposers.base import DecomposersManager
 from openPLM.plmapp.utils import r2r
 
@@ -464,11 +464,14 @@ def display_doc_cad(request, obj_type, obj_ref, obj_revi):
     else:
         formset = forms.get_doc_cad_formset(obj)
     dforms = dict((form.instance.id, form) for form in formset.forms)
+    documents = obj.get_attached_documents()
     ctx.update({'current_page':'doc-cad',
-                'documents': obj.get_attached_documents(),
+                'documents': documents,
                 'forms' : dforms,
                 'archive_formats' : ARCHIVE_FORMATS,
-                'docs_formset': formset})
+                'docs_formset': formset,
+    })
+    ctx.update(get_id_card_data([d.document.id for d in documents]))
     return r2r('parts/doccad.html', ctx, request)
 
 
@@ -512,4 +515,23 @@ def add_doc_cad(request, obj_type, obj_ref, obj_revi):
                 'add_doc_cad_form': add_doc_cad_form,
                 'attach' : (obj, "attach_doc")})
     return r2r('parts/doccad_add.html', ctx, request)
+
+
+@handle_errors
+def delete_doc_cad(request, obj_type, obj_ref, obj_revi):
+    """
+    View to detach a document referred by the POST parameter ``plmobject``.
+
+    :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/doc-cad/delete/`
+
+    .. include:: views_params.txt
+    """
+    obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
+
+    if request.POST:
+        doc_id = int(request.POST["plmobject"])
+        doc = get_obj_by_id(doc_id, request.user)
+        obj.detach_document(doc)
+    return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
+
 

@@ -1,0 +1,8 @@
+{% load i18n %}
+{# template to show two buttons to switch to/from table/grid view #}
+<div class="tb-btn-toolbar tb-pull-right">
+    <div class="tb-btn-group">
+        <a class="tb-btn" href="?table=0" title="{% trans "Display as grid"%}"><i class="tb-icon-th"></i></a>
+        <a class="tb-btn" href="?table=1" title="{% trans "Display as table"%}"><i class="tb-icon-th-list"></i></a>
+    </div>
+</div>
