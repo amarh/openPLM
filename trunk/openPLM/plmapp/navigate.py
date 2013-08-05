@@ -150,8 +150,8 @@ class NavigationGraph(object):
     NODE_ATTRIBUTES = dict(shape='none',
                            fixedsize='true',
                            bgcolor="transparent",
-                           width=100./96,
-                           height=70./96)
+                           width=162./96,
+                           height=180./96)
 
     EDGE_ATTRIBUTES = dict(color='#373434',
                            minlen="1.5",
@@ -174,7 +174,6 @@ class NavigationGraph(object):
                    "request_notification_from", OSR)
         self.options = dict.fromkeys(options, False)
         self.options["prog"] = "dot"
-        self.options["cards"] = True
         self.options["doc_parts"] = []
         self.nodes = defaultdict(dict)
         self.edges = set()
@@ -392,9 +391,6 @@ class NavigationGraph(object):
         node = self.nodes[id_]
         self._set_node_attributes(self.object, id_)
         self.main_node = node["id"]
-        if not self.options["cards"]:
-            node["width"] = 110. / 96
-            node["height"] = 80. / 96
         opt_to_meth = {
             'child' : (self._create_child_edges, None),
             'parents' : (self._create_parents_edges, None),
@@ -522,23 +518,19 @@ class NavigationGraph(object):
                 URL=(url or obj.plmobject_url) + "navigate/",
                 id=id_,
                 )
-        if self.options["cards"]:
-            self.nodes[obj_id]["width"] = ([162., 162.][type_ == "part"]) / 96
-            self.nodes[obj_id]["height"] = 180. / 96
         self._title_to_node[id_] = data
 
     def _convert_map(self, map_string):
         elements = []
         ajax_navigate = "/ajax/navigate/" + get_path(self.object)
         time_str = "" if not self.time else self.time.strftime(TIME_FORMAT)
-        if self.options["cards"]:
-            card_data = get_id_card_data(self._doc_ids)
-            ids = self._doc_ids + self._part_to_node.keys()
-            if ids:
-                states = dict(models.StateHistory.objects.at(self.time).filter(
-                plmobject__in=ids).values_list("plmobject", "state"))
-            else:
-                states = {}
+        card_data = get_id_card_data(self._doc_ids)
+        ids = self._doc_ids + self._part_to_node.keys()
+        if ids:
+            states = dict(models.StateHistory.objects.at(self.time).filter(
+            plmobject__in=ids).values_list("plmobject", "state"))
+        else:
+            states = {}
 
         for area in ET.fromstring(map_string).findall("area"):
             if area.get("href") == ".":
@@ -562,11 +554,9 @@ class NavigationGraph(object):
             # render the div
             id_ = "Nav-%s" % area.get("id")
             ctx = data.copy()
-            ctx["card"] = self.options["cards"]
-            if ctx["card"]:
-                ctx.update(card_data)
-                if ctx["type"] in ("part", "document"):
-                    ctx["object"]["state_id"] = states.get(ctx["object"]["id"])
+            ctx.update(card_data)
+            if ctx["type"] in ("part", "document"):
+                ctx["object"]["state_id"] = states.get(ctx["object"]["id"])
             ctx["style"] = style
             ctx["id"] = id_
             main = self.main_node == area.get("id")

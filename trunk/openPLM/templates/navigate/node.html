@@ -1,21 +1,15 @@
 {% load i18n %}
 {% spaceless %}
-    <div id="{{id|safe}}" class="node n_{{type}} {{main|yesno:"main_node, "}} {{card|yesno:"card,nocard"}}" style="{{style|safe}}"
+    <div id="{{id|safe}}" class="node n_{{type}} {{main|yesno:"main_node, "}} card" style="{{style|safe}}"
         title="{{title_}}">
 
-        {% if card %}
-            <div class="bar"><span class="menuitem">&nbsp;</span></div>
-            {% with type|add:"s/identity_card.html" as tpl %}
-                {% with "true" as hide_link %}
-                    {% include tpl %}
-                {% endwith %}
+        <div class="bar"><span class="menuitem">&nbsp;</span></div>
+        {% with type|add:"s/identity_card.html" as tpl %}
+            {% with "true" as hide_link %}
+                {% include tpl %}
             {% endwith %}
+        {% endwith %}
 
-        {% else %}
-            <div class="table">
-                {{label|linebreaks}}
-            </div>
-        {% endif %}
 
         <div class="node-toolbar">
             {% if type == "document" %}
