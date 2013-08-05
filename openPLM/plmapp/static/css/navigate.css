@@ -26,6 +26,8 @@ div.node {
     display: block;
     background-repeat: no-repeat;
     position: absolute;
+    width: 162px;
+    height: 170px;
 }
 
 div.node:hover .identity_card .id_details {
@@ -49,25 +51,6 @@ div.node > div.table {
     height: 100%;
 
 }
-
-div.node.nocard p {
-    color: #fff;
-    font-weight: bold;
-    display: table-cell;
-    vertical-align: middle;
-    font-size: 11px;
-    max-width: 90px;
-    padding: 4px;
-    overflow: hidden;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-div.node.card {
-    width: 162px;
-    height: 170px;
-}
-
 div.card div.bar {
     width: 5em;
     margin-left: 1em;
@@ -129,10 +112,6 @@ div.n_part .identity_card {
     width: inherit;
 }
 
-div.main_node.nocard p {
-    color: #343434;
-    text-shadow: 1px 1px #ccc;
-}
 
 #navDocument {
     word-wrap: break-word;
@@ -336,31 +315,6 @@ div#FilterNav label {
     text-align: right;
     font-size: 75%;
     padding: 5px;
-}
-
-div.n_part.nocard {
-    background-image: url("../img/navigate/part.png");
-}
-div.n_document.nocard  {
-    background-image: url("../img/navigate/document.png");
-}
-div.n_group.nocard  {
-    background-image: url("../img/navigate/user.png");
-}
-div.n_user.nocard  {
-    background-image: url("../img/navigate/user.png");
-}
-div.n_part.main_node.nocard  {
-    background-image: url("../img/navigate/part_main.png");
-}
-div.n_document.main_node.nocard  {
-    background-image: url("../img/navigate/document_main.png");
-}
-div.n_group.main_node.nocard  {
-    background-image: url("../img/navigate/user_main.png");
-}
-div.n_user.main_node.nocard {
-    background-image: url("../img/navigate/user_main.png");
 }
 
 .edge {
