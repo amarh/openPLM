@@ -428,3 +428,8 @@ def avatar_url(user):
     else:
         return settings.STATIC_URL + "img/icon_user.png"
 
+
+@register.filter
+def normalize_language_code(code):
+    return code.lower().replace("_", "-")
+

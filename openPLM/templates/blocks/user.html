@@ -14,7 +14,7 @@
         <select name="language">
 
             {% for lang in LANGUAGES %}
-                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
+                <option value="{{ lang.0 }}" {% if LANGUAGE_CODE == lang.0|normalize_language_code %} selected="selected"{% endif %} >
                 {{ lang.1 }}
                 </option>
             {% endfor %}
