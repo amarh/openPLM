@@ -1,8 +1,7 @@
 {% load i18n plmapp_tags highlight humanize %}
 
 {% is_object_readable %}
-<div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}" 
-    data-toggle="tooltip">
+<div class="identity_card ic-{{type}} {% if not is_object_readable and suffix_url != "public/" %}unreadable{% endif %}">
     {% if detach_objects %}
         <div class="detach-form">
             <form method="POST" action="./delete/">{% csrf_token %}
@@ -16,6 +15,17 @@
             <a href="{% block object_url %}{{object.plmobject_url}}{{ suffix_url }}{% endblock %}">
             {% endif %}
         {% endif %}
+
+        <div class="id_title">
+            {% block id_title %}
+                <p>
+                <span class="type">{{object.type}}</span>
+                <br/>
+                <span class="reference">{{object.reference}}</span>
+                <span class="tb-pull-right revision">{{object.revision}}</span>
+                </p>
+            {% endblock %}
+        </div>
         <div class="id_thumbnail">
             {% block thumbnail %}
                 <div class="id_thumbnail_inner">
@@ -28,11 +38,6 @@
             {% block id_details %}
                 <p>
                 <span class="name">{{object.name}}</span>
-                </p>
-                <p>
-                    <span class="type">{{object.type}}</span>//
-                    <span class="reference">{{object.reference}}</span>//
-                    <span class="revision">{{object.revision}}</span>
                 </p>
                 <p>
                 <span class="state">{{object.state_id}}</span>
