@@ -151,7 +151,7 @@ class NavigationGraph(object):
                            fixedsize='true',
                            bgcolor="transparent",
                            width=162./96,
-                           height=180./96)
+                           height=162./96)
 
     EDGE_ATTRIBUTES = dict(color='#373434',
                            minlen="1.5",

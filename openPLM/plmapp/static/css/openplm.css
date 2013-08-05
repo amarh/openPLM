@@ -1254,13 +1254,12 @@ div#attributes {
     -webkit-box-shadow: 1px 1px 3px #888;
     box-shadow: 1px 1px 3px #888;
     width: 160px;
-    height: 160px;
+    height: 210px;
     margin: 0.5em;
     position: relative;
 }
 
 .identity_card:hover {
-    background-color: #f3f3f1;
     -webkit-box-shadow: 1px 1px 3px #555;
     box-shadow: 1px 1px 3px #555;
 }
@@ -1268,6 +1267,7 @@ div#attributes {
 .identity_card > a {
     padding: 5px;
     display: block;
+    text-decoration: none;
 }
 
 
@@ -1281,9 +1281,8 @@ div#attributes {
 /*    float: left; */
     background-color: #343434;
     border: 0px solid #343434;
-    border-radius: 4px;
 /*    margin-top: 20px; */
-    display: table-cell;
+    position: relative;
 }
 .identity_card .id_thumbnail_inner {
     vertical-align: middle;
@@ -1300,36 +1299,34 @@ div#attributes {
     display: block;
     background-color: #FFFFFF;
 }
-.identity_card .id_details {
-    height: 30px;
-/*    border-left: 1px solid #ccc; */
-    padding: 5px;
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
+
+.id_details, .id_title {
     width: 150px;
     font-size: 80%;
     line-height: 15px;
+    padding: 0.2em;
+}
+
+.identity_card .id_details {
+    height: 30px;
+/*    border-left: 1px solid #ccc; */
+    position: absolute;
+    bottom: 4px;
     background-color: white;
     overflow: hidden;
-    border-radius: 6px;
 }
 
 .identity_card:hover .id_details {
-    bottom: 0px;
-    height: 150px;
+    height: 160px;
 }
 
 .identity_card:hover .id_details .name {
     height: 60px;
 }
-.id_details span.type {
-/*    display: inline-block; 
-    font-weight: bold; 
-    left: -130px; 
-    top: -2px;
-    width: 300px;
-    position: relative;*/
+.id_title span.type {
+    font-style: normal;
+    font-size: 85%;
+    font-weight: bold;
 }
 .id_details p {
 /*    margin-top: 0.3em; */
@@ -1352,14 +1349,16 @@ div#attributes {
     max-height: 2.2em;
     display: block;
 }
-.id_details .sort, .id_thumbnail .num_files, .id_details .state {
+.id_details .sort, .id_details .state {
     font-size: 85%;
 }
 
 .num_files {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 0;
+    top: 0;
+    font-size: 70%;
+    padding: 0.2em;
     background-color: white;
 }
 

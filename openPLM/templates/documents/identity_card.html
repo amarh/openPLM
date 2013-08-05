@@ -13,7 +13,6 @@
 
 {% block thumbnail %}
     {{ block.super }}
-    <p>
     <span class="num_files">
         {% blocktrans count num_files|key:object.id as file_count %}
             {{file_count}} file
@@ -21,6 +20,5 @@
             {{file_count}} files
         {% endblocktrans %}
     </span>
-    </p>
 {% endblock %}
 

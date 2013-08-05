@@ -4,13 +4,15 @@
 {% block object_url %}/user/{{object.username|urlencode}}{{ suffix_url }}{% endblock %}
 
 {% block thumbnail_url%}{% avatar_url object %}{% endblock %}
-{% block id_details%}
+{% block id_title %}
     <p>
     <span class="type">{% trans "User" %}</span>
     </p>
     <p>
     <span class="reference">{{object.username}}</span>
     </p>
+{% endblock %}
+{% block id_details%}
     <p>
     <span class="fullname name">{{ object.get_full_name }}</span>
     </p>

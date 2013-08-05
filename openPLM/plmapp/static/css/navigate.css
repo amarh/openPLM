@@ -22,24 +22,31 @@ div#Navigate
 }
 
 div.node {
-    text-align:center;
     display: block;
     background-repeat: no-repeat;
     position: absolute;
+}
+
+.node, .identity_card {
     width: 162px;
-    height: 170px;
+    height: 162px;
 }
 
 div.node:hover .identity_card .id_details {
-    bottom: 0px;
-    height: 150px;
+    height: 110px;
 }
 
 div.node:hover .identity_card .id_details .name {
-    height: 60px;
+    height: 40px;
 }
 
+.identity_card .id_thumbnail_inner, .identity_card .id_thumbnail {
+    height: 100px;
+}
 
+.identity_card .id_thumbnail img {
+    max-height: 100px;
+}
 
 .node, .node * {
     z-index: 5;
