@@ -35,13 +35,6 @@ div.timeline dt {
     float: left;
 
 }
- .individual_action {
-/*    background-color: white;
-    border: 1px solid #777777;
-    border-radius: 0.4em 0.4em 0.4em 0.4em;
-    box-shadow: 1px 1px 3px #888888; */
-    margin: 2px;
-}
 
 .timeline dt:hover, .timeline dt:hover + dd,
 .timeline dd:hover, .timeline dt.active
