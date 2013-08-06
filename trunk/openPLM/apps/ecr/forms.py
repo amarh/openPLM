@@ -50,7 +50,7 @@ class ECRForm(forms.ModelForm):
     class Meta:
         model = ECR
         fields = ECR.get_creation_fields()
-        fields.insert(1, "auto")
+        fields.insert(fields.index("reference") + 1, "auto")
 
     auto = BooleanField(required=False, initial=True,
             help_text=_("Checking this box, you allow OpenPLM to set the reference of the ECR."))
