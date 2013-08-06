@@ -129,7 +129,7 @@ What's new for administrators
 Customize default references
 +++++++++++++++++++++++++++++++++
 
-It is now possible to customize the default reference of parts and document.
+It is now possible to customize the default reference of parts and documents.
 Read :ref:`admin-references` for details on how to customize default
 references.
 
