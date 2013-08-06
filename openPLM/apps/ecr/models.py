@@ -222,7 +222,7 @@ class ECR(models.Model, pmodels.IObject):
         """
         Returns fields which should be displayed in a creation form.
         """
-        return ["reference", "name", "description", "lifecycle"]
+        return ["name", "reference", "description", "lifecycle"]
 
     @classmethod
     def get_modification_fields(cls):

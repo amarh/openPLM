@@ -378,11 +378,11 @@ class PLMObject(AbstractPLMObject):
         By default, it returns :attr:`.attributes` less attributes returned by
         :meth:`.excluded_creation_fields`
         """
-        fields = ["reference", "type", "revision", "lifecycle"]
+        fields = ["name", "group", "reference", "type", "revision", "lifecycle", "description"]
         excludes = cls.excluded_creation_fields()
         for field in cls(__fake__=True).attributes:
             if field not in excludes and field not in fields:
-                fields.append(field)
+                fields.insert(2, field)
         return fields
 
     @classmethod

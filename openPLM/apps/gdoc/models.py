@@ -50,6 +50,11 @@ class GoogleDocument(Document):
         return super(GoogleDocument, self).attributes + ["resource_id"]
 
     @classmethod
+    def get_creation_fields(cls):
+        # remove the "name" field
+        return super(GoogleDocument, cls).get_creation_fields()[1:]
+
+    @classmethod
     def excluded_creation_fields(cls):
         return super(GoogleDocument, cls).excluded_creation_fields() + \
                 ['name', 'resource_id']

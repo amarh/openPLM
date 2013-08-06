@@ -271,7 +271,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
                 base_form = Document2CreationForm
             else:
                 base_form = PLMObjectCreationForm
-            fields.insert(1, "auto")
+            fields.insert(fields.index("reference") + 1, "auto")
         else:
             base_form = CreationForm
         Form = modelform_factory(cls, fields=fields, exclude=('type', 'state'), form=base_form)
