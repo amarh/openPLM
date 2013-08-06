@@ -70,12 +70,27 @@ A visual editor is available:
 Parts and documents: new *description* field
 ++++++++++++++++++++++++++++++++++++++++++++++
 
+Parts and documents have now a *description* field.
+Now parts, documents, groups and ECRs have a name and a description fields.
+
+This field supports formatted content.
+
 
 Assembly promotion in two clicks
 +++++++++++++++++++++++++++++++++++
 
+A new button is available to promote a whole assembly.
+It is no more necessary to promote each individual part in the right order.
+
+This button is available if the following conditions are met:
+
+    * the user is the only signer of every parts (or other signers have delegated their right);
+    * all leaf parts are attached to an official document.
+
+
 Avatars
 ++++++++++++++++++
+
 
 Check-in improvements
 ++++++++++++++++++++++
