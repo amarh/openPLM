@@ -35,8 +35,41 @@ What's new for users
 Wiki syntax
 ++++++++++++++++++
 
+It is now possible to write rich formatted comments and other text
+(description, technical details, etc.).
+
+The syntax is based on Markdown and it supports:
+
+    * titles and subtitles
+    * images
+    * bullet and ordered lists
+    * tables
+    * special links (to a part, document, user and more)
+
+The syntax is documented :ref:`on this page <user-richtext>`.
+
+A visual editor is available:
+
+.. figure:: /whatsnew/1.3/editor_compose.png
+    :align: center
+
+    The compose mode of the markdown editor.
+
+
+.. figure:: /whatsnew/1.3/editor_preview.png
+    :align: center
+
+    The preview mode of the markdown editor.
+
+
+.. figure:: /whatsnew/1.3/editor_result.png
+    :align: center
+
+    The rendered text.
+
 Parts and documents: new *description* field
 ++++++++++++++++++++++++++++++++++++++++++++++
+
 
 Assembly promotion in two clicks
 +++++++++++++++++++++++++++++++++++
@@ -67,6 +100,10 @@ Navigate: full screen display
     It is licenced under the `Attribution - Share Alike - Creative Commons license`_. 
 
 .. _Attribution - Share Alike - Creative Commons license: http://creativecommons.org/licenses/by-sa/3.0/
+
+
+Other enhancements
+++++++++++++++++++++++
 
 What's new for administrators
 ===============================
