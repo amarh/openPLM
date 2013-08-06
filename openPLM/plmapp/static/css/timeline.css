@@ -52,12 +52,13 @@ div.timeline dt em {
 div.timeline dt.highlight { background-color: #ffa; } 
 div.timeline dd { 
     font-size: 70%;
-    padding: 0 0 .75em 1em;
+    padding: 0 0 .75em 90px;
     border-radius: 0 0 12px 0;
     
     display: list-item;
     list-style-position: inside;
     list-style-image: url("../img/puce.png");
+    min-height: 50px;
 }
 
 div.timeline div.details,
@@ -79,9 +80,6 @@ div.timeline ul:not(.management) li {
     list-style-size: small;
     margin-left: 1em;
     margin-top: 0.5em;
-}
-div.timeline br {
-    clear:left;
 }
 
 div.timeline {

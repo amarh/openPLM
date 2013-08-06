@@ -13,80 +13,80 @@
     <link rel="alternate" type="application/rss+xml" href="../rss/">
 {% endblock %}
 {% block content %}
-     <form action="." method="get"  >
-            {%if timeline%}
-                <div class="history_form">
+    <form action="." method="get"  >
+        {%if timeline%}
+            <div class="history_form">
                 {{ form_object.as_p }}
             {% else %}
                 <div class="history_form" style="top: 220px">
-            {% endif %}
+                {% endif %}
                 {{ form_date.as_p }}
-            <input type="submit" value="Submit" style="height: 20px; text-align: center; font-size: 12px"/>
-            {%trans "*: Required fields" %}
-        </div>
-    </form>
-    <br />
-    <br />
-    {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
-    <span style="position: absolute; left: 45%; text-decoration: underline">{{date_end_period}} - {{date_begin_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
-
-    {% if object_history%}
-        {% regroup object_history by get_day as histories %}
-        {% for group in histories %}
-            <div class="timeline" >
-                <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
-
-                <dl style="min-height: 100px margin: 10px; width: 98%">
-                    {% for histo in group.list %}
-                        <dt class="changeset" id="{{histo.id}}">
-                        <img class="avatar" src="{% avatar_url histo.user %}"/>
-                        <span class="time">
-                            {{histo.date|date:"G:i"}}
-                        </span>
-                        {% spaceless %}
-                            <a href="/user/{{histo.user|urlencode }}/">
-                                <span class="user">{{histo.user}}</span>
-                            </a>
-                        {% endspaceless %}
-                        <span class="action">
-                            {{histo.action}}
-                        </span>
-                        {% if show_identifiers %}
-                            <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
-                            <span>:</span>
-                        {% endif %}
-                        {% if show_revisions %}
-                            <span class="revision">
-                                {%if obj.revision == histo.plmobject.revision%}
-                                    <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
-                                {% else %}
-                                    <span style="background: #68A7FF; color: #3B3A3D; padding-left: 5px; padding-right: 5px">{{histo.plmobject.revision}}</span>
-
-                                {% endif %}
-                            </span>
-                        {% endif %}
-                        </dt>
-                        <dd class="clearfix">
-                        <div class="details">
-                            {{ histo.details|linebreaksbr }}
-                        </div>
-                        </dd>
-                    {% endfor %}
-                </dl>
+                <input type="submit" value="Submit" style="height: 20px; text-align: center; font-size: 12px"/>
+                {%trans "*: Required fields" %}
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="timeline">
-             <h3 class="hplm">{{ date_begin_period|naturalday|capfirst}} - {{ date_end_period|naturalday|capfirst}}</h3>
-             <p> {% trans "There are no event to display for this period" %}</p>
-        </div>
-    {% endif %}
-    <hr />
-    {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
-    <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span> 
-    {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get  document=display_document part=display_part group=display_group date_history_begin=date_after number_days=number_days%}">{%trans "Next Period →"%} </a> {% endif %}
-    <br />
-    
-    <script type="text/javascript"> $(function() {$("#id_date_history_begin").datepicker();}); </script>
-{% endblock %}
+        </form>
+        <br />
+        <br />
+        {% if date_before%} <a style="padding: 20px; position: relative; " href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
+        <span style="position: absolute; left: 45%; text-decoration: underline">{{date_end_period}} - {{date_begin_period}} </span> 
+        {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
+
+        {% if object_history%}
+            {% regroup object_history by get_day as histories %}
+            {% for group in histories %}
+                <div class="timeline" >
+                    <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
+
+                    <dl>
+                        {% for histo in group.list %}
+                            <dt class="changeset" id="{{histo.id}}">
+                            <img class="avatar" src="{% avatar_url histo.user %}"/>
+                            <span class="time">
+                                {{histo.date|date:"G:i"}}
+                            </span>
+                            {% spaceless %}
+                                <a href="/user/{{histo.user|urlencode }}/">
+                                    <span class="user">{{histo.user}}</span>
+                                </a>
+                            {% endspaceless %}
+                            <span class="action">
+                                {{histo.action}}
+                            </span>
+                            {% if show_identifiers %}
+                                <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
+                                <span>:</span>
+                            {% endif %}
+                            {% if show_revisions %}
+                                <span class="revision">
+                                    {%if obj.revision == histo.plmobject.revision%}
+                                        <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
+                                    {% else %}
+                                        <span style="background: #68A7FF; color: #3B3A3D; padding-left: 5px; padding-right: 5px">{{histo.plmobject.revision}}</span>
+
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                            </dt>
+                            <dd>
+                            <div class="details">
+                                {{ histo.details|linebreaksbr }}
+                            </div>
+                            </dd>
+                        {% endfor %}
+                    </dl>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="timeline">
+                <h3 class="hplm">{{ date_begin_period|naturalday|capfirst}} - {{ date_end_period|naturalday|capfirst}}</h3>
+                <p> {% trans "There are no event to display for this period" %}</p>
+            </div>
+        {% endif %}
+        <hr />
+        {% if date_before%} <a style="padding:20px;  position: relative; " href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_before number_days=number_days%}">{%trans "← Previous Period" %}</a> {% endif %}
+        <span style="position: absolute; left: 45%"> {{date_begin_period}} - {{date_end_period}} </span> 
+        {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get  document=display_document part=display_part group=display_group date_history_begin=date_after number_days=number_days%}">{%trans "Next Period →"%} </a> {% endif %}
+        <br />
+
+        <script type="text/javascript"> $(function() {$("#id_date_history_begin").datepicker();}); </script>
+    {% endblock %}
