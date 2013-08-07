@@ -44,7 +44,8 @@ from openPLM.plmapp.views.base import (get_obj, get_obj_from_form, get_id_card_d
     get_obj_by_id, handle_errors, get_generic_data,  secure_required)
 from openPLM.plmapp.controllers import UserController
 from openPLM.plmapp.utils import r2r
-from openPLM.plmapp.filehandlers.progressbarhandler import ProgressBarUploadHandler
+from openPLM.plmapp.filehandlers.progressbarhandler import (ProgressBarUploadHandler,
+    get_upload_suffix)
 
 
 @handle_errors
@@ -355,9 +356,9 @@ def up_progress(request, obj_type, obj_ref, obj_revi):
     """
     obj, ctx = get_generic_data(request, obj_type, obj_ref, obj_revi)
     ret = ""
-    p_id = request.GET['X-Progress-ID']
+    suffix = get_upload_suffix(request.GET['X-Progress-ID'])
     tempdir = settings.FILE_UPLOAD_TEMP_DIR or tempfile.gettempdir()
-    f = glob.glob(os.path.join(tempdir, "*%s_upload" % p_id))
+    f = glob.glob(os.path.join(tempdir, "*" + suffix))
     if f:
         ret = str(os.path.getsize(f[0]))
     if not ret:

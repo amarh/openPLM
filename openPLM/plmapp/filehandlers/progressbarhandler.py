@@ -8,6 +8,8 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadhandler import FileUploadHandler
 from django.core.files.uploadedfile import UploadedFile
 
+def get_upload_suffix(progress_id):
+    return ".%d_openplm_upload" % hash(progress_id)
 
 class ProgressBarUploadHandler(FileUploadHandler):
     """
@@ -25,7 +27,7 @@ class ProgressBarUploadHandler(FileUploadHandler):
         Create the file object, identified by the corresponding query parameter,
         to append to as data is coming in.
         """
-        self.progress_id[file_name]=self.request.GET[file_name]
+        self.progress_id[file_name] = self.request.GET[file_name]
         super(ProgressBarUploadHandler, self).new_file(file_name, *args, **kwargs)
         self.file = ProgressUploadedFile(self.progress_id[file_name], self.file_name,
                 self.content_type, 0, self.charset)
@@ -49,12 +51,13 @@ class ProgressUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location with a specified suffix (i.e. stream-to-disk).
     """
-    def __init__(self, suf_id, name, content_type, size, charset):
+    def __init__(self, progress_id, name, content_type, size, charset):
+        suffix = get_upload_suffix(progress_id)
         if settings.FILE_UPLOAD_TEMP_DIR:
-            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % suf_id,
+            file = tempfile.NamedTemporaryFile(suffix=suffix,
                                                dir=settings.FILE_UPLOAD_TEMP_DIR)
         else:
-            file = tempfile.NamedTemporaryFile(suffix='.%s_upload' % suf_id)
+            file = tempfile.NamedTemporaryFile(suffix=suffix)
         super(ProgressUploadedFile, self).__init__(file, name, content_type, size, charset)
 
     def temporary_file_path(self):
