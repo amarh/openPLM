@@ -230,7 +230,7 @@ Optional
 
 .. data:: RICHTEXT_FILTER and RICHTEXT_WIDGET_CLASS
 
-    This settings set the wiki syntax used by comments and description fields.
+    These settings set the wiki syntax used by comments and description fields.
 
     To enable the Markdown syntaxe, add the following lines::
 
