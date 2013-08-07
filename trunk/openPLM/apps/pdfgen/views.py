@@ -297,7 +297,7 @@ class FakeLink(object):
 
 def select_pdf_part(request, ctx, obj):
     """
-    Views to select pdf files to download.
+    View helper to select pdf files to download.
 
     :type obj: :class:`.PartController`
     """
