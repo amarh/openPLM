@@ -132,9 +132,9 @@ INSTALLED_APPS = (
 )
 
 COMMENTS_APP = "openPLM.plmapp"
-# uncomment these settings to enable the MarkDown syntax 
-#RICHTEXT_FILTER = 'openPLM.plmapp.filters.markdown_filter'
-#RICHTEXT_WIDGET_CLASS = 'openPLM.plmapp.widgets.MarkdownWidget'
+# comment these settings to disable the MarkDown syntax
+RICHTEXT_FILTER = 'openPLM.plmapp.filters.markdown_filter'
+RICHTEXT_WIDGET_CLASS = 'openPLM.plmapp.widgets.MarkdownWidget'
 
 
 CELERY_CREATE_MISSING_QUEUES = True
