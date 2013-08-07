@@ -2,6 +2,7 @@
 .. module:: meta_badges
 """
 
+from django.db import Q
 from django.contrib.comments import Comment
 from django.utils.translation import ugettext_lazy as _
 
@@ -30,18 +31,6 @@ class Autobiographer(MetaBadge):
         has_l_name = 1 if user.last_name else 0
         return has_email + has_f_name + has_l_name
 
-    def check_email(self, instance):
-        return instance.user.email
-
-    def check_last_name(self, instance):
-        return instance.user.last_name
-
-    def check_first_name(self, instance):
-        return instance.user.first_name
-
-    def check_can_win_badge(self, instance):
-        return True
-
 
 #: badges won when user cancel objects
 class SerialKiller(MetaBadge):
@@ -65,9 +54,6 @@ class SerialKiller(MetaBadge):
     def get_progress(self, user):
         cancel_hist = self.model.objects.filter(user=user,action='Cancel').count()
         return cancel_hist
-
-    def check_action(self, instance):
-        return instance.action == 'Cancel'
 
 
 #: badges won by sponsoring or delegating
@@ -93,9 +79,6 @@ class WelcomeAA(MetaBadge):
         sponsored = self.model.current_objects.filter(delegator=user,role='sponsor').count()
         return sponsored
 
-    def check_role(self, instance):
-        return instance.role == 'sponsor'
-
 
 class GodFather(MetaBadge):
     """
@@ -118,9 +101,6 @@ class GodFather(MetaBadge):
     def get_progress(self, user):
         sponsored = self.model.current_objects.filter(delegator=user,role='sponsor').count()
         return sponsored
-
-    def check_role(self, instance):
-        return instance.role == 'sponsor'
 
 
 class DelegateSponsor(MetaBadge):
@@ -154,6 +134,8 @@ class DelegateSponsor(MetaBadge):
 
 PONY_NAMES = set(["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"])
 
+_added_file_query = Q(action__in=("File added", "added file"))
+_deleted_file_query = Q(action__in=("File deleted", "deleted file"))
 
 class PonyRider(MetaBadge):
     """
@@ -168,7 +150,7 @@ class PonyRider(MetaBadge):
     level = "2"
 
     def get_progress(self, user):
-        doc_file_hist = self.model.objects.filter(user=user, action="File added")
+        doc_file_hist = self.model.objects.filter(user=user).filter(_added_file_query)
         progress = 0
         for h in doc_file_hist :
             f_name = h.details.split(" : ")[1]
@@ -176,10 +158,6 @@ class PonyRider(MetaBadge):
                 progress = 1
                 break
         return progress
-
-    def check_action(self, instance):
-        return instance.action == "File added"
-
 
 
 class SuperPonyRider(MetaBadge):
@@ -197,16 +175,13 @@ class SuperPonyRider(MetaBadge):
     pony_names=["pinkie pie", "applejack", "twilight sparkle", "rarity", "rainbow dash", "fluttershy"]
 
     def get_progress(self, user):
-        doc_file_hist = self.model.objects.filter(user=user, action='File added')
+        doc_file_hist = self.model.objects.filter(user=user).filter(_added_file_query)
         progress = 0
         f_names = []
         for h in doc_file_hist :
             f_names.append(h.details.split(" : ")[1])
         progress = int(set(f_names).issuperset(PONY_NAMES))
         return progress
-
-    def check_action(self, instance):
-        return instance.action == "File added"
 
 
 class DragonSlayer(MetaBadge):
@@ -222,19 +197,15 @@ class DragonSlayer(MetaBadge):
     level = "4"
 
     def get_progress(self, user):
-        spike_hist = self.model.objects.filter(user=user, action__startswith="File ", details__icontains=" spike")
+        spike_hist = self.model.objects.filter(user=user, action__icontains="file", details__icontains=" spike")
         if not spike_hist:
             return 0
 
-        if spike_hist.filter(action="File added") and spike_hist.filter(action="File deleted"):
+        if spike_hist.filter(_added_file_query) and spike_hist.filter(_deleted_file_query):
             progress = 1
         else:
             progress = 0
         return progress
-
-    def check_action(self, instance):
-        return instance.action in ['File added', 'File deleted']
-
 
 
 #: badges won by user who diffused informations
@@ -256,10 +227,6 @@ class Herald(MetaBadge):
     def get_progress(self, user):
         notified = self.model.objects.filter(user=user, action="New notified").count()
         return notified
-
-    def check_action(self, instance):
-        return instance.action == "New notified"
-
 
 
 class Journalist(MetaBadge):
@@ -329,12 +296,9 @@ class WelcomeToHogwarts(MetaBadge):
     level = "4"
 
     def get_progress(self, user):
-        wizard = models.Part.objects.filter(creator=user, name__icontains="Wizard Wand").exists()
+        wizard = models.Part.objects.filter(creator=user, name="Wizard Wand").exists()
         progress = 1 if wizard else 0
         return progress
-
-    def check_action(self,instance):
-        return instance.action == "Create"
 
 
 class EmmettBrown(MetaBadge):
@@ -354,9 +318,6 @@ class EmmettBrown(MetaBadge):
     def get_progress(self, user):
         created = models.PLMObject.objects.filter(creator=user).count()
         return created
-
-    def check_action(self, instance):
-        return instance.action == "Create"
 
 
 
@@ -381,9 +342,6 @@ class Guru(MetaBadge):
         created = models.GroupInfo.objects.filter(creator=user).count()
         return created
 
-    def check_action(self, instance):
-        return instance.action == "Create"
-
 
 #: badges won manipulating object
 class Archivist(MetaBadge):
@@ -403,17 +361,9 @@ class Archivist(MetaBadge):
 
     def get_progress(self, user):
         docs_deprecated = models.Document.objects.filter(state='deprecated').values_list('id', flat=True)
-        deprecated = self.model.objects.filter(user=user, action__in=["Promote", "Modify"],
+        deprecated = self.model.objects.filter(user=user, action__in=["Promote", "Modify", "promoted", "demoted"],
                 details__regex=r'changes?.* from.* to .*deprecated.*$', plmobject__in=docs_deprecated).count()
         return deprecated
-
-    def check_action(self, instance):
-        return instance.action in ["Promote", "Modify"]
-
-    def check_object(self, instance):
-        ret = instance.plmobject.is_deprecated
-        ret = ret and instance.plmobject.is_document
-        return ret
 
 
 class WisedOne(MetaBadge):
@@ -432,11 +382,8 @@ class WisedOne(MetaBadge):
     progress_finish = 10
 
     def get_progress(self, user):
-        rejected = self.model.objects.filter(user=user, action="Demote").count()
+        rejected = self.model.objects.filter(user=user, action__in=("Demote", "demoted")).count()
         return rejected/50
-
-    def check_action(self, instance):
-        return instance.action == "Demote"
 
 
 class Replicant(MetaBadge):
@@ -453,11 +400,8 @@ class Replicant(MetaBadge):
     level = "1"
 
     def get_progress(self, user):
-        progress = 1 if self.model.objects.filter(user=user, action="Clone").exists() else 0
+        progress = 1 if self.model.objects.filter(user=user, action__in=("Clone", "cloned")).exists() else 0
         return progress
-
-    def check_action(self, instance):
-        return instance.action == "Clone"
 
 
 class Frankeinstein(MetaBadge):
@@ -474,16 +418,13 @@ class Frankeinstein(MetaBadge):
     level = "2"
 
     def get_progress(self, user):
-        cloned = self.model.objects.filter(user=user, action="Clone")
+        cloned = self.model.objects.filter(user=user, action__in=("Clone", "cloned"))
         if not cloned :
             return 0
 
         cloned = [c.plmobject for c in cloned if c.plmobject.is_cancelled or c.plmobject.is_deprecated]
         progress = 0 if not cloned else 1
         return progress
-
-    def check_action(self, instance):
-        return instance.action == "Clone"
 
 
 class Tipiak(MetaBadge):
@@ -500,16 +441,13 @@ class Tipiak(MetaBadge):
     level = "3"
 
     def get_progress(self, user):
-        cloned = self.model.objects.filter(user=user, action="Clone")
+        cloned = self.model.objects.filter(user=user, action__in=("Clone", "cloned"))
         if not cloned :
             return 0
 
         cloned = [c for c in cloned if c.plmobject.owner != user and c.plmobject.creator != user]
         progress = 0 if not cloned else 1
         return progress
-
-    def check_action(self, instance):
-        return instance.action == "Clone"
 
 
 #: property badges
@@ -563,9 +501,6 @@ class Popular(MetaBadge):
         else :
             return 0
 
-    def check_can_win_badge(self, instance):
-        return True
-
 
 #: comment badges
 class DarthVader(MetaBadge):
@@ -585,10 +520,6 @@ class DarthVader(MetaBadge):
         comments = [c.lower() for c in comments]
         progress = 1 if "chocking hazard" in comments else 0
         return progress
-
-    def check_can_win_badge(self, instance):
-        return True
-
 
 
 class RadicalEdward(MetaBadge):
@@ -616,8 +547,5 @@ class RadicalEdward(MetaBadge):
             if ":)" in c :
                 count = count +1
         return count
-
-    def check_can_win_badge(self, instance):
-        return True
 
 
