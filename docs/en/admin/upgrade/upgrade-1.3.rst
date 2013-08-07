@@ -2,7 +2,11 @@
 Upgrading from OpenPLM 1.2 to OpenPLM 1.3
 ===========================================
 
-:Date: 2013-06-17
+:Date: 2013-08-07
+
+.. seealso::
+
+     :ref:`admin-upgrade`
 
 New/updated dependencies
 ==============================

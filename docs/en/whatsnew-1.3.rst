@@ -123,7 +123,10 @@ Other enhancements
 What's new for administrators
 ===============================
 
-:doc:`/admin/upgrade/upgrade-1.3`
+OpenPLM now requires Django 1.5. 
+Some dependencies and the settings file must be upgraded.
+Read the :doc:`instructions </admin/upgrade/upgrade-1.3>` before upgrading
+your installation.
 
 
 Customize default references
