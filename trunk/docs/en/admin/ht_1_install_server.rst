@@ -381,6 +381,14 @@ how mails are sent. See the `Django documentation <https://docs.djangoproject.co
 OpenPLM adds another variable `EMAIL_OPENPLM` which is the e-mail address set
 in the `from` field of each e-mail. Usually, this is a `no-reply@` address.
 
+
+Turning off the debugging mode
+================================
+
+Once your server is configured and runs fine, you should turn off the debug mode.
+Set the :const:`DEBUG` setting to ``False`` and restart celery and apache.
+
+
 Troubleshootings
 ==================
 
