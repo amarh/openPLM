@@ -95,11 +95,23 @@ Avatars
 Check-in improvements
 ++++++++++++++++++++++
 
+A click on the check-in button immediately triggers the file selector.
+And the file is uploaded when the file selector is validated.
+
+
 Search: all types
 +++++++++++++++++++++++
 
 Timeline: browse by date and filtering
 ++++++++++++++++++++++++++++++++++++++++++
+
+The timeline has been improved. It now displays all events which happened
+during a given period. 
+The previous version displayed a fixed number of events.
+
+Moreover, it is possible to filter events based on their type (part, document and/or group)
+and by their author.
+
 
 Navigate: full screen display
 ++++++++++++++++++++++++++++++
@@ -119,6 +131,8 @@ Navigate: full screen display
 
 Other enhancements
 ++++++++++++++++++++++
+
+    * new login page
 
 What's new for administrators
 ===============================
