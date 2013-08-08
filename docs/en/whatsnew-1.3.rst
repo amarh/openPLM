@@ -119,6 +119,9 @@ Navigate: full screen display
 3D view: full screen display and BOM
 +++++++++++++++++++++++++++++++++++++
 
+The assembly tree of a STEP file is now displayed as a treeview.
+
+A click on the "full screen" button makes the view fullscreen. 
 
 .. figure:: /whatsnew/1.3/3D_mendelmax.png
     :align: center
@@ -162,10 +165,20 @@ What's new for developers
 Django 1.5
 ++++++++++++++
 
-    * StreamingHttpResponse
-    * static files
+Django 1.5 adds *custom user model*. OpenPLM still uses the User model
+provided by Django and a separated profile (:class:`~UserProfile`).
+To get the profile of a user instance, you must now access the
+:samp:`{user}.profile` attribute instead of calling :samp:`{user}.get_profile()`.
 
-Call :func:`~user.profile` instead of ``user.get_profile()``.
+
+Static files are now located in :samp:`{app}/static/` directories
+instead of the `media/` directory.
+
+HttpResponse which takes a file or an iterator are now
+instances of :class:`.StreamingHttpResponse`.
+
+All DateTime fields are now timezone aware.
+
 
 Rich text | Wiki syntax
 ++++++++++++++++++++++++++
@@ -192,6 +205,12 @@ References
 ++++++++++++
 
 :mod:`.references`
+
+Celery tasks
+++++++++++++++++
+
+Task are now executed after the current database transaction.
+If the transaction failed, tasks are not executed.
 
 
 Previous versions
