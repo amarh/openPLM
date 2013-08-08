@@ -55,6 +55,15 @@ class OfficeDocument(Document):
     def excluded_creation_fields(cls):
         return Document.excluded_creation_fields() + ["nb_pages", "format"]
 
+
+    @classmethod
+    def get_creation_score(cls, files):
+        office_ext = (".odt", ".ods", ".odp", ".doc", ".xls", ".ppt", ".docx", ".xlsx", ".pptx")
+        if any(f.filename.lower().endswith(office_ext) for f in files):
+            return 40
+        return super(OfficeDocument, cls).get_creation_score(files)
+
+
 class OfficeDocumentController(DocumentController):
 
     def handle_added_file(self, doc_file):

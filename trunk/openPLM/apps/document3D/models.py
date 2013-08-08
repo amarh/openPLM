@@ -16,6 +16,7 @@ from django.core.files import File
 
 
 from openPLM.plmapp.controllers import get_controller, PartController
+from openPLM.plmapp.files.formats import is_cad_file
 from openPLM.apps.document3D import classes
 from openPLM.plmapp.controllers import DocumentController
 import openPLM.plmapp.models as pmodels
@@ -93,6 +94,13 @@ class Document3D(pmodels.Document):
                 if Location_link.objects.filter(link=link).exists():
                     document_related.append(Document3D.objects.get(PartDecompose=link.child))
         return document_related
+
+    @classmethod
+    def get_creation_score(cls, files):
+        if any(is_cad_file(f.filename) for f in files):
+            return 50
+        return super(Document3D, cls).get_creation_score(files)
+
 
 admin.site.register(Document3D)
 
