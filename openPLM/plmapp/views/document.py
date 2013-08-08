@@ -233,6 +233,15 @@ def upload_and_create(request, obj_ref):
     return r2r('users/files.html', ctx, request)
 
 
+def _get_redirect_url(obj, added_files):
+    if isinstance(obj, UserController):
+        dtype = models.get_best_document_type(added_files)
+        pfiles = "&".join("pfiles=%d" % f.id for f in added_files)
+        url = "/object/create/?type=%s&%s" % (dtype, pfiles)
+    else:
+        url = obj.plmobject_url + "files/"
+    return url
+
 @csrf_protect
 @handle_errors(undo="..")
 def add_file(request, obj_type, obj_ref, obj_revi):
@@ -265,12 +274,7 @@ def add_file(request, obj_type, obj_ref, obj_revi):
             added_files = []
             for fkey, f in request.FILES.iteritems():
                 added_files.append(obj.add_file(request.FILES[fkey]))
-            if isinstance(obj, UserController):
-                pfiles = "&".join("pfiles=%d" % f.id for f in added_files)
-                url = "/object/create/?type=Document&%s" % pfiles
-            else:
-                url = obj.plmobject_url + "files/"
-            return HttpResponseRedirect(url)
+            return HttpResponseRedirect(_get_redirect_url(obj, added_files))
     else:
         if obj_type != "User" and 'file_name' in request.GET:
             f_name = request.GET['file_name'].encode("utf-8")
@@ -321,12 +325,7 @@ def _up_file(request, obj_type, obj_ref, obj_revi):
             added_files = []
             for fkey, f in request.FILES.iteritems():
                 added_files.append(obj.add_file(request.FILES[fkey]))
-            if isinstance(obj, UserController):
-                pfiles = "&".join("pfiles=%d" % f.id for f in added_files)
-                url = "/object/create/?type=Document&%s" % pfiles
-            else:
-                url = obj.plmobject_url + "files/"
-            return HttpResponse(url)
+            return HttpResponse(_get_redirect_url(obj, added_files))
         else:
             return HttpResponse("failed")
 

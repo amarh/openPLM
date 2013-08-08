@@ -3,7 +3,6 @@ import os
 import string
 import random
 import hashlib
-import datetime
 from django.utils import timezone
 
 from django.db import models
@@ -289,6 +288,31 @@ class Document(PLMObject):
     def is_document(self):
         return True
 
+    @classmethod
+    def get_creation_score(cls, files):
+        """
+        .. versionadded:: 1.3
+
+        Returns a score (an integer) computed from *files*.
+        *files* is a list of :class:`PrivateFile` uploaded by a user
+        who wants to create a document with all files.
+
+        The class which returns the highest score is chosen has the
+        default type after an upload.
+
+        The default implementation returns 10 if the current class is *Document*
+        and 0 otherwise.
+
+        For example, :class:`~Document3D` returns 50 if a CAD file has been
+        uploaded. Document3D is so preferred when a STEP file is uploaded.
+
+        .. seealso::
+            :func:`get_best_document_type`
+        """
+        if cls == Document:
+            return 10
+        return 0
+
 
 @memoize_noarg
 def get_all_documents():
@@ -319,3 +343,23 @@ def get_all_documents_with_level(only_accept_files=False):
     return lst
 
 get_all_documents_with_level = memoize(get_all_documents_with_level, {}, 1)
+
+
+def get_best_document_type(files):
+    """
+    .. versionadded:: 1.3
+
+    Returns the document type (str) which returns the highest
+    creation score for the uploaded files (list of :class:`PrivateFile`).
+
+    .. seealso::
+        :meth:`Document.get_creation_score`
+    """
+    dtype = "Document"
+    max_score = 0
+    for name, cls in get_all_documents().iteritems():
+        score = cls.get_creation_score(files)
+        if score > max_score:
+            max_score = score
+            dtype = name
+    return dtype
