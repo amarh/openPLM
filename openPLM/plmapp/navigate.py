@@ -103,7 +103,7 @@ class FrozenAGraph(pgv.AGraph):
 def get_path(obj):
     if hasattr(obj, "type"):
         if obj.type == "ECR":
-            return u"/ECR/%s" % obj.reference
+            return u"ECR/%s" % obj.reference
         return u"/".join((obj.type, obj.reference, obj.revision))
     elif hasattr(obj, 'name'):
         return u"Group/%s/-/" % obj.name
