@@ -421,9 +421,10 @@ function init(){
             uri_rx = /\/user\/(.*)\/navigate\/?/;
             result = uri_rx.exec(uri);
             if (result === null) {
-                uri_rx = /\/group\/(.*)\/navigate\/?/;
+                uri_rx = /\/(group|ecr)\/(.*)\/navigate\/?/;
                 result = uri_rx.exec(uri);
-                uri = "/ajax/navigate/Group/" + (result[1]) + "/-/";
+                t = {"ecr": "ECR", "group": "Group"}
+                uri = "/ajax/navigate/"+ t[result[1]] +  "/" + (result[2]) + "/-/";
             }
             else {
                 uri = "/ajax/navigate/User/" + (result[1]) + "/-/";

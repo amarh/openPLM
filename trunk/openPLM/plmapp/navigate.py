@@ -102,6 +102,8 @@ class FrozenAGraph(pgv.AGraph):
 
 def get_path(obj):
     if hasattr(obj, "type"):
+        if obj.type == "ECR":
+            return u"/ECR/%s" % obj.reference
         return u"/".join((obj.type, obj.reference, obj.revision))
     elif hasattr(obj, 'name'):
         return u"Group/%s/-/" % obj.name
@@ -289,6 +291,15 @@ class NavigationGraph(object):
             for part in parts[:OBJECTS_LIMIT]:
                 self.edges.add((node, part.id, " "))
                 self._set_node_attributes(part)
+        elif obj.type == "ECR":
+            node = "ECR%d" % obj.id
+            links = obj.get_attached_parts(self.time).select_related("plmobject").only(*_plmobjects_attrs)
+            if self.options[OSR]:
+                links = links.filter(plmobject__in=self.plmobject_results)
+            for link in links[:OBJECTS_LIMIT]:
+                self.edges.add((node, link.plmobject_id, " "))
+                self._set_node_attributes(link.plmobject)
+
         else:
             links = obj.get_attached_parts(self.time).select_related("part").only(*_parts_attrs)
             if self.options[OSR]:
@@ -311,6 +322,14 @@ class NavigationGraph(object):
             for doc in docs[:OBJECTS_LIMIT]:
                 self.edges.add((node, doc.id, " "))
                 self._set_node_attributes(doc)
+        elif getattr(obj, "type", "") == "ECR":
+            node = "ECR%d" % obj.id
+            links = obj.get_attached_documents(self.time).select_related("plmobject").only(*_plmobjects_attrs)
+            if self.options[OSR]:
+                links = links.filter(plmobject__in=self.plmobject_results)
+            for link in links[:OBJECTS_LIMIT]:
+                self.edges.add((node, link.plmobject_id, " "))
+                self._set_node_attributes(link.plmobject)
         else:
             # obj is the part id
             links = models.DocumentPartLink.objects.at(self.time).filter(part__id=obj).select_related("document")
@@ -331,7 +350,12 @@ class NavigationGraph(object):
         else:
             users = obj.users.at(self.time).filter(role__istartswith=role)
             users = ((u.user, u.role) for u in users.select_related("profile").all())
-        node = "Group%d" % obj.id if isinstance(obj, GroupController) else obj.id
+        if isinstance(obj, GroupController):
+             node = "Group%d" % obj.id
+        elif obj.type == "ECR":
+            node = "ECR%d" % obj.id
+        else:
+            node = obj.id
         for user, role in users:
             if self.options[OSR] and user.id not in self.user_results:
                 continue
@@ -386,6 +410,8 @@ class NavigationGraph(object):
             id_ = "User%d" % self.object.id
         elif isinstance(self.object, GroupController):
             id_ = "Group%d" % self.object.id
+        elif self.object.type == "ECR":
+            id_ = "ECR%d" % self.object.id
         else:
             id_ = self.object.id
         node = self.nodes[id_]
@@ -410,7 +436,7 @@ class NavigationGraph(object):
         # now that all parts have been added, we can add the documents
         if self.options["doc"]:
             if not (self.options[OSR] and not self.plmobject_results):
-                if isinstance(self.object, GroupController):
+                if isinstance(self.object, GroupController) or getattr(self.object, "type", "") == "ECR":
                     self._create_doc_edges(self.object, None)
                 if self._part_to_node:
                     links = models.DocumentPartLink.objects.at(self.time).\
@@ -504,11 +530,15 @@ class NavigationGraph(object):
                     "first_name" :obj.first_name, "last_name" : obj.last_name,
                     "get_full_name": obj.get_full_name(), 'profile': obj.profile,
                     "type" : "User"}
+        elif getattr(obj, "type", "") == "ECR":
+            label = obj.name
+            type_ = "ecr"
+            data["object"] = {"id" : obj.id, "name" : obj.name, "type" : "ECR"}
+
         else:
             label = obj.name
             type_ = "group"
-            data["object"] = {"id" : obj.id, "name" : obj.name,
-                    "type" : "Group"}
+            data["object"] = {"id" : obj.id, "name" : obj.name, "type" : "Group"}
         id_ = "%s_%s_%d" % (obj_id, type_.capitalize(), id_)
 
         data["label"] = label + "\n" + extra_label if extra_label else label

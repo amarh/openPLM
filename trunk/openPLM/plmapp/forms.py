@@ -714,6 +714,13 @@ class GroupNavigateFilterForm(NavigateFilterForm):
     part = forms.BooleanField(initial=True, required=False, label=_("part"))
     doc = forms.BooleanField(initial=True, required=False, label=_("doc"))
 
+class ECRNavigateFilterForm(NavigateFilterForm):
+    owner = forms.BooleanField(required=False, label=_("owner"))
+    signer = forms.BooleanField(required=False, label=_("signer"))
+    part = forms.BooleanField(initial=True, required=False, label=_("part"))
+    doc = forms.BooleanField(initial=True, required=False, label=_("doc"))
+
+
 def get_navigate_form(obj):
     if isinstance(obj, UserController):
         cls = UserNavigateFilterForm
@@ -721,6 +728,8 @@ def get_navigate_form(obj):
         cls = DocNavigateFilterForm
     elif isinstance(obj, GroupController):
         cls = GroupNavigateFilterForm
+    elif obj.type == "ECR":
+        cls = ECRNavigateFilterForm
     else:
         cls = PartNavigateFilterForm
     return cls
