@@ -24,9 +24,10 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
-from django.utils import timezone
-
+from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
@@ -532,6 +533,8 @@ def delete_doc_cad(request, obj_type, obj_ref, obj_revi):
         doc_id = int(request.POST["plmobject"])
         doc = get_obj_by_id(doc_id, request.user)
         obj.detach_document(doc)
+        msg = _("The document {doc.type}/{doc.reference}/{doc.revision} has been detached.")
+        messages.info(request, msg.format(doc=doc))
     return HttpResponseRedirect(obj.plmobject_url + "doc-cad/")
 
 
