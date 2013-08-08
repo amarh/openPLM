@@ -156,6 +156,8 @@ def delete_part(request, obj_type, obj_ref, obj_revi):
         part_id = int(request.POST["plmobject"])
         part = get_obj_by_id(part_id, request.user)
         obj.detach_part(part)
+        msg = _("The part {part.type}/{part.reference}/{part.revision} has been detached.")
+        messages.info(request, msg.format(part=part))
     return HttpResponseRedirect(obj.plmobject_url + "parts/")
 
 
