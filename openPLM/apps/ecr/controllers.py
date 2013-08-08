@@ -774,3 +774,11 @@ class ECRController(Controller):
     def can_detach_plmobject(self, plmobject):
         return self.check_detach_object(plmobject, False)
 
+    def get_attached_parts(self, time=None):
+        types = models.get_all_parts().keys()
+        return self.plmobjects.filter(plmobject__type__in=types).at(time)
+
+    def get_attached_documents(self, time=None):
+        types = models.get_all_documents().keys()
+        return self.plmobjects.filter(plmobject__type__in=types).at(time)
+
