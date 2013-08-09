@@ -209,6 +209,8 @@ def sponsor_resend_mail(request, obj_ref):
             link_id = request.POST["link_id"]
             link = models.DelegationLink.objects.get(id=int(link_id))
             obj.resend_sponsor_mail(link.delegatee)
+            msg = _("Mail resent to %(name)s") % {"name": link.delegatee.get_full_name()}
+            messages.info(request, msg)
         except (KeyError, ValueError, ControllerError):
             return HttpResponseForbidden()
     return HttpResponseRedirect("../../")
