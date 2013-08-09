@@ -2,7 +2,7 @@
 .. module:: meta_badges
 """
 
-from django.db import Q
+from django.db.models import Q
 from django.contrib.comments import Comment
 from django.utils.translation import ugettext_lazy as _
 
