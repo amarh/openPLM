@@ -73,7 +73,7 @@ Parts and documents: new *description* field
 Parts and documents have now a *description* field.
 Now parts, documents, groups and ECRs have a name and a description fields.
 
-This field supports formatted content.
+This field supports formatted content and is indexed by the search engine.
 
 
 Assembly promotion in two clicks
@@ -99,8 +99,22 @@ A click on the check-in button immediately triggers the file selector.
 And the file is uploaded when the file selector is validated.
 
 
-Search: all types
-+++++++++++++++++++++++
+Search: all types, official objects
+++++++++++++++++++++++++++++++++++++
+
+It is possible to run a query matching any types of object (parts, documents,
+groups, users, ECRs).
+
+The drop down menu used to select the type is replaced by a left panel.
+This panel is divised in two sections. The first section gives
+direct access to main types (All, Part, Document, Group, User and ECR).
+The second is fold and gives access to part or document subtypes
+(Document3D, ElectronicPart, etc.).
+
+It is possible to search for only official objects.
+
+Moreover, the search engine suggests a spelling correction when no results
+are returned.
 
 Timeline: browse by date and filtering
 ++++++++++++++++++++++++++++++++++++++++++
@@ -135,7 +149,10 @@ A click on the "full screen" button makes the view fullscreen.
 Other enhancements
 ++++++++++++++++++++++
 
-    * new login page
+    * New login page
+    * The Document3D type is automatically selected if a CAD file is uploaded
+    * Navigate supports ECRs
+    
 
 What's new for administrators
 ===============================
