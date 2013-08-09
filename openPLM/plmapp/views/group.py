@@ -25,7 +25,9 @@
 ################################################################################
 
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
@@ -66,7 +68,10 @@ def group_add_user(request, obj_ref):
     if request.method == "POST":
         form = forms.SelectUserForm(request.POST)
         if form.is_valid():
-            obj.add_user(User.objects.get(username=form.cleaned_data["username"]))
+            guest = User.objects.get(username=form.cleaned_data["username"])
+            obj.add_user(guest)
+            msg = _("Invitation sent to %(name)s") % {"name": guest.get_full_name()}
+            messages.info(request, msg)
             return HttpResponseRedirect("..")
     else:
         form = forms.SelectUserForm()
@@ -85,6 +90,8 @@ def group_ask_to_join(request, obj_ref):
     obj, ctx = get_generic_data(request, "Group", obj_ref)
     if request.method == "POST":
         obj.ask_to_join()
+        msg = _("Invitation asked to %(name)s") % {"name": obj.owner.get_full_name()}
+        messages.info(request, msg)
         return HttpResponseRedirect("..")
     ctx["ask_form"] = ""
     ctx['current_page'] = 'users'
@@ -117,6 +124,8 @@ def accept_invitation(request, obj_ref, token):
         form = forms.InvitationForm(request.POST)
         if form.is_valid() and inv == form.cleaned_data["invitation"]:
             obj.accept_invitation(inv)
+            msg = _("Invitation accepted")
+            messages.success(request, msg)
             return HttpResponseRedirect("../../../users/")
     else:
         form = forms.InvitationForm(initial={"invitation" : inv})
@@ -138,6 +147,8 @@ def refuse_invitation(request, obj_ref, token):
         form = forms.InvitationForm(request.POST)
         if form.is_valid() and inv == form.cleaned_data["invitation"]:
             obj.refuse_invitation(inv)
+            msg = _("Invitation refused")
+            messages.info(request, msg)
             return HttpResponseRedirect("../../../users/")
     else:
         form = forms.InvitationForm(initial={"invitation" : inv})
@@ -161,7 +172,12 @@ def send_invitation(request, obj_ref, token):
     if request.method == "POST":
         if inv.guest_asked:
             obj.send_invitation_to_owner(inv)
+            msg = _("Invitation asked to %(name)s")
+            name = inv.owner.get_full_name()
         else:
             obj.send_invitation_to_guest(inv)
+            msg = _("Invitation sent to %(name)s")
+            name = inv.guest.get_full_name()
+        messages.info(request, msg % {"name": name})
     return HttpResponseRedirect("../../../users/")
 
