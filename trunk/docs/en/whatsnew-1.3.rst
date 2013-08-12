@@ -65,7 +65,7 @@ A visual editor is available:
 .. figure:: /whatsnew/1.3/editor_result.png
     :align: center
 
-    The rendered text.
+    The rendered content.
 
 Parts and documents: new *description* field
 ++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,6 +90,30 @@ This button is available if the following conditions are met:
 
 Avatars
 ++++++++++++++++++
+
+Each user can now upload an avatar.
+
+Avatars are visible on:
+
+    * each user's page
+
+      .. image:: /whatsnew/1.3/avatar_profile.png
+
+    * each comment
+
+      .. image:: /whatsnew/1.3/avatar_comment.png
+
+    * each action of the timeline
+
+    
+      .. image:: /whatsnew/1.3/avatar_timeline.png
+
+    * each card (browse and navigate)
+      
+      .. image:: /whatsnew/1.3/avatar_card.png
+
+
+To upload your avatar, simply edit your personal data on your user's page.
 
 
 Check-in improvements
@@ -130,12 +154,16 @@ and by their author.
 Navigate: full screen display
 ++++++++++++++++++++++++++++++
 
+You can now display the navigate view in full screen mode.
+
+
 3D view: full screen display and BOM
 +++++++++++++++++++++++++++++++++++++
 
 The assembly tree of a STEP file is now displayed as a treeview.
 
-A click on the "full screen" button makes the view fullscreen. 
+You can now display the 3D view in full screen mode.
+ 
 
 .. figure:: /whatsnew/1.3/3D_mendelmax.png
     :align: center
@@ -152,6 +180,10 @@ Other enhancements
     * New login page
     * The Document3D type is automatically selected if a CAD file is uploaded
     * Navigate supports ECRs
+    * The :ref:`webdav application <webdav-admin>` is now compatible with Windows 7 client
+    * All comments have a permalink
+    * Histories and timeline record comments
+
     
 
 What's new for administrators
@@ -173,7 +205,9 @@ references.
 New application: richpage
 +++++++++++++++++++++++++++++++++
 
-:ref:`richpage-admin`
+The :ref:`richpage application <richpage-admin>` adds a new type
+of document, *Page* which has a dedicated tab to a formatted content.
+
 
 
 What's new for developers
@@ -200,7 +234,9 @@ All DateTime fields are now timezone aware.
 Rich text | Wiki syntax
 ++++++++++++++++++++++++++
 
-:ref:`devel-richtext`
+You can now add rich text support to any TextField.
+:ref:`devel-richtext` explains how to add this support and how
+to add its own syntax.
 
 Modules
 ++++++++++++
@@ -217,11 +253,22 @@ A lot of views moved from :mod:`plmapp.views.main` to :mod:`plmapp.views.group`,
 :mod:`plmapp.views.document`, :mod:`plmapp.views.part`,
 :mod:`plmapp.views.plmobject` or :mod:`plmapp.views.user`.
 
+HTTP API
+++++++++
+
+The :mod:`http_api` has new routes:
+
+    - :func:`http_api.get`
+    - :func:`http_api.attached_documents`
+    - :func:`http_api.attached_parts`
+    - :func:`http_api.lock_files`
+
 
 References
 ++++++++++++
 
-:mod:`.references`
+The new module :mod:`.references` adds functions to parse and generate
+a new reference for a part or a document.
 
 Celery tasks
 ++++++++++++++++
@@ -229,6 +276,19 @@ Celery tasks
 Task are now executed after the current database transaction.
 If the transaction failed, tasks are not executed.
 
+Models
++++++++
+
+:class:`.PLMObject` has now a :attr:`~.PLMObject.description` field.
+If one of your models already has a such field, you should create
+a migration *before* upgrading your installation. The software
+application contains a migration that copies the content
+of an existing description field.
+
+
+Document subclasses may implement the :meth:`.Document.get_creation_score`
+classmethod. It is used to determinate which document type is chosen
+after an upload.
 
 Previous versions
 =================
