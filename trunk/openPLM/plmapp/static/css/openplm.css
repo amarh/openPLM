@@ -1444,6 +1444,10 @@ ul.tbi li {
     color: white;
 }
 
+.tb-dropdown-toggle {
+    margin-top: 0;
+}
+
 .identity_card .detach-form {
     display: none;
 }
