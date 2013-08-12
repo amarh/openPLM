@@ -150,6 +150,13 @@ class PLMObject(AbstractPLMObject):
 
             number found in the reference if it matches ``PART_|DOC_\d+``
 
+        .. attribute:: description
+
+            .. versionadded:: 1.3
+
+            a short description of the object. This field is optional
+            and is a richtext field.
+
     .. note::
 
         This class is abstract, to create a PLMObject, see :class:`.Part` and
