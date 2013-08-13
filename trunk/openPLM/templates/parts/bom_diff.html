@@ -9,10 +9,18 @@
 {% block content %}
     <form method="GET" action="">
         {% trans "Choose two dates and display options:" %}
-        <ul>
-            {{cmp_form.as_ul}}
-        </ul>
-        <input type="submit" class="tb-btn" value="{% trans "Compare" %}"/>
+        <div class="bom-form inline-form">
+            {% for field in cmp_form %}
+                {{ field.errors }}
+                {{ field.label_tag }}: {{ field }}
+                {% if field.name == "date2" or field.name == "level" or field.name == "state" %}
+                    <br/>
+                {% endif %}
+            {% endfor %}
+            <br/>
+            <br/>
+            <input type="submit" class="tb-btn" value="{% trans "Compare" %}"/>
+        </div>
     </form>
 
     {% with compact|yesno:"6,10" as col_count %}

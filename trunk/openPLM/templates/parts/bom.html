@@ -61,14 +61,17 @@ $(function() {
         </div>
     {% endif %}
     <form method="GET" action="">
-        <div class="inline-form">
+        <div class="bom-form inline-form">
             {% for field in display_form %}
                 {{ field.errors }}
                 {{ field.label_tag }}: {{ field }}
+                {% if field.name == "level" or field.name == "state" %}
+                    <br/>
+                {% endif %}
             {% endfor %}
+            <br/>
+            <br/>
             <input type="submit" class="tb-btn" name="update" value="{% trans "Update view" %}"/>
-        </div>
-        <div class="tb-btn-toolbar">
             <input type="submit" class="tb-btn" name="diff" value="{% trans "Compare two BOMs" %}"/>
         </div>
     </form>
