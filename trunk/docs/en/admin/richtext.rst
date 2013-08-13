@@ -4,10 +4,10 @@
 Rich text | wiki syntax
 ==================================
 
-.. versionadded:: 1.3
+.. versionadded:: 2.0
 
 
-OpenPLM 1.3 introduces a rich syntax (wiki). It can be enabled
+OpenPLM 2.0 introduces a rich syntax (wiki). It can be enabled
 at any time by editing the :file:`settings.py` file.
 This syntax is used to render comments, long description fields
 and by the :ref:`richpage application <richpage-admin>`.

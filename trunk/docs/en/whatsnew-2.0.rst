@@ -1,14 +1,14 @@
-.. _whatsnew-1.3:
+.. _whatsnew-2.0:
 
 .. Images come later, once you are sure you would not have to update them ;)
 
 =========================
-What's new in OpenPLM 1.3
+What's new in OpenPLM 2.0
 =========================
 
 .. warning::
 
-    OpenPLM 1.3 is still in development, you can read the 
+    OpenPLM 2.0 is still in development, you can read the 
     :ref:`previous release notes <whatsnew-1.2>`.
 
 
@@ -27,7 +27,7 @@ Notable changes:
 
     * Wiki syntax and Page document
     * Avatars
-    * 
+    * Interface enhancements 
 
 What's new for users
 =====================
@@ -50,22 +50,46 @@ The syntax is documented :ref:`on this page <user-richtext>`.
 
 A visual editor is available:
 
-.. figure:: /whatsnew/1.3/editor_compose.png
+.. figure:: /whatsnew/2.0/editor_compose.png
     :align: center
 
     The compose mode of the markdown editor.
 
 
-.. figure:: /whatsnew/1.3/editor_preview.png
+.. figure:: /whatsnew/2.0/editor_preview.png
     :align: center
 
     The preview mode of the markdown editor.
 
 
-.. figure:: /whatsnew/1.3/editor_result.png
+.. figure:: /whatsnew/2.0/editor_result.png
     :align: center
 
     The rendered content.
+
+Interface enhancements
++++++++++++++++++++++++
+
+All buttons have been redesigned.
+Their background colors depend on the consequences of their actions.
+For example, delete buttons have a red background and promote buttons
+have a green background.
+
+.. figure:: /whatsnew/2.0/attributes.png
+    :align: center
+
+    Icons and styles are based on Twitter Bootstrap.
+
+.. figure:: /whatsnew/2.0/toolbar.png
+    :align: center
+
+    The main toolbar
+
+.. figure:: /whatsnew/2.0/cards.png
+    :align: center
+
+    New cards
+
 
 Parts and documents: new *description* field
 ++++++++++++++++++++++++++++++++++++++++++++++
@@ -97,20 +121,20 @@ Avatars are visible on:
 
     * each user's page
 
-      .. image:: /whatsnew/1.3/avatar_profile.png
+      .. image:: /whatsnew/2.0/avatar_profile.png
 
     * each comment
 
-      .. image:: /whatsnew/1.3/avatar_comment.png
+      .. image:: /whatsnew/2.0/avatar_comment.png
 
     * each action of the timeline
 
     
-      .. image:: /whatsnew/1.3/avatar_timeline.png
+      .. image:: /whatsnew/2.0/avatar_timeline.png
 
     * each card (browse and navigate)
       
-      .. image:: /whatsnew/1.3/avatar_card.png
+      .. image:: /whatsnew/2.0/avatar_card.png
 
 
 To upload your avatar, simply edit your personal data on your user's page.
@@ -151,6 +175,11 @@ Moreover, it is possible to filter events based on their type (part, document an
 and by their author.
 
 
+.. figure:: /whatsnew/2.0/history.png
+    :align: center
+
+    History of a part
+
 Navigate: full screen display
 ++++++++++++++++++++++++++++++
 
@@ -165,7 +194,7 @@ The assembly tree of a STEP file is now displayed as a treeview.
 You can now display the 3D view in full screen mode.
  
 
-.. figure:: /whatsnew/1.3/3D_mendelmax.png
+.. figure:: /whatsnew/2.0/3D_mendelmax.png
     :align: center
     
     The model is done by `Brojt <http://www.thingiverse.com/thing:19782>`_.
@@ -191,7 +220,7 @@ What's new for administrators
 
 OpenPLM now requires Django 1.5. 
 Some dependencies and the settings file must be upgraded.
-Read the :doc:`instructions </admin/upgrade/upgrade-1.3>` before upgrading
+Read the :doc:`instructions </admin/upgrade/upgrade-2.0>` before upgrading
 your installation.
 
 

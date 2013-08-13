@@ -1,5 +1,5 @@
 ===========================================
-Upgrading from OpenPLM 1.2 to OpenPLM 1.3
+Upgrading from OpenPLM 1.2 to OpenPLM 2.0
 ===========================================
 
 :Date: 2013-08-07
@@ -21,7 +21,7 @@ Django 1.5
 +++++++++++++++++
 
 OpenPLM 1.2 depends on Django 1.2 or Django 1.3,
-OpenPLM 1.3 requires Django 1.5.
+OpenPLM 2.0 requires Django 1.5.
 
     * ``pip install -U 'django==1.5'``
 
@@ -30,7 +30,7 @@ Celery 3.0 and Django-Celery 3.0
 
 
 OpenPLM 1.2 depends on Celery 2.3 or Celery 2.5,
-OpenPLM 1.3 is now compatible with Celery 3.0 which is the only version
+OpenPLM 2.0 is now compatible with Celery 3.0 which is the only version
 supported by OpenPLM.
 
     * ``pip install -U celery django-celery kombu``
@@ -284,12 +284,12 @@ Apache must serve the ``static/`` folder. It must also be able to write in the `
 
 Apache files look like:
 
-.. literalinclude:: ../apache/simple_1.3.conf
+.. literalinclude:: ../apache/simple_2.0.conf
     :language: apache
 
 SSL:
 
-.. literalinclude:: ../apache/ssl_1.3.conf
+.. literalinclude:: ../apache/ssl_2.0.conf
     :language: apache
 
 Ad the following lines if document3D application is installed (befor the ``<Location /media>`` line):

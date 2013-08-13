@@ -484,7 +484,7 @@ def add_thumbnail(request, doc_id, df_id):
 @login_json
 def get_object(request, obj_id):
     """
-    .. versionadded:: 1.3
+    .. versionadded:: 2.0
 
     Returns basic fields of the :class:`.PLMObject` identified by *obj_id*.
 
@@ -502,7 +502,7 @@ def get_object(request, obj_id):
 @login_json
 def get_attached_parts(request, doc_id):
     """
-    .. versionadded:: 1.3
+    .. versionadded:: 2.0
 
     Returns parts attached to the :class:`.Document` identified by *doc_id*.
 
@@ -524,7 +524,7 @@ def get_attached_parts(request, doc_id):
 @login_json
 def get_attached_documents(request, part_id):
     """
-    .. versionadded:: 1.3
+    .. versionadded:: 2.0
 
     Returns documents attached to the :class:`.Part` identified by *part_id*.
 
@@ -545,7 +545,7 @@ def get_attached_documents(request, part_id):
 @login_json
 def lock_files(request):
     """
-    .. versionadded:: 1.3
+    .. versionadded:: 2.0
 
     Locks several files in one transactional block.
 

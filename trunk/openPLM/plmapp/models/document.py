@@ -291,7 +291,7 @@ class Document(PLMObject):
     @classmethod
     def get_creation_score(cls, files):
         """
-        .. versionadded:: 1.3
+        .. versionadded:: 2.0
 
         Returns a score (an integer) computed from *files*.
         *files* is a list of :class:`PrivateFile` uploaded by a user
@@ -347,7 +347,7 @@ get_all_documents_with_level = memoize(get_all_documents_with_level, {}, 1)
 
 def get_best_document_type(files):
     """
-    .. versionadded:: 1.3
+    .. versionadded:: 2.0
 
     Returns the document type (str) which returns the highest
     creation score for the uploaded files (list of :class:`PrivateFile`).

@@ -152,7 +152,7 @@ class PLMObject(AbstractPLMObject):
 
         .. attribute:: description
 
-            .. versionadded:: 1.3
+            .. versionadded:: 2.0
 
             a short description of the object. This field is optional
             and is a richtext field.

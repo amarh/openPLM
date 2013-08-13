@@ -7,7 +7,7 @@ This document describes how to install an openPLM server.
 
 .. warning::
 
-    OpenPLM 1.3 (current development version) will no longer be
+    OpenPLM 2.0 (current development version) will no longer be
     compatible with django 1.2 and the portage is in in progress.
     It is recommended to wait until the migration is done before
     installing this version. (2013/02/25)
@@ -244,7 +244,7 @@ Configure Apache server
 Create a new apache's site (:file:`/etc/apache2/sites-available/openplm`)
 and add the following lines (replace the server name):
     
-.. literalinclude:: apache/simple_1.3.conf
+.. literalinclude:: apache/simple_2.0.conf
     :language: apache
 
 Restart Apache server
@@ -349,7 +349,7 @@ Each HTTP connection will be redirected to an HTTPS connection.
 A possible apache configuration would be (the rewrite and ssl modules must
 be enabled)
 
-.. literalinclude:: apache/ssl_1.3.conf
+.. literalinclude:: apache/ssl_2.0.conf
     :language: apache
 
 Configuring E-mails

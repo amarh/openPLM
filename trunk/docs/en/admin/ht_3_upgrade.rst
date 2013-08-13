@@ -179,7 +179,7 @@ Version 1.2:
 Collecting static files
 =========================
 
-.. versionadded:: 1.3
+.. versionadded:: 2.0
 
 Not required if you update using the tarball:
 

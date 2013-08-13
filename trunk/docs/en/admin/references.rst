@@ -4,7 +4,7 @@
 References -- how to customize generated references
 ====================================================
 
-.. versionadded:: 1.3
+.. versionadded:: 2.0
 
 
 Reference numbers
