@@ -17,9 +17,9 @@ Requirements
 
 This HowTo is based on:
 
-    * Debian Squeeze
-    * Apache Server version: Apache/2.2.16 (from Debian)
-    * PostgreSQL 8.4.4
+    * Debian Wheezy
+    * Apache Server version: Apache/2.2.22 (from Debian)
+    * PostgreSQL 9.1
     * Python 2.6.X or 2.7.X
     * Django 1.5.X
     * Celery 3.0.X
@@ -28,7 +28,8 @@ This HowTo is based on:
     * Lepl 5.0
     * South 0.7.6
     * Markdown 2.2
- 
+
+It is also valid on Debian Squeeze (Apache 2.2.16, PostgreSQL 8.4).
  
 .. note::
 
@@ -236,20 +237,12 @@ Django 1.5 checks the host before serving a request.
 You must edit the :django:setting:`ALLOWED_HOSTS` setting so that
 django accepts to serve your requests.
 
-Check required modules
-======================
-    
-    * ``./bin/check_modules.py`` ::
-    
-        /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
-        from sets import ImmutableSet
-        All is ok
 
 Configure Apache server
 =======================
 
-Edit you Apache configuration file (:file:`/etc/apache2/sites-available/openplm`) and
-add the following lines:
+Create a new apache's site (:file:`/etc/apache2/sites-available/openplm`)
+and add the following lines (replace the server name):
     
 .. literalinclude:: apache/simple_1.3.conf
     :language: apache
@@ -262,6 +255,15 @@ Restart Apache server
 
 First steps in openPLM
 ======================
+
+Editing the site adress
+-------------------------
+
+Edit the default Site (:samp:`http://{server}/admin/sites/site/1/`) and set the
+domain name. 
+This should be the same domain set in the apache file and in the ALLOWED_HOST setting.
+You must login with the admin account.
+You can use ``localhost`` on a local installation.
 
 Adding users
 ------------
