@@ -32,6 +32,18 @@ Notable changes:
 What's new for users
 =====================
 
+Enhanced Login page
++++++++++++++++++++
+.. figure:: /whatsnew/2.0/login_page.png
+    :align: center
+
+Enhanced Home page
++++++++++++++++++++
+You access to Search engine directly from Home page
+.. figure:: /whatsnew/2.0/home_page.png
+    :align: center
+
+
 Wiki syntax
 ++++++++++++++++++
 
@@ -206,7 +218,6 @@ You can now display the 3D view in full screen mode.
 Other enhancements
 ++++++++++++++++++++++
 
-    * New login page
     * The Document3D type is automatically selected if a CAD file is uploaded
     * Navigate supports ECRs
     * The :ref:`webdav application <webdav-admin>` is now compatible with Windows 7 client
