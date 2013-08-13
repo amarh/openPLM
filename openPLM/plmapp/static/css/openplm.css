@@ -956,7 +956,7 @@ ul.errorlist li {
 .inline-form > * {
     vertical-align: middle;
 }
-.inline-form label {
+.inline-form label, .inline-form input {
     margin-left: 1em;
 }
 
