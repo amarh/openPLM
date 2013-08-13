@@ -4,13 +4,13 @@
 Rich text | Wiki syntax
 ==========================================================
 
-.. versionadded:: 1.3
+.. versionadded:: 2.0
 
 
 Introduction
 ================
 
-OpenPLM 1.3 introduces a wiki syntax to comments and some text fields.
+OpenPLM 2.0 introduces a wiki syntax to comments and some text fields.
 
 The code and this documentation speak about rich text instead of a
 wiki content as it is not really a wiki engine (no WikiLink automatically

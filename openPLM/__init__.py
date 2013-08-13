@@ -1,7 +1,7 @@
 import os.path
 import re
 
-VERSION = (1, 3, 0, 'dev', 0)
+VERSION = (2, 0, 0, 'dev', 0)
 
 def get_svn_revision(path):
     """

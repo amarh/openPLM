@@ -1,5 +1,5 @@
 ===================================================
-How to install openPLM server 1.3
+How to install openPLM server 2.0
 ===================================================
 
 This document describes how to install an openPLM server using the 1.2 version
@@ -60,7 +60,7 @@ Get the tarball containing the code
 
 Extract the code in /var and rename the directory to django
 
-    * ``tar xzf openplm-1.3.tar.gz -C /var/``
+    * ``tar xzf openplm-2.0.tar.gz -C /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -271,7 +271,7 @@ Configure Apache server
 Create a new apache's site (:file:`/etc/apache2/sites-available/openplm`)
 and add the following lines (replace the server name):
     
-.. literalinclude:: apache/simple_1.3b.conf
+.. literalinclude:: apache/simple_2.0b.conf
     :language: apache
 
 Restart Apache server
@@ -375,7 +375,7 @@ Each HTTP connection will be redirected to an HTTPS connection.
 A possible apache configuration would be (the rewrite and ssl modules must
 be enabled)
 
-.. literalinclude:: apache/ssl_1.3b.conf
+.. literalinclude:: apache/ssl_2.0b.conf
     :language: apache
 
 Configuring E-mails

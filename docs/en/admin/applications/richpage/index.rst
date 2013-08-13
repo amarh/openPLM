@@ -4,7 +4,7 @@
 richpage - Page document (wiki page)
 ===============================================
 
-.. versionadded:: 1.3
+.. versionadded:: 2.0
 
 This application adds a new type of document, **Page** which
 does not contain files but has an editable "content" field.
