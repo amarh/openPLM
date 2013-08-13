@@ -1,5 +1,5 @@
 ===================================================
-How to install openPLM server 1.2
+How to install openPLM server 1.3
 ===================================================
 
 This document describes how to install an openPLM server using the 1.2 version
@@ -7,6 +7,7 @@ tarball.
 
 Previous versions:
 
+    - `1.2 <http://wiki.openplm.org/docs/1.2/en/admin/ht_1_install_server.html>`_
     - `1.1 <http://wiki.openplm.org/docs/1.1/en/admin/ht_1_install_server.html>`_
 
 
@@ -15,17 +16,21 @@ Requirements
 
 This HowTo is based on:
 
-    * Ubuntu 12.04 LTS server edition
-    * Apache Server version: Apache/2.2.22 (Ubuntu)
+
+    * Debian Wheezy
+    * Apache Server version: Apache/2.2.22 (from Debian)
     * PostgreSQL 9.1
-    * Python 2.7.3
-    * Django 1.3.1
-    * Celery 2.4.6
-    * Haystack 1.2.7
-    * Xapian 1.2.8
-    * Lepl 5.1.1
-    * South 0.7.3
+    * Python 2.6.X or 2.7.X
+    * Django 1.5.X
+    * Celery 3.0.X
+    * Haystack 1.2.X
+    * Xapian 1.2.X
+    * Lepl 5.0
+    * South 0.7.6
+    * Markdown 2.2
+
  
+It is also valid on Debian Squeeze (Apache 2.2.16, PostgreSQL 8.4).
  
 .. note::
 
@@ -38,15 +43,8 @@ Install necessary packages
 
 First, you must install some dependencies:
 
-    #. ``apt-get install swig build-essential pkg-config gettext``
-    #. ``apt-get install apache2 libapache2-mod-wsgi``
-    #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
-    #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
-    #. ``apt-get install python-xapian rabbitmq-server python-django python-docutils``
-    #. ``apt-get install python-django-celery python-django-south python-pisa``
-    #. ``apt-get install postgresql python-psycopg2``
-    #. ``apt-get install libgsf-bin``
-    #. ``pip install odfpy 'django-haystack<2' lepl``
+    #. ``apt-get install swig build-essential pkg-config gettext apache2 libapache2-mod-wsgi python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython graphviz graphviz-dev python-pygraphviz  python-xapian rabbitmq-server postgresql libpq-dev python-tz python-pisa libgsf-bin imagemagick python-pisa python-lxml``
+    #. ``pip install odfpy docutils celery django-celery 'django==1.5.1' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
 
 To enable plain text search on files, you need to install the following
 dependencies:
@@ -54,14 +52,15 @@ dependencies:
     #. ``apt-get install poppler-utils html2text odt2txt antiword catdoc``
     #. ``pip install openxmllib``
 
+
 Get the tarball containing the code
 ===================================
 
-    * `Download OpenPLM <http://wiki.openplm.org/trac/downloads/7>`_
+    * `Download OpenPLM <http://wiki.openplm.org/trac/downloads/8>`_
 
 Extract the code in /var and rename the directory to django
 
-    * ``tar xzf openplm-1.2.tar.gz -C /var/``
+    * ``tar xzf openplm-1.3.tar.gz -C /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -80,7 +79,7 @@ You have two way of doing so, you can either use the following **sed** command
 
 Or you can grab your favorite editor and change the followings files yourself:
 
-    * ``settings.py`` change **MEDIA_ROOT** and **TEMPLATE_DIRS** :
+    * ``settings.py`` change **MEDIA_ROOT** and **TEMPLATE_DIRS**:
 
         .. code-block:: python
 
@@ -179,7 +178,7 @@ Then execute the following commands:
 
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
-    * ``./manage.py loaddada extra_lifecycles``  
+    * ``./manage.py loaddata extra_lifecycles``  
     
     .. note::
         You have to create the superadmin user for Django and a special user named 'company'.
@@ -200,8 +199,7 @@ Change rights:
      
 Change rights for the directory where thumbnails will be stored:
     
-    * ``chown www-data:www-data /var/django/openPLM/media/thumbnails``
-    * ``chown www-data:www-data /var/django/openPLM/media/public/thumbnails``
+    * ``chown -R www-data:www-data /var/django/openPLM/trunk/openPLM/media/``
  
 .. _search-engine:
 
@@ -254,43 +252,54 @@ For example:
     * ``cp /var/django/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
     * ``cp /var/django/openPLM/etc/default/celeryd /etc/default/celeryd``
     * ``chmod +x /etc/init.d/celeryd``
-    * ``mkdir /var/{log,run}/celery``
-    * ``chown www-data:www-data /var/{log,run}/celery``
+    * ``update-rc.d celeryd defaults``
 
 To launch :command:`celeryd`, run ``/etc/init.d/celeryd start``.
 
 
-Check required modules
-======================
-    
-    * ``./bin/check_modules.py`` ::
-    
-        All is ok
+Configure allowed hosts
+==========================
+
+Django 1.5 checks the host before serving a request.
+You must edit the :django:setting:`ALLOWED_HOSTS` setting so that
+django accepts to serve your requests.
+
 
 Configure Apache server
 =======================
 
-Edit you Apache configuration file (:file:`/etc/apache2/httpd.conf`) and
-add the following lines:
+Create a new apache's site (:file:`/etc/apache2/sites-available/openplm`)
+and add the following lines (replace the server name):
     
-.. literalinclude:: apache/simple_1.1.conf
+.. literalinclude:: apache/simple_1.3b.conf
     :language: apache
 
 Restart Apache server
 =====================
 
+    * ``a2ensite openplm``
     * ``service apache2 restart``
 
 
 First steps in openPLM
 ======================
 
+
+Editing the site adress
+-------------------------
+
+Edit the default Site (:samp:`http://{server}/admin/sites/site/1/`) and set the
+domain name.
+This should be the same domain set in the apache file and in the ALLOWED_HOST setting.
+You must login with the admin account.
+You can use ``localhost`` on a local installation.
+
 Adding users
 ------------
 
 To add users in OpenPLM, you have two methods. The first one uses the
- delegation tab directly in OpenPLM and the second one uses the administration
- interface.
+delegation tab directly in OpenPLM and the second one uses the administration
+interface.
 
 Recommanded method
 ~~~~~~~~~~~~~~~~~~
@@ -348,9 +357,6 @@ Do not forget to edit Home>Plmapp>User profiles in order to give correct rights 
 .. note::
     For more information about the `Django Admin tool <http://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ . 
 
-Then you must create a new *Site* (use the admin interface) and set the `SITE_ID`
-variable in the :file:`settings.py` file.
-
 You are now ready for your first login: ::
 
     http://localhost/
@@ -369,7 +375,7 @@ Each HTTP connection will be redirected to an HTTPS connection.
 A possible apache configuration would be (the rewrite and ssl modules must
 be enabled)
 
-.. literalinclude:: apache/ssl_1.1.conf
+.. literalinclude:: apache/ssl_1.3b.conf
     :language: apache
 
 Configuring E-mails
@@ -394,16 +400,6 @@ Troubleshootings
 
 .. contents::
     :local:
-
-Admin pages are ugly
----------------------
-
-openPLM ships with a simlink (:file:`/path/to/openPLM/media/admin`) that may
-be broken on your system.
-
-To fix this link, run the following command:
-``ln -s `python -c 'import django; print django.__path__[0]'`/contrib/admin/media
-/var/django/openPLM/media/admin``
 
 
 Connection refused
