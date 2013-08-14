@@ -29,13 +29,14 @@ What's new for users
 
 Enhanced Login page
 +++++++++++++++++++
+We improve the style of the Login page.
 
 .. image:: /whatsnew/2.0/login_page.png
     :align: center
 
 Enhanced Home page
 +++++++++++++++++++
-You access to Search engine directly from Home page
+You access to Search engine directly from Home page.
 
 .. image:: /whatsnew/2.0/home_page.png
     :align: center
