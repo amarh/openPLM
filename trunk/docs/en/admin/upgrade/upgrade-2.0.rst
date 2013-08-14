@@ -23,7 +23,7 @@ Django 1.5
 OpenPLM 1.2 depends on Django 1.2 or Django 1.3,
 OpenPLM 2.0 requires Django 1.5.
 
-    * ``pip install -U 'django==1.5'``
+    * ``pip install -U 'django==1.5.2'``
 
 Celery 3.0 and Django-Celery 3.0
 ++++++++++++++++++++++++++++++++++
