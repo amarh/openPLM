@@ -6,11 +6,6 @@
 What's new in OpenPLM 2.0
 =========================
 
-.. warning::
-
-    OpenPLM 2.0 is still in development, you can read the 
-    :ref:`previous release notes <whatsnew-1.2>`.
-
 
 Introduction
 ===============
