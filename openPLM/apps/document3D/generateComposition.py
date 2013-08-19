@@ -88,9 +88,6 @@ def composer(temp_file_name):
         writer.Transfer(lr.Value(i+1), STEPControl_AsIs)
 
     writer.Write(temp_file_name)
-    del my_step_importer
-    app = XCAFApp.GetApplication().GetObject()
-    app.Delete()
 
 
 def add_labels(product,lr,st):
