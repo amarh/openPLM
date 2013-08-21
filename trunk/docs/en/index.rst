@@ -48,6 +48,7 @@ Table of contents:
     devel/index
     specs/index
     license
+    changes
 
 
 Indices and tables
