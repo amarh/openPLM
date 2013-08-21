@@ -144,10 +144,9 @@ div#navThumbnails {
     width: 180px;
     display:none;
     float:right;
-    height: 500px;
+    height: 100%;
     z-index:70;
     position:absolute;
-    height: 500px;
     right:0px;
     border-left: 1px solid #7f7c7c;
     background: rgba(52, 52, 52, 0.7);
@@ -273,7 +272,7 @@ div#RevisionsNav
 {
     position: absolute;
     right: 20px;
-    top: 20px;
+    top: 30px;
     z-index : 99;
     padding: 2px;
     width: 250px;
@@ -285,7 +284,7 @@ div#FilterNav
     position: absolute;
     border: 1px solid #242424;
     right: 10px;
-    top: 60px;
+    top: 70px;
     z-index: 99;
     padding: 3px;
     width: 250px;
@@ -300,7 +299,7 @@ div#FilterNav
     z-index: 500;
     display: block;
     top: 5px;
-    right: 5px;
+    right: 10px;
 }
 
 div#FilterNav label {
