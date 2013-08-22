@@ -107,24 +107,30 @@ function hide_thumbnails_panel(){
     $("#navThumbnails").hide();
     $("#FilterNav, #RevisionsNav, #full-screen").css("right", "10px");
 }
-
+var escapeHTML = (function () {
+    'use strict';
+    var chr = { '"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;' };
+    return function (text) {
+        return text.replace(/[\"&<>]/g, function (a) { return chr[a]; });
+    };
+}());
 function display_thumbnails(node_id, ajax_url){
     $("#thumbnailsList").empty();
     $.ajax({
         url: ajax_url,
         success: function( data ) {
             var list = $("#thumbnailsList");
+            var div, name, title;
             $.each(data["files"], function(index, value){
-                var url = value.url;
-                var img = value.img;
-                var title = "Download " + value["name"];
-                if (value.deprecated) {
-                    title += " ! deprecated !";
-                }
+                name = escapeHTML(value.name);
                 if (value.deleted) {
-                    div = "<div><span>" + value.name + " - deleted" + "</span></div>";
+                    div = "<div><span>" + name + " - deleted</span></div>";
                 } else {
-                    div = "<div><a href='"+ url +"'><div> <img src='" + img + "' title='" + title + "' /><span>" + value.name + "</span></div></a></div>";
+                    title = "Download " + name;
+                    if (value.deprecated) {
+                        title += " ! deprecated !";
+                    }
+                    div = "<div><a href='"+ value.url +"'><div> <img src='" + value.img + "' title='" + title + "' /><span>" + name + "</span></div></a></div>";
                 }
                 list.append($(div));
             });
@@ -504,6 +510,8 @@ $.fn.draggable2 = function() {
             var buttons = $elem.find("button");
             var click_prevented = false;
             $document.bind('mousemove.drag', function(e) {
+                if (e.pageX - mouse.x == 0 && e.pageY - mouse.y == 0)
+                    return;
                 if (! click_prevented ){
                     links.bind("click.prevent", function(event) { event.preventDefault(); });
                     buttons.each(function (i){
@@ -620,13 +628,14 @@ $(document).ready(function(){
             }
         });
 
-        $("#full-screen").click(function() {
-            var main = document.getElementById("main_content");
-            if (screenfull.enabled) {
+        if (screenfull.enabled) {
+            $("#full-screen").click(function() {
+                var main = document.getElementById("main_content");
                 screenfull.toggle(main);
-            }
-
-        });
+            });
+        } else {
+            $("#full-screen").hide();
+        }
         var width = $("#main_content").width();
         var height = $("#main_content").height();
         screenfull.onchange = function() {

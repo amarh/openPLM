@@ -2,6 +2,10 @@ Release 2.0.1
 =============
 
  * Apache configuration files: allow access to public thumbnails
- * Document3D: fix download of a decomposed STEP file
- * Document3D: fix 3D view of published Document3D (add a missing JavaScript file)
- * Navigate: fix overlapping of fullscreen button and thumbnails list
+ * Document3D:
+    * fix download of a decomposed STEP file
+    * fix 3D view of published Document3D (add a missing JavaScript file)
+ * Navigate:
+    * fix overlapping of fullscreen button and thumbnails list
+    * disable fullscreen button if full screen is not supported, fix #216
+    * fix buttons on Google Chrome on Windows (#217)
