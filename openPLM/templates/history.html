@@ -32,31 +32,22 @@
         {% if date_after %}<a style="position: absolute; right: 250px" href= "{%add_get document=display_document part=display_part group=display_group date_history_begin=date_after number_days=number_days%}">{% trans "Next Period →" %}</a> {% endif %}
 
         {% if object_history%}
-            {% regroup object_history by get_day as histories %}
+            {% regroup object_history by get_day_as_int as histories %}
             {% for group in histories %}
                 <div class="timeline" >
-                    <h3 class="hplm">{{ group.grouper|naturalday|capfirst}}</h3>
+                    <h3 class="hplm">{{ group.list.0.date|naturalday|capfirst}}</h3>
 
                     <dl>
                         {% for histo in group.list %}
                             <dt class="changeset" id="{{histo.id}}">
                             <img class="avatar" src="{% avatar_url histo.user %}"/>
-                            <span class="time">
-                                {{histo.date|date:"G:i"}}
-                            </span>
-                            {% spaceless %}
-                                <a href="/user/{{histo.user|urlencode }}/">
-                                    <span class="user">{{histo.user}}</span>
-                                </a>
-                            {% endspaceless %}
-                            <span class="action">
-                                {{histo.action}}
-                            </span>
+                            <span class="time"> {{histo.date|date:"G:i"}} </span>
+                            <a href="/user/{{histo.user|urlencode }}/"><span class="user">{{histo.user}}</span></a>
+                            <span class="action"> {{ histo.action }} </span>
                             {% if show_identifiers %}
                                 <a href="{{ histo.plmobject.plmobject_url}}">{{ histo.title }}</a> 
                                 <span>:</span>
-                            {% endif %}
-                            {% if show_revisions %}
+                            {% elif show_revisions %}
                                 <span class="revision">
                                     {%if obj.revision == histo.plmobject.revision%}
                                         <span style="background: #FF6B6B; color: #3B3A3D; padding-left: 5px; padding-right: 5px"> {{ histo.plmobject.revision }} </span>
@@ -68,9 +59,7 @@
                             {% endif %}
                             </dt>
                             <dd>
-                            <div class="details">
-                                {{ histo.details|linebreaksbr }}
-                            </div>
+                            <div class="details"> {{ histo.details|linebreaksbr }} </div>
                             </dd>
                         {% endfor %}
                     </dl>

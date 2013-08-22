@@ -14,6 +14,9 @@ from .plmobject import PLMObject
 from .part import get_all_parts
 from .document import get_all_documents
 
+def _prefetch_related(qs, *extra):
+    return qs.prefetch_related("plmobject", "user", "user__profile", *extra)
+
 # history stuff
 class AbstractHistory(models.Model):
     u"""
@@ -63,12 +66,15 @@ class AbstractHistory(models.Model):
     def __unicode__(self):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
 
+    def get_day_as_int(self):
+        return self.date.year * 10000 + self.date.month * 100 + self.date.day
+
     def get_day(self):
         return datetime.date(self.date.year, self.date.month, self.date.day)
 
     @classmethod
     def timeline_items(cls, user):
-        return cls.objects.all().order_by("-date").select_related("user", "plmobject")
+        return _prefetch_related(cls.objects.all().order_by("-date"))
 
     @property
     def title(self):
@@ -88,8 +94,7 @@ class History(AbstractHistory):
         q = models.Q(plmobject__owner__username=settings.COMPANY)
         q |= models.Q(plmobject__group__in=user.groups.all())
         histories = History.objects.filter(q).order_by('-date')
-        return histories.select_related("user", "plmobject__type", "plmobject__reference",
-            "plmobject__revision")
+        return _prefetch_related(histories)
 
 class UserHistory(AbstractHistory):
     class Meta:
@@ -105,7 +110,7 @@ class UserHistory(AbstractHistory):
 
     @classmethod
     def timeline_items(cls, user):
-        return cls.objects.all().order_by("-date").select_related("user", "plmobject")
+        return _prefetch_related(cls.objects.all().order_by("-date"))
 
 
 class GroupHistory(AbstractHistory):
@@ -118,8 +123,7 @@ class GroupHistory(AbstractHistory):
 
     @classmethod
     def timeline_items(cls, user):
-        return cls.objects.all().order_by("-date").select_related("user",
-                "plmobject", "plmobject__groupinfo")
+        return _prefetch_related(cls.objects.all().order_by("-date"), "plmobject__groupinfo")
 
     @property
     def title(self):
@@ -273,19 +277,13 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
 
         if list_display["display_document"] or list_display["display_part"]:
             history_plmobject = History.timeline_items(user)
-            if list_display["display_document"]:
+            if list_display["display_document"] and not list_display["display_part"]:
                 documents = get_all_documents().keys()
-                history_document = history_plmobject.filter(plmobject__type__in = documents)
-            if list_display["display_part"]:
+                history_plmobject = history_plmobject.filter(plmobject__type__in = documents)
+            elif not list_display["display_document"]:
                 parts = get_all_parts().keys()
-                if list_display["display_document"]:
-                    history_plmobject =  history_document | history_plmobject.filter(plmobject__type__in = parts)
-                else:
-                    history_plmobject = history_plmobject.filter(plmobject__type__in = parts)
-            else:
-                history_plmobject = history_document
+                history_plmobject = history_plmobject.filter(plmobject__type__in = parts)
             history_plmobject = history_plmobject.filter(date__gte = date_end, date__lt = date_begin)
-            history_plmobject = history_plmobject.select_related("plmobject", "user__profile")
 
             if done_by:
                 if User.objects.filter(username=done_by).exists():
@@ -296,7 +294,6 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
         if list_display["display_group"]:
             history_group = GroupHistory.timeline_items(user)
             history_group = history_group.filter(date__gte = date_end, date__lt = date_begin)
-            history_group = history_group.select_related("plmobject", "user__profile")
 
             if done_by != "":
                 if User.objects.filter(username= done_by).exists():
