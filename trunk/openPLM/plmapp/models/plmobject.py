@@ -214,6 +214,8 @@ class PLMObject(AbstractPLMObject):
         if "__fake__" not in kwargs:
             super(PLMObject, self).__init__(*args, **kwargs)
         self._promotion_errors = None
+        self._title = None
+        self._plmobject_url = None
 
     def __unicode__(self):
         return u"%s<%s/%s/%s>" % (type(self).__name__, self.reference, self.type,
@@ -221,9 +223,11 @@ class PLMObject(AbstractPLMObject):
 
     @property
     def title(self):
-        attrs = tuple(esc(x) for x in [self.name, self.type, self.reference, self.revision])
-        return mark_safe(u'''<span class="name">%s</span> (<span class="type">%s</span> // <span class="reference">%s</span>
+        if self._title is None:
+            attrs = tuple(esc(x) for x in [self.name, self.type, self.reference, self.revision])
+            self._title = mark_safe(u'''<span class="name">%s</span> (<span class="type">%s</span> // <span class="reference">%s</span>
  // <span class="revision">%s</span>)''' % attrs)
+        return self._title
 
     def _is_promotable(self):
         """
@@ -373,9 +377,10 @@ class PLMObject(AbstractPLMObject):
 
     @property
     def plmobject_url(self):
-        url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision)
-        return iri_to_uri(url)
-
+        if self._plmobject_url is None:
+            url = u"/object/%s/%s/%s/" % (self.type, self.reference, self.revision)
+            self._plmobject_url = iri_to_uri(url)
+        return self._plmobject_url
 
     @classmethod
     def get_creation_fields(cls):
