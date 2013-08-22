@@ -37,9 +37,9 @@ function new_input_file(){
         }
         $("span.warning").remove();
     });
-    if(($.browser.msie!=true)&&($.browser.opera!=true)&&(xhr!=null)){
+    //if(($.browser.msie!=true)&&($.browser.opera!=true)&&(xhr!=null)){
         input.attr("multiple","multiple");
-    }
+    //}
     var td_input = $("<td></td>");
     td_input.append(input);
     var tr_input = $("<tr><th><label for='id_filename"+num+"'>Filename:</label></th></tr>");
@@ -190,7 +190,7 @@ function add_f_file(input,f){
 
         //create an object related to the file in the files_info array-like
         var f_id = gen_uuid();
-        if(($.browser.opera!=true)&&($.browser.msie!=true)){
+        if(FD_SUPPORTED){
             files_info[key]={"field_name":" ", "f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
         }else{
             files_info[key]={"f_name":f.name, "p_id":f_id, "size":size, "uploaded":0, "status":"waiting"};
@@ -240,7 +240,7 @@ function del_file(item,input){
     $(".up_fail").remove();
     
     //input file's multiple selection is not enable for opera and IE
-    if(($.browser.opera)||($.browser.msie)||(input.files.length==1)){
+    if(input.files.length==1){
         $(input).remove();
     }
     if(files_info.size()==0){
@@ -461,7 +461,7 @@ function init_files_data(f_form){
     });
     
     var inputs_file = $(f_form).find("input[type='file']");
-    if(($.browser.opera!=true)&&($.browser.msie!=true)){
+    if(FD_SUPPORTED){
         $.each(inputs_file, function(id, input){
             files = input.files;
             $.each(files,function(id, file){
@@ -550,7 +550,7 @@ function up_file(f_form){
         
         t=window.setTimeout(update_progress_info, 1000);
         
-        if(($.browser.opera)||($.browser.msie)){
+        if(!FD_SUPPORTED){
             var x=document.getElementById("hidden_frame");
             var y=(x.contentWindow || x.contentDocument);
             if(y.document){
@@ -576,7 +576,7 @@ function up_file(f_form){
     
     t=window.setTimeout(update_progress_info, 1000);
     
-    if(($.browser.opera!=true)&&($.browser.msie!=true)){
+    if(FD_SUPPORTED){
         xhr.onreadystatechange = function() {
             if(xhr.readyState == 4){
                 if(xhr.status==200 && xhr.responseText != "failed") {
@@ -640,23 +640,8 @@ function reset_upload(){
 
 //get the appropriate XmlHttpRequest object
 function getXHR(){
-    var xhr=null;
-	
-    if (window.XMLHttpRequest || window.ActiveXObject) {
-	    if (window.ActiveXObject) {
-	        try {
-		        xhr = new ActiveXObject("Msxml2.XMLHTTP");
-	        } catch(e) {
-		        xhr = new ActiveXObject("Microsoft.XMLHTTP");
-	        }
-	    } else {
-		    xhr = new XMLHttpRequest(); 
-	    }
-    } else {
-	    return null;
-    }
-    
-    return xhr;
+    return new XMLHttpRequest;
+
 }
 
 //contains translation needed for different message/text
@@ -664,7 +649,8 @@ var trans=[];
 
 //sets data according to the browser used
 var data;
-if(($.browser.opera!=true)&&($.browser.msie!=true)){
+var FD_SUPPORTED = FormData !== undefined;
+if(FD_SUPPORTED){
     data = new FormData($('form.hidden')[0]);
 }
 
@@ -735,7 +721,7 @@ $(function(){
     if(xhr!=null){
     //if the browser supports xmlhttprequest object
     
-        if(($.browser.msie!=true)&&($.browser.opera!=true)){
+        if(FD_SUPPORTED){
             $("input[type='file']").attr('multiple','multiple');
         }
         
