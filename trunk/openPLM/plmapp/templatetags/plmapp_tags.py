@@ -433,3 +433,8 @@ def avatar_url(user):
 def normalize_language_code(code):
     return code.lower().replace("_", "-")
 
+@register.filter
+def fix_rendered_result(rendered_text):
+    # ugly hack to fix invalid rendered content
+    # it replaces <a .."/><span ...</a> with <a .."<span .. </a>
+    return rendered_text.replace('"/><span', '"><span>')
