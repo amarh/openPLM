@@ -190,6 +190,7 @@ class AssemblyBuilder(object):
         self._files.append(df.file.path)
         if self._lock:
             doc.lock(df)
+        return df
 
     def _checkin_step(self, doc, node):
         df = self._get_step_docfile(node)
