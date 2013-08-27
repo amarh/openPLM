@@ -4,7 +4,6 @@ import json
 from collections import namedtuple
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.files.base import File
 from django.db import transaction
@@ -13,6 +12,7 @@ from django.http import (HttpResponse, HttpResponseRedirect,
 
 from openPLM.plmapp.views.base import (handle_errors, secure_required,
         get_generic_data, get_obj, get_obj_by_id, init_ctx)
+from openPLM.plmapp.views.ajax import ajax_login_required
 from openPLM.apps.document3D import forms
 from openPLM.apps.document3D import models
 from openPLM.apps.document3D.arborescense import JSGenerator
@@ -688,7 +688,7 @@ def generateGhostDocumentFile(product, document, locker):
 
 
 @secure_required
-@login_required
+@ajax_login_required
 def ajax_part_creation_form(request, prefix):
     """
     It updates the form of an assembly determined by **prefix** without recharging the whole page and respecting the information introduced up to the moment
