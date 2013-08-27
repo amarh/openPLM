@@ -12,3 +12,4 @@ Release 2.0.1 (Aug 27, 2013)
     * fix buttons on Google Chrome on Windows (#217)
  * Fix upload and check-in on Internet Explorer 10 (#215)
  * Fix notification messages of the "create and attach" feature
+ * Home page: give focus to the search field 
