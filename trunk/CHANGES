@@ -1,11 +1,14 @@
-Release 2.0.1
-=============
+Release 2.0.1 (Aug 27, 2013)
+============================
 
  * Apache configuration files: allow access to public thumbnails
  * Document3D:
     * fix download of a decomposed STEP file
     * fix 3D view of published Document3D (add a missing JavaScript file)
+    * fix order of column headers in the decompose view
  * Navigate:
     * fix overlapping of fullscreen button and thumbnails list
     * disable fullscreen button if full screen is not supported, fix #216
     * fix buttons on Google Chrome on Windows (#217)
+ * Fix upload and check-in on Internet Explorer 10 (#215)
+ * Fix notification messages of the "create and attach" feature
