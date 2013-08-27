@@ -1,5 +1,5 @@
 <table class="Content">
-    {% for field in creation_form %} 
+    {% for field in creation_form.visible_fields %} 
         {% if field.name != "reference" and field.name != "name" and field.name != "revision" %} 
             <tr>
 
@@ -15,4 +15,7 @@
 
         {% endif %}
     {% endfor %} 
+    {% for field in creation_form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
 </table>
