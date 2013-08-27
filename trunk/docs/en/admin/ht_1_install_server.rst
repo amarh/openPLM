@@ -60,7 +60,7 @@ Get the tarball containing the code
 
 Extract the code in /var and rename the directory to django
 
-    * ``tar xzf openplm-2.0.tar.gz -C /var/``
+    * ``tar xzf openplm-2.0.1.tar.gz -C /var/``
     
     * ``mv /var/openplm /var/django``
     

@@ -42,7 +42,7 @@ Table of contents:
 
     resources
     glossary
-    whatsnew-2.0
+    whatsnew-2.1
     user/index
     admin/index
     devel/index
