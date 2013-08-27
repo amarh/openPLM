@@ -20,8 +20,10 @@ Ce tutoriel a été réalisé à l'aide des logiciels suivant :
     * Haystack 1.2.X
     * Xapian 1.2.X
     * Lepl 5.0
-    * South 0.7.3
- 
+    * South 0.7.6
+    * Markdown 2.2
+
+Il est également valide pour Debian Squeeze (Apache 2.2.16, PostgreSQL 8.4).
  
 .. note::
 
@@ -36,22 +38,8 @@ Installation des paquets nécessaires
 
 Pour commencer, il faut satisfaire quelques dépendances :
 
-    #. ``apt-get install swig build-essential pkg-config gettext``
-    #. ``apt-get install apache2 libapache2-mod-wsgi``
-    #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
-    #. ``pip install odfpy``
-    #. ``apt-get install graphviz graphviz-dev``
-    #. ``pip install 'pygraphviz>=1.1'``
-    #. ``apt-get install python-xapian rabbitmq-server``
-    #. ``apt-get install python-django python-docutils``
-    #. ``pip install 'south>=0.7'``
-    #. ``pip install celery``
-    #. ``pip install django-celery``
-    #. ``pip install 'django-haystack<2'``
-    #. ``apt-get install postgresql python-psycopg2``
-    #. ``pip install lepl``
-    #. ``apt-get install python-pisa``
-    #. ``apt-get install libgsf-bin``
+    #. ``apt-get install swig build-essential pkg-config gettext apache2 libapache2-mod-wsgi python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython graphviz graphviz-dev python-pygraphviz  python-xapian rabbitmq-server postgresql libpq-dev python-tz python-pisa libgsf-bin imagemagick python-pisa python-lxml``
+    #. ``pip install odfpy docutils celery django-celery 'django==1.5.2' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
 
 Les dépendances suivantes sont aussi nécessaires pour permettre la recherche
 textuelle dans les fichiers :
@@ -71,7 +59,7 @@ répertoire.
     
     * ``cd /var/django``
     
-    * ``svn co svn://openplm.org/openPLM``
+    * ``svn co http://svn.openplm.org/svn/openPLM/``
     
 Le répertoire ./openPLM est créé et le code source y est téléchargé.
     
@@ -144,6 +132,7 @@ On exécute ensuite les commandes suivantes :
     * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
+    * ``./manage.py loaddata extra_lifecycles`` pour charger des cycles de vie supplémentaires
     
     .. note::
         Vous devez créer un utilisateur superadmin pour Django, ainsi qu'un
@@ -161,7 +150,8 @@ Compilation des fichiers de traduction
 Exécuter les commandes suivantes :
     
     #. ``make``
-    #. ``./bin/translate_all.sh compile all``.
+    #. ``./bin/translate_all.sh compile all``
+
    
 Configuration du stockage des fichiers
 ======================================
@@ -169,6 +159,7 @@ Configuration du stockage des fichiers
 Création du répertoire où seront stocker les fichiers uploader : 
     
     * ``mkdir /var/openPLM``
+
     
 On ajuste les droits : 
     
@@ -176,8 +167,14 @@ On ajuste les droits :
      
 On ajuste aussi les droits pour le répertoire où sont stockés les aperçus : 
     
-    * ``chown www-data:www-data /var/django/openPLM/trunk/openPLM/media/thumbnails``
- 
+    * ``chown -R www-data:www-data /var/django/openPLM/trunk/openPLM/media/``
+
+Collecter les fichiers statiques
+==================================
+
+Lancer la commande ``./manage.py collectstatic``.
+Cela collecte les fichiers statiques(javascript, images, css) dans le répertoire:file:`static/`.
+
 .. _search-engine-svn:
 
 Configuration du moteur de recherche
@@ -234,28 +231,25 @@ Par exemple :
     * ``cp /var/django/openPLM/trunk/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
     * ``cp /var/django/openPLM/trunk/openPLM/etc/default/celeryd /etc/default/celeryd``
     * ``chmod +x /etc/init.d/celeryd``
-    * ``mkdir /var/log/celery``
-    * ``mkdir /var/run/celery``
-    * ``chown www-data:www-data /var/log/celery /var/run/celery``
+    * ``update-rc.d celeryd defaults``
+
 
 Pour lancer :command:`celeryd`, exécuter ``/etc/init.d/celeryd start``.
 
-
-Vérification des modules requis
+Configurer les hôtes autorisés
 ===============================
-    
-    * ``./bin/check_modules.py`` ::
-    
-        /usr/local/lib/python2.6/dist-packages/pyPdf-1.12-py2.6.egg/pyPdf/pdf.py:52: DeprecationWarning: the sets module is deprecated
-        from sets import ImmutableSet
-        All is ok
+
+Django 1.5 vérifie l'hôte avant de servir une requête.
+Vous devez éditer le paramètre  :django:setting:`ALLOWED_HOSTS`  pour
+que Django accepte de servir vos requêtes.
+
 
 Configuration du serveur Apache
 ===============================
 
-Éditer le fichier de configuration d'Apache (:file:`/etc/apache2/httpd.conf`) et ajouter les lignes suivantes :
+Éditer le fichier de configuration d'Apache (:file:`/etc/apache2/sites-available/openplm`) et ajouter les lignes suivantes (remplacez le nom du serveur):
     
-.. literalinclude:: apache/simple.conf
+.. literalinclude:: apache/simple_2.0.conf
     :language: apache
 
 
@@ -356,7 +350,7 @@ Toutes les connexion HTTP seront rediriger sur des connexions HTTPS.
 
 Une configuration possible de apache (avec les modules rewrite et ssl activés) :
 
-.. literalinclude:: apache/ssl.conf
+.. literalinclude:: apache/ssl_2.0.conf
     :language: apache
 
 
@@ -370,6 +364,14 @@ Vous pouvez vous référer à la `documentation Django <https://docs.djangoproje
 OpenPLM ajoute à celles-ci une variable `EMAIL_OPENPLM`, qui permet d'indiquer
 l'adresse mail spécifier dans le champ `de` (`from`) de chaque e-mail. Il
 s'agit habituellement d'une adresse en `no-reply@`.
+
+
+Désactivation du mode de debuggage
+==================================
+
+Une fois que le serveur est configuré et tourne convenablement,
+vous devez désactiver le mode de debuggage.
+Mettez le paramètre :const:`DEBUG` à ``False`` et redémarrer celery er apache.
 
 Dépannage
 =========
