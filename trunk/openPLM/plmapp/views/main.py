@@ -501,7 +501,8 @@ def create_object(request, from_registered_view=False, creation_form=None):
             if attach is not None:
                 try:
                     attach(ctrl)
-                    messages.info(request, _(u"Files has been attached"))
+                    message = _(u"The %(Object_type)s has been attached") % dict(Object_type = type_)
+                    messages.info(request, message)
                 except (ControllerError, ValueError) as e:
                     # crtl cannot be attached (maybe the state of the
                     # related object as changed)
