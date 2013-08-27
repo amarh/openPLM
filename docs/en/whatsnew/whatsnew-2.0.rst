@@ -334,6 +334,6 @@ Previous versions
 .. toctree::
     :maxdepth: 1
 
-    whatsnew/whatsnew-1.2
-    whatsnew/whatsnew-1.1
+    /whatsnew/whatsnew-1.2
+    /whatsnew/whatsnew-1.1
 
