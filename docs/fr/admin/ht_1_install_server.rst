@@ -5,8 +5,9 @@ Installation de OpenPLM serveur version 1.2
 Ce document décrit l'installation d'un serveur OpenPLM en version stable 1.1
 
 Versions précédentes:
-    
-    - `1.1 <http://wiki.openplm.org/docs/1.1/fr/admin/ht_1_install_server.html>`_
+
+    - `1.2 <http://wiki.openplm.org/docs/1.2/en/admin/ht_1_install_server.html>`_
+    - `1.1 <http://wiki.openplm.org/docs/1.1/en/admin/ht_1_install_server.html>`_
 
 
 
@@ -15,16 +16,18 @@ Prérequis
 
 Ce tutoriel a été réalisé à l'aide des logiciels suivant :
 
-    * Ubuntu 12.04 LTS server edition
-    * Apache Server version: Apache/2.2.22 (Ubuntu)
+    * Debian Wheezy
+    * Apache Server version: Apache/2.2.22 (from Debian)
     * PostgreSQL 9.1
-    * Python 2.7.3
-    * Django 1.3.1
-    * Celery 2.4.6
-    * Haystack 1.2.7
-    * Xapian 1.2.8
-    * Lepl 5.1.1
-    * South 0.7.3
+    * Python 2.6.X or 2.7.X
+    * Django 1.5.X
+    * Celery 3.0.X
+    * Haystack 1.2.X
+    * Xapian 1.2.X
+    * Lepl 5.0
+    * South 0.7.6
+    * Markdown 2.2
+
  
  
 .. note::
@@ -40,15 +43,8 @@ Installation des paquets nécessaires
 
 Pour commencer, il faut satisfaire quelques dépendances :
 
-    #. ``apt-get install swig build-essential pkg-config gettext``
-    #. ``apt-get install apache2 libapache2-mod-wsgi``
-    #. ``apt-get install python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython``
-    #. ``apt-get install graphviz graphviz-dev python-pygraphviz``
-    #. ``apt-get install python-xapian rabbitmq-server python-django python-docutils``
-    #. ``apt-get install python-django-celery python-django-south python-pisa``
-    #. ``apt-get install postgresql python-psycopg2``
-    #. ``apt-get install libgsf-bin``
-    #. ``pip install odfpy 'django-haystack<2' lepl``
+    #. ``apt-get install swig build-essential pkg-config gettext apache2 libapache2-mod-wsgi python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython graphviz graphviz-dev python-pygraphviz  python-xapian rabbitmq-server postgresql libpq-dev python-tz python-pisa libgsf-bin imagemagick python-pisa python-lxml``
+    #. ``pip install odfpy docutils celery django-celery 'django==1.5.2' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
 
 Les dépendances suivantes sont aussi nécessaires pour permettre la recherche
 textuelle dans les fichiers :
@@ -59,11 +55,12 @@ textuelle dans les fichiers :
 Récupération de l'archive contenant le code source
 ==================================================
 
-    * ``wget -O openplm-1.2.tar.gz http://wiki.openplm.org/trac/downloads/7``
+
+    * `Télécharger OpenPLM <http://wiki.openplm.org/trac/downloads/9>`_
 
 On extrait le code dans /var et l'on renomme le répertoire en django
 
-    * ``tar xzf openplm-1.2.tar.gz /var/``
+    * ``tar xzf openplm-2.0.1.tar.gz -C /var/``
     
     * ``mv /var/openplm /var/django``
     
@@ -96,7 +93,7 @@ Ou alors vous pouvez éditer les fichers à la main :
                 "/var/django/openPLM/templates",
             )
 
-   * ``apache/django.wsgi`` changer les trois **sys.path.append**
+   * ``apache/*.wsgi`` changer les trois **sys.path.append**
 
         .. code-block:: python
 
@@ -184,7 +181,7 @@ On exécute ensuite les commandes suivantes :
 
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
-    * ``./manage.py loaddada extra_lifecycles``  
+    * ``./manage.py loaddata extra_lifecycles``  
     
     .. note::
         Vous devez créer un utilisateur superadmin pour Django, ainsi qu'un
@@ -208,7 +205,7 @@ On ajuste les droits :
      
 On ajuste aussi les droits pour le répertoire où sont stockés les aperçus : 
     
-    * ``chown www-data:www-data /var/django/openPLM/media/thumbnails``
+    * ``chown -R www-data:www-data /var/django/openPLM/trunk/openPLM/media/``
  
 .. _search-engine:
 
@@ -266,31 +263,32 @@ Par exemple :
     * ``cp /var/django/openPLM/etc/init.d/celeryd /etc/init.d/celeryd``
     * ``cp /var/django/openPLM/etc/default/celeryd /etc/default/celeryd``
     * ``chmod +x /etc/init.d/celeryd``
-    * ``mkdir /var/{log,run}/celery``
-    * ``chown www-data:www-data /var/{log,run}/celery``
+    * ``update-rc.d celeryd defaults``
 
 Pour lancer :command:`celeryd`, exécuter ``/etc/init.d/celeryd start``.
 
 
-Vérification des modules requis
+Configurer les hôtes autorisés
 ===============================
-    
-    * ``./bin/check_modules.py`` ::
-    
-        All is ok
+
+Django 1.5 vérifie l'hôte avant de servir une requête.
+Vous devez éditer le paramètre  :django:setting:`ALLOWED_HOSTS`  pour
+que Django accepte de servir vos requêtes.
+
 
 Configuration du serveur Apache
 ===============================
 
-Éditer le fichier de configuration d'Apache (:file:`/etc/apache2/httpd.conf`) et ajouter les lignes suivantes :
+Éditer le fichier de configuration d'Apache (:file:`/etc/apache2/sites-available/openplm`) et ajouter les lignes suivantes (remplacez le nom du serveur):
     
-.. literalinclude:: apache/simple_1.1.conf
+.. literalinclude:: apache/simple_2.0b.conf
     :language: apache
 
 
 Redémarrage du serveur Apache
 =============================
 
+    * ``a2ensite openplm``
     * ``service apache2 restart``
 
 Premiers pas sur OpenPLM
@@ -385,7 +383,7 @@ Toutes les connexion HTTP seront rediriger sur des connexions HTTPS.
 
 Une configuration possible de apache (avec les modules rewrite et ssl activés) :
 
-.. literalinclude:: apache/ssl_1.1.conf
+.. literalinclude:: apache/ssl_2.0b.conf
     :language: apache
 
 
@@ -400,20 +398,19 @@ OpenPLM ajoute à celles-ci une variable `EMAIL_OPENPLM`, qui permet d'indiquer
 l'adresse mail spécifier dans le champ `de` (`from`) de chaque e-mail. Il
 s'agit habituellement d'une adresse en `no-reply@`.
 
+
+Désactivation du mode de debuggage
+==================================
+
+Une fois que le serveur est configuré et tourne convenablement,
+vous devez désactiver le mode de debuggage.
+Mettez le paramètre :const:`DEBUG` à ``False`` et redémarrer celery er apache.
+
 Dépannage
 =========
 
 .. contents::
     :local:
-
-Les pages d'administrations sont moches
----------------------------------------
-
-openPLM utilise un lien symbolique (:file:`/path/to/openPLM/media/admin`) qui peut être erroné sur votre système.
-
-La commande suivante le corrigera :
-``ln -s `python -c 'import django; print django.__path__[0]'`/contrib/admin/media
-/var/django/openPLM/media/admin``
 
 
 Connexion refusée

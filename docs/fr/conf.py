@@ -51,7 +51,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
               'sphinx.ext.coverage', 'sphinx.ext.pngmath',
               'sphinx.ext.autosummary', 'sphinx.ext.inheritance_diagram',
               'sphinx.ext.viewcode', 'sphinx.ext.extlinks',
-              'sphinx.ext.graphviz',]
+              'sphinx.ext.graphviz', 'djangodocs']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
