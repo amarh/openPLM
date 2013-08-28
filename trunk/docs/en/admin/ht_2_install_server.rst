@@ -17,12 +17,12 @@ Requirements
 
 This HowTo is based on:
 
-    * Debian Wheezy
-    * Apache Server version: Apache/2.2.22 (from Debian)
-    * PostgreSQL 9.1
-    * Python 2.6.X or 2.7.X
-    * Django 1.5.X
-    * Celery 3.0.X
+    * Debian Squeeze
+    * Apache Server version: Apache/2.2.16
+    * PostgreSQL 8.4.4
+    * Python 2.6.X
+    * Django 1.2.X
+    * Celery 2.3.X
     * Haystack 1.2.X
     * Xapian 1.2.X
     * Lepl 5.0
@@ -134,7 +134,7 @@ Then execute the following commands:
     * ``cd /var/django/openPLM/trunk/openPLM/``
     * ``./manage.py syncdb --all``
     * ``./manage.py migrate --all --fake``
-    * ``./manage.py loaddata extra_lifecycles`` to load optional lifecycles
+    * ``./manage.py loaddata extra_lifecycles template_lifecycles`` to load optional lifecycles
     
     .. note::
         You have to create the superadmin user for Django and a special user named 'company'.

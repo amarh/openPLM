@@ -16,7 +16,7 @@ from django.utils.functional import memoize
 from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.utils import memoize_noarg
 
-
+from .lifecycle import Lifecycle
 from .plmobject import (PLMObject, get_all_subclasses,
         get_all_subclasses_with_level)
 
@@ -244,6 +244,9 @@ class Document(PLMObject):
 
     ACCEPT_FILES = True
 
+    template = models.ForeignKey('self', related_name='tpl_instances',
+            null=True, default=None, editable=False)
+
     @property
     def files(self):
         "Queryset of all non deprecated :class:`.DocumentFile` linked to self"
@@ -312,6 +315,10 @@ class Document(PLMObject):
         if cls == Document:
             return 10
         return 0
+
+    @property
+    def is_template(self):
+        return self.lifecycle.type == Lifecycle.TEMPLATE
 
 
 @memoize_noarg

@@ -12,12 +12,12 @@ from openPLM.plmapp.utils import memoize_noarg
 class State(models.Model):
     u"""
     State : object which represents a state in a lifecycle
-    
+
     .. attribute:: name
 
         name of the state, must be unique
     """
-    
+
     class Meta:
         app_label = "plmapp"
 
@@ -29,7 +29,7 @@ class State(models.Model):
 class Lifecycle(models.Model):
     u"""
     Lifecycle : object which represents a lifecycle
-    
+
     .. attribute:: name
 
         name of the lifecycle, must be unique
@@ -46,15 +46,16 @@ class Lifecycle(models.Model):
         A class that simplifies the usage of a LifeCycle
 
     """
-    
+
     class Meta:
         app_label = "plmapp"
 
-    STANDARD, CANCELLED, ECR = (1, 2, 3)
+    STANDARD, CANCELLED, ECR, TEMPLATE = (1, 2, 3, 4)
     TYPES = (
         (STANDARD, "standard"),
         (CANCELLED, "cancelled"),
         (ECR, "ECR"),
+        (TEMPLATE, "template"),
     )
 
     name = models.CharField(max_length=50, primary_key=True)
@@ -88,7 +89,7 @@ class Lifecycle(models.Model):
         if self._first_state is None:
             self._first_state = self.lifecyclestates_set.order_by('rank')[0].state
         return self._first_state
-    
+
     @property
     def last_state(self):
         if self._last_state is None:
@@ -109,12 +110,12 @@ class Lifecycle(models.Model):
         u"""
         Builds a Lifecycle from *cycle*. The built object is save in the database.
         This function creates states which were not in the database
-        
+
         :param cycle: the cycle used to build the :class:`.Lifecycle`
         :type cycle: :class:`~plmapp.lifecycle.LifecycleList`
         :return: a :class:`.Lifecycle`
         """
-        
+
         lifecycle = cls(name=cycle.name,
             official_state=State.objects.get_or_create(name=cycle.official_state)[0])
         if cycle.official_state == cycle[-1]:
@@ -125,18 +126,18 @@ class Lifecycle(models.Model):
             lcs = LifecycleStates(lifecycle=lifecycle, state=state, rank=i)
             lcs.save()
         return lifecycle
-                
+
 class LifecycleStates(models.Model):
     u"""
     A LifecycleStates links a :class:`.Lifecycle` and a :class:`.State`.
-    
+
     The link is made with a field *rank* to order the states.
     """
     lifecycle = models.ForeignKey(Lifecycle)
     state = models.ForeignKey(State)
     rank = models.PositiveSmallIntegerField()
 
-    
+
     class Meta:
         app_label = "plmapp"
         unique_together = (('lifecycle', 'state'),)
