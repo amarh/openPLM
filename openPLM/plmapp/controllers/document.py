@@ -79,11 +79,18 @@ class DocumentController(PLMObjectController):
             for pf in private_files:
                 doc_file = models.DocumentFile.objects.create(filename=pf.filename, size=pf.size,
                     file=pf.file.path, document=obj.object)
-                obj.handle_added_file(doc_file)
                 generate_thumbnail.delay(doc_file.id)
                 # django < 1.2.5 deletes the file when pf is deleted
                 pf.file = ""
                 pf.delete()
+            template = form.cleaned_data["template"]
+            if not private_files and template:
+                if template.type == obj.type and template.is_official:
+                    obj.copy_files(template)
+                else:
+                    raise ValueError("invalid template")
+            for df in obj.files:
+                obj.handle_added_file(df)
         return obj
 
     def has_standard_related_locked(self, new_filename):
@@ -409,15 +416,13 @@ class DocumentController(PLMObjectController):
         else:
             return models.Part.objects.none()
 
-    def revise(self, new_revision, selected_parts=(), **kwargs):
-        # same as PLMObjectController + duplicate files (and their thumbnails)
-        rev = super(DocumentController, self).revise(new_revision, **kwargs)
-        for doc_file in self.object.files.all():
+    def copy_files(self, src):
+        for doc_file in src.files.all():
             filename = doc_file.filename
             path = models.docfs.get_available_name(filename.encode("utf-8"))
             shutil.copy(doc_file.file.path, models.docfs.path(path))
             new_doc = models.DocumentFile.objects.create(file=path,
-                filename=filename, size=doc_file.size, document=rev.object)
+                filename=filename, size=doc_file.size, document=self.object)
             os.chmod(new_doc.file.path, 0400)
             new_doc.thumbnail = doc_file.thumbnail
             if doc_file.thumbnail:
@@ -430,6 +435,11 @@ class DocumentController(PLMObjectController):
             new_doc.locked = False
             new_doc.locker = None
             new_doc.save()
+
+    def revise(self, new_revision, selected_parts=(), **kwargs):
+        # same as PLMObjectController + duplicate files (and their thumbnails)
+        rev = super(DocumentController, self).revise(new_revision, **kwargs)
+        rev.copy_files(self)
         # attach the given parts
         for part in selected_parts:
             rev.documentpartlink_document.create(part=part)
@@ -590,24 +600,7 @@ class DocumentController(PLMObjectController):
         :param parts: list of :class:`.Part` selected to be attached to the new document
         """
         new_ctrl = super(DocumentController, self).clone(form, user, block_mails, no_index)
-
-        for doc_file in self.object.files.all():
-            filename = doc_file.filename
-            path = models.docfs.get_available_name(filename.encode("utf-8"))
-            shutil.copy(doc_file.file.path, models.docfs.path(path))
-            new_doc = models.DocumentFile.objects.create(file=path,
-                filename=filename, size=doc_file.size, document=new_ctrl.object)
-            new_doc.thumbnail = doc_file.thumbnail
-            if doc_file.thumbnail:
-                ext = os.path.splitext(doc_file.thumbnail.path)[1]
-                thumb = "%d%s" %(new_doc.id, ext)
-                dirname = os.path.dirname(doc_file.thumbnail.path)
-                thumb_path = os.path.join(dirname, thumb)
-                shutil.copy(doc_file.thumbnail.path, thumb_path)
-                new_doc.thumbnail = os.path.basename(thumb_path)
-            new_doc.locked = False
-            new_doc.locker = None
-            new_doc.save()
+        new_ctrl.copy_files(self)
 
         if parts :
             # attach the given parts

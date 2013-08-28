@@ -272,6 +272,7 @@ class UserViewTestCase(CommonViewTest):
         self.assertEquals(name, cform.initial["name"])
         form = lxml.html.fromstring(response.content).xpath("//form[@id='creation_form']")[0]
         data = dict(form.fields)
+        data["template"] = ""
         r2 = self.post(url, data)
         obj = r2.context["obj"]
         self.assertEquals(name, obj.name)

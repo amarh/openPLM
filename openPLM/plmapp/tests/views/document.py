@@ -24,6 +24,7 @@
 
 
 from django.contrib import messages
+from django.forms import HiddenInput
 
 from openPLM.plmapp import forms
 import openPLM.plmapp.models as m
@@ -35,6 +36,7 @@ class DocumentViewTestCase(ViewTest):
 
     TYPE = "Document"
     CONTROLLER = DocumentController
+    fixtures = ["template_lifecycles.json"]
 
     def get_part(self, ref="P1"):
         return PartController.create(ref, "Part", "a", self.user,
@@ -551,6 +553,80 @@ class DocumentViewTestCase(ViewTest):
         self.assertEqual(self.user, obj.creator)
         self.assertFalse(m.DocumentPartLink.current_objects.filter(
             document=obj, part=part.id).exists())
+
+    def test_create_from_template_get(self):
+        # create templates
+        data = self.DATA.copy()
+        data["lifecycle"] = m.Lifecycle.objects.get(name="Template")
+        template = self.CONTROLLER.create('TPL_1', 'Document', 'a', self.user, data, True, True)
+        template.add_file(self.get_file("data.test", "plop"))
+        template.promote(checked=True)
+        self.CONTROLLER.create('TPL_2', 'Document', 'a', self.user, data, True, True)
+
+        # only the official template is suggested
+        response = self.get("/object/create/", {"type": "Document"})
+        form = response.context["creation_form"]
+        template_field = form.fields["template"]
+        self.assertEqual([template.object], list(template_field.queryset))
+
+        # Other document type: template field is hidden
+        response = self.get("/object/create/", {"type": "OfficeDocument"})
+        form = response.context["creation_form"]
+        template_field = form.fields["template"]
+        self.assertFalse(template_field.queryset.exists())
+        self.assertTrue(isinstance(template_field.widget, HiddenInput))
+
+        # create another template, but with a different type
+        template2 = self.CONTROLLER.create('TPL_2', 'OfficeDocument', 'a', self.user, data, True, True)
+        template2.add_file(self.get_file("data.test", "plop"))
+        template2.promote(checked=True)
+
+        response = self.get("/object/create/", {"type": "Document"})
+        form = response.context["creation_form"]
+        template_field = form.fields["template"]
+        self.assertEqual([template.object], list(template_field.queryset))
+
+        response = self.get("/object/create/", {"type": "OfficeDocument"})
+        form = response.context["creation_form"]
+        template_field = form.fields["template"]
+        self.assertEqual([template2.object.document], list(template_field.queryset))
+
+        # simulate an upload & create
+        response = self.get("/object/create/", {"type": "Document", "pfiles":1})
+        form = response.context["creation_form"]
+        template_field = form.fields["template"]
+        self.assertTrue(isinstance(template_field.widget, HiddenInput))
+
+    def test_create_from_template_post(self):
+        data = self.DATA.copy()
+        data["lifecycle"] = m.Lifecycle.objects.get(name="Template")
+        template = self.CONTROLLER.create('TPL_1', 'Document', 'a', self.user, data, True, True)
+        template.add_file(self.get_file("data.test", "plop"))
+        template.promote(checked=True)
+
+        data = self.DATA.copy()
+        data.update({
+                "type" : self.TYPE,
+                "reference" : "doc2",
+                "auto" : False,
+                "revision" : "a",
+                "name" : "Docc",
+                "group" : str(self.group.id),
+                "lifecycle" : m.get_default_lifecycle().pk,
+                "state" : m.get_default_state().pk,
+                "template": str(template.id),
+                })
+        response = self.post("/object/create/", data)
+        obj = m.Document.objects.get(type=self.TYPE, reference="doc2", revision="a")
+        self.assertEqual(obj, response.context["obj"].object)
+        self.assertEqual("Docc", obj.name)
+        self.assertEqual(self.user, obj.owner)
+        self.assertEqual(self.user, obj.creator)
+        df, = obj.files
+        self.assertEqual("data.test", df.filename)
+        self.assertEqual("plop", open(df.file.path).read())
+        self.assertNotEqual(template.files[0].id, df.id)
+        self.assertEqual(template.object, obj.template)
 
 
 class SpecialCharactersDocumentViewTestCase(DocumentViewTestCase):

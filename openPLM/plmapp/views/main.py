@@ -478,7 +478,8 @@ def create_object(request, from_registered_view=False, creation_form=None):
         return r2r('create.html', ctx, request)
 
     if request.method == 'GET' and creation_form is None:
-        creation_form = forms.get_creation_form(request.user, cls)
+        creation_form = forms.get_creation_form(request.user, cls,
+             template="pfiles" not in request.GET)
         if related is not None:
             creation_form.fields["group"].initial = related.group
             creation_form.initial["lifecycle"] = related.lifecycle

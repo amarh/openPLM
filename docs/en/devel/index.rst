@@ -29,3 +29,4 @@ If you are a core developper, you may want to read:
     publication
     richtext
     testing
+    doctemplate

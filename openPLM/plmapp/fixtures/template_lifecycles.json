@@ -1,0 +1,39 @@
+[
+    {
+        "pk": "Template", 
+        "model": "plmapp.lifecycle", 
+        "fields": {
+            "official_state":"official",
+            "type" : 4
+        }
+    },
+
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "draft", 
+            "lifecycle": "Template", 
+            "rank": 0
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "official", 
+            "lifecycle": "Template", 
+            "rank": 1
+        }
+    },
+    {
+        "pk": null, 
+        "model": "plmapp.lifecyclestates", 
+        "fields": {
+            "state": "deprecated", 
+            "lifecycle": "Template", 
+            "rank": 2
+        }
+    }
+     
+]

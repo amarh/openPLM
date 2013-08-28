@@ -73,6 +73,7 @@ def ajax_creation_form(request):
         if view is not None:
             return {"reload" : True}
         initial = dict(request.GET.iteritems())
+        initial.pop("template", None)
         if "pfiles" in request.GET:
             initial["pfiles"] = request.GET.getlist("pfiles")
         if "reference" in initial:

@@ -130,6 +130,7 @@ class CreationForm(forms.ModelForm):
     def __init__(self, user, start, inbulk_cache, *args, **kwargs):
         self.start = start
         self.inbulk_cache = inbulk_cache
+        kwargs.pop("template", False)
         super(CreationForm, self).__init__(*args, **kwargs)
 
 
@@ -194,7 +195,7 @@ class PLMObjectCreationForm(forms.ModelForm):
         field = self.fields["lifecycle"]
         field.cache_choices = inbulk_cache is not None
         if inbulk_cache is None or "lifecycles" not in inbulk_cache:
-            lifecycles = m.Lifecycle.objects.filter(type=m.Lifecycle.STANDARD).\
+            lifecycles = m.Lifecycle.objects.filter(type__in=(m.Lifecycle.STANDARD, m.Lifecycle.TEMPLATE)).\
                     exclude(pk=m.get_cancelled_lifecycle().pk).order_by("name")
             self.fields["lifecycle"].queryset = lifecycles
             if inbulk_cache is not None:
@@ -233,15 +234,33 @@ class PrivateFileChoiceField(forms.ModelMultipleChoiceField):
         return obj.filename
 
 
+class TemplateChoiceField(forms.ModelChoiceField):
+
+    def label_from_instance(self, obj):
+        return u"{0.name} ({0.type}/{0.reference}/{0.revision})".format(obj)
+
+
 class Document2CreationForm(PLMObjectCreationForm):
 
+    template = TemplateChoiceField(label=_("Template"), required=False,
+            queryset=m.Document.objects.officials().filter(lifecycle__type=m.Lifecycle.TEMPLATE))
     pfiles = PrivateFileChoiceField(queryset=m.PrivateFile.objects.none(),
             required=False, widget=forms.MultipleHiddenInput())
 
     def __init__(self, user, start, inbulk_cache, *args, **kwargs):
+        data = kwargs.get("data", {})
+        initial = kwargs.get("initial")
+        template_disabled = not kwargs.pop("template", True)
         super(Document2CreationForm, self).__init__(user, start, inbulk_cache,
             *args, **kwargs)
         self.fields["pfiles"].queryset = user.files.all().order_by("filename")
+        qs = self.fields["template"].queryset.filter(type=self.Meta.model.__name__)
+        self.fields["template"].queryset = qs
+        # hides the template field if the queryset is empty or if the creation
+        # follows an upload
+        pfiles = (data and "pfiles" in data) or (initial and "pfiles" in initial)
+        if template_disabled or pfiles or not qs.exists():
+            self.fields["template"].widget = forms.HiddenInput()
 
 
 def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=None, **kwargs):
@@ -269,6 +288,7 @@ def get_creation_form(user, cls=m.PLMObject, data=None, start=0, inbulk_cache=No
         if issubclass(cls, m.PLMObject):
             if issubclass(cls, m.Document) and cls.ACCEPT_FILES:
                 base_form = Document2CreationForm
+                fields.insert(0, "template")
             else:
                 base_form = PLMObjectCreationForm
             fields.insert(fields.index("reference") + 1, "auto")
