@@ -125,6 +125,21 @@
                         {% endif %}
 
                     {% endblock %}
+
+                    {% if plmobjects and not restricted %}
+                        <div>
+                            <h3 class="hplm alternate collapsed" data-toggle="collapse" data-target="#br-templates"> 
+                                <span class="expander"></span>{% trans "Templates" %} </h3> 
+                        </div>
+                        <ul id="br-templates" class="tb-collapse">
+                            <li {% if template == "1"%}class="selected"{% endif %} >
+                            <a href="{% add_get template='1' %}"><span>{% trans "Templates" %}</span></a>
+                            </li>
+                            <li {% if template != "1"%}class="selected"{% endif %} >
+                            <a href="{% add_get template='0' %}"><span>{% trans "Any" %}</span></a>
+                            </li>
+                        </ul>
+                    {% endif %}
                 </div>
             {% endblock %}
             {% block browse-results %}

@@ -788,6 +788,9 @@ def browse(request, type="object"):
             elif state != "all":
                 object_list = object_list.filter(state=state)
             ctx["states"] = models.State.objects.order_by("name").values_list("name", flat=True)
+            ctx["template"] = request.GET.get("template", "0")
+            if ctx["template"] == "1":
+                object_list = object_list.filter(lifecycle__type=models.Lifecycle.TEMPLATE)
 
         # date filters
         model = object_list.model
