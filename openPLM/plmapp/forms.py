@@ -130,11 +130,12 @@ class CreationForm(forms.ModelForm):
     def __init__(self, user, start, inbulk_cache, *args, **kwargs):
         self.start = start
         self.inbulk_cache = inbulk_cache
+        self.user = user
         kwargs.pop("template", False)
         super(CreationForm, self).__init__(*args, **kwargs)
 
 
-class PLMObjectCreationForm(forms.ModelForm):
+class PLMObjectCreationForm(CreationForm):
 
     auto = BooleanField(required=False, initial=True,
             help_text=_("Checking this box, you allow OpenPLM to set the reference of the object."))
@@ -148,10 +149,7 @@ class PLMObjectCreationForm(forms.ModelForm):
             initial = get_initial_creation_data(user, self.Meta.model, start, inbulk_cache)
             initial.update(kwargs.pop("initial", {}))
             kwargs["initial"] = initial
-        self.start = start
-        self.inbulk_cache = inbulk_cache
-        self.user = user
-        super(PLMObjectCreationForm, self).__init__(*args, **kwargs)
+        super(PLMObjectCreationForm, self).__init__(user, start, inbulk_cache, *args, **kwargs)
         # lifecycles and groups are cached if inbulk_cache is a dictionary
         # this is an optimization if several creation forms are displayed
         # in one request
