@@ -29,7 +29,26 @@ global_settings.BROKER_BACKEND = "memory"
 global_settings.DOCUMENTS_DIR = "/tmp"
 global_settings.THUMBNAILS_DIR = "/tmp"
 global_settings.THUMBNAILS_URL = "/media/thumbnails/"
+global_settings.DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.dummy', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
+        'NAME': 'database_tests.db',               # Or path to database file if using sqlite3.
+    }
+}
+
 settings.configure()
+# Django 1.5 introduces a NewBase class between Model and object
+# (this is done by six.with_metaclass)
+# we set base.NewBase so that it can be handled by inheritance_diagram
+import django.db.models.base as b
+class NewBase(object):
+    pass
+b.NewBase = b.Model.__base__
+# default QuerySet.__repr__ executes a database query
+def safe_repr(self):
+    return "QuerySet<{0}>".format(type(self.model))
+from django.db.models.query import QuerySet
+QuerySet.__repr__ = safe_repr
 
 from openPLM import get_version
 
