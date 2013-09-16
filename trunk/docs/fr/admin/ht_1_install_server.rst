@@ -44,7 +44,7 @@ Installation des paquets nécessaires
 Pour commencer, il faut satisfaire quelques dépendances :
 
     #. ``apt-get install swig build-essential pkg-config gettext apache2 libapache2-mod-wsgi python-pip python-dev python-imaging python-kjbuckets python-pypdf ipython graphviz graphviz-dev python-pygraphviz  python-xapian rabbitmq-server postgresql libpq-dev python-tz python-pisa libgsf-bin imagemagick python-pisa python-lxml``
-    #. ``pip install odfpy docutils celery django-celery 'django==1.5.2' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
+    #. ``pip install odfpy docutils celery django-celery 'django==1.5.4' 'south==0.7.6' psycopg2  'django-haystack<2' librabbitmq markdown lepl`` 
 
 Les dépendances suivantes sont aussi nécessaires pour permettre la recherche
 textuelle dans les fichiers :
