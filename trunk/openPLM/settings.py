@@ -1,7 +1,7 @@
 #-!- coding:utf-8 -!-
 # Django settings for openPLM project.
 # settings that you may have to modify are marked with a #XYZ: comment
-
+# File for django settings
 
 import sys
 import os.path
