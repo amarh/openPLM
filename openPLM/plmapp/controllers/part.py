@@ -21,18 +21,14 @@
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
-
-"""
-"""
 import difflib
-from itertools import imap, izip_longest, groupby
+#from itertools import imap, izip_longest, groupby
 from operator import attrgetter, itemgetter
 from collections import namedtuple, defaultdict
-
+from itertools import zip_longest, groupby
 from django.db import transaction
 from django.db.models.query import Q
 from django.utils import timezone
-
 import openPLM.plmapp.models as models
 from openPLM.plmapp.utils.units import DEFAULT_UNIT
 from openPLM.plmapp.controllers.plmobject import PLMObjectController
@@ -44,12 +40,11 @@ from openPLM.plmapp.utils import level_to_sign_str
 
 Child = namedtuple("Child", "level link")
 Parent = namedtuple("Parent", "level link")
-
 def unique_justseen(iterable, key=None):
     "List unique elements, preserving order. Remember only the element just seen."
     # unique_justseen('AAAABBBCCDAABBB') --> A B C D A B
     # unique_justseen('ABBCcAD', str.lower) --> A B C A D
-    return imap(next, imap(itemgetter(1), groupby(iterable, key)))
+    return map(next, map(itemgetter(1), groupby(iterable, key)))
 
 def flatten_bom(data):
     flatten = []
@@ -181,7 +176,7 @@ class PartController(PLMObjectController):
         try:
             self.check_add_child(child)
             can_add = True
-        except StandardError:
+        except Exception:
             pass
         return can_add
 
@@ -689,7 +684,8 @@ class PartController(PLMObjectController):
         s1 = flatten_bom(bom1)
         s2 = flatten_bom(bom2)
         matcher = difflib.SequenceMatcher(None, s1, s2)
-        diff = ((tag, izip_longest(s1[i1:i2], s2[j1:j2]))
+        
+        diff = ((tag, zip_longest(s1[i1:i2], s2[j1:j2]))
             for tag, i1, i2, j1, j2 in matcher.get_opcodes())
         ctx = {
                 "diff" : diff,
@@ -968,7 +964,7 @@ class PartController(PLMObjectController):
         try:
             self.check_attach_document(document)
             can_attach = True
-        except StandardError:
+        except Exception:
             pass
         return can_attach
 
@@ -980,7 +976,7 @@ class PartController(PLMObjectController):
         try:
             self.check_attach_document(document, True)
             can_detach = True
-        except StandardError:
+        except Exception:
             pass
         return can_detach
 
@@ -1233,7 +1229,8 @@ class PartController(PLMObjectController):
             self.end_alternate()
         return r
 
-    @transaction.commit_on_success
+    @transaction.atomic 
+    #@transaction.commit_on_success
     def promote_assembly(self):
         # FIXME Inefficient version
         # FIXME does not check if alternates part are promoted

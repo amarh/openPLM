@@ -125,8 +125,8 @@ from openPLM.plmapp.models.history import *
 from openPLM.plmapp.models.link import *
 
 # monkey patch Comment models to select related fields
-from django.contrib.comments.models import Comment
-from django.contrib.comments.managers import CommentManager
+from django_comments.models import Comment
+from django_comments.managers import CommentManager
 
 class CommentManager(CommentManager):
     def get_query_set(self):
@@ -165,9 +165,9 @@ def import_models(force_reload=False):
                 import_name = import_name.replace("..", ".")
                 try:
                     __import__(import_name, globals(), locals(), [], -1)
-                except ImportError, exc:
-                    print "Exception in import_models", module_name, exc
-                except StandardError, exc:
-                    print "Exception in import_models", module_name, type(exc), exc
+                except ImportError as exc:
+                    print ("Exception in import_models", module_name, exc)
+                except StandardError as  exc:
+                    print ("Exception in import_models", module_name, type(exc), exc)
 import_models()
 

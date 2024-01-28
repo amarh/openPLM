@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import F
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
 from openPLM.plmapp.utils import memoize_noarg
 
 from .plmobject import (PLMObject, get_all_subclasses,
@@ -108,8 +108,8 @@ class Part(AbstractPart, PLMObject):
     @property
     def menu_items(self):
         items = list(super(Part, self).menu_items)
-        items.extend([ugettext_noop("BOM-child"), ugettext_noop("parents"),
-                      ugettext_noop("alternates"), ugettext_noop("doc-cad")])
+        items.extend([gettext_noop("BOM-child"), gettext_noop("parents"),
+                      gettext_noop("alternates"), gettext_noop("doc-cad")])
         return items
 
     def is_promotable(self):
@@ -183,7 +183,7 @@ class Part(AbstractPart, PLMObject):
 
 @memoize_noarg
 def get_all_parts():
-    u"""
+    """
     Returns a dict<part_name, part_class> of all available :class:`.Part` classes
     """
     res = {}

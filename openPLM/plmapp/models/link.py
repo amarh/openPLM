@@ -1,7 +1,7 @@
 from django.utils import timezone
-import kjbuckets
+#import kjbuckets
 
-
+import networkx as nx
 from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from django.db.models.query import QuerySet
@@ -107,7 +107,7 @@ class Link(models.Model):
     """
 
     ctime = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
+    end_time = models.DateTimeField(blank=True, null=True, default=None)
 
     objects = LinkManager()
     current_objects = CurrentLinkManager()
@@ -185,12 +185,12 @@ class ParentChildLink(Link):
 
     ACTION_NAME = "Link : parent-child"
 
-    parent = models.ForeignKey(Part, related_name="%(class)s_parent")
-    child = models.ForeignKey(Part, related_name="%(class)s_child")
-    quantity = models.FloatField(default=lambda: 1)
+    parent = models.ForeignKey(Part, related_name="%(class)s_parent",on_delete=models.CASCADE)
+    child = models.ForeignKey(Part, related_name="%(class)s_child",on_delete=models.CASCADE)
+    quantity = models.FloatField(default=1)
     unit = models.CharField(max_length=4, choices=UNITS,
-            default=lambda: DEFAULT_UNIT)
-    order = models.PositiveSmallIntegerField(default=lambda: 1)
+            default=DEFAULT_UNIT)
+    order = models.PositiveSmallIntegerField(default=1)
 
     class Meta:
         app_label = "plmapp"
@@ -329,7 +329,7 @@ class ParentChildLinkExtension(ParentModel):
         app_label = "plmapp"
 
     #! link bound to the PCLE
-    link = models.ForeignKey(ParentChildLink, related_name="%(class)s_link")
+    link = models.ForeignKey(ParentChildLink, related_name="%(class)s_link",on_delete=models.CASCADE)
 
     objects = models.Manager()
     children = ChildManager()
@@ -442,8 +442,8 @@ class RevisionLink(Link):
         unique_together = ("old", "new", "end_time")
 
     ACTION_NAME = "Link : revision"
-    old = models.ForeignKey(PLMObject, related_name="%(class)s_old")
-    new = models.ForeignKey(PLMObject, related_name="%(class)s_new")
+    old = models.ForeignKey(PLMObject, related_name="%(class)s_old",on_delete=models.CASCADE)
+    new = models.ForeignKey(PLMObject, related_name="%(class)s_new",on_delete=models.CASCADE)
 
     def __unicode__(self):
         return u"RevisionLink<%s, %s>" % (self.old, self.new)
@@ -463,8 +463,8 @@ class DocumentPartLink(Link):
 
     ACTION_NAME = "Link : document-part"
 
-    document = models.ForeignKey(Document, related_name="%(class)s_document")
-    part = models.ForeignKey(Part, related_name="%(class)s_part")
+    document = models.ForeignKey(Document, related_name="%(class)s_document",on_delete=models.CASCADE)
+    part = models.ForeignKey(Part,related_name="%(class)s_part",on_delete=models.CASCADE)
 
     class Meta:
         app_label = "plmapp"
@@ -486,6 +486,7 @@ for i in range(10):
 ROLE_READER = "reader"
 ROLES.append(ROLE_READER)
 
+
 class DelegationLink(Link):
     """
     Link between two :class:`~.django.contrib.auth.models.User` to delegate
@@ -505,10 +506,9 @@ class DelegationLink(Link):
 
     ACTION_NAME = "Link : delegation"
 
-    delegator = models.ForeignKey(User, related_name="%(class)s_delegator")
-    delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee")
-    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
-            db_index=True)
+    delegator = models.ForeignKey(User, related_name="%(class)s_delegator",on_delete=models.CASCADE)
+    delegatee = models.ForeignKey(User, related_name="%(class)s_delegatee",on_delete=models.CASCADE)
+    role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),db_index=True)
 
     class Meta:
         app_label = "plmapp"
@@ -518,15 +518,35 @@ class DelegationLink(Link):
         return u"DelegationLink<%s, %s, %s>" % (self.delegator, self.delegatee,
                                                 self.role)
 
+    
     @classmethod
     def get_delegators(cls, user, role):
         """
+        Returns the list of user's id of the delegators of *user* for the role *role*.
+        """
+        # Get the links (delegatee, delegator) for the specified role
+        links = cls.current_objects.filter(role=role).values_list("delegatee", "delegator")
+
+        # Create a directed graph
+        gr = nx.DiGraph()
+
+        # Add edges to the graph
+        gr.add_edges_from(links)
+
+        # Find reachable nodes from the user's ID
+        reachable_nodes = nx.descendants(gr, user.id)
+
+        # Return the list of reachable nodes (delegators)
+        return list(reachable_nodes)
+
+        """   def get_delegators(cls, user, role):
+    
         Returns the list of user's id of the delegators of *user* for the role
         *role*.
-        """
+        
         links = cls.current_objects.filter(role=role).values_list("delegatee", "delegator")
         gr = kjbuckets.kjGraph(tuple(links))
-        return gr.reachable(user.id).items()
+        return gr.reachable(user.id).items()"""
 
 
 class PLMObjectUserLink(Link):
@@ -548,8 +568,8 @@ class PLMObjectUserLink(Link):
 
     ACTION_NAME = "Link : PLMObject-user"
 
-    plmobject = models.ForeignKey(PLMObject, related_name="users")
-    user = models.ForeignKey(User, related_name="%(class)s_user")
+    plmobject = models.ForeignKey(PLMObject, related_name="users",on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="%(class)s_user",on_delete=models.CASCADE)
     role = models.CharField(max_length=30, choices=zip(ROLES, ROLES),
             db_index=True)
 
@@ -584,10 +604,10 @@ class PromotionApproval(Link):
             next :class:`.State` of :attr:`plmobject` when if will be promoted
 
     """
-    plmobject = models.ForeignKey(PLMObject, related_name="approvals")
-    user = models.ForeignKey(User, related_name="approvals")
-    current_state = models.ForeignKey(State, related_name="+")
-    next_state = models.ForeignKey(State, related_name="+")
+    plmobject = models.ForeignKey(PLMObject, related_name="approvals",on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="approvals",on_delete=models.CASCADE)
+    current_state = models.ForeignKey(State, related_name="+",on_delete=models.CASCADE)
+    next_state = models.ForeignKey(State, related_name="+",on_delete=models.CASCADE)
 
     class Meta:
         app_label = "plmapp"

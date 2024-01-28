@@ -9,11 +9,10 @@ from django.core.files.storage import FileSystemStorage
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
 from django.utils.encoding import iri_to_uri
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class AvatarStorage(FileSystemStorage):
-
     def get_valid_name(self, name):
         name = name.encode("utf-8")
         basename = os.path.basename(name)
@@ -35,7 +34,7 @@ class UserProfile(models.Model):
     class Meta:
         app_label = "plmapp"
 
-    user = models.OneToOneField(User, unique=True, related_name="profile")
+    user = models.OneToOneField(User, unique=True, related_name="profile",on_delete=models.CASCADE)
     #: True if user is an administrator
     is_administrator = models.BooleanField(default=False, blank=True)
     #: True if user is a contributor
@@ -46,7 +45,7 @@ class UserProfile(models.Model):
     restricted = models.BooleanField(default=False, blank=True)
 
     #: language
-    language = models.CharField(max_length=5, default="en",
+    language = models.CharField(max_length=10, default="en",
             choices=settings.LANGUAGES)
 
     avatar = models.ImageField(upload_to='avatars', null=True,

@@ -89,7 +89,9 @@ def attach_plmobject(request, obj_ref):
         form = PLMObjectForm()
     if obj.is_editable and ctx["is_owner"]:
         plmobjects = obj.plmobjects.now().values_list("plmobject", flat=True)
-        can_attach = lambda x: x.id not in plmobjects
+        def can_attach_function(x):
+            return x.id not in plmobjects
+        can_attach = can_attach_function
     else:
         can_attach = lambda x: False
     ctx.update({

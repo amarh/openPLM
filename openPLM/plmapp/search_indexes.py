@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE
 from django.conf import settings
 from django.db.models import signals
 
-from haystack import site
+#from haystack import site
 from haystack import indexes
 from haystack.indexes import *
 from haystack.models import SearchResult
@@ -59,7 +59,7 @@ class QueuedSearchIndex(indexes.SearchIndex):
 ##################
 
 def set_template_name(index):
-    for name, field in index.fields.iteritems():
+    for name, field in index.fields.items():
         field.template_name = "search/indexes_%s.txt" % name
 
 
@@ -85,9 +85,8 @@ class UserIndex(ModelSearchIndex):
     def prepare_ctime(self, obj):
         return prepare_date(obj.date_joined)
 
-
 set_template_name(UserIndex)
-site.register(models.User, UserIndex)
+#indexes.base.Index.register(models.User, UserIndex)
 
 class GroupIndex(ModelSearchIndex):
     class Meta:
@@ -112,9 +111,9 @@ class GroupIndex(ModelSearchIndex):
     rendered_add = CharField(use_template=True, indexed=False)
 
 set_template_name(GroupIndex)
-site.register(models.GroupInfo, GroupIndex)
+#indexes.base.Index.register(models.GroupInfo, GroupIndex)
 
-indexed = site.get_indexed_models()
+#indexed= [index.model for index in indexes.Index.get_indexes()]
 
 def get_state_class(obj):
     if obj.is_cancelled:
@@ -129,9 +128,8 @@ def get_state_class(obj):
         cls = "proposed"
     return "state-" + cls
 
-for key, model in models.get_all_plmobjects().iteritems():
-    if model in indexed:
-        continue
+for key, model in models.get_all_plmobjects().items():
+
     class ModelIndex(QueuedModelSearchIndex):
         model = model
         key = key
@@ -178,7 +176,7 @@ for key, model in models.get_all_plmobjects().iteritems():
                 return self.model.objects.all()
 
     set_template_name(ModelIndex)
-    site.register(model, ModelIndex)
+ #   indexes.base.Index.register(model, ModelIndex)
 
 text_files = set((".txt", ".test", ))
 
@@ -226,5 +224,5 @@ class DocumentFileIndex(QueuedModelSearchIndex):
             self.remove_object(instance)
         return not instance.deprecated
 
-site.register(models.DocumentFile, DocumentFileIndex)
+#indexes.base.Index.register(models.DocumentFile, DocumentFileIndex)
 

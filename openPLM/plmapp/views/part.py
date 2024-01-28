@@ -27,7 +27,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms

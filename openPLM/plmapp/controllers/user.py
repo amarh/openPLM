@@ -31,8 +31,8 @@ from :class:`.PLMObjectController` are not defined.
 
 import os
 from django.conf import settings
-from django.db.models.fields import FieldDoesNotExist
-from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import FieldDoesNotExist
+from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
 from django.template import Context, Template
 from django.shortcuts import get_object_or_404
@@ -378,7 +378,7 @@ class UserController(Controller):
                         file=models.docfs.save(f.name,f), creator=self.object)
         self.save(False)
         # set read only file
-        os.chmod(doc_file.file.path, 0400)
+        os.chmod(doc_file.file.path, Oo400)
         # no history!
         return doc_file
 
@@ -404,7 +404,7 @@ class UserController(Controller):
         path = os.path.realpath(doc_file.file.path)
         if not path.startswith(settings.DOCUMENTS_DIR):
             raise DeleteFileError("Bad path : %s" % path)
-        os.chmod(path, 0700)
+        os.chmod(path, Oo700)
         os.remove(path)
         doc_file.delete()
 

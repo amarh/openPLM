@@ -8,7 +8,7 @@ from django.utils.dates import WEEKDAYS
 from django.utils.html import conditional_escape as esc
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 try:
     from django_ical.views import ICalFeed

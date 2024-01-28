@@ -544,18 +544,18 @@ class Location_link(pmodels.ParentChildLinkExtension):
      0  0  0  1   1 = 1
      == == == == == = ==
     """
-    x1 = models.FloatField(default=lambda: 0)
-    x2 = models.FloatField(default=lambda: 0)
-    x3 = models.FloatField(default=lambda: 0)
-    x4 = models.FloatField(default=lambda: 0)
-    y1 = models.FloatField(default=lambda: 0)
-    y2 = models.FloatField(default=lambda: 0)
-    y3 = models.FloatField(default=lambda: 0)
-    y4 = models.FloatField(default=lambda: 0)
-    z1 = models.FloatField(default=lambda: 0)
-    z2 = models.FloatField(default=lambda: 0)
-    z3 = models.FloatField(default=lambda: 0)
-    z4 = models.FloatField(default=lambda: 0)
+    x1 = models.FloatField(default=0)
+    x2 = models.FloatField(default=0)
+    x3 = models.FloatField(default=0)
+    x4 = models.FloatField(default=0)
+    y1 = models.FloatField(default=0)
+    y2 = models.FloatField(default=0)
+    y3 = models.FloatField(default= 0)
+    y4 = models.FloatField(default=0)
+    z1 = models.FloatField(default=0)
+    z2 = models.FloatField(default=0)
+    z3 = models.FloatField(default=0)
+    z4 = models.FloatField(default=0)
 
     name = models.CharField(max_length=100, default="no_name")
 
@@ -614,10 +614,11 @@ def generate_extra_location_links(link, pcl):
         loc.link = pcl
         array = link.locations[i].to_array()
         loc.name = link.names[i]
-        (loc.x1, loc.x2, loc.x3, loc.x4,
-         loc.y1, loc.y2, loc.y3, loc.y4,
-         loc.z1, loc.z2, loc.z3, loc.z4) = map(lambda x: 0.0 if abs(x) < 1e-50 else x, array)
+        loc.x1, loc.x2, loc.x3, loc.x4, loc.y1, loc.y2, loc.y3, loc.y4, loc.z1, loc.z2, loc.z3, loc.z4 = [
+            0.0 if abs(x) < 1e-50 else x for x in array
+        ]
         loc.save()
+
 
 
 @task(name="openPLM.apps.document3D.decomposer_all",

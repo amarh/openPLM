@@ -40,10 +40,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.http import (HttpResponse, HttpResponseForbidden, Http404,
      HttpResponseRedirect, HttpResponseServerError)
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openPLM import get_version
 import openPLM.plmapp.models as models
@@ -102,7 +102,7 @@ def json_view(func, API_VERSION=""):
         except KeyboardInterrupt:
             # Allow keyboard interrupts through for debugging.
             raise
-        except Exception, e:
+        except Exception  as  e:
             #Mail the admins with the error
             exc_info = sys.exc_info()
             subject = 'JSON view error: %s' % request.path
@@ -204,10 +204,10 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
             except (ControllerError, ValueError) as exc:
                 ctx = init_ctx("-", "-", "-")
                 ctx["message"] = _(str(exc))
-                return render_to_response("error.html", ctx, context_instance=RequestContext(request))
+                return render("error.html", ctx, context_instance=RequestContext(request))
             except Http404:
                 raise
-            except StandardError:
+            except Exception:
                 if settings.DEBUG:
                     raise
             return HttpResponseServerError()

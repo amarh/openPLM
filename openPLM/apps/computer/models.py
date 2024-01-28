@@ -24,8 +24,8 @@
 
 from django.db import models
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
 
 from openPLM.plmapp.models import Part, ParentChildLinkExtension, register_PCLE
 from openPLM.plmapp.controllers import PartController
@@ -46,7 +46,7 @@ class SinglePart(Part):
     @property
     def attributes(self):
         attrs = list(super(SinglePart, self).attributes)
-        attrs.extend([ugettext_noop("supplier"), ugettext_noop("tech_details")])
+        attrs.extend([gettext_noop("supplier"), gettext_noop("tech_details")])
         return attrs
 
 class SinglePartController(PartController):
@@ -131,7 +131,7 @@ register(MechanicalPart)
 
 
 class Mouse(SinglePart):
-    number_of_buttons = models.PositiveSmallIntegerField(verbose_name=_("number of buttons"), default=lambda: 3)
+    number_of_buttons = models.PositiveSmallIntegerField(verbose_name=_("number of buttons"), default= 3)
 
     @property
     def attributes(self):

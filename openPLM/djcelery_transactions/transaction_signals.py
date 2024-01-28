@@ -29,8 +29,8 @@ functionality, which can be found on GitHub: https://gist.github.com/247844
 """
 from functools import partial
 import thread
-
 from django.db import transaction
+
 try:
     # Prior versions of Django 1.3
     from django.db.transaction import state

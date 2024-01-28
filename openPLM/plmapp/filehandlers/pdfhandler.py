@@ -24,12 +24,12 @@
 
 import warnings
 
-from base import HandlersManager, FileHandler
+from .base import HandlersManager, FileHandler
 from openPLM.plmapp.utils import size_to_format
 
 #  sudo apt-get install python-pypdf
 warnings.simplefilter('ignore', DeprecationWarning)
-from pyPdf import PdfFileReader
+from PyPDF2 import PdfFileReader
 warnings.simplefilter('default', DeprecationWarning)
 
 class PDFHandler(FileHandler):
@@ -57,7 +57,7 @@ class PDFHandler(FileHandler):
             page = pdf.getPage(0)
             page.mediaBox
             self._set_valid()
-        except Exception, e:
+        except Exception as e:
             # load may raise several exceptions...
             self._set_invalid()
         warnings.simplefilter('default', DeprecationWarning)

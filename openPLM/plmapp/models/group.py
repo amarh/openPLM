@@ -7,22 +7,22 @@ from django.contrib.auth.models import User, Group
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
 from django.utils.encoding import iri_to_uri
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 class GroupInfo(Group):
-    u"""
+    """
     Class that stores additional data on a :class:`Group`.
     """
-
     class Meta:
         app_label = "plmapp"
 
+
     description = models.TextField(blank=True)
     description.richtext = True
-    creator = models.ForeignKey(User, related_name="%(class)s_creator")
+    creator = models.ForeignKey(User, related_name="%(class)s_creator",on_delete=models.CASCADE)
 
     owner = models.ForeignKey(User, verbose_name=_("owner"),
-                              related_name="%(class)s_owner")
+                              related_name="%(class)s_owner",on_delete=models.CASCADE)
     ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
@@ -80,13 +80,13 @@ class Invitation(models.Model):
     STATES = ((PENDING, "Pending"),
               (ACCEPTED, "Accepted"),
               (REFUSED, "Refused"))
-    group = models.ForeignKey(GroupInfo)
-    owner = models.ForeignKey(User, related_name="%(class)s_inv_owner")
-    guest = models.ForeignKey(User, related_name="%(class)s_inv_guest")
-    state = models.CharField(max_length=1, choices=STATES, default=PENDING)
+    group = models.ForeignKey(GroupInfo,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name="%(class)s_inv_owner",on_delete=models.CASCADE)
+    guest = models.ForeignKey(User, related_name="%(class)s_inv_guest",on_delete=models.CASCADE)
+    state = models.CharField(max_length=10, choices=STATES, default=PENDING)
     ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     validation_time = models.DateTimeField(_("date of validation"), null=True)
     guest_asked = models.BooleanField(_("True if guest created the invitation"))
     token = models.CharField(max_length=155, primary_key=True,
-            default=lambda:str(random.getrandbits(512)))
+            default=str(random.getrandbits(512)))

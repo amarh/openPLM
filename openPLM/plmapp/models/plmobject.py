@@ -4,13 +4,13 @@ from functools import wraps
 from django.db import models
 from django.db.models import F
 from django.db.models.query import QuerySet
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
 from django.utils import timezone
-from django.utils.translation import ugettext_noop, ugettext_lazy as _
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from openPLM.plmapp.utils import level_to_sign_str, memoize_noarg
 from .iobject import IObject
@@ -177,27 +177,27 @@ class PLMObject(AbstractPLMObject):
 
     # other attributes
     name = models.CharField(_("name"), max_length=100, blank=True,
-                            help_text=_(u"Name of the product"))
+                            help_text=_("Name of the product"))
 
     description = models.TextField(_("description"), blank=True, default="")
     description.richtext = True
 
     creator = models.ForeignKey(User, verbose_name=_("creator"),
-                                related_name="%(class)s_creator")
+                                related_name="%(class)s_creator",on_delete=models.CASCADE)
     owner = models.ForeignKey(User, verbose_name=_("owner"),
-                              related_name="%(class)s_owner")
+                              related_name="%(class)s_owner",on_delete=models.CASCADE)
     ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
-    group = models.ForeignKey(GroupInfo, verbose_name=_("group"), related_name="%(class)s_group")
+    group = models.ForeignKey(GroupInfo, verbose_name=_("group"), related_name="%(class)s_group",on_delete=models.CASCADE)
 
     # state and lifecycle
     lifecycle = models.ForeignKey(Lifecycle, verbose_name=_("lifecycle"),
                                   related_name="+",
-                                  default=get_default_lifecycle)
+                                  default=get_default_lifecycle,on_delete=models.CASCADE)
     state = models.ForeignKey(State, verbose_name=_("state"),
                               related_name="+",
-                              default=get_default_state)
+                              default=get_default_state,on_delete=models.CASCADE)
 
     published = models.BooleanField(verbose_name=_("published"), default=False)
 
@@ -366,8 +366,8 @@ class PLMObject(AbstractPLMObject):
     @property
     def menu_items(self):
         "Menu items to choose a view"
-        return [ugettext_noop("attributes"), ugettext_noop("lifecycle"),
-                ugettext_noop("revisions"), ugettext_noop("history"),
+        return [gettext_noop("attributes"), gettext_noop("lifecycle"),
+                gettext_noop("revisions"), gettext_noop("history"),
                ]
 
     @classmethod
@@ -402,11 +402,11 @@ class PLMObject(AbstractPLMObject):
         """
         Returns fields which should not be available in a modification form
         """
-        return [ugettext_noop("type"), ugettext_noop("reference"),
-                ugettext_noop("revision"),
-                ugettext_noop("ctime"), ugettext_noop("creator"),
-                ugettext_noop("owner"), ugettext_noop("ctime"),
-                ugettext_noop("mtime"), ugettext_noop("group")]
+        return [gettext_noop("type"), gettext_noop("reference"),
+                gettext_noop("revision"),
+                gettext_noop("ctime"), gettext_noop("creator"),
+                gettext_noop("owner"), gettext_noop("ctime"),
+                gettext_noop("mtime"), gettext_noop("group")]
 
     @classmethod
     def get_modification_fields(cls):
@@ -472,13 +472,15 @@ def get_all_users_and_plmobjects():
     res.update(get_all_plmobjects())
     return res
 
+def sort_key_function(c):
+    return c.__name__
 
 def get_all_subclasses_with_level(base, lst, level):
     level = "=" + level
     if base.__name__ not in lst:
         lst.append((base.__name__,level[3:] + base.__name__))
     subclasses = base.__subclasses__()
-    subclasses.sort(key=lambda c: c.__name__)
+    subclasses.sort(key=sort_key_function)
     for cls in subclasses:
         if not getattr(cls, "_deferred", False):
             get_all_subclasses_with_level(cls, lst, level)
@@ -489,7 +491,7 @@ def get_subclasses(base):
     def populate(b, l):
         r.append((l, b, b.__name__))
         subclasses = b.__subclasses__()
-        subclasses.sort(key=lambda c: c.__name__)
+        subclasses.sort(key=sort_key_function)
         for cls in subclasses:
             if not getattr(cls, "_deferred", False):
                 populate(cls, l + 1)

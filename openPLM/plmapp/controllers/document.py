@@ -29,7 +29,7 @@ import os
 import shutil
 from django.utils import timezone
 
-import Image
+import image as  Image
 from django.conf import settings
 from djcelery_transactions import task
 
@@ -48,7 +48,7 @@ from openPLM.plmapp.tasks import update_indexes
 def delete_old_files(doc_file_pk, selectors):
     doc_file = models.DocumentFile.objects.get(id=doc_file_pk)
     for df in get_deletable_files(doc_file, selectors):
-        os.chmod(df.file.path, 0700)
+        os.chmod(df.file.path, Oo700)
         os.remove(df.file.path)
         if df.thumbnail:
             df.thumbnail.delete(save=False)
@@ -215,7 +215,7 @@ class DocumentController(PLMObjectController):
         doc_file.save()
         self.save(False)
         # set read only file
-        os.chmod(doc_file.file.path, 0400)
+        os.chmod(doc_file.file.path, Oo400)
         self._save_histo("added file to ", "file : %s added" % f.name)
         if update_attributes:
             self.handle_added_file(doc_file)
@@ -372,7 +372,7 @@ class DocumentController(PLMObjectController):
         try:
             self.check_attach_part(part)
             can_attach = True
-        except StandardError:
+        except Exception:
             pass
         return can_attach
 
@@ -384,7 +384,7 @@ class DocumentController(PLMObjectController):
         try:
             self.check_attach_part(part, True)
             can_detach = True
-        except StandardError:
+        except Exception:
             pass
         return can_detach
 
@@ -423,7 +423,7 @@ class DocumentController(PLMObjectController):
             shutil.copy(doc_file.file.path, models.docfs.path(path))
             new_doc = models.DocumentFile.objects.create(file=path,
                 filename=filename, size=doc_file.size, document=self.object)
-            os.chmod(new_doc.file.path, 0400)
+            os.chmod(new_doc.file.path, Oo400)
             new_doc.thumbnail = doc_file.thumbnail
             if doc_file.thumbnail:
                 ext = os.path.splitext(doc_file.thumbnail.path)[1]
@@ -509,7 +509,7 @@ class DocumentController(PLMObjectController):
         doc_file.previous_revision = deprecated_df
         doc_file.revision += 1
         doc_file.ctime = now
-        os.chmod(doc_file.file.path, 0400)
+        os.chmod(doc_file.file.path, Oo400)
         doc_file.no_index = False
         doc_file.save()
         # delete "old" files (not the document file)

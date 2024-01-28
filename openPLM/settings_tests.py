@@ -114,11 +114,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django.contrib.comments',
+    'django_comments',
     'django.contrib.humanize',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djcelery',
+  #  'djcelery',
     'haystack',
     'openPLM.plmapp',
     'openPLM.apps.rss',
@@ -136,6 +136,9 @@ INSTALLED_APPS = (
     'openPLM.apps.richpage',
     'openPLM.plmapp.tests',
 )
+
+
+MIGRATION_MODULES = {'openPLM.plmapp': 'plmapp.migrations'}
 
 if os.environ.get("openPLM3D", "") == "enabled":
     INSTALLED_APPS += ("openPLM.apps.document3D", )
@@ -169,6 +172,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.request",
         "django.contrib.messages.context_processors.messages",
 )
+MIDDLEWARE = [
+    # ...
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    # ...
+]
 
 #: expeditor's mail used when sending notification emails
 EMAIL_OPENPLM = "no-reply@openplm.example.com"
@@ -191,13 +201,33 @@ EXTRACTOR = os.path.abspath("bin/extractor.sh")
 BROKER_BACKEND = "memory"
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Gestion native
 ENABLE_NATIVE_FILE_MANAGEMENT=True
-
-
-import djcelery
-djcelery.setup_loader()
+import os 
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.join(BASE_DIR, 'templates'))],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+MEDIA_URL='/media/'
+MEDIA_ROOT=BASE_DIR/"media"
+STATIC_URL = 'static/'
+#
+#import djcelery
+#djcelery.setup_loader()
 
 COMPANY = "company"
 
@@ -207,3 +237,6 @@ TEST_RUNNER = "openPLM.plmapp.tests.runner.OpenPLMTestSuiteRunner"
 TEST_OUTPUT_DIR = "tests_results"
 
 DOCUMENTATION_URL ="http://wiki.openplm.org/docs/user/"
+MEDIA_URL='/media/'
+MEDIA_ROOT=BASE_DIR/"media"
+STATIC_URL = 'static/'

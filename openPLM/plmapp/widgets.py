@@ -1,6 +1,7 @@
 from django import forms
-from django.forms.widgets import flatatt
-from django.utils.encoding import smart_unicode
+from django.forms.utils import flatatt
+from django.utils.encoding import smart_str
+
 from django.utils.html import escape
 from json import JSONEncoder
 from django.utils.safestring import mark_safe
@@ -34,7 +35,7 @@ class JQueryAutoComplete(forms.TextInput):
     def render(self, name, value=None, attrs=None):
         final_attrs = self.build_attrs(attrs, name=name)
         if value:
-            final_attrs['value'] = escape(smart_unicode(value))
+            final_attrs['value'] = escape(smart_str(value))
 
         if not self.attrs.has_key('id'):
             final_attrs['id'] = 'id_%s' % name

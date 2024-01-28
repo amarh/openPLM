@@ -32,7 +32,6 @@ Ajax views are in :mod:`.ajax` and API views are in :mod:`.api`
 Most of the views are decorated with :func:`.handle_errors` and
 render HTML with the django template engine.
 """
-
 import os
 import csv
 import json
@@ -46,17 +45,17 @@ from django.contrib.admin import DateFieldListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
-from django.contrib.comments.views.comments import post_comment
+from django_comments.views.comments import post_comment
 from django.db.models import Q
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.http import (HttpResponseRedirect, HttpResponse, Http404,
                         HttpResponsePermanentRedirect)
 from django.utils.encoding import iri_to_uri
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.i18n import set_language as dj_set_language
-from django.forms.util import from_current_timezone
-
+#from django.forms.util import from_current_timezone
+from django.forms.utils import from_current_timezone
 from haystack.views import SearchView
 
 import openPLM.plmapp.csvimport as csvimport

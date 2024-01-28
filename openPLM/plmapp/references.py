@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from django.conf import settings
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openPLM.plmapp.models import PLMObject, Part, Document
 
 #: Regular expression to test if a reference is invalid (forbidden characters)

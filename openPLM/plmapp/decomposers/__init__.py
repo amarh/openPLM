@@ -27,4 +27,4 @@ This module contains utilities to decompose a :class:`.Part`.
 
 """
 
-from base import Decomposer, DecomposersManager
+from .base import Decomposer, DecomposersManager

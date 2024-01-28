@@ -22,7 +22,7 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
-from base import HandlersManager, FileHandler
+from .base import HandlersManager, FileHandler
 from openPLM.plmapp.utils import size_to_format
 
 # see odfpy (sudo easy_install odfpy)
@@ -56,7 +56,7 @@ class ODFHandler(FileHandler):
             h = page.getAttrNS(FONS, 'page-height')
             self.format = size_to_format(w, h)
             self._set_valid()
-        except Exception, e:
+        except Exception as e:
             # load may raise several exceptions...
             self._set_invalid()
     

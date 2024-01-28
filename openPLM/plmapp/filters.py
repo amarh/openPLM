@@ -1,4 +1,5 @@
-import re, htmlentitydefs
+#import re, htmlentitydefs
+import re, html.entities
 
 from django.conf import settings
 from django.utils.html import strip_tags, linebreaks
@@ -26,7 +27,7 @@ def unescape(text):
         else:
             # named entity
             try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                text = unichr(html.entities.name2codepoint[text[1:-1]])
             except KeyError:
                 pass
         return text # leave as is

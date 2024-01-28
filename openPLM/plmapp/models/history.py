@@ -6,8 +6,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User, Group
-from django.contrib.comments.signals import comment_was_posted
-from django.utils.translation import ugettext_lazy as _
+from django_comments.signals import comment_was_posted
+from django.utils.translation import gettext_lazy as _
 
 from .lifecycle import State, Lifecycle, get_cancelled_state
 from .plmobject import PLMObject
@@ -61,7 +61,7 @@ class AbstractHistory(models.Model):
     action = models.CharField(max_length=50, choices=ACTIONS)
     details = models.TextField()
     date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name="%(class)s_user")
+    user = models.ForeignKey(User, related_name="%(class)s_user",on_delete=models.CASCADE)
 
     def __unicode__(self):
         return "History<%s, %s, %s>" % (self.plmobject, self.date, self.action)
@@ -84,7 +84,7 @@ class AbstractHistory(models.Model):
 class History(AbstractHistory):
     class Meta:
         app_label = "plmapp"
-    plmobject = models.ForeignKey(PLMObject)
+    plmobject = models.ForeignKey(PLMObject,on_delete=models.CASCADE)
 
     def get_redirect_url(self):
         return "/history_item/object/%d/" % self.id
@@ -99,7 +99,7 @@ class History(AbstractHistory):
 class UserHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
-    plmobject = models.ForeignKey(User)
+    plmobject = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def get_redirect_url(self):
         return "/history_item/user/%d/" % self.id
@@ -116,7 +116,7 @@ class UserHistory(AbstractHistory):
 class GroupHistory(AbstractHistory):
     class Meta:
         app_label = "plmapp"
-    plmobject = models.ForeignKey(Group)
+    plmobject = models.ForeignKey(Group,on_delete=models.CASCADE)
 
     def get_redirect_url(self):
         return "/history_item/group/%d/" % self.id
@@ -243,9 +243,9 @@ class StateHistory(models.Model):
         (CANCELLED, "cancelled")
     )
 
-    plmobject = models.ForeignKey(PLMObject)
-    state = models.ForeignKey(State)
-    lifecycle = models.ForeignKey(Lifecycle)
+    plmobject = models.ForeignKey(PLMObject,on_delete=models.CASCADE)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
+    lifecycle = models.ForeignKey(Lifecycle,on_delete=models.CASCADE)
     start_time = models.DateTimeField(_("date of promotion"),
             default=timezone.now, auto_now_add=False)
     end_time = models.DateTimeField(null=True)
@@ -267,7 +267,7 @@ class StateHistory(models.Model):
         self.state_category = category
         super(StateHistory, self).save(*args, **kwargs)
 
-def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_display=None):
+def timeline_histories(self,user, date_begin=None, date_end=None, done_by=None, list_display=None):
     if date_begin is None and date_end is None:
         return History.timeline_items(user)
     else:
@@ -304,7 +304,7 @@ def timeline_histories(user, date_begin=None, date_end=None, done_by=None, list_
                 h.plmobject.plmobject_url = h.plmobject.groupinfo.plmobject_url
 
         if (list_display["display_document"] or list_display["display_part"]) and list_display["display_group"]:
-            history = sorted(chain(history_group, history_plmobject), key=lambda instance: instance.date, reverse=True)
+            history = sorted(chain(history_group, history_plmobject), key=self.date, reverse=True)
         elif list_display["display_group"]:
             history = history_group
         elif list_display["display_document"] or list_display["display_part"]:

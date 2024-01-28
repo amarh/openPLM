@@ -10,22 +10,22 @@ This module defines two constants:
     All valid units of a BOM row.
 """
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 DEFAULT_UNIT = "-"
 
 UNITS = (
-    (_(u'Amounts'), (
-        (DEFAULT_UNIT, _(u'Each')),
-        ('mol', _(u'mol')),
+    (_('Amounts'), (
+        (DEFAULT_UNIT, _('Each')),
+        ('mol', _('mol')),
         )
     ),
     (_(u'Lengths'), (
-        ('mm', _(u'mm')),
-        ('cm', _(u'cm')),
-        ('dm', _(u'dm')),
-        ('m', _(u'm')),
-        ('km', _(u'km')),
+        ('mm', _('mm')),
+        ('cm', _('cm')),
+        ('dm', _('dm')),
+        ('m', _('m')),
+        ('km', _('km')),
         )
     ),
     (_(u'Volumes'), (
@@ -37,11 +37,11 @@ UNITS = (
         )
     ),
     (_(u'Masses'), (
-        ('mg', _(u'mg')),
-        ('cg', _(u'cg')),
-        ('dg', _(u'dg')),
-        ('g', _(u'g')),
-        ('kg', _(u'kg')),
+        ('mg', _('mg')),
+        ('cg', _('cg')),
+        ('dg', _('dg')),
+        ('g', _('g')),
+        ('kg', _('kg')),
         )
     ),
 )

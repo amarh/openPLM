@@ -41,7 +41,7 @@ from openPLM.plmapp.controllers.base import Controller, permission_required
 from openPLM.plmapp.references import validate_reference
 
 class GroupController(Controller):
-    u"""
+    """
     Object used to manage a :class:`~django.contrib.auth.models.Group` and store his
     modification in a history
 

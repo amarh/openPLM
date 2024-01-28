@@ -1,7 +1,6 @@
 import os.path
 import tarfile
 import itertools
-from cStringIO import StringIO
 import struct, time, sys
 import binascii, stat
 from zipfile import ZipInfo, ZIP_STORED, ZIP_DEFLATED, LargeZipFile, ZIP64_LIMIT
@@ -93,10 +92,9 @@ class IterZipFile:
             pass
         elif compression in (ZIP_DEFLATED, ZIP_AUTO):
             if not zlib:
-                raise RuntimeError,\
-                      "Compression requires the (missing) zlib module"
+                raise RuntimeError(  "Compression requires the (missing) zlib module")
         else:
-            raise RuntimeError, "That compression method is not supported"
+            raise RuntimeError  ("That compression method is not supported")
 
         self._allowZip64 = allowZip64
         self.debug = 0  # Level of printing: 0 through 3
@@ -111,13 +109,11 @@ class IterZipFile:
         """Check for errors before writing a file to the archive."""
         if zinfo.filename in self.NameToInfo:
             if self.debug:      # Warning for duplicate names
-                print "Duplicate name:", zinfo.filename
+                print ("Duplicate name:", zinfo.filename)
         if zinfo.compress_type == ZIP_DEFLATED and not zlib:
-            raise RuntimeError, \
-                  "Compression requires the (missing) zlib module"
+            raise RuntimeError("Compression requires the (missing) zlib module")
         if zinfo.compress_type not in (ZIP_STORED, ZIP_DEFLATED):
-            raise RuntimeError, \
-                  "That compression method is not supported"
+            raise RuntimeError("That compression method is not supported")
         if zinfo.file_size > ZIP64_LIMIT:
             if not self._allowZip64:
                 raise LargeZipFile("Filesize would require ZIP64 extensions")
@@ -142,7 +138,7 @@ class IterZipFile:
         if isdir:
             arcname += '/'
         zinfo = ZipInfo(arcname, date_time)
-        zinfo.external_attr = (st[0] & 0xFFFF) << 16L      # Unix attributes
+        zinfo.external_attr = (st[0] & 0xFFFF) << 16      # Unix attributes
         if self.compression == ZIP_AUTO:
             ext = os.path.splitext(filename)[1].lower()
             compression = ZIP_STORED if ext and ext[1:] in STORED_FORMATS \
@@ -238,7 +234,7 @@ class IterZipFile:
 
             if zinfo.header_offset > ZIP64_LIMIT:
                 extra.append(zinfo.header_offset)
-                header_offset = 0xffffffffL
+                header_offset = 0xffffffff
             else:
                 header_offset = zinfo.header_offset
 
@@ -328,7 +324,8 @@ def generate_tarfile(files):
 
     :param files: a sequence of class:`.DocumentFile`
     """
-    fake_file = StringIO()
+    import io
+    fake_file = io.StringIO()
     tf = tarfile.open(mode= "w", fileobj=fake_file)
     filenames = set()
     for df in files:

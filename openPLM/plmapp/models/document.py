@@ -1,17 +1,15 @@
-
 import os
 import string
 import random
 import hashlib
 from django.utils import timezone
-
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
-from django.utils.functional import memoize
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
+from functools import lru_cache
 
 from openPLM.plmapp.files.formats import native_to_standards
 from openPLM.plmapp.utils import memoize_noarg
@@ -53,7 +51,7 @@ class DocumentStorage(FileSystemStorage):
 
         def rand():
             r = ""
-            for i in xrange(7):
+            for i in range(7):
                 r += random.choice(string.ascii_lowercase + string.digits)
             return r
         basename = os.path.basename(name)
@@ -133,20 +131,20 @@ class DocumentFile(models.Model):
     size = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to=".", storage=thumbnailfs,
                                  blank=True, null=True)
-    locked = models.BooleanField(default=lambda: False)
+    locked = models.BooleanField(default=False)
     locker = models.ForeignKey(User, null=True, blank=True,
-                               default=lambda: None)
-    document = models.ForeignKey('Document')
-    deprecated = models.BooleanField(default=lambda: False)
+                               default=None,on_delete=models.CASCADE)
+    document = models.ForeignKey('Document',on_delete=models.CASCADE)
+    deprecated = models.BooleanField(default=False)
 
     ctime = models.DateTimeField(auto_now_add=False, default=timezone.now)
-    end_time = models.DateTimeField(blank=True, null=True, default=lambda: None)
+    end_time = models.DateTimeField(blank=True, null=True, default=None)
     deleted = models.BooleanField(default=False)
     revision = models.IntegerField(default=1)
     previous_revision = models.OneToOneField('self',
-            related_name="next_revision", default=None, null=True)
+            related_name="next_revision", default=None, null=True,on_delete=models.CASCADE)
     last_revision = models.ForeignKey('self',
-            related_name="older_files", default=None, null=True)
+            related_name="older_files", default=None, null=True,on_delete=models.CASCADE)
 
     @property
     def native_related(self):
@@ -227,7 +225,7 @@ class PrivateFile(models.Model):
     filename = models.CharField(max_length=200)
     file = models.FileField(upload_to=".", storage=docfs)
     size = models.PositiveIntegerField()
-    creator = models.ForeignKey(User, related_name="files")
+    creator = models.ForeignKey(User, related_name="files",on_delete=models.CASCADE)
     ctime = models.DateTimeField(auto_now_add=False, default=timezone.now)
 
     def __unicode__(self):
@@ -245,7 +243,7 @@ class Document(PLMObject):
     ACCEPT_FILES = True
 
     template = models.ForeignKey('self', related_name='tpl_instances',
-            null=True, default=None, editable=False)
+            null=True, default=None, editable=False,on_delete=models.CASCADE)
 
     @property
     def files(self):
@@ -279,8 +277,8 @@ class Document(PLMObject):
     @property
     def menu_items(self):
         items = list(super(Document, self).menu_items)
-        items.insert(0, ugettext_noop("files"))
-        items.append(ugettext_noop("parts"))
+        items.insert(0, gettext_noop("files"))
+        items.append(gettext_noop("parts"))
         return items
 
     @property
@@ -339,7 +337,7 @@ def get_all_subtype_documents(subtype):
     get_all_subclasses(subtype, res)
     return res
 
-
+@lru_cache(maxsize=None)
 def get_all_documents_with_level(only_accept_files=False):
     lst = []
     level="=>"
@@ -349,7 +347,7 @@ def get_all_documents_with_level(only_accept_files=False):
         return [(n, l) for n, l in lst if classes[n].ACCEPT_FILES]
     return lst
 
-get_all_documents_with_level = memoize(get_all_documents_with_level, {}, 1)
+#get_all_documents_with_level = memoize(get_all_documents_with_level, {}, 1)
 
 
 def get_best_document_type(files):

@@ -31,7 +31,7 @@ import string
 import random
 import os.path
 from functools import wraps
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 
 class SeekedFile(object):
@@ -202,8 +202,8 @@ FORMATS = {
     ("37.0", "52.0") : "A9",
     ("26.0", "37.0") : "A10",
 }
-CFORMATS = [(x, x) for x in FORMATS.itervalues()]
-CFORMATS.sort()
+
+CFORMATS = [(value, value) for _, value in sorted(FORMATS.items())]
 CFORMATS.append(("Other", "Other"))
 def size_to_format(width_lg, height_lg):
     """
@@ -222,7 +222,6 @@ def size_to_format(width_lg, height_lg):
 def level_to_sign_str(level):
     """
     Converts a level (int, starting from 0) to a sign role
-
     Example::
 
         >>> level_to_sign_str(0)
@@ -238,7 +237,6 @@ def level_to_sign_str(level):
         >>> level_to_sign_str(10)
         'sign_11th_level'
     """
-
     types = {0 : "1st", 1 : "2nd", 2 : "3rd"}
     return "sign_%s_level" % types.get(level, "%dth" % (level + 1))
 
@@ -258,7 +256,7 @@ def generate_password(length=12):
     """
     Generates a random password of *length* characters.
     """
-    return "".join(random.choice(password_chars) for x in xrange(length))
+    return "".join(random.choice(password_chars) for x in range(length))
 
 
 def can_generate_pdf():
@@ -344,8 +342,7 @@ def r2r(template, dictionary, request):
         render_to_response(template, dictionary,
                               context_instance=RequestContext(request))
     """
-    return render_to_response(template, dictionary,
-                              context_instance=RequestContext(request))
+    return render(template, dictionary, context=RequestContext(request))
 
 
 if __name__ == "__main__":

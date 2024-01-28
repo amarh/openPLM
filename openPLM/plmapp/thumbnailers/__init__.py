@@ -7,18 +7,13 @@ Thumbnailers are registered with :class:`.ThumbnailersManager`.
 """
 
 import os.path
-import Image
+import image as Image 
 
-from base import ThumbnailersManager
+from .base import ThumbnailersManager
 from openPLM.plmapp.utils import get_ext
 
 # import "official" thumbnailers
-import pilthumbnailer
-import odfthumbnailer
-import magickthumbnailer
-import jfifthumbnailer
-import pngthumbnailer
-import swthumbnailer
+
 
 from openPLM.plmapp.models import DocumentFile, thumbnailfs
 from djcelery_transactions import task
@@ -47,7 +42,7 @@ def generate_thumbnail(doc_file_id):
     for thumbnailer in thumbnailers:
         try:
             resize = thumbnailer(doc_file.file.path, doc_file.filename, thumbnail_path)
-        except Exception, e:
+        except Exception as e:
             # let another thumbnailer do the job
             if os.path.exists(thumbnail_path):
                 # this file may be corrupted
