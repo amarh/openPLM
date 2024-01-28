@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.template import Node, Variable
 from haystack.models import SearchResult
 
+
 from openPLM.plmapp.controllers import (DocumentController, PartController,UserController, GroupController)
 from openPLM.plmapp import models
 from openPLM.plmapp.filters import richtext, plaintext

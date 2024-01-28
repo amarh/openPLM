@@ -147,8 +147,8 @@ CELERY_CONFIG_MODULE = 'your_celery_config_module'
 
 #XYZ: allowed hosts
 #: see :django:setting:`ALLOWED_HOSTS`
-ALLOWED_HOSTS = ["www.example.com",]
-
+ALLOWED_HOSTS = ["*"]
+DEBUG = True 
 #XYZ: EMAIL settings
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST
 EMAIL_HOST = 'localhost'
@@ -179,6 +179,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.request",
         "django.contrib.messages.context_processors.messages",
         )
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': '/to/whoosh/index/',
+    },
+}
+
 
 MIDDLEWARE = [
     # ...
