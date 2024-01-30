@@ -129,7 +129,7 @@ urlpatterns = [
 urlpatterns+=[
     path('i18n/setlang/', openPLM.plmapp.views.main.set_language),
     path('(?:home/)?$', display_home_page),
-    path('accounts/', User_login),
+    path('accounts/',User_login),
     re_path(r'^(?:accounts/)?login/', User_login),
     path('(?:accounts/)?logout/',user_logout),
     path('object/create/', create_object),

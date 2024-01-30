@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
      'openPLM.apps.document3D',
+     'openPLM.apps.subversion',
 )
 
 COMMENTS_APP = "openPLM.plmapp"
