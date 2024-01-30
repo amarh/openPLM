@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib import admin
 
-from django.utils.translation import ugettext_noop
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_lazy as _
 
 from openPLM.plmapp.models import Document
 
@@ -31,7 +31,7 @@ class URLDoc(Document):
     @property
     def menu_items(self):
         items = super(URLDoc, self).menu_items
-        items = items+[ugettext_noop("content")]
+        items = items+[gettext_noop("content")]
         return items
 
 register(URLDoc)    

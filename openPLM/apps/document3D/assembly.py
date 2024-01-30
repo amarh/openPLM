@@ -92,7 +92,7 @@ class AssemblyBuilder(object):
             raise
         return native
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def _build(self, tree, native_files, step_files):
         # tasks (handle_step_files, update_indexes) are executed
         # once the transaction is commited, so we do not have to
@@ -135,7 +135,7 @@ class AssemblyBuilder(object):
             raise
         return native
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def _update(self, tree, native_files, step_files):
         # tasks (handle_step_files, update_indexes) are executed
         # once the transaction is commited, so we do not have to

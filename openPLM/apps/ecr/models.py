@@ -5,9 +5,10 @@ from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape as esc
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
-from django.forms.util import ErrorList
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
+from django.forms.utils import ErrorList
+
 
 from openPLM.plmapp.utils import level_to_sign_str
 import openPLM.plmapp.models as pmodels
@@ -16,7 +17,7 @@ from openPLM.plmapp.utils import memoize_noarg
 _menu_items = pmodels.PLMObject.menu_items
 
 def menu_items(self):
-    return _menu_items.fget(self) + [ugettext_noop("changes")]
+    return _menu_items.fget(self) + [gettext_noop("changes")]
 
 pmodels.PLMObject.menu_items = property(menu_items)
 
@@ -76,22 +77,23 @@ class ECR(models.Model, pmodels.IObject):
     description.richtext = True
 
     creator = models.ForeignKey(User, verbose_name=_("creator"),
-                                related_name="%(class)s_creator")
+                                related_name="%(class)s_creator",on_delete=models.CASCADE)
     owner = models.ForeignKey(User, verbose_name=_("owner"),
-                              related_name="%(class)s_owner")
+                              related_name="%(class)s_owner",on_delete=models.CASCADE)
     ctime = models.DateTimeField(_("date of creation"), default=timezone.now,
                                  auto_now_add=False)
     mtime = models.DateTimeField(_("date of last modification"), auto_now=True)
 
     # state and lifecycle
     lifecycle = models.ForeignKey(pmodels.Lifecycle, verbose_name=_("lifecycle"),
-                                  related_name="+",)
+                                  related_name="+",on_delete=models.CASCADE)
     state = models.ForeignKey(pmodels.State, verbose_name=_("state"),
-                              related_name="+",)
+                              related_name="+",on_delete=models.CASCADE)
 
     class Meta:
         # keys in the database
         ordering = ["reference"]
+        app_label='ecr'
 
     def __init__(self, *args, **kwargs):
         # little hack:
@@ -209,8 +211,8 @@ class ECR(models.Model, pmodels.IObject):
     @property
     def menu_items(self):
         "Menu items to choose a view"
-        return [ugettext_noop("attributes"), ugettext_noop("lifecycle"),
-                ugettext_noop("history"), ugettext_noop("part-doc-cads"),
+        return [gettext_noop("attributes"), gettext_noop("lifecycle"),
+                gettext_noop("history"), gettext_noop("part-doc-cads"),
                ]
 
     @property
@@ -261,19 +263,21 @@ class ECR(models.Model, pmodels.IObject):
 
 class ECRHistory(pmodels.AbstractHistory):
 
-    plmobject = models.ForeignKey(ECR)
+    plmobject = models.ForeignKey(ECR,on_delete=models.CASCADE)
 
     def get_redirect_url(self):
         return "/history_item/ecr/%d/" % self.id
+    class Meta:
+        app_label='ecr'
 
-
+        
 class ECRPLMObjectLink(pmodels.Link):
-    ecr = models.ForeignKey(ECR, related_name="plmobjects")
-    plmobject = models.ForeignKey(pmodels.PLMObject, related_name="ecrs")
+    ecr = models.ForeignKey(ECR, related_name="plmobjects",on_delete=models.CASCADE)
+    plmobject = models.ForeignKey(pmodels.PLMObject, related_name="ecrs",on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("ecr", "plmobject", "end_time")
-
+        app_label='ecr'
     def __unicode__(self):
         return u"ECRPLMObjectLink<%s, %s>" % (self.ecr, self.plmobject)
 
@@ -297,15 +301,15 @@ class ECRUserLink(pmodels.Link):
 
     ACTION_NAME = "Link : ECR-user"
 
-    ecr = models.ForeignKey(ECR, related_name="users")
-    user = models.ForeignKey(User, related_name="ecrs")
+    ecr = models.ForeignKey(ECR, related_name="users",on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="ecrs",on_delete=models.CASCADE)
     role = models.CharField(max_length=30, choices=zip(pmodels.ROLES, pmodels.ROLES),
             db_index=True)
 
     class Meta:
         unique_together = ("ecr", "user", "role", "end_time")
         ordering = ["user", "role", "ecr__reference",]
-
+        app_label='ecr'
     def __unicode__(self):
         return u"ECRUserLink<%s, %s, %s>" % (self.ecr, self.user, self.role)
 
@@ -328,14 +332,14 @@ class ECRPromotionApproval(pmodels.Link):
             next :class:`.State` of :attr:`ecr` when if will be promoted
 
     """
-    ecr = models.ForeignKey(ECR, related_name="approvals")
-    user = models.ForeignKey(User, related_name="ecr_approvals")
-    current_state = models.ForeignKey(pmodels.State, related_name="+")
-    next_state = models.ForeignKey(pmodels.State, related_name="+")
+    ecr = models.ForeignKey(ECR, related_name="approvals",on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="ecr_approvals",on_delete=models.CASCADE)
+    current_state = models.ForeignKey(pmodels.State, related_name="+",on_delete=models.CASCADE)
+    next_state = models.ForeignKey(pmodels.State, related_name="+",on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("ecr", "user", "current_state", "next_state", "end_time")
-
+        app_label='ecr'
 
 @memoize_noarg
 def get_default_lifecycle():

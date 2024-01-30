@@ -117,7 +117,7 @@ INSTALLED_APPS = (
     'openPLM.apps.cae',
     'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
-    # 'openPLM.apps.document3D',
+     'openPLM.apps.document3D',
 )
 
 COMMENTS_APP = "openPLM.plmapp"
@@ -179,10 +179,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.request",
         "django.contrib.messages.context_processors.messages",
         )
+import os
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': '/to/whoosh/index/',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
     },
 }
 
@@ -220,10 +221,12 @@ MAX_FILE_SIZE = -1
 import os 
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.join(BASE_DIR, 'templates'))],
+        'DIRS': [os.path.join(BASE_DIR,'openPLM/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -245,7 +248,8 @@ DATABASES = {
 
 MEDIA_URL='/media/'
 MEDIA_ROOT=BASE_DIR/"media"
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 HAYSTACK_CONNECTIONS = {
     'default': {
@@ -261,13 +265,6 @@ HAYSTACK_CONNECTIONS = {
         'PATH': '/home/search/whoosh_index',
         'STORAGE': 'file',
         'POST_LIMIT': 128 * 1024 * 1024,
-        'INCLUDE_SPELLING': True,
-        'BATCH_SIZE': 100,
-        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
-    },
-    'slave': {
-        'ENGINE': 'xapian_backend.XapianEngine',
-        'PATH': '/home/search/xapian_index',
         'INCLUDE_SPELLING': True,
         'BATCH_SIZE': 100,
         'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],

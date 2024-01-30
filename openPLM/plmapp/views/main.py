@@ -38,7 +38,7 @@ import json
 import tempfile
 import datetime
 import itertools
-
+from django.shortcuts import render
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import DateFieldListFilter
@@ -75,7 +75,7 @@ def set_language(request):
     stores the language in the user profile.
     """
     response = dj_set_language(request)
-    if request.method == "POST" and request.user.is_authenticated():
+    if request.method == "POST" and request.user.is_authenticated:
         language = request.session.get('django_language')
         if language:
             request.user.profile.language = language
@@ -155,6 +155,26 @@ def render_attributes(obj, attrs):
         object_attributes.append((item, getattr(obj, attr), richtext))
     return object_attributes
 
+from django.contrib.auth import authenticate, login,logout
+
+
+def User_login(request):
+    if request.method=="POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return render(request,"home.html",{user:user})
+    elif request.method=="GET":
+        return render(request,"home.html")
+    else:
+        return Http404
+
+def user_logout(request):
+        logout(request.user)
+        return render(request,"home.html")
+
 
 @handle_errors(restricted_access=False)
 def display_object_attributes(request, obj_type, obj_ref, obj_revi):
@@ -191,24 +211,29 @@ def display_object_attributes(request, obj_type, obj_ref, obj_revi):
             ctx["link_creation_action"] = u"%sparts/add/" % obj.plmobject_url
     return r2r('attributes.html', ctx, request)
 
+from django.http import HttpResponsePermanentRedirect
+from django.urls import reverse
+from django.utils.encoding import iri_to_uri
 
 @handle_errors(restricted_access=False)
 def display_object(request, obj_type, obj_ref, obj_revi):
     """
     Generic object view.
-
     Permanently redirects to the attribute page of the given object if it
-    is a part, a user or a group and to the files page if it is a document.
+    is a part, a user, or a group and to the files page if it is a document.
 
     :url: :samp:`/object/{obj_type}/{obj_ref}/{obj_revi}/`
     """
 
     if obj_type in ('User', 'Group'):
-        url = u"/%s/%s/attributes/" % (obj_type.lower(), obj_ref)
+        url = reverse(f'{obj_type.lower()}_attributes', args=[obj_ref])
     else:
-        model_cls = models.get_all_plmobjects()[obj_type]
-        page = "files" if issubclass(model_cls, models.Document) else "attributes"
-        url = u"/object/%s/%s/%s/%s/" % (obj_type, obj_ref, obj_revi, page)
+        if models.get_all_plmobjects()[obj_type]!=None:
+            model_cls = models.get_all_plmobjects()[obj_type]
+            page = "files" if issubclass(model_cls, models.Document) else "attributes"
+            url = reverse('object_page', args=[obj_type, obj_ref, obj_revi, page])
+        else:
+            return Http404
     return HttpResponsePermanentRedirect(iri_to_uri(url))
 
 
@@ -426,89 +451,88 @@ def create_object(request, from_registered_view=False, creation_form=None):
     ``next``
         value of the ``__next__`` request variable if given
     """
-
     obj, ctx = get_generic_data(request)
     Form = forms.TypeForm
-    # it is possible that the created object must be attached to a part
-    # or a document
-    # related_doc and related_part should be a plmobject id
-    # If the related_doc/part is not a doc/part, we let python raise
-    # an AttributeError, since a user should not play with the URL
-    # and openPLM must be smart enough to produce valid URLs
     attach = related = None
-    if "related_doc" in request.REQUEST:
-        Form = forms.PartTypeForm
-        doc = get_obj_by_id(int(request.REQUEST["related_doc"]), request.user)
-        attach = doc.attach_to_part
-        ctx["related_doc"] = request.REQUEST["related_doc"]
-        related = ctx["related"] = doc
-    elif "related_part" in request.REQUEST:
-        Form = forms.DocumentTypeForm
-        part = get_obj_by_id(int(request.REQUEST["related_part"]), request.user)
-        attach = part.attach_to_document
-        ctx["related_part"] = request.REQUEST["related_part"]
-        related = ctx["related"] = part
-    elif "related_parent" in request.REQUEST:
-        Form = forms.PartTypeForm
-        parent = get_obj_by_id(int(request.REQUEST["related_parent"]), request.user)
-        ctx["related_parent"] = request.REQUEST["related_parent"]
-        related = ctx["related"] = parent
-    if "pfiles" in request.REQUEST:
-        Form = forms.Document2TypeForm
 
-    if "__next__" in request.REQUEST:
-        redirect_to = request.REQUEST["__next__"]
-        ctx["next"] = redirect_to
-    else:
-        # will redirect to the created object
-        redirect_to = None
-
-    type_form = Form(request.REQUEST)
-    if type_form.is_valid():
-        type_ = type_form.cleaned_data["type"]
-        cls = models.get_all_users_and_plmobjects()[type_]
-        if not from_registered_view:
-            view = get_creation_view(cls)
-            if view is not None:
-                # view has been registered to create an object of type 'cls'
-                return view(request)
-    else:
-        ctx["creation_type_form"] = type_form
-        return r2r('create.html', ctx, request)
-
-    if request.method == 'GET' and creation_form is None:
-        creation_form = forms.get_creation_form(request.user, cls,
-             template="pfiles" not in request.GET)
-        if related is not None:
-            creation_form.fields["group"].initial = related.group
-            creation_form.initial["lifecycle"] = related.lifecycle
+    if request.method=='GET':
+        if "related_doc" in request.GET:
+            Form = forms.PartTypeForm
+            doc = get_obj_by_id(int(request.GET["related_doc"]), request.user)
+            attach = doc.attach_to_part
+            ctx["related_doc"] = request.GET["related_doc"]
+            related = ctx["related"] = doc
+        elif "related_part" in request.GET:
+            Form = forms.DocumentTypeForm
+            part = get_obj_by_id(int(request.GET["related_part"]), request.user)
+            attach = part.attach_to_document
+            ctx["related_part"] = request.GET["related_part"]
+            related = ctx["related"] = part
+        elif "related_parent" in request.GET:
+            Form = forms.PartTypeForm
+            parent = get_obj_by_id(int(request.GET["related_parent"]), request.user)
+            ctx["related_parent"] = request.GET["related_parent"]
+            related = ctx["related"] = parent
         if "pfiles" in request.GET:
-            pfiles = request.GET.getlist("pfiles")
-            creation_form.initial["pfiles"] = pfiles
-            try:
-                name = filename_to_name(obj.files.get(id=int(pfiles[0])).filename)
-                creation_form.initial["name"] = name
-            except Exception:
-                pass
+            Form = forms.Document2TypeForm
+       
+        if "__next__" in request.GET:
+            redirect_to = request.GET["__next__"]
+            ctx["next"] = redirect_to
+        else:
+            # will redirect to the created object
+            redirect_to = None
+        
+        type_form = Form(request.GET)
+        if type_form.is_valid():
+            type_ = type_form.cleaned_data["type"]
+            cls = models.get_all_users_and_plmobjects()[type_]
+            if not from_registered_view:
+                view = get_creation_view(cls)
+                if view is not None:
+                    # view has been registered to create an object of type 'cls'
+                    return view(request)
+        else:
+            print("func")
+            ctx["creation_type_form"] = type_form
+            print(ctx)
+            return r2r('create.html', ctx, request)
+        
+
+        if request.method == 'GET' and creation_form is None:
+            creation_form = forms.get_creation_form(request.user, cls,template="pfiles" not in request.GET)
+            if related is not None:
+                creation_form.fields["group"].initial = related.group
+                creation_form.initial["lifecycle"] = related.lifecycle
+            if "pfiles" in request.GET:
+                pfiles = request.GET.getlist("pfiles")
+                creation_form.initial["pfiles"] = pfiles
+                try:
+                    name = filename_to_name(obj.files.get(id=int(pfiles[0])).filename)
+                    creation_form.initial["name"] = name
+                except Exception:
+                    pass
+               
     elif request.method == 'POST':
         if creation_form is None:
             creation_form = forms.get_creation_form(request.user, cls, request.POST)
         if creation_form.is_valid():
             ctrl_cls = get_controller(type_)
             ctrl = ctrl_cls.create_from_form(creation_form, request.user)
-            message = _(u"The %(Object_type)s has been created") % dict(Object_type = type_)
+            message = _("The %(Object_type)s has been created") % {'Object_type': type_}
+    
             messages.info(request, message)
             if attach is not None:
                 try:
                     attach(ctrl)
-                    message = _(u"The %(Object_type)s has been attached") % dict(Object_type = type_)
+                    message = _("The %(Object_type)s has been attached") % {'Object_type': type_}
                     messages.info(request, message)
                 except (ControllerError, ValueError) as e:
                     # crtl cannot be attached (maybe the state of the
                     # related object as changed)
                     # alerting the user using the messages framework since
                     # the response is redirected
-                    message = _(u"Error: %(details)s") % dict(details=unicode(e))
+                    message = _(u"Error: %(details)s") % {'details':unicode(e)}
                     messages.error(request, message)
                     # redirecting to the ctrl page that lists its attached
                     # objects

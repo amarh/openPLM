@@ -336,13 +336,12 @@ def filename_to_name(filename):
 def r2r(template, dictionary, request):
     """
     Shortcut for:
-
     ::
-
         render_to_response(template, dictionary,
                               context_instance=RequestContext(request))
     """
-    return render(template, dictionary, context=RequestContext(request))
+    
+    return render(request,template, dictionary)
 
 
 if __name__ == "__main__":

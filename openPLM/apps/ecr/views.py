@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.db.models import F
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openPLM.plmapp import models
 import openPLM.plmapp.views.base as bv

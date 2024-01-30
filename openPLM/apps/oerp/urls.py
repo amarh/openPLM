@@ -1,7 +1,7 @@
 from django.conf.urls import *
-
-urlpatterns = patterns('openPLM.apps.oerp.views',
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/$', 'erp_summary'),
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/publish/$', 'erp_summary', {"publish" : True}),
-    (r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/update_cost/$', 'erp_summary', {"update" : True}),
-)
+from django.urls import re_path
+urlpatterns = [
+    re_path(r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/$', 'erp_summary'),
+    re_path(r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/publish/$', 'erp_summary', {"publish" : True}),
+    re_path(r'^object/([^/]+)/([^/]+)/([^/]+)/ERP/update_cost/$', 'erp_summary', {"update" : True}),
+]

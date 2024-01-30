@@ -20,7 +20,7 @@ class JQueryAutoComplete(forms.TextInput):
         self.options = {}
         self.attrs = {'autocomplete': 'off'}
         self.source = source
-        if isinstance(source, basestring):
+        if isinstance(source, str):
             self.source = escape(source)
         if options:
             self.options = options

@@ -24,7 +24,7 @@
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
 
-
+from openPLM.plmapp.utils import  r2r
 import datetime
 import functools
 import json
@@ -196,25 +196,30 @@ def handle_errors(func=None, undo="..", restricted_access=True, no_cache=True):
             if restricted_access and request.user.profile.restricted:
                 return HttpResponseForbidden()
             try:
-                response = f(request, *args, **kwargs)
+                response = f(request,*args, **kwargs)
                 if no_cache:
                     response['Pragma'] = 'no-cache'
                     response['Cache-Control'] = 'no-cache must-revalidate proxy-revalidate'
                 return response
-            except (ControllerError, ValueError) as exc:
+            except Exception as exc:
+                print(exc)
                 ctx = init_ctx("-", "-", "-")
                 ctx["message"] = _(str(exc))
-                return render("error.html", ctx, context_instance=RequestContext(request))
-            except Http404:
+                return r2r("error.html", ctx,request)
+            """except Http404:
                 raise
             except Exception:
                 if settings.DEBUG:
-                    raise
+                    raise"""
             return HttpResponseServerError()
         return wrapper
+    
     if func:
         return decorator(func)
     return decorator
+    
+
+    
 
 _version = get_version()
 def init_ctx(init_type_, init_reference, init_revision):
@@ -378,7 +383,11 @@ def get_generic_data(request, type_='-', reference='-', revision='-', search=Tru
         ctx["is_readable"] = True
     # little hack to avoid a KeyError
     # see https://github.com/toastdriven/django-haystack/issues/404
-    from haystack import site
+    try:
+      from haystack import site
+    except ImportError:
+        from haystack import indexes as site
+
     for r in request.session.get("results", []):
         r.searchsite = site
 

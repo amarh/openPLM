@@ -42,11 +42,7 @@
                         <li>
                         <select name="language">
 
-                            {% for lang in LANGUAGES %}
-                                <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %} >
-                                {{ lang.1 }}
-                                </option>
-                            {% endfor %}
+                          
                         </select>
                         </li>
                         <li>
@@ -65,7 +61,7 @@
                         </div>
                     {% endif %}
 
-                    <form action="{% url 'django.contrib.auth.views.login' %}" method="post">{% csrf_token %}
+                    <form action="{% url 'User_login' %}" method="post">{% csrf_token %}
                         <table style="display:inline-block">
                             <tr>
                                 <td>{% trans "Login :" %}</td>

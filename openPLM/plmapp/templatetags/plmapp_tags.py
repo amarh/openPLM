@@ -246,14 +246,18 @@ def add_get(parser, token):
         else:
             variables.append(parser.compile_filter(pair))
     return AddGetParameter(values, variables)
-
+from django.shortcuts import redirect
 
 class AddSearchParameter(Node):
     def __init__(self, values):
         self.values = values
-
+        
     def render(self, context):
-        req = Variable('request', context)
+        try:
+          req = Variable('request', context)
+        except Exception as e:
+            print(e)
+            return redirect("/")
         params = req.GET.copy()
         if "type" not in self.values:
             params["type"] = req.session.get("type", "all")
@@ -264,6 +268,7 @@ class AddSearchParameter(Node):
         for key, value in self.values.items():
             params[key] = value.resolve(context)
         return '?%s' %  params.urlencode()
+
 
 
 @register.tag

@@ -87,7 +87,7 @@ def enhance_fields(form, cls):
     if richtext_class is not None:
         richtext_class = import_dotted_path(richtext_class)
 
-    for field, form_field in form.base_fields.iteritems():
+    for field, form_field in form.base_fields.items():
         if field not in ("reference", "revision") and \
                 isinstance(form_field.widget, forms.TextInput):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)

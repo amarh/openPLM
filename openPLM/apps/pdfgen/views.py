@@ -23,14 +23,14 @@
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
-
+import io
 import os.path
 import datetime
 import warnings
 from collections import namedtuple
 
-from pyPdf import PdfFileWriter, PdfFileReader
-from pyPdf.generic import NameObject, DictionaryObject, NumberObject,\
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2.generic import NameObject, DictionaryObject, NumberObject,\
     StreamObject, ArrayObject, IndirectObject
 
 from django import http
@@ -43,7 +43,7 @@ try:
     import xhtml2pdf.pisa as pisa
 except ImportError:
     import ho.pisa as pisa
-import cStringIO as StringIO
+#import cStringIO as StringIO
 
 from openPLM.plmapp.views.base import get_obj, handle_errors, get_generic_data
 from openPLM.plmapp.controllers import get_controller
@@ -77,7 +77,7 @@ class StreamedPdfFileWriter(PdfFileWriter):
                 data[key] = value
             return data
         elif isinstance(data, ArrayObject):
-            for i in xrange(len(data)):
+            for i in range(len(data)):
                 value = self._sweepIndirectReferences(externMap, data[i])
                 if isinstance(value, StreamObject):
                     # an array value is a stream.  streams must be indirect
@@ -129,7 +129,7 @@ class StreamedPdfFileWriter(PdfFileWriter):
         self._sweepIndirectReferences(externalReferenceMap, self._root)
         del self.set
 
-        stream = StringIO.StringIO()
+        stream = io.StringIO.StringIO()
         for i, obj in enumerate(self._objects):
             idnum = (i + 1)
             object_positions.append(length)
@@ -190,8 +190,8 @@ def render_to_pdf(template_src, context_dict, filename):
     template = get_template(template_src)
     context = Context(context_dict)
     html = template.render(context)
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-16")), result,
+    result = io.StringIO.StringIO()
+    pdf = pisa.pisaDocument(io.StringIO.StringIO(html.encode("utf-16")), result,
         link_callback=fetch_resources)
     if not pdf.err:
         response = http.HttpResponse(result.getvalue(), content_type='application/pdf')
@@ -250,8 +250,8 @@ def download_merged_pdf(obj, files):
             }
     template = get_template("summary.xhtml")
     html  = template.render(Context(ctx))
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-16")), result)
+    result = io.openStringIO.StringIO()
+    pdf = pisa.pisaDocument(io.StringIO.StringIO(html.encode("utf-16")), result)
     result.seek(0)
     inp = PdfFileReader(result)
     for page in inp.pages:

@@ -452,7 +452,7 @@ def get_all_subclasses(base, d):
 
 @memoize_noarg
 def get_all_plmobjects():
-    u"""
+    """
     Returns a dict<name, class> of all available :class:`.PLMObject` subclasses
     """
     res = {}
@@ -461,6 +461,7 @@ def get_all_plmobjects():
     del res["PLMObject"]
     get_all_subclasses(IObject, res)
     del res["IObject"]
+    print(res)
     return res
 
 @memoize_noarg

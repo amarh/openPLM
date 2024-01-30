@@ -196,7 +196,13 @@ HAYSTACK_XAPIAN_PATH = ":memory:"
 # the memory backend does not support spelling
 HAYSTACK_INCLUDE_SPELLING = False
 EXTRACTOR = os.path.abspath("bin/extractor.sh")
-
+import os
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
+}
 # celery stuff
 BROKER_BACKEND = "memory"
 CELERY_ALWAYS_EAGER = True

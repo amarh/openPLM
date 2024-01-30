@@ -6,7 +6,7 @@ from django.contrib.syndication.views import Feed
 from django.utils.encoding import iri_to_uri
 from django.utils.html import strip_tags
 from django.utils.feedgenerator import Atom1Feed
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openPLM.plmapp.views.base import get_obj
 from openPLM.plmapp.models import timeline_histories

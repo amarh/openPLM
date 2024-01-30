@@ -167,7 +167,7 @@ def import_models(force_reload=False):
                     __import__(import_name, globals(), locals(), [], -1)
                 except ImportError as exc:
                     print ("Exception in import_models", module_name, exc)
-                except StandardError as  exc:
+                except Exception as  exc:
                     print ("Exception in import_models", module_name, type(exc), exc)
 import_models()
 

@@ -128,5 +128,4 @@ if __name__ == "__main__":
                 " a AND NOT b OR CC",
                 ):
         s = s.strip()
-        print s
-        print c(s)[0]
+        print( c(s)[0])

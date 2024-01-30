@@ -1,11 +1,9 @@
 from django.db import models
 from django.contrib import admin
 from django.core.validators import RegexValidator
-from django.utils.translation import ugettext_noop
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_lazy as _
 import pysvn
-
 import openPLM.plmapp.exceptions as exc
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
@@ -17,10 +15,11 @@ date_rx = (r"(?P<year>[0-9]{4})(-(?P<month>[0-9]{1,2})(-(?P<day>[0-9]{1,2})"
 
 revision_rx = r'^\d+|HEAD|\{(?:%s)\}$' % date_rx
 revision_validator = RegexValidator(revision_rx,
-        message=ugettext_noop(u"Valid value are HEAD, a number or a date between brackets"))
+        message=gettext_noop(u"Valid value are HEAD, a number or a date between brackets"))
 
 class SubversionRepository(Document):
-
+    class Meta:
+        app_label="subversion"
     ACCEPT_FILES = False
 
     repository_uri = models.CharField(verbose_name=_("repository uri"),max_length=250, blank=False, null=False)
@@ -71,7 +70,8 @@ def parse_revision(rev_string):
 
 
 class SubversionRepositoryController(DocumentController):
-
+    class Meta:
+        app_label="subversion"
     def lock(self, doc_file):
         raise exc.LockError()
 
@@ -103,7 +103,7 @@ class SubversionRepositoryController(DocumentController):
                 rev = str(infos[0][1]["rev"].number)
                 self.object.svn_revision = rev
                 self.object.save()
-            except (StandardError, pysvn.ClientError):
+            except (Exception, pysvn.ClientError):
                 pass
         return r
 

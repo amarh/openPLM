@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011 David Sauve
+'''# Copyright (C) 2009, 2010, 2011 David Sauve
 # Copyright (C) 2009, 2010 Trapeze
 # 2011: Modifications by LinObject
 
@@ -1333,3 +1333,4 @@ def _marshal_datetime(dt):
             dt.year, dt.month, dt.day, dt.hour,
             dt.minute, dt.second
         )
+'''
