@@ -1,20 +1,16 @@
 import re
-
 from django import template
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.template import Node, resolve_variable
-
+from django.template import Node, Variable
 from haystack.models import SearchResult
 
-from openPLM.plmapp.controllers import (DocumentController, PartController,
-        UserController, GroupController)
+
+from openPLM.plmapp.controllers import (DocumentController, PartController,UserController, GroupController)
 from openPLM.plmapp import models
 from openPLM.plmapp.filters import richtext, plaintext
 from openPLM.plmapp.utils import get_pages_num
-
-
 register = template.Library()
 
 @register.filter
@@ -228,7 +224,7 @@ class AddGetParameter(Node):
         self.variables = variables
 
     def render(self, context):
-        req = resolve_variable('request', context)
+        req = Variable('request', context)
         params = req.GET.copy()
         for key, value in self.values.items():
             params[key] = value.resolve(context)
@@ -250,14 +246,18 @@ def add_get(parser, token):
         else:
             variables.append(parser.compile_filter(pair))
     return AddGetParameter(values, variables)
-
+from django.shortcuts import redirect
 
 class AddSearchParameter(Node):
     def __init__(self, values):
         self.values = values
-
+        
     def render(self, context):
-        req = resolve_variable('request', context)
+        try:
+          req = Variable('request', context)
+        except Exception as e:
+            print(e)
+            return redirect("/")
         params = req.GET.copy()
         if "type" not in self.values:
             params["type"] = req.session.get("type", "all")
@@ -268,6 +268,7 @@ class AddSearchParameter(Node):
         for key, value in self.values.items():
             params[key] = value.resolve(context)
         return '?%s' %  params.urlencode()
+
 
 
 @register.tag
@@ -305,7 +306,7 @@ def do_is_object_readable(parser, token):
     try:
         tag_name, = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires no arguments" % token.contents.split()[0]
+        raise (template.TemplateSyntaxError, "%r tag requires no arguments" % token.contents.split()[0])
     return IsObjectReadableNode()
 register.tag('is_object_readable', do_is_object_readable)
 

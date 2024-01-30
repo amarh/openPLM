@@ -1,33 +1,26 @@
 
 #! -*- coding:utf-8 -*-
-
 from django.db import models
 from openPLM.plmapp.lifecycle import LifecycleList
 from openPLM.plmapp.utils import memoize_noarg
 
-
-
 # lifecycle stuff
-
 class State(models.Model):
-    u"""
+    """
     State : object which represents a state in a lifecycle
 
     .. attribute:: name
 
         name of the state, must be unique
     """
-
     class Meta:
         app_label = "plmapp"
-
     name = models.CharField(max_length=50, primary_key=True)
-
     def __unicode__(self):
         return u'State<%s>' % self.name
 
 class Lifecycle(models.Model):
-    u"""
+    """
     Lifecycle : object which represents a lifecycle
 
     .. attribute:: name
@@ -58,8 +51,9 @@ class Lifecycle(models.Model):
         (TEMPLATE, "template"),
     )
 
+
     name = models.CharField(max_length=50, primary_key=True)
-    official_state = models.ForeignKey(State)
+    official_state = models.ForeignKey(State,on_delete=models.CASCADE)
     type = models.PositiveSmallIntegerField(default=STANDARD, choices=TYPES)
 
     def __init__(self, *args, **kwargs):
@@ -133,8 +127,8 @@ class LifecycleStates(models.Model):
 
     The link is made with a field *rank* to order the states.
     """
-    lifecycle = models.ForeignKey(Lifecycle)
-    state = models.ForeignKey(State)
+    lifecycle = models.ForeignKey(Lifecycle,on_delete=models.CASCADE)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
     rank = models.PositiveSmallIntegerField()
 
 
@@ -152,7 +146,10 @@ def get_default_lifecycle():
     u"""
     Returns the default :class:`.Lifecycle` used when instanciate a :class:`.PLMObject`
     """
-    return Lifecycle.objects.get(name="draft_official_deprecated")
+    try:
+        return Lifecycle.objects.get(name="draft_official_deprecated")
+    except Lifecycle.DoesNotExist:
+        return None
 
 @memoize_noarg
 def get_cancelled_lifecycle():
@@ -171,16 +168,22 @@ def get_cancelled_state():
 
 _default_states_cache = {}
 def get_default_state(lifecycle=None):
-    u"""
-    Returns the default :class:`.State` used when instanciate a :class:`.PLMObject`.
+    """
+    Returns the default :class:`.State` used when instantiating a :class:`.PLMObject`.
     It's the first state of the default lifecycle.
     """
 
-    if not lifecycle:
+    if lifecycle is None:
         lifecycle = get_default_lifecycle()
-    state = _default_states_cache.get(lifecycle.name, None)
-    if state is None:
-        state = lifecycle.first_state
-        _default_states_cache[lifecycle.name] = state
-    return state
+
+    if lifecycle and lifecycle.name:
+        state = _default_states_cache.get(lifecycle.name, None)
+        if state is None:
+            state = lifecycle.first_state
+            _default_states_cache[lifecycle.name] = state
+        return state
+    else:
+        # Handle the case when lifecycle or its name attribute is None
+        return None  # Replace this line with your desired logic
+
 

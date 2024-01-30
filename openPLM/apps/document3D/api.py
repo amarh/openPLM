@@ -73,7 +73,7 @@ def prepare_multi_check_out(request,doc_id):
 
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def lock_docfiles(documents, user,type_check_out):  # para generar bien el commit on succes
 
     objects=[]

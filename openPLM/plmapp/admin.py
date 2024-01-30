@@ -40,5 +40,5 @@ for attr in dir(m):
         obj = getattr(m, attr)
         if issubclass(obj, models.Model) and not obj._meta.abstract:
             admin.site.register(obj)
-    except (TypeError, admin.sites.AlreadyRegistered), e:
+    except (TypeError, admin.sites.AlreadyRegistered) as  e:
         continue

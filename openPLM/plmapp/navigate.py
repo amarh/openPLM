@@ -30,16 +30,16 @@ the navigation's graph in :func:`~plmapp.views.navigate`.
 import re
 import datetime
 import warnings
-import cStringIO as StringIO
+#import cStringIO as StringIO
 import xml.etree.cElementTree as ET
 from collections import defaultdict
-
+import io
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.html import linebreaks
 from django.utils.encoding import iri_to_uri
-from django.forms.util import from_current_timezone
+from django.forms.utils import from_current_timezone
 
 import pygraphviz as pgv
 
@@ -658,8 +658,8 @@ class NavigationGraph(object):
 
         prog = self.options.get("prog", "dot")
         self.graph.layout(prog=prog)
-        s = StringIO.StringIO()
-        svg = StringIO.StringIO()
+        s = io.StringIO()
+        svg = io.StringIO()
         self.graph.draw(svg, format='svg', prog=prog)
         svg.seek(0)
         self.graph.draw(s, format='cmapx', prog=prog)

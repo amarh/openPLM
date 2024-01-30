@@ -30,7 +30,7 @@ All exceptions defined here derive from :exc:`ControllerError`
 (except of course :exc:`ControllerError`)
 """
 
-class ControllerError(StandardError):
+class ControllerError(Exception):
     """
     Base class of exceptions raised by a
     :class:`~plmapp.controllers.PLMObjectController`.

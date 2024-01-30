@@ -26,19 +26,22 @@
 This module contains a function :func:`send_mail` which can be used to notify
 users about a changement in a :class:`.PLMObject`.
 """
-from collections import Iterable, Mapping, defaultdict
+from collections.abc import Iterable, Mapping
+from collections import defaultdict
+
 from operator import itemgetter
 from itertools import groupby
-
-import kjbuckets
+import networkx as nx 
+#import kjbuckets
 
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Model, Q
 from django.template.loader import render_to_string
-from django.db.models.loading import get_model
+from django.apps import apps
+
 from django.contrib.sites.models import Site
 from djcelery_transactions import task
 
@@ -62,7 +65,7 @@ def get_recipients(obj, roles, users):
         links = tuple(DelegationLink.current_objects.filter(roles_filter).order_by("role")\
                 .values_list("role", "delegator", "delegatee"))
         for role, group in groupby(links, itemgetter(0)):
-            gr = kjbuckets.kjGraph(tuple((x[1], x[2]) for x in group))
+            gr = nx.DiGraph(tuple((x[1], x[2]) for x in group))
             for u in users:
                 recipients.update(gr.reachable(u).items())
     elif roles == [ROLE_OWNER]:

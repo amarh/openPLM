@@ -555,7 +555,7 @@ def initialize_assemblies(assemblies,product,group,user,index, obj_type, inbulk_
 
         assemblies.append(Assembly(part_docs, product.name, product.visited, product.deep, obj_type))
 
-@transaction.commit_on_success
+@transaction.atomic
 def generate_part_doc_links_AUX(request,product, parent_ctrl,instances,doc3D):
     # wraps generate_part_doc_links with @commit_on_succes
     # it is not possible to decorate this function since it is recursive

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import admin
-from django.utils.translation import ugettext_noop, ugettext_lazy as _
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from openPLM.plmapp.models import Document
 from openPLM.plmapp.controllers import DocumentController
@@ -17,7 +17,7 @@ class Page(Document):
     @property
     def menu_items(self):
         menu = super(Page, self).menu_items
-        menu.insert(0, ugettext_noop("page"))
+        menu.insert(0, gettext_noop("page"))
         return menu
 
     def is_promotable(self):

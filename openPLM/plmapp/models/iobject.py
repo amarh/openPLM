@@ -6,7 +6,7 @@ class IObject(object):
 
     @property
     def plmobject_url(self):
-        return u""
+        return ""
 
     @property
     def menu_items(self):

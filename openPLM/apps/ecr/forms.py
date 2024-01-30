@@ -3,7 +3,7 @@ import re
 from django import forms
 from django.forms.fields import BooleanField
 from django.forms import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import openPLM.plmapp.models as m
 from openPLM.plmapp.references import validate_reference

@@ -50,7 +50,7 @@ class PartCost(models.Model):
     part = models.ForeignKey(Part, unique=True)
     cost = models.FloatField(validators=[MinValueValidator(0),])
     unit = models.CharField(max_length=4, choices=UNITS,
-                default=lambda: DEFAULT_UNIT)
+                default=DEFAULT_UNIT)
 
     def __unicode__(self):
         return u"PartCost<%s, %.2f, %s>" % (self.part, self.cost, self.unit)

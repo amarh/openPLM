@@ -1,9 +1,6 @@
 import datetime
-from django.utils import timezone
-import urlparse
-
+from urllib.parse import urlparse
 import pysvn
-
 from openPLM.plmapp.utils import r2r
 from openPLM.plmapp.views.base import handle_errors, get_generic_data
 

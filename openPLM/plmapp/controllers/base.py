@@ -30,8 +30,9 @@ import difflib
 import itertools
 from functools import wraps
 from collections import deque
+from django.core.exceptions import FieldDoesNotExist
 
-from django.db.models.fields import FieldDoesNotExist
+
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import PermissionError

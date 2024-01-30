@@ -7,45 +7,45 @@
 {% block leftcolumn %} {% endblock %}
 
 {% block reference %}
-    <div id="ReferenceArea">
-        <h2>
-            {% with user.get_full_name as full_name %}
-                {% blocktrans %}Welcome {{full_name}}{% endblocktrans %}
-            {% endwith %}
-        </h2>
-    </div>
+<div id="ReferenceArea">
+    <h2>
+        {% with user.get_full_name as full_name %}
+        {% blocktrans %}Welcome {{full_name}}{% endblocktrans %}
+        {% endwith %}
+    </h2>
+</div>
 {% endblock %}
 
 {% block content %}
 
-    <div id="supermenuholder">
-        {% include "blocks/supermenu.html" %}
+<div id="supermenuholder">
+    {% include "blocks/supermenu.html" %}
+</div>
+
+{% with pending_invitations_owner as pending_invitations %}
+{% if pending_invitations %}
+<div>
+    <h3 class="hplm">{% trans "Groups that you own: pending invitations" %}</h3>
+    <div class="invitations">
+        {% include "groups/pending_invitations.html" with prefix="yes" %}
     </div>
-    
-    {% with pending_invitations_owner as pending_invitations %}
-        {% if pending_invitations %}
-            <div>
-                <h3 class="hplm">{% trans "Groups that you own: pending invitations" %}</h3>
-                <div class="invitations">
-                {% include "groups/pending_invitations.html" with prefix="yes" %}
-                </div>
-            </div>
-        {% endif %}
-    {% endwith %}
-    {% with pending_invitations_guest as pending_invitations %}
-        {% if pending_invitations %}
-            <div>
-                <h3 class="hplm">{% trans "Groups that you may join: pending invitations" %}</h3>
-                <div class="invitations">
-                {% include "groups/pending_invitations.html" with prefix="yes" %}
-                </div>
-            </div>
-        {% endif %}
-    {% endwith %}
+</div>
+{% endif %}
+{% endwith %}
+{% with pending_invitations_guest as pending_invitations %}
+{% if pending_invitations %}
+<div>
+    <h3 class="hplm">{% trans "Groups that you may join: pending invitations" %}</h3>
+    <div class="invitations">
+        {% include "groups/pending_invitations.html" with prefix="yes" %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+
 {% endblock %}
 
 {% block scripts %}
-    <script>$(function(){$("input[name='q']").focus()});</script>
+<script>$(function () { $("input[name='q']").focus() });</script>
 {% endblock %}
-
-

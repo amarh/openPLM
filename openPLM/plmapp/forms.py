@@ -34,9 +34,11 @@ from django.forms.models import modelform_factory, modelformset_factory, \
         BaseModelFormSet
 from django.forms.fields import BooleanField
 from django.contrib.auth.models import User, Group
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
-from django.utils.functional import memoize
+#from functools import lru_cache
+
+#from django.utils.functional import memoize
 from django.template.defaultfilters import filesizeformat
 
 from haystack.forms import SearchForm
@@ -85,7 +87,7 @@ def enhance_fields(form, cls):
     if richtext_class is not None:
         richtext_class = import_dotted_path(richtext_class)
 
-    for field, form_field in form.base_fields.iteritems():
+    for field, form_field in form.base_fields.items():
         if field not in ("reference", "revision") and \
                 isinstance(form_field.widget, forms.TextInput):
             source = '/ajax/complete/%s/%s/' % (cls.__name__, field)
@@ -931,7 +933,7 @@ def get_headers_formset(Importer):
 
     return formset_factory(CSVHeaderForm, extra=0, formset=BaseHeadersFormset)
 
-get_headers_formset = memoize(get_headers_formset, {}, 1)
+#get_headers_formset = lru_cache(get_headers_formset, {}, 1)
 
 class ConfirmPasswordForm(forms.Form):
     """

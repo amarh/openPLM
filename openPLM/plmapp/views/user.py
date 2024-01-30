@@ -23,18 +23,16 @@
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
-
+from django.shortcuts import render
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import (HttpResponseRedirect, Http404,
                         HttpResponseForbidden, HttpResponseBadRequest)
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import gettext_lazy as _
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
-from openPLM.plmapp.views.base import (get_obj_from_form,
-    handle_errors, get_generic_data, register_creation_view)
+from openPLM.plmapp.views.base import (get_obj_from_form,handle_errors, get_generic_data, register_creation_view)
 from openPLM.plmapp.exceptions import ControllerError, PermissionError
 from openPLM.plmapp.utils import level_to_sign_str, r2r
 
@@ -53,7 +51,7 @@ def get_last_edited_objects(user):
         h = qs[0]
         histories.append(h)
         plmobjects.append(h.plmobject_id)
-        for i in xrange(4):
+        for i in range(4):
             h = qs.filter(date__lt=h.date).exclude(plmobject__in=plmobjects)[0]
             histories.append(h)
             plmobjects.append(h.plmobject_id)
@@ -160,16 +158,15 @@ def delegate(request, obj_ref, role, sign_level):
 
 
 @handle_errors
-def display_groups(request, obj_ref):
+def display_users(request,obj_ref):
     """
     View of the *groups* page of a user.
 
     """
-    obj, ctx = get_generic_data(request, "User", obj_ref)
-    ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all())\
-            .order_by("name")
+    obj, ctx = get_generic_data(request, "User")
+    ctx["groups"] = models.GroupInfo.objects.filter(id__in=obj.groups.all()).order_by("name")
     ctx['current_page'] = 'groups'
-    return r2r("users/groups.html", ctx, request)
+    return render("users/groups.html", ctx, request)
 
 @handle_errors
 def sponsor(request, obj_ref):

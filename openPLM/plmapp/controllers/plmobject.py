@@ -31,7 +31,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import openPLM.plmapp.models as models
 from openPLM.plmapp.exceptions import RevisionError, PermissionError,\

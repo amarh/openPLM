@@ -7,7 +7,7 @@ __version__ = (1, 1, 6, 'beta')
 
 import time
 import datetime
-import cPickle as pickle
+import  pickle
 import os
 import re
 import shutil
@@ -15,7 +15,7 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import force_unicode
+#from django.utils.encoding import force_unicode
 
 from haystack.backends import BaseSearchBackend, BaseSearchQuery, SearchNode, log_query
 from haystack.constants import ID
@@ -1301,7 +1301,7 @@ def _marshal_value(value):
     elif isinstance(value, (int, long)):
         value = u'%012d' % value
     else:
-        value = force_unicode(value).lower()
+        value = value.lower()
     return value
 
 
@@ -1314,7 +1314,7 @@ def _marshal_term(term):
     elif isinstance(term, datetime.date):
         term = _marshal_date(term)
     else:
-        term = force_unicode(term).lower()
+        term = term.lower()
     return term
 
 

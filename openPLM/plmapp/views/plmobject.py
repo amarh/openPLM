@@ -31,7 +31,7 @@ from mimetypes import guess_type
 from django.forms import HiddenInput
 from django.http import (HttpResponseRedirect, Http404,
     HttpResponseForbidden, StreamingHttpResponse)
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 import openPLM.plmapp.models as models

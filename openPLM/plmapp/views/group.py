@@ -23,25 +23,24 @@
 #    Philippe Joulaud : ninoo.fr@gmail.com
 #    Pierre Cosquer : pcosquer@linobject.com
 ################################################################################
-
+from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import gettext_lazy as _
 import openPLM.plmapp.models as models
 import openPLM.plmapp.forms as forms
 from openPLM.plmapp.views.base import handle_errors, get_generic_data, get_pagination
 from openPLM.plmapp.utils import r2r
 
 
-@handle_errors
-def display_users(request, obj_ref):
+@handle_errors(restricted_access=False)
+def display_groups(request, obj_ref):
     """
     View of the *user* page of a group.
 
     """
-    obj, ctx = get_generic_data(request, "Group", obj_ref)
+    obj, ctx = get_generic_data(request,"Group", obj_ref)
     if request.method == "POST":
         formset = forms.get_user_formset(obj, request.POST)
         if formset.is_valid():
@@ -54,7 +53,11 @@ def display_users(request, obj_ref):
             state=models.Invitation.PENDING).select_related("guest", "owner")
     ctx['current_page'] = 'users'
     ctx['in_group'] = bool(request.user.groups.filter(id=obj.id))
-    return r2r("groups/users.html", ctx, request)
+    return render("groups/users.html", ctx, request)
+
+
+
+
 
 
 @handle_errors

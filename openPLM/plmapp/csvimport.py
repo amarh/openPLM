@@ -1,7 +1,6 @@
 u"""
 Tools to import data from a CSV file.
 """
-
 import re
 from abc import ABCMeta, abstractmethod
 from functools import partial
@@ -9,19 +8,17 @@ from itertools import islice
 from collections import defaultdict
 
 from django.db import transaction
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
 
 from openPLM.plmapp import models
 from openPLM.plmapp.utils.unicodecsv import UnicodeReader
 from openPLM.plmapp.controllers import PLMObjectController, UserController
 from openPLM.plmapp.tasks import update_indexes
-
-
 # function that replace spaces by an underscore
 _to_underscore = partial(re.compile(r"\s+").sub, "_")
 
-class CSVImportError(StandardError):
+class CSVImportError(Exception):
     """
     Exception raised when an import of a CSV file fails.
 
@@ -141,7 +138,7 @@ class CSVImporter(object):
         self.csv_file.seek(0)
         return Preview(self.csv_file, self.encoding, self.get_headers_set())
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def __do_import_csv(self, headers):
         self.csv_file.seek(0)
         reader = UnicodeReader(self.csv_file, encoding=self.encoding)
@@ -158,7 +155,7 @@ class CSVImporter(object):
         for line, row in enumerate(reader):
             try:
                 self.parse_row(line + 2, row)
-            except Exception, e:
+            except Exception as e:
                 self.store_errors(line + 2, e)
         if self._errors:
             raise CSVImportError(self._errors)

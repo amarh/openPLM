@@ -59,8 +59,8 @@ For example, if you have a model called *PDFDocument* with an attribute called
                     self.save()
 """
 
-from base import FileHandler, HandlersManager
-from odfhandler import ODFHandler
-from pdfhandler import PDFHandler
+from .base import FileHandler, HandlersManager
+from .odfhandler import ODFHandler
+from .pdfhandler import PDFHandler
 
-from progressbarhandler import *
+from .progressbarhandler import *

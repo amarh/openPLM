@@ -1,15 +1,17 @@
 ###########################
 # adapted from https://github.com/mixcloud/django-celery-haystack-SearchIndex/
 # by sdcooke
-
 from functools import wraps
-
-from django.db.models.loading import get_model
-
+#from django.db.models.loading import get_model
+from django.apps import apps
+#apps.get_model('app_name', 'ModelName')
 import openPLM.plmapp.mail
 import openPLM.plmapp.thumbnailers
-
+import django 
+from functools import wraps
+from django.apps import apps
 from djcelery_transactions import task
+
 
 def synchronized(cls=None, lock=None):
     """Class decorator to synchronize execution of a task's run method.
@@ -66,7 +68,6 @@ def _get_manager(model_class):
         return manager.select_related(*_documentfile_fields)
     return manager
 
-
 @synchronized
 @task(name="openPLM.plmapp.tasks.update_index",
       default_retry_delay=60, max_retries=10)
@@ -74,7 +75,7 @@ def update_index(app_name, model_name, pk, fast_reindex=False, **kwargs):
     from haystack import site
     import openPLM.plmapp.search_indexes
 
-    model_class = get_model(app_name, model_name)
+    model_class = apps.get_model(app_name, model_name)
     manager = _get_manager(model_class)
     instance = manager.get(pk=pk)
     if fast_reindex:
@@ -88,15 +89,15 @@ def update_index(app_name, model_name, pk, fast_reindex=False, **kwargs):
 def update_indexes(instances, fast_reindex=False):
     from haystack import site
     import openPLM.plmapp.search_indexes
-
     for app_name, model_name, pk in instances:
-        model_class = get_model(app_name, model_name)
+        model_class = apps.get_model(app_name, model_name)
         manager = _get_manager(model_class)
         instance = manager.get(pk=pk)
         if fast_reindex:
             instance.fast_reindex = True
         search_index = site.get_index(model_class)
         search_index.update_object(instance)
+
 update_indexes = synchronized(update_indexes, update_index.lock)
 
 
@@ -106,7 +107,7 @@ def remove_index(app_name, model_name, identifier):
     from haystack import site
     import openPLM.plmapp.search_indexes
 
-    model_class = get_model(app_name, model_name)
+    model_class = apps.get_model(app_name, model_name)
     search_index = site.get_index(model_class)
     search_index.remove_object(identifier)
 remove_index = synchronized(remove_index, update_index.lock)
@@ -116,4 +117,3 @@ remove_index = synchronized(remove_index, update_index.lock)
 def add(a, b):
     u"""Simple task, to test the queue ;-)"""
     return a + b
-

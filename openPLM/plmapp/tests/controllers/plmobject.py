@@ -220,7 +220,7 @@ class ControllerTest(BaseTestCase):
         ctrl = self.create("Part1")
         self.promote_to_official(ctrl)
         rev = ctrl.revise("b")
-        rev.object.is_promotable = lambda: True
+        rev.object.is_promotable =True
         self.assertEqual(self.user, rev.owner)
         rev.promote()
         self.assertTrue(rev.is_official)
@@ -239,7 +239,7 @@ class ControllerTest(BaseTestCase):
         ctrl.state = ctrl.lifecycle.last_state
         ctrl.set_owner(self.cie)
         ctrl.save()
-        rev.object.is_promotable = lambda: True
+        rev.object.is_promotable = True
         self.assertEqual(self.user, rev.owner)
         rev.promote()
         self.assertTrue(rev.is_official)
@@ -255,7 +255,7 @@ class ControllerTest(BaseTestCase):
         ctrl = self.create("Part1")
         ctrl.save()
         rev = ctrl.revise("b")
-        rev.object.is_promotable = lambda: True
+        rev.object.is_promotable = True
         self.assertEqual(self.user, rev.owner)
         rev.promote()
         ctrl = rev.get_previous_revisions()[0]

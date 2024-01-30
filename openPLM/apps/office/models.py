@@ -27,7 +27,7 @@ import os
 from django.db import models
 from django.contrib import admin
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openPLM.plmapp.filehandlers import HandlersManager
 from openPLM.plmapp.models import Document
@@ -43,7 +43,7 @@ def register(cls):
 class OfficeDocument(Document):
 
     nb_pages = models.PositiveIntegerField(_("Number of pages"), blank=True, null=True)
-    format = models.CharField(verbose_name=_("format"), max_length=10, choices=CFORMATS, default=lambda: "A4")
+    format = models.CharField(verbose_name=_("format"), max_length=10, choices=CFORMATS, default="A4")
 
     @property
     def attributes(self):

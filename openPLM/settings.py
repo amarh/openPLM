@@ -19,18 +19,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # or 'postgresql', 'mysql', 'sqlite3', 'oracle'.
-        'NAME': 'openplm',               # Or path to database file if using sqlite3.
-        'USER': 'django',                # Not used with sqlite3.
-        #XYZ: should be the password set by the postgresql command
-        # "create role django with password 'MyPassword' login;"
-        'PASSWORD': 'MyPassword',        # Not used with sqlite3.
-        'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
+
 
 
 #XYZ: Local time zone for this installation. Choices can be found here:
@@ -86,12 +75,12 @@ LOCALE_PATHS = (
 
 ugettext = lambda s: s
 LANGUAGES = (
-      ('fr', u'Français'),
-      ('en', 'English'),
-      ('es', u'Español'),
-      ('ja', u'日本語'),
-      ('ru', u'Русский'),
-      ('zh_CN', u'中文'),
+    ('fr', 'Français'),
+    ('en', 'English'),
+    ('es', 'Español'),
+    ('ja', '日本語'),
+    ('ru', 'Русский'),
+    ('zh-hans', '中文'),
 )
 
 ROOT_URLCONF = 'openPLM.urls'
@@ -104,6 +93,7 @@ TEMPLATE_DIRS = (
 )
 USE_TZ = True
 
+MIGRATION_MODULES = {'plmapp': 'plmapp.migrations'}
 
 #: list of installed apps
 INSTALLED_APPS = (
@@ -112,13 +102,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django.contrib.comments',
+    'django_comments',
     'django.contrib.humanize',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djcelery',
+    #'djcelery',
     'haystack',
-    'south',
     'openPLM.plmapp',
     'openPLM.apps.rss',
     'openPLM.apps.pdfgen', # enable pdf generations
@@ -128,7 +117,8 @@ INSTALLED_APPS = (
     'openPLM.apps.cae',
     'openPLM.apps.office',
     # document3D requires pythonOCC, uncomment this line to enable it
-    # 'openPLM.apps.document3D',
+     'openPLM.apps.document3D',
+     'openPLM.apps.subversion',
 )
 
 COMMENTS_APP = "openPLM.plmapp"
@@ -151,11 +141,15 @@ if "openPLM.apps.document3D" in INSTALLED_APPS:
         "openPLM.apps.document3d.models.decomposer_all": {"queue": "step"},
     })
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+CELERY_CONFIG_MODULE = 'your_celery_config_module'
 
 #XYZ: allowed hosts
 #: see :django:setting:`ALLOWED_HOSTS`
-ALLOWED_HOSTS = ["www.example.com",]
-
+ALLOWED_HOSTS = ["*"]
+DEBUG = True 
 #XYZ: EMAIL settings
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-EMAIL_HOST
 EMAIL_HOST = 'localhost'
@@ -186,7 +180,22 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.request",
         "django.contrib.messages.context_processors.messages",
         )
+import os
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
+}
 
+
+MIDDLEWARE = [
+    # ...
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    # ...
+]
 
 #XYZ:
 #: expeditor's mail used when sending notification emails
@@ -198,23 +207,79 @@ EMAIL_OPENPLM = "no-reply@openplm.example.com"
 #: ``new_user`` and ``sponsor`` (:class:`.User` instances)
 #: for example, it could be
 #: ``u"Welcome {{new_user.get_full_name}}, {{sponsor.get_full_name}} has sponsored you on OpenPLM"``.
-NEW_ACCOUNT_SUBJECT = u"New account on OpenPLM"
+NEW_ACCOUNT_SUBJECT = "New account on OpenPLM"
 
 #: Max file size for documents in bytes, -1 means illimited
 MAX_FILE_SIZE = -1
 
 # search stuff
-if "rebuild_index" not in sys.argv:
-    HAYSTACK_ENABLE_REGISTRATIONS = False
-HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
-HAYSTACK_SEARCH_ENGINE = 'xapian'
-HAYSTACK_XAPIAN_PATH = "/var/openPLM/xapian_index/"
-HAYSTACK_INCLUDE_SPELLING = True
-EXTRACTOR = os.path.abspath(os.path.join(os.path.dirname(__file__), "bin", "extractor.sh"))
+#if "rebuild_index" not in sys.argv:
+#HAYSTACK_ENABLE_REGISTRATIONS = False
+#HAYSTACK_SITECONF = 'openPLM.plmapp.search_sites'
+#HAYSTACK_SEARCH_ENGINE = 'xapian'
+#HAYSTACK_XAPIAN_PATH = "/var/openPLM/xapian_index/"
+#EXTRACTOR = os.path.abspath(os.path.join(os.path.dirname(__file__), "bin", "extractor.sh"))
+import os 
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR,'openPLM/templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+MEDIA_URL='/media/'
+MEDIA_ROOT=BASE_DIR/"media"
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://localhost:9001/solr/default',
+        'TIMEOUT': 60 * 5,
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
+    },
+    'autocomplete': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': '/home/search/whoosh_index',
+        'STORAGE': 'file',
+        'POST_LIMIT': 128 * 1024 * 1024,
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
+    },
+    'db': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
+    }
+}
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
 # celery stuff
-import djcelery
-djcelery.setup_loader()
+#import djcelery
+#djcelery.setup_loader()
 
 BROKER_HOST = "localhost"
 BROKER_PORT = 5672
